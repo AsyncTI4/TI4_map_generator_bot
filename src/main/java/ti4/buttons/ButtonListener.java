@@ -1468,8 +1468,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you sure you want to proceed?", buttons);
                 }
                 for(Player player_ : activeMap.getRealPlayers()){
-                    if(!player_.isPlayerMemberOfAlliance(player)||FoWHelper.playerHasUnitsInSystem(player_, activeMap.getTileByPosition(pos))){
-                        String msgA = Helper.getPlayerRepresentation(player, activeMap) + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. ";
+                    if(!player_.isPlayerMemberOfAlliance(player)&&FoWHelper.playerHasUnitsInSystem(player_, activeMap.getTileByPosition(pos))){
+                        String msgA = Helper.getPlayerRepresentation(player_, activeMap) + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. ";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
                     }
                 }
