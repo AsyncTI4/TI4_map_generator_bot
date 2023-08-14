@@ -70,6 +70,9 @@ public class AgendaHelper {
                         player2.setSearchWarrant();
                         activeMap.drawSecretObjective(player2.getUserID());
                         activeMap.drawSecretObjective(player2.getUserID());
+                        if(player2.hasAbility("plausible_deniability")){
+                            activeMap.drawSecretObjective(player2.getUserID());
+                        }
                         SOInfo.sendSecretObjectiveInfo(activeMap, player2, event);
                          MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Drew elected 2 SOs and set their SO info as public");
@@ -166,6 +169,10 @@ public class AgendaHelper {
                    if(agID.equalsIgnoreCase("secret")){
                         String message = "Drew Secret Objective for the elected player";
                         activeMap.drawSecretObjective(player2.getUserID());
+                        if(player2.hasAbility("plausible_deniability")){
+                            activeMap.drawSecretObjective(player2.getUserID());
+                            message = message +". Drew a second SO due to plausible deniability";
+                        }
                         SOInfo.sendSecretObjectiveInfo(activeMap, player2, event);
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                    }

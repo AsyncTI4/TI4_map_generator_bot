@@ -885,7 +885,16 @@ public class ButtonListener extends ListenerAdapter {
             }
                     event.getMessage().editMessage(editedMessage).queue();
 
-            // MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            // MessageHelper.sendMessageToChannel(event.getChannel(), message);resFrontier_
+         } else if (buttonID.startsWith("resFrontier_")) {
+            buttonID = buttonID.replace("resFrontier_", "");
+            String[] stuff = buttonID.split("_");
+            String cardChosen = stuff[0];
+            String pos = stuff[1];
+            String cardRefused = stuff[2];
+            activeMap.addExplore(cardRefused);
+            new ExpFrontier().expFrontAlreadyDone(event, activeMap.getTileByPosition(pos), activeMap, player, cardChosen);
+            event.getMessage().delete().queue();
          } else if (buttonID.startsWith("pillage_")) {
             ButtonHelperFactionSpecific.pillage(buttonID, event, activeMap, player, ident, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("exhaust_")) {
@@ -1995,6 +2004,10 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
+                    if(player.hasAbility("plausible_deniability")){
+                        activeMap.drawSecretObjective(player.getUserID());
+                        message = message + ". Drew a second SO due to plausible deniability";
+                    }
                     player.addFollowedSC(8);
                     SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
