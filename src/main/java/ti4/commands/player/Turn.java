@@ -341,7 +341,8 @@ public class Turn extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
             
         }
-        Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
+        Player solPlayer =  Helper.getPlayerFromUnit(activeMap, "sol_flagship");
+        
 
         if (solPlayer != null) {
             String colorID = Mapper.getColorID(solPlayer.getColor());

@@ -526,6 +526,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
             writer.write(System.lineSeparator());
 
@@ -567,6 +570,11 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + String.join(",", player.getFrankenBagToPass()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + String.join(",", player.getFrankenBagPersonal()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -1602,6 +1610,8 @@ public class MapSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_BAG_TO_PASS -> player.setFrankenBagToPass(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_PERSONAL_BAG -> player.setFrankenBagPersonal(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<String>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
@@ -1685,6 +1695,7 @@ public class MapSaveLoadManager {
                     player.setFogFilter(filter);
                 }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
