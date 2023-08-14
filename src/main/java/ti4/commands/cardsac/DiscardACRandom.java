@@ -49,6 +49,9 @@ public class DiscardACRandom extends ACCardsSubcommandData {
         
     }
     public void discardRandomAC(GenericInteractionCreateEvent event, Map activeMap, Player player, int count){
+        if(count < 1){
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
