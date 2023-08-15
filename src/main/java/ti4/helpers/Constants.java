@@ -4,6 +4,10 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Constants {
+
+    public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
+    public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
+    public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
