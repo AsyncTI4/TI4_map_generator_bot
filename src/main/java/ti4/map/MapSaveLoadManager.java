@@ -40,9 +40,9 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
+import ti4.model.FactionModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
-import ti4.model.FactionModel;
 
 public class MapSaveLoadManager {
 
@@ -103,6 +103,7 @@ public class MapSaveLoadManager {
         }
         
         if (activeMap.isDiscordantStarsMode()) {
+            DiscordantStarsHelper.checkOlradinMech(activeMap);
             DiscordantStarsHelper.checkGardenWorlds(activeMap);
             DiscordantStarsHelper.checkSigil(activeMap);
         }
@@ -467,7 +468,6 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSet());
         writer.write(System.lineSeparator());
-
         ObjectMapper mapper = new ObjectMapper();
         String anomaliesJson = mapper.writeValueAsString(activeMap.getBorderAnomalies()); //much easier than manually (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
@@ -510,7 +510,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
+             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
@@ -528,7 +528,7 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
             writer.write(System.lineSeparator());
-
+            
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
             writer.write(System.lineSeparator());
 
