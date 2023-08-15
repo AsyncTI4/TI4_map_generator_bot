@@ -103,7 +103,7 @@ public class MapSaveLoadManager {
         }
         
         if (activeMap.isDiscordantStarsMode()) {
-            DiscordantStarsHelper.checkOlradinMech(activeMap);
+//            DiscordantStarsHelper.checkOlradinMech(activeMap);
             DiscordantStarsHelper.checkGardenWorlds(activeMap);
             DiscordantStarsHelper.checkSigil(activeMap);
         }
