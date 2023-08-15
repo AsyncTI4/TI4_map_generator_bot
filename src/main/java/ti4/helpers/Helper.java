@@ -210,6 +210,7 @@ public class Helper {
         }
         return player;
     }
+
     @Nullable
     public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
@@ -751,7 +752,7 @@ public class Helper {
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, boolean ac) {
         List<Button> planetButtons = new ArrayList<>();
-                List<String> planets = new ArrayList<>(player.getPlanets(activeMap));
+        List<String> planets = new ArrayList<>(player.getPlanets(activeMap));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         for (String planet : planets) {
             if (!Helper.getPlanetRepresentation(planet,activeMap).toLowerCase().contains("mecatol") || ac) {
@@ -1848,31 +1849,6 @@ public class Helper {
 
         }
         if (numMechs > 0 ) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    
-    public static boolean oneMechCheck(String planetName, Map activeMap, Player player) {
-        String message = "";
-        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
-
-        if (unitHolder.getUnits() != null) {
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
-            }
-
-        }
-        if (numMechs == 1 ) {
             return true;
         } else {
             return false;
