@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Constants {
-
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
     public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
@@ -841,8 +840,6 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
-    public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
-    public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
     public static final String SET_POLICY = "set_policy";
     public static final String SET_PEOPLE = "set_people";
     public static final String SET_ENVIRONMENT = "set_environment";
