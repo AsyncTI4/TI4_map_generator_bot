@@ -198,7 +198,18 @@ public class Helper {
         }
         return player;
     }
-
+    public static Player getPlayerFromUnit(Map activeMap, String unit) {
+        Player player = null;
+        if (unit != null) {
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_.isRealPlayer() && player_.getUnitsOwned().contains(unit)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
     @Nullable
     public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
@@ -624,7 +635,7 @@ public class Helper {
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
+        List<String> planets = new ArrayList<>(player.getPlanets(activeMap));
         for (String planet : planets) {
             Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
@@ -740,7 +751,7 @@ public class Helper {
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, boolean ac) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
+                List<String> planets = new ArrayList<>(player.getPlanets(activeMap));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         for (String planet : planets) {
             if (!Helper.getPlanetRepresentation(planet,activeMap).toLowerCase().contains("mecatol") || ac) {
