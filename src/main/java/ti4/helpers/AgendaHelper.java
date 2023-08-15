@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
@@ -66,6 +67,17 @@ public class AgendaHelper {
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Added Law with " + winner + " as the elected!");
+                    if(agID.equalsIgnoreCase("warrant")){
+                        player2.setSearchWarrant();
+                        activeMap.drawSecretObjective(player2.getUserID());
+                        activeMap.drawSecretObjective(player2.getUserID());
+                        if(player2.hasAbility("plausible_deniability")){
+                            activeMap.drawSecretObjective(player2.getUserID());
+                        }
+                        SOInfo.sendSecretObjectiveInfo(activeMap, player2, event);
+                         MessageHelper.sendMessageToChannel(event.getChannel(),
+                            "Drew elected 2 SOs and set their SO info as public");
+                    }
                 } else {
                     if (winner.equalsIgnoreCase("for")) {
                         activeMap.addLaw(aID, null);
@@ -86,6 +98,30 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Gave everyone 1 extra fleet CC");
 
                         }   
+                    }
+                      if(agID.equalsIgnoreCase("conventions")){
+                        List<Player> winOrLose = null;
+                        if (!winner.equalsIgnoreCase("for")) {
+                            winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
+                            for(Player playerWL : winOrLose){
+                               new DiscardACRandom().discardRandomAC(event, activeMap, playerWL, playerWL.getAc());
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Discarded the ACs of those who voted against");
+                        }
+                    }
+                    if(agID.equalsIgnoreCase("sanctions")){
+                        List<Player> winOrLose = null;
+                        if (!winner.equalsIgnoreCase("for")) {
+                            winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
+                            for(Player playerWL : activeMap.getRealPlayers()){
+                               new DiscardACRandom().discardRandomAC(event, activeMap, playerWL,1);
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Discarded 1 random AC of each player");
+                        }else{
+                             for(Player playerWL : activeMap.getRealPlayers()){
+                               ButtonHelper.checkACLimit(activeMap, event, playerWL);
+                            }
+                        }
                     }
                     if (activeMap.getCurrentAgendaInfo().contains("Secret")) {
                         activeMap.addLaw(aID, winner);
@@ -128,7 +164,37 @@ public class AgendaHelper {
                     }
                 }
             } else {
-                 
+                   if (activeMap.getCurrentAgendaInfo().contains("Player")) {
+                    Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, winner);
+                   if(agID.equalsIgnoreCase("secret")){
+                        String message = "Drew Secret Objective for the elected player";
+                        activeMap.drawSecretObjective(player2.getUserID());
+                        if(player2.hasAbility("plausible_deniability")){
+                            activeMap.drawSecretObjective(player2.getUserID());
+                            message = message +". Drew a second SO due to plausible deniability";
+                        }
+                        SOInfo.sendSecretObjectiveInfo(activeMap, player2, event);
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                   }
+                   if(agID.equalsIgnoreCase("execution")){
+                        String message = "Discarded elected player's ACs and exhausted all their planets (not technically the way its done but for the most part equivalent)";
+                        new DiscardACRandom().discardRandomAC(event, activeMap, player2, player2.getAc());
+                        for (String planet : player2.getPlanets()) {
+                            player2.exhaustPlanet(planet);
+                        }
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                   }
+                   if(agID.equalsIgnoreCase("grant_reallocation")){
+                        activeMap.setComponentAction(true);
+                        Button getTech = Button.success("acquireATech", "Get a tech");
+                        List<Button> buttons = new ArrayList<Button>();
+                        buttons.add(getTech);
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player2, activeMap), Helper.getPlayerRepresentation(player2, activeMap)+" Use the button to get a tech", buttons);
+                   }
+
+
+
+                }
                 
                 if(agID.equalsIgnoreCase("mutiny")){
                     List<Player> winOrLose = null;
@@ -149,6 +215,24 @@ public class AgendaHelper {
                     }
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());     
                 }
+                 if(agID.equalsIgnoreCase("seed_empire")){
+                    List<Player> winOrLose = null;
+                    StringBuilder message = new StringBuilder("");
+                    Integer poIndex = 5;
+                    poIndex = activeMap.addCustomPO("Seed", 1);
+                    if (winner.equalsIgnoreCase("for")) {
+                        winOrLose = AgendaHelper.getPlayersWithMostPoints(activeMap);
+                    }else{
+                        winOrLose = AgendaHelper.getPlayersWithLeastPoints(activeMap);
+
+                    }
+                    message.append("Custom PO 'Seed' has been added.\n");
+                    for(Player playerWL : winOrLose){
+                        activeMap.scorePublicObjective(playerWL.getUserID(), poIndex);
+                        message.append(Helper.getPlayerRepresentation(playerWL, activeMap)).append(" scored 'Seed'\n");
+                    }
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());     
+                }
                 if(agID.equalsIgnoreCase("plowshares")){
                     if (winner.equalsIgnoreCase("for")) {
                         for(Player playerB : activeMap.getRealPlayers()){
@@ -160,6 +244,32 @@ public class AgendaHelper {
                         }
                     }   
                 }
+                 if(agID.equalsIgnoreCase("unconventional")){
+                        List<Player> winOrLose = null;
+                        if (!winner.equalsIgnoreCase("for")) {
+                            winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
+                            for(Player playerWL : winOrLose){
+                               new DiscardACRandom().discardRandomAC(event, activeMap, playerWL, playerWL.getAc());
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Discarded the ACs of those who voted for");
+                        }else{
+                            winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
+                            for(Player playerWL : winOrLose){
+                                activeMap.drawActionCard(playerWL.getUserID());
+                                activeMap.drawActionCard(playerWL.getUserID());
+                                if(playerWL.hasAbility("scheming")){
+                                    activeMap.drawActionCard(playerWL.getUserID());
+                                }
+                                ACInfo.sendActionCardInfo(activeMap, playerWL, event);
+                                if(playerWL.getLeaderIDs().contains("yssarilcommander") && !playerWL.hasLeaderUnlocked("yssarilcommander")){
+                                    ButtonHelper.commanderUnlockCheck(playerWL, activeMap, "yssaril", event);
+                                }
+                                ButtonHelper.checkACLimit(activeMap, event, playerWL);
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Drew 2 AC for each of the players who voted for");
+                        }
+                }
+
                 if(agID.equalsIgnoreCase("economic_equality")){
                     int tg = 0;
                     if (winner.equalsIgnoreCase("for")) {
@@ -975,7 +1085,7 @@ public class AgendaHelper {
                         if(specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")){
                             activeMap.setComponentAction(true);
                             Button getTech = Button.success("acquireATech", "Get a tech");
-                            List<Button> buttons = new ArrayList();
+                            List<Button> buttons = new ArrayList<Button>();
                             buttons.add(getTech);
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity+" resolve Technology Rider by using the button to get a tech", buttons);
                         }
@@ -1153,7 +1263,36 @@ public class AgendaHelper {
         }
         return losers;
     }
-
+public static List<Player> getPlayersWithMostPoints(Map activeMap) {
+        List<Player> losers = new ArrayList<Player>();
+        int most = 0;
+        for(Player p : activeMap.getRealPlayers()){
+            if(p.getTotalVictoryPoints(activeMap) > most){
+                most = p.getTotalVictoryPoints(activeMap);
+            }
+        }
+        for(Player p : activeMap.getRealPlayers()){
+            if(p.getTotalVictoryPoints(activeMap) == most){
+                losers.add(p);
+            }
+        }
+        return losers;
+    }
+    public static List<Player> getPlayersWithLeastPoints(Map activeMap) {
+        List<Player> losers = new ArrayList<Player>();
+        int least = 20;
+        for(Player p : activeMap.getRealPlayers()){
+            if(p.getTotalVictoryPoints(activeMap) < least){
+                least = p.getTotalVictoryPoints(activeMap);
+            }
+        }
+        for(Player p : activeMap.getRealPlayers()){
+            if(p.getTotalVictoryPoints(activeMap) == least){
+                losers.add(p);
+            }
+        }
+        return losers;
+    }
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         int hasXxchaAlliance = activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
