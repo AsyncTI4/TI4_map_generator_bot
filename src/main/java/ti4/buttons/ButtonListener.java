@@ -712,10 +712,11 @@ public class ButtonListener extends ListenerAdapter {
             String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
             player.addTech(AliasHandler.resolveTech(tech));
+            ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, tech, activeMap);
+            ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeMap);
             if(AliasHandler.resolveTech(tech).equalsIgnoreCase("iihq")){
                 message = message + "\n Automatically added the Custodia Vigilia planet";
             }
-            ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeMap);
             if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
             }
@@ -1477,8 +1478,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you sure you want to proceed?", buttons);
                 }
                 for(Player player_ : activeMap.getRealPlayers()){
-                    if(!player_.isPlayerMemberOfAlliance(player)&&FoWHelper.playerHasUnitsInSystem(player_, activeMap.getTileByPosition(pos))){
-                        String msgA = Helper.getPlayerRepresentation(player_, activeMap) + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. ";
+                    if(!player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)&&FoWHelper.playerHasUnitsInSystem(player_, activeMap.getTileByPosition(pos))){
+                        String msgA = Helper.getPlayerRepresentation(player_, activeMap) + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. You can proceed and float them unless you think they are particularly relevant, or wish to offer a pleading window. ";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
                     }
                 }
@@ -1681,6 +1682,20 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolvePNPlay_")) {
             String pnID = buttonID.replace("resolvePNPlay_", "");
+            if(pnID.contains("ra_")){
+                String tech = pnID.replace("ra_", "");
+                pnID = pnID.replace("_"+tech, "");
+                String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech)) + " via Research Agreement";
+                player.addTech(AliasHandler.resolveTech(tech));
+                ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeMap);
+                if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
+                }
+                if(player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "nekro", event);
+                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), message);
+            }
             ButtonHelper.resolvePNPlay(pnID, player, activeMap, event);
             if(!pnID.equalsIgnoreCase("bmf")){
                 event.getMessage().delete().queue();

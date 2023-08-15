@@ -30,10 +30,13 @@ public class DealSOToAll extends SOCardsSubcommandData {
     public void dealSOToAll(GenericInteractionCreateEvent event, int count, Map activeMap){
         if(count > 0){
             for (Player player : activeMap.getRealPlayers()) {
-                    for (int i = 0; i < count; i++) {
-                        activeMap.drawSecretObjective(player.getUserID());
-                    }
-                    SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+                for (int i = 0; i < count; i++) {
+                    activeMap.drawSecretObjective(player.getUserID());
+                }
+                if(player.hasAbility("plausible_deniability")){
+                    activeMap.drawSecretObjective(player.getUserID());
+                }
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");

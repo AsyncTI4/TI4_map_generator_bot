@@ -17,6 +17,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.model.PromissoryNoteModel;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -172,6 +173,7 @@ public class Turn extends PlayerSubcommandData {
                 List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
                 activeMap.updateActivePlayer(player);
                 activeMap.setCurrentPhase("action");
+                ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeMap);
                 if (isFowPrivateGame) {
                     
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, mainPlayer, "ended turn");
