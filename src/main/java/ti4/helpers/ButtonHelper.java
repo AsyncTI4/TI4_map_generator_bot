@@ -2342,6 +2342,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             if(activeMap.isFoWMode()){
                 FoWHelper.pingAllPlayersWithFullStats(activeMap, event, nextPlayer, "started turn");
             }
+            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeMap);
             
             activeMap.setCurrentPhase("action");
         }
@@ -3522,6 +3523,16 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         if (id.equalsIgnoreCase("terraform")) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, activeMap, event);
         }
+        if (id.equalsIgnoreCase("ms")) {
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeMap, "2gf", "placeOneNDone_skipbuild"));
+            if(owner.getStrategicCC() > 0){
+                owner.setStrategicCC(owner.getStrategicCC()-1);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(owner, activeMap), ButtonHelper.getTrueIdentity(owner, activeMap) + " lost a command counter from strategy pool due to a Military Support play");
+            }
+            String message = ButtonHelper.getTrueIdentity(player, activeMap)+" Use buttons to drop 2 infantry on a planet";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message, buttons);
+        }
        
        
 
@@ -3530,7 +3541,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             // Add extra message for visibility
             FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( player, activeMap),sb.toString());
          if (id.equalsIgnoreCase("fires")) {
             player.addTech("ws");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " acquired Warsun tech");
@@ -3549,16 +3560,11 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the number of comms the player had. ("+player.getTg()+"->"+(player.getTg()+comms)+"). Please follow up with the player if this number seems off";
             player.setTg(player.getTg()+comms);
             ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, owner, player, owner.getCommoditiesTotal(), event);
-
-            if(activeMap.isFoWMode()){
-                MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), reducedMsg2);
-            }else{
-                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), reducedMsg2);
-                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), reducedMsg);
-            }
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(owner, activeMap), reducedMsg);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), reducedMsg2);
         }
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+        PNInfo.sendPromissoryNoteInfo(activeMap, owner, false);
     }
 
 }

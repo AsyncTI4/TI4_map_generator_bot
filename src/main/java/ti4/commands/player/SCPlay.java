@@ -230,7 +230,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
                             } else {
-                                MessageHelper.sendMessageToChannel(event.getMessageChannel(), acqMessage);
+                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), acqMessage);
                             }
                         }
                     }

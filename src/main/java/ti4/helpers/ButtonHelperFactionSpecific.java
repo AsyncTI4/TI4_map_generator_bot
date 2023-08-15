@@ -35,6 +35,42 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void resolveResearchAgreementCheck(Player player, String tech, Map activeMap){
+        if(Helper.getPlayerFromColorOrFaction(activeMap, Mapper.getPromissoryNoteOwner("ra")) == player){
+            if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("")){
+                for(Player p2 : activeMap.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(p2.getPromissoryNotes().containsKey("ra") && !p2.getTechs().contains(tech)){
+                        String msg = ButtonHelper.getTrueIdentity(p2, activeMap) + " the RA owner has researched the tech "+Helper.getTechRepresentation(AliasHandler.resolveTech(tech)) +"Use the below button if you want to play RA to get it.";
+                        Button transact = Button.success("resolvePNPlay_ra_"+AliasHandler.resolveTech(tech), "Acquire "+ tech);
+                        List<Button> buttons = new ArrayList<Button>();
+                        buttons.add(transact);
+                        buttons.add(Button.danger("deleteButtons","Decline"));
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), msg, buttons);
+                    }
+                }
+            }
+        }
+    }
+    public static void resolveMilitarySupportCheck(Player player,  Map activeMap){
+        if(Helper.getPlayerFromColorOrFaction(activeMap, Mapper.getPromissoryNoteOwner("ms")) == player){
+            for(Player p2 : activeMap.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                if(p2.getPromissoryNotes().containsKey("ms")){
+                    String msg = ButtonHelper.getTrueIdentity(p2, activeMap) + " the Military Support owner has started their turn, use the button to play Military Support if you want";
+                    Button transact = Button.success("resolvePNPlay_ms", "Play Military Support ");
+                    List<Button> buttons = new ArrayList<Button>();
+                    buttons.add(transact);
+                    buttons.add(Button.danger("deleteButtons","Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), msg, buttons);
+                }
+            }
+        }
+    }
     public static void resolveNekroCommanderCheck(Player player, String tech, Map activeMap){
         if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")){
             if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("") || !player.hasAbility("technological_singularity")){
