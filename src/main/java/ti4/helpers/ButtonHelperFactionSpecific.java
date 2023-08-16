@@ -551,7 +551,7 @@ public class ButtonHelperFactionSpecific {
     }
     public static void resolveMitosisInf(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         List<Button> buttons = new ArrayList<Button>();
-        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeMap, "gf", "placeOneNDone_skipbuild"));
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeMap, "infantry", "placeOneNDone_skipbuild"));
         String message = ButtonHelper.getTrueIdentity(player, activeMap)+" Use buttons to put 1 infantry on a planet";
         
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), ident + " is resolving mitosis");
@@ -569,16 +569,28 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Map activeMap, String finChecker) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeMap));
+        List<String> tiles = new ArrayList<String>();
         for (String planet : planets) {
             Tile tile =  activeMap.getTile(AliasHandler.resolveTile(planet));
-            for(UnitHolder planetUnit :tile.getUnitHolders().values()){
-                if(planetUnit.getName().equalsIgnoreCase("space")){
+            if(tiles.contains(tile.getPosition())){
+                continue;
+            }else{
+                tiles.add(tile.getPosition());
+            }
+            for(UnitHolder unitHolder :tile.getUnitHolders().values()){
+                if(unitHolder.getName().equalsIgnoreCase("space")){
                     continue;
                 }
-                Planet planetReal =  (Planet) planetUnit;
-                String key = Mapper.getUnitID(AliasHandler.resolveUnit("infantry"), player.getColor());
-                if (planetReal != null   && planetReal.getUnits().containsKey(key)) {
-                    Button button = Button.success(finChecker+"mitoMechPlacement_"+planet, "Place mech on" + Helper.getPlanetRepresentation(planet, activeMap));
+                String colorID = Mapper.getColorID(player.getColor());
+                int numInf = 0;
+                String infKey = colorID + "_gf.png";
+                if (unitHolder.getUnits() != null) {
+                    if (unitHolder.getUnits().get(infKey) != null) {
+                        numInf = unitHolder.getUnits().get(infKey);
+                    }
+                }
+                if (numInf > 0) {
+                    Button button = Button.success(finChecker+"mitoMechPlacement_"+unitHolder.getName().toLowerCase().replace("'","").replace("-","").replace(" ",""), "Place mech on " + Helper.getPlanetRepresentation(unitHolder.getName(), activeMap));
                     planetButtons.add(button);
                 }
             }
@@ -588,7 +600,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveMitosisMechPlacement(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String planetName = buttonID.replace("mitoMechPlacement_","");
         new AddUnits().unitParsing(event, player.getColor(),
-                        activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech", activeMap);
+                        activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech "+planetName, activeMap);
         String key = Mapper.getUnitID(AliasHandler.resolveUnit("infantry"), player.getColor());
         //activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
         new RemoveUnits().removeStuff(event,activeMap.getTile(AliasHandler.resolveTile(planetName)), 1, planetName, key, player.getColor(), false);
