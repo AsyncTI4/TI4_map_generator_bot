@@ -1,6 +1,7 @@
 package ti4.generator;
 
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +54,8 @@ public class Mapper {
     private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
     private static final HashMap<String, UnitModel> units = new HashMap<>();
+    @Getter
+    private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
 
     public static void init() {
@@ -85,6 +88,7 @@ public class Mapper {
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjects("decks.json", decks, DeckModel.class, "could not read decks file");
         importJsonObjects("units.json", units, UnitModel.class, "could not read units file");
+        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
     }
 

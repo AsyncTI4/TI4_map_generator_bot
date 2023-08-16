@@ -21,6 +21,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
 
 public class MapSaveLoadManager {
 
@@ -100,6 +103,7 @@ public class MapSaveLoadManager {
         }
         
         if (activeMap.isDiscordantStarsMode()) {
+//            DiscordantStarsHelper.checkOlradinMech(activeMap);
             DiscordantStarsHelper.checkGardenWorlds(activeMap);
             DiscordantStarsHelper.checkSigil(activeMap);
         }
@@ -462,6 +466,12 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSet());
+        writer.write(System.lineSeparator());
+        ObjectMapper mapper = new ObjectMapper();
+        String anomaliesJson = mapper.writeValueAsString(activeMap.getBorderAnomalies()); //much easier than manually (de)serialising
+        writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.GAME_HAS_ENDED + " " + activeMap.isHasEnded());
         writer.write(System.lineSeparator());
@@ -469,7 +479,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",",activeMap.getRunMigrations()));
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeMap.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -516,6 +526,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
+            writer.write(System.lineSeparator());
+            
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
             writer.write(System.lineSeparator());
 
@@ -541,15 +554,6 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
-            //MIGRATION CODE - TODO: remove after the first save/load of all maps
-            if (player.getUnitsOwned().isEmpty()) {
-                String playerFaction = player.getFaction();
-                if (playerFaction != null) {
-                    FactionModel factionModel = Mapper.getFactionSetup(playerFaction);
-                    if (factionModel != null) player.setUnitsOwned(new HashSet<String>(factionModel.getUnits()));
-                }    
-            }
-
             writer.write(Constants.UNITS_OWNED + " " + String.join(",", player.getUnitsOwned()));
             writer.write(System.lineSeparator());
 
@@ -566,6 +570,11 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + String.join(",", player.getFrankenBagToPass()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + String.join(",", player.getFrankenBagPersonal()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -592,6 +601,10 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.TG + " " + player.getTg());
             writer.write(System.lineSeparator());
+
+            writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
@@ -609,12 +622,12 @@ public class MapSaveLoadManager {
             writer.write(Constants.CAPTURE + " " + units);
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.UNIT_CAP + " " + getUnitCapList(player.getUnitCaps()));
+            writer.write(Constants.UNIT_CAP + " " + getStringRepresentationOfMap(player.getUnitCaps()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
+            writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
+            writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
@@ -693,18 +706,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static String getSecretList(LinkedHashMap<String, Integer> secrets) {
+    private static String getStringRepresentationOfMap(java.util.Map<String, Integer> map) {
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
-            sb.append(so.getKey()).append(",").append(so.getValue()).append(";");
-        }
-        return sb.toString();
-    }
-
-    public static String getUnitCapList(HashMap<String, Integer> unitCaps) {
-        StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> unitCap : unitCaps.entrySet()) {
-            sb.append(unitCap.getKey()).append(",").append(unitCap.getValue()).append(";");
+        for (java.util.Map.Entry<String, Integer> entry : map.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         return sb.toString();
     }
@@ -1058,6 +1063,7 @@ public class MapSaveLoadManager {
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> activeMap.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> activeMap.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.STRATEGY_CARD_SET -> activeMap.setScSet(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
 
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
@@ -1072,6 +1078,16 @@ public class MapSaveLoadManager {
                     }
 
                     activeMap.setCustomAdjacentTiles(adjacentTilesMigrated);
+                }
+                case Constants.BORDER_ANOMALIES -> {
+                    if(info.equals("[]"))
+                        break;
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        activeMap.setBorderAnomalies(mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>(){}));
+                    } catch (Exception e) {
+                        BotLogger.log("Error reading border anomalies from save file!", e);
+                    }
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
@@ -1441,9 +1457,10 @@ public class MapSaveLoadManager {
                 }
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
-    
+
                     while (migrationInfo.hasMoreTokens()) {
-                        activeMap.addMigration(migrationInfo.nextToken());
+                        String migration = migrationInfo.nextToken();
+                        activeMap.addMigration(migration);
                     }
                 }
             }
@@ -1520,6 +1537,17 @@ public class MapSaveLoadManager {
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DEBT -> {
+                    StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>();
+                    while (debtToken.hasMoreTokens()) {
+                        StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
+                        String colour = debtInfo.nextToken();
+                        Integer count = Integer.parseInt(debtInfo.nextToken());
+                        debtTokens.put(colour, count);
+                    }
+                    player.setDebtTokens(debtTokens);
+                }
                 case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<Integer>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<Integer>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
@@ -1582,6 +1610,8 @@ public class MapSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_BAG_TO_PASS -> player.setFrankenBagToPass(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_PERSONAL_BAG -> player.setFrankenBagPersonal(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<String>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
@@ -1665,6 +1695,7 @@ public class MapSaveLoadManager {
                     player.setFogFilter(filter);
                 }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));

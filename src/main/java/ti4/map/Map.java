@@ -1,5 +1,9 @@
 package ti4.map;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +30,9 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
+import ti4.model.DeckModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -95,12 +102,17 @@ public class Map {
     private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
+
+    @Getter @Setter @ExportableField
+    private String scSet = null;
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode = false;
     private boolean hasEnded = false;
     private long endedDate;
+    @Getter @Setter
+    private List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
     @Nullable
     private String tableTalkChannelID = null;
     @Nullable
@@ -263,6 +275,23 @@ public class Map {
     public int getNumberOfSOsInTheDeck(){
         return secretObjectives.size();
     }
+
+    public boolean hasBorderAnomalyOn(String tile, Integer direction) {
+        List anomaliesOnBorder = this.borderAnomalies.stream()
+                .filter(anomaly -> !anomaly.getType().equals(BorderAnomalyModel.BorderAnomalyType.ARROW))
+                .filter(anomaly -> anomaly.getTile().equals(tile))
+                .filter(anomaly -> anomaly.getDirection() == direction)
+                .collect(Collectors.toList());
+        return CollectionUtils.isNotEmpty(anomaliesOnBorder);
+    }
+    public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
+        this.borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
+    }
+
+    public void removeBorderAnomaly(String tile, Integer direction) {
+        this.borderAnomalies.removeIf(anom -> anom.getTile().equals(tile) && anom.getDirection() == direction);
+    }
+
     public int getNumberOfSOsInPlayersHands(){
         int soNum = 0;
         for(Player player : getPlayers().values()){
@@ -2136,6 +2165,28 @@ public class Map {
         this.actionCards = actionCards;
     }
 
+    public void validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        if (this.getDiscardActionCards().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
+            return;
+        }
+        for (Player player : this.getPlayers().values()) {
+            if (player.getActionCards().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
+                return;
+            }
+        }
+        this.setActionCards(deck.getShuffledCardList());
+    }
+
+    public void validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        if (this.getDiscardAgendas().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
+            return;
+        }
+        this.setAgendas(deck.getShuffledCardList());
+    }
+
     @JsonSetter
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
         this.discardActionCards = discardActionCards;
@@ -2507,9 +2558,7 @@ public class Map {
     }
 
     public void addMigration(String string) {
-        if(!this.runDataMigrations.contains(string)){
-            this.runDataMigrations.add(string);    
-        }
+        this.runDataMigrations.add(string);    
     }
 
     public ArrayList<String> getRunMigrations(){

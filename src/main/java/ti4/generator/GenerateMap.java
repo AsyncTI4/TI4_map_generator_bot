@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,8 @@ import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
@@ -32,6 +35,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -246,6 +250,10 @@ public class GenerateMap {
                 tileMap.remove(null);
                 Set<String> tiles = tileMap.keySet();
                 Set<String> tilesWithExtra = new HashSet<String>(activeMap.getAdjacentTileOverrides().values());
+                tilesWithExtra.addAll(activeMap.getBorderAnomalies().stream()
+                        .map(BorderAnomalyHolder::getTile)
+                        .collect(Collectors.toSet()));
+
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Tile));
                 tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Extras));
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Units));
@@ -548,6 +556,10 @@ public class GenerateMap {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, activeMap);
                 }
 
+                if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
+                    xDelta = debtInfo(player, xDelta, yPlayArea, activeMap);
+                }
+
                 if (!player.getAbilities().isEmpty()) {
                     xDelta = abilityInfo(player, xDelta, yPlayArea, activeMap);
                 }
@@ -756,7 +768,6 @@ public class GenerateMap {
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
-
                 Collection<Player> players = activeMap.getPlayers().values();
                 for (Player player_ : players) {
                     if (player_ != player) {
@@ -789,6 +800,77 @@ public class GenerateMap {
             }
         }
         return x + deltaX + 20;
+    }
+
+    private int debtInfo(Player player, int x, int y, Map activeMap) {
+        int deltaX = 0;
+        int deltaY = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+             
+        String bankImage = "vaden".equals(player.getFaction().toLowerCase()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png"; //TODO: add generic bank image
+        drawPAImage(x + deltaX, y, bankImage);
+        
+        deltaX += 24;
+        deltaY += 2;
+
+        BufferedImage factionImage = null;
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
+
+        int tokenDeltaY = 0;
+        int playerCount = 0;
+        int maxTokenDeltaX = 0;
+        for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
+            int tokenDeltaX = 0;
+            String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            if (controlID.contains("null")) {
+                continue;
+            }
+            factionImage = null;
+            float scale = 0.60f;
+            if (!convertToGeneric) {
+                String faction = getFactionByControlMarker(activeMap.getPlayers().values(), controlID);
+                if (faction != null) {
+                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                    if (factionImagePath != null) {
+                        try {
+                            factionImage = resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
+                    }
+                }
+            }
+
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), scale);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+
+            for (int i = 0; i < debtToken.getValue(); i++) {
+                graphics.drawImage(bufferedImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                if (!convertToGeneric) {
+                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                }
+                tokenDeltaX += 15;
+            }
+            tokenDeltaY += 29;
+            maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
+            playerCount++;
+            if (playerCount % 5 == 0) {
+                tokenDeltaY = 0;
+                deltaX += maxTokenDeltaX;
+                maxTokenDeltaX = 0;
+            }
+        }
+        deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
+        graphics.setColor(Color.WHITE);
+        graphics.drawRect(x - 2, y - 2, deltaX, 152);
+
+        return x + deltaX + 10;
     }
 
     private int abilityInfo(Player player, int x, int y, Map activeMap) {
@@ -1102,7 +1184,7 @@ public class GenerateMap {
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
                 || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy") || colorID.startsWith("eth")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
@@ -1510,9 +1592,7 @@ public class GenerateMap {
                 AffineTransform originalTransform = g2.getTransform();
                 g2.rotate(Math.toRadians(-90));
                 g2.setFont(Storage.getFont20());
-                String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).isPresent() ?
-                        Mapper.getPlanet(planetName).getShortName() :
-                        Mapper.getPlanet(planetName).getName();
+                String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).orElse(Mapper.getPlanet(planetName).getName());
                 g2.drawString(name.substring(0, Math.min(name.length(), 10)).toUpperCase(),
                         (y+146)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                         x + 6 + g2.getFontMetrics().getHeight()/2);
@@ -2484,7 +2564,7 @@ public class GenerateMap {
                 return new Color(186, 193, 195);
             case "sunset":
                 return new Color(173, 106, 248);
-            case "torquoise":
+            case "turquoise":
                 return new Color(37, 255, 232);
             case "gold":
                 return new Color(215, 1, 247);
@@ -2508,6 +2588,8 @@ public class GenerateMap {
                 return Color.decode("#d59de2");
             case "spring":
                 return Color.decode("#cedd8e");
+            case "ethereal":
+                return Color.decode("#31559e");
             default:
                 return Color.WHITE;
         }
@@ -2625,10 +2707,14 @@ public class GenerateMap {
                 int direction = 0;
                 for (String secondaryTile : adj) {
                     if (secondaryTile != null) {
-                        addAdjacencyArrow(tile, direction, secondaryTile, tileGraphics, activeMap);
+                        addBorderDecoration(tile, direction, secondaryTile, tileGraphics, activeMap, BorderAnomalyModel.BorderAnomalyType.ARROW);
                     }
                     direction++;
                 }
+                activeMap.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+                    if(borderAnomalyHolder.getTile().equals(tile.getPosition()))
+                        addBorderDecoration(tile, borderAnomalyHolder.getDirection(), null, tileGraphics, activeMap, borderAnomalyHolder.getType());
+                });
             }
             case Units -> {
                 if (tileIsFoggy) return tileOutput;
@@ -2698,70 +2784,48 @@ public class GenerateMap {
         return outputImage;
     }
 
-    private static void addAdjacencyArrow(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap) {
-        int deltaX = 0;
-        int deltaY = 0;
-        int textOffsetX = 12;
-        int textOffsetY = 40;
-        BufferedImage arrowImage = null;
+    private static void addBorderDecoration(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap, BorderAnomalyModel.BorderAnomalyType decorationType) {
+        Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
-        int degrees = 0;
-        switch (direction) {
-            case 0 -> {
-                deltaX = 118;
-                deltaY = -28;
-                degrees = 0;
-            }
-            case 1 -> {
-                deltaX = 257;
-                deltaY = 26;
-                degrees = 60;
-            }
-            case 2 -> {
-                deltaX = 283;
-                deltaY = 167;
-                degrees = 300;
-                textOffsetY = 25;
-            }
-            case 3 -> {
-                deltaX = 167;
-                deltaY = 273;
-                degrees = 0;
-                textOffsetY = 25;
-            }
-            case 4 -> {
-                deltaX = 28;
-                deltaY = 210;
-                degrees = 60;
-                textOffsetY = 25;
-            }
-            case 5 -> {
-                deltaX = 0;
-                deltaY = 69;
-                degrees = 300;
-            }
-        }
+        BufferedImage borderDecorationImage = null;
+
         try {
-            BufferedImage outputImage = ImageIO.read(new File(Helper.getAdjacencyOverridePath(direction)));
-            arrowImage = outputImage;
+            borderDecorationImage = ImageIO.read(decorationType.getImageFile());
+        } catch (Exception e) {
+            BotLogger.log("Could not find border decoration image! Decoration was " + decorationType.toString());
+            return;
+        }
+        int imageCenterX = borderDecorationImage.getWidth()/2;
+        int imageCenterY = borderDecorationImage.getHeight()/2;
 
-            Graphics arrow = arrowImage.getGraphics();
+        AffineTransform originalTileTransform = tileGraphics2d.getTransform();
+        //Translate the graphics so that a rectangle drawn at 0,0 with same size as the tile (345x299) is centered
+        tileGraphics2d.translate(100, 100);
+        int centerX = 173;
+        int centerY = 150;
 
-            arrow.setFont(Storage.getFont16());
-            if (secondaryTile.length() > 3) {
-                arrow.setFont(Storage.getFont14());
-            }
+        if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
+            int textOffsetX = 11;
+            int textOffsetY = 40;
+            Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
+            AffineTransform arrowTextTransform = arrow.getFont().getTransform();
+
+            arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
             arrow.setColor(Color.BLACK);
+
+            if(direction >= 2 && direction <= 4) { //all the south directions
+                arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
+                textOffsetY = 25;
+            }
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+            arrow.setTransform(arrowTextTransform);
+        }
 
-            double rotation = Math.toRadians(degrees);
-            double rotateX = arrowImage.getWidth() / 2;
-            double rotateY = arrowImage.getHeight() / 2;
-            AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-
-            tileGraphics.drawImage(op.filter(arrowImage, null), TILE_PADDING + deltaX, TILE_PADDING + deltaY, null);
-        } catch (Exception e) {}
+        tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
+        if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW))
+            centerX -= 20;
+        tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
+        tileGraphics2d.setTransform(originalTileTransform);
     }
 
     private static void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Map activeMap, Player frogPlayer, Boolean isFrogPrivate) {
@@ -3136,7 +3200,7 @@ public class GenerateMap {
             if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
                     || unitID.startsWith("gld") || unitID.startsWith("lme") || unitID.startsWith("lvn") || unitID.startsWith("rse")
-                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy")) {
+                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy") || unitID.startsWith("eth")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {

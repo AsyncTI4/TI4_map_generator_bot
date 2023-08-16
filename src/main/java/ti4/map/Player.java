@@ -3,6 +3,8 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -34,6 +36,7 @@ public class Player {
     private String userName;
 
     private boolean passed = false;
+    private boolean readyToPassBag= false;
     private boolean searchWarrant = false;
     private boolean isDummy = false;
 
@@ -69,6 +72,8 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> frankenBagPersonal = new ArrayList<>();
+    private List<String> frankenBagToPass = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -78,10 +83,10 @@ public class Player {
     @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
 
-    private HashMap<String,String> debt_tokens = new HashMap<>();
-    private HashMap<String,String> fow_seenTiles = new HashMap<>();
-    private HashMap<String,Integer> unitCaps = new HashMap<>();
-    private HashMap<String,String> fow_customLabels = new HashMap<>();
+    private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); //colour, count
+    private HashMap<String, String> fow_seenTiles = new HashMap<>();
+    private HashMap<String, Integer> unitCaps = new HashMap<>();
+    private HashMap<String, String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
 
@@ -198,6 +203,13 @@ public class Player {
         }
         return false;
     }
+    public boolean hasFF2Tech() {
+        if(getTechs().contains("ff2") ||getTechs().contains("hcf2") ||getTechs().contains("dsflorff") ||getTechs().contains("dslizhff"))
+        {
+            return true; 
+        }
+        return false;
+    }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
@@ -214,8 +226,8 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         if (activeMap.isFoWMode()) {
-                threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
-            }
+            threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+        }
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
@@ -281,6 +293,9 @@ public class Player {
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
+        if(activeMap.getName().contains("pbd100") || activeMap.getName().contains("pbd500")){
+            isPrivateChannel = true;
+        }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
@@ -305,6 +320,13 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+     public boolean isReadyToPassBag() {
+        return readyToPassBag;
+    }
+
+    public void setReadyToPassBag(boolean passed) {
+        readyToPassBag= passed;
     }
 
     public HashSet<String> getAbilities() {
@@ -1116,6 +1138,12 @@ public class Player {
     public List<String> getTechs() {
         return techs;
     }
+    public List<String> getFrankenBagPersonal() {
+        return frankenBagPersonal;
+    }
+    public List<String> getFrankenBagToPass() {
+        return frankenBagToPass;
+    }
 
     public boolean hasTech(String techID) {
         return techs.contains(techID);
@@ -1124,13 +1152,40 @@ public class Player {
     public boolean hasTechReady(String techID) {
         return hasTech(techID) && !exhaustedTechs.contains(techID);
     }
-
     public List<String> getPlanets() {
         return planets;
+    }
+    public boolean isPlayerMemberOfAlliance(Player player2) {
+        return allianceMembers.contains(player2.getFaction());
+    }
+
+    public List<String> getPlanets(ti4.map.Map activeMap) {
+        List<String> newPlanets = new ArrayList<String>();
+        newPlanets.addAll(planets);
+        if(!allianceMembers.equalsIgnoreCase("")){
+            for(Player player2 : activeMap.getRealPlayers()){
+                if(getAllianceMembers().contains(player2.getFaction())){
+                    newPlanets.addAll(player2.getPlanets());
+                }
+            }
+        }
+        return newPlanets;
     }
 
     public void setPlanets(List<String> planets) {
         this.planets = planets;
+    }
+    public void setFrankenBagPersonal(List<String> planets) {
+        frankenBagPersonal = planets;
+    }
+    public void setFrankenBagToPass(List<String> planets) {
+        frankenBagToPass = planets;
+    }
+
+    public List<String> getReadiedPlanets() {
+        List<String> planets = new ArrayList<>(getPlanets());
+        planets.removeAll(getExhaustedPlanets());
+        return planets;
     }
 
     public List<String> getExhaustedPlanets() {
@@ -1200,6 +1255,18 @@ public class Player {
 
         doAdditionalThingsWhenAddingTech(techID);
     }
+    public void addToFrankenPersonalBag(String thing) {
+        if (frankenBagPersonal.contains(thing)) {
+            return;
+        }
+        frankenBagPersonal.add(thing);
+    }
+    public void addToFrankenPassingBag(String thing) {
+        if (frankenBagToPass.contains(thing)) {
+            return;
+        }
+        frankenBagToPass.add(thing);
+    }
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
@@ -1239,6 +1306,9 @@ public class Player {
         if (isRemoved) removeTech(tech);
         refreshTech(tech);
         //TODO: Remove unitupgrade -> fix owned units
+    }
+    public void removeElementFromBagToPass(String tech) {
+        frankenBagToPass.remove(tech);
     }
 
     public void addPlanet(String planet) {
@@ -1461,5 +1531,39 @@ public class Player {
 
     public void setHasFoundUnkFrag(boolean hasFoundUnkFrag) {
         this.hasFoundUnkFrag = hasFoundUnkFrag;
+    }
+
+    public Map<String, Integer> getDebtTokens() {
+        return debt_tokens;
+    }
+
+    public void setDebtTokens(Map<String, Integer> debt_tokens) {
+        this.debt_tokens = debt_tokens;
+    }
+
+    public void addDebtTokens(String tokenColour, int count) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) + count);
+        } else {
+            debt_tokens.put(tokenColour, count);
+        }
+    }
+
+    public void removeDebtTokens(String tokenColour, int count) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, Math.max(debt_tokens.get(tokenColour) - count, 0));
+        }
+    }
+
+    public void clearAllDebtTokens(String tokenColour) {
+        debt_tokens.remove(tokenColour);
+    }
+
+    public int getDebtTokenCount(String tokenColour) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            return debt_tokens.get(tokenColour);
+        } else {
+            return 0;
+        }
     }
 }

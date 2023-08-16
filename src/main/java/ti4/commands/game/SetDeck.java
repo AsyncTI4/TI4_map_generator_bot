@@ -1,73 +1,85 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.collections4.CollectionUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
+import ti4.model.StrategyCardModel;
 
 public class SetDeck extends GameSubcommandData {
 
+    private List<String> deckTypes;
+
     public SetDeck() {
-        super(Constants.SET_DECK, "Replace a deck with a new deck");
-        addOptions(new OptionData(OptionType.STRING, Constants.DECK_NAME, "Name of the Deck to set").setRequired(true).setAutoComplete(true));
+        super(Constants.SET_DECK, "Change game decks");
+        deckTypes = new ArrayList<>();
+        addDefaultOption(Constants.AC_DECK, "AC");
+        addDefaultOption(Constants.SO_DECK, "SO");
+        addDefaultOption(Constants.STAGE_1_PUBLIC_DECK, "Stage 1 public");
+        addDefaultOption(Constants.STAGE_2_PUBLIC_DECK, "Stage 2 public");
+        addDefaultOption(Constants.RELIC_DECK, "Relic");
+        addDefaultOption(Constants.AGENDA_DECK, "Agenda");
+        addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
+        addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
 
-        String deckID = event.getOption(Constants.DECK_NAME, null, OptionMapping::getAsString);
+        java.util.Map<String, DeckModel> changedDecks = new HashMap<>();
 
-        if (deckID == null || !Mapper.getDecks().containsKey(deckID)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No valid deck was provided."); // Please see `/help list_decks` for available choices.");
-            return;
-        }
+        this.deckTypes.forEach(deckType -> {
+            String value = event.getOption(deckType, null, OptionMapping::getAsString);
+            if (Optional.ofNullable(value).isPresent()) {
+                if(deckType.equals(Constants.STRATEGY_CARD_SET)) {
+                    StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
+                    activeMap.setHomeBrewSCMode(true);
+                    activeMap.setScTradeGoods(new LinkedHashMap<>());
+                    activeMap.setScSet(strategyCardModel.getAlias());
 
-
-
-        DeckModel deck = Mapper.getDecks().get(deckID);
-        switch (deck.getType()) {
-            case "action_card" -> validateAndSetActionCardDeck(event, activeMap, deck);
-            case "agenda" -> validateAndSetAgendaDeck(event, activeMap, deck);
-            case "secret_objective" -> activeMap.setSecretObjectives(deck.getShuffledCardList());
-            case "public_stage_1_objective" -> activeMap.setPublicObjectives1(new ArrayList<>(deck.getShuffledCardList()));
-            case "public_stage_2_objective" -> activeMap.setPublicObjectives2(new ArrayList<>(deck.getShuffledCardList()));
-            case "relic" -> activeMap.setRelics(new ArrayList<>(deck.getShuffledCardList()));
-            case "explore" -> activeMap.setExploreDeck(new ArrayList<>(deck.getShuffledCardList()));
-        }
-        String message = deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n> " + deck.getDescription();
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
-    }
-
-    private void validateAndSetActionCardDeck(SlashCommandInteractionEvent event, Map activeMap, DeckModel deck) {
-        if (activeMap.getDiscardActionCards().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
-            return;
-        }
-        for (Player player : activeMap.getPlayers().values()) {
-            if (player.getActionCards().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
-                return;
+                    strategyCardModel.getCardValues().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
+                }
+                else {
+                    DeckModel deckModel = Mapper.getDecks().get(value);
+                    if(Optional.ofNullable(deckModel).isPresent()) {
+                        switch (deckType) {
+                            case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
+                            case Constants.SO_DECK -> activeMap.setSecretObjectives(deckModel.getShuffledCardList());
+                            case Constants.STAGE_1_PUBLIC_DECK -> activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.STAGE_2_PUBLIC_DECK -> activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.RELIC_DECK -> activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
+                            case Constants.EXPLORATION_DECKS -> activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
+                        }
+                        changedDecks.put(deckModel.getType(), deckModel);
+                    }
+                    else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong, and the deck " + value + " could not be found, try executing the command again (without copy/pasting).");
+                    }
+                }
             }
+        });
+
+        if(CollectionUtils.isNotEmpty(changedDecks.keySet())) {
+            List<String> changeMessage = new ArrayList<>();
+            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n> " + deck.getDescription()));
+            MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
-        activeMap.setActionCards(deck.getShuffledCardList());
     }
 
-    private void validateAndSetAgendaDeck(SlashCommandInteractionEvent event, Map activeMap, DeckModel deck) {
-        if (activeMap.getDiscardAgendas().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
-            return;
-        }
-        activeMap.setAgendas(deck.getShuffledCardList());
+    private void addDefaultOption(String constantName, String descName) {
+        addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
+        this.deckTypes.add(constantName);
     }
-
-
 }

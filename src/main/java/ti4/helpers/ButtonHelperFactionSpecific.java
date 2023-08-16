@@ -35,6 +35,42 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void resolveResearchAgreementCheck(Player player, String tech, Map activeMap){
+        if(Helper.getPlayerFromColorOrFaction(activeMap, Mapper.getPromissoryNoteOwner("ra")) == player){
+            if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("")){
+                for(Player p2 : activeMap.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(p2.getPromissoryNotes().containsKey("ra") && !p2.getTechs().contains(tech)){
+                        String msg = ButtonHelper.getTrueIdentity(p2, activeMap) + " the RA owner has researched the tech "+Helper.getTechRepresentation(AliasHandler.resolveTech(tech)) +"Use the below button if you want to play RA to get it.";
+                        Button transact = Button.success("resolvePNPlay_ra_"+AliasHandler.resolveTech(tech), "Acquire "+ tech);
+                        List<Button> buttons = new ArrayList<Button>();
+                        buttons.add(transact);
+                        buttons.add(Button.danger("deleteButtons","Decline"));
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), msg, buttons);
+                    }
+                }
+            }
+        }
+    }
+    public static void resolveMilitarySupportCheck(Player player,  Map activeMap){
+        if(Helper.getPlayerFromColorOrFaction(activeMap, Mapper.getPromissoryNoteOwner("ms")) == player){
+            for(Player p2 : activeMap.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                if(p2.getPromissoryNotes().containsKey("ms")){
+                    String msg = ButtonHelper.getTrueIdentity(p2, activeMap) + " the Military Support owner has started their turn, use the button to play Military Support if you want";
+                    Button transact = Button.success("resolvePNPlay_ms", "Play Military Support ");
+                    List<Button> buttons = new ArrayList<Button>();
+                    buttons.add(transact);
+                    buttons.add(Button.danger("deleteButtons","Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), msg, buttons);
+                }
+            }
+        }
+    }
     public static void resolveNekroCommanderCheck(Player player, String tech, Map activeMap){
         if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")){
             if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("") || !player.hasAbility("technological_singularity")){
@@ -194,14 +230,13 @@ public class ButtonHelperFactionSpecific {
                 "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
     }
-     public static void resolveLetnevCommanderCheck(Player player, Map activeMap) {
-        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeMap);
+     public static void resolveLetnevCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")){
             int old = player.getTg();
             int newTg = player.getTg()+1;
             player.setTg(player.getTg()+1);
             String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
-            MessageHelper.sendMessageToChannel(channel, mMessage);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
      }
@@ -209,10 +244,82 @@ public class ButtonHelperFactionSpecific {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> empties = new ArrayList<Button>();
         for(Tile tile :activeMap.getTileMap().values()){
-            if(tile.getUnitHolders().values().size() > 1 && FoWHelper.playerHasShipsInSystem(player, tile)){
+            if(tile.getUnitHolders().values().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)){
                 continue;
             }
             empties.add(Button.primary(finChecker+"exploreFront_"+tile.getPosition(), "Explore "+tile.getRepresentationForButtons(activeMap, player)));
+        }
+        return empties;
+    }
+    public static boolean isCabalBlockadedByPlayer(Player player, Map activeMap, Player cabal){
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, cabal, "csd");
+        for(Tile tile : tiles){
+            if(FoWHelper.playerHasShipsInSystem(player, tile) && !FoWHelper.playerHasShipsInSystem(cabal, tile)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void cabalEatsUnit(Player player, Map activeMap, Player cabal, int amount, String unit, GenericInteractionCreateEvent event){
+        String msg = Helper.getPlayerRepresentation(cabal, activeMap, activeMap.getGuild(), true)+" has failed to eat "+amount+" of the "+unit +"s owned by " + Helper.getPlayerRepresentation(player, activeMap) + " because they were blockaded. Wah-wah.";
+        if(!isCabalBlockadedByPlayer(player, activeMap, cabal)){
+            msg = Helper.getFactionIconFromDiscord(cabal.getFaction())+" has devoured "+amount+" of the "+unit +"s owned by " + player.getColor() + ". Chomp chomp.";
+            String color = player.getColor();
+            String unitP = AliasHandler.resolveUnit(unit);
+            if (unitP.contains("ff") || unitP.contains("gf")) {
+                color = cabal.getColor();
+            }
+            msg = msg.replace("Infantrys","infantry");
+            if (unitP.contains("sd") || unitP.contains("pds")) {
+                return;
+            }
+            
+            new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount +" " +unit, activeMap);
+        }
+        if(activeMap.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
+        }else{
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        }
+        
+    }
+    public static void executeCabalHero(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
+        String pos = buttonID.replace("cabalHeroTile_","");
+        Tile tile = activeMap.getTileByPosition(pos);
+        Player cabal = player;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        HashMap<String, Integer> units1 = space.getUnits();
+        String cID = Mapper.getColorID(player.getColor());
+        HashMap<String, Integer> units = new HashMap<String, Integer>();
+        units.putAll(units1);
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeMap, cabal)){
+                ButtonHelper.riftAllUnitsInASystem(pos, event, activeMap, p2, Helper.getFactionIconFromDiscord(p2.getFaction()), cabal);
+            }
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeMap, cabal)){
+                String msg = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" has failed to eat units owned by " + Helper.getPlayerRepresentation(player, activeMap) + " because they were blockaded. Wah-wah.";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
+            }
+        }
+
+    }
+
+    public static List<Button> getCabalHeroButtons(Player player, Map activeMap){
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> empties = new ArrayList<Button>();
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, player, "csd");
+        List<Tile> adjtiles = new ArrayList<Tile>();
+        for(Tile tile : tiles){
+            for(String pos : FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), player, false)){
+                Tile tileToAdd = activeMap.getTileByPosition(pos);
+                if(!adjtiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)){
+                    adjtiles.add(tileToAdd);
+                }
+            }
+        }
+        for(Tile tile : adjtiles){
+            empties.add(Button.primary(finChecker+"cabalHeroTile_"+tile.getPosition(), "Roll for units in "+tile.getRepresentationForButtons(activeMap, player)));
         }
         return empties;
     }
@@ -353,8 +460,13 @@ public class ButtonHelperFactionSpecific {
     public static void mageon(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String trueIdentity){
         buttonID = buttonID.replace("takeAC_", "");
         int acNum = Integer.parseInt(buttonID.split("_")[0]);
+
         String faction2 = buttonID.split("_")[1];
         Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, faction2);
+        if(!player2.getActionCards().values().contains((Integer) acNum)){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC added/lost");
+            return;
+       }
         String ident2 = Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), false);
         String message2 = trueIdentity + " took AC #" + acNum + " from " + ident2;
         String acID = null;

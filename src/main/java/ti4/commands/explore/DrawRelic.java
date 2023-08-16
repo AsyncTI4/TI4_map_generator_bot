@@ -33,6 +33,8 @@ public class DrawRelic extends GenericRelicAction {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getMessageChannel(), "Relic deck is empty");
             return;
         }
+        relicID = relicID.replace("extra1","");
+        relicID = relicID.replace("extra2","");
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
         StringBuilder message = new StringBuilder();
@@ -47,11 +49,17 @@ public class DrawRelic extends GenericRelicAction {
             }
             case "obsidian" -> {
                 activeMap.drawSecretObjective(player.getUserID());
+                
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
-                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+                
                 message.append("\nAn SO has been automatically drawn");
+                if(player.hasAbility("plausible_deniability")){
+                    activeMap.drawSecretObjective(player.getUserID());
+                    message.append(". Drew a second SO due to plausible deniability");
+                }
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
             }
             case "shard" -> {
                 Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);
