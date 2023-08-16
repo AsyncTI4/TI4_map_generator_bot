@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -103,6 +104,9 @@ public class SCPick extends PlayerSubcommandData {
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+        if(maxSCsPerPlayer < 1){
+            maxSCsPerPlayer = 1;
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
@@ -178,6 +182,7 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
+                ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeMap);
                 if(activeMap.isFoWMode()){
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, nextPlayer, "started turn");
                 }

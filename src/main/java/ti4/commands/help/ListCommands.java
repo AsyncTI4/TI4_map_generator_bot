@@ -17,12 +17,14 @@ public class ListCommands extends HelpSubcommandData {
         super(Constants.LIST_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SUBCOMMANDS, "True to include subcommands"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean includeSubcommands = event.getOption(Constants.INCLUDE_SUBCOMMANDS, false, OptionMapping::getAsBoolean);
         boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, false, OptionMapping::getAsBoolean);
+        String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
         StringBuilder sb = new StringBuilder("__**Command List**__");
         List<Command> commands = event.getGuild().retrieveCommands().complete();
@@ -36,32 +38,39 @@ public class ListCommands extends HelpSubcommandData {
             List<Option> options = command.getOptions();
             int optionCount = options.size();
 
-            sb.append("`/" + command.getFullCommandName() + "` : **" + command.getDescription() + "** (").append(subcommandCount).append("/25)\n");
+            String commandText = "`/" + command.getFullCommandName() + "` : **" + command.getDescription() + "**";
+            if (searchString == null || commandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(commandText + " (").append(subcommandCount).append("/25)\n");
             commandCount++;
 
             //COMMAND OPTIONS
             if (includeOptions) {
                 for (Option option : options) {
-                    sb.append("> `     ").append(option.getName()).append("` : " + option.getDescription()).append("\n");
+                    String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
+                    if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) sb.append(optionText).append("\n");
                 }
             }
 
             //SUBCOMMANDS
             if (includeSubcommands) {
                 for (Subcommand subcommand : subcommands) {
-                    sb.append("> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription()).append("\n");
+                    String subcommandText = "> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription();
+                    if (searchString == null || subcommandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(subcommandText).append("\n");
                     subcommandCount++;
 
                     //SUBCOMMAND OPTIONS
                     if (includeOptions) {
                         List<Option> suboptions = subcommand.getOptions();
                         for (Option option : suboptions) {
-                            sb.append("> `     ").append(option.getName()).append("` : " + option.getDescription()).append("\n");
+                            String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
+                            if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) sb.append(optionText).append("\n");
                         }
                     }
                 }
             }
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Command List", sb.toString());
+
+        String searchDescription = searchString == null ? "" : " search: " + searchString;
+        String threadName = "/help list_commands" + searchDescription;
+        MessageHelper.sendMessageToThread(event.getChannel(), threadName, sb.toString());
     }
 }

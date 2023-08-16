@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -51,28 +52,34 @@ public class PNInfo extends PNCardsSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getPromissoryNoteCardInfo(activeMap, player, longFormat));
 
         //BUTTONS
-        String pnPlayMessage = "_ _\nClick a button below to play a Promissory Note";
-        List<Button> pnButtons = getPlayablePNButtons(activeMap, player);
-        if (pnButtons != null && !pnButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(pnPlayMessage, pnButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
+        List<Button> buttons = new ArrayList<Button>();
+        for(String pnShortHand : player.getPromissoryNotes().keySet())
+        {
+            if(player.getPromissoryNotesInPlayArea().contains(pnShortHand)){
+                continue;
+            }
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+            Player owner = activeMap.getPNOwner(pnShortHand);
+            if(owner == player){
+                continue;
+            }else{
+                Button transact;
+                if(activeMap.isFoWMode()){
+                    transact = Button.success("resolvePNPlay_"  + pnShortHand, "Play " +owner.getColor() +" "+ promissoryNote.getName());
+                }else{
+                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                }
+                buttons.add(transact);
             }
         }
-        List<Button> buttons = new ArrayList<Button>();
         Button transaction = Button.primary("transaction", "Transaction");
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
-        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), "You can use this button to resolve a transaction or to modify units", buttons);
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 
-    private static List<Button> getPlayablePNButtons(Map activeMap, Player player) {
-        List<Button> pnButtons = new ArrayList<>();
-        //TODO: PN BUTTONS
-        return pnButtons;
-    }
+   
 
     public static String getPromissoryNoteCardInfo(Map activeMap, Player player, boolean longFormat) {
         StringBuilder sb = new StringBuilder();

@@ -35,7 +35,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
     }
 
     public void doRise(Player player, GenericInteractionCreateEvent event, Map activeMap){
-        List<String> planets = player.getPlanets();
+        List<String> planets = player.getPlanets(activeMap);
         for (Tile tile : activeMap.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())){

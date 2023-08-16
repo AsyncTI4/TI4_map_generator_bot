@@ -182,6 +182,8 @@ public class MapGenerator {
         commandManager.addCommand(new StatisticsCommand());
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
+        commandManager.addCommand(new AddBorderAnomaly());
+        commandManager.addCommand(new RemoveBorderAnomaly());
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));

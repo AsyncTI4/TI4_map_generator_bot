@@ -2358,5 +2358,65 @@
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the turquoise player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the turquoise player."
+    },
+    {
+        "alias": "ethereal_cf",
+        "name": "Ceasefire",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "false",
+        "attachment": "",
+        "source": "Base Game",
+        "text": "After the **ethereal** player activates a system that contains 1 or more of your units: The **ethereal** player cannot move units to the active system. Then return this card to the **ethereal** player."
+    },
+    {
+        "alias": "ethereal_ps",
+        "name": "Political Secret",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "false",
+        "attachment": "",
+        "source": "Base Game",
+        "text": "When an agenda is revealed: The **ethereal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **ethereal** player."
+    },
+    {
+        "alias": "ethereal_sftt",
+        "name": "Support for the Throne",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "true",
+        "attachment": "",
+        "source": "Base Game",
+        "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **ethereal** player's units, or if the **ethereal** player is eliminated, lose 1 victory point and return this card to the **ethereal** player."
+    },
+    {
+        "alias": "ethereal_ta",
+        "name": "Trade Agreement",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "false",
+        "attachment": "",
+        "source": "Base Game",
+        "text": "When the **ethereal** player replenishes commodities: The **ethereal** player gives you all of their commodities. Then, return this card to the **ethereal** player."
+    },
+    {
+        "alias": "ethereal_an",
+        "name": "Alliance",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "true",
+        "attachment": "",
+        "source": "PoK",
+        "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **ethereal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **ethereal** player's units, return this card to the **ethereal** player."
+    },
+    {
+        "alias": "absol_ethereal_ps",
+        "name": "Absol's Political Secret",
+        "faction": "",
+        "colour": "ethereal",
+        "playArea": "false",
+        "attachment": "",
+        "source": "Absol",
+        "text": "When you cast votes: You may exhaust up to 3 of the ethereal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the ethereal player."
     }
 ]

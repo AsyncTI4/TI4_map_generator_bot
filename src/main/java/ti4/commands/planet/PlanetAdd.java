@@ -74,6 +74,8 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
+                    String msg = Helper.getPlayerRepresentation(player_, activeMap) + " has a window to play reparations for the taking of the planet "+planet+" (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
                     if (moveTitanPN){
                        if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)){
                            player_.removePromissoryNote(Constants.TERRAFORM);

@@ -107,7 +107,7 @@ public class Swap extends GameSubcommandData {
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
                 
-                if(activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
+                if(activeMap.getActivePlayer() != null && activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
                     if(!activeMap.isFoWMode())
                     {
                         try {
@@ -122,7 +122,7 @@ public class Swap extends GameSubcommandData {
                     }
                     String text = "# " + Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
                     String buttonText = "Use buttons to do your turn. ";
-                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
+                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), text);
                     MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), buttonText, buttons);
                 }

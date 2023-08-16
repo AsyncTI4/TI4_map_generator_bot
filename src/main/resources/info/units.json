@@ -1252,7 +1252,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of non-supernova anomalies."
+        "ability": "This unit may ignore the movement effects of non-supernova anomalies. [Note: This does not ignore Gravity Rifts/non-movement-effects!]"
     },
     {
         "id": "kjalengard_carrier2",
@@ -1271,7 +1271,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of anomalies."
+        "ability": "This unit may ignore the movement effects of anomalies. [Note: This does not ignore Gravity Rifts/non-movement-effects!]"
     },
     {
         "id": "kjalengard_flagship",
@@ -3205,10 +3205,13 @@
         "cost": 8,
         "combatHitsOn": 7,
         "combatDieCount": 2,
+        "spaceCannonHitsOn": 5,
+        "spaceCannonDieCount": 3,
+        "deepSpaceCannon": true,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may use this unot's SPACE CANNON against ships that are in adjacent systems."
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems."
     },
     {
         "id": "xxcha_mech",
@@ -3222,10 +3225,9 @@
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
-        "spaceCannonHitsOn": 1,
+        "spaceCannonHitsOn": 8,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
-        "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems."

@@ -8,8 +8,6 @@
            "card1","card2","card3"
         ]
     },
-
-    
     {
         "alias": "agendas_pok",
         "name": "PoK Agendas",
@@ -75,7 +73,27 @@
         ]
     },
     
-    
+    {
+        "alias": "relics_absol_ds",
+        "name": "Absol's Relics plus Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Absol Relics plus Discordant Stars Relics - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3",
+            "absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+    {
+        "alias": "relics_ds-pok-absol mix",
+        "name": "Curated mix of relics from DS, Absol and PoK",
+        "type": "relic",
+        "description": "Weaker PoK relics replaced with Absol, plus absol uniques, plus pok relics",
+        "cardIDs": [
+            "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament",
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },    
+  
     {
         "alias": "relics_ds",
         "name": "Discordant Stars Relics",
@@ -106,9 +124,6 @@
             "star_chart_cultural","star_chart_hazardous","star_chart_industrial","star_chart_frontier","forgotten_trade_port","distinguished_admiral","council_preserve","survey_drone_hub","war_forge_ruins","arcane_shield_emitter","hidden_laboratory","ancient_shipyard","orbital_foundries","folder_space","suspicious_wreckage","dark_visions"
         ]
     },
-
-
-
     {
         "alias": "agendas_absol",
         "name": "Absol's Agendas",
@@ -139,8 +154,6 @@
             "dh1","dh2","dh3","dh4","dp1","dp2","dp3","dp4","fs1","fs2","fs3","fs4","mb1","mb2","mb3","mb4","mjets1","mjets2","mjets3","mjets4","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","sh1","sh2","sh3","sh4","war_machine1","war_machine2","war_machine3","war_machine4"
         ]
     },
-
-
     {
         "alias": "pbd100_secret_objectives",
         "name": "Secret Objectives for pbd100",

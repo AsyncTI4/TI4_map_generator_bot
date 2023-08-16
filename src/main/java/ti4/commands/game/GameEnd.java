@@ -138,6 +138,10 @@ public class GameEnd extends GameSubcommandData {
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
         TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
         if (inLimboCategory != null) {
+            if (inLimboCategory.getChannels().size() > 40) {
+                String holytispoonMention = event.getJDA().getUserById("150809002974904321").getAsMention();
+                MessageHelper.sendMessageToChannel(bothelperLoungeChannel, inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " is almost full. " + holytispoonMention + " - please make room soon!");
+            }
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
                 MessageHelper.sendMessageToChannel(event.getChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
             } else {

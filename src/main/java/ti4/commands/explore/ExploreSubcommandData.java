@@ -162,6 +162,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);
                 message = "Token added to planet";
+                if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "sol", event);
+                }
+                if(player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "xxcha", event);
+                }
             } else {
                 message = "Invalid token, tile, or planet";
             }
@@ -169,7 +175,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getTokenID(token);
             if (tokenFilename != null && tile != null) {
-                if("ionalpha".equalsIgnoreCase("token")){
+                if("ionalpha".equalsIgnoreCase(token)){
                     message = "Use buttons to decide to place either an alpha or a beta ionstorm";
                     List<Button> buttonIon = new ArrayList<Button>();
                     buttonIon.add(Button.success("addIonStorm_beta_"+tile.getPosition(), "Put down a beta"));
@@ -190,7 +196,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-
+        cardID = cardID.replace("extra1", "");
+        cardID = cardID.replace("extra2", "");
         switch (cardID) {
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
@@ -212,6 +219,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 activeMap.drawSecretObjective(player.getUserID());
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
+                }
+                if(player.hasAbility("plausible_deniability")){
+                    activeMap.drawSecretObjective(player.getUserID());
+                    message = message+". Drew a second SO due to plausible deniability";
                 }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);

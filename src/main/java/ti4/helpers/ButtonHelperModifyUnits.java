@@ -82,7 +82,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
-        String rest = buttonID.replace("retreatGroundUnits_", "");
+        String rest = buttonID.replace("retreatGroundUnits_", "").replace("'","");
         String pos1 = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos1 + "_", "");
         String pos2 = rest.substring(0, rest.indexOf("_"));
@@ -194,6 +194,9 @@ public class ButtonHelperModifyUnits {
                         activeMap.getTile(AliasHandler.resolveTile(planetName)), "csd " + planetName, activeMap);
                 successMessage = "Placed a cabal space dock on "
                         + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                if(player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "cabal", event);
+                }
             } else {
                 new AddUnits().unitParsing(event, player.getColor(),
                         activeMap.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
@@ -475,7 +478,7 @@ public class ButtonHelperModifyUnits {
         String planet = "";
         if (rest.contains("_")) {
             unitkey = rest.split("_")[0];
-            planet = rest.split("_")[1].replace(" ", "").toLowerCase();
+            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("-","").replace("'","");
         } else {
             unitkey = rest;
         }
@@ -505,7 +508,7 @@ public class ButtonHelperModifyUnits {
         String planet = "";
         if (rest.contains("_")) {
             unitkey = rest.split("_")[0];
-            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("'","");
+            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("'","").replace("-","");
         } else {
             unitkey = rest;
         }
@@ -764,6 +767,7 @@ public class ButtonHelperModifyUnits {
             String pos = rest.substring(0, rest.indexOf("_"));
             Tile tile = activeMap.getTileByPosition(pos);
             rest = rest.replace(pos + "_", "");
+            Player cabal = Helper.getPlayerFromAbility(activeMap, "amalgamation");
             if(rest.contains("All")){
                     java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
                     java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
@@ -789,6 +793,9 @@ public class ButtonHelperModifyUnits {
                                     rest = unitKey+"_"+unitHolder.getName();
                                     String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
                                     new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false);
+                                    if(cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName())&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
+                                        ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, unitEntry.getValue(), unitKey, event);
+                                    }
 
                                 }
                             }
@@ -809,6 +816,9 @@ public class ButtonHelperModifyUnits {
                                         }
                                         String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
                                         new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
+                                        if(cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
+                                            ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, totalUnits, unitKey, event);
+                                        }
                                     }
                                 }         
                         }             
@@ -840,16 +850,23 @@ public class ButtonHelperModifyUnits {
             String planetName = "";
             if (planet.equalsIgnoreCase("")) {
                 planetName = "space";
+                if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())&& FoWHelper.playerHasShipsInSystem(cabal, tile)){
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
+                }
             } else {
                 planetName = planet.toLowerCase().replace(" ", "");
                 planetName = planet.replace("'", "");
                 planetName = AliasHandler.resolvePlanet(planetName);
+                if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())&& FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)){
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
+                }
             }
             if(buttonLabel.toLowerCase().contains("damaged")){
                 new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), true);
             }else{
                 new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), false);
             }
+            
             
             String message = event.getMessage().getContentRaw();
             
@@ -935,7 +952,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
-        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeMap);
+        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeMap, event);
     }
 
 }

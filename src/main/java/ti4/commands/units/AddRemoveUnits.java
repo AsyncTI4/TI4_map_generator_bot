@@ -351,7 +351,7 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map activeMap) {
-        unitList = unitList.replace(", ", ",");
+        unitList = unitList.replace(", ", ",").replace("-","").replace("'","").toLowerCase();
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
@@ -428,7 +428,7 @@ abstract public class AddRemoveUnits implements Command {
             activeMap = mapManager.getUserActiveMap(userID);
         }
        // Map activeMap = mapManager.getUserActiveMap(userID);
-        if (!Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planetName) && !Constants.SPACE.equals(planetName)){
+        if (!Constants.SPACE.equals(planetName)){
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
             if (unitHolder != null){
                 Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
@@ -443,7 +443,7 @@ abstract public class AddRemoveUnits implements Command {
                        if (player.getFaction() != null && player.getColor() != null) {
                            String colorID = Mapper.getColorID(player.getColor());
                            if (unitColor.equals(colorID)){
-                               if (!player.getPlanets().contains(planetName)) {
+                               if (!player.getPlanets(activeMap).contains(planetName)) {
                                    new PlanetAdd().doAction(player, planetName, activeMap, event);
                                }
                                break;
