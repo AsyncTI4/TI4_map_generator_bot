@@ -651,6 +651,7 @@ public class Helper {
         }
         return planetButtons;
     }
+    
     public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeMap);
