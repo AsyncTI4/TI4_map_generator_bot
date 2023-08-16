@@ -64,7 +64,7 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player2).contains(player)|| Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
@@ -657,6 +657,8 @@ public class ButtonHelper {
                         List<Button> buttonsWeb = new ArrayList<Button>();
                         Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
                         buttonsWeb.add(linkToWebsite);
+                        buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
+                        buttonsWeb.add(Button.secondary("showGameAgain","Show Game")); 
                         MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
                     }
                 }
@@ -672,6 +674,8 @@ public class ButtonHelper {
                 List<Button> buttonsWeb = new ArrayList<Button>();
                 Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
                 buttonsWeb.add(linkToWebsite);
+                buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
+                buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
                 MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "",buttonsWeb);
             }
         }
@@ -1145,10 +1149,7 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker+"exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("titans"))));
         }
         Player sol = Helper.getPlayerFromUnlockedLeader(activeMap, "solagent");
-        if((!activeMap.isFoWMode() || sol == p1) &&sol != null && !sol.getLeaderByID("solagent").isExhausted() && groundOrSace.equalsIgnoreCase("ground")){
-            String finChecker = "FFCC_"+sol.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker+"exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
-        }
+        
         Player letnev = Helper.getPlayerFromUnlockedLeader(activeMap, "letnevagent");
         if((!activeMap.isFoWMode() || letnev == p1) &&letnev != null && !letnev.getLeaderByID("letnevagent").isExhausted()&& groundOrSace.equalsIgnoreCase("space")){
             String finChecker = "FFCC_"+letnev.getFaction() + "_";
@@ -1272,6 +1273,7 @@ public class ButtonHelper {
             }
         }
 
+        
         if(!hadAnyUnplayedSCs && !doneActionThisTurn)
         {
             Button pass = Button.danger(finChecker+"passForRound", "Pass");
@@ -1280,6 +1282,7 @@ public class ButtonHelper {
             }
             
             startButtons.add(pass);
+            
         }
         if(doneActionThisTurn)
         {
@@ -1288,9 +1291,17 @@ public class ButtonHelper {
             }
             Button pass = Button.danger("turnEnd", "End Turn");
             startButtons.add(pass);
-        }else if(player.getTechs().contains("cm")) {
-            Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
-            startButtons.add(chaos);
+        }else  {
+            if(player.getTechs().contains("cm")){
+                Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+                startButtons.add(chaos);
+            }
+            if(player.hasTech("td") && !player.getExhaustedTechs().contains("td"))
+            {
+                Button transit = Button.secondary(finChecker+"exhaustTech_td", "Exhaust Transit Diodes");
+                transit = transit.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
+                startButtons.add(transit);
+            }
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
@@ -1485,7 +1496,7 @@ public class ButtonHelper {
             }
             Planet planetReal =  (Planet) planetUnit;
             String planet = planetReal.getName();    
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && !planetReal.getUnits().isEmpty()) {
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets(activeMap).contains(planet) && !planetReal.getUnits().isEmpty()) {
                 List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
                 buttons.addAll(planetButtons);
             }
@@ -1780,9 +1791,36 @@ public class ButtonHelper {
         activeMap.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
+        if(player.hasLeader("sardakkagent")&&!player.getLeaderByID("sardakkagent").isExhausted()){
+            buttons.addAll(getSardakkAgentButtons(activeMap, player));
+        }
         Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
         buttons.add(concludeMove);
         return buttons;
+    }
+    public static String getIdent(Player player){
+        return Helper.getFactionIconFromDiscord(player.getFaction());
+    }
+    public static List<Button> getSardakkAgentButtons(Map activeMap, Player player) {
+       
+         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null  && player.getPlanets(activeMap).contains(planet)) {
+                List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+                buttons.add(Button.success("exhaustAgent_sardakkagent_"+activeMap.getActiveSystem()+"_"+planetId, "Use Sardakk Agent on "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+            }
+        }
+
+        return buttons;
+
     }
     public static String buildMessageFromDisplacedUnits(Map activeMap, boolean landing, Player player, String moveOrRemove) {
         String message = "";

@@ -1,5 +1,6 @@
 package ti4.commands.map;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -80,14 +81,19 @@ public class ShowGame implements Command {
                 displayType = DisplayType.system;
             }
         }
+        simpleShowGame(activeMap, event, displayType);
+    }
+    public void simpleShowGame(Map activeMap, GenericInteractionCreateEvent event, DisplayType displayType){
         File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
         if(activeMap.isFoWMode()){
-            MessageHelper.sendFileToChannel(event.getChannel(), file);
+            MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
         }else{
             List<Button> buttonsWeb = new ArrayList<Button>();
             Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
             buttonsWeb.add(linkToWebsite);
-            MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+            buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
+            buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
+            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "",buttonsWeb);
         }
     }
 
