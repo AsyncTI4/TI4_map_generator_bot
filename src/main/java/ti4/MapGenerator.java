@@ -112,6 +112,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
+        adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
