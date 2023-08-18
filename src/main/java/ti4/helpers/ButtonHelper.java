@@ -34,6 +34,7 @@ import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.special.CombatRoll;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
@@ -58,6 +59,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 
 public class ButtonHelper {
@@ -709,6 +711,9 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            case "letnev" -> {
+                shouldBeUnlocked = true;
+            }
             case "hacan" -> {
                 if(player.getTg() > 9){
                     shouldBeUnlocked = true;
@@ -1193,27 +1198,118 @@ public class ButtonHelper {
         
         return buttons;
     }
-    public static List<Button> getYinAgentButtons(Player player, Map activeMap, String pos) {
-        List<Button> buttons = new ArrayList<>();
-        Tile tile = activeMap.getTileByPosition(pos);
-        String placePrefix = "placeOneNDone_skipbuild";
-        String tp = tile.getPosition();
-        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Place 2 Fighters" );
-        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
-        buttons.add(ff2Button);
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            if (unitHolder instanceof Planet planet){
-                String pp = planet.getName();
-                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Place 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
-                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
-                buttons.add(inf2Button);
+     public static void checkFleetAndCapacity(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
+        int armadaValue = 0;
+        if(player.hasAbility("armada")){
+            armadaValue = 2;
+        }
+        int fleetCap = (player.getFleetCC() + armadaValue+player.getMahactCC().size())*2;
+        if(player.hasLeader("letnevhero")){
+            Leader playerLeader = player.getLeader("letnevhero");
+            if(playerLeader.isActive()){
+                fleetCap = 1000;
             }
         }
+        int capacity = 0;
+        int numInfNFightersNMechs = 0;
+        int numOfCapatitalShips = 0;
+        int fightsIgnored = 0;
+        int numFighter2s = 0;
+        int numFighter2sFleet = 0;
+        boolean capacityViolated = false;
+        boolean fleetSupplyViolated = false;
 
+        for(UnitHolder capChecker : tile.getUnitHolders().values()){
+            java.util.HashMap<UnitModel, Integer> unitsByQuantity = new CombatRoll().getAllUnitsFromUnitHolder(player, capChecker);
+            for(UnitModel unit : unitsByQuantity.keySet()){
+                if(capChecker.getName().equalsIgnoreCase("space")){
+                    capacity = capacity + (unit.getCapacityValue()*unitsByQuantity.get(unit));
+                }
+                 if(unit.getBaseType().equalsIgnoreCase("spacedock") && !capChecker.getName().equalsIgnoreCase("space")){
+                    if(unit.getId().equalsIgnoreCase("cabal_spacedock")){
+                        fightsIgnored = fightsIgnored + 6;
+                        
+                    }else if(unit.getId().equalsIgnoreCase("cabal_spacedock2")){
+                        fightsIgnored = fightsIgnored + 12;
+                    }else{
+                        fightsIgnored = fightsIgnored + 3;
+                        
+                    }
+                 }
+                
+            }
+        }
+        UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
+        java.util.HashMap<UnitModel, Integer> unitsByQuantity = new CombatRoll().getAllUnitsFromUnitHolder(player, combatOnHolder);
+        for(UnitModel unit : unitsByQuantity.keySet()){
+            if(unit.getBaseType().equalsIgnoreCase("fighter") || unit.getBaseType().equalsIgnoreCase("infantry") || unit.getBaseType().equalsIgnoreCase("mech")){
+                if(unit.getBaseType().equalsIgnoreCase("fighter")&& player.hasFF2Tech()){
+                    numFighter2s  = unitsByQuantity.get(unit) -fightsIgnored;
+                    if(numFighter2s < 0){
+                        numFighter2s = 0;
+                    }
+                }
+                if(unit.getBaseType().equalsIgnoreCase("fighter")){
+                    int numCountedFights = unit.getCapacityUsed()*unitsByQuantity.get(unit) - fightsIgnored;
+                    if(numCountedFights < 0){
+                        numCountedFights = 0;
+                    }
+                    numInfNFightersNMechs =numInfNFightersNMechs + numCountedFights;
+                }else{
+                    numInfNFightersNMechs =numInfNFightersNMechs + unit.getCapacityUsed()*unitsByQuantity.get(unit);
+                }
+                
+            }else{
+                if((unit.getIsShip() != null && unit.getIsShip())){
+                    if(player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")){
+                        numOfCapatitalShips = numOfCapatitalShips + unitsByQuantity.get(unit);
+                    }else{
+                        numOfCapatitalShips = numOfCapatitalShips + unitsByQuantity.get(unit)*2;
+                    }
+                }
+            }
+            
+            
+            
+        }
+        if(numOfCapatitalShips > fleetCap){
+            fleetSupplyViolated = true;
+        }
+        if(numInfNFightersNMechs > capacity){
+            if(numInfNFightersNMechs - numFighter2s > capacity)
+            {
+                capacityViolated = true;
+            }else{
+                numFighter2s = numInfNFightersNMechs - capacity;
+                if(player.hasTech("hcf2")){
+                        numFighter2sFleet = numFighter2s;
+                }else{
+                    numFighter2sFleet = numFighter2s * 2;
+                }
+                if(numFighter2sFleet+numOfCapatitalShips > fleetCap){
+                    fleetSupplyViolated = true;
+                }
+            }
+        }
+        if(numOfCapatitalShips > 4 && !fleetSupplyViolated){
+            if(player.getLeaderIDs().contains("letnevcommander") && !player.hasLeaderUnlocked("letnevcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "letnev", event);
+            }
+        }
+        String message = ButtonHelper.getTrueIdentity(player, activeMap);
+        if(fleetSupplyViolated){
+            message = message + " You are violating fleet supply in tile "+tile.getRepresentation() +". ";
+        }
+        if(capacityViolated){
+            message = message + " You are violating capacity (how much things can carry) in tile "+tile.getRepresentation() +". ";
+        }
+        System.out.println(fleetCap + " "+numOfCapatitalShips + " "+capacity + " "+numInfNFightersNMechs);
+        if(capacityViolated || fleetSupplyViolated){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), message);
+        }
 
-
-        return buttons;
-    }
+     }
+    
     public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
