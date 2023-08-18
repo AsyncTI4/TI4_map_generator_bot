@@ -129,7 +129,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 if(player.hasAbility("policy_the_environment_preserve")) 
                 {
                     player.removeAbility("policy_the_environment_preserve");
-                    sendMessage("removed Policy - The Environment: Preserve (-).");
+                    sendMessage("removed Policy - The Environment: Preserve (+).");
                 }            
                 player.addAbility("policy_the_environment_plunder");
                 sendMessage("added Policy - The Environment: Plunder (-).");
