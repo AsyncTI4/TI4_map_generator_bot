@@ -146,7 +146,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         if ((token.equals(Constants.WARFARE) ||
                              token.equals(Constants.PROPULSION) ||
                              token.equals(Constants.CYBERNETIC) ||
-                             token.equals(Constants.BIOTIC))) {
+                             token.equals(Constants.BIOTIC) ||
+                             token.equals(Constants.WEAPON))) {
                             String attachmentID = Mapper.getAttachmentID(token + "stat");
                             if (attachmentID != null){
                                 tokenFilename = attachmentID;
