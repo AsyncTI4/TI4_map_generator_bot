@@ -694,7 +694,7 @@ public class GenerateMap {
         return xDelta;
     }
 
-    private int relicInfo(Player player, int x, int y) {
+    private int relicInfo(Player player, int x, int y) { //HERE
         int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -702,8 +702,6 @@ public class GenerateMap {
 
         List<String> exhaustedRelics = player.getExhaustedRelics();
         for (String relicID : player.getRelics()) {
-
-
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
@@ -1611,7 +1609,7 @@ public class GenerateMap {
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            BotLogger.log("Could not display play area: " + resourceName, e);
+                BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
