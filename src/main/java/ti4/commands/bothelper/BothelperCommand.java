@@ -104,7 +104,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new CreateTile());
         subcommands.add(new ReExportAllTiles());
         subcommands.add(new JazzCommand());
-        subCommands.add(new Observer();)
+        subcommands.add(new Observer());
         return subcommands;
     }
 
