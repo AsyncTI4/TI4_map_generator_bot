@@ -1331,14 +1331,24 @@ public class AgendaHelper {
 
     public static List<Player> getVotingOrder(Map activeMap) {
         List<Player> orderList = new ArrayList<>();
-        orderList.addAll(activeMap.getPlayers().values().stream().filter(p -> p.isRealPlayer()).toList());
+        orderList.addAll(activeMap.getPlayers().values().stream()
+                .filter(p -> p.isRealPlayer())
+                .toList());
         String speakerName = activeMap.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
+        Optional<Player> optSpeaker = orderList.stream()
+                .filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
 
         if (optSpeaker.isPresent()) {
             int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
             Collections.rotate(orderList, rotationDistance);
+        }
+        if(activeMap.isReverseSpeakerOrder()) {
+            Collections.reverse(orderList);
+            if (optSpeaker.isPresent()) {
+                int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
+                Collections.rotate(orderList, rotationDistance);
+            }
         }
         if (activeMap.getHackElectionStatus()) {
             Collections.reverse(orderList);

@@ -462,9 +462,6 @@ public class ButtonHelper {
         }
     }
 
-    
-
-
     public static int resolveOnActivationEnemyAbilities(Map activeMap, Tile activeSystem, Player player, boolean justChecking) {
         int numberOfAbilities = 0;
         
@@ -585,7 +582,7 @@ public class ButtonHelper {
         }
         return techPresent;
     }
-     public static  List<Button> getXxchaAgentReadyButtons(Map activeMap, Player player) {
+     public static List<Button> getXxchaAgentReadyButtons(Map activeMap, Player player) {
         List<Button> buttons = new ArrayList<Button>();
         for(String planet : player.getExhaustedPlanets()){
             buttons.add(Button.success("refresh_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
@@ -694,16 +691,10 @@ public class ButtonHelper {
                 
             }
         }
-
         return isFSThere;
-
-
-        
-
      }
 
     public static void commanderUnlockCheck(Player player, Map activeMap, String faction, GenericInteractionCreateEvent event) {
-
         boolean shouldBeUnlocked = false;
         switch(faction){
             case "yssaril" -> {
@@ -851,8 +842,7 @@ public class ButtonHelper {
         }
         return num;
     }
-    
-    
+
     public static List<String> getPlanetsWithSpecificUnit(Player player, Map activeMap, Tile tile,String unit) {
         List<String> planetsWithUnit = new ArrayList<String>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
@@ -932,7 +922,6 @@ public class ButtonHelper {
         }
         return playersWithShips;
     }
-
     public static List<Tile> getTilesWithYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         List<Tile> tilesWithCC = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
@@ -981,7 +970,6 @@ public class ButtonHelper {
         }
 
     }
-
     public static int checkNetGain(Player player, String ccs) {
         int netgain = 0;
         int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
@@ -993,8 +981,6 @@ public class ButtonHelper {
         netgain = (player.getTacticalCC()-oldTactic) + (player.getFleetCC()-oldFleet) + (player.getStrategicCC() - oldStrat);
         return netgain;
     }
-
-
     public static List<Button> getButtonsToRemoveYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event, String whatIsItFor) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         String finChecker = "FFCC_"+player.getFaction() + "_";
@@ -1016,8 +1002,6 @@ public class ButtonHelper {
         
         return buttonsToRemoveCC;
     }
-
-    
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Map activeMap){
         List<Button> buttons = new ArrayList<Button>();
         for(String plan : player.getPlanets()){
@@ -1575,8 +1559,6 @@ public class ButtonHelper {
            
         }
     }
-    
-
     public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet){
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         if(unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.WARFARE)) ||
@@ -1591,7 +1573,6 @@ public class ButtonHelper {
             return false;
         }
     }
-
     public static List<Button> scanlinkResolution(Player player, Map activeMap, ButtonInteractionEvent event) {
         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
         List<Button> buttons = new ArrayList<Button>();
@@ -1608,7 +1589,6 @@ public class ButtonHelper {
         }
         return buttons;
     }
-
     public static List<Button> getPlanetExplorationButtons(Map activeMap, Planet planet) {
         if (planet == null || activeMap == null) return null;
 
@@ -1695,8 +1675,6 @@ public class ButtonHelper {
             return activeMap.getMainGameChannel();
         }
     }
-
-
     public static List<Button> getTilesToMoveFrom(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -1989,7 +1967,6 @@ public class ButtonHelper {
         }
         return list;
     }
-
     public static String getUnitName(String id) {
         String name = "";
         switch(id){
@@ -2217,8 +2194,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-
-public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Map activeMap, Tile tile) {
+    public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Map activeMap, Tile tile) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
@@ -2313,8 +2289,6 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         buttons.add(concludeMove);
         return buttons;
     }
-
-
 
     public static List<Button> getButtonsForRepairingUnitsInASystem(Player player, Map activeMap, Tile tile) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
@@ -2755,8 +2729,6 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         return stuffToTransButtons;
     }
-
-
     public static void resolveSpecificTransButtons(Map activeMap, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+p1.getFaction() + "_";
    
@@ -2991,8 +2963,6 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
 
     
     }
-
-    
 
     public static List<Button> getAllPossibleCompButtons(Map activeMap, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+p1.getFaction() + "_";
@@ -3265,8 +3235,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
 
         return youCanSpend;
     }
-    public static List<Tile> getTilesOfPlayersSpecificUnit(Map activeMap, Player p1, String unit)
-    {
+    public static List<Tile> getTilesOfPlayersSpecificUnit(Map activeMap, Player p1, String unit) {
         List<Tile> tiles = new ArrayList<Tile>();
         for(Tile tile : activeMap.getTileMap().values())
         {
@@ -3286,10 +3255,8 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         return tiles;  
     }
-    
 
-    public static int getNumberOfUnitsOnTheBoard(Map activeMap, Player p1, String unit)
-    {
+    public static int getNumberOfUnitsOnTheBoard(Map activeMap, Player p1, String unit) {
         int count = 0;
         for(Tile tile : activeMap.getTileMap().values())
         {
@@ -3315,8 +3282,6 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         return count;  
     }
-    
-
     public static void resolvePressedCompButton(Map activeMap, Player p1, ButtonInteractionEvent event, String buttonID) {
         String prefix = "componentActionRes_";
         String finChecker = "FFCC_"+p1.getFaction() + "_";
