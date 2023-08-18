@@ -149,6 +149,28 @@ public class CombatRoll extends SpecialSubcommandData {
         return unitModels;
     }
 
+    public java.util.HashMap<UnitModel, Integer> getAllUnitsFromUnitHolder(Player player, UnitHolder unitHolder) {
+        java.util.HashMap<UnitModel, Integer> unitModels = new HashMap<>();
+
+        HashMap<String, Integer> units = unitHolder.getUnits();
+        for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+
+            String unitType = unitEntry.getKey();
+            Integer quantity = unitEntry.getValue();
+
+            UnitModel unitModel = getUnitModel(unitType, player);
+            if (unitModel != null) {
+                // TODO: Check for racial exceptions like:
+                // - Nekro & NRA mechs that could be in space
+                // - (For ground combat) titan pds
+                
+                unitModels.put(unitModel, quantity);
+                
+            }
+        }
+        return unitModels;
+    }
+
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         super.reply(event);
