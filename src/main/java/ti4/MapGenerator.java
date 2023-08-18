@@ -20,6 +20,7 @@ import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.all_info.AllInfo;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
+import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
@@ -171,6 +172,7 @@ public class MapGenerator {
         commandManager.addCommand(new AgendaCommand());
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
+        commandManager.addCommand(new CombatCommand());
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new InstallationCommand());

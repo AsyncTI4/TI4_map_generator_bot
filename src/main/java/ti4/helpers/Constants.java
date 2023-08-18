@@ -219,7 +219,7 @@ public class Constants {
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
     public static final String ROUND = "round";
 
-    public static final String COMBAT_INFO = "combat_info";
+    public static final String COMBAT_INFO = "info";
     public static final String COMBAT_ROLL = "combat_roll";
     public static final String COMBAT_MODIFIERS = "mods";
     public static final String COMBAT_EXTRA_ROLLS = "extrarolls";
@@ -862,4 +862,5 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
+    public static final String COMBAT = "combat";
 }
