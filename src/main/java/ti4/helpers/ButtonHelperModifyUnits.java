@@ -357,6 +357,7 @@ public class ButtonHelperModifyUnits {
         if(player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "argent", event);
         }
+        
         if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
         }
