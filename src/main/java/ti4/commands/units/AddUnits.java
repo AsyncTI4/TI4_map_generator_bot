@@ -18,12 +18,12 @@ public class AddUnits extends AddRemoveUnits {
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
         tile.addUnit(planetName, unitID, count);
-        ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap,color), activeMap, tile, event);
     }
     @Override
     protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+        
         tile.addUnit(planetName, unitID, count);
-        ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap,color), activeMap, tile, event);
+        
     }
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {

@@ -24,6 +24,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.special.SleeperToken;
+import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
@@ -800,6 +801,117 @@ public class ButtonHelperFactionSpecific {
                     }
                 }
         event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+    }
+    public static void resolveSardakkCommander(Map activeMap, Player p1, String buttonID, ButtonInteractionEvent event, String ident ){
+        String mechorInf = buttonID.split("_")[1];
+        String planet1= buttonID.split("_")[2];
+        String planet2 = buttonID.split("_")[3];
+        String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeMap);
+        String planetRepresentation = Helper.getPlanetRepresentation(planet1, activeMap);
+
+        String message = ident + " moved 1 "+ mechorInf + " from " +planetRepresentation2 + " to "+planetRepresentation +" using Sardakk Commander";
+         new RemoveUnits().unitParsing(event, p1.getColor(),
+                            Helper.getTileFromPlanet(planet2, activeMap), "1 "+mechorInf + " "+planet2,
+                            activeMap);
+        new AddUnits().unitParsing(event, p1.getColor(),
+                            Helper.getTileFromPlanet(planet1, activeMap), "1 "+mechorInf + " "+planet1,
+                            activeMap);
+       
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeMap), message);
+        String exhaustedMessage = event.getMessage().getContentRaw();
+        if(exhaustedMessage == null || exhaustedMessage.equalsIgnoreCase("")){
+            exhaustedMessage ="Updated";
+        }
+        List<ActionRow> actionRow2 = new ArrayList<>();
+        for (ActionRow row : event.getMessage().getActionRows()) {
+            List<ItemComponent> buttonRow = row.getComponents();
+            int buttonIndex = buttonRow.indexOf(event.getButton());
+            if (buttonIndex > -1) {
+                buttonRow.remove(buttonIndex);
+            }
+            if (buttonRow.size() > 0) {
+                actionRow2.add(ActionRow.of(buttonRow));
+            }
+        }
+        if(actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")){
+             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+        }else{
+            event.getMessage().delete().queue();
+        }
+    }
+    public static List<Button> getSardakkCommanderButtons(Map activeMap, Player player, GenericInteractionCreateEvent event) {
+       
+         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null) {
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+                for(String pos2 : FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), player, false)){
+                    Tile tile2 = activeMap.getTileByPosition(pos2);
+                    if(AddCC.hasCC(event, player.getColor(), tile2)){
+                        continue;
+                    }
+                     for(UnitHolder planetUnit2 : tile2.getUnitHolders().values()){
+                        if(planetUnit2.getName().equalsIgnoreCase("space")){
+                            continue;
+                        }
+                        Planet planetReal2 =  (Planet) planetUnit2;
+                        String planet2 = planetReal2.getName(); 
+                        if (planetReal2 != null) { 
+                            int numMechs = 0;
+                            int numInf = 0;
+                            String colorID = Mapper.getColorID(player.getColor());
+                            String mechKey = colorID + "_mf.png";
+                            String infKey = colorID + "_gf.png";
+                            if (planetUnit2.getUnits() != null) {
+                                if (planetUnit2.getUnits().get(mechKey) != null) {
+                                    numMechs =  planetUnit2.getUnits().get(mechKey);
+                                }
+                                if ( planetUnit2.getUnits().get(infKey) != null) {
+                                    numInf = planetUnit2.getUnits().get(infKey);
+                                }
+                            }
+                            String planetId2 = planetReal2.getName();
+                            String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, activeMap);
+                            if(numInf > 0){
+                                buttons.add(Button.success("sardakkcommander_infantry_"+planetId+"_"+planetId2, "Commit 1 infantry from "+planetRepresentation2+" to "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+                            }
+                            if(numMechs > 0){
+                                buttons.add(Button.primary("sardakkcommander_mech_"+planetId+"_"+planetId2, "Commit 1 mech from "+planetRepresentation2+" to "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+                            }
+                         }
+                    }
+                }
+                
+            }
+        }
+        return buttons;
+     }
+    public static List<Button> getSardakkAgentButtons(Map activeMap, Player player) {
+       
+         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null  && player.getPlanets(activeMap).contains(planet)) {
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+                buttons.add(Button.success("exhaustAgent_sardakkagent_"+activeMap.getActiveSystem()+"_"+planetId, "Use Sardakk Agent on "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+            }
+        }
+
+        return buttons;
+
     }
     public static void giveKeleresCommsNTg(Map activeMap, GenericInteractionCreateEvent event){
 
