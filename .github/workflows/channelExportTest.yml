@@ -19,4 +19,4 @@ jobs:
         envs: AWS_KEY, AWS_SECRET
         script: |
           docker version
-          docker run --rm -v $PWD:/STORAGE/exported_channels:/out tyrrrz/discordchatexporter:stable export -t BOT_KEY=$DISCORD_BOT_KEY -c 1142100229072638023
+          docker run --rm -v /opt/STORAGE/exported_channels:/out tyrrrz/discordchatexporter:stable export -t BOT_KEY=$DISCORD_BOT_KEY -c 1142100229072638023
