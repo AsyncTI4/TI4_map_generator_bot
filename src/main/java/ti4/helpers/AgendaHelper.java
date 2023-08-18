@@ -16,6 +16,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.player.SCPick;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.generator.Mapper;
@@ -953,7 +954,13 @@ public class AgendaHelper {
         for (int x = 1; x < 9; x++) {
             Button button = null;
             if (rider == null) {
-                button = Button.secondary(prefix+"_"+x, x+"");
+                Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(x));
+                if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                    button = Button.secondary(prefix+"_"+x, " ").withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary(prefix+"_"+x, x+"");
+                }
+               
             } else {
                 button = Button.secondary(prefix+"rider_sc;"+x+"_"+rider, x+"");
             }
