@@ -196,14 +196,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CREATE GAME
         Map newMap = GameCreate.createNewGame(event, gameName, gameOwner);
-
+        
         //ADD PLAYERS
         for (Member member : members) {
             newMap.addPlayer(member.getId(), member.getEffectiveName());
         }
-
+        
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
+        newMap.setName(gameFunName);
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
@@ -215,7 +216,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
-        MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
         newMap.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
@@ -223,7 +223,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
-        MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
         newMap.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
@@ -232,17 +231,30 @@ public class CreateGameChannels extends BothelperSubcommandData {
         .complete();
         newMap.setBotMapUpdatesThreadID(botThread.getId());
 
+        // INTRODUCTION TO TABLETALK CHANNEL
+        StringBuilder tabletalkGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - table talk channel\n");
+        tabletalkGetStartedMessage.append("This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n");
+        tabletalkGetStartedMessage.append("If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n");
+        tabletalkGetStartedMessage.append("Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n");
+        MessageHelper.sendMessageToChannelAndPin((MessageChannel) chatChannel, tabletalkGetStartedMessage.toString());
+
+        // INTRODUCTION TO ACTIONS CHANNEL
+        StringBuilder actionsGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - actions channel\n");
+        actionsGetStartedMessage.append("This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n");
+        actionsGetStartedMessage.append("Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n");
+        MessageHelper.sendMessageToChannelAndPin((MessageChannel) actionsChannel, actionsGetStartedMessage.toString());
+
+        // INTRODUCTION TO BOT-MAP THREAD
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
-        botGetStartedMessage.append("__Use the following commands to get started:__\n");
+        botGetStartedMessage.append("This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n");
+        botGetStartedMessage.append("### __Use the following commands to get started:__\n");
         botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
         botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
         botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
         botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
         botGetStartedMessage.append("> `/player tech_add` for factions who need to add tech\n");
-        botGetStartedMessage.append("> `/add_frontier_tokens` to place frontier tokens on empty spaces\n");
-        botGetStartedMessage.append("> `/so deal_to_all (count:2)` to deal two" + Emojis.SecretObjective + " to all players\n");
         botGetStartedMessage.append("\n");
-        botGetStartedMessage.append("__Other helpful commands:__\n");
+        botGetStartedMessage.append("### __Other helpful commands:__\n");
         botGetStartedMessage.append("> `/game replace` to replace a player in the game with a new one\n");
         botGetStartedMessage.append("> `/role remove` to remove the game role to any replaced players\n");
         botGetStartedMessage.append("> `/role add` to add the game role to any replacing players\n");
