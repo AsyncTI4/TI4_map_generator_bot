@@ -5,7 +5,7 @@
         "type": "template",
         "description": "A template json deck",
         "cardIDs": [
-           "card1","card2","card3"
+            "card1","card2","card3"
         ]
     },
     {
@@ -72,7 +72,7 @@
             "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
         ]
     },
-    
+
     {
         "alias": "relics_absol_ds",
         "name": "Absol's Relics plus Discordant Stars Relics",
@@ -92,8 +92,8 @@
             "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament",
             "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
         ]
-    },    
-  
+    },
+
     {
         "alias": "relics_ds",
         "name": "Discordant Stars Relics",
@@ -104,7 +104,7 @@
             "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
         ]
     },
-    
+
     {
         "alias": "explores_pok",
         "name": "PoK Explore Cards",
@@ -142,8 +142,6 @@
             "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament"
         ]
     },
-
-    
     {
         "alias": "action_deck_2",
         "name": "Action Deck 2",
@@ -163,5 +161,33 @@
             "ans","baf","bam","btgk","btv","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fsn","fwm","gamf","hrm","mew","mlp","mp","mrm","mtm","ose","otf","pem","sar","syc","ttfd","uf",
             "a_worthy_sacrifice_pbd100","accept_bribes_pbd100","alphabet_squadron_pbd100","ambush_their_fleets_pbd100","assemble_a_speedy_fleet_pbd100","assemble_a_swarm_pbd100","burn_their_shipyards_pbd100","bypass_their_defenses_pbd100","check_and_balance_pbd100","clear_the_way_pbd100","come_see_conquer_pbd100","command_a_diverse_fleet_pbd100","conspire_with_patience_pbd100","construct_transport_network_pbd100","construction_entusiast_pbd100","converge_forces_pbd100","core_expedition__pbd100","corner_your_enemies_pbd100","deal_in_obligations_pbd100","deep_space_research_pbd100","demilitirize_the_nation_pbd100","destroy_a_masterpiece_pbd100","diversify_research_pbd100","establish_a_new_home_pbd100","expand_borders_pbd100","exterminate_an_enemy_pbd100","field_test_advancements_pbd100","fight_with_precision_pbd100","form_a_contact_network_pbd100","form_the_heart_of_a_new_empire_pbd100","foster_cohesion_pbd100","galvanize_the_people_pbd100","gather_a_legion_pbd100","gather_abundance_pbd100","incorporate_legends_in_your_history_pbd100","indebt_your_leadership_pbd100","invest_in_infrastructure_pbd100","learn_from_others_pbd100","leave_no_survivors_pbd100","leverage_your_soft_power_pbd100","lone_survivor_pbd100","lure_them_in__pbd100","make_many_enemies_pbd100","meet_your_neighbors_pbd100","mercy_for_the_weak_pbd100","multiple_allegiances_pbd100","overrrun_defenses_pbd100","preserve_your_investments_pbd100","promote_peace_pbd100","prosecute_heretics_pbd100","prove_intense_endurance_pbd100","punish_the_weak_pbd100","really_learn_the_secrets_of_the_cosmos_pbd100","rebel_against_political_elites_pbd100","reclaim_ancient_monuments_pbd100","repair_and_recommission_pbd100","rule_a_diverse_empire_pbd100","save_the_homeland_pbd100","secure_a_path_pbd100","seize_an_icon_pbd100","spare_no_munitions_pbd100","sponsor_data_archives_pbd100","spread_your_wings_pbd100","strike_a_handsome_deal_pbd100","trade_conduit_pbd100","warning_shots_pbd100","watch_the_world_burn_pbd100","win_the_people's_favor_pbd100","wormhole_artillery_pbd100"
         ]
-    }
+    },
+    {
+        "alias": "asteroid_actions",
+        "name": "Asteroid's Actions",
+        "type": "action_card",
+        "description": "A combination of PoK and homebrew action cards, with a lot of the chaff removed.",
+        "cardIDs": [
+            "lead_rider", "diplo_rider", "politic_rider", "const_rider", "trade_rider", "war_rider", "tech_rider", "imp_rider", "relic_rider", "bureaucracy_rider", "defense_rider", "exploration_rider", "frontier_rider", "production_rider",
+            "assassin", "assassin2", "assassin3", "assassin4", "bribery", "bribery2", "bribery3", "bribery4", "veto", "veto2", "veto3", "veto4", "corporate_lobbying", "corporate_lobbying2", "distinguished", "distinguished2", "insider", "insider2", "public_outcry"," public_outcry2", "confusing", "confounding", "contradictory_legal_text", "repeal", "sanction",
+            "fs1", "fs2", "fs3", "fs4", "mb1", "mb2", "mb3", "mb4", "sabo1", "sabo2", "sabo3", "sabo4", "sh1", "sh2", "sh3", "sh4", "s_retreat1", "s_retreat2", "s_retreat3", "s_retreat4", "dh1", "dh2", "f_conscription", "messiah",
+            "arch_expedition", "arch_expedition2", "arch_expedition3", "arch_expedition4", "artifact_hunters", "artifact_hunters2", "artifact_hunters3", "artifact_hunters4", "deep_space_station", "deep_space_station2", "deep_space_station3", "deep_space_station4", "probe", "probe2", "probe3", "probe4", "professional_archeologists", "professional_archeologists2", "professional_archeologists3", "professional_archeologists4", "planetary_rigs", "planetary_rigs2", "reconstruction", "reconstruction2", "secured_trove", "secured_trove2",
+            "f_researched", "f_researched2", "f_researched3", "f_researched4", "reveal_prototype", "reveal_prototype2", "reveal_prototype3", "reveal_prototype4", "steal_prototype", "steal_prototype2", "steal_prototype3", "steal_prototype4", "side_project", "side_project2", "side_project3", "side_project4", "artifact_research", "artifact_research2", "divert_funding", "divert_funding2", "plagiarize", "plagiarize2",
+            "timely_reinforcements", "timely_reinforcements2", "timely_reinforcements3", "timely_reinforcements4", "disable", "disable2", "experimental", "experimental2", "fire_for_effect", "fire_for_effect2", "rout", "rout2", "shrapnel_turrets", "shrapnel_turrets2",
+            "adrenaline_shots", "adrenaline_shots2", "anti-gravity_drive", "anti-gravity_drive2", "brutal_occupation", "brutal_occupation2", "counterstroke", "counterstroke2", "decoy", "decoy2", "f_deployment", "f_deployment2", "ghost_ship", "ghost_ship2", "silence_space", "silence_space2", "infiltrate", "infiltrate2", "asteroid_lost_star_1", "asteroid_lost_star_2", "master_plan", "master_plan2", "nav_suite", "nav_suite2", "overtime", "overtime2", "propaganda", "propaganda2", "prophecy", "confused_sage", "proxy_war", "proxy_war2", "disgrace", "disgrace2", "rapid_mobilization", "rapid_mobilization2", "relay_connection", "relay_connection2", "unexpected", "unexpected2", "black_market_raid", "ixthian_gift", "stability", "lived_clone"
+        ]
+    },
+    {
+    "alias": "explores_asteroid",
+    "name": "Asteroid's Exploration Decks",
+    "type": "explore",
+    "description": "(NOT READY FOR USE) All explore cards in a 'vanilla' PoK game, plus some additions",
+    "cardIDs": [
+        "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
+        "imperial_research_institute", "trade_office", "spy_agency", "galactic_heritage_site", "distinguished_councilor","talented_officer1","talented_officer2","acrf1", "acrf2", "acrf3", "acrf4", "acrf5", "acrf6",
+        "weapons_research_facility","freighter_conversion1","freighter_conversion2","bootstrapping1","bootstrapping2","wormhole_generator1","wormhole_generator2","ahrf1","ahrf2","ahrf3","ahrf4",
+        "construction_yard1","construction_yard2","construction_yard3","construction_yard4","abandoned_keel1","abandoned_keel2","abandoned_keel3","lazax_manufactorum","airf1","airf2","airf3","airf4","airf5"
+    ]
+}
 ]
+
