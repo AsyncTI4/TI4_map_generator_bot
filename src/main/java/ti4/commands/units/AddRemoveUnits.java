@@ -161,7 +161,7 @@ abstract public class AddRemoveUnits implements Command {
             }
 
             planetName = getPlanet(event, tile, planetName);
-            unitAction(event, tile, count, planetName, unitID, color);
+            unitAction(event, tile, count, planetName, unitID, color, activeMap);
 
 
             addPlanetToPlayArea(event, tile, planetName, activeMap);
@@ -238,7 +238,7 @@ abstract public class AddRemoveUnits implements Command {
             }
 
             planetName = getPlanet(event, tile, planetName);
-            unitAction(event, tile, count, planetName, unitID, color);
+            unitAction(event, tile, count, planetName, unitID, color, activeMap);
 
 
             addPlanetToPlayArea(event, tile, planetName, activeMap);
@@ -316,7 +316,7 @@ abstract public class AddRemoveUnits implements Command {
             }
 
             planetName = getPlanet(event, tile, planetName);
-            unitAction(event, tile, count, planetName, unitID, color);
+            unitAction(event, tile, count, planetName, unitID, color, activeMap);
 
 
             addPlanetToPlayArea(event, tile, planetName, activeMap);
@@ -355,6 +355,7 @@ abstract public class AddRemoveUnits implements Command {
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map activeMap) {
         unitList = unitList.replace(", ", ",").replace("-","").replace("'","").toLowerCase();
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
+        
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
@@ -396,7 +397,7 @@ abstract public class AddRemoveUnits implements Command {
             }
 
             planetName = getPlanet(event, tile, planetName);
-            unitAction(event, tile, count, planetName, unitID, color);
+            unitAction(event, tile, count, planetName, unitID, color, activeMap);
             addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         if (activeMap.isFoWMode()) {
@@ -475,8 +476,8 @@ abstract public class AddRemoveUnits implements Command {
         return planetName;
     }
 
-    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
-    abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color);
+    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap);
+    abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap){
         //do nothing, overriden by child classes
