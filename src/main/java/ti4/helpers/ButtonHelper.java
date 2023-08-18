@@ -1479,10 +1479,12 @@ public class ButtonHelper {
         if(unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.WARFARE)) ||
             unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.CYBERNETIC)) ||
             unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.BIOTIC)) ||
-            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.PROPULSION)))
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.PROPULSION)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.WEAPON)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID("imperialinstitute")))
         {
             return true;
-        }else{
+        } else{
             return false;
         }
     }
