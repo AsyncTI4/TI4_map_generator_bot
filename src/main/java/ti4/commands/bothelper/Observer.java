@@ -28,7 +28,7 @@ public class Observer extends BothelperSubcommandData {
        
         List<GuildChannel> channels = guild.getChannels();
         for(GuildChannel channel : channels) {
-            if(channel.getName().contains(event.getOption(Constants.PBD_NUMBER, null, OptionMapping::getAsString)) {
+            if(channel.getName().contains(event.getOption(Constants.PBD_NUMBER, null, OptionMapping::getAsString))) {
                 sendMessage("Found: " + channel.getName());
             }
        }
