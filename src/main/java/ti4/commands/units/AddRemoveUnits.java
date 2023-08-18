@@ -13,6 +13,7 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
@@ -415,13 +416,22 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
+                String message = colorMention + " has modified units in the system. ";
+                if(this.getActionDescription().contains("add_units")){
+                    message = message + " Specific units modified include: "+unitList;
+                }
+                message = message + "Refresh map to see what changed ";
+                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
                   if (count <10) {
                     activeMap.setPingSystemCounter(count);
                     activeMap.setTileAsPinged(count, tile.getPosition());
                   }
             }
         }
+        if(this.getActionDescription().contains("add_units")){
+             ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
+        }
+       
     }
 
     public void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Map activeMap) {
