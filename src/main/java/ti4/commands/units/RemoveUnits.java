@@ -16,13 +16,13 @@ import java.util.Objects;
 public class RemoveUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
-
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+        removeStuff(event, tile, count, planetName, unitID, color, true);
     }
 
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
         OptionMapping option = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         boolean priorityDmg = true;
         if (option != null) {

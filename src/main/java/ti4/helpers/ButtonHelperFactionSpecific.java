@@ -38,6 +38,25 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+    public static List<Button> getYinAgentButtons(Player player, Map activeMap, String pos) {
+        List<Button> buttons = new ArrayList<>();
+        Tile tile = activeMap.getTileByPosition(pos);
+        String placePrefix = "placeOneNDone_skipbuild";
+        String tp = tile.getPosition();
+        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Place 2 Fighters" );
+        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        buttons.add(ff2Button);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet){
+                String pp = planet.getName();
+                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Place 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                buttons.add(inf2Button);
+            }
+        }
+        return buttons;
+    }
+
     public static void resolveResearchAgreementCheck(Player player, String tech, Map activeMap){
         if(Helper.getPlayerFromColorOrFaction(activeMap, Mapper.getPromissoryNoteOwner("ra")) == player){
             if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("")){
@@ -667,7 +686,7 @@ public class ButtonHelperFactionSpecific {
                 String pos = posNFaction.split("_")[0];
                 String faction = posNFaction.split("_")[1];
                 Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+" Use buttons to resolve yin agent", ButtonHelper.getYinAgentButtons(p2, activeMap, pos));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+" Use buttons to resolve yin agent", ButtonHelperFactionSpecific.getYinAgentButtons(p2, activeMap, pos));
             }
             if(agent.equalsIgnoreCase("naaluagent")){
                 String faction = rest.replace("naaluagent_","");

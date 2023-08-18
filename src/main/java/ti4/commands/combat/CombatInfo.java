@@ -1,4 +1,4 @@
-package ti4.commands.special;
+package ti4.commands.combat;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CombatInfo extends SpecialSubcommandData {
+public class CombatInfo extends CombatSubcommandData {
     public CombatInfo() {
         super(Constants.COMBAT_INFO, "Combat info for system");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
