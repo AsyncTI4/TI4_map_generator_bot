@@ -62,7 +62,7 @@ public class AddTileList implements Command {
         List<String> badTiles = new ArrayList<>();
         userActiveMap.clearTileMap();
         for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
-            String tileID = entry.getValue();
+            String tileID = entry.getValue().toLowerCase();
             if (tileID.equals("-1")) {
                 continue;
             }
