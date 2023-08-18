@@ -15,6 +15,7 @@ import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -106,7 +107,7 @@ public class AddTileList implements Command {
 
         File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
         MessageHelper.replyToMessage(event, file);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -115,7 +116,7 @@ public class AddTileList implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Add tile list to generate map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format")
                                 .setRequired(true))
 
         );
