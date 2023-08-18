@@ -1611,7 +1611,7 @@ public class GenerateMap {
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            BotLogger.log("Could not display play area: " + resourceName, e);
+            //BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 

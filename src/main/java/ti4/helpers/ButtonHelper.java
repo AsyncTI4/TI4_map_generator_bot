@@ -1364,7 +1364,13 @@ public class ButtonHelper {
             }
         }
         else{
+            
             int ringN = Integer.parseInt(ringNum.charAt(0)+"");
+             if(ringNum.contains("_")){
+                ringN = Integer.parseInt(ringNum.substring(0, ringNum.indexOf("_")));
+             }else{
+                ringN = Integer.parseInt(ringNum);
+             }
             int totalTiles = ringN*6;
             if(ringNum.contains("_")){
                 String side = ringNum.substring(ringNum.lastIndexOf("_")+1, ringNum.length());
@@ -1401,6 +1407,7 @@ public class ButtonHelper {
                 }
             }
             else{
+
                 if(ringN <5){
                     for(int x = 1; x < totalTiles+1; x++)
                     {
