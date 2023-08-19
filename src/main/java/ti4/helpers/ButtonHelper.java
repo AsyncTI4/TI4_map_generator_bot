@@ -66,10 +66,10 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player2).contains(player)|| Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(player == player2 || !activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player2).contains(player)|| Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with "+player2.getColor());
     }
     public static void riftUnitsButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         Tile tile = activeMap.getTileByPosition(buttonID.replace("getRiftButtons_",""));
@@ -2001,7 +2001,7 @@ public class ButtonHelper {
 
                     String key = unitEntry.getKey();
                    
-                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || (!player.hasFF2Tech() && key.endsWith("ff.png"))) {
+                    if (  (!activeMap.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander") && (key.endsWith("gf.png") || key.endsWith("mf.png"))) || (!player.hasFF2Tech() && key.endsWith("ff.png"))) {
                         continue;
                     }
                    
@@ -3622,6 +3622,12 @@ public class ButtonHelper {
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, activeMap, event);
+        }
+        if (id.equalsIgnoreCase("iff")) {
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.addAll(ButtonHelperFactionSpecific.getCreusIFFTypeOptions(activeMap, player));
+            String message = ButtonHelper.getTrueIdentity(player, activeMap)+" select type of wormhole you wish to drop";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message, buttons);
         }
         if (id.equalsIgnoreCase("ms")) {
             List<Button> buttons = new ArrayList<Button>();

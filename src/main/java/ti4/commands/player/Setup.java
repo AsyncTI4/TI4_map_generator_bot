@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -31,8 +32,10 @@ public class Setup extends PlayerSubcommandData {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
+         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set player as speaker. Y/N"));
+       
     }
 
     @Override
@@ -206,6 +209,15 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
+         OptionMapping speakerO = event.getOption(Constants.SPEAKER);
+        String speaker = speakerO != null ? speakerO.getAsString().toLowerCase() : "";
+
+        if(speaker.equalsIgnoreCase("y") || speaker.equalsIgnoreCase("yes")){
+            activeMap.setSpeaker(player.getUserID());
+            String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap);
+            sendMessage(msg);
+        }
+        
 
         //STARTING PNs
         player.initPNs(activeMap);
