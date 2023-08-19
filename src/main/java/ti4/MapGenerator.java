@@ -113,6 +113,8 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
+        
+        
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -128,6 +130,7 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
 

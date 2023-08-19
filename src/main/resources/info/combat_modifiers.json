@@ -1,0 +1,206 @@
+[
+    {
+        "alias": "plus1_1round_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "tech", "alias":"sc"},
+            {"type": "ac", "alias": "morale_boost_ds"},
+            {"type": "ac", "alias": "mb1"},
+            {"type": "ac", "alias": "mb2"},
+            {"type": "ac", "alias": "mb3"},
+            {"type": "ac", "alias": "mb4"},
+            {"type": "leader", "alias": "vaylerianhero"}
+        ]
+    },
+    {
+        "alias": "plus3_1round_all",
+        "type": "DIE_MOD",
+        "value": "+3",
+        "scope": "",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "ac", "alias": "close_quarters"}
+        ]
+    },
+    {
+        "alias": "minus1_always_all",
+        "type": "DIE_MOD",
+        "value": "-1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "ability", "alias": "fragile"}
+        ]
+    },
+    {
+        "alias": "plus1_always_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "ability", "alias": "unrelenting"}, 
+            {"type":"relic", "alias":"starfall_array"},
+            {"type":"relic", "alias":"absol_thalnos"}
+        ]
+    },
+    {
+        "alias": "plus1_1round_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "ff",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "pn", "alias":"tekklar"},
+            {"type": "pn", "alias":"dspnkjal"},
+            {"type": "ac", "alias":"f_prototype"}
+        ]
+    },
+    {
+        "alias": "plus1_always_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "ff",
+        "persistanceType": "ALWAYS",
+        "related":[
+            {"type": "agenda", "alias":"prophecy"}
+        ]
+    },
+    {
+        "alias": "plus_x_frag_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistanceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "bentor_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_law_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "law",
+        "persistanceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "edyn_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_po_others_scored_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "po_opponent_exclusively_scored",
+        "persistanceType": "ALWAYS",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "kyro_mech"}
+        ]
+    },
+    {
+        "alias": "plus_half_unit_tech_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "unit_tech",
+        "valueScalingMultipler": 0.5,
+        "persistanceType": "ALWAYS",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "mirveda_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2x_destroyers_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "destroyers",
+        "valueScalingMultipler": 0.5,
+        "persistanceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "nokar_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_1_always_other_units_with_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "scopeExcept":"fs",
+        "related":[
+            {"type": "unit", "alias": "sardakk_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_opponent_unit_tech_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "opponent_unit_tech",
+        "persistanceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "zealots_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_opponent_faction_tech_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "opponent_faction_tech",
+        "persistanceType": "ALWAYS",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "zealots_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_opponent_frag_conditional_mech",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition": "opponent_frag",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "naalu_mech"}
+        ]
+    },
+    {
+        "alias": "plus_1_inf_with_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "CONDITIONAL",
+        "condition": "has_ability_fragile",
+        "scope": "gf",
+        "related":[
+            {"type": "unit", "alias": "jolnar_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition":"opponent_stolen_faction_tech",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "nekro_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_mr_legendary_home_conditional",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition": "planet_mr_legendary_home",
+        "scope": "",
+        "related":[
+            {"type": "leader", "alias": "winnucommander"}
+        ]
+    }
+]

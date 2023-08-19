@@ -1,10 +1,15 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.model.UnitModel;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,17 +21,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = Space.class, name = "space"),
-    @JsonSubTypes.Type(value = Planet.class, name = "planet")
+        @JsonSubTypes.Type(value = Space.class, name = "space"),
+        @JsonSubTypes.Type(value = Planet.class, name = "planet")
 })
 abstract public class UnitHolder {
     private final String name;
 
     private final Point holderCenterPosition;
 
-    //ID, Count
+    // ID, Count
     private final HashMap<String, Integer> units = new HashMap<>();
-    //ID, Count
+    // ID, Count
     private final HashMap<String, Integer> unitsDamage = new HashMap<>();
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
@@ -38,7 +43,7 @@ abstract public class UnitHolder {
 
     @JsonCreator
     public UnitHolder(@JsonProperty("name") String name,
-                         @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
+            @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
     }
@@ -134,7 +139,8 @@ abstract public class UnitHolder {
 
     public void removeAllUnitDamage(String color) {
         String colorID = Mapper.getColorID(color);
-        if (colorID == null) return;
+        if (colorID == null)
+            return;
         unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
@@ -142,10 +148,10 @@ abstract public class UnitHolder {
         unitsDamage.clear();
     }
 
-
     public void removeAllUnits(String color) {
         String colorID = Mapper.getColorID(color);
-        if (colorID == null) return;
+        if (colorID == null)
+            return;
         units.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
@@ -176,5 +182,33 @@ abstract public class UnitHolder {
 
     public Point getHolderCenterPosition() {
         return holderCenterPosition;
+    }
+
+    public HashMap<String, Integer> getUnitAsyncIdsOnHolder(String color) {
+        return new HashMap<>(units.entrySet().stream()
+                .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
+                .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
+    }
+
+    public java.util.List<String> getUnitColorsOnHolder() {
+        java.util.List<String> unitColors = getUnits().keySet().stream()
+                .map(unit -> getUnitColor(unit))
+                .distinct()
+                .collect(Collectors.toList());
+        return unitColors;
+    }
+
+    public String getUnitAliasId(String unitHolderString) {
+        String unitHolderFileSuffix = ".png";
+        String unitColor = unitHolderString.substring(unitHolderString.indexOf("_") + 1);
+        unitColor = unitColor.replace(unitHolderFileSuffix, "");
+        return unitColor;
+    }
+
+    public String getUnitColor(String unitHolderString) {
+        String unitHolderFileSuffix = ".png";
+        String unitColor = unitHolderString.substring(0, unitHolderString.indexOf("_"));
+        unitColor = unitColor.replace(unitHolderFileSuffix, "");
+        return unitColor;
     }
 }

@@ -2127,6 +2127,8 @@
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
         "ability": "During combat against an opponent who has at least 1 relic fragment, apply +2 to the results of this unit's combat rolls."
     },
     {
