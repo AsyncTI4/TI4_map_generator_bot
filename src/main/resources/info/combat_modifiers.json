@@ -6,13 +6,13 @@
         "scope": "",
         "persistanceType": "ONE_ROUND",
         "related":[
-            {"type": "technology", "alias":"sc"},
-            {"type": "action_cards", "alias": "morale_boost_ds"},
-            {"type": "action_cards", "alias": "mb1"},
-            {"type": "action_cards", "alias": "mb2"},
-            {"type": "action_cards", "alias": "mb3"},
-            {"type": "action_cards", "alias": "mb4"},
-            {"type": "leaders", "alias": "vaylerianhero"}
+            {"type": "tech", "alias":"sc"},
+            {"type": "ac", "alias": "morale_boost_ds"},
+            {"type": "ac", "alias": "mb1"},
+            {"type": "ac", "alias": "mb2"},
+            {"type": "ac", "alias": "mb3"},
+            {"type": "ac", "alias": "mb4"},
+            {"type": "leader", "alias": "vaylerianhero"}
         ]
     },
     {
@@ -22,7 +22,7 @@
         "scope": "",
         "persistanceType": "ONE_ROUND",
         "related":[
-            {"type": "action_cards", "alias": "close_quarters"}
+            {"type": "ac", "alias": "close_quarters"}
         ]
     },
     {
@@ -32,7 +32,7 @@
         "persistanceType": "ALWAYS",
         "scope": "",
         "related":[
-            {"type": "faction_abilities", "alias": "fragile"}
+            {"type": "ability", "alias": "fragile"}
         ]
     },
     {
@@ -42,9 +42,9 @@
         "persistanceType": "ALWAYS",
         "scope": "",
         "related":[
-            {"type": "faction_abilities", "alias": "unrelenting"}, 
-            {"type":"relics", "alias":"starfall_array"},
-            {"type":"relics", "alias":"absol_thalnos"}
+            {"type": "ability", "alias": "unrelenting"}, 
+            {"type":"relic", "alias":"starfall_array"},
+            {"type":"relic", "alias":"absol_thalnos"}
         ]
     },
     {
@@ -54,9 +54,9 @@
         "scope": "ff",
         "persistanceType": "ONE_ROUND",
         "related":[
-            {"type": "promissory_notes", "alias":"tekklar"},
-            {"type": "promissory_notes", "alias":"dspnkjal"},
-            {"type": "action_cards", "alias":"f_prototype"}
+            {"type": "pn", "alias":"tekklar"},
+            {"type": "pn", "alias":"dspnkjal"},
+            {"type": "ac", "alias":"f_prototype"}
         ]
     },
     {
@@ -66,7 +66,7 @@
         "scope": "ff",
         "persistanceType": "ALWAYS",
         "related":[
-            {"type": "agendas", "alias":"prophecy"}
+            {"type": "agenda", "alias":"prophecy"}
         ]
     },
     {
@@ -77,7 +77,7 @@
         "persistanceType": "ALWAYS",
         "scope": "fs",
         "related":[
-            {"type": "units", "alias": "bentor_flagship"}
+            {"type": "unit", "alias": "bentor_flagship"}
         ]
     },
     {
@@ -88,7 +88,7 @@
         "persistanceType": "ALWAYS",
         "scope": "fs",
         "related":[
-            {"type": "units", "alias": "edyn_flagship"}
+            {"type": "unit", "alias": "edyn_flagship"}
         ]
     },
     {
@@ -99,7 +99,7 @@
         "persistanceType": "ALWAYS",
         "scope": "mf",
         "related":[
-            {"type": "units", "alias": "kyro_mech"}
+            {"type": "unit", "alias": "kyro_mech"}
         ]
     },
     {
@@ -111,7 +111,7 @@
         "persistanceType": "ALWAYS",
         "scope": "mf",
         "related":[
-            {"type": "units", "alias": "mirveda_mech"}
+            {"type": "unit", "alias": "mirveda_mech"}
         ]
     },
     {
@@ -123,7 +123,7 @@
         "persistanceType": "ALWAYS",
         "scope": "fs",
         "related":[
-            {"type": "units", "alias": "nokar_flagship"}
+            {"type": "unit", "alias": "nokar_flagship"}
         ]
     },
     {
@@ -134,7 +134,7 @@
         "scope": "",
         "scopeExcept":"fs",
         "related":[
-            {"type": "units", "alias": "sardakk_flagship"}
+            {"type": "unit", "alias": "sardakk_flagship"}
         ]
     },
     {
@@ -145,7 +145,7 @@
         "persistanceType": "ALWAYS",
         "scope": "fs",
         "related":[
-            {"type": "units", "alias": "zealots_flagship"}
+            {"type": "unit", "alias": "zealots_flagship"}
         ]
     },
     {
@@ -156,7 +156,7 @@
         "persistanceType": "ALWAYS",
         "scope": "mf",
         "related":[
-            {"type": "units", "alias": "zealots_mech"}
+            {"type": "unit", "alias": "zealots_mech"}
         ]
     },
     {
@@ -167,7 +167,7 @@
         "condition": "opponent_frag",
         "scope": "mf",
         "related":[
-            {"type": "units", "alias": "naalu_mech"}
+            {"type": "unit", "alias": "naalu_mech"}
         ]
     },
     {
@@ -178,7 +178,7 @@
         "condition": "has_ability_fragile",
         "scope": "gf",
         "related":[
-            {"type": "units", "alias": "jolnar_mech"}
+            {"type": "unit", "alias": "jolnar_mech"}
         ]
     },
     {
@@ -189,7 +189,7 @@
         "condition":"opponent_stolen_faction_tech",
         "scope": "mf",
         "related":[
-            {"type": "units", "alias": "nekro_mech"}
+            {"type": "unit", "alias": "nekro_mech"}
         ]
     },
     {
@@ -200,7 +200,7 @@
         "condition": "planet_mr_legendary_home",
         "scope": "",
         "related":[
-            {"type": "leaders", "alias": "winnucommander"}
+            {"type": "leader", "alias": "winnucommander"}
         ]
     }
 ]

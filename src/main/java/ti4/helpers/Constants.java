@@ -130,6 +130,7 @@ public class Constants {
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
 
+    public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
@@ -417,6 +418,7 @@ public class Constants {
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
+    public static final String UNIT_TECH = "unit_tech";
     public static final String TACTICAL = "tactical_cc";
     public static final String FLEET = "fleet_cc";
     public static final String STRATEGY = "strategy_cc";
@@ -862,4 +864,13 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
+
+    public static final String MOD_OPPONENT_STOLEN_TECH = "opponent_stolen_faction_tech";
+    public static final String MOD_OPPONENT_FRAG = "opponent_frag";
+    public static final String MOD_PLANET_MR_LEGEND_HOME = "planet_mr_legendary_home";
+    public static final String MOD_OPPONENT_PO_EXCLUSIVE_SCORED = "po_opponent_exclusively_scored";
+    public static final String MOD_DESTROYERS = "destroyers";
+    public static final String MOD_OPPONENT_UNIT_TECH = "opponent_unit_tech";
+    public static final String MOD_OPPONENT_FACTION_TECH = "opponent_faction_tech";
+    public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
 }
