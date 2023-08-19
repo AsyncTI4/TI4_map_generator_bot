@@ -103,6 +103,7 @@ public class GameCommand implements Command {
         subcommands.add(new SetDeck());
         subcommands.add(new GameCreate());
         subcommands.add(new Swap());
+        subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }
 

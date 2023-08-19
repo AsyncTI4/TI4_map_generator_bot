@@ -31,7 +31,7 @@
   },
   {
     "name": "Asteroid's Anarchy",
-    "alias": "asteroid",
+    "alias": "anarchy",
     "cardValues": [1,2,3,4,5,6,7,8,9,10,11],
     "description": "Asteroid's set of 11 custom SCs"
   }
