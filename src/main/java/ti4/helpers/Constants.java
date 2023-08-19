@@ -67,6 +67,7 @@ public class Constants {
     public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
+    public static final String REVERSE_SPEAKER_ORDER = "reverse_speaker_order";
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
     public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
     public static final String SET_STATUS = "set_status";
@@ -220,7 +221,7 @@ public class Constants {
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
     public static final String ROUND = "round";
 
-    public static final String COMBAT_INFO = "combat_info";
+    public static final String COMBAT_INFO = "info";
     public static final String COMBAT_ROLL = "combat_roll";
     public static final String COMBAT_MODIFIERS = "mods";
     public static final String COMBAT_EXTRA_ROLLS = "extrarolls";
@@ -647,6 +648,7 @@ public class Constants {
     public static final String PROPULSION = "propulsion";
     public static final String CYBERNETIC = "cybernetic";
     public static final String BIOTIC = "biotic";
+    public static final String WEAPON = "weapon";
     public static final String UNIT_UPGRADE = "unitupgrade";
 
     public static final String PRIVATE_CHANNEL = "-private";
@@ -864,6 +866,7 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
+    public static final String COMBAT = "combat";
 
     public static final String MOD_OPPONENT_STOLEN_TECH = "opponent_stolen_faction_tech";
     public static final String MOD_OPPONENT_FRAG = "opponent_frag";

@@ -1,33 +1,25 @@
-package ti4.commands.capture;
+package ti4.commands.combat;
 
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.generator.GenerateMap;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
-
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class CaptureCommand implements Command {
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.Command;
+import ti4.helpers.Constants;
+import ti4.map.Map;
+import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
+import ti4.message.MessageHelper;
 
-    private final Collection<CaptureSubcommandData> subcommandData = getSubcommands();
+public class CombatCommand implements Command {
+        private final Collection<CombatSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.CAPTURE;
+        return Constants.COMBAT;
     }
 
     @Override
@@ -35,7 +27,6 @@ public class CaptureCommand implements Command {
         if (event.getName().equals(getActionID())) {
             String userID = event.getUser().getId();
             MapManager mapManager = MapManager.getInstance();
-             
             if (!mapManager.isUserWithActiveMap(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
@@ -51,34 +42,10 @@ public class CaptureCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
-        String activeMap = "";
-        if (userActiveMap != null) {
-            activeMap = "Active map: " + userActiveMap.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        CaptureSubcommandData executedCommand = null;
-        for (CaptureSubcommandData subcommand : subcommandData) {
+        CombatSubcommandData executedCommand = null;
+        for (CombatSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -97,28 +64,22 @@ public class CaptureCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap, event);
-
-       // File file = GenerateMap.getInstance().saveImage(activeMap, event);
-       // MessageHelper.replyToMessage(event, file);
     }
 
 
     protected String getActionDescription() {
-        return "Capture units";
+        return "Combat";
     }
 
-    private Collection<CaptureSubcommandData> getSubcommands() {
-        Collection<CaptureSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new AddUnits());
-        subcommands.add(new RemoveUnits());
-
+    private Collection<CombatSubcommandData> getSubcommands() {
+        Collection<CombatSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new CombatInfo());
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+                Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

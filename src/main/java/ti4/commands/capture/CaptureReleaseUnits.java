@@ -39,6 +39,7 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
             }
 
             Player player = activeMap.getPlayer(getUser().getId());
+            player = Helper.getGamePlayer(activeMap, player, event.getMember(), getUser().getId());
             if (player == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
                 return;

@@ -426,6 +426,16 @@ public class Mapper {
         return (String) relics.get(id);
     }
 
+    public static RelicModel getRelicObject(String id) {
+        String relicString = getRelic(id);
+
+        StringTokenizer tokenizer = new StringTokenizer((String) relicString, ";");
+        String name = tokenizer.nextToken();
+        String effect = tokenizer.nextToken();
+        String shortName = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
+        return new RelicModel(id, name, effect, shortName);
+    }
+
     public static PlanetModel getPlanet(String id) {
         return TileHelper.getAllPlanets().get(id);
     }
