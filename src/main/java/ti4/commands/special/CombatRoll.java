@@ -32,7 +32,7 @@ public class CombatRoll extends SpecialSubcommandData {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL,
-                "*BETA* Combat rolls for units on tile. *Auto includes always on mods* (from units, abilities, etc");
+                "*V2* *BETA* Combat rolls for units on tile. *Auto includes always on mods*");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
