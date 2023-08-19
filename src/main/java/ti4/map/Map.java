@@ -2544,6 +2544,31 @@ public class Map {
         return false;
     }
 
+    public List<Leader> playerUnlockedLeadersOrAlliance(Player player){
+        List<Leader> leaders = new ArrayList<>(player.getLeaders());
+        // check if player has any allainces with players that have the commander unlocked
+        for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if (pnID.contains("_an") || "dspnceld".equals(pnID)) { //dspnceld = Celdauri Trade Alliance
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null && !pnOwner.equals(player)) {
+                    leaders.add( pnOwner.getLeaderByType(Constants.COMMANDER) );
+                }
+            }
+        }
+
+        // check if player has Imperia and if any of the stolen CCs are owned by players that have the leader unlocked
+        if (player.hasAbility("imperia")) {
+            for (Player otherPlayer : getRealPlayers()) {
+                if (otherPlayer.equals(player)) continue;
+                if (player.getMahactCC().contains(otherPlayer.getColor())) {
+                    leaders.add( otherPlayer.getLeaderByType(Constants.COMMANDER) );
+                }
+            }
+        }
+        leaders = leaders.stream().filter(leader -> !leader.isLocked()).collect(Collectors.toList());
+        return leaders;
+    }
+
     public int getMapImageGenerationCount() {
         return mapImageGenerationCount;
     }
