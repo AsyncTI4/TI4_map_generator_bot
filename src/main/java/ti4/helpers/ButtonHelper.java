@@ -34,7 +34,6 @@ import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.special.CombatRoll;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
@@ -1204,7 +1203,7 @@ public class ButtonHelper {
         boolean fleetSupplyViolated = false;
 
         for(UnitHolder capChecker : tile.getUnitHolders().values()){
-            java.util.HashMap<UnitModel, Integer> unitsByQuantity = new CombatRoll().getAllUnitsFromUnitHolder(player, capChecker);
+            java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(capChecker, player);
             for(UnitModel unit : unitsByQuantity.keySet()){
                 if(capChecker.getName().equalsIgnoreCase("space")){
                     capacity = capacity + (unit.getCapacityValue()*unitsByQuantity.get(unit));
@@ -1224,7 +1223,7 @@ public class ButtonHelper {
             }
         }
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
-        java.util.HashMap<UnitModel, Integer> unitsByQuantity = new CombatRoll().getAllUnitsFromUnitHolder(player, combatOnHolder);
+        java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player);
         for(UnitModel unit : unitsByQuantity.keySet()){
             if(unit.getBaseType().equalsIgnoreCase("fighter") || unit.getBaseType().equalsIgnoreCase("infantry") || unit.getBaseType().equalsIgnoreCase("mech")){
                 if(unit.getBaseType().equalsIgnoreCase("fighter")&& player.hasFF2Tech()){
