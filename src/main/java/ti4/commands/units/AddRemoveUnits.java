@@ -259,13 +259,20 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
-                if (count <10) {
+                String message = colorMention + " has modified units in the system. ";
+                if(this.getActionDescription().contains("add_units")){
+                    message = message + " Specific units modified include: "+unitList;
+                }
+                message = message + "Refresh map to see what changed ";
+                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
+                  if (count <10) {
                     activeMap.setPingSystemCounter(count);
                     activeMap.setTileAsPinged(count, tile.getPosition());
-                }
-
+                  }
             }
+        }
+        if(this.getActionDescription().contains("add_units")){
+             ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
         actionAfterAll(event, tile, color, activeMap);
     }

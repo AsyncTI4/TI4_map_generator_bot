@@ -320,6 +320,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveArcExpButtons(activeMap, player, buttonID, event, trueIdentity);
          } else if (buttonID.startsWith("cabalHeroTile_")) {
            ButtonHelperFactionSpecific.executeCabalHero(buttonID, player, activeMap, event);
+        } else if (buttonID.startsWith("creussIFFStart_")) {
+           ButtonHelperFactionSpecific.resolveCreussIFFStart(activeMap, player, buttonID, ident, event);
+        } else if (buttonID.startsWith("creussIFFResolve_")) {
+           ButtonHelperFactionSpecific.resolveCreussIFF(activeMap, player, buttonID, ident, event);
         } else if (buttonID.startsWith("acToSendTo_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
@@ -364,6 +368,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.exhaustAgent(buttonID,event,activeMap,player, ident);
         } else if (buttonID.startsWith("sardakkcommander_")) {
             ButtonHelperFactionSpecific.resolveSardakkCommander(activeMap, player, buttonID, event, ident);
+        } else if (buttonID.startsWith("peaceAccords_")) {
+            ButtonHelperFactionSpecific.resolvePeaceAccords(buttonID, ident, player, activeMap, event);
         } else if (buttonID.startsWith("get_so_discard_buttons")) {
             String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(activeMap, player);
@@ -1789,6 +1795,12 @@ public class ButtonListener extends ListenerAdapter {
                                 (MessageChannel) player.getCardsInfoThread(activeMap), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                    if(player.hasAbility("peace_accords")){
+                        List<Button> buttons2 = ButtonHelperFactionSpecific.getXxchaPeaceAccordsButtons(activeMap, player, event, finsFactionCheckerPrefix);
+                        if(!buttons2.isEmpty()){
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), trueIdentity + " use buttons to resolve peace accords", buttons2);
+                         }
                     }
                 }
                 case "leadershipExhaust" -> {
