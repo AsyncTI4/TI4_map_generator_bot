@@ -3467,7 +3467,7 @@
         "imageFileSuffix": "_ca.png",
         "name": "Cruiser II",
         "upgradesFromUnitId": "cruiser",
-        "requiredTechId": "ca2",
+        "requiredTechId": "cr2",
         "source": "base",
         "moveValue": 3,
         "capacityValue": 1,
