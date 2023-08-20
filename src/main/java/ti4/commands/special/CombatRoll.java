@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -36,15 +37,15 @@ public class CombatRoll extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
-                "+/- <unit type>. Eg -1 all, +2 mech. Temp ACs/PN/exhaust-tech mods should be added here")
+                "+/- <unit type>. Eg -1 all, +2 mech. Temp ACs/PN/exhaust-tech mods")
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
-                "(optional) Planet to have combat on. By default rolls for space combat.").setAutoComplete(true)
+                "(optional) Planet to have combat on. Default is space combat.").setAutoComplete(true)
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
-                "comma list of <count> <unit> eg 2 fighter 1 dreadnought for extra roll")
+                "comma list of <count> <unit> eg 2 fighter 1 dreadnought")
                 .setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (by default your units)")
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
                 .setAutoComplete(true).setRequired(false));
     }
 
@@ -57,8 +58,27 @@ public class CombatRoll extends SpecialSubcommandData {
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
 
+        String userID = getUser().getId();
+        Player player = activeMap.getPlayer(userID);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
+
+         if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
+
         if (tileOption == null) {
             return;
+        }
+        List<NamedCombatModifierModel> customMods = new ArrayList<>();
+        if (mods != null) {
+            customMods = parseCustomUnitMods(mods.getAsString());
+        }
+
+        HashMap<String, Integer> extraRollsParsed = new HashMap<String, Integer>();
+        if (extraRollsOption != null) {
+            extraRollsParsed = parseUnits(extraRollsOption.getAsString());
         }
 
         String unitHolderName = Constants.SPACE;
@@ -74,39 +94,22 @@ public class CombatRoll extends SpecialSubcommandData {
                     "Tile " + tileOption.getAsString() + " not found");
             return;
         }
-        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
 
+        secondHalfOfCombatRoll(player, activeMap, event, tile, unitHolderName, extraRollsParsed, customMods);
+    }
+
+    public void secondHalfOfCombatRoll(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
+
+        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         String tileName = tile.getTilePath();
         tileName = tileName.substring(tileName.indexOf("_") + 1);
         tileName = tileName.substring(0, tileName.indexOf(".png"));
         tileName = " - " + tileName + "[" + tile.getTileID() + "]";
         StringBuilder sb = new StringBuilder();
-
-        String userID = getUser().getId();
-        Player player = activeMap.getPlayer(userID);
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
 
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
-
-        List<NamedCombatModifierModel> customMods = new ArrayList<>();
-        if (mods != null) {
-            customMods = parseCustomUnitMods(mods.getAsString());
-        }
-
-        HashMap<String, Integer> extraRollsParsed = new HashMap<String, Integer>();
-        if (extraRollsOption != null) {
-            extraRollsParsed = parseUnits(extraRollsOption.getAsString());
-        }
-
-    
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsInCombat, tileModel, activeMap);
 
@@ -118,9 +121,9 @@ public class CombatRoll extends SpecialSubcommandData {
                 tile.getPosition());
         message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeMap);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         message = StringUtils.removeEnd(message, ";\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 
     @Override
