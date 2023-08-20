@@ -200,9 +200,9 @@ abstract public class UnitHolder {
 
     public String getUnitAliasId(String unitHolderString) {
         String unitHolderFileSuffix = ".png";
-        String unitColor = unitHolderString.substring(unitHolderString.indexOf("_") + 1);
-        unitColor = unitColor.replace(unitHolderFileSuffix, "");
-        return unitColor;
+        String unitId = unitHolderString.substring(unitHolderString.indexOf("_") + 1);
+        unitId = unitId.replace(unitHolderFileSuffix, "");
+        return unitId;
     }
 
     public String getUnitColor(String unitHolderString) {
