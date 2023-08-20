@@ -1029,7 +1029,7 @@
     {
         "id": "gledge_pds",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Orion Platform I",
         "upgradesToUnitId": "gledge_pds2",
@@ -1044,7 +1044,7 @@
     {
         "id": "gledge_pds2",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Orion Platform II",
         "upgradesFromUnitId": "gledge_pds",
@@ -1847,7 +1847,7 @@
     {
         "id": "mirveda_pds",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Gauss Cannon I",
         "upgradesToUnitId": "mirveda_pds2",
@@ -1866,7 +1866,7 @@
     {
         "id": "mirveda_pds2",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Gauss Cannon II",
         "upgradesFromUnitId": "mirveda_pds",
@@ -2854,7 +2854,7 @@
     {
         "id": "titans_pds",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Hel-Titan I",
         "upgradesToUnitId": "titans_pds2",
@@ -2874,7 +2874,7 @@
     {
         "id": "titans_pds2",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "Hel-Titan II",
         "upgradesFromUnitId": "titans_pds",
@@ -3666,7 +3666,7 @@
     {
         "id": "pds",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "PDS I",
         "upgradesToUnitId": "pds2",
@@ -3679,7 +3679,7 @@
     {
         "id": "pds2",
         "baseType": "pds",
-        "asyncId": "pds",
+        "asyncId": "pd",
         "imageFileSuffix": "_pds.png",
         "name": "PDS II",
         "upgradesFromUnitId": "pds",
