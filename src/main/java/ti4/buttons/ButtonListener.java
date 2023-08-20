@@ -831,6 +831,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("delete_buttons_")) {
             AgendaHelper.resolvingAnAgendaVote(buttonID, event, activeMap, player);
+        } else if (buttonID.startsWith("combatRoll_")) {
+            ButtonHelper.resolveCombatRoll(player, activeMap, event, buttonID);
         } else if (buttonID.startsWith("forceAbstainForPlayer_")) {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Player was forcefully abstained");
             String faction = buttonID.replace("forceAbstainForPlayer_", "");

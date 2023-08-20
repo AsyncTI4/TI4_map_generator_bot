@@ -1,13 +1,16 @@
 package ti4.commands.special;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -16,6 +19,7 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class SystemInfo extends SpecialSubcommandData {
@@ -133,6 +137,23 @@ public class SystemInfo extends SpecialSubcommandData {
             }
             File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tileID, event);
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
+            if(!activeMap.isFoWMode()){
+                for(Player player : activeMap.getRealPlayers()){
+
+                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeMap, tile);
+                    if(players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())){
+                        Player player2 = players.get(0);
+                        if(player2 == player){
+                            player2 = players.get(1);
+                        }
+                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition(), player, player2, "space");
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
+                        break;
+                    }
+                }
+            }
+                            
+
         }
     }
 

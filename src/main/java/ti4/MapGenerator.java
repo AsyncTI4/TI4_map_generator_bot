@@ -152,8 +152,6 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveCC());
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
-        // commandManager.addCommand(new AddControl()); //disabled due to confusing players - /player planet_add should be used
-        // commandManager.addCommand(new RemoveControl()); //disabled due to confusing players - /player planet_remove should be used
         commandManager.addCommand(new MoveUnits());
         commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
@@ -165,14 +163,20 @@ public class MapGenerator {
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
+
+
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
+
+
         commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
+
+
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CombatCommand());
