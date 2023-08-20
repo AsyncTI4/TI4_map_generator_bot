@@ -11,22 +11,35 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.UnitModel;
 
 public class CombatHelper {
 
-    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player) {
+    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<UnitModel, Integer> unitsInCombat = new HashMap<>(unitHolder.getUnitAsyncIdsOnHolder(colorID)
                 .entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> player.getUnitByAsyncID(entry.getKey().toLowerCase()),
                         Entry::getValue)));
+        
+        // Gracefully fail when units don't exist
+        if (unitsInCombat.containsKey(null)) {
+            List<String> problems = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+                .filter(unit -> player.getUnitByAsyncID(unit.toLowerCase()) == null).toList();
+            StringBuilder error = new StringBuilder("You do not seem to own any of the following unit types, so they will be skipped.");
+            error.append(" Ping bothelper if this seems to be in error.\n");
+            error.append("> Unowned units: ").append(problems).append("\n");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+            unitsInCombat.remove(null);
+        }
 
         if (unitHolder.getName() == Constants.SPACE) {
             return new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
@@ -58,7 +71,7 @@ public class CombatHelper {
 
     public static String RollForUnits(java.util.Map<UnitModel, Integer> units,
             HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
-            Map map) {
+            Map activeMap) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
@@ -92,7 +105,7 @@ public class CombatHelper {
             int numOfUnit = entry.getValue();
 
             int toHit = unit.getCombatHitsOn();
-            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, map);
+            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeMap);
             int extraRollsForUnit = 0;
             if (extraRolls.containsKey(unit.getAsyncId())) {
                 extraRollsForUnit = extraRolls.get(unit.getAsyncId());

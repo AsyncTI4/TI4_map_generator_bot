@@ -24,7 +24,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -275,7 +274,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static String getNextGameName() {
-        ArrayList<Integer> existingNums = getAllExistingPBDNumbers();
+        List<Integer> existingNums = getAllExistingPBDNumbers();
         if (existingNums.size() == 0) {
             return "pbd1";
         }
@@ -308,9 +307,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
     }
 
-    private static ArrayList<Integer> getAllExistingPBDNumbers() {
+    private static List<Integer> getAllExistingPBDNumbers() {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
-        ArrayList<Integer> pbdNumbers = new ArrayList<>();
+        List<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
@@ -338,8 +337,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }
-        pbdNumbers.remove(1000); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
-        return pbdNumbers;
+        return pbdNumbers.stream().filter(num -> num != 1000).toList(); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
     }
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = MapGenerator.jda.getGuilds();

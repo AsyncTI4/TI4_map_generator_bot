@@ -158,19 +158,19 @@ public class CombatModHelper {
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, List<NamedCombatModifierModel> modifiers, Player player,
-            Player opponent, Map map) {
+            Player opponent, Map activeMap) {
         Integer modValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit)) {
-                modValue += GetVariableModValue(modifier, player, opponent, map);
+                modValue += GetVariableModValue(modifier, player, opponent, activeMap);
             }
         }
         return modValue;
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-            Player opponent, Map map) {
+            Player opponent, Map activeMap) {
         Boolean meetsCondition = false;
         String condition = "";
         if(modifier != null && modifier.getCondition() != null){
@@ -217,7 +217,7 @@ public class CombatModHelper {
     /// But for some (mostly flagships), the value is scaled depending on game state like how many fragments you have
     /// or how many POs the opponent has scored that you havent etc.
     ///
-    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent, Map map) {
+    public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent, Map activeMap) {
         Double value = mod.getValue().doubleValue();
         Double multipler = 1.0;
         Long scalingCount = (long) 0;
@@ -230,13 +230,13 @@ public class CombatModHelper {
                     scalingCount = Long.valueOf(player.getFragments().size());
                     break;
                 case Constants.LAW:
-                    scalingCount = Long.valueOf(map.getLaws().size());
+                    scalingCount = Long.valueOf(activeMap.getLaws().size());
                     break;
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED:
                     if (opponent != null) {
-                        var customPublicVPList = map.getCustomPublicVP();
+                        var customPublicVPList = activeMap.getCustomPublicVP();
                         List<List<String>> scoredPOUserLists = new ArrayList<>();
-                        for (Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
+                        for (Entry<String, List<String>> entry : activeMap.getScoredPublicObjectives().entrySet()) {
                             // Ensure its actually a revealed PO not imperial or a relic
                             if (!customPublicVPList.containsKey(entry.getKey().toString())) {
                                 scoredPOUserLists.add(entry.getValue());
@@ -257,7 +257,7 @@ public class CombatModHelper {
                 case Constants.MOD_DESTROYERS:
                     // TODO: Doesnt seem like an easier way to do this? Seems slow.
                     String colorID = Mapper.getColorID(player.getColor());
-                    for (Tile tile : map.getTileMap().values()) {
+                    for (Tile tile : activeMap.getTileMap().values()) {
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 
                             HashMap<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
