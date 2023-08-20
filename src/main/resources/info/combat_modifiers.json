@@ -149,6 +149,17 @@
         ]
     },
     {
+        "alias": "plus_2_opponent_cc_not_in_fleet_flagship",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition": "opponent_no_cc_fleet",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "mahact_flagship"}
+        ]
+    },
+    {
         "alias": "plus_x_opponent_faction_tech_always_mech",
         "type": "DIE_MOD",
         "value": "+1",

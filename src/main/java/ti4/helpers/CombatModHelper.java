@@ -205,6 +205,9 @@ public class CombatModHelper {
             case Constants.MOD_HAS_FRAGILE:
                 meetsCondition = player.getAbilities().contains("fragile");
                 break;
+            case Constants.MOD_OPPONENT_NO_CC_FLEET:
+                meetsCondition = !player.getMahactCC().contains(opponent.getColor());
+                break;
             default:
                 meetsCondition = true;
                 break;
