@@ -31,12 +31,12 @@ public class Observer extends BothelperSubcommandData {
         for(GuildChannel channel : channels) {
             if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
                 sendMessage("Found channel match: " + channel.getName());
-                if(event.getOption(Constants.ADD_REMOVE).toString() == "add") {
+                if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "add") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) event.getOption(Constants.PLAYER)).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
                     sendMessage("Permissions granted on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
                 }
 
-                if(event.getOption(Constants.ADD_REMOVE).toString() == "remove") {
+                if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "remove") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) event.getOption(Constants.PLAYER)).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
                     sendMessage("Permissions revoked on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
                 }
