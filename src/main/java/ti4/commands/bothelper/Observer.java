@@ -27,7 +27,7 @@ public class Observer extends BothelperSubcommandData {
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
-        sendMessage("DEBUG: Playername: " + event.getOption(Constants.PLAYER).getName() + " Add/remove: " + event.getOption(Constants.ADD_REMOVE).toString());
+        sendMessage("DEBUG: Playername: " + event.getOption(Constants.PLAYER, null, OptionMapping::getAsString) + " Add/remove: " + event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString));
         for(GuildChannel channel : channels) {
             if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
                 sendMessage("Found channel match: " + channel.getName());
