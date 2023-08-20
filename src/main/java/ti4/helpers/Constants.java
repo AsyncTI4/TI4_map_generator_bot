@@ -876,4 +876,5 @@ public class Constants {
     public static final String MOD_OPPONENT_UNIT_TECH = "opponent_unit_tech";
     public static final String MOD_OPPONENT_FACTION_TECH = "opponent_faction_tech";
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
+    public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
 }
