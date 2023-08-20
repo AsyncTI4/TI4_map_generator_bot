@@ -5,6 +5,8 @@ import java.util.List;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -24,20 +26,21 @@ public class Observer extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
        Guild guild = event.getGuild();
+       Member user = guild.getMemberById(event.getOption(Constants.PLAYER, null, OptionMapping::getAsString));
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
-        sendMessage("DEBUG: Playername: " + event.getOption(Constants.PLAYER, null, OptionMapping::getAsString) + " Add/remove: " + event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString));
+        sendMessage("DEBUG: Playername: " + user.getNickname() + " Add/remove: " + event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString));
         for(GuildChannel channel : channels) {
             if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
                 sendMessage("Found channel match: " + channel.getName());
                 if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "add") {
-                    channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) event.getOption(Constants.PLAYER)).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
+                    channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
                     sendMessage("Permissions granted on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
                 }
 
                 if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "remove") {
-                    channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) event.getOption(Constants.PLAYER)).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
+                    channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
                     sendMessage("Permissions revoked on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
                 }
             }
