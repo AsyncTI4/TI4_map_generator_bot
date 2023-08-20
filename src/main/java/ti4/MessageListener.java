@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -280,15 +281,23 @@ public class MessageListener extends ListenerAdapter {
         }
         if (event.getChannel() instanceof ThreadChannel &&  event.getChannel().getName().contains("vs") &&  event.getChannel().getName().contains("private")) {
             String gameName = event.getChannel().getName();
+            String message2 = msg.getContentRaw();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Map activeMap = MapManager.getInstance().getMap(gameName);
-            if(activeMap.isFoWMode() && !event.getAuthor().getId().equalsIgnoreCase("947763140517560331") && !event.getAuthor().getId().equalsIgnoreCase("1089270182171656292")){
+            if(activeMap.isFoWMode() && ((!event.getAuthor().getId().equalsIgnoreCase("947763140517560331") && !event.getAuthor().isBot() && !event.getAuthor().getId().equalsIgnoreCase("1089270182171656292")) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
                 
                 for(Player player : activeMap.getRealPlayers()){
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if(pChan != null){
-                        String newMessage = ButtonHelper.getTrueIdentity(player, activeMap)+" Someone said: " + msg.getContentRaw();
+                        
+                        
+                        String newMessage = ButtonHelper.getTrueIdentity(player, activeMap)+" Someone said: " + message2;
+                        if(event.getAuthor().isBot() && message2.contains("Total hits ")){
+                            String hits = StringUtils.substringAfter(message2, "Total hits ");
+                            String location = StringUtils.substringBefore(message2, "combat rolls for");
+                            newMessage = ButtonHelper.getTrueIdentity(player, activeMap)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
+                        }
                         String[] threadN = event.getChannel().getName().split("-");
                         String threadName = threadN[0]+"-"+threadN[1]+"-"+threadN[2]+"-"+threadN[3]+"-"+threadN[4];
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
