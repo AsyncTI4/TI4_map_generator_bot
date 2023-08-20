@@ -48,7 +48,7 @@ public class SetDeck extends GameSubcommandData {
                     activeMap.setScTradeGoods(new LinkedHashMap<>());
                     activeMap.setScSet(strategyCardModel.getAlias());
 
-                    strategyCardModel.getCardValues().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
+                    strategyCardModel.getCardValues().keySet().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
                 }
                 else {
                     DeckModel deckModel = Mapper.getDecks().get(value);

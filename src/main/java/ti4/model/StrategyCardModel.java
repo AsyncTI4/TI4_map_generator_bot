@@ -2,13 +2,13 @@ package ti4.model;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import java.util.List;
+import java.util.Map;
 
 @Data
 public class StrategyCardModel implements ModelInterface{
     private String name;
     private String alias;
-    private List<Integer> cardValues;
+    private Map<Integer, String> cardValues;
     private String description;
 
     @Override
