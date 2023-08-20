@@ -652,6 +652,16 @@ public class AutoCompleteProvider {
                         .toList();
                 event.replyChoiceStrings(allWormholeTypes).queue();
             }
+            case Constants.ADD_REMOVE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<String> values = Arrays.asList("add","remove");
+                List<Command.Choice> options = values.stream()
+                        .filter(token -> token.contains(enteredValue))
+                        .limit(25)
+                        .map(token -> new Command.Choice(token, token))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 }
