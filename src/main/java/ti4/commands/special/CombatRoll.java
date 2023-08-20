@@ -92,7 +92,7 @@ public class CombatRoll extends SpecialSubcommandData {
         }
 
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
-        HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player);
+        HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
 
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
 

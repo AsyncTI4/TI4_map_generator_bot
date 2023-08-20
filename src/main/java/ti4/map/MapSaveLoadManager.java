@@ -122,7 +122,9 @@ public class MapSaveLoadManager {
 
         File mapFile = Storage.getMapImageStorage(activeMap.getName() + TXT);
         if (mapFile != null) {
-            saveUndo(activeMap, mapFile);
+            if (mapFile.exists()) {
+                saveUndo(activeMap, mapFile);
+            }
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
                 HashMap<String, Tile> tileMap = activeMap.getTileMap();
                 writer.write(activeMap.getOwnerID());

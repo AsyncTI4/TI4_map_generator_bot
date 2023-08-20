@@ -1203,7 +1203,7 @@ public class ButtonHelper {
         boolean fleetSupplyViolated = false;
 
         for(UnitHolder capChecker : tile.getUnitHolders().values()){
-            java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(capChecker, player);
+            java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(capChecker, player, event);
             for(UnitModel unit : unitsByQuantity.keySet()){
                 if(capChecker.getName().equalsIgnoreCase("space")){
                     capacity = capacity + (unit.getCapacityValue()*unitsByQuantity.get(unit));
@@ -1223,7 +1223,7 @@ public class ButtonHelper {
             }
         }
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
-        java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player);
+        java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
         for(UnitModel unit : unitsByQuantity.keySet()){
             if(unit.getBaseType().equalsIgnoreCase("fighter") || unit.getBaseType().equalsIgnoreCase("infantry") || unit.getBaseType().equalsIgnoreCase("mech")){
                 if(unit.getBaseType().equalsIgnoreCase("fighter")&& player.hasFF2Tech()){
