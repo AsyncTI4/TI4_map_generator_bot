@@ -6,14 +6,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Player;
 
 public class Observer extends BothelperSubcommandData {
     public Observer() {
@@ -26,7 +24,7 @@ public class Observer extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
        Guild guild = event.getGuild();
-       Member user = guild.getMemberById(event.getOption(Constants.PLAYER, null, OptionMapping::getAsString));
+       Member user = event.getOption(Constants.PLAYER).getAsMember();
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
