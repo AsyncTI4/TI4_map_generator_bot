@@ -15,7 +15,7 @@ import ti4.helpers.Constants;
 public class Observer extends BothelperSubcommandData {
     public Observer() {
         super(Constants.OBSERVER,"Add or remove observers to game channels");
-        addOptions(new OptionData(OptionType.STRING, Constants.PBD_NUMBER, "The game number I.E. pbd###").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER,"Player @playername").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADD_REMOVE,"add or remove player as observer").setRequired(true));
     }
@@ -28,7 +28,8 @@ public class Observer extends BothelperSubcommandData {
        
         List<GuildChannel> channels = guild.getChannels();
         for(GuildChannel channel : channels) {
-            if(channel.getName().contains(event.getOption(Constants.PBD_NUMBER, null, OptionMapping::getAsString))) {
+            sendMessage("Found channel match: " + channel.getName());
+            if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
                 if(event.getOption(Constants.ADD_REMOVE,null,OptionMapping::getAsString) == "add") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) event.getOption(Constants.PLAYER)).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
                     sendMessage("Permissions granted on " + player.getName() + " to channel " + channel.getName());
