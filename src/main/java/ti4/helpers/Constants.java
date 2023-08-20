@@ -864,6 +864,5 @@ public class Constants {
     public static final String CLEAR_DEBT = "clear_debt";
 
     public static final String OBSERVER = "observer";
-    public static final String PBD_NUMBER = "pbd_number";
     public static final String ADD_REMOVE = "add_remove";
 }
