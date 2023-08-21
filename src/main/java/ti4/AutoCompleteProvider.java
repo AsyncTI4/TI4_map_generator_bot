@@ -142,8 +142,18 @@ public class AutoCompleteProvider {
             }
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> relics = Mapper.getRelics();
-                if (activeMap != null && activeMap.isAbsolMode()){
+                //HashMap<String, String> relics = Mapper.getRelics();
+                List<String> tableRelics=
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    List<String> playerRelics = player.getRelics();
+                    tableRelics.addAll(playerRelics);
+                }
+                    List<Command.Choice> options = Stream.of(tableRelics)
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+/*                if (activeMap != null && activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                             .filter(value -> value.getKey().startsWith("absol_") || value.getKey().equals("enigmaticdevice"))
@@ -159,7 +169,7 @@ public class AutoCompleteProvider {
                             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                             .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                }
+                }*/
             }
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
