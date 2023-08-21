@@ -107,8 +107,23 @@ public class Map {
     @ExportableField
     private boolean absolMode = false;
 
+    @Getter @Setter
+    private String acDeckID = "action_cards_pok";
+    @Getter @Setter
+    private String soDeckID = "secret_objectives_pok";
+    @Getter @Setter
+    private String stage1PublicDeckID = "public_stage_1_objectives_pok";
+    @Getter @Setter
+    private String stage2PublicDeckID = "public_stage_2_objectives_pok";
+    @Getter @Setter
+    private String relicDeckID = "relics_pok";
+    @Getter @Setter
+    private String agendaDeckID = "agendas_pok";
+    @Getter @Setter
+    private String explorationDeckID = "explores_pok";
     @Getter @Setter @ExportableField
-    private String scSet = "pok";
+    private String scSetID = "pok";
+
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -1439,11 +1454,7 @@ public class Map {
     }
 
     public void resetAgendas() {
-        if (this.absolMode) {
-            this.agendas = Mapper.getDecks().get("agendas_absol").getShuffledCardList();
-        } else {
-            this.agendas = Mapper.getDecks().get("agendas_pok").getShuffledCardList();
-        }
+        this.agendas = Mapper.getDecks().get(getAgendaDeckID()).getShuffledCardList();
         Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();
     }
@@ -2133,13 +2144,10 @@ public class Map {
     }
 
     public void resetRelics() {
-        if (this.absolMode) {
-            this.relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
-        } else {
-            this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
-        }
+        this.relics = Mapper.getDecks().get(getRelicDeckID()).getShuffledCardList();
         Collections.shuffle(this.relics);
     }
+    
     public void triplicateRelics() {
         if (this.absolMode) {
             this.relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
@@ -2181,6 +2189,7 @@ public class Map {
                 return;
             }
         }
+        setAcDeckID(deck.getAlias());
         this.setActionCards(deck.getShuffledCardList());
     }
 
@@ -2189,6 +2198,7 @@ public class Map {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
             return;
         }
+        setAgendaDeckID(deck.getAlias());
         this.setAgendas(deck.getShuffledCardList());
     }
 
@@ -2596,6 +2606,6 @@ public class Map {
     }
 
     public StrategyCardModel getStrategyCardSet() {
-        return Mapper.getStrategyCardSets().get(getScSet());
+        return Mapper.getStrategyCardSets().get(getScSetID());
     }
 }

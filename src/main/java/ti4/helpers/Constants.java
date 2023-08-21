@@ -883,4 +883,12 @@ public class Constants {
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
     public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
+    
+    public static final String AC_DECK_ID = "ac_deck_id";
+    public static final String SO_DECK_ID = "so_deck_id";
+    public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";
+    public static final String STAGE_2_PUBLIC_DECK_ID = "stage_2_public_deck_id";
+    public static final String RELIC_DECK_ID = "relic_deck_id";
+    public static final String AGENDA_DECK_ID = "agenda_deck_id";
+    public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
 }
