@@ -24,22 +24,22 @@ public class Observer extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
        Guild guild = event.getGuild();
-       Member user = event.getOption(Constants.PLAYER).getAsMember();
+       Member user = event.getOption("player").getAsMember();
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
-        sendMessage("DEBUG: Playername: " + user.getNickname() + " Add/remove: " + event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString));
+        sendMessage("DEBUG: Playername: " + user.getNickname() + " Add/remove: " + event.getOption("add_remove").getAsString());
         for(GuildChannel channel : channels) {
             if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
                 sendMessage("Found channel match: " + channel.getName());
-                if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "add") {
+                if(event.getOption("add_remove").getAsString() == "add") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
-                    sendMessage("Permissions granted on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
+                    sendMessage("Permissions granted on " + user.getNickname() + " to channel " + channel.getName());
                 }
 
-                if(event.getOption(Constants.ADD_REMOVE, null, OptionMapping::getAsString) == "remove") {
+                if(event.getOption("add_remove").getAsString() == "remove") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
-                    sendMessage("Permissions revoked on " + event.getOption(Constants.PLAYER).getName() + " to channel " + channel.getName());
+                    sendMessage("Permissions revoked on " + user.getNickname() + " to channel " + channel.getName());
                 }
             }
         }
