@@ -579,12 +579,13 @@ public class Map {
             put("FoW", isFoWMode());
             put(Emojis.Absol + "Absol", isAbsolMode());
             put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+            put("HomebrewSC", isHomeBrewSCMode());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode());
     }
 
     @JsonIgnore
