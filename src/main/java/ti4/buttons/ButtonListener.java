@@ -38,6 +38,7 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.map.ShowGame;
 import ti4.commands.planet.PlanetExhaust;
@@ -54,7 +55,6 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -78,7 +78,6 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 
@@ -1337,8 +1336,7 @@ public class ButtonListener extends ListenerAdapter {
             Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
-            boolean pickSuccessful = stats.secondHalfOfPickSC((GenericInteractionCreateEvent) event, activeMap, player,
-                    scpick);
+            boolean pickSuccessful = stats.secondHalfOfPickSC((GenericInteractionCreateEvent) event, activeMap, player, scpick);
             if (pickSuccessful) {
                 new SCPick().secondHalfOfSCPick((GenericInteractionCreateEvent) event, player, activeMap, scpick);
                 event.getMessage().delete().queue();
@@ -2073,7 +2071,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!player.getSCs().contains(8)) {
                         MessageHelper.sendMessageToChannel(privateChannel, "Only the player who has "
-                                + Helper.getSCBackRepresentation(event, 8) + " can score the Imperial point");
+                                + Helper.getSCBackRepresentation(event, activeMap, 8) + " can score the Imperial point");
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID + "score_imperial", activeMap, player, event,
@@ -2992,34 +2990,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getGamePing(event.getGuild(),
                             activeMap)
                             + " All players have indicated completion of status phase. Proceed to Strategy Phase.");
-                    Player speaker = null;
-                    if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
-                        speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
-                    } else {
-                        speaker = null;
-                    }
-                    String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
-                            + " UP TO PICK SC\n";
-                    activeMap.updateActivePlayer(speaker);
-                    activeMap.setCurrentPhase("strategy");
-                    ButtonHelperFactionSpecific.giveKeleresCommsNTg(activeMap, event);
-                    if (activeMap.isFoWMode()) {
-                        // MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
-                        if (!activeMap.isHomeBrewSCMode()) {
-                            MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
-                        } else {
-                            MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
-                        }
-                    } else {
-                        // MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                        if (!activeMap.isHomeBrewSCMode()) {
-                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
-                        } else {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                        }
-                    }
+                    StartPhase.startPhase(event, activeMap, "strategy");
                 }
             }
         }

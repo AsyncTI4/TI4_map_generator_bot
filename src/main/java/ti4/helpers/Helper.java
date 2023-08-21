@@ -317,34 +317,29 @@ public class Helper {
         };
     }
 
-    public static String getSCAsMention(Guild guild, int sc) {
-        return getRoleMentionByName(guild, getSCName(sc));
+    public static String getSCAsMention(Guild guild, int sc, Map activeMap) {
+        return getRoleMentionByName(guild, getSCName(sc, activeMap));
     }
 
     public static String getSCAsMention(Guild guild, String scname) {
         return getRoleMentionByName(guild, scname);
     }
 
-    public static String getSCFrontRepresentation(GenericInteractionCreateEvent event, int sc) {
-        return getSCEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc);
+    public static String getSCFrontRepresentation(GenericInteractionCreateEvent event, Map activeMap, int sc) {
+        if (activeMap.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeMap);
+        return getSCEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc, activeMap);
     }
 
-    public static String getSCBackRepresentation(GenericInteractionCreateEvent event, int sc) {
-        return getSCBackEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc);
+    public static String getSCBackRepresentation(GenericInteractionCreateEvent event, Map activeMap, int sc) {
+        if (activeMap.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeMap) + " (Played)";
+        return getSCBackEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc, activeMap);
     }
 
-    public static String getSCName(int sc) {
-        return switch (sc) {
-            case 1 -> "leadership";
-            case 2 -> "diplomacy";
-            case 3 -> "politics";
-            case 4 -> "construction";
-            case 5 -> "trade";
-            case 6 -> "warfare";
-            case 7 -> "technology";
-            case 8 -> "imperial";
-            default -> "" + sc;
-        };
+    public static String getSCName(int sc, Map activeMap) {
+        if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("null")) {
+            return Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(sc);
+        }
+        return "" + sc;
     }
 
     public static Integer getSCNumber(String sc) {
@@ -614,7 +609,7 @@ public class Helper {
             if (held) continue;
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
-            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeMap.isHomeBrewSCMode()) {
                 button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, " ").withEmoji(scEmoji);
             } else {
                 button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc);

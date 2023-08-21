@@ -265,59 +265,58 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
-			if (optionSC == null) {
-				return false;
-			}
-			if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
-				activeMap.setMapStatus(MapStatus.open);
-			}
-			int scNumber = optionSC.getAsInt();
-			return secondHalfOfPickSC(event, activeMap, player, scNumber);
+		if (optionSC == null) {
+			return false;
+		}
+		if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
+			activeMap.setMapStatus(MapStatus.open);
+		}
+		int scNumber = optionSC.getAsInt();
+		return secondHalfOfPickSC(event, activeMap, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber)
-	{
-			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can pick SC only if faction and color picked");
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber) {
+		LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
+			return false;
+		}
+		if (!scTradeGoods.containsKey(scNumber)) {
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
+			return false;
+		}
+
+		LinkedHashMap<String, Player> players = activeMap.getPlayers();
+		for (Player playerStats : players.values()) {
+			if (playerStats.getSCs().contains(scNumber)) {
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
 				return false;
 			}
-			if (!scTradeGoods.containsKey(scNumber)) {
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game");
-				return false;
-			}
+		}
 
-			LinkedHashMap<String, Player> players = activeMap.getPlayers();
-			for (Player playerStats : players.values()) {
-				if (playerStats.getSCs().contains(scNumber)) {
-					MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
-					return false;
-				}
-			}
-
-			player.addSC(scNumber);
+		player.addSC(scNumber);
+		if (activeMap.isFoWMode()) {
 			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+		}
+		
+		Integer tgCount = scTradeGoods.get(scNumber);
+		if (tgCount != null && tgCount != 0) {
+			int tg = player.getTg();
+			tg += tgCount;
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
 			if (activeMap.isFoWMode()) {
+				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 			}
-			Integer tgCount = scTradeGoods.get(scNumber);
-			if (tgCount != null && tgCount != 0) {
-				int tg = player.getTg();
-				tg += tgCount;
-				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
-				}
 
-				player.setTg(tg);
-				if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
-					ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
-				}
-				ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+			player.setTg(tg);
+			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+				ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
 			}
-			return true;
-
+			ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+		}
+		return true;
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
