@@ -24,13 +24,13 @@ public class Observer extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
        Guild guild = event.getGuild();
-       Member user = event.getOption("player").getAsMember();
+       Member user = guild.getMemberById(event.getOption("player").getAsString());
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
         sendMessage("DEBUG: Playername: " + event.getOption("player").getAsString() + " Add/remove: " + event.getOption("add_remove").getAsString());
         for(GuildChannel channel : channels) {
-            if(channel.getName().contains(event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString))) {
+            if(channel.getName().contains(event.getOption("game_name").getAsString())) {
                 sendMessage("Found channel match: " + channel.getName());
                 if(event.getOption("add_remove").getAsString() == "add") {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
