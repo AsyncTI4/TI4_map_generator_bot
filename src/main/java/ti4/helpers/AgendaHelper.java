@@ -43,7 +43,7 @@ public class AgendaHelper {
                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
                 AgendaModel agendaDetails = Mapper.getAgenda(id2);
                 String agendaName = agendaDetails.getName();
-                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "The hidden agenda was " + agendaName
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "#The hidden agenda was " + agendaName
                         + "! You can find it added as a law or in the discard.");
                 Integer uniqueID = discardAgendas.get(id2);
                 aID = uniqueID;
@@ -66,7 +66,7 @@ public class AgendaHelper {
                         activeMap.addLaw(aID, winner);
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "Added Law with " + winner + " as the elected!");
+                            "#Added Law with " + winner + " as the elected!");
                     if(agID.equalsIgnoreCase("warrant")){
                         player2.setSearchWarrant();
                         activeMap.drawSecretObjective(player2.getUserID());
