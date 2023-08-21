@@ -80,8 +80,6 @@ public class SCPlay extends PlayerSubcommandData {
             }
         }
 
-        String emojiName = "SC" + scToPlay;
-
         if (activeMap.getPlayedSCs().contains(scToPlay)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
             return;
@@ -90,23 +88,8 @@ public class SCPlay extends PlayerSubcommandData {
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         //String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
-        StringBuilder scMessageBuilder = new StringBuilder("SC ");
-        if(activeMap.isHomeBrewSCMode()) {
-            scMessageBuilder
-                    .append("#")
-                    .append(scToPlay);
-            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
-                String scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getSCName(scToPlay);
-                scMessageBuilder
-                        .append(" ")
-                        .append(scName);
-            }
-        }
-        else {
-            scMessageBuilder
-                    .append(Helper.getEmojiFromDiscord(emojiName))
-                    .append(Helper.getSCAsMention(activeMap.getGuild(), scToDisplay, activeMap));
-        }
+        StringBuilder scMessageBuilder = new StringBuilder();
+        scMessageBuilder.append(Helper.getSCFrontRepresentation(event, activeMap, scToPlay));
         if (pbd100or500) {
             scMessageBuilder
                     .append(" Group ")
