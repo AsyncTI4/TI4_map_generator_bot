@@ -16,8 +16,10 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -34,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
+
+import com.amazonaws.util.StringUtils;
 
 public class MessageHelper {
 	interface MessageFunction{
@@ -94,10 +98,28 @@ public class MessageHelper {
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file) {
+		if(channel.getName().contains("-actions")){
+			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
+			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			for (ThreadChannel threadChannel_ : threadChannels) {
+				if (threadChannel_.getName().equals(threadName)) {
+					channel = (MessageChannel) threadChannel_;
+				}
+			}
+		}
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+		if(channel.getName().contains("-actions")){
+			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
+			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			for (ThreadChannel threadChannel_ : threadChannels) {
+				if (threadChannel_.getName().equals(threadName)) {
+					channel = (MessageChannel) threadChannel_;
+				}
+			}
+		}
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 		splitAndSent(message, channel, buttons);
@@ -134,6 +156,17 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageWithFile(MessageChannel channel, File file, String messageText, boolean pinMessage) {
+		
+		if(channel.getName().contains("-actions")){
+			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
+			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			for (ThreadChannel threadChannel_ : threadChannels) {
+				if (threadChannel_.getName().equals(threadName)) {
+					channel = (MessageChannel) threadChannel_;
+				}
+			}
+		}
+		
 		FileUpload fileUpload = FileUpload.fromData(file);
 		MessageCreateBuilder message = new MessageCreateBuilder();
 		if (messageText != null) {
