@@ -143,7 +143,7 @@ public class AutoCompleteProvider {
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 //HashMap<String, String> relics = Mapper.getRelics();
-                List<String> tableRelics=
+                List<String> tableRelics;
                 for (Player player_ : activeMap.getPlayers().values()) {
                     List<String> playerRelics = player.getRelics();
                     tableRelics.addAll(playerRelics);
