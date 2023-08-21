@@ -71,9 +71,9 @@ public class DataMigrationManager {
     public static Boolean migrateNullSCDeckToPoK_210823(Map map) {
         Boolean mapNeededMigrating = false;
 
-        if (map.getScSet() == null || map.getScSet().equals("null")) {
+        if (map.getScSetID() == null || map.getScSetID().equals("null")) {
             mapNeededMigrating = true;
-            map.setScSet("pok");
+            map.setScSetID("pok");
         }
 
         return mapNeededMigrating;

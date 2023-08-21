@@ -49,7 +49,15 @@ public class Info extends GameSubcommandData{
         if (activeMap.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append(NEW_LINE);
         sb.append("Game Modes: " + activeMap.getGameModesText()).append(NEW_LINE);
-        sb.append("Strategy Card Set: ").append(activeMap.getScSet()).append(NEW_LINE);
+        sb.append("Strategy Card Set: ").append(activeMap.getScSetID()).append(NEW_LINE);
+        sb.append("Decks: ").append(NEW_LINE);
+        sb.append("> Action Card Deck: ").append(activeMap.getAcDeckID()).append(NEW_LINE);
+        sb.append("> Secret Objective Deck: ").append(activeMap.getSoDeckID()).append(NEW_LINE);
+        sb.append("> Stage 1 Public Objective Deck: ").append(activeMap.getStage1PublicDeckID()).append(NEW_LINE);
+        sb.append("> Stage 2 Public Objective Deck: ").append(activeMap.getStage2PublicDeckID()).append(NEW_LINE);
+        sb.append("> Relic Deck:").append(activeMap.getRelicDeckID()).append(NEW_LINE);
+        sb.append("> Agenda Deck:").append(activeMap.getAgendaDeckID()).append(NEW_LINE);
+        sb.append("> Exploration Deck:").append(activeMap.getExplorationDeckID()).append(NEW_LINE);
         sb.append("Current Phase: " +activeMap.getCurrentPhase()).append(NEW_LINE);
         sb.append("Ring Count: " +activeMap.getRingCount()).append(NEW_LINE);
         sb.append("Auto-Ping Time Interval (hrs): " + activeMap.getAutoPingSpacer()).append(NEW_LINE);

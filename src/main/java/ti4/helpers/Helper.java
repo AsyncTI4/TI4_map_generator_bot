@@ -336,8 +336,8 @@ public class Helper {
     }
 
     public static String getSCName(int sc, Map activeMap) {
-        if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("null")) {
-            return Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(sc);
+        if (Optional.ofNullable(activeMap.getScSetID()).isPresent() && !activeMap.getScSetID().equals("null")) {
+            return Mapper.getStrategyCardSets().get(activeMap.getScSetID()).getCardValues().get(sc);
         }
         return "" + sc;
     }
@@ -357,8 +357,8 @@ public class Helper {
     }
 
     public static File getSCImageFile(Integer sc, Map activeMap) {
-        String scSet = activeMap.getScSet();
-        if(Optional.ofNullable(activeMap.getScSet()).isEmpty() || activeMap.getScSet().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
+        String scSet = activeMap.getScSetID();
+        if(Optional.ofNullable(activeMap.getScSetID()).isEmpty() || activeMap.getScSetID().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
         boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500") && !scSet.equals("tribunal");
