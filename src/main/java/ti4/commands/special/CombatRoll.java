@@ -110,9 +110,10 @@ public class CombatRoll extends SpecialSubcommandData {
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
 
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
-        List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
-        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsInCombat, tileModel, activeMap);
+        
+        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeMap);
 
+        List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
         autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat);
 
