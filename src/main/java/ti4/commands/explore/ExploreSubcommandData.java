@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
@@ -159,6 +161,29 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (token.equals(Constants.DMZ)) {
                     String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                     tile.addToken(dmzLargeFilename, planetName);
+                    HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                    UnitHolder planetUnitHolder = unitHolders.get(planetName);
+                    UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
+                    if (planetUnitHolder != null && spaceUnitHolder != null){
+                        HashMap<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                        for (Player player_ : activeMap.getPlayers().values()) {
+                            String color = player_.getColor();
+                            planetUnitHolder.removeAllUnits(color);
+                        }
+                        HashMap<String, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                        for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                            String key = unitEntry.getKey();
+                            if (key.contains("ff") || key.contains("gf") || key.contains("mf")){
+                                Integer count = spaceUnits.get(key);
+                                if (count == null){
+                                    count = unitEntry.getValue();
+                                } else {
+                                    count += unitEntry.getValue();
+                                }
+                                spaceUnits.put(key, count);
+                            }
+                        }
+                    }
                 }
                 tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);

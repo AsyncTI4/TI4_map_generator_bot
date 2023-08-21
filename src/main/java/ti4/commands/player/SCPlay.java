@@ -121,7 +121,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         if (activeMap.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeMap));
+            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeMap), true);
             //MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay, activeMap));
         }
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
