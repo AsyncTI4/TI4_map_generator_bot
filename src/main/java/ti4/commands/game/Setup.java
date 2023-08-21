@@ -168,7 +168,9 @@ public class Setup extends GameSubcommandData {
         OptionMapping absolModeOption = event.getOption(Constants.ABSOL_MODE);
         if (absolModeOption != null) {
             getActiveMap().setAbsolMode(absolModeOption.getAsBoolean());
+            getActiveMap().setAgendaDeckID("agendas_absol");
             getActiveMap().resetAgendas();
+            getActiveMap().setRelicDeckID("relics_absol");
             getActiveMap().resetRelics();
         }
 
