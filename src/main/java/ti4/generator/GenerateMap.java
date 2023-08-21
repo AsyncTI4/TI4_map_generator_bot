@@ -195,7 +195,9 @@ public class GenerateMap {
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
-                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                    if (fowPlayer != null) {
+                        tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                    }
                 }
             }
         }
