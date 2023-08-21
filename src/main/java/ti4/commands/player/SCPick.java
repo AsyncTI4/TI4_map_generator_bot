@@ -213,23 +213,13 @@ public class SCPick extends PlayerSubcommandData {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                if(!allPicked && !activeMap.isHomeBrewSCMode())
-                {
+                if(!allPicked) {
                     activeMap.updateActivePlayer(privatePlayer);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
                     activeMap.setCurrentPhase("strategy");
-                }
-                else{
-                    if(allPicked)
-                    {
-                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
-                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
-
-                    }
-                    else
-                    {
-                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
-                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                    MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
                 }
             }
         }
