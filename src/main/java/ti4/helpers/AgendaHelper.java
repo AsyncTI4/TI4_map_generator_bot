@@ -16,6 +16,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.player.SCPick;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.generator.Mapper;
@@ -378,6 +379,9 @@ public class AgendaHelper {
         activeMap.setLatestOutcomeVotedFor(outcome);
         int maxVotes = getTotalVoteCount(activeMap, player);
         int minVotes = 1;
+        if(player.hasAbility("zeal")){
+            minVotes = minVotes+activeMap.getRealPlayers().size();
+        }
 
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
                 minVotes = 1;
@@ -405,9 +409,12 @@ public class AgendaHelper {
                 "Done exhausting planets.");
         Button OopsMistake = Button.success("refreshVotes_" + votes,
                 "I made a mistake and want to ready some planets");
+         Button OopsMistake2 = Button.success("outcome_" + activeMap.getLatestOutcomeVotedFor(),
+                "I made a mistake and want to choose a different amount of votes");
         voteActionRow.add(exhausteverything);
         voteActionRow.add(concludeExhausting);
         voteActionRow.add(OopsMistake);
+        voteActionRow.add(OopsMistake2);
         String voteMessage2 = "Exhaust stuff";
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2, voteActionRow);
@@ -701,20 +708,30 @@ public class AgendaHelper {
 
     public static void reverseRider(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String choice = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
-        String voteMessage = "Chose to reverse latest rider on " + choice;
+        String voteMessage = ident+" Chose to reverse the " + choice;
         HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
-        String existingData = outcomes.getOrDefault(choice, "empty");
-        if (existingData.equalsIgnoreCase("empty")) {
-            voteMessage = "Something went wrong. Ping Fin and continue onwards.";
-        } else {
-            int lastSemicolon = existingData.lastIndexOf(";");
-            if (lastSemicolon < 0) {
-                existingData = "";
-            } else {
-                existingData = existingData.substring(0, lastSemicolon);
+        for(String outcome : outcomes.keySet()){
+            String existingData = outcomes.getOrDefault(outcome, "empty");
+            if (existingData == null || existingData.equalsIgnoreCase("empty") || existingData.equalsIgnoreCase("")) {
+                continue;
+            }else {
+                String[] votingInfo = existingData.split(";");
+                String total = "";
+                for(String onePiece : votingInfo){
+                    if(!onePiece.contains(choice)){
+                        total = total + ";" + onePiece;
+                    }
+                }
+                if(total.length() > 0 && total.charAt(0) == ';'){
+                    total = total.substring(1, total.length());
+                }
+                activeMap.setCurrentAgendaVote(outcome, total);
             }
+            
         }
-        activeMap.setCurrentAgendaVote(choice, existingData);
+       
+        
+        
         event.getChannel().sendMessage(voteMessage).queue();
         event.getMessage().delete().queue();
     }
@@ -733,7 +750,7 @@ public class AgendaHelper {
        if(agendaDetails.contains("Planet") || agendaDetails.contains("planet")){
             cleanedChoice = Helper.getPlanetRepresentation(choice, activeMap);
        }
-        String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
+        String voteMessage = ident+" Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
         String identifier = "";
         if (activeMap.isFoWMode()) {
             identifier = player.getColor();
@@ -753,7 +770,7 @@ public class AgendaHelper {
                 && !rider.equalsIgnoreCase("Keleres Xxcha Hero")
                 && !rider.equalsIgnoreCase("Galactic Threat Rider")) {
             List<Button> voteActionRow = new ArrayList<Button>();
-            Button concludeExhausting = Button.danger("reverse_" + choice, "Click this if the rider is sabod");
+            Button concludeExhausting = Button.danger("reverse_" + rider, "Click this if the "+rider+" is sabod");
             voteActionRow.add(concludeExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
         } else {
@@ -953,7 +970,13 @@ public class AgendaHelper {
         for (int x = 1; x < 9; x++) {
             Button button = null;
             if (rider == null) {
-                button = Button.secondary(prefix+"_"+x, x+"");
+                Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(x));
+                if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                    button = Button.secondary(prefix+"_"+x, " ").withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary(prefix+"_"+x, x+"");
+                }
+               
             } else {
                 button = Button.secondary(prefix+"rider_sc;"+x+"_"+rider, x+"");
             }
@@ -1324,14 +1347,24 @@ public class AgendaHelper {
 
     public static List<Player> getVotingOrder(Map activeMap) {
         List<Player> orderList = new ArrayList<>();
-        orderList.addAll(activeMap.getPlayers().values().stream().filter(p -> p.isRealPlayer()).toList());
+        orderList.addAll(activeMap.getPlayers().values().stream()
+                .filter(p -> p.isRealPlayer())
+                .toList());
         String speakerName = activeMap.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
+        Optional<Player> optSpeaker = orderList.stream()
+                .filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
 
         if (optSpeaker.isPresent()) {
             int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
             Collections.rotate(orderList, rotationDistance);
+        }
+        if(activeMap.isReverseSpeakerOrder()) {
+            Collections.reverse(orderList);
+            if (optSpeaker.isPresent()) {
+                int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
+                Collections.rotate(orderList, rotationDistance);
+            }
         }
         if (activeMap.getHackElectionStatus()) {
             Collections.reverse(orderList);

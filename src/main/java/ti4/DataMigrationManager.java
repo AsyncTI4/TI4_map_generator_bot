@@ -47,6 +47,7 @@ public class DataMigrationManager {
         try {
             runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
             runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
+            runMigration("migrateOwnedUnitsV2_210823", (map) -> migrateOwnedUnitsV2_210823(map));
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -63,6 +64,110 @@ public class DataMigrationManager {
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
 
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Refresh owned units V2
+    /// The first version of this had two issues;
+    /// 1. nekro unit upgrades werent included cause the base unit didnt exist in the faction setup (updated the code below slightly)
+    /// 2. the cruiser unit.json was referring to the wrong tech (this just requires us to run the same code again after changing units.json)
+    /// Better to keep this code seprate so we know what was changed when. 
+    ///
+    public static Boolean migrateOwnedUnitsV2_210823(Map map) {
+        Boolean mapNeededMigrating = false;
+        try {
+            for (Player player : map.getRealPlayers()) {
+                FactionModel factionSetupInfo = player.getFactionSetupInfo();
+
+                // Trying to assign an accurate Faction Model for old keleres players.
+                if (factionSetupInfo == null && player.getFaction().equals("keleres")) {
+                    List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
+                            .filter(factionID -> factionID.startsWith("keleres") && !factionID.equals("keleres"))
+                            .map(factionID -> Mapper.getFactionSetup(factionID))
+                            .collect(Collectors.toList());
+
+                    // guess subfaction based on homeplanet
+                    for (FactionModel factionModel : keleresSubfactions) {
+
+                        // Check if a keleres home system is on the board.
+                        Tile homesystem = map.getTile(factionModel.getHomeSystem());
+                        if (homesystem == null) {
+                            homesystem = map.getTile(factionModel.getHomeSystem().replace("new", ""));
+                        }
+                        if (homesystem != null) {
+                            factionSetupInfo = Mapper.getFactionSetup(factionModel.getAlias());
+                            break;
+                        }
+
+                        // When your kereles your supposed to have a '<planet-alias>k' version of the
+                        // homesystem, but some games do not, so this checks for the normal planet home
+                        // systems
+                        // and checks if the associated faction isnt in the game.
+                        List<String> subfactionHomePlanetsWithoutKeleresSuffix = factionModel.getHomePlanets()
+                                .stream()
+                                .map(alias -> alias.substring(0, alias.length() - 1))
+                                .collect(Collectors.toList());
+
+                        Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
+                                .findFirst();
+                        if (firstHomePlanet.isPresent()) {
+                            Tile homeSystem = Helper.getTileFromPlanet(firstHomePlanet.get().toLowerCase(), map);
+                            if (homeSystem != null) {
+                                Boolean isHomeSystemUsedBySomeoneElse = false;
+                                for (String factionId : map.getFactions()) {
+                                    FactionModel otherFactionSetup = Mapper.getFactionSetup(factionId);
+                                    if (otherFactionSetup != null
+                                            && otherFactionSetup.getHomeSystem().equals(homeSystem.getTileID())) {
+                                        isHomeSystemUsedBySomeoneElse = true;
+                                        break;
+                                    }
+                                }
+                                if (!isHomeSystemUsedBySomeoneElse) {
+                                    factionSetupInfo = factionModel;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                if (factionSetupInfo == null) {
+                    throw new Exception(
+                            String.format("Failed to find correct faction to sync units with faction: %s, map: %s",
+                                    player.getFaction(), map.getName()));
+                }
+                List<String> ownedUnitIDs = factionSetupInfo.getUnits();
+
+                List<TechnologyModel> playerTechs = player.getTechs().stream().map(techID -> Mapper.getTech(techID))
+                        .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                        .collect(Collectors.toList());
+
+                for (TechnologyModel technologyModel : playerTechs) {
+                    UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
+                    if (upgradedUnit != null) {
+                        if (StringUtils.isNotBlank(upgradedUnit.getBaseType())) {
+                            Integer upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getBaseType());
+                            if (upgradesFromUnitIndex != null && upgradesFromUnitIndex >= 0) {
+                                ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
+                            }
+                            else {
+                                ownedUnitIDs.add(upgradedUnit.getId());
+                            }
+                        } else {
+                            ownedUnitIDs.add(upgradedUnit.getId());
+                        }
+                    }
+                }
+                HashSet<String> updatedUnitIDs = new HashSet<String>(ownedUnitIDs);
+                if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
+                    mapNeededMigrating = true;
+                    player.setUnitsOwned(updatedUnitIDs);
+                }
+
+            }
+        } catch (Exception e) {
+            BotLogger.log("Failed to migrate owned units for map" + map.getName(), e);
+        }
         return mapNeededMigrating;
     }
 
