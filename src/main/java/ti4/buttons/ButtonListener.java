@@ -963,6 +963,13 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.offerVoteAmounts(buttonID, event, activeMap, player, ident, buttonLabel);
         } else if (buttonID.startsWith("votes_")) {
            AgendaHelper.exhaustPlanetsForVoting(buttonID, event, activeMap, player, ident, buttonLabel, finsFactionCheckerPrefix);
+        } else if (buttonID.startsWith("dacxive_")) {
+           String planet = buttonID.replace("dacxive_","");
+           new AddUnits().unitParsing(event, player.getColor(),
+                            activeMap.getTile(AliasHandler.resolveTile(planet)), "infantry " + planet,
+                            activeMap);
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident + " placed 1 infantry on "+ Helper.getPlanetRepresentation(planet, activeMap) +" via the tech Dacxive Animators");
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("autoresolve_")) {
             String result = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             if (result.equalsIgnoreCase("manual")) {
