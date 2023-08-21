@@ -48,6 +48,17 @@
         ]
     },
     {
+        "alias": "plus2_2_matching_non_ff",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition":"units_two_matching_not_ff",
+        "scope": "",
+        "related":[
+            {"type": "ability", "alias": "rule_of_two"}
+        ]
+    },
+    {
         "alias": "plus1_1round_fighter",
         "type": "DIE_MOD",
         "value": "+1",
