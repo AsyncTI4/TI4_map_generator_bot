@@ -2694,6 +2694,8 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
         } else {
             speaker = null;
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed");
+            return;
         }
         String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
                 + " UP TO PICK SC\n";
@@ -2708,15 +2710,9 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
             }
         } else {
-            if (!activeMap.isHomeBrewSCMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(),
-                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
-            } else {
-                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
-            }
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
         }
     }
-
 
     public static List<Button> getPlayersToTransact(Map activeMap, Player p) {
         List<Button> playerButtons = new ArrayList<>();

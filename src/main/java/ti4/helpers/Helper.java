@@ -614,7 +614,7 @@ public class Helper {
             if (held) continue;
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
-            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeMap.isHomeBrewSCMode()) {
                 button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, " ").withEmoji(scEmoji);
             } else {
                 button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc);
