@@ -96,7 +96,7 @@ public class SCPlay extends PlayerSubcommandData {
                     .append("#")
                     .append(scToPlay);
             if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
-                String scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
+                String scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getSCName(scToPlay);
                 scMessageBuilder
                         .append(" ")
                         .append(scName);
@@ -105,7 +105,7 @@ public class SCPlay extends PlayerSubcommandData {
         else {
             scMessageBuilder
                     .append(Helper.getEmojiFromDiscord(emojiName))
-                    .append(Helper.getSCAsMention(activeMap.getGuild(), scToDisplay));
+                    .append(Helper.getSCAsMention(activeMap.getGuild(), scToDisplay, activeMap));
         }
         if (pbd100or500) {
             scMessageBuilder
@@ -126,15 +126,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message += "Indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String scName = String.valueOf(scToDisplay);
-        if(!activeMap.isHomeBrewSCMode()) {
-            scName = Helper.getSCName(scToDisplay);
-        }
-        else {
-            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
-                scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
-            }
-        }
+        String scName = Helper.getSCName(scToDisplay, activeMap);
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + scName + (pbd100or500 ? "-group_" + pbd100group : "");
 
         TextChannel textChannel = (TextChannel) mainGameChannel;
