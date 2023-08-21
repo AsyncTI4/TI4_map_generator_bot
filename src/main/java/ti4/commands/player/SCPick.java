@@ -111,7 +111,7 @@ public class SCPick extends PlayerSubcommandData {
         if (!activeMap.isHomeBrewSCMode()) {
             sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
         } else {
-            sb.append(" Picked: ").append(("SC #"+scPicked));
+            sb.append(" Picked: ").append(("SC #" + scPicked));
         }
 
         boolean nextCorrectPing = false;
