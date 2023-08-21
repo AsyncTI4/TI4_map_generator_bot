@@ -358,11 +358,11 @@
   },
   {
     "alias": "representative_government",
-    "name": "Representative Government (Replaced by card of the same name)",
+    "name": "Representative Government (Base Game)",
     "type": "Law",
     "target": "For/Against",
-    "text1": "Players cannot exhaust planets to cast votes during the agenda phase. Each player may cast 1 vote on each agenda instead.",
-    "text2": "At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
+    "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. Each player may cast 1 vote on each agenda instead.",
+    "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
     "source": "base"
   },
   {
