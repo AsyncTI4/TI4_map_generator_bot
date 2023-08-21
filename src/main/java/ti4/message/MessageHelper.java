@@ -110,6 +110,10 @@ public class MessageHelper {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
+	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
+		FileUpload fileUpload = FileUpload.fromData(file);
+		channel.sendFiles(fileUpload).queue();
+	}
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
