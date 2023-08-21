@@ -9,6 +9,16 @@
         ]
     },
     {
+        "alias": "agendas_base_game",
+        "name": "Base Game Agendas",
+        "type": "agenda",
+        "description": "All agendas in the Base Game of TI4",
+        "cardIDs": [
+            "abolishment","arbiter","arms_reduction","artifact","classified","committee","conscription","constitution","conventions","defense_act","disarmamament","economic_equality","execution","incentive","minister_commrece","minister_exploration","minister_industry","minister_peace","minister_policy","minister_sciences","minister_war","miscount","mutiny","plowshares","prophecy","redistribution","regulations","revolution","sanctions","schematics","secret","seed_empire","shared_research","travel_ban","unconventional","wormhole_recon","wormhole_research",
+            "core_mining","demilitarized_zone","holy_planet_of_ixth","representative_government","rt_biotic","rt_cybernetic","rt_propulsion","rt_warfare","senate_sancuary","shard_of_the_throne","terraforming_initiative","crown_of_emphidia","crown_of_thalnos"
+        ]
+    },
+    {
         "alias": "agendas_pok",
         "name": "PoK Agendas",
         "type": "agenda",
