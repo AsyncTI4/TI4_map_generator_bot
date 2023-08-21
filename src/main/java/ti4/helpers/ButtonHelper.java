@@ -65,6 +65,13 @@ import ti4.model.UnitModel;
 public class ButtonHelper {
     
 
+    public static List<Button> getDacxiveButtons(Map activeMap, Player player, String planet){
+        List<Button> buttons = new ArrayList<Button>();
+        buttons.add(Button.success("dacxive_"+planet, "Resolve Dacxive"));
+        buttons.add(Button.danger("deleteButtons", "No Dacxive"));
+        return buttons;
+    }
+
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
         if(player == player2 || !activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player2).contains(player)|| Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
@@ -958,13 +965,14 @@ public class ButtonHelper {
         }
         RemoveCC.removeCC(event, player.getColor(), tile, activeMap);
          
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-
+        
+        String finChecker = "FFCC_"+player.getFaction() + "_";
         if(whatIsItFor.equalsIgnoreCase("mahactCommander")){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+ "reduced their tactic CCs from " + player.getTacticalCC() +" to "+ (player.getTacticalCC()-1));
             player.setTacticalCC(player.getTacticalCC()-1);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> conclusionButtons = new ArrayList<Button>();
-            Button endTurn = Button.danger("turnEnd", "End Turn");
+            Button endTurn = Button.danger(finChecker+"turnEnd", "End Turn");
             conclusionButtons.add(endTurn);
             if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
                 conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
@@ -1397,7 +1405,7 @@ public class ButtonHelper {
             if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
                 startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
             }
-            Button pass = Button.danger("turnEnd", "End Turn");
+            Button pass = Button.danger(finChecker+"turnEnd", "End Turn");
             startButtons.add(pass);
         }else  {
             if(player.getTechs().contains("cm")){

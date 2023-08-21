@@ -240,7 +240,8 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();
-        Button endTurn = Button.danger("turnEnd", "End Turn");
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        Button endTurn = Button.danger(finChecker+"turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
         if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
