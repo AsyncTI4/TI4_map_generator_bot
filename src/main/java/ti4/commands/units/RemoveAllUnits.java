@@ -22,12 +22,12 @@ public class RemoveAllUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
         //No need for this action
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
         //No need for this action
     }
 

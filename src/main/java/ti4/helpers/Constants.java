@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Constants {
-
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
     public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
@@ -68,6 +67,7 @@ public class Constants {
     public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
+    public static final String REVERSE_SPEAKER_ORDER = "reverse_speaker_order";
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
     public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
     public static final String SET_STATUS = "set_status";
@@ -131,6 +131,7 @@ public class Constants {
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
 
+    public static final String UNIT = "unit";
     public static final String UNIT_CAP = "unit_cap";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
@@ -220,7 +221,7 @@ public class Constants {
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
     public static final String ROUND = "round";
 
-    public static final String COMBAT_INFO = "combat_info";
+    public static final String COMBAT_INFO = "info";
     public static final String COMBAT_ROLL = "combat_roll";
     public static final String COMBAT_MODIFIERS = "mods";
     public static final String COMBAT_EXTRA_ROLLS = "extrarolls";
@@ -418,6 +419,7 @@ public class Constants {
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
+    public static final String UNIT_TECH = "unit_tech";
     public static final String TACTICAL = "tactical_cc";
     public static final String FLEET = "fleet_cc";
     public static final String STRATEGY = "strategy_cc";
@@ -646,6 +648,7 @@ public class Constants {
     public static final String PROPULSION = "propulsion";
     public static final String CYBERNETIC = "cybernetic";
     public static final String BIOTIC = "biotic";
+    public static final String WEAPON = "weapon";
     public static final String UNIT_UPGRADE = "unitupgrade";
 
     public static final String PRIVATE_CHANNEL = "-private";
@@ -841,8 +844,6 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
-    public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
-    public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
     public static final String SET_POLICY = "set_policy";
     public static final String SET_PEOPLE = "set_people";
     public static final String SET_ENVIRONMENT = "set_environment";
@@ -865,4 +866,21 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
+
+
+    public static final String OBSERVER = "observer";
+    public static final String ADD_REMOVE = "add_remove";
+
+    public static final String COMBAT = "combat";
+
+    public static final String MOD_OPPONENT_STOLEN_TECH = "opponent_stolen_faction_tech";
+    public static final String MOD_OPPONENT_FRAG = "opponent_frag";
+    public static final String MOD_PLANET_MR_LEGEND_HOME = "planet_mr_legendary_home";
+    public static final String MOD_OPPONENT_PO_EXCLUSIVE_SCORED = "po_opponent_exclusively_scored";
+    public static final String MOD_DESTROYERS = "destroyers";
+    public static final String MOD_OPPONENT_UNIT_TECH = "opponent_unit_tech";
+    public static final String MOD_OPPONENT_FACTION_TECH = "opponent_faction_tech";
+    public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
+    public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
+    public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
 }

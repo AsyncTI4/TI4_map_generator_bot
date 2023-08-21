@@ -12,12 +12,15 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,6 +32,7 @@ import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -274,6 +278,41 @@ public class MessageListener extends ListenerAdapter {
             if (message.startsWith("to" + color)) {
                 messageToColor = true;
             }
+        }
+        if (event.getChannel() instanceof ThreadChannel &&  event.getChannel().getName().contains("vs") &&  event.getChannel().getName().contains("private")) {
+            String gameName = event.getChannel().getName();
+            String message2 = msg.getContentRaw();
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			Map activeMap = MapManager.getInstance().getMap(gameName);
+            if(activeMap.isFoWMode() && ((!event.getAuthor().getId().equalsIgnoreCase("947763140517560331") && !event.getAuthor().isBot() && !event.getAuthor().getId().equalsIgnoreCase("1089270182171656292")) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
+                
+                for(Player player : activeMap.getRealPlayers()){
+                    MessageChannel pChannel = player.getPrivateChannel();
+                    TextChannel pChan = (TextChannel) pChannel;
+                    if(pChan != null){
+                        
+                        
+                        String newMessage = ButtonHelper.getTrueIdentity(player, activeMap)+" Someone said: " + message2;
+                        if(event.getAuthor().isBot() && message2.contains("Total hits ")){
+                            String hits = StringUtils.substringAfter(message2, "Total hits ");
+                            String location = StringUtils.substringBefore(message2, "combat rolls for");
+                            newMessage = ButtonHelper.getTrueIdentity(player, activeMap)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
+                        }
+                        String[] threadN = event.getChannel().getName().split("-");
+                        String threadName = threadN[0]+"-"+threadN[1]+"-"+threadN[2]+"-"+threadN[3]+"-"+threadN[4];
+                        List<ThreadChannel> threadChannels = pChan.getThreadChannels();
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().contains(threadName) && (MessageChannel) threadChannel_ != (MessageChannel)event.getChannel()) {
+                                MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, newMessage);
+                            }
+                        }
+                    }
+                }
+                //activeMap.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
+                
+            }
+            
+            
         }
 
         if (messageToColor) {

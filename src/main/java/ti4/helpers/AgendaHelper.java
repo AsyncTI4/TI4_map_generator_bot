@@ -9,14 +9,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
 import java.util.Map.Entry;
-import ti4.generator.Mapper;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.player.SCPick;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.generator.Mapper;
@@ -99,7 +99,7 @@ public class AgendaHelper {
 
                         }   
                     }
-                      if(agID.equalsIgnoreCase("conventions")){
+                    if(agID.equalsIgnoreCase("conventions")){
                         List<Player> winOrLose = null;
                         if (!winner.equalsIgnoreCase("for")) {
                             winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
@@ -164,7 +164,8 @@ public class AgendaHelper {
                     }
                 }
             } else {
-                   if (activeMap.getCurrentAgendaInfo().contains("Player")) {
+                 
+                if (activeMap.getCurrentAgendaInfo().contains("Player")) {
                     Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, winner);
                    if(agID.equalsIgnoreCase("secret")){
                         String message = "Drew Secret Objective for the elected player";
@@ -193,9 +194,8 @@ public class AgendaHelper {
                    }
 
 
-
+                   
                 }
-                
                 if(agID.equalsIgnoreCase("mutiny")){
                     List<Player> winOrLose = null;
                     StringBuilder message = new StringBuilder("");
@@ -215,7 +215,7 @@ public class AgendaHelper {
                     }
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());     
                 }
-                 if(agID.equalsIgnoreCase("seed_empire")){
+                if(agID.equalsIgnoreCase("seed_empire")){
                     List<Player> winOrLose = null;
                     StringBuilder message = new StringBuilder("");
                     Integer poIndex = 5;
@@ -224,7 +224,7 @@ public class AgendaHelper {
                         winOrLose = AgendaHelper.getPlayersWithMostPoints(activeMap);
                     }else{
                         winOrLose = AgendaHelper.getPlayersWithLeastPoints(activeMap);
-
+                        
                     }
                     message.append("Custom PO 'Seed' has been added.\n");
                     for(Player playerWL : winOrLose){
@@ -233,6 +233,7 @@ public class AgendaHelper {
                     }
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());     
                 }
+                
                 if(agID.equalsIgnoreCase("plowshares")){
                     if (winner.equalsIgnoreCase("for")) {
                         for(Player playerB : activeMap.getRealPlayers()){
@@ -244,7 +245,7 @@ public class AgendaHelper {
                         }
                     }   
                 }
-                 if(agID.equalsIgnoreCase("unconventional")){
+                if(agID.equalsIgnoreCase("unconventional")){
                         List<Player> winOrLose = null;
                         if (!winner.equalsIgnoreCase("for")) {
                             winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
@@ -378,6 +379,9 @@ public class AgendaHelper {
         activeMap.setLatestOutcomeVotedFor(outcome);
         int maxVotes = getTotalVoteCount(activeMap, player);
         int minVotes = 1;
+        if(player.hasAbility("zeal")){
+            minVotes = minVotes+activeMap.getRealPlayers().size();
+        }
 
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
                 minVotes = 1;
@@ -405,9 +409,12 @@ public class AgendaHelper {
                 "Done exhausting planets.");
         Button OopsMistake = Button.success("refreshVotes_" + votes,
                 "I made a mistake and want to ready some planets");
+         Button OopsMistake2 = Button.success("outcome_" + activeMap.getLatestOutcomeVotedFor(),
+                "I made a mistake and want to choose a different amount of votes");
         voteActionRow.add(exhausteverything);
         voteActionRow.add(concludeExhausting);
         voteActionRow.add(OopsMistake);
+        voteActionRow.add(OopsMistake2);
         String voteMessage2 = "Exhaust stuff";
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2, voteActionRow);
@@ -701,20 +708,30 @@ public class AgendaHelper {
 
     public static void reverseRider(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String choice = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
-        String voteMessage = "Chose to reverse latest rider on " + choice;
+        String voteMessage = ident+" Chose to reverse the " + choice;
         HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
-        String existingData = outcomes.getOrDefault(choice, "empty");
-        if (existingData.equalsIgnoreCase("empty")) {
-            voteMessage = "Something went wrong. Ping Fin and continue onwards.";
-        } else {
-            int lastSemicolon = existingData.lastIndexOf(";");
-            if (lastSemicolon < 0) {
-                existingData = "";
-            } else {
-                existingData = existingData.substring(0, lastSemicolon);
+        for(String outcome : outcomes.keySet()){
+            String existingData = outcomes.getOrDefault(outcome, "empty");
+            if (existingData == null || existingData.equalsIgnoreCase("empty") || existingData.equalsIgnoreCase("")) {
+                continue;
+            }else {
+                String[] votingInfo = existingData.split(";");
+                String total = "";
+                for(String onePiece : votingInfo){
+                    if(!onePiece.contains(choice)){
+                        total = total + ";" + onePiece;
+                    }
+                }
+                if(total.length() > 0 && total.charAt(0) == ';'){
+                    total = total.substring(1, total.length());
+                }
+                activeMap.setCurrentAgendaVote(outcome, total);
             }
+            
         }
-        activeMap.setCurrentAgendaVote(choice, existingData);
+       
+        
+        
         event.getChannel().sendMessage(voteMessage).queue();
         event.getMessage().delete().queue();
     }
@@ -733,7 +750,7 @@ public class AgendaHelper {
        if(agendaDetails.contains("Planet") || agendaDetails.contains("planet")){
             cleanedChoice = Helper.getPlanetRepresentation(choice, activeMap);
        }
-        String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
+        String voteMessage = ident+" Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
         String identifier = "";
         if (activeMap.isFoWMode()) {
             identifier = player.getColor();
@@ -753,7 +770,7 @@ public class AgendaHelper {
                 && !rider.equalsIgnoreCase("Keleres Xxcha Hero")
                 && !rider.equalsIgnoreCase("Galactic Threat Rider")) {
             List<Button> voteActionRow = new ArrayList<Button>();
-            Button concludeExhausting = Button.danger("reverse_" + choice, "Click this if the rider is sabod");
+            Button concludeExhausting = Button.danger("reverse_" + rider, "Click this if the "+rider+" is sabod");
             voteActionRow.add(concludeExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
         } else {
@@ -953,7 +970,13 @@ public class AgendaHelper {
         for (int x = 1; x < 9; x++) {
             Button button = null;
             if (rider == null) {
-                button = Button.secondary(prefix+"_"+x, x+"");
+                Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(x));
+                if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                    button = Button.secondary(prefix+"_"+x, " ").withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary(prefix+"_"+x, x+"");
+                }
+               
             } else {
                 button = Button.secondary(prefix+"rider_sc;"+x+"_"+rider, x+"");
             }
@@ -1263,7 +1286,7 @@ public class AgendaHelper {
         }
         return losers;
     }
-public static List<Player> getPlayersWithMostPoints(Map activeMap) {
+    public static List<Player> getPlayersWithMostPoints(Map activeMap) {
         List<Player> losers = new ArrayList<Player>();
         int most = 0;
         for(Player p : activeMap.getRealPlayers()){
@@ -1293,6 +1316,7 @@ public static List<Player> getPlayersWithMostPoints(Map activeMap) {
         }
         return losers;
     }
+
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         int hasXxchaAlliance = activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
@@ -1323,14 +1347,24 @@ public static List<Player> getPlayersWithMostPoints(Map activeMap) {
 
     public static List<Player> getVotingOrder(Map activeMap) {
         List<Player> orderList = new ArrayList<>();
-        orderList.addAll(activeMap.getPlayers().values().stream().filter(p -> p.isRealPlayer()).toList());
+        orderList.addAll(activeMap.getPlayers().values().stream()
+                .filter(p -> p.isRealPlayer())
+                .toList());
         String speakerName = activeMap.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
+        Optional<Player> optSpeaker = orderList.stream()
+                .filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
 
         if (optSpeaker.isPresent()) {
             int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
             Collections.rotate(orderList, rotationDistance);
+        }
+        if(activeMap.isReverseSpeakerOrder()) {
+            Collections.reverse(orderList);
+            if (optSpeaker.isPresent()) {
+                int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
+                Collections.rotate(orderList, rotationDistance);
+            }
         }
         if (activeMap.getHackElectionStatus()) {
             Collections.reverse(orderList);
@@ -1652,7 +1686,6 @@ public static List<Player> getPlayersWithMostPoints(Map activeMap) {
 
     public static int getVoteCountFromPlanets(Map activeMap, Player player) {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
         int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
@@ -1682,23 +1715,6 @@ public static List<Player> getPlayersWithMostPoints(Map activeMap) {
         if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             int readyPlanetCount = planets.size();
             voteCount += readyPlanetCount;
-        }
-
-        //Olradin "Control" - +2 votes per cultural planet
-        if (player.hasAbility("policy_the_people_control")){
-            List<String> cultPlanets = new ArrayList<>();   
-            PlanetModel planetModel;     
-            String planetType;
-            for (String cplanet : planets) 
-                { 
-                     planetModel = Mapper.getPlanet(cplanet);
-                     planetType = planetModel.getPlanetType().toString();
-                                      if(planetModel.getPlanetType().toString().equals(Constants.CULTURAL))
-                        {
-                        cultPlanets.add(cplanet);                        
-                        }
-                }            
-            voteCount += (cultPlanets.size()*2);
         }
 
         return voteCount;
@@ -1743,11 +1759,6 @@ public static List<Player> getPlayersWithMostPoints(Map activeMap) {
         //Xxcha Alliance
         if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             additionalVotesAndSources.put(Emojis.Xxcha + "Alliance has been counted for", 0);
-        }
-
-        //Olradin Control
-        if (player.hasAbility("policy_the_people_control")){
-            additionalVotesAndSources.put(Emojis.olradin + "Policy: The People : Control (-) has been counted for", 0);
         }
 
         //Absol Shard of the Throne

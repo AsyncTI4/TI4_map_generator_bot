@@ -8,9 +8,11 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -33,6 +35,7 @@ public class CaptureCommand implements Command {
         if (event.getName().equals(getActionID())) {
             String userID = event.getUser().getId();
             MapManager mapManager = MapManager.getInstance();
+             
             if (!mapManager.isUserWithActiveMap(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
