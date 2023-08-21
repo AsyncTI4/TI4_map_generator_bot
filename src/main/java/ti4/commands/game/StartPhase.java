@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,6 +23,10 @@ public class StartPhase extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         String phase = event.getOption(Constants.SPECIFIC_PHASE, null, OptionMapping::getAsString);
+        startPhase(event, activeMap, phase);
+    }
+
+    public static void startPhase(GenericInteractionCreateEvent event, Map activeMap, String phase) {
         switch (phase) {
             case "strategy" -> {
                 ButtonHelper.startStrategyPhase(event, activeMap);
@@ -46,7 +51,7 @@ public class StartPhase extends GameSubcommandData {
                 ButtonHelper.startActionPhase(event, activeMap);
             }
             default -> {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find phase: `" + phase + "`");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
             }
         }
     }
