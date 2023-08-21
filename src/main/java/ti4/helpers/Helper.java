@@ -1962,12 +1962,6 @@ public class Helper {
                 }
             }
         }
-
-        //agendas
-        activeMap.removeAgendaFromGame("minister_antiquities");
-        activeMap.removeAgendaFromGame("rearmament");
-        activeMap.removeAgendaFromGame("articles_war");
-        activeMap.removeAgendaFromGame("nexus");
     }
 
     /**
