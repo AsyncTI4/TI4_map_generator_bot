@@ -49,6 +49,7 @@ public class DataMigrationManager {
             runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
             runMigration("migrateOwnedUnitsV2_210823", (map) -> migrateOwnedUnitsV2_210823(map));
             runMigration("migrateNullSCDeckToPoK_210823", (map) -> migrateNullSCDeckToPoK_210823(map));
+            runMigration("migrateAbsolDeckIDs_210823", (map) -> migrateAbsolDeckIDs_210823(map));
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -64,6 +65,21 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Update "absol mode" games' deck IDs
+    /// Only truly matters if map.resetRelics or map.resetAgendas is called 
+    /// Migrated ~pbd893ish
+    public static Boolean migrateAbsolDeckIDs_210823(Map map) {
+        Boolean mapNeededMigrating = false;
+
+        if (map.isAbsolMode() && !map.getRelicDeckID().equals("relics_absol") && !map.getAgendaDeckID().equals("agendas_absol")) {
+            mapNeededMigrating = true;
+            map.setRelicDeckID("relics_absol");
+            map.setAgendaDeckID("agendas_absol");
+        }
+
         return mapNeededMigrating;
     }
 
