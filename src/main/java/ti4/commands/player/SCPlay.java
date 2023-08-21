@@ -80,8 +80,6 @@ public class SCPlay extends PlayerSubcommandData {
             }
         }
 
-        String emojiName = "SC" + scToPlay;
-
         if (activeMap.getPlayedSCs().contains(scToPlay)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
             return;
@@ -90,23 +88,8 @@ public class SCPlay extends PlayerSubcommandData {
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         //String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
-        StringBuilder scMessageBuilder = new StringBuilder("SC ");
-        if(activeMap.isHomeBrewSCMode()) {
-            scMessageBuilder
-                    .append("#")
-                    .append(scToPlay);
-            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
-                String scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
-                scMessageBuilder
-                        .append(" ")
-                        .append(scName);
-            }
-        }
-        else {
-            scMessageBuilder
-                    .append(Helper.getEmojiFromDiscord(emojiName))
-                    .append(Helper.getSCAsMention(activeMap.getGuild(), scToDisplay));
-        }
+        StringBuilder scMessageBuilder = new StringBuilder();
+        scMessageBuilder.append(Helper.getSCFrontRepresentation(event, activeMap, scToPlay));
         if (pbd100or500) {
             scMessageBuilder
                     .append(" Group ")
@@ -126,15 +109,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message += "Indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String scName = String.valueOf(scToDisplay);
-        if(!activeMap.isHomeBrewSCMode()) {
-            scName = Helper.getSCName(scToDisplay);
-        }
-        else {
-            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
-                scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
-            }
-        }
+        String scName = Helper.getSCName(scToDisplay, activeMap).toLowerCase();
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + scName + (pbd100or500 ? "-group_" + pbd100group : "");
 
         TextChannel textChannel = (TextChannel) mainGameChannel;
@@ -152,54 +127,54 @@ public class SCPlay extends PlayerSubcommandData {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeMap), true);
             //MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay, activeMap));
         }
-            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-            //GET BUTTONS
-            ActionRow actionRow = null;
-            List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeMap));
-            if(!activeMap.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeMap, "propagation") != null){
-                scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
+
+        // GET BUTTONS
+        ActionRow actionRow = null;
+        List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeMap));
+        if (!activeMap.isHomeBrewSCMode() && !activeMap.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeMap, "propagation") != null) {
+            scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+        }
+        if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
+        if (actionRow != null) baseMessageObject.addComponents(actionRow);
+
+        final Player player_ = player;
+        mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+            Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_);
+            if (reactionEmoji != null) {
+                message_.addReaction(reactionEmoji).queue();
+                player_.addFollowedSC(scToPlay);
             }
-            if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
-            if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
-            final Player player_ = player;
-            mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-                Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_);
-                if (reactionEmoji != null) {
-                    message_.addReaction(reactionEmoji).queue();
-                    player_.addFollowedSC(scToPlay);
-                }
-
-                if (activeMap.isFoWMode()) {
-                    //in fow, send a message back to the player that includes their emoji
-                    String response = "SC played.";
-                    response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
-                    MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, response);
-                } else {
-                    //only do thread in non-fow games
-                    ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-                    threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-                    threadChannel.queue(m5 -> {
-                        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
-                        if (threadChannels != null) {
-                            // SEARCH FOR EXISTING OPEN THREAD
-                            for (ThreadChannel threadChannel_ : threadChannels) {
-                                if (threadChannel_.getName().equals(threadName)) {
-                                    if (scToPlay == 5) {
-                                        Button transaction = Button.primary("transaction", "Transaction");
-                                        scButtons.add(transaction);
-                                    }
-                                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "These buttons will work inside the thread", scButtons);
+            if (activeMap.isFoWMode()) {
+                // in fow, send a message back to the player that includes their emoji
+                String response = "SC played.";
+                response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
+                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, response);
+            } else {
+                // only do thread in non-fow games
+                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                threadChannel.queue(m5 -> {
+                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                    if (threadChannels != null) {
+                        // SEARCH FOR EXISTING OPEN THREAD
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) {
+                                if (scToPlay == 5) {
+                                    Button transaction = Button.primary("transaction", "Transaction");
+                                    scButtons.add(transaction);
                                 }
+                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "These buttons will work inside the thread", scButtons);
                             }
                         }
-                    });
+                    }
+                });
 
-                }
-            });
+            }
+        });
 
-        //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
-       
+        // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeMap.isFoWMode() && scToPlay == 3) {
             String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
 

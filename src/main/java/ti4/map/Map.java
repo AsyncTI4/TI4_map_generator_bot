@@ -33,6 +33,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.StrategyCardModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -107,7 +108,7 @@ public class Map {
     private boolean absolMode = false;
 
     @Getter @Setter @ExportableField
-    private String scSet = null;
+    private String scSet = "pok";
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -578,12 +579,13 @@ public class Map {
             put("FoW", isFoWMode());
             put(Emojis.Absol + "Absol", isAbsolMode());
             put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
+            put("HomebrewSC", isHomeBrewSCMode());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode());
     }
 
     @JsonIgnore
@@ -2591,5 +2593,9 @@ public class Map {
 
     public ArrayList<String> getRunMigrations(){
         return this.runDataMigrations;
+    }
+
+    public StrategyCardModel getStrategyCardSet() {
+        return Mapper.getStrategyCardSets().get(getScSet());
     }
 }

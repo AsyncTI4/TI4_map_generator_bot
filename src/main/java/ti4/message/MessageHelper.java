@@ -37,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 
-import com.amazonaws.util.StringUtils;
-
 public class MessageHelper {
 	interface MessageFunction{
 		void run(Message msg);

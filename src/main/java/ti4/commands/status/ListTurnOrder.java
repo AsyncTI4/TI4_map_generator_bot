@@ -53,7 +53,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 if (isPlayed) {
                     text += "~~";
                 }
-                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_);
+                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_, activeMap);
                 if (isPlayed) {
                     text += "~~";
                 }
