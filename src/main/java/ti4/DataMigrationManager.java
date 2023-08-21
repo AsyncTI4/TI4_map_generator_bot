@@ -48,6 +48,7 @@ public class DataMigrationManager {
             runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
             runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
             runMigration("migrateOwnedUnitsV2_210823", (map) -> migrateOwnedUnitsV2_210823(map));
+            runMigration("migrateNullSCDeckToPoK_210823", (map) -> migrateNullSCDeckToPoK_210823(map));
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -63,6 +64,17 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: All maps should have their default scSet be "pok"
+    public static Boolean migrateNullSCDeckToPoK_210823(Map map) {
+        Boolean mapNeededMigrating = false;
+
+        if (map.getScSet() == null || map.getScSet().equals("null")) {
+            mapNeededMigrating = true;
+            map.setScSet("pok");
+        }
 
         return mapNeededMigrating;
     }
