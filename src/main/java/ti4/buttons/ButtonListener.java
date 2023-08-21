@@ -2071,7 +2071,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!player.getSCs().contains(8)) {
                         MessageHelper.sendMessageToChannel(privateChannel, "Only the player who has "
-                                + Helper.getSCBackRepresentation(event, 8) + " can score the Imperial point");
+                                + Helper.getSCBackRepresentation(event, activeMap, 8) + " can score the Imperial point");
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID + "score_imperial", activeMap, player, event,
