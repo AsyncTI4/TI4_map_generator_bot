@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.IPermissionHolder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -28,18 +27,18 @@ public class Observer extends BothelperSubcommandData {
        // Check if game channels exist
        
         List<GuildChannel> channels = guild.getChannels();
-        sendMessage("DEBUG: PlayerID: " + event.getOption("player").getAsString() + " Add/remove: " + event.getOption("add_remove").getAsString() + " playername: " + user.getNickname() + " userID: " + user.getId());
+        sendMessage("DEBUG: PlayerID: " + event.getOption("player").getAsString() + " Add/remove: " + event.getOption("add_remove").getAsString() + " playername: " + user.getAsMention() + " userID: " + user.getId());
         for(GuildChannel channel : channels) {
             if(channel.getName().contains(event.getOption("game_name").getAsString())) {
                 sendMessage("Found channel match: " + channel.getName());
-                if(event.getOption("add_remove").getAsString() == "add") {
+                if(event.getOption("add_remove").getAsString().equals("add")) {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
-                    sendMessage("Permissions granted on " + user.getNickname() + " to channel " + channel.getName());
+                    sendMessage("Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
                 }
 
-                if(event.getOption("add_remove").getAsString() == "remove") {
+                if(event.getOption("add_remove").getAsString().equals("remove")) {
                     channel.getPermissionContainer().upsertPermissionOverride((IPermissionHolder) user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
-                    sendMessage("Permissions revoked on " + user.getNickname() + " to channel " + channel.getName());
+                    sendMessage("Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
                 }
             }
         }
