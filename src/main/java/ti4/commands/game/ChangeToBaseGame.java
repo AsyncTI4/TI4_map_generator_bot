@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -31,6 +32,7 @@ public class ChangeToBaseGame extends GameSubcommandData {
         }
         activeMap.setBaseGameMode(true);
         Helper.removePoKComponents(activeMap, codex);
+        SetDeck.setDeck(event, activeMap, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
         MapSaveLoadManager.saveMap(activeMap, event);
 
