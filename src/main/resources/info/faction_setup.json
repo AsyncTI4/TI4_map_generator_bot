@@ -519,7 +519,7 @@
   },
   {
     "alias": "augers",
-    "factionName": "Augurs of Ilyxum",
+    "factionName": "Augers of Ilyxum",
     "homeSystem": "d19",
     "startingFleet": "cv,2 dd,2 ff, 2 inf c,2 inf d,sd c,pds d",
     "commodities": 3,

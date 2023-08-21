@@ -20,6 +20,7 @@ import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.all_info.AllInfo;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
+import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
@@ -113,6 +114,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
+
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -128,6 +130,7 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
 
@@ -149,8 +152,6 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveCC());
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
-        // commandManager.addCommand(new AddControl()); //disabled due to confusing players - /player planet_add should be used
-        // commandManager.addCommand(new RemoveControl()); //disabled due to confusing players - /player planet_remove should be used
         commandManager.addCommand(new MoveUnits());
         commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
@@ -162,16 +163,23 @@ public class MapGenerator {
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
+
+
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
+
+
         commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
+
+
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
+        commandManager.addCommand(new CombatCommand());
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new InstallationCommand());
