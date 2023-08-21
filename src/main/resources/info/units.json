@@ -2547,6 +2547,8 @@
         "cost": 8,
         "combatHitsOn": 5,
         "combatDieCount": 2,
+        "afbHitsOn": 6,
+        "afbDieCount": 4,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true
