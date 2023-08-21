@@ -56,6 +56,7 @@ public class Mapper {
     private static final HashMap<String, UnitModel> units = new HashMap<>();
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
+    private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
 
     public static void init() {
         readData("unit_image_suffixes.properties", unitImageSuffixes, "Could not read unit image suffix file");
@@ -88,6 +89,7 @@ public class Mapper {
         importJsonObjects("decks.json", decks, DeckModel.class, "could not read decks file");
         importJsonObjects("units.json", units, UnitModel.class, "could not read units file");
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
+        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -424,6 +426,16 @@ public class Mapper {
         return (String) relics.get(id);
     }
 
+    public static RelicModel getRelicObject(String id) {
+        String relicString = getRelic(id);
+
+        StringTokenizer tokenizer = new StringTokenizer((String) relicString, ";");
+        String name = tokenizer.nextToken();
+        String effect = tokenizer.nextToken();
+        String shortName = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
+        return new RelicModel(id, name, effect, shortName);
+    }
+
     public static PlanetModel getPlanet(String id) {
         return TileHelper.getAllPlanets().get(id);
     }
@@ -709,6 +721,11 @@ public class Mapper {
     public static HashMap<String, DeckModel> getDecks() {
         HashMap<String, DeckModel> deckList = new HashMap<>(decks);
         return deckList;
+    }
+
+    public static HashMap<String, CombatModifierModel> getCombatModifiers() {
+        HashMap<String, CombatModifierModel> combatModifiersList = new HashMap<>(combatModifiers);
+        return combatModifiersList;
     }
 
     public static HashMap<String, String> getFactionAbilities() {

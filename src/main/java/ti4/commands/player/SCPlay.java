@@ -1,9 +1,6 @@
 package ti4.commands.player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -54,7 +51,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         LinkedHashSet<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            sendMessage("No SC has been selected by the player");
+            sendMessage("No SC has been selected");
             return;
         }
 
@@ -83,7 +80,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
         }
 
-        String emojiName = "SC" + String.valueOf(scToPlay);
+        String emojiName = "SC" + scToPlay;
 
         if (activeMap.getPlayedSCs().contains(scToPlay)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
@@ -92,23 +89,54 @@ public class SCPlay extends PlayerSubcommandData {
 
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
-        if (activeMap.isFoWMode()) {
-            if(activeMap.isHomeBrewSCMode())
-            {
-                message = "Strategy card #" + scToPlay + " played.\n\n";
-            }
-            else
-            {
-                message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + " played.\n\n";
+        //String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
+        StringBuilder scMessageBuilder = new StringBuilder("SC ");
+        if(activeMap.isHomeBrewSCMode()) {
+            scMessageBuilder
+                    .append("#")
+                    .append(scToPlay);
+            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
+                String scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
+                scMessageBuilder
+                        .append(" ")
+                        .append(scName);
             }
         }
+        else {
+            scMessageBuilder
+                    .append(Helper.getEmojiFromDiscord(emojiName))
+                    .append(Helper.getSCAsMention(activeMap.getGuild(), scToDisplay));
+        }
+        if (pbd100or500) {
+            scMessageBuilder
+                    .append(" Group ")
+                    .append(pbd100group);
+        }
+        scMessageBuilder
+                .append(" played");
+        if (!activeMap.isFoWMode()) {
+            scMessageBuilder.append(" by ")
+                    .append(Helper.getPlayerRepresentation(player, activeMap));
+        }
+        scMessageBuilder.append(".\n\n");
+        String message = scMessageBuilder.toString();
+
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
+        message += "Indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToDisplay) + (pbd100or500 ? "-group_" + pbd100group : "");
+        String scName = String.valueOf(scToDisplay);
+        if(!activeMap.isHomeBrewSCMode()) {
+            scName = Helper.getSCName(scToDisplay);
+        }
+        else {
+            if (Optional.ofNullable(activeMap.getScSet()).isPresent() && !activeMap.getScSet().equals("pok") && !activeMap.getScSet().equals("null")) {
+                scName = Mapper.getStrategyCardSets().get(activeMap.getScSet()).getCardValues().get(scToPlay);
+            }
+        }
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + scName + (pbd100or500 ? "-group_" + pbd100group : "");
+
         TextChannel textChannel = (TextChannel) mainGameChannel;
 
         for (Player player2 : activeMap.getPlayers().values()) {
@@ -212,7 +240,8 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();
-        Button endTurn = Button.danger("turnEnd", "End Turn");
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        Button endTurn = Button.danger(finChecker+"turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
         if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
@@ -230,7 +259,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
                             } else {
-                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), acqMessage);
+                                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), acqMessage);
                             }
                         }
                     }

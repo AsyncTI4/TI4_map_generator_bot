@@ -2,37 +2,98 @@
   {
     "name": "SC Set Template",
     "alias": "template",
-    "cardValues": [1,2,3,4,5,6,7,8],
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Imperial"
+    },
     "description": "A template json strategy card set"
   },
   {
     "name": "PoK Strategy Cards",
     "alias": "pok",
-    "cardValues": [1,2,3,4,5,6,7,8],
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Imperial"
+    },
     "description": "The \"default\" set of strategy cards, used in PoK"
   },
   {
     "name": "Base Game Strategy Cards",
     "alias": "base_game",
-    "cardValues": [1,2,3,4,5,6,7,8],
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Imperial"
+    },
     "description": "The original set of strategy cards, before Diplomacy and Construction were updated"
   },
   {
     "name": "Tispoon Ten",
     "alias": "tispoon",
-    "cardValues": [1,2,3,4,5,6,7,8,9,10],
+    "cardValues": {
+      "1": "Anticipation",
+      "2": "Diplomacy",
+      "3": "Leadership",
+      "4": "Politics",
+      "5": "Construction",
+      "6": "Trade",
+      "7": "Warfare",
+      "8": "Technology",
+      "9": "Espionage",
+      "10": "Imperial"
+    },
     "description": "A set of 10 strategy cards by HolyTispoon used in FoW41"
   },
   {
     "name": "Tispoon's Tribunal",
     "alias": "tribunal",
-    "cardValues": [1,2,3,4,5,6,7,8,9,10],
+    "cardValues": {
+      "1": "Anticipation",
+      "2": "Diplomacy",
+      "3": "Leadership",
+      "4": "Politics",
+      "5": "Construction",
+      "6": "Trade",
+      "7": "Warfare",
+      "8": "Technology",
+      "9": "Espionage",
+      "10": "Imperial"
+    },
     "description": "A set of 10 strategy cards by HolyTispoon used in PBD500"
   },
   {
     "name": "Asteroid's Anarchy",
-    "alias": "asteroid",
-    "cardValues": [1,2,3,4,5,6,7,8,9,10,11],
+    "alias": "anarchy",
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Preparation",
+      "3": "Diplomacy",
+      "4": "Politics",
+      "5": "Construction",
+      "6": "Trade",
+      "7": "Fabrication",
+      "8": "Warfare",
+      "9": "Technology",
+      "10": "Espionage",
+      "11": "Imperial"
+    },
     "description": "Asteroid's set of 11 custom SCs"
   }
 ]
