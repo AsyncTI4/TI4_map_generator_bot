@@ -108,7 +108,7 @@ public class Map {
     private boolean absolMode = false;
 
     @Getter @Setter @ExportableField
-    private String scSet = null;
+    private String scSet = "pok";
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
