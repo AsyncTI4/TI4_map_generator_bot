@@ -44,7 +44,7 @@ public class SetDeck extends GameSubcommandData {
             if (Optional.ofNullable(value).isPresent()) {
                 if(deckType.equals(Constants.STRATEGY_CARD_SET)) {
                     StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
-                    activeMap.setHomeBrewSCMode(!value.equals("pok"));
+                    activeMap.setHomeBrewSCMode(!value.equals("pok") && !value.equals("base_game"));
                     activeMap.setScTradeGoods(new LinkedHashMap<>());
                     activeMap.setScSet(strategyCardModel.getAlias());
 
@@ -52,16 +52,7 @@ public class SetDeck extends GameSubcommandData {
                 }
                 else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
-                    if(Optional.ofNullable(deckModel).isPresent()) {
-                        switch (deckType) {
-                            case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
-                            case Constants.SO_DECK -> activeMap.setSecretObjectives(deckModel.getShuffledCardList());
-                            case Constants.STAGE_1_PUBLIC_DECK -> activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
-                            case Constants.STAGE_2_PUBLIC_DECK -> activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
-                            case Constants.RELIC_DECK -> activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
-                            case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
-                            case Constants.EXPLORATION_DECKS -> activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
-                        }
+                    if (setDeck(event, activeMap, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
                     }
                     else {
@@ -81,5 +72,21 @@ public class SetDeck extends GameSubcommandData {
     private void addDefaultOption(String constantName, String descName) {
         addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
         this.deckTypes.add(constantName);
+    }
+
+    public static boolean setDeck(SlashCommandInteractionEvent event, Map activeMap, String deckType, DeckModel deckModel) {
+        if(Optional.ofNullable(deckModel).isPresent()) {
+            switch (deckType) {
+                case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
+                case Constants.SO_DECK -> activeMap.setSecretObjectives(deckModel.getShuffledCardList());
+                case Constants.STAGE_1_PUBLIC_DECK -> activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
+                case Constants.STAGE_2_PUBLIC_DECK -> activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
+                case Constants.RELIC_DECK -> activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
+                case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
+                case Constants.EXPLORATION_DECKS -> activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
+            }
+            return true;
+        }
+        return false;
     }
 }
