@@ -33,6 +33,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.StrategyCardModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -2591,5 +2592,9 @@ public class Map {
 
     public ArrayList<String> getRunMigrations(){
         return this.runDataMigrations;
+    }
+
+    public StrategyCardModel getStrategyCardSet() {
+        return Mapper.getStrategyCardSets().get(getScSet());
     }
 }
