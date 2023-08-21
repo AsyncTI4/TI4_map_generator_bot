@@ -337,8 +337,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }
+
         return pbdNumbers.stream().filter(num -> num != 1000).toList(); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
     }
+  
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();

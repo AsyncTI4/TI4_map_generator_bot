@@ -866,6 +866,11 @@ public class Constants {
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
+
+
+    public static final String OBSERVER = "observer";
+    public static final String ADD_REMOVE = "add_remove";
+
     public static final String COMBAT = "combat";
 
     public static final String MOD_OPPONENT_STOLEN_TECH = "opponent_stolen_faction_tech";
