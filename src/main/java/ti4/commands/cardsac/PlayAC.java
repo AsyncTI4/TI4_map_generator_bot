@@ -163,7 +163,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                         button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
                     } else {
-                        button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, "" + sc);
+                        button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, activeMap));
                     }
                     scButtons.add(button);
                 }
