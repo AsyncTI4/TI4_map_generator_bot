@@ -32,12 +32,12 @@ public class Observer extends BothelperSubcommandData {
             if(channel.getName().contains(event.getOption("game_name").getAsString())) {
             
                 if(event.getOption("add_remove").getAsString().equals("add")) {
-                    channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
+                    channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL,Permission.MESSAGE_SEND).queue();
                     //sendMessage("Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
                 }
 
                 if(event.getOption("add_remove").getAsString().equals("remove")) {
-                    channel.getPermissionContainer().upsertPermissionOverride(user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND);
+                    channel.getPermissionContainer().upsertPermissionOverride(user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
                     //sendMessage("Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
                 }
             }
