@@ -338,7 +338,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. Then, destroy 1 infantry on the planet. The resource value of this planet is increased by 2.",
-    "source": "base"
+    "text2":"","source": "base"
   },
   {
     "alias": "demilitarized_zone",
@@ -346,7 +346,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. Then, destroy all units on that planet. Player's units cannot land, be produced, or be placed on this planet.",
-    "source": "base"
+    "text2":"","source": "base"
   },
   {
     "alias": "holy_planet_of_ixth",
@@ -354,7 +354,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. The planet's owner gains 1 victory point. Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",
-    "source": "base"
+    "text2":"","source": "base"
   },
   {
     "alias": "representative_government",
@@ -371,6 +371,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. When the owner of this planet researches technology, they may exhaust this card to ignore 1 green prerequisite.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -379,6 +380,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. When the owner of this planet researches technology, they may exhaust this card to ignore 1 yellow prerequisite.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -387,6 +389,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. When the owner of this planet researches technology, they may exhaust this card to ignore 1 blue prerequisite.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -395,6 +398,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. When the owner of this planet researches technology, they may exhaust this card to ignore 1 red prerequisite.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -403,6 +407,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. The influence value of this planet is increased by 2.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -411,6 +416,7 @@
     "type": "Law",
     "target": "Elect Player",
     "text1": "The elected player gains this card and 1 victory point. A player gains this card and 1 victory point when they win a combat against the owner of this card. Then, the previous owner of this card loses 1 victory point.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -419,6 +425,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. The resource and influence values of this planet are increased by 1.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -427,6 +434,7 @@
     "type": "Law",
     "target": "Elect Player",
     "text1": "The elected player gains this card and 1 victory point. A player gains this card and 1 victory point after they gain control of a planet in the home system of this card's owner. Then, the previous owner of this card loses 1 victory point.",
+    "text2": "",
     "source": "base"
   },
   {
@@ -435,6 +443,7 @@
     "type": "Law",
     "target": "Elect Player",
     "text1": "The elected player gains this card. During each combat round, the owner of this card may reroll any number of dice; they must destroy each of their units that did not produce a hit with its reroll.",
+    "text2": "",
     "source": "base"
   },
   {
