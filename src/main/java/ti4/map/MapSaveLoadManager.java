@@ -470,19 +470,19 @@ public class MapSaveLoadManager {
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AC_DECK_ID + activeMap.getAcDeckID());
+        writer.write(Constants.AC_DECK_ID + " " + activeMap.getAcDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SO_DECK_ID + activeMap.getSoDeckID());
+        writer.write(Constants.SO_DECK_ID + " " + activeMap.getSoDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + activeMap.getStage1PublicDeckID());
+        writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + activeMap.getStage1PublicDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + activeMap.getStage2PublicDeckID());
+        writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeMap.getStage2PublicDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.RELIC_DECK_ID + activeMap.getRelicDeckID());
+        writer.write(Constants.RELIC_DECK_ID + " " + activeMap.getRelicDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.AGENDA_DECK_ID + activeMap.getAgendaDeckID());
+        writer.write(Constants.AGENDA_DECK_ID + " " + activeMap.getAgendaDeckID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.EXPLORATION_DECK_ID + activeMap.getExplorationDeckID());
+        writer.write(Constants.EXPLORATION_DECK_ID + " " + activeMap.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSetID());
