@@ -169,7 +169,11 @@ public class CombatHelper {
                     Arrays.toString(resultRolls), hitRolls.length, rollsSuffix);
         }
 
-        result += String.format("\n**Total hits %s**\n", totalHits);
+        String hitEmojis = "";
+        for (int i = 0; i < totalHits; i++) {
+            hitEmojis += ":boom:";
+        }
+        result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
         return result.toString();
     }
 }
