@@ -1374,6 +1374,8 @@ public class ButtonListener extends ListenerAdapter {
                             + " Select which AC you would like to steal",
                     buttons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("specialRex_")){
+            ButtonHelper.resolveSpecialRex(player, activeMap, buttonID, ident, event);
         } else if (buttonID.startsWith("doActivation_")) {
             String pos = buttonID.replace("doActivation_", "");
             ButtonHelper.resolveOnActivationEnemyAbilities(activeMap, activeMap.getTileByPosition(pos), player, false);
