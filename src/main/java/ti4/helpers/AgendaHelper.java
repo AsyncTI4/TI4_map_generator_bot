@@ -701,7 +701,8 @@ public class AgendaHelper {
         Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
         Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
         List<Button> deadlyActionRow3 = List.of(autoResolve, manualResolve);
-        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage3,
+        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), resMessage3);
+        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "Resolve",
                 deadlyActionRow3);
 
     }
@@ -750,7 +751,10 @@ public class AgendaHelper {
        if(agendaDetails.contains("Planet") || agendaDetails.contains("planet")){
             cleanedChoice = Helper.getPlanetRepresentation(choice, activeMap);
        }
-        String voteMessage = ident+" Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
+        String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
+        if(!activeMap.isFoWMode()){
+            voteMessage = ident+" "+ voteMessage;
+        }
         String identifier = "";
         if (activeMap.isFoWMode()) {
             identifier = player.getColor();
