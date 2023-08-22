@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
+import ti4.commands.admin.RunManualDataMigration;
 import ti4.commands.bothelper.BothelperCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.capture.CaptureCommand;
