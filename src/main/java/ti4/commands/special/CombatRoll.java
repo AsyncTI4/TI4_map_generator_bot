@@ -18,6 +18,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatHelper;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -107,8 +108,22 @@ public class CombatRoll extends SpecialSubcommandData {
         tileName = " - " + tileName + "[" + tile.getTileID() + "]";
         StringBuilder sb = new StringBuilder();
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
+        if(combatOnHolder == null){
+            sendMessage("Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+            return;
+        }
+        
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
+        if(unitsByQuantity.size() == 0){
+            String fightingOnUnitHolderName = unitHolderName;
+            if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){
+                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeMap);
+            }
+            sendMessage("There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
+            + "Ping bothelper if this seems to be in error.");
 
+            return;
+        }
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
         
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeMap);
@@ -117,9 +132,9 @@ public class CombatRoll extends SpecialSubcommandData {
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
         autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat);
 
-        String message = String.format("%s combat rolls for %s on %s: \n",
+        String message = String.format("%s combat rolls for %s on %s %s:  \n",
                 StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
-                tile.getPosition());
+                tile.getPosition(), Emojis.RollDice);
         message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
