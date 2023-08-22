@@ -98,6 +98,7 @@ public class AdminCommand implements Command {
         subcommands.add(new Statistics());
         subcommands.add(new SetGlobalSetting());
         subcommands.add(new UpdateThreadArchiveTime());
+        subcommands.add(new RunManualDataMigration());
         return subcommands;
     }
 
