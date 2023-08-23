@@ -109,7 +109,7 @@ public class CombatRoll extends SpecialSubcommandData {
         StringBuilder sb = new StringBuilder();
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if(combatOnHolder == null){
-            sendMessage("Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
             return;
         }
         
@@ -119,7 +119,7 @@ public class CombatRoll extends SpecialSubcommandData {
             if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeMap);
             }
-            sendMessage("There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
             + "Ping bothelper if this seems to be in error.");
 
             return;
