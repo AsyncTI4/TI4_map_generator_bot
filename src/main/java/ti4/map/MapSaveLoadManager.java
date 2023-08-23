@@ -1,6 +1,7 @@
 package ti4.map;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,11 +23,14 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
+import org.apache.commons.io.input.BOMInputStream;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import lombok.val;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -904,7 +908,9 @@ public class MapSaveLoadManager {
     private static Map loadMap(File mapFile) {
         if (mapFile != null) {
             Map activeMap = new Map();
-            try (Scanner myReader = new Scanner(mapFile)) {
+
+            try(Scanner myReader = new Scanner(BOMInputStream.builder().setInputStream(new FileInputStream(mapFile)).get()))
+            {
                 activeMap.setOwnerID(myReader.nextLine());
                 activeMap.setOwnerName(myReader.nextLine());
                 activeMap.setName(myReader.nextLine());
