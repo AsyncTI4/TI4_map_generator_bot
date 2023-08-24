@@ -37,6 +37,6 @@ public abstract class CaptureSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        SCCommand.reply(event);
+       // SCCommand.reply(event);
     }
 }
