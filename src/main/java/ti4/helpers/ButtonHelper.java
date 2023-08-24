@@ -2402,7 +2402,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                                 Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey, "Remove "+x+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                 buttons.add(validTile2);
                             }
-                            if( ((unitKey.equalsIgnoreCase("mech") && player.getUnitsOwned().contains("nomad_mech")) ||unitKey.equalsIgnoreCase("dreadnought") || unitKey.equalsIgnoreCase("warsun") || unitKey.equalsIgnoreCase("flagship") || (unitKey.equalsIgnoreCase("cruiser") && player.hasTech("se2")) || (unitKey.equalsIgnoreCase("carrier") && player.hasTech("ac2"))) && totalUnits > 0){
+                            if( ((unitKey.equalsIgnoreCase("mech") && !activeMap.getLaws().keySet().contains("articles_war") &&player.getUnitsOwned().contains("nomad_mech")) ||unitKey.equalsIgnoreCase("dreadnought") || unitKey.equalsIgnoreCase("warsun") || unitKey.equalsIgnoreCase("flagship") || (unitKey.equalsIgnoreCase("cruiser") && player.hasTech("se2")) || (unitKey.equalsIgnoreCase("carrier") && player.hasTech("ac2"))) && totalUnits > 0){
                                 Button validTile2 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+1+unitKey, "Sustain "+1+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                 buttons.add(validTile2);
                             }
@@ -3806,7 +3806,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             int comms = owner.getCommodities();
             owner.setCommodities(0);
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeMap, activeMap.getGuild(), true ) + " your TA was played.";
-            String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the number of comms the player had. ("+player.getTg()+"->"+(player.getTg()+comms)+"). Please follow up with the player if this number seems off";
+            String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the number of comms the player had (your tgs went from "+player.getTg()+"tgs to -> "+(player.getTg()+comms)+"tgs). Please follow up with the player if this number seems off";
             player.setTg(player.getTg()+comms);
             ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, owner, player, owner.getCommoditiesTotal(), event);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(owner, activeMap), reducedMsg);
