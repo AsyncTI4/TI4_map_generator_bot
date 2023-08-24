@@ -402,6 +402,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
         writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + activeMap.isReverseSpeakerOrder());
+        writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
         for (java.util.Map.Entry<Pair<String, Integer>, String> entry : activeMap.getAdjacentTileOverrides().entrySet()) {
