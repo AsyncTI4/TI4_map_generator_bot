@@ -2532,8 +2532,8 @@
     "alias": "special_session",
     "name": "Special Session",
     "phase": "Agenda",
-    "window": "After an agenda is revealed:",
-    "text": "Each player must vote on this agenda, if able.",
+    "window": "At the end of the agenda phase, after players ready planets:",
+    "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready 1 planet they control.",
     "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
     "source": "ds"
   },
@@ -2794,7 +2794,7 @@
     "name": "Professional Archeologists",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
@@ -2803,7 +2803,7 @@
     "name": "Professional Archeologists",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
@@ -2812,7 +2812,7 @@
     "name": "Professional Archeologists",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
@@ -2821,7 +2821,7 @@
     "name": "Professional Archeologists",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
