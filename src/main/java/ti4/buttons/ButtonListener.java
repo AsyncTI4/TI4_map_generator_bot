@@ -2083,6 +2083,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    ButtonHelperFactionSpecific.KeleresIIHQCCGainCheck(player, activeMap);
                     ScorePublic.scorePO(event, privateChannel, activeMap, player, 0);
                 }
                 // AFTER AN AGENDA HAS BEEN REVEALED
