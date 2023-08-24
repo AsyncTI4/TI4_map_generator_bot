@@ -40,6 +40,29 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+     public static void KeleresIIHQCCGainCheck(Player player, Map activeMap) {
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
+            if(p2.hasTech("iihq")){
+                String finChecker = "FFCC_"+p2.getFaction() + "_";
+                Button getTactic= Button.success(finChecker+"increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success(finChecker+"increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat= Button.success(finChecker+"increase_strategy_cc", "Gain 1 Strategy CC");
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String trueIdentity = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true);
+                String message = trueIdentity+" Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
+                String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(p2)+". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeMap), message);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeMap), message2, buttons);
+                break;
+            }
+        }
+
+     }
+
     public static List<Button> getYinAgentButtons(Player player, Map activeMap, String pos) {
         List<Button> buttons = new ArrayList<>();
         Tile tile = activeMap.getTileByPosition(pos);
@@ -1136,7 +1159,10 @@ public class ButtonHelperFactionSpecific {
             successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
                     + tile.getRepresentationForButtons(activeMap, player) + ".";
         }
-        successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, activeMap, player, event);
+        if(!activeMap.getLaws().keySet().contains("articles_war")){
+            successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, activeMap, player, event);
+        }
+        
 
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         String message = "Use buttons to end turn or do another action";

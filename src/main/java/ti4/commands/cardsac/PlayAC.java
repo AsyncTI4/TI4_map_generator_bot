@@ -115,7 +115,7 @@ public class PlayAC extends ACCardsSubcommandData {
         Button sabotageButton = Button.danger("sabotage_ac_"+actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromUnit(activeMap, "empyrean_mech");
-        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeMap, player, empy)) {
+        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeMap, player, empy) && !activeMap.getLaws().keySet().contains("articles_war")) {
             Player player2 = empy;
             Button empyButton = Button.secondary("sabotage_empy_"+actionCardTitle, "Cancel "+actionCardTitle+" With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
             List<Button> empyButtons = new ArrayList<Button>();
