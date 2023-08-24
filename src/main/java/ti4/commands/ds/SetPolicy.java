@@ -41,7 +41,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             return;
         }
 
-        if (player == null) {
+        if (player == null){
             sendMessage("Player could not be found");
             return;
         }
