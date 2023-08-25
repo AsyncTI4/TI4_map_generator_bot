@@ -1177,7 +1177,7 @@
     "faction": "kolume",
     "baseUpgrade": "",
     "source": "ds",
-    "text": "When you pass, you may gain 1 trade good for each other player who has passed. ACTION: Exhaust this card."
+    "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card."
   },
   {
     "alias": "dskolur",
