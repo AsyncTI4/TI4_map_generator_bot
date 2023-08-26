@@ -218,7 +218,7 @@ public class Turn extends PlayerSubcommandData {
             if (!player.hasFollowedSC(sc)) {
                 if(!activeMap.isHomeBrewSCMode())
                 {
-                    sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                    sb.append(Helper.getSCBackEmojiFromInteger(sc)).append(" ").append(Helper.getSCAsMention(sc));
                 }
                 else
                 {
