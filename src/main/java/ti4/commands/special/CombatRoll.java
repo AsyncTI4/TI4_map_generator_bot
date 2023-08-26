@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -114,6 +116,13 @@ public class CombatRoll extends SpecialSubcommandData {
         }
         
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
+        if (activeMap.getLaws().containsKey("articles_war")) {
+            if (unitsByQuantity.keySet().stream().anyMatch(unit -> unit.getAlias().equals("naaz_mech_space"))) {
+                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !e.getKey().getAlias().equals("naaz_mech_space"))
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Helper.getFactionIconFromDiscord("naaz") + " Z-Grav Eidolon due to Articles of War agenda.");
+            }
+        }
         if(unitsByQuantity.size() == 0){
             String fightingOnUnitHolderName = unitHolderName;
             if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){

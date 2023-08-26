@@ -455,12 +455,11 @@ public class Player {
                 .orElse(null);
     }
 
-    public UnitModel getUnitByAsyncID(String asyncID) {
+    public List<UnitModel> getUnitsByAsyncID(String asyncID) {
         return getUnitsOwned().stream()
                 .map(unitID -> Mapper.getUnit(unitID))
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
-                .findFirst()
-                .orElse(null);
+                .toList();
     }
 
     public UnitModel getUnitByID(String unitID) {

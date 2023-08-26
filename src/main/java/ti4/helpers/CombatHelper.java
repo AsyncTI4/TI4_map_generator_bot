@@ -1,17 +1,15 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
+
 import ti4.generator.Mapper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -24,32 +22,46 @@ public class CombatHelper {
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
-        HashMap<UnitModel, Integer> unitsInCombat = new HashMap<>(unitHolder.getUnitAsyncIdsOnHolder(colorID)
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> player.getUnitByAsyncID(entry.getKey().toLowerCase()),
-                        Entry::getValue)));
-        
-        // Gracefully fail when units don't exist
-        if (unitsInCombat.containsKey(null)) {
-            List<String> problems = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
-                .filter(unit -> player.getUnitByAsyncID(unit.toLowerCase()) == null).toList();
-            StringBuilder error = new StringBuilder("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(problems).append("\n");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-            unitsInCombat.remove(null);
-        }
+        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
+            entry -> player.getUnitsByAsyncID(entry.getKey()).stream().map(x -> new ImmutablePair<>(x, entry.getValue()))
+        ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
+        HashMap<UnitModel, Integer> output = null;
         if (unitHolder.getName() == Constants.SPACE) {
-            return new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
+            output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
                     .filter(entry -> entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
-            return new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
+            output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
                     .filter(entry -> entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
+        Set<String> duplicates = new HashSet<String>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(unit -> unit.getBaseType())
+            .collect(Collectors.toList());
+        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
+
+        // Gracefully fail when units don't exist
+        StringBuilder error = new StringBuilder();
+        if (missing.size() > 0) {
+            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
+            error.append(" Ping bothelper if this seems to be in error.\n");
+            error.append("> Unowned units: ").append(missing).append("\n");
+        }
+        if (dupes.size() > 0) {
+            error.append("You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+            error.append("> Duplicate units: ").append(dupes);
+        }   
+        if (missing.size() > 0 || dupes.size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        }
+
+        return output;
     }
 
     public static Player GetOpponent(Player player, UnitHolder unitHolder, Map activeMap) {
