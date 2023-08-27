@@ -216,12 +216,10 @@ public class Turn extends PlayerSubcommandData {
 
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
-                if(!activeMap.isHomeBrewSCMode())
-                {
-                    sb.append(Helper.getSCBackEmojiFromInteger(sc)).append(" ").append(Helper.getSCAsMention(sc));
-                }
-                else
-                {
+                if (!activeMap.isHomeBrewSCMode()) {
+                    sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                    sb.append(" ").append(Helper.getSCAsMention(activeMap.getGuild(), sc, activeMap));
+                } else {
                     sb.append("SC #"+sc);
                 }
                 
