@@ -307,7 +307,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(activeMap, position);
+		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;
