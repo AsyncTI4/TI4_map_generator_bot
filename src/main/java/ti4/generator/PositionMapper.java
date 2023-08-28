@@ -19,24 +19,24 @@ import java.util.stream.Collectors;
 
 //Handles positions of map
 public class PositionMapper {
-    private static final Properties positionTileMap = new Properties();
+    private static final Properties tileImageCoordinates = new Properties();
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
     private static final Properties playerInfo8ring = new Properties();
     private static final Properties stats = new Properties();
     private static final Properties reinforcements = new Properties();
 
-    private static final Properties adjacent8RingTiles = new Properties();
+    private static final Properties tileAdjacencies = new Properties();
 
 
     public static void init() {
-        readData("8ring.properties", positionTileMap, "Could not read position file");
+        readData("tileImageCoordinates.properties", tileImageCoordinates, "Could not read position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
         readData("8ring_info.properties", playerInfo8ring, "Could not read player info position file");
         readData("stats.properties", stats, "Could not read player info position file");
         readData("reinforcements.properties", reinforcements, "Could not read reinforcements position file");
-        readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
+        readData("tileAdjacencies.properties", tileAdjacencies, "Could not read adjacent tiles file");
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
@@ -74,12 +74,12 @@ public class PositionMapper {
     }
 
     public static boolean isTilePositionValid(String position) {
-        return positionTileMap.getProperty(position) != null;
+        return tileImageCoordinates.getProperty(position) != null;
     }
 
-    public static HashSet<String> get8RingTiles() {
+    public static HashSet<String> getTilePositions() {
         HashSet<String> positions = new HashSet<>();
-        for (Object key : positionTileMap.keySet()) {
+        for (Object key : tileImageCoordinates.keySet()) {
             if (key instanceof String position) {
                 positions.add(position);
             }
@@ -89,7 +89,7 @@ public class PositionMapper {
 
     @Nullable
     public static Point getTilePosition(String position) {
-        return getPosition(position, positionTileMap);
+        return getPosition(position, tileImageCoordinates);
     }
 
     private static Point getPosition(String position, Properties positionTileMap) {
@@ -225,7 +225,7 @@ public class PositionMapper {
      * @return List of tiles adjacent to tileID in clockwise compass order: [N, NE, SE, S, SW, NW]
      */
     public static List<String> getAdjacentTilePositions(String tileID) {
-        String property = adjacent8RingTiles.getProperty(tileID);
+        String property = tileAdjacencies.getProperty(tileID);
         if (property == null) {
             return Collections.emptyList();
         }
