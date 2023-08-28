@@ -604,17 +604,17 @@ public class Constants {
     public static final String PURGE_PN = "purge";
     public static final String PURGED_PN = "purged_pn";
 
-    public static final String TECH_ADD = "tech_add";
-    public static final String TECH_REMOVE = "tech_remove";
-    public static final String TECH_EXHAUST = "tech_exhaust";
-    public static final String TECH_REFRESH = "tech_ready";
+    public static final String TECH_ADD = "add";
+    public static final String TECH_REMOVE = "remove";
+    public static final String TECH_EXHAUST = "exhaust";
+    public static final String TECH_REFRESH = "ready";
 
-    public static final String PLANET_ADD = "planet_add";
-    public static final String PLANET_REMOVE = "planet_remove";
-    public static final String PLANET_EXHAUST = "planet_exhaust";
-    public static final String PLANET_REFRESH = "planet_ready";
-    public static final String PLANET_REFRESH_ALL = "planet_ready_all";
-    public static final String PLANET_EXHAUST_ALL = "planet_exhaust_all";
+    public static final String PLANET_ADD = "add";
+    public static final String PLANET_REMOVE = "remove";
+    public static final String PLANET_EXHAUST = "exhaust";
+    public static final String PLANET_REFRESH = "ready";
+    public static final String PLANET_REFRESH_ALL = "ready_all";
+    public static final String PLANET_EXHAUST_ALL = "exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
 
