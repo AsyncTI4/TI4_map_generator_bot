@@ -220,6 +220,10 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
+    /**
+     * @param tileID
+     * @return List of tiles adjacent to tileID in clockwise compass order: [N, NE, SE, S, SW, NW]
+     */
     public static List<String> getAdjacentTilePositions(String tileID) {
         String property = adjacent8RingTiles.getProperty(tileID);
         if (property == null) {
