@@ -3,7 +3,7 @@ package ti4.generator;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.map.Map;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
@@ -226,5 +226,100 @@ public class PositionMapper {
             return Collections.emptyList();
         }
         return Arrays.stream(property.split(",")).toList();
+    }
+
+    public static List<String> getAdjacentTilePositionsNew(String tileID) {
+        List<String> adjacentTiles = new ArrayList<>();
+        if (!Helper.isInteger(tileID)) return adjacentTiles;
+
+        int ringNumber = Integer.parseInt(tileID) / 100;
+        if (ringNumber == 0) return List.of("101", "102", "103", "104", "105", "106");
+        int tileNumber = Integer.parseInt(tileID) % 100;
+        int maxRingTileCount = ringNumber * 6;
+
+        adjacentTiles.addAll(getAdjacentTilePositionsWithinRing(tileID));
+
+        if (isCornerOfHexRing(tileID)) {
+            //Inside Corner
+            adjacentTiles.add(getCornerPositionOfHexRing(ringNumber - 1, getSideNumberOfHexRing(tileID)));
+
+            //Outside Corner
+            String outsideCornerTileID = getCornerPositionOfHexRing(ringNumber + 1, getSideNumberOfHexRing(tileID));
+            adjacentTiles.add(outsideCornerTileID);
+            adjacentTiles.addAll(getAdjacentTilePositionsWithinRing(outsideCornerTileID));
+        } else {
+            int currentPositionWithinSide = getPositionWithinHexSide(tileID);
+            int currentSideNumber = getSideNumberOfHexRing(tileID);
+            adjacentTiles.add(getTileAtPositionWithinHexSide(ringNumber - 1, currentSideNumber, currentPositionWithinSide - 1));
+            adjacentTiles.add(getTileAtPositionWithinHexSide(ringNumber - 1, currentSideNumber, currentPositionWithinSide));
+            adjacentTiles.add(getTileAtPositionWithinHexSide(ringNumber + 1, currentSideNumber, currentPositionWithinSide));
+            adjacentTiles.add(getTileAtPositionWithinHexSide(ringNumber + 1, currentSideNumber, currentPositionWithinSide + 1));
+        }
+
+        adjacentTiles.sort(Comparator.comparingInt(Integer::parseInt));
+
+        return adjacentTiles;
+    }
+
+    private static List<String> getAdjacentTilePositionsWithinRing(String tileID) {
+        List<String> adjacentTiles = new ArrayList<>();
+        if (!Helper.isInteger(tileID)) return adjacentTiles;
+
+        int ringNumber = Integer.parseInt(tileID) / 100;
+        int tileNumber = Integer.parseInt(tileID) % 100;
+        int maxRingTileCount = ringNumber * 6;
+
+        if (tileNumber == maxRingTileCount) { //last one in ring
+            adjacentTiles.add(ringNumber + "01");
+            adjacentTiles.add(ringNumber + String.format("%02d", maxRingTileCount - 1));
+        } else if (tileNumber == 1) { //first one in ring
+            adjacentTiles.add(ringNumber + String.format("%02d", maxRingTileCount));
+            adjacentTiles.add(ringNumber + String.format("%02d", tileNumber + 1));
+        } else {
+            adjacentTiles.add(ringNumber + String.format("%02d", tileNumber - 1));
+            adjacentTiles.add(ringNumber + String.format("%02d", tileNumber + 1));
+        }
+        return adjacentTiles;
+    }
+
+    public static Boolean isCornerOfHexRing(String tileID) {
+        if (!Helper.isInteger(tileID)) return null;
+        int ringNumber = Integer.parseInt(tileID) / 100;
+        for (int corner = 1; corner <= 6; corner++) {
+            if (tileID.equals(getCornerPositionOfHexRing(ringNumber, corner))) return true;
+        }
+        return false;
+    }
+
+    public static Integer getPositionWithinHexSide(String tileID) {
+        if (!Helper.isInteger(tileID)) return null;
+        int ringNumber = Integer.parseInt(tileID) / 100;
+        int tileNumber = Integer.parseInt(tileID) % 100;
+        for (int corner = 1; corner <= 6; corner++) {
+            int upperBound = 1 + ringNumber * (corner);
+            int lowerBound = 1 + ringNumber * (corner - 1);
+            if (tileNumber >= lowerBound && tileNumber < upperBound) return tileNumber - lowerBound;
+        }
+        return null;
+    }
+
+    public static String getTileAtPositionWithinHexSide(int ring, int side, int position) {
+        return ring + String.format("%02d", 1 + ring * (side - 1) + position);
+    }
+
+    public static Integer getSideNumberOfHexRing(String tileID) {
+        if (!Helper.isInteger(tileID)) return null;
+        int ringNumber = Integer.parseInt(tileID) / 100;
+        int tileNumber = Integer.parseInt(tileID) % 100;
+        for (int corner = 1; corner <= 6; corner++) {
+            int upperBound = 1 + ringNumber * (corner);
+            int lowerBound = 1 + ringNumber * (corner - 1);
+            if (tileNumber >= lowerBound && tileNumber < upperBound) return corner;
+        }
+        return null;
+    }
+
+    public static String getCornerPositionOfHexRing(int ring, int cornerNumber) {
+        return ring + String.format("%02d", 1 + ring * (cornerNumber - 1));
     }
 }
