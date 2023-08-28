@@ -89,7 +89,7 @@ public class SCPlay extends PlayerSubcommandData {
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         //String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
         StringBuilder scMessageBuilder = new StringBuilder();
-        scMessageBuilder.append(Helper.getSCFrontRepresentation(event, activeMap, scToPlay));
+        scMessageBuilder.append(Helper.getSCFrontRepresentation(activeMap, scToPlay));
         if (pbd100or500) {
             scMessageBuilder
                     .append(" Group ")

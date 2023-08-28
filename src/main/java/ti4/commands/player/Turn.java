@@ -216,7 +216,7 @@ public class Turn extends PlayerSubcommandData {
 
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
-                sb.append(Helper.getSCBackRepresentation(getEvent(), activeMap, sc)); 
+                sb.append(Helper.getSCBackRepresentation(activeMap, sc)); 
                 sendReminder = true;
             }
         }

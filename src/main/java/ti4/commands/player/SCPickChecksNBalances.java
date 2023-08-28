@@ -35,7 +35,7 @@ public class SCPickChecksNBalances {
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
-        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, activeMap, scPicked));
+        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(activeMap, scPicked));
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
