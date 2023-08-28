@@ -3,7 +3,7 @@ package ti4.generator;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.map.Map;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
@@ -19,29 +19,24 @@ import java.util.stream.Collectors;
 
 //Handles positions of map
 public class PositionMapper {
-
-    private static final Properties positionTileMap6Player = new Properties();
-    private static final Properties positionTileMap8Player = new Properties();
-    private static final Properties positionTileMap8Ring = new Properties();
+    private static final Properties tileImageCoordinates = new Properties();
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
     private static final Properties playerInfo8ring = new Properties();
     private static final Properties stats = new Properties();
     private static final Properties reinforcements = new Properties();
 
-    private static final Properties adjacent8RingTiles = new Properties();
+    private static final Properties tileAdjacencies = new Properties();
 
 
     public static void init() {
-        readData("6player.properties", positionTileMap6Player, "Could not read position file");
-        readData("8player.properties", positionTileMap8Player, "Could not read position file");
-        readData("8ring.properties", positionTileMap8Ring, "Could not read position file");
+        readData("tileImageCoordinates.properties", tileImageCoordinates, "Could not read position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
         readData("8ring_info.properties", playerInfo8ring, "Could not read player info position file");
         readData("stats.properties", stats, "Could not read player info position file");
         readData("reinforcements.properties", reinforcements, "Could not read reinforcements position file");
-        readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
+        readData("tileAdjacencies.properties", tileAdjacencies, "Could not read adjacent tiles file");
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
@@ -79,12 +74,12 @@ public class PositionMapper {
     }
 
     public static boolean isTilePositionValid(String position) {
-        return positionTileMap8Ring.getProperty(position) != null;
+        return tileImageCoordinates.getProperty(position) != null;
     }
 
-    public static HashSet<String> get8RingTiles() {
+    public static HashSet<String> getTilePositions() {
         HashSet<String> positions = new HashSet<>();
-        for (Object key : positionTileMap8Ring.keySet()) {
+        for (Object key : tileImageCoordinates.keySet()) {
             if (key instanceof String position) {
                 positions.add(position);
             }
@@ -94,7 +89,7 @@ public class PositionMapper {
 
     @Nullable
     public static Point getTilePosition(String position) {
-        return getPosition(position, positionTileMap8Ring);
+        return getPosition(position, tileImageCoordinates);
     }
 
     private static Point getPosition(String position, Properties positionTileMap) {
@@ -225,8 +220,12 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
-    public static List<String> getAdjacentTilePositions(Map activeMap, String tileID) {
-        String property = adjacent8RingTiles.getProperty(tileID);
+    /**
+     * @param tileID
+     * @return List of tiles adjacent to tileID in clockwise compass order: [N, NE, SE, S, SW, NW]
+     */
+    public static List<String> getAdjacentTilePositions(String tileID) {
+        String property = tileAdjacencies.getProperty(tileID);
         if (property == null) {
             return Collections.emptyList();
         }

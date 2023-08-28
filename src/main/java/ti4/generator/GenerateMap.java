@@ -217,7 +217,7 @@ public class GenerateMap {
                         maxX = -1;
                         maxY = -1;
                         Set<String> filledPositions = new HashSet<>();
-                        for (String position : PositionMapper.get8RingTiles()) {
+                        for (String position : PositionMapper.getTilePositions()) {
                             String tileRing = "0";
                             if (position.length() == 3) {
                                 tileRing = position.substring(0, 1);
@@ -236,7 +236,7 @@ public class GenerateMap {
                                 filledPositions.add(position);
                             }
                         }
-                        for (String position : PositionMapper.get8RingTiles()) {
+                        for (String position : PositionMapper.getTilePositions()) {
                             if (!tileMap.containsKey(position) || !filledPositions.contains(position)) {
                                 addTile(new Tile("0border", position), activeMap, TileStep.Tile, true);
                             }
