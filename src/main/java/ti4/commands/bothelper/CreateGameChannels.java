@@ -253,7 +253,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
         botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
         botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
-        botGetStartedMessage.append("> `/player tech_add` for factions who need to add tech\n");
+        botGetStartedMessage.append("> `/tech add` for factions who need to add tech\n");
         botGetStartedMessage.append("\n");
         botGetStartedMessage.append("### __Other helpful commands:__\n");
         botGetStartedMessage.append("> `/game replace` to replace a player in the game with a new one\n");
