@@ -1462,13 +1462,16 @@ public class ButtonHelper {
         
         startButtons.add(componentAction);
         boolean hadAnyUnplayedSCs = false;
-        for(Integer SC : player.getSCs())
-        {
-            if(!activeMap.getPlayedSCs().contains(SC))
-            {
+        for (Integer SC : player.getSCs()) {
+            if (!activeMap.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
-                Button strategicAction = Button.success(finChecker+"strategicAction_"+SC, "Play SC #"+SC);
-                startButtons.add(strategicAction);
+                if (activeMap.isHomeBrewSCMode()) {
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
+                    startButtons.add(strategicAction);
+                } else {
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC).withEmoji(Emoji.fromFormatted(Helper.getSCEmojiFromInteger(SC)));
+                    startButtons.add(strategicAction);
+                }
             }
         }
 
