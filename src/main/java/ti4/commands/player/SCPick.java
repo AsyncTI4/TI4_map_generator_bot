@@ -46,6 +46,11 @@ public class SCPick extends PlayerSubcommandData {
         Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
+        if (activePlayers.size() == 0) {
+            sendMessage("No active players found");
+            return;
+        }
+
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
         if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
