@@ -19,9 +19,6 @@ import java.util.stream.Collectors;
 
 //Handles positions of map
 public class PositionMapper {
-
-    private static final Properties positionTileMap6Player = new Properties();
-    private static final Properties positionTileMap8Player = new Properties();
     private static final Properties positionTileMap8Ring = new Properties();
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
@@ -33,8 +30,6 @@ public class PositionMapper {
 
 
     public static void init() {
-        readData("6player.properties", positionTileMap6Player, "Could not read position file");
-        readData("8player.properties", positionTileMap8Player, "Could not read position file");
         readData("8ring.properties", positionTileMap8Ring, "Could not read position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
@@ -225,7 +220,7 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
-    public static List<String> getAdjacentTilePositions(Map activeMap, String tileID) {
+    public static List<String> getAdjacentTilePositions(String tileID) {
         String property = adjacent8RingTiles.getProperty(tileID);
         if (property == null) {
             return Collections.emptyList();
