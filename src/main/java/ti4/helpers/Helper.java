@@ -325,14 +325,14 @@ public class Helper {
         return getRoleMentionByName(guild, scname);
     }
 
-    public static String getSCFrontRepresentation(GenericInteractionCreateEvent event, Map activeMap, int sc) {
+    public static String getSCFrontRepresentation(Map activeMap, int sc) {
         if (activeMap.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeMap);
-        return getSCEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc, activeMap);
+        return getSCEmojiFromInteger(sc) + getSCAsMention(activeMap.getGuild(), sc, activeMap);
     }
 
-    public static String getSCBackRepresentation(GenericInteractionCreateEvent event, Map activeMap, int sc) {
+    public static String getSCBackRepresentation(Map activeMap, int sc) {
         if (activeMap.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeMap) + " (Played)";
-        return getSCBackEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc, activeMap);
+        return getSCBackEmojiFromInteger(sc) + getSCAsMention(activeMap.getGuild(), sc, activeMap);
     }
 
     public static String getSCName(int sc, Map activeMap) {
