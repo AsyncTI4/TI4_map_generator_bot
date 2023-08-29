@@ -1892,17 +1892,25 @@ public class GenerateMap {
             if (convertToGeneric) {
                 continue;
             }
+
+            //PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX, point.y + deltaY);
+            
+            //PAINT FACTION
+            point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
+            graphics.drawString(StringUtils.capitalize(player.getFaction()), point.x + deltaX, point.y + deltaY);
+            
+            //PAIN VICTORY POINTS
             Integer vpCount = userVPs.get(player);
             vpCount = vpCount == null ? 0 : vpCount;
             point = PositionMapper.getPlayerStats(Constants.STATS_VP);
-            graphics.drawString(StringUtils.capitalize(player.getFaction()) + ", VP - " + vpCount, point.x + deltaX, point.y + deltaY);
-
+            graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
+            
+            //PAINT SO ICONS
             int totalSecrets = player.getSecrets().keySet().size();
             Set<String> soSet = player.getSecretsScored().keySet();
             int soOffset = 0;
-
             String soHand = "pa_so-icon_hand.png";
             String soScored = "pa_so-icon_scored.png";
             point = PositionMapper.getPlayerStats(Constants.STATS_SO);
