@@ -779,6 +779,7 @@ public class Constants {
     public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME="userName";
+    public static final String STATS_FACTION = "faction";
     public static final String STATS_VP ="vp";
     public static final String STATS_CC="cc";
     public static final String STATS_SPEAKER="speaker";
