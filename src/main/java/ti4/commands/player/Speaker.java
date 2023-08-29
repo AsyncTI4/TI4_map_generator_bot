@@ -12,7 +12,6 @@ import ti4.map.Player;
 public class Speaker extends PlayerSubcommandData {
     public Speaker() {
         super(Constants.SPEAKER, "Speaker selection");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
