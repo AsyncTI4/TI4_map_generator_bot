@@ -1791,7 +1791,6 @@ public class GenerateMap {
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
 
         boolean inverted = false;
-        int index = 0;
         for (Player player : players) {
 
             if (player.getFaction() == null || !player.isRealPlayer()) {
@@ -1816,71 +1815,36 @@ public class GenerateMap {
             int deltaSplitX = 0;
             int deltaSplitY = 0;
             boolean specialCase = false;
-            if (playerCount == 6 && ringCount == 3) {
-                Point tilePosition = PositionMapper.getTilePosition(player.getOriginalHomeSystemLocation());
-                if (tilePosition != null) {
-                    tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
-                    if (index == 0) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
+
+            String playerHomeSystemLocation = player.getOriginalHomeSystemLocation();
+            if (playerHomeSystemLocation != null) {
+                String locationOfHomeSystemProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerHomeSystemLocation);
+                Point homeSystemProjectedTilePosition = PositionMapper.getTilePosition(locationOfHomeSystemProjectedOnOutsideRing);
+                if (homeSystemProjectedTilePosition != null) {
+                    Point playerStatsTilePosition = getTilePosition(activeMap, "", homeSystemProjectedTilePosition.x, homeSystemProjectedTilePosition.y);
+                    int hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getOriginalHomeSystemLocation()) - 1;
+                    if (hsLocationIndex == 0) { //North East
+                        deltaX = playerStatsTilePosition.x + extraX + 360;
+                        deltaY = playerStatsTilePosition.y;
                         deltaSplitX = 200;
-                    } else if (index == 1) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 2) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 3) {
-                        deltaX = tilePosition.x + extraX;
-                        deltaY = tilePosition.y + 360  + extraY;
+                    } else if (hsLocationIndex == 1) { //East
+                        deltaX = playerStatsTilePosition.x + 360 + extraX;
+                        deltaY = playerStatsTilePosition.y + extraY;
+                    } else if (hsLocationIndex == 2) { //South East
+                        deltaX = playerStatsTilePosition.x + 360 + extraX;
+                        deltaY = playerStatsTilePosition.y + extraY;
+                    } else if (hsLocationIndex == 3) { //South West
+                        deltaX = playerStatsTilePosition.x;
+                        deltaY = playerStatsTilePosition.y + 250  + extraY;
                         deltaSplitX = 200;
-                    } else if (index == 4) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 5) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
+                    } else if (hsLocationIndex == 4) { //West
+                        deltaX = playerStatsTilePosition.x + 10;
+                        deltaY = playerStatsTilePosition.y + extraY;
+                    } else if (hsLocationIndex == 5) { //North West
+                        deltaX = playerStatsTilePosition.x + 10;
+                        deltaY = playerStatsTilePosition.y - 100;
+                        deltaSplitX = 200;
                     }
-                    index++;
-                }
-            } else if (playerCount == 8 && ringCount == 4) {
-                Point tilePosition = PositionMapper.getTilePosition(player.getOriginalHomeSystemLocation());
-                if (tilePosition != null) {
-                    tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
-                    if (index == 0) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                    } else if (index == 1) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                    } else if (index == 2) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 3) {
-                        deltaX = tilePosition.x + extraX + 50;
-                        deltaY = tilePosition.y + 360  + extraY;
-                        deltaSplitX = 200;
-                        specialCase = true;
-                    } else if (index == 4) {
-                        deltaX = tilePosition.x + extraX;
-                        deltaY = tilePosition.y + 360  + extraY;
-                        deltaSplitX = 200;
-                    } else if (index == 5) {
-                        deltaX = tilePosition.x + extraX/2;
-                        deltaY = tilePosition.y + 360 + extraY;
-                        deltaSplitX = 200;
-                    }else if (index == 6) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
-                    }else if (index == 7) {
-                        deltaX = tilePosition.x + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                        specialCase = true;
-                    }
-                    index++;
                 }
             }
 
