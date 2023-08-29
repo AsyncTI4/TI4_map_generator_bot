@@ -1817,8 +1817,7 @@ public class GenerateMap {
             int deltaSplitY = 0;
             boolean specialCase = false;
             if (playerCount == 6 && ringCount == 3) {
-                String tileID = Constants.setup6p.get(index);
-                Point tilePosition = PositionMapper.getTilePosition(tileID);
+                Point tilePosition = PositionMapper.getTilePosition(player.getOriginalHomeSystemLocation());
                 if (tilePosition != null) {
                     tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
                     if (index == 0) {
@@ -1845,8 +1844,7 @@ public class GenerateMap {
                     index++;
                 }
             } else if (playerCount == 8 && ringCount == 4) {
-                String tileID = Constants.setup8p.get(index);
-                Point tilePosition = PositionMapper.getTilePosition(tileID);
+                Point tilePosition = PositionMapper.getTilePosition(player.getOriginalHomeSystemLocation());
                 if (tilePosition != null) {
                     tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
                     if (index == 0) {
