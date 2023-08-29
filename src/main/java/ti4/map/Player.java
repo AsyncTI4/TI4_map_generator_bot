@@ -3,8 +3,6 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -26,6 +24,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.*;
@@ -45,6 +46,9 @@ public class Player {
     //abilities
     //factiontech
     //home
+
+    @Getter @Setter
+    private String originalHomeSystemLocation = null;
     private String allianceMembers = "";
     private String color;
     private String autoCompleteRepresentation = null;
