@@ -93,6 +93,7 @@ public class PositionMapper {
     }
 
     private static Point getPosition(String position, Properties positionTileMap) {
+        if (position == null) return null;
         String value = positionTileMap.getProperty(position);
         return getPoint(value);
     }
