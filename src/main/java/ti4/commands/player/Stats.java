@@ -237,19 +237,20 @@ public class Stats extends PlayerSubcommandData {
 			sb.append("      No SC Picked");
 		}
 		sb.append("\n");
-		sb.append("> Debt: ").append(player.getDebtTokens()).append("\n");
-		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
-		sb.append("> Passed: ").append(player.isPassed()).append("\n");
-		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
+		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
+		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
+		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
 
-		sb.append("> Abilities: ").append(player.getAbilities()).append("\n");
-		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
-		sb.append("> Techs: ").append(player.getTechs()).append("\n");
-		sb.append("> Relics: ").append(player.getRelics()).append("\n");
-		sb.append("> Mahact CC: ").append(player.getMahactCC()).append("\n");
-		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
-		sb.append("> Owned PNs: ").append(player.getPromissoryNotesOwned()).append("\n");
-		sb.append("> Owned Units: ").append(player.getUnitsOwned()).append("\n");
+		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
+		sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
+		sb.append("> Techs: `").append(player.getTechs()).append("`\n");
+		sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+		sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
+		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
+		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
+		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
 		sb.append("\n");
 
 		return sb.toString();
