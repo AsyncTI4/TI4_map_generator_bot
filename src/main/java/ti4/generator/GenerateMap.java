@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
-import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +24,6 @@ import ti4.model.TechnologyModel;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1773,7 +1771,6 @@ public class GenerateMap {
     }
 
     private void playerInfo(Map activeMap) {
-        int playerRow = 1;
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         Player speaker = activeMap.getPlayer(activeMap.getSpeaker());
@@ -1786,7 +1783,6 @@ public class GenerateMap {
         int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
         int deltaY = extraY;
         
-        int playerCount = activeMap.getPlayerCountForMap();
         int ringCount = activeMap.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         
@@ -1796,26 +1792,9 @@ public class GenerateMap {
                 continue;
             }
 
-            if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
-                playerRow++;
-                if (playerRow == 2) {
-                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
-                    deltaX = 10;
-                    inverted = true;
-                } else if (playerRow == 3) {
-                    deltaX = mapWidth - extraX + 10;
-                    deltaY = extraY;
-                    inverted = false;
-                } else if (playerRow == 4) {
-                    deltaX = mapWidth + 10;
-                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
-                    inverted = true;
-                }
-            }
-
             int deltaSplitX = 0;
             int deltaSplitY = 0;
-            boolean specialCase = false;
+            boolean specialSpeakerTokenLocation = false;
 
             String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
             if (playerStatsAnchor != null) {
@@ -1823,25 +1802,37 @@ public class GenerateMap {
                 Point anchorProjectedPoint = PositionMapper.getTilePosition(anchorProjectedOnOutsideRing);
                 if (anchorProjectedPoint != null) {
                     Point playerStatsAnchorPoint = getTilePosition(activeMap, anchorProjectedOnOutsideRing, anchorProjectedPoint.x, anchorProjectedPoint.y);
-                    Integer hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
-                    if (hsLocationIndex == 0) { //North East
-                        deltaX = playerStatsAnchorPoint.x + extraX + 360;
+                    Integer anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
+                    boolean isCorner = anchorProjectedOnOutsideRing.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
+                    if (anchorLocationIndex == 0 && isCorner) { //North Corner
+                        deltaX = playerStatsAnchorPoint.x + extraX + 80;
+                        deltaY = playerStatsAnchorPoint.y - 80;
+                        deltaSplitX = 200;
+                    } else if (anchorLocationIndex == 0) { //North East
+                        deltaX = playerStatsAnchorPoint.x + extraX + 300;
                         deltaY = playerStatsAnchorPoint.y;
                         deltaSplitX = 200;
-                    } else if (hsLocationIndex == 1) { //East
+                    } else if (anchorLocationIndex == 1) { //East
                         deltaX = playerStatsAnchorPoint.x + 360 + extraX;
                         deltaY = playerStatsAnchorPoint.y + extraY;
-                    } else if (hsLocationIndex == 2) { //South East
+                    } else if (anchorLocationIndex == 2) { //South East
                         deltaX = playerStatsAnchorPoint.x + 360 + extraX;
                         deltaY = playerStatsAnchorPoint.y + extraY;
-                    } else if (hsLocationIndex == 3) { //South West
+                    } else if (anchorLocationIndex == 3 && isCorner) { //South Corner
+                        deltaX = playerStatsAnchorPoint.x + extraX;
+                        deltaY = playerStatsAnchorPoint.y + 360  + extraY;
+                        deltaSplitX = 200;
+                    } else if (anchorLocationIndex == 3) { //South West
                         deltaX = playerStatsAnchorPoint.x;
                         deltaY = playerStatsAnchorPoint.y + 250  + extraY;
                         deltaSplitX = 200;
-                    } else if (hsLocationIndex == 4) { //West
+                    } else if (anchorLocationIndex == 4) { //West
                         deltaX = playerStatsAnchorPoint.x + 10;
                         deltaY = playerStatsAnchorPoint.y + extraY;
-                    } else if (hsLocationIndex == 5) { //North West
+                    } else if (anchorLocationIndex == 5 && isCorner) { //North West Corner
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 5) { //North West
                         deltaX = playerStatsAnchorPoint.x + 10;
                         deltaY = playerStatsAnchorPoint.y - 100;
                         deltaSplitX = 200;
@@ -1933,7 +1924,7 @@ public class GenerateMap {
                         BotLogger.log("Could not read speaker file", e);
                     }
                     point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
-                    int negativeDelta = specialCase ? 200 : 0;
+                    int negativeDelta = specialSpeakerTokenLocation ? 200 : 0;
                     graphics.drawImage(bufferedImage, point.x + deltaX + deltaSplitX + negativeDelta, point.y + deltaY - deltaSplitY, null);
                     graphics.setColor(Color.WHITE);
                 }
