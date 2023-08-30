@@ -395,7 +395,8 @@ public class PositionMapper {
         return null;
     }
 
-    public static String getTileIDAtPositionInRingSide(int ring, int side, int position) {
+    public static String getTileIDAtPositionInRingSide(Integer ring, Integer side, Integer position) {
+        if (ring == null || side == null || position == null) return null;
         return ring + String.format("%02d", 1 + ring * (side - 1) + position);
     }
 
