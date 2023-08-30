@@ -1791,16 +1791,11 @@ public class GenerateMap {
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         
         boolean inverted = false;
-        for (Player player : players) {
-            if (inverted) {
-                deltaX = 10;
-            } else {
-                deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
-            }
-            
+        for (Player player : players) {           
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
+
             if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
                 playerRow++;
                 if (playerRow == 2) {
@@ -1817,6 +1812,7 @@ public class GenerateMap {
                     inverted = true;
                 }
             }
+
             int deltaSplitX = 0;
             int deltaSplitY = 0;
             boolean specialCase = false;
@@ -1850,8 +1846,8 @@ public class GenerateMap {
                         deltaY = playerStatsAnchorPoint.y - 100;
                         deltaSplitX = 200;
                     }
-                }
-            }
+                } else continue;
+            } else continue;
 
             String userName = player.getUserName();
 
@@ -1909,7 +1905,7 @@ public class GenerateMap {
                 count++;
             }
 
-
+            //PAINT CCs
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
@@ -1925,6 +1921,7 @@ public class GenerateMap {
             drawCCOfPlayer(fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player.getFleetCC(), hasArmadaAbility, player, activeMap);
             drawCCOfPlayer(ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), false, null, activeMap);
 
+            //PAINT SPEAKER
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
                 String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
