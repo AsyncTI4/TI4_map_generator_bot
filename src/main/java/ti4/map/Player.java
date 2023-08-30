@@ -48,7 +48,7 @@ public class Player {
     //home
 
     @Getter @Setter
-    private String originalHomeSystemLocation = null;
+    private String playerStatsAnchorPosition = null;
     private String allianceMembers = "";
     private String color;
     private String autoCompleteRepresentation = null;

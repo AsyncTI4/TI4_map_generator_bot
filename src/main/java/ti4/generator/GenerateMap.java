@@ -1816,13 +1816,13 @@ public class GenerateMap {
             int deltaSplitY = 0;
             boolean specialCase = false;
 
-            String playerHomeSystemLocation = player.getOriginalHomeSystemLocation();
+            String playerHomeSystemLocation = player.getPlayerStatsAnchorPosition();
             if (playerHomeSystemLocation != null) {
                 String locationOfHomeSystemProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerHomeSystemLocation);
                 Point homeSystemProjectedTilePosition = PositionMapper.getTilePosition(locationOfHomeSystemProjectedOnOutsideRing);
                 if (homeSystemProjectedTilePosition != null) {
                     Point playerStatsTilePosition = getTilePosition(activeMap, "", homeSystemProjectedTilePosition.x, homeSystemProjectedTilePosition.y);
-                    int hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getOriginalHomeSystemLocation()) - 1;
+                    int hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
                     if (hsLocationIndex == 0) { //North East
                         deltaX = playerStatsTilePosition.x + extraX + 360;
                         deltaY = playerStatsTilePosition.y;
