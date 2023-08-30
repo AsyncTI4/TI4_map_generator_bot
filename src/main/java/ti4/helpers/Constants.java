@@ -667,29 +667,7 @@ public class Constants {
         leaderList.add(ENVOY);
     }
 
-    public static final String KELERES_HS = "keleres_hs";
     public static final String HS_TILE_POSITION = "hs_tile_position";
-    public static final ArrayList<String> setup6p = new ArrayList<>();
-    static {
-        setup6p.add("301");
-        setup6p.add("304");
-        setup6p.add("307");
-        setup6p.add("310");
-        setup6p.add("313");
-        setup6p.add("316");
-    }
-
-    public static final ArrayList<String> setup8p = new ArrayList<>();
-    static {
-        setup8p.add("401");
-        setup8p.add("404");
-        setup8p.add("407");
-        setup8p.add("410");
-        setup8p.add("413");
-        setup8p.add("416");
-        setup8p.add("419");
-        setup8p.add("422");
-    }
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
     public static final String TERRAFORM = "terraform";
@@ -780,6 +758,7 @@ public class Constants {
     public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME="userName";
+    public static final String STATS_FACTION = "faction";
     public static final String STATS_VP ="vp";
     public static final String STATS_CC="cc";
     public static final String STATS_SPEAKER="speaker";
@@ -895,4 +874,6 @@ public class Constants {
     public static final String RELIC_DECK_ID = "relic_deck_id";
     public static final String AGENDA_DECK_ID = "agenda_deck_id";
     public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
+    public static final String STATS_ANCHOR_LOCATION = "stats_anchor_location";
+    public static final String SET_STATS_ANCHOR = "set_stats_anchor";
 }
