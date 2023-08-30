@@ -17,6 +17,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -464,6 +465,34 @@ public class Player {
                 .map(unitID -> Mapper.getUnit(unitID))
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
                 .toList();
+    }
+
+    public UnitModel getPriorityUnitByAsyncID(String asyncID){
+        List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+
+        
+        if(allUnits.isEmpty()){
+            return null;
+        }
+        if(allUnits.size() == 1){
+            return allUnits.get(0);
+        }
+        Collections.sort(allUnits, (d1, d2) -> {
+            return GetUnitModelPriority(d2) - GetUnitModelPriority(d1);
+        });
+
+
+        return allUnits.get(0);
+    }
+    private Integer GetUnitModelPriority(UnitModel unit){
+        if(StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            return 4;
+        else if(StringUtils.isNotBlank(unit.getFaction()))
+            return 3;
+        else if(StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            return 2;
+        else 
+            return 1;
     }
 
     public UnitModel getUnitByID(String unitID) {
