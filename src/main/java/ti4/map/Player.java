@@ -47,7 +47,7 @@ public class Player {
     //factiontech
     //home
 
-    @Getter @Setter
+    @Setter
     private String playerStatsAnchorPosition = null;
     private String allianceMembers = "";
     private String color;
@@ -1568,5 +1568,10 @@ public class Player {
         } else {
             return 0;
         }
+    }
+
+    public String getPlayerStatsAnchorPosition() {
+        if ("null".equals(playerStatsAnchorPosition)) return null;
+        return playerStatsAnchorPosition;
     }
 }
