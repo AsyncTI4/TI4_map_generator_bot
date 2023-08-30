@@ -873,5 +873,6 @@ public class Constants {
     public static final String RELIC_DECK_ID = "relic_deck_id";
     public static final String AGENDA_DECK_ID = "agenda_deck_id";
     public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
-    public static final String HOME_SYSTEM_LOCATION = "home_system_location";
+    public static final String STATS_ANCHOR_LOCATION = "stats_anchor_location";
+    public static final String SET_STATS_ANCHOR = "set_stats_anchor";
 }
