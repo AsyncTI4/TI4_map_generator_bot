@@ -132,6 +132,7 @@ public class MapGenerator {
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
+        bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
