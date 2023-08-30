@@ -1785,14 +1785,19 @@ public class GenerateMap {
 
         int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
         int deltaY = extraY;
-
+        
         int playerCount = activeMap.getPlayerCountForMap();
         int ringCount = activeMap.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-
+        
         boolean inverted = false;
         for (Player player : players) {
-
+            if (inverted) {
+                deltaX = 10;
+            } else {
+                deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
+            }
+            
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
@@ -1816,33 +1821,33 @@ public class GenerateMap {
             int deltaSplitY = 0;
             boolean specialCase = false;
 
-            String playerHomeSystemLocation = player.getPlayerStatsAnchorPosition();
-            if (playerHomeSystemLocation != null) {
-                String locationOfHomeSystemProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerHomeSystemLocation);
-                Point homeSystemProjectedTilePosition = PositionMapper.getTilePosition(locationOfHomeSystemProjectedOnOutsideRing);
-                if (homeSystemProjectedTilePosition != null) {
-                    Point playerStatsTilePosition = getTilePosition(activeMap, "", homeSystemProjectedTilePosition.x, homeSystemProjectedTilePosition.y);
-                    int hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
+            String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
+            if (playerStatsAnchor != null) {
+                String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
+                Point anchorProjectedPoint = PositionMapper.getTilePosition(anchorProjectedOnOutsideRing);
+                if (anchorProjectedPoint != null) {
+                    Point playerStatsAnchorPoint = getTilePosition(activeMap, anchorProjectedOnOutsideRing, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                    Integer hsLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
                     if (hsLocationIndex == 0) { //North East
-                        deltaX = playerStatsTilePosition.x + extraX + 360;
-                        deltaY = playerStatsTilePosition.y;
+                        deltaX = playerStatsAnchorPoint.x + extraX + 360;
+                        deltaY = playerStatsAnchorPoint.y;
                         deltaSplitX = 200;
                     } else if (hsLocationIndex == 1) { //East
-                        deltaX = playerStatsTilePosition.x + 360 + extraX;
-                        deltaY = playerStatsTilePosition.y + extraY;
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
                     } else if (hsLocationIndex == 2) { //South East
-                        deltaX = playerStatsTilePosition.x + 360 + extraX;
-                        deltaY = playerStatsTilePosition.y + extraY;
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
                     } else if (hsLocationIndex == 3) { //South West
-                        deltaX = playerStatsTilePosition.x;
-                        deltaY = playerStatsTilePosition.y + 250  + extraY;
+                        deltaX = playerStatsAnchorPoint.x;
+                        deltaY = playerStatsAnchorPoint.y + 250  + extraY;
                         deltaSplitX = 200;
                     } else if (hsLocationIndex == 4) { //West
-                        deltaX = playerStatsTilePosition.x + 10;
-                        deltaY = playerStatsTilePosition.y + extraY;
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
                     } else if (hsLocationIndex == 5) { //North West
-                        deltaX = playerStatsTilePosition.x + 10;
-                        deltaY = playerStatsTilePosition.y - 100;
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y - 100;
                         deltaSplitX = 200;
                     }
                 }
