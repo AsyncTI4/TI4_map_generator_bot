@@ -1815,9 +1815,12 @@ public class GenerateMap {
                     } else if (anchorLocationIndex == 1) { //East
                         deltaX = playerStatsAnchorPoint.x + 360 + extraX;
                         deltaY = playerStatsAnchorPoint.y + extraY;
-                    } else if (anchorLocationIndex == 2) { //South East
+                    } else if (anchorLocationIndex == 2 && isCorner) { //South East Corner
                         deltaX = playerStatsAnchorPoint.x + 360 + extraX;
                         deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 2) { //South East
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY + 100;
                     } else if (anchorLocationIndex == 3 && isCorner) { //South Corner
                         deltaX = playerStatsAnchorPoint.x + extraX;
                         deltaY = playerStatsAnchorPoint.y + 360  + extraY;
