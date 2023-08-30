@@ -352,6 +352,7 @@ public class Constants {
     public static final String SC_PLAYED = "sc_played";
     public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
+    public static final String SC_UNPLAY = "sc_unplay";
     public static final String SC_PICK = "sc_pick";
     public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";
