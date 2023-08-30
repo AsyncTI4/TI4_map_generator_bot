@@ -2606,9 +2606,9 @@ public class GenerateMap {
             BufferedImage tileImage = partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (IOException e) {
-            BotLogger.log("Error drawing tile: " + tile.getTileID(), e);
+            BotLogger.log("Error drawing tile: " + tile.getTileID() + " for map: " + activeMap.getName(), e);
         } catch (Exception exception) {
-            BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
+            BotLogger.log("Tile Error, when building map `" + activeMap.getName() + "`, tile: " + tile.getTileID(), exception);
         }
     }
 
