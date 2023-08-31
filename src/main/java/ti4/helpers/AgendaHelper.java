@@ -709,7 +709,13 @@ public class AgendaHelper {
 
     public static void reverseRider(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String choice = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
-        String voteMessage = ident+" Chose to reverse the " + choice;
+        
+        String voteMessage = " Chose to reverse the " + choice;
+        if(activeMap.isFoWMode()){
+            voteMessage = player.getColor() + voteMessage;
+        }else{
+            voteMessage = ident + voteMessage;
+        }
         HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
         for(String outcome : outcomes.keySet()){
             String existingData = outcomes.getOrDefault(outcome, "empty");

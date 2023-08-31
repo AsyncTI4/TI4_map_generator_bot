@@ -220,7 +220,7 @@ public class Turn extends PlayerSubcommandData {
                 sendReminder = true;
             }
         }
-        sb.append(" above before doing anything else.");
+        sb.append(" above before doing anything else. Make sure to do it in the order they were played");
         return sendReminder ? sb.toString() : null;
     }
 

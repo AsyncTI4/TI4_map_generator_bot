@@ -8,6 +8,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -101,8 +102,55 @@ public class Setup extends PlayerSubcommandData {
 
         //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            tile = new Tile("51", "tr");
+            AddToken.addToken(event, tile, Constants.FRONTIER, activeMap);
+            if (useSpecified){
+                position = "tr";
+            } else {
+                int positionNumber = 1;
+                for (Player playerInfo : players.values()) {
+                    if (playerInfo.equals(player)) {
+                        break;
+                    }
+                    positionNumber++;
+                }
+
+
+                if (is6playerMap) {
+                   if (positionNumber == 1 || positionNumber == 2){
+                       position = "tr";
+                   } else if (positionNumber == 3 || positionNumber == 4) {
+                       position = "br";
+                   } else if (positionNumber == 5){
+                       position = "bl";
+                   } else {
+                       position = "tl";
+
+                       Tile mallice = activeMap.getTile(position);
+                       if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                       }
+                   }
+                } else {
+                    if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
+                        position = "tr";
+                    } else if (positionNumber == 4 || positionNumber == 5) {
+                        position = "br";
+                    } else if (positionNumber == 6 || positionNumber == 7){
+                        position = "bl";
+                    } else {
+                        position = "tl";
+                        Tile mallice = activeMap.getTile(position);
+                        if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                        }
+                    }
+                }
+            }
+            tile = new Tile("51", position);
             activeMap.setTile(tile);
         }
 
