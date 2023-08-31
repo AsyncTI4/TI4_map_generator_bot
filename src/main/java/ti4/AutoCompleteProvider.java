@@ -180,6 +180,21 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }*/
             }
+            case Constants.RELIC_ALL -> { 
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, String> relics = Mapper.getRelics();           
+
+
+                    List<Command.Choice> options = relics.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            
+        
+  
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
