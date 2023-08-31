@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -60,8 +61,12 @@ public class CombatHelper {
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
-            entry -> player.getUnitsByAsyncID(entry.getKey()).stream().map(x -> new ImmutablePair<>(x, entry.getValue()))
+        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
+            entry -> new ImmutablePair<UnitModel, Integer>
+            (
+                player.getPriorityUnitByAsyncID(entry.getKey()),
+                entry.getValue()
+            )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output = null;
@@ -209,7 +214,7 @@ public class CombatHelper {
 
             }
             String upgradedUnitName = "";
-            if (!StringUtils.isBlank(unit.getRequiredTechId())) {
+            if (!StringUtils.isBlank(unit.getUpgradesFromUnitId()) || !StringUtils.isBlank(unit.getFaction())) {
                 upgradedUnitName = String.format(" %s", unit.getName());
             }
             String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());

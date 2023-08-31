@@ -57,7 +57,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
-				sendMessage("Not enough fragments");
+				sendMessage("Not enough fragments. Note that default count is 3.");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
