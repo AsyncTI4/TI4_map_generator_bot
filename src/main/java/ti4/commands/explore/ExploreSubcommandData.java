@@ -279,13 +279,25 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                if(activeMap.getActivePlayer() != null && !(activeMap.getActivePlayer().equalsIgnoreCase("")) && player.hasAbility("scavenge") && event != null)
+                if(  ( (activeMap.getActivePlayer() != null && !(activeMap.getActivePlayer().equalsIgnoreCase(""))) || activeMap.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge") && event != null)
                 {
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                 }
+                for(String law : activeMap.getLaws().keySet()){
+                    if(law.equalsIgnoreCase("minister_exploration")){
+                        if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
+                            String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
+                            player.setTg(player.getTg()+1);
+                            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+                        }
+                    }
+                }
+                    
+                
                 StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
                 exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
