@@ -259,7 +259,7 @@ public class ButtonHelperModifyUnits {
 
             }
         }
-        if (unit.equalsIgnoreCase("sd") || unitLong.equalsIgnoreCase("pds")) {
+        if ((unit.equalsIgnoreCase("sd") || unitLong.equalsIgnoreCase("pds") ) && event.getMessage().getContentRaw().contains("for construction")) {
 
             if (activeMap.isFoWMode() || !activeMap.getCurrentPhase().equalsIgnoreCase("action")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);
@@ -454,7 +454,7 @@ public class ButtonHelperModifyUnits {
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "l1z1x", event);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
         Button DoneExhausting = null;
@@ -465,7 +465,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(DoneExhausting);
         if(!skipbuild.equalsIgnoreCase("skipbuild")){
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message2, buttons);
         }
         event.getMessage().delete().queue();
     }
