@@ -318,7 +318,7 @@ public class ButtonHelperFactionSpecific {
                 color = cabal.getColor();
             }
             msg = msg.replace("Infantrys","infantry");
-            if (unitP.contains("sd") || unitP.contains("pds")) {
+            if (unitP.contains("sd") || unitP.contains("pd") || cabal.getAllianceMembers().contains(player.getFaction())) {
                 return;
             }
             

@@ -20,6 +20,43 @@ import ti4.model.UnitModel;
 
 public class CombatHelper {
 
+    
+
+    public static HashMap<UnitModel, Integer> GetAllUnits(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+        String colorID = Mapper.getColorID(player.getColor());
+        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
+            entry -> player.getUnitsByAsyncID(entry.getKey()).stream().map(x -> new ImmutablePair<>(x, entry.getValue()))
+        ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output = null;
+       
+        output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        
+        Set<String> duplicates = new HashSet<String>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(unit -> unit.getBaseType())
+            .collect(Collectors.toList());
+        for(int x = 1; x < dupes.size(); x++){
+            String dupe = dupes.get(x);
+            for(UnitModel mod : output.keySet()){
+                if(mod.getBaseType().equalsIgnoreCase(dupe)){
+                    output.put(mod, 0);
+                    break;
+                }
+            }
+
+        }
+
+        
+        
+
+
+        return output;
+    }
+
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);

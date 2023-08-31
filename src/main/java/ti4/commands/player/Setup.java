@@ -8,6 +8,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -128,6 +129,7 @@ public class Setup extends PlayerSubcommandData {
 
         //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
+            AddToken.addToken(event, tile, Constants.FRONTIER, activeMap);
             if (useSpecified){
                 position = "tr";
             } else {

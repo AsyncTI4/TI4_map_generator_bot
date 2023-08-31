@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -65,6 +66,9 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             }
         }
         sendMessage(sb.toString());
+        if(player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "ghost", event);
+        }
     }
 
     private boolean isValidCreussWormhole(String tokenName) {

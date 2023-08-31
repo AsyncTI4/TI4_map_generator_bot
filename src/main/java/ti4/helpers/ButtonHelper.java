@@ -710,6 +710,16 @@ public class ButtonHelper {
 
      }
 
+     public static int getAllTilesWithAlphaNBetaNUnits(Player player, Map activeMap){
+        int count = 0;
+        for(Tile tile : activeMap.getTileMap().values()){
+            if(FoWHelper.playerHasUnitsInSystem(player, tile) && FoWHelper.doesTileHaveAlphaOrBeta(activeMap, tile.getPosition(), player)){
+                count = count +1;
+            }
+        }
+        return count;
+     }
+
     public static void commanderUnlockCheck(Player player, Map activeMap, String faction, GenericInteractionCreateEvent event) {
 
         boolean shouldBeUnlocked = false;
@@ -729,6 +739,11 @@ public class ButtonHelper {
             }
             case "sardakk" -> {
                 if(player.getPlanets().size() > 6){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "ghost" -> {
+                if(ButtonHelper.getAllTilesWithAlphaNBetaNUnits(player, activeMap) > 2){
                     shouldBeUnlocked = true;
                 }
             }
@@ -979,6 +994,8 @@ public class ButtonHelper {
                 conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn.", conclusionButtons);
+        }else{
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
         }
         if(whatIsItFor.equalsIgnoreCase("warfare")){
              List<Button> redistributeButton = new ArrayList<Button>();
@@ -1241,7 +1258,7 @@ public class ButtonHelper {
         boolean fleetSupplyViolated = false;
 
         for(UnitHolder capChecker : tile.getUnitHolders().values()){
-            java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(capChecker, player, event);
+            java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
             for(UnitModel unit : unitsByQuantity.keySet()){
                 if(capChecker.getName().equalsIgnoreCase("space")){
                     capacity = capacity + (unit.getCapacityValue()*unitsByQuantity.get(unit));
@@ -1261,7 +1278,7 @@ public class ButtonHelper {
             }
         }
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
-        java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
+        java.util.HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
         for(UnitModel unit : unitsByQuantity.keySet()){
             if(unit.getBaseType().equalsIgnoreCase("fighter") || unit.getBaseType().equalsIgnoreCase("infantry") || unit.getBaseType().equalsIgnoreCase("mech")){
                 if(unit.getBaseType().equalsIgnoreCase("fighter")&& player.hasFF2Tech()){
@@ -1705,7 +1722,7 @@ public class ButtonHelper {
             }
             Planet planetReal =  (Planet) planetUnit;
             String planet = planetReal.getName();    
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets(activeMap).contains(planet) && !planetReal.getUnits().isEmpty()) {
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets(activeMap).contains(planet) && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
                 buttons.addAll(planetButtons);
             }
@@ -1948,6 +1965,9 @@ public class ButtonHelper {
         if(player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "empyrean", event);
         }
+        if(player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "ghost", event);
+        }
         return buttons;
     }
     
@@ -2105,7 +2125,7 @@ public class ButtonHelper {
             case "gf"-> name = "Infantry";
             case "mf"-> name = "Mech";
             case "sd"-> name = "Spacedock";
-            case "csd"-> name = "Spacedock";
+            case "csd"-> name = "cabalspacedock";
             case "pd"-> name = "pds";
             case "ff"-> name = "fighter";
             case "ca"-> name = "cruiser";
@@ -2358,7 +2378,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                                 }
                                 Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, "Remove "+x+" "+unitRepresentation.get(unitRepresentationKey) +" from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                 buttons.add(validTile2);
-                                if(key.contains("mf")){
+                                if(key.contains("mf") || (key.contains("pd") && (player.getUnitsOwned().contains("Hel-Titan") ||player.getTechs().contains("ht2")) )){
                                     Button validTile3 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, "Sustain "+x+" "+unitRepresentation.get(unitRepresentationKey) +
                                     " from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                     buttons.add(validTile3);
@@ -2409,6 +2429,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                                 Button validTile2 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+1+unitKey, "Sustain "+1+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                 buttons.add(validTile2);
                             }
+                            
                         }
                     }
                 }
@@ -3541,8 +3562,17 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 if (player.hasRelic(relicId)) {
                     if(relicId.equalsIgnoreCase("titanprototype") ||relicId.equalsIgnoreCase("absol_jr") )
                     {
+                        List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "jrResolution", null);
                         player.addExhaustedRelic(relicId);
                         purgeOrExhaust = "Exhausted ";
+                        Button sdButton = Button.success("jrStructure_sd", "Place A SD");
+                        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+                        Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
+                        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+                        List<Button> buttons = new ArrayList();
+                        buttons.add(sdButton);
+                        buttons.add(pdsButton);
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
                     }
                     else{
                         player.removeRelic(relicId);
@@ -3561,6 +3591,16 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                     if(relicName.contains("Nanoforge")){      
                         ButtonHelper.offerNanoforgeButtons(player, activeMap, event);
                     }
+                    if (relicId.equals("dynamiscore") || relicId.equals("absol_dynamiscore")){
+                        int oldTg = player.getTg();
+                        player.setTg(oldTg+player.getCommoditiesTotal()+2);
+                        if(relicId.equals("absol_dynamiscore")){
+                             player.setTg(player.getTg()+2);
+                        }
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Your tgs increased from "+oldTg+" -> "+player.getTg());
+                        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+                    }
+                    
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Invalid relic or player does not have specified relic");
                 }
