@@ -14,12 +14,12 @@ public class AddRelicBackIntoDeck extends GenericRelicAction {
 
     public AddRelicBackIntoDeck() {
         super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC_ALL, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
     }
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.RELIC);
+        OptionMapping option = event.getOption(Constants.RELIC_ALL);
         if (option == null) {
             sendMessage("Specify relic");
             return;
