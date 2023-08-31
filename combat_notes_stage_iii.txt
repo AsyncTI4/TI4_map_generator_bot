@@ -1,0 +1,41 @@
+ONE_TACTICAL_ACTION
+ONE_ROUND
+ONE_COMBAT
+
+so we exahust or play a card to use one of these 
+
+then later we press combat_roll 
+
+the one_round ones are fine, cause you add them to a list, then end of the rolls code you remove them from the list
+
+one_combat ones need to know if the unit holder or active turn is different from when they were played 
+
+one_tactical_action needs to know the system that was activated, and the active player 
+
+
+You dont have a huge striaght line, they might just call the command, or call system_info and press the button in a non-fighting channel
+
+player.unusedCombatModifiers.add(any, player.numTurns)
+
+/combat_roll (000 space)
+    - if unsused - use (unless its a different turn, then empty it)
+        - if one_round - use - dont add to recoop
+        - if one_combat - reuse in this combat (000 space) (add to recoop with combat details)
+        - if one tactical action - reuse in this system & turn (000, player.num_turns) (add to recoop with system details)
+
+    - if recooped 
+        - check against conditions - then use 
+        - otherwise remove from recoop (for one_combat, this changes as soon as unit_holder changes, for one_tactical_action this changes when system is different)
+
+TemporaryCombatModifier
+    Integer useInTurn
+    String relatedType
+    String relatedID
+    CombatModifier modifier
+    String useInSystem
+    String useInUnitHolder
+
+
+line in player stats in pbdxxx.txt
+
+tempmods leader,vaylerianhero,plus1_1tacticalaction_all,12,000,space;leader,vaylerianhero,plus1_1tacticalaction_all,12,000,space

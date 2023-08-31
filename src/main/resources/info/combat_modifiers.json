@@ -1,5 +1,61 @@
 [
     {
+        "alias": "plus1_1round_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "tech", "alias":"sc"},
+            {"type": "ac", "alias": "morale_boost_ds"},
+            {"type": "ac", "alias": "mb1"},
+            {"type": "ac", "alias": "mb2"},
+            {"type": "ac", "alias": "mb3"},
+            {"type": "ac", "alias": "mb4"}
+        ]
+    },
+    {
+        "alias": "plus1_1tacticalaction_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "persistanceType": "ONE_TACTICAL_ACTION",
+        "related":[
+            {"type": "leader", "alias": "vaylerianhero"}
+        ]
+    },
+    {
+        "alias": "plus3_1combat_all",
+        "type": "DIE_MOD",
+        "value": "+3",
+        "scope": "",
+        "persistanceType": "ONE_COMBAT",
+        "related":[
+            {"type": "ac", "alias": "close_quarters"}
+        ]
+    },
+    {
+        "alias": "plus1_1combat_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "ff",
+        "persistanceType": "ONE_COMBAT",
+        "related":[
+            {"type": "pn", "alias":"tekklar"},
+            {"type": "pn", "alias":"dspnkjal"}
+        ]
+    },
+    {
+        "alias": "plus1_1round_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "ff",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "ac", "alias":"f_prototype"}
+        ]
+    },
+    {
         "alias": "minus1_always_all",
         "type": "DIE_MOD",
         "value": "-1",

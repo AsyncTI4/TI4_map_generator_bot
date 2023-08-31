@@ -19,6 +19,7 @@ import ti4.map.UnitHolder;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -67,6 +68,53 @@ public class CombatModHelper {
             }
         }
         return false;
+    }
+
+    public static void ProcessNewTemporaryMods(Player player, TileModel tile, UnitHolder holder){
+        List<TemporaryCombatModifierModel> modsToUseNow = new ArrayList<>();
+        // player.unusedCombatModifiers.add(any, player.numTurns)
+        //....
+        // /combat_roll (000 space)
+        //     - if unsused - use (unless its a different turn, then empty it)
+        //         - if one_round - use - dont add to recoop
+        //         - if one_combat - reuse in this combat (000 space) (add to recoop with combat details)
+        //         - if one tactical action - reuse in this system & turn (000, player.num_turns) (add to recoop with system details)
+
+        //     - if recooped 
+        //         - check against conditions - then use 
+        //         - otherwise remove from recoop (for one_combat, this changes as soon as unit_holder changes, for one_tactical_action this changes when system is different)
+
+        List<TemporaryCombatModifierModel> unusedMods = player.getUnusedTemporaryCombatModifiers();
+        unusedMods = unusedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns()).collect(Collectors.toList());
+        for (TemporaryCombatModifierModel mod : unusedMods) {            
+            mod.setUseInSystem(tile.getId());
+            //mod.setUseInTurn(player.getNumberTurns()); todo: this gets set when the temp mod gets created via a card played/exhausted 
+            mod.setUseInUnitHolder(holder.getName());
+            
+            modsToUseNow.add(mod);
+        }
+    }
+
+    public static void ProcessExistingTemporaryMods(Player player, TileModel tile, UnitHolder holder){
+        List<TemporaryCombatModifierModel> usedMods = player.getUsedTemporaryCombatModifiers();
+        usedMods = usedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns()).collect(Collectors.toList());
+        for (TemporaryCombatModifierModel mod : unusedMods) {            
+
+            if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_ROUND){
+                //remove 
+            }else if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_COMBAT 
+                 && mod.getUseInUnitHolder() == holder.getName()
+                 && mod.getUseInSystem() == tile.getId()){
+                    //use again
+            }
+            else if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_TACTILE_ACTION 
+                 && mod.getUseInSystem() == tile.getId()){
+                    //use again
+            }
+            else{
+                //remove
+            }
+        }
     }
 
     /// Retrieves Always on modifiers, 
