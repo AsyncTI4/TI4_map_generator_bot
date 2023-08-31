@@ -34,7 +34,7 @@ public class Stats extends PlayerSubcommandData {
 				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Toggle a Strategy Card played status. Enter the SC #"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -170,6 +170,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			sendMessage(message.toString());
 		}
+		
 		pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
 
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
@@ -237,19 +238,21 @@ public class Stats extends PlayerSubcommandData {
 			sb.append("      No SC Picked");
 		}
 		sb.append("\n");
-		sb.append("> Debt: ").append(player.getDebtTokens()).append("\n");
-		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
-		sb.append("> Passed: ").append(player.isPassed()).append("\n");
-		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
+		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
+		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
+		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
 
-		sb.append("> Abilities: ").append(player.getAbilities()).append("\n");
-		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
-		sb.append("> Techs: ").append(player.getTechs()).append("\n");
-		sb.append("> Relics: ").append(player.getRelics()).append("\n");
-		sb.append("> Mahact CC: ").append(player.getMahactCC()).append("\n");
-		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
-		sb.append("> Owned PNs: ").append(player.getPromissoryNotesOwned()).append("\n");
-		sb.append("> Owned Units: ").append(player.getUnitsOwned()).append("\n");
+		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
+		sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
+		sb.append("> Techs: `").append(player.getTechs()).append("`\n");
+		sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
+		sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+		sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
+		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
+		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
+		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
 		sb.append("\n");
 
 		return sb.toString();

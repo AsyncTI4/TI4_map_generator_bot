@@ -107,6 +107,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new Stats());
         subcommands.add(new Setup());
         subcommands.add(new SCPlay());
+        subcommands.add(new SCUnplay());
         subcommands.add(new Pass());
         subcommands.add(new AbilityInfo());
         subcommands.add(new Turn());
@@ -120,6 +121,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new ChangeColor());
         subcommands.add(new UnitInfo());
         subcommands.add(new AddAllianceMember());
+        subcommands.add(new SetStatsAnchor());
         return subcommands;
     }
 

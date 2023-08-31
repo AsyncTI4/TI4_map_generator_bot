@@ -88,6 +88,7 @@ public class Info extends GameSubcommandData{
         }
         sb.append("Public Objectives:\n> `").append(activeMap.getRevealedPublicObjectives()).append("`").append(NEW_LINE);
         sb.append("Laws:\n> `").append(activeMap.getLaws()).append("`").append(NEW_LINE);
+        sb.append("Migrations Run:\n> `").append(activeMap.getRunMigrations()).append("`").append(NEW_LINE);
 
         return sb;
     }
