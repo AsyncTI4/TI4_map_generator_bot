@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
-import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +24,6 @@ import ti4.model.TechnologyModel;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -195,7 +193,9 @@ public class GenerateMap {
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
-                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                    if (fowPlayer != null) {
+                        tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                    }
                 }
             }
         }
@@ -215,7 +215,7 @@ public class GenerateMap {
                         maxX = -1;
                         maxY = -1;
                         Set<String> filledPositions = new HashSet<>();
-                        for (String position : PositionMapper.get8RingTiles()) {
+                        for (String position : PositionMapper.getTilePositions()) {
                             String tileRing = "0";
                             if (position.length() == 3) {
                                 tileRing = position.substring(0, 1);
@@ -234,7 +234,7 @@ public class GenerateMap {
                                 filledPositions.add(position);
                             }
                         }
-                        for (String position : PositionMapper.get8RingTiles()) {
+                        for (String position : PositionMapper.getTilePositions()) {
                             if (!tileMap.containsKey(position) || !filledPositions.contains(position)) {
                                 addTile(new Tile("0border", position), activeMap, TileStep.Tile, true);
                             }
@@ -1771,7 +1771,6 @@ public class GenerateMap {
     }
 
     private void playerInfo(Map activeMap) {
-        int playerRow = 1;
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         Player speaker = activeMap.getPlayer(activeMap.getSpeaker());
@@ -1783,106 +1782,66 @@ public class GenerateMap {
 
         int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
         int deltaY = extraY;
-
-        int playerCount = activeMap.getPlayerCountForMap();
+        
         int ringCount = activeMap.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-
+        
         boolean inverted = false;
-        int index = 0;
-        for (Player player : players) {
-
+        for (Player player : players) {           
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
-            if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
-                playerRow++;
-                if (playerRow == 2) {
-                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
-                    deltaX = 10;
-                    inverted = true;
-                } else if (playerRow == 3) {
-                    deltaX = mapWidth - extraX + 10;
-                    deltaY = extraY;
-                    inverted = false;
-                } else if (playerRow == 4) {
-                    deltaX = mapWidth + 10;
-                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
-                    inverted = true;
-                }
-            }
+
             int deltaSplitX = 0;
             int deltaSplitY = 0;
-            boolean specialCase = false;
-            if (playerCount == 6 && ringCount == 3) {
-                String tileID = Constants.setup6p.get(index);
-                Point tilePosition = PositionMapper.getTilePosition(tileID);
-                if (tilePosition != null) {
-                    tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
-                    if (index == 0) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
+            boolean specialSpeakerTokenLocation = false;
+
+            String playerStatsAnchor = player.getPlayerStatsAnchorPosition();
+            if (playerStatsAnchor != null) {
+                String anchorProjectedOnOutsideRing = PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
+                Point anchorProjectedPoint = PositionMapper.getTilePosition(anchorProjectedOnOutsideRing);
+                if (anchorProjectedPoint != null) {
+                    Point playerStatsAnchorPoint = getTilePosition(activeMap, anchorProjectedOnOutsideRing, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                    Integer anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
+                    boolean isCorner = anchorProjectedOnOutsideRing.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
+                    if (anchorLocationIndex == 0 && isCorner) { //North Corner
+                        deltaX = playerStatsAnchorPoint.x + extraX + 80;
+                        deltaY = playerStatsAnchorPoint.y - 80;
                         deltaSplitX = 200;
-                    } else if (index == 1) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 2) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 3) {
-                        deltaX = tilePosition.x + extraX;
-                        deltaY = tilePosition.y + 360  + extraY;
+                    } else if (anchorLocationIndex == 0) { //North East
+                        deltaX = playerStatsAnchorPoint.x + extraX + 300;
+                        deltaY = playerStatsAnchorPoint.y;
                         deltaSplitX = 200;
-                    } else if (index == 4) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 5) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
+                    } else if (anchorLocationIndex == 1) { //East
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 2 && isCorner) { //South East Corner
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 2) { //South East
+                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
+                        deltaY = playerStatsAnchorPoint.y + extraY + 100;
+                    } else if (anchorLocationIndex == 3 && isCorner) { //South Corner
+                        deltaX = playerStatsAnchorPoint.x + extraX;
+                        deltaY = playerStatsAnchorPoint.y + 360  + extraY;
+                        deltaSplitX = 200;
+                    } else if (anchorLocationIndex == 3) { //South West
+                        deltaX = playerStatsAnchorPoint.x;
+                        deltaY = playerStatsAnchorPoint.y + 250  + extraY;
+                        deltaSplitX = 200;
+                    } else if (anchorLocationIndex == 4) { //West
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 5 && isCorner) { //North West Corner
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y + extraY;
+                    } else if (anchorLocationIndex == 5) { //North West
+                        deltaX = playerStatsAnchorPoint.x + 10;
+                        deltaY = playerStatsAnchorPoint.y - 100;
+                        deltaSplitX = 200;
                     }
-                    index++;
-                }
-            } else if (playerCount == 8 && ringCount == 4) {
-                String tileID = Constants.setup8p.get(index);
-                Point tilePosition = PositionMapper.getTilePosition(tileID);
-                if (tilePosition != null) {
-                    tilePosition = getTilePosition(activeMap, "", tilePosition.x, tilePosition.y);
-                    if (index == 0) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                    } else if (index == 1) {
-                        deltaX = tilePosition.x + extraX + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                    } else if (index == 2) {
-                        deltaX = tilePosition.x + 360 + extraX;
-                        deltaY = tilePosition.y + extraY;
-                    } else if (index == 3) {
-                        deltaX = tilePosition.x + extraX + 50;
-                        deltaY = tilePosition.y + 360  + extraY;
-                        deltaSplitX = 200;
-                        specialCase = true;
-                    } else if (index == 4) {
-                        deltaX = tilePosition.x + extraX;
-                        deltaY = tilePosition.y + 360  + extraY;
-                        deltaSplitX = 200;
-                    } else if (index == 5) {
-                        deltaX = tilePosition.x + extraX/2;
-                        deltaY = tilePosition.y + 360 + extraY;
-                        deltaSplitX = 200;
-                    }else if (index == 6) {
-                        deltaX = 10;
-                        deltaY = tilePosition.y + extraY;
-                    }else if (index == 7) {
-                        deltaX = tilePosition.x + 80;
-                        deltaY = tilePosition.y - 80;
-                        deltaSplitX = 200;
-                        specialCase = true;
-                    }
-                    index++;
-                }
-            }
+                } else continue;
+            } else continue;
 
             String userName = player.getUserName();
 
@@ -1890,17 +1849,25 @@ public class GenerateMap {
             if (convertToGeneric) {
                 continue;
             }
+
+            //PAINT USERNAME
             Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX, point.y + deltaY);
+            
+            //PAINT FACTION
+            point = PositionMapper.getPlayerStats(Constants.STATS_FACTION);
+            graphics.drawString(StringUtils.capitalize(player.getFaction()), point.x + deltaX, point.y + deltaY);
+            
+            //PAIN VICTORY POINTS
             Integer vpCount = userVPs.get(player);
             vpCount = vpCount == null ? 0 : vpCount;
             point = PositionMapper.getPlayerStats(Constants.STATS_VP);
-            graphics.drawString(StringUtils.capitalize(player.getFaction()) + ", VP - " + vpCount, point.x + deltaX, point.y + deltaY);
-
+            graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
+            
+            //PAINT SO ICONS
             int totalSecrets = player.getSecrets().keySet().size();
             Set<String> soSet = player.getSecretsScored().keySet();
             int soOffset = 0;
-
             String soHand = "pa_so-icon_hand.png";
             String soScored = "pa_so-icon_scored.png";
             point = PositionMapper.getPlayerStats(Constants.STATS_SO);
@@ -1932,7 +1899,7 @@ public class GenerateMap {
                 count++;
             }
 
-
+            //PAINT CCs
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
@@ -1948,6 +1915,7 @@ public class GenerateMap {
             drawCCOfPlayer(fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player.getFleetCC(), hasArmadaAbility, player, activeMap);
             drawCCOfPlayer(ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), false, null, activeMap);
 
+            //PAINT SPEAKER
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
                 String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
@@ -1959,7 +1927,7 @@ public class GenerateMap {
                         BotLogger.log("Could not read speaker file", e);
                     }
                     point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
-                    int negativeDelta = specialCase ? 200 : 0;
+                    int negativeDelta = specialSpeakerTokenLocation ? 200 : 0;
                     graphics.drawImage(bufferedImage, point.x + deltaX + deltaSplitX + negativeDelta, point.y + deltaY - deltaSplitY, null);
                     graphics.setColor(Color.WHITE);
                 }
@@ -2641,9 +2609,9 @@ public class GenerateMap {
             BufferedImage tileImage = partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (IOException e) {
-            BotLogger.log("Error drawing tile: " + tile.getTileID(), e);
+            BotLogger.log("Error drawing tile: " + tile.getTileID() + " for map: " + activeMap.getName(), e);
         } catch (Exception exception) {
-            BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
+            BotLogger.log("Tile Error, when building map `" + activeMap.getName() + "`, tile: " + tile.getTileID(), exception);
         }
     }
 

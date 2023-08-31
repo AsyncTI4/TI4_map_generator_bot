@@ -307,7 +307,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(activeMap, position);
+		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;
@@ -739,7 +739,7 @@ public class FoWHelper {
 		if (success < total) {
 			MessageHelper.replyToMessage(event, "One more more pings failed to send.  Please follow up with game's GM.");
 		} else {
-			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
+			MessageHelper.replyToMessage(event, "Successfully sent all pings.");
 		}
 	}
 

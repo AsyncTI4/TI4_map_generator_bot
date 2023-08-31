@@ -48,6 +48,9 @@ public class DataMigrationManager {
             runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
             runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
             runMigration("migrateOwnedUnitsV2_210823", (map) -> migrateOwnedUnitsV2_210823(map));
+            runMigration("migrateNullSCDeckToPoK_210823", (map) -> migrateNullSCDeckToPoK_210823(map));
+            runMigration("migrateAbsolDeckIDs_210823", (map) -> migrateAbsolDeckIDs_210823(map));
+            runMigration("migratePlayerStatsBlockPositions_300823", (map) -> migratePlayerStatsBlockPositions_300823(map));
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -63,6 +66,87 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Player stats anchors implemented, but blown away all existing games.
+    /// This will fix 6 player 3 ring maps anchors
+    public static Boolean migratePlayerStatsBlockPositions_300823(Map activeMap) {
+        Boolean mapNeededMigrating = false;
+        ArrayList<String> setup6p = new ArrayList<>() {
+            {
+                add("301");
+                add("304");
+                add("307");
+                add("310");
+                add("313");
+                add("316");
+            }
+        };
+        ArrayList<String> setup8p = new ArrayList<>(){
+            {
+                add("401");
+                add("404");
+                add("407");
+                add("410");
+                add("413");
+                add("416");
+                add("419");
+                add("422");
+            }
+        };
+        
+        List<Player> players = new ArrayList<>(activeMap.getPlayers().values());
+        int playerCount = activeMap.getRealPlayers().size();
+
+        ArrayList<String> setup = null;
+        if (playerCount == 6 && activeMap.getRingCount() == 3) {
+            setup = setup6p;
+        }
+        else if (playerCount == 8 && activeMap.getRingCount() == 4) {
+            setup = setup8p;
+        }
+        else {
+            return mapNeededMigrating;
+        }
+       
+        int playerIndex = 0;
+        for (Player player : players) {
+            if (!player.isRealPlayer()) continue;
+
+            String statsAnchor = player.getPlayerStatsAnchorPosition();
+            if (statsAnchor != null) continue;
+
+            player.setPlayerStatsAnchorPosition(setup.get(playerIndex));
+            playerIndex++;
+        }
+
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Update "absol mode" games' deck IDs
+    /// Only truly matters if map.resetRelics or map.resetAgendas is called 
+    /// Migrated ~pbd893ish
+    public static Boolean migrateAbsolDeckIDs_210823(Map map) {
+        Boolean mapNeededMigrating = false;
+
+        if (map.isAbsolMode() && !map.getRelicDeckID().equals("relics_absol") && !map.getAgendaDeckID().equals("agendas_absol")) {
+            mapNeededMigrating = true;
+            map.setRelicDeckID("relics_absol");
+            map.setAgendaDeckID("agendas_absol");
+        }
+
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: All maps should have their default scSet be "pok"
+    public static Boolean migrateNullSCDeckToPoK_210823(Map map) {
+        Boolean mapNeededMigrating = false;
+
+        if (map.getScSetID() == null || map.getScSetID().equals("null")) {
+            mapNeededMigrating = true;
+            map.setScSetID("pok");
+        }
 
         return mapNeededMigrating;
     }

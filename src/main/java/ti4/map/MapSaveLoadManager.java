@@ -402,6 +402,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
         writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + activeMap.isReverseSpeakerOrder());
+        writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
         for (java.util.Map.Entry<Pair<String, Integer>, String> entry : activeMap.getAdjacentTileOverrides().entrySet()) {
@@ -469,8 +470,25 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSet());
+
+        writer.write(Constants.AC_DECK_ID + " " + activeMap.getAcDeckID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SO_DECK_ID + " " + activeMap.getSoDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.STAGE_1_PUBLIC_DECK_ID + " " + activeMap.getStage1PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.STAGE_2_PUBLIC_DECK_ID + " " + activeMap.getStage2PublicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.RELIC_DECK_ID + " " + activeMap.getRelicDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.AGENDA_DECK_ID + " " + activeMap.getAgendaDeckID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.EXPLORATION_DECK_ID + " " + activeMap.getExplorationDeckID());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSetID());
+        writer.write(System.lineSeparator());
+
         ObjectMapper mapper = new ObjectMapper();
         String anomaliesJson = mapper.writeValueAsString(activeMap.getBorderAnomalies()); //much easier than manually (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
@@ -511,6 +529,9 @@ public class MapSaveLoadManager {
                 playerColor = "null";
             }
             writer.write(Constants.COLOR + " " + playerColor);
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
             writer.write(System.lineSeparator());
 
              writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
@@ -1066,9 +1087,15 @@ public class MapSaveLoadManager {
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> activeMap.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> activeMap.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
-                case Constants.STRATEGY_CARD_SET -> activeMap.setScSet(info);
+                case Constants.AC_DECK_ID -> activeMap.setAcDeckID(info);
+                case Constants.SO_DECK_ID -> activeMap.setSoDeckID(info);
+                case Constants.STAGE_1_PUBLIC_DECK_ID -> activeMap.setStage1PublicDeckID(info);
+                case Constants.STAGE_2_PUBLIC_DECK_ID -> activeMap.setStage2PublicDeckID(info);
+                case Constants.RELIC_DECK_ID -> activeMap.setRelicDeckID(info);
+                case Constants.AGENDA_DECK_ID -> activeMap.setAgendaDeckID(info);
+                case Constants.EXPLORATION_DECK_ID -> activeMap.setExplorationDeckID(info);
+                case Constants.STRATEGY_CARD_SET -> activeMap.setScSetID(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
-
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
                     LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
                     for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
@@ -1534,6 +1561,7 @@ public class MapSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());

@@ -135,7 +135,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 sb.append("----------\n");
             }
-            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tileID, event);
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
             if(!activeMap.isFoWMode()){
                 for(Player player : activeMap.getRealPlayers()){

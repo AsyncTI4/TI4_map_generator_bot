@@ -46,6 +46,11 @@ public class SCPick extends PlayerSubcommandData {
         Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
+        if (activePlayers.size() == 0) {
+            sendMessage("No active players found");
+            return;
+        }
+
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
         if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
@@ -108,11 +113,7 @@ public class SCPick extends PlayerSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
-        if (!activeMap.isHomeBrewSCMode()) {
-            sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
-        } else {
-            sb.append(" Picked: ").append(("SC #"+scPicked));
-        }
+        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(activeMap, scPicked));
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
@@ -217,23 +218,13 @@ public class SCPick extends PlayerSubcommandData {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                if(!allPicked && !activeMap.isHomeBrewSCMode())
-                {
+                if(!allPicked) {
                     activeMap.updateActivePlayer(privatePlayer);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
                     activeMap.setCurrentPhase("strategy");
-                }
-                else{
-                    if(allPicked)
-                    {
-                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
-                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
-
-                    }
-                    else
-                    {
-                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
-                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                    MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
                 }
             }
         }
