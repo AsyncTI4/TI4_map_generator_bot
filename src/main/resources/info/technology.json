@@ -1253,7 +1253,7 @@
     "alias": "dslizhb",
     "name": "Wraith Engine",
     "type": "propulsion",
-    "requirements": "BB",
+    "requirements": "B",
     "faction": "lizho",
     "baseUpgrade": "",
     "source": "ds",
