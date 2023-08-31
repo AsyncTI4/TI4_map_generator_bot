@@ -3,8 +3,6 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -19,12 +17,16 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,6 +47,9 @@ public class Player {
     //abilities
     //factiontech
     //home
+
+    @Setter
+    private String playerStatsAnchorPosition = null;
     private String allianceMembers = "";
     private String color;
     private String autoCompleteRepresentation = null;
@@ -460,6 +465,34 @@ public class Player {
                 .map(unitID -> Mapper.getUnit(unitID))
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
                 .toList();
+    }
+
+    public UnitModel getPriorityUnitByAsyncID(String asyncID){
+        List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
+
+        
+        if(allUnits.isEmpty()){
+            return null;
+        }
+        if(allUnits.size() == 1){
+            return allUnits.get(0);
+        }
+        Collections.sort(allUnits, (d1, d2) -> {
+            return GetUnitModelPriority(d2) - GetUnitModelPriority(d1);
+        });
+
+
+        return allUnits.get(0);
+    }
+    private Integer GetUnitModelPriority(UnitModel unit){
+        if(StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            return 4;
+        else if(StringUtils.isNotBlank(unit.getFaction()))
+            return 3;
+        else if(StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            return 2;
+        else 
+            return 1;
     }
 
     public UnitModel getUnitByID(String unitID) {
@@ -1564,5 +1597,10 @@ public class Player {
         } else {
             return 0;
         }
+    }
+
+    public String getPlayerStatsAnchorPosition() {
+        if ("null".equals(playerStatsAnchorPosition)) return null;
+        return playerStatsAnchorPosition;
     }
 }

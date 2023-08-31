@@ -33,10 +33,9 @@ public class Setup extends PlayerSubcommandData {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
-         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
-        addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set player as speaker. Y/N"));
-       
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
     }
 
     @Override
@@ -87,97 +86,24 @@ public class Setup extends PlayerSubcommandData {
         player.getPlanets().clear();
         player.getTechs().clear();
 
-        int index = -1;
-        for (Player player_ : players.values()) {
-            index++;
-            if (player_ == player) {
-                break;
-            }
-        }
-
         FactionModel setupInfo = player.getFactionSetupInfo();
 
         //HOME SYSTEM
-        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
-
-        ArrayList<String> setup;
-        boolean useSpecified = false;
-        OptionMapping option = event.getOption(Constants.HS_TILE_POSITION);
-        String positionHS = option != null ? option.getAsString().toLowerCase() : "";
-        boolean is6playerMap = true;
-        if (activeMap.getPlayerCountForMap() == 6){
-            setup = Constants.setup6p;
-            if (PositionMapper.isTilePositionValid(positionHS)){
-                useSpecified = true;
-            }
-        } else {
-            setup = Constants.setup8p;
-            is6playerMap = false;
-            if (activeMap.getRingCount() == 8) {
-                useSpecified = true;
-            } else if (PositionMapper.isTilePositionValid(positionHS)){
-                useSpecified = true;
-            }
-        }
-        if (!positionHS.isEmpty() && !useSpecified){
-            sendMessage("Tile position: " + positionHS + " not found in map. Stopping setup");
+        String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
+        if (!PositionMapper.isTilePositionValid(positionHS)) {
+            sendMessage("Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
-        String position = useSpecified && !positionHS.isEmpty() ? positionHS : setup.get(index);
-        Tile tile = new Tile(hsTile, position);
+        
+        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
+        Tile tile = new Tile(hsTile, positionHS);
         activeMap.setTile(tile);
+        player.setPlayerStatsAnchorPosition(positionHS);
 
         //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
-            AddToken.addToken(event, tile, Constants.FRONTIER, activeMap);
-            if (useSpecified){
-                position = "tr";
-            } else {
-                int positionNumber = 1;
-                for (Player playerInfo : players.values()) {
-                    if (playerInfo.equals(player)) {
-                        break;
-                    }
-                    positionNumber++;
-                }
-
-
-                if (is6playerMap) {
-                   if (positionNumber == 1 || positionNumber == 2){
-                       position = "tr";
-                   } else if (positionNumber == 3 || positionNumber == 4) {
-                       position = "br";
-                   } else if (positionNumber == 5){
-                       position = "bl";
-                   } else {
-                       position = "tl";
-
-                       Tile mallice = activeMap.getTile(position);
-                       if(mallice != null){
-                            mallice.setPosition("tr");
-                            activeMap.removeTile("tl");
-                            activeMap.setTile(mallice);
-                       }
-                   }
-                } else {
-                    if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
-                        position = "tr";
-                    } else if (positionNumber == 4 || positionNumber == 5) {
-                        position = "br";
-                    } else if (positionNumber == 6 || positionNumber == 7){
-                        position = "bl";
-                    } else {
-                        position = "tl";
-                        Tile mallice = activeMap.getTile(position);
-                        if(mallice != null){
-                            mallice.setPosition("tr");
-                            activeMap.removeTile("tl");
-                            activeMap.setTile(mallice);
-                        }
-                    }
-                }
-            }
-            tile = new Tile("51", position);
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile = new Tile("51", "tr");
             activeMap.setTile(tile);
         }
 
@@ -211,15 +137,13 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
-         OptionMapping speakerO = event.getOption(Constants.SPEAKER);
-        String speaker = speakerO != null ? speakerO.getAsString().toLowerCase() : "";
 
-        if(speaker.equalsIgnoreCase("y") || speaker.equalsIgnoreCase("yes")){
+        boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
+
+        if (setSpeaker) {
             activeMap.setSpeaker(player.getUserID());
-            String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap);
-            sendMessage(msg);
-        }
-        
+            sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap));
+        }        
 
         //STARTING PNs
         player.initPNs(activeMap);
