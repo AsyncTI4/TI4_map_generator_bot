@@ -20,4 +20,8 @@ public class StrategyCardModel implements ModelInterface{
     public String getAlias() {
         return this.alias;
     }
+
+    public String getSCName(int scNumber) {
+        return cardValues.get(scNumber);
+    }
 }

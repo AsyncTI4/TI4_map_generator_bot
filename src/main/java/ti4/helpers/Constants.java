@@ -352,6 +352,7 @@ public class Constants {
     public static final String SC_PLAYED = "sc_played";
     public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
+    public static final String SC_UNPLAY = "sc_unplay";
     public static final String SC_PICK = "sc_pick";
     public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";
@@ -604,17 +605,17 @@ public class Constants {
     public static final String PURGE_PN = "purge";
     public static final String PURGED_PN = "purged_pn";
 
-    public static final String TECH_ADD = "tech_add";
-    public static final String TECH_REMOVE = "tech_remove";
-    public static final String TECH_EXHAUST = "tech_exhaust";
-    public static final String TECH_REFRESH = "tech_ready";
+    public static final String TECH_ADD = "add";
+    public static final String TECH_REMOVE = "remove";
+    public static final String TECH_EXHAUST = "exhaust";
+    public static final String TECH_REFRESH = "ready";
 
-    public static final String PLANET_ADD = "planet_add";
-    public static final String PLANET_REMOVE = "planet_remove";
-    public static final String PLANET_EXHAUST = "planet_exhaust";
-    public static final String PLANET_REFRESH = "planet_ready";
-    public static final String PLANET_REFRESH_ALL = "planet_ready_all";
-    public static final String PLANET_EXHAUST_ALL = "planet_exhaust_all";
+    public static final String PLANET_ADD = "add";
+    public static final String PLANET_REMOVE = "remove";
+    public static final String PLANET_EXHAUST = "exhaust";
+    public static final String PLANET_REFRESH = "ready";
+    public static final String PLANET_REFRESH_ALL = "ready_all";
+    public static final String PLANET_EXHAUST_ALL = "exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
 
@@ -666,29 +667,7 @@ public class Constants {
         leaderList.add(ENVOY);
     }
 
-    public static final String KELERES_HS = "keleres_hs";
     public static final String HS_TILE_POSITION = "hs_tile_position";
-    public static final ArrayList<String> setup6p = new ArrayList<>();
-    static {
-        setup6p.add("301");
-        setup6p.add("304");
-        setup6p.add("307");
-        setup6p.add("310");
-        setup6p.add("313");
-        setup6p.add("316");
-    }
-
-    public static final ArrayList<String> setup8p = new ArrayList<>();
-    static {
-        setup8p.add("401");
-        setup8p.add("404");
-        setup8p.add("407");
-        setup8p.add("410");
-        setup8p.add("413");
-        setup8p.add("416");
-        setup8p.add("419");
-        setup8p.add("422");
-    }
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
     public static final String TERRAFORM = "terraform";
@@ -779,6 +758,7 @@ public class Constants {
     public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME="userName";
+    public static final String STATS_FACTION = "faction";
     public static final String STATS_VP ="vp";
     public static final String STATS_CC="cc";
     public static final String STATS_SPEAKER="speaker";
@@ -883,4 +863,17 @@ public class Constants {
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
     public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
+    
+    public static final String MIGRATION_NAME = "migration_name";
+    public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
+    
+    public static final String AC_DECK_ID = "ac_deck_id";
+    public static final String SO_DECK_ID = "so_deck_id";
+    public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";
+    public static final String STAGE_2_PUBLIC_DECK_ID = "stage_2_public_deck_id";
+    public static final String RELIC_DECK_ID = "relic_deck_id";
+    public static final String AGENDA_DECK_ID = "agenda_deck_id";
+    public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
+    public static final String STATS_ANCHOR_LOCATION = "stats_anchor_location";
+    public static final String SET_STATS_ANCHOR = "set_stats_anchor";
 }

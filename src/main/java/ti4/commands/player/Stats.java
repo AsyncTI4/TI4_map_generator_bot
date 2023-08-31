@@ -34,7 +34,7 @@ public class Stats extends PlayerSubcommandData {
 				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Toggle a Strategy Card played status. Enter the SC #"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -170,6 +170,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			sendMessage(message.toString());
 		}
+		
 		pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
 
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
@@ -237,19 +238,21 @@ public class Stats extends PlayerSubcommandData {
 			sb.append("      No SC Picked");
 		}
 		sb.append("\n");
-		sb.append("> Debt: ").append(player.getDebtTokens()).append("\n");
-		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
-		sb.append("> Passed: ").append(player.isPassed()).append("\n");
-		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
+		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
+		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
+		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
 
-		sb.append("> Abilities: ").append(player.getAbilities()).append("\n");
-		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
-		sb.append("> Techs: ").append(player.getTechs()).append("\n");
-		sb.append("> Relics: ").append(player.getRelics()).append("\n");
-		sb.append("> Mahact CC: ").append(player.getMahactCC()).append("\n");
-		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
-		sb.append("> Owned PNs: ").append(player.getPromissoryNotesOwned()).append("\n");
-		sb.append("> Owned Units: ").append(player.getUnitsOwned()).append("\n");
+		sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
+		sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
+		sb.append("> Techs: `").append(player.getTechs()).append("`\n");
+		sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
+		sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+		sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
+		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
+		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
+		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
 		sb.append("\n");
 
 		return sb.toString();
@@ -265,59 +268,58 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
-			if (optionSC == null) {
-				return false;
-			}
-			if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
-				activeMap.setMapStatus(MapStatus.open);
-			}
-			int scNumber = optionSC.getAsInt();
-			return secondHalfOfPickSC(event, activeMap, player, scNumber);
+		if (optionSC == null) {
+			return false;
+		}
+		if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
+			activeMap.setMapStatus(MapStatus.open);
+		}
+		int scNumber = optionSC.getAsInt();
+		return secondHalfOfPickSC(event, activeMap, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber)
-	{
-			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can pick SC only if faction and color picked");
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber) {
+		LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
+			return false;
+		}
+		if (!scTradeGoods.containsKey(scNumber)) {
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
+			return false;
+		}
+
+		LinkedHashMap<String, Player> players = activeMap.getPlayers();
+		for (Player playerStats : players.values()) {
+			if (playerStats.getSCs().contains(scNumber)) {
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
 				return false;
 			}
-			if (!scTradeGoods.containsKey(scNumber)) {
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game");
-				return false;
-			}
+		}
 
-			LinkedHashMap<String, Player> players = activeMap.getPlayers();
-			for (Player playerStats : players.values()) {
-				if (playerStats.getSCs().contains(scNumber)) {
-					MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
-					return false;
-				}
-			}
-
-			player.addSC(scNumber);
+		player.addSC(scNumber);
+		if (activeMap.isFoWMode()) {
 			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+		}
+		
+		Integer tgCount = scTradeGoods.get(scNumber);
+		if (tgCount != null && tgCount != 0) {
+			int tg = player.getTg();
+			tg += tgCount;
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
 			if (activeMap.isFoWMode()) {
+				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 			}
-			Integer tgCount = scTradeGoods.get(scNumber);
-			if (tgCount != null && tgCount != 0) {
-				int tg = player.getTg();
-				tg += tgCount;
-				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
-				}
 
-				player.setTg(tg);
-				if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
-					ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
-				}
-				ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+			player.setTg(tg);
+			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+				ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
 			}
-			return true;
-
+			ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+		}
+		return true;
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,

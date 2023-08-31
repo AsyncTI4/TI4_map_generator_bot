@@ -21,6 +21,6 @@ public class ResetAgendas extends AgendaSubcommandData {
             return;
         }
         getActiveMap().resetAgendas();
-        MessageHelper.replyToMessage(event, "Agenda deck reset. Discards removed. All shuffled as new");
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveMap().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
     }
 }
