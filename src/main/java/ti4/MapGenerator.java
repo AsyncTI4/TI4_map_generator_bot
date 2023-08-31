@@ -64,6 +64,7 @@ public class MapGenerator {
     public static String userID;
     public static Guild guildPrimary = null;
     public static Guild guildSecondary = null;
+    public static Guild guild3rd = null;
     public static Guild guildFogOfWar = null;
     public static Guild guildCommunityPlays = null;
     public static String adminID;
@@ -108,6 +109,7 @@ public class MapGenerator {
         //ADMIN ROLES
         adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server (Hub)
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
+        adminRoles.add(jda.getRoleById("1146511484264906814")); // Async 3rd Server
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
@@ -122,6 +124,7 @@ public class MapGenerator {
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
+        developerRoles.add(jda.getRoleById("1146529125184581733")); // Async 3rd server
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.removeIf(Objects::isNull);
 
@@ -129,6 +132,7 @@ public class MapGenerator {
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
+        bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
@@ -227,6 +231,17 @@ public class MapGenerator {
             if (guildSecondary != null) {
                 BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+            }
+        }
+
+        //Async 3rd Server
+        if (args.length >= 7) {
+            guild3rd = jda.getGuildById(args[6]);
+            if (guild3rd != null) {
+                BotLogger.log("BOT STARTED UP: " + guild3rd.getName());
+                CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
             }

@@ -140,9 +140,28 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.RELIC -> {
+           
+            case Constants.RELIC -> { 
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> relics = Mapper.getRelics();
+                //HashMap<String, String> relics = Mapper.getRelics(); - switched from hashmap style to string style
+                
+                List<String> tableRelics = new ArrayList<>();
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    List<String> playerRelics = player_.getRelics();             
+                    tableRelics.addAll(playerRelics);
+                }
+                List<String> relicDeck = activeMap.getAllRelics();
+                tableRelics.addAll(relicDeck);
+                
+                    List<Command.Choice> options = tableRelics.stream()
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                        
+                    event.replyChoices(options).queue();
+                /* old relic autocomplete
+		try {
                 if (activeMap != null && activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
@@ -159,7 +178,7 @@ public class AutoCompleteProvider {
                             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                             .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                }
+                }*/
             }
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
