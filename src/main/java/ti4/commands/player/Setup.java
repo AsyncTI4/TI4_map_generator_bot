@@ -102,6 +102,7 @@ public class Setup extends PlayerSubcommandData {
 
         //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
+
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
             activeMap.setTile(tile);
