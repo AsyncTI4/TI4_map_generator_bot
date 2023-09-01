@@ -287,6 +287,9 @@ public class Helper {
     }
 
     public static String getRoleMentionByName(Guild guild,  String roleName) {
+        if(roleName == null || guild.getRolesByName(roleName, true) == null){
+            return "@Oopsidoops no name";
+        }
         List<Role> roles = guild.getRolesByName(roleName, true);
         if (!roles.isEmpty()){
             return roles.get(0).getAsMention();
@@ -318,7 +321,12 @@ public class Helper {
     }
 
     public static String getSCAsMention(Guild guild, int sc, Map activeMap) {
-        return getRoleMentionByName(guild, getSCName(sc, activeMap));
+        if(getRoleMentionByName(guild, getSCName(sc, activeMap)) != null){
+            return getRoleMentionByName(guild, getSCName(sc, activeMap));
+        }else{
+            return "@SC #"+sc;
+        }
+        
     }
 
     public static String getSCAsMention(Guild guild, String scname) {
@@ -609,10 +617,15 @@ public class Helper {
             if (held) continue;
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
+            String label = " ";
+            if(activeMap.getScTradeGoods().get(sc) > 0 && !activeMap.isFoWMode()){
+                label = "[has "+activeMap.getScTradeGoods().get(sc)+" tg]";
+            }
             if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeMap.isHomeBrewSCMode()) {
-                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, " ").withEmoji(scEmoji);
+                
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, label).withEmoji(scEmoji);
             } else {
-                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc + label);
             }
             scButtons.add(button);
         }

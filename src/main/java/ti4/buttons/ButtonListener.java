@@ -1173,13 +1173,19 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("jrStructure_")) {
             String unit = buttonID.replace("jrStructure_", "");
-            String message = trueIdentity + " Click the name of the planet you wish to put your unit on";
-            List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeMap, unit, "placeOneNDone_dontskip");
-            if (!activeMap.isFoWMode()) {
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap),
-                        message, buttons);
-            } else {
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+            if(!unit.equalsIgnoreCase("tg")){
+                String message = trueIdentity + " Click the name of the planet you wish to put your unit on";
+                List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeMap, unit, "placeOneNDone_dontskip");
+                if (!activeMap.isFoWMode()) {
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap),
+                            message, buttons);
+                } else {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                }
+            }else{
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), ident + " tgs increased by 1 ("+player.getTg()+"->"+(player.getTg()+1)+")");
+                player.setTg(player.getTg()+1);
+                ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("produceOneUnitInTile_")) {
@@ -1196,6 +1202,10 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("yinagent_")) {
             ButtonHelperFactionSpecific.yinAgent(buttonID, event, activeMap, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("resolveMaw")) {
+            ButtonHelper.resolveMaw(activeMap, player, event);
+        } else if (buttonID.startsWith("resolveCrownOfE")) {
+            ButtonHelper.resolveCrownOfE(activeMap, player, event);
         } else if (buttonID.startsWith("jrResolution_")) {
             String faction2 = buttonID.split("_")[1];
             Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction2);
@@ -1203,9 +1213,11 @@ public class ButtonListener extends ListenerAdapter {
             sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
             Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
             pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
-            List<Button> buttons = new ArrayList();
+            Button tgButton = Button.success("jrStructure_tg", "Gain a tg");
+            List<Button> buttons = new ArrayList<Button>();
             buttons.add(sdButton);
             buttons.add(pdsButton);
+            buttons.add(tgButton);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeMap), ButtonHelper.getTrueIdentity(p2, activeMap)+" Use buttons to decide what structure to build", buttons);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
