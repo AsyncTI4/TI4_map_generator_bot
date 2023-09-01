@@ -1469,6 +1469,14 @@ public class Player {
         return !(isDummy || faction == null || color == null || color.equals("null"));
     }
 
+    /**
+     * @return true if the player is: a "dummy", faction == null, color == null, & color == "null"
+     */
+    @JsonIgnore
+    public boolean isNotRealPlayer() {
+        return !isRealPlayer();
+    }
+
     public void setFogFilter(String preference) {
         fowFogFilter = preference;
     }
