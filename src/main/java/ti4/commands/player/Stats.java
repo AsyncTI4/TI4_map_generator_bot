@@ -253,6 +253,8 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
 		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
 		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
+		sb.append("> Alliance Members: `").append(player.getAllianceMembers()).append("`\n");
+		sb.append("> Followed SCs: `").append(player.getFollowedSCs()).append("`\n");
 		sb.append("\n");
 
 		return sb.toString();

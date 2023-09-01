@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -15,25 +16,19 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     public JoinLeave(@NotNull String name, @NotNull String description) {
         super(name, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().get(0).getAsString();
-        if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
-            return;
-        }
-
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getMap(mapName);
+        Map activeMap = getActiveMap();
         if (!activeMap.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
             return;
         }
         User user = event.getUser();
         action(activeMap, user);
+        Helper.fixGameChannelPermissions(event.getGuild(), activeMap);
         MapSaveLoadManager.saveMap(activeMap, event);
         MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
     }
