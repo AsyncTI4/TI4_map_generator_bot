@@ -290,7 +290,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     if(law.equalsIgnoreCase("minister_exploration")){
                         if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
                             String fac = Helper.getFactionIconFromDiscord(player.getFaction());
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
                             player.setTg(player.getTg()+1);
                             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                         }

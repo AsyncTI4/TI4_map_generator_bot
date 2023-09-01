@@ -440,6 +440,118 @@ public class ButtonHelperFactionSpecific {
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
     }
+
+    public static List<Button> getTilesToArboAgent(Player player, Map activeMap, GenericInteractionCreateEvent event) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
+			if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Button.success(finChecker+"arboAgentIn_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
+                buttons.add(validTile);
+			}
+		}
+        Button validTile2 = Button.danger(finChecker+"deleteButtons", "Decline");
+        buttons.add(validTile2);
+        return buttons;
+    }
+    public static List<Button> getUnitsToArboAgent(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        String cID = Mapper.getColorID(player.getColor());
+        for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            String name = entry.getKey();
+            UnitHolder unitHolder = entry.getValue();
+            HashMap<String, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet planet) {
+                continue;
+            }
+            else{
+                java.util.Map<String, Integer> tileUnits = new HashMap<>();
+                tileUnits.putAll(units);
+                for (java.util.Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
+                    String key = unitEntry.getKey();
+                    if (key.endsWith("gf.png") || key.endsWith("mf.png") ||  key.endsWith("ff.png")) {
+                        continue;
+                    }
+                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                            
+                            String unitKey = key.replace(cID+"_", "");
+                            int totalUnits = unitEntry.getValue();
+                            unitKey  = unitKey.replace(".png", "");
+                            unitKey = ButtonHelper.getUnitName(unitKey);
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            for(int x = 1; x < damagedUnits +1; x++){
+                                if(x > 1){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"arboAgentOn_"+tile.getPosition()+"_"+unitKey+"damaged", "Remove A Damaged "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                            totalUnits = totalUnits-damagedUnits;
+                            for(int x = 1; x < totalUnits +1; x++){
+                                if(x > 1){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"arboAgentOn_"+tile.getPosition()+"_"+unitKey, "Remove "+x+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Button validTile2 = Button.danger(finChecker+"deleteButtons", "Decline");
+        buttons.add(validTile2);
+        return buttons;
+    }
+
+    public static List<Button> getArboAgentReplacementOptions(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile, String unit) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<Button>();
+        String unitName = ButtonHelper.getUnitName(unit);
+        boolean damaged = false;
+        if(unit.contains("damaged")){
+                unit = unit.replace("damaged", "");
+                damaged = true;
+        }
+        String key = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
+        new RemoveUnits().removeStuff(event,tile, 1, "space", key, player.getColor(),damaged);
+        String msg = Helper.getEmojiFromDiscord(unit.toLowerCase()) +" was removed via Arborec agent by "+ButtonHelper.getIdent(player);
+        if(damaged){
+            msg = "A damaged " + msg;
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
+        String unit2 = "";
+        Button unitButton2;
+        unit2 = "destroyer";
+        unitButton2 = Button.danger(finChecker+"arboAgentPutShip_"+unit2+"_"+tile.getPosition(), "Place "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        buttons.add(unitButton2);
+        unit2 = "cruiser";
+        unitButton2 = Button.danger(finChecker+"arboAgentPutShip_"+unit2+"_"+tile.getPosition(), "Place "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        buttons.add(unitButton2);
+        unit2 = "carrier";
+        unitButton2 = Button.danger(finChecker+"arboAgentPutShip_"+unit2+"_"+tile.getPosition(), "Place "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        buttons.add(unitButton2);
+        
+        if(!unit.equals("destroyer")){
+            unit2 = "dreadnought";
+            unitButton2 = Button.danger(finChecker+"arboAgentPutShip_"+unit2+"_"+tile.getPosition(), "Place "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+
+        return buttons;
+
+    }
+    
+
+
     public static void offerTerraformButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<Button>();
         for(String planet : player.getPlanets()){
@@ -542,6 +654,9 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), "# "+ Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+" Lost " + acID +" to mageon (or perhaps Yssaril hero)");
         ACInfo.sendActionCardInfo(activeMap, player2);
         ACInfo.sendActionCardInfo(activeMap, player);
+        if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+        }
         event.getMessage().delete().queue();
     }
     public static void pillage(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String finsFactionCheckerPrefix){
@@ -879,6 +994,18 @@ public class ButtonHelperFactionSpecific {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) + message, buttons);
             }
+            if(agent.equalsIgnoreCase("arborecagent")){
+                String faction = rest.replace("arborecagent_","");
+                Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+                MessageChannel channel = event.getMessageChannel();
+                if(activeMap.isFoWMode()){
+                    channel = p2.getPrivateChannel();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
+                }
+                String message = "Use buttons to select which tile to use arborec agent in";
+                List<Button> buttons = ButtonHelperFactionSpecific.getTilesToArboAgent(p2, activeMap, event);
+                MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) + message, buttons);
+            }
             String exhaustedMessage = event.getMessage().getContentRaw();
             if(exhaustedMessage == null || exhaustedMessage.equalsIgnoreCase("")){
                 exhaustedMessage ="Updated";
@@ -1174,6 +1301,35 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         String message = "Use buttons to end turn or do another action";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void arboAgentPutShip(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+        String unitNPlace = buttonID.replace("arboAgentPutShip_", "");
+        String unit = unitNPlace.split("_")[0];
+        String pos = unitNPlace.split("_")[1];
+        Tile tile = activeMap.getTileByPosition(pos);
+        String successMessage = "";
+        
+        if (unit.equals("destroyer")) {
+            new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", activeMap);
+            successMessage = ident+" Placed 1 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+                    + tile.getRepresentationForButtons(activeMap, player) + " via Arborec Agent.";
+
+        } else if (unit.equals("cruiser")){
+            new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeMap);
+            successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("cruiser") + " in tile "
+                    + tile.getRepresentationForButtons(activeMap, player) + " via Arborec Agent.";
+        } else if (unit.equals("carrier")){
+            new AddUnits().unitParsing(event, player.getColor(), tile, "carrier", activeMap);
+            successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("carrier") + " in tile "
+                    + tile.getRepresentationForButtons(activeMap, player) + " via Arborec Agent.";
+        } else if (unit.equals("dreadnought")){
+            new AddUnits().unitParsing(event, player.getColor(), tile, "dreadnought", activeMap);
+            successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("dreadnought") + " in tile "
+                    + tile.getRepresentationForButtons(activeMap, player) + " via Arborec Agent.";
+        }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         event.getMessage().delete().queue();
     }
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
