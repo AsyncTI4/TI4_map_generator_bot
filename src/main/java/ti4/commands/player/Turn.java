@@ -224,7 +224,7 @@ public class Turn extends PlayerSubcommandData {
                 sendReminder = true;
             }
         }
-        sb.append(" above before doing anything else. Make sure to do it in the order they were played");
+        sb.append(" above before doing anything else. Make sure to do it in the order they were played. You currently have "+player.getStrategicCC() + " CC in your strategy pool.");
         return sendReminder ? sb.toString() : null;
     }
 

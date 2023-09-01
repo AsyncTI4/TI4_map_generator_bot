@@ -100,6 +100,19 @@ public class ButtonHelper {
        event.getMessage().editMessage(message)
                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
+     public static void arboAgentOnButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+       String rest = buttonID.replace("arboAgentOn_", "").toLowerCase();
+       String pos = rest.substring(0, rest.indexOf("_"));
+       Tile tile = activeMap.getTileByPosition(pos);
+       rest = rest.replace(pos + "_", "");
+       int amount = Integer.parseInt(rest.charAt(0) + "");
+       rest = rest.substring(1, rest.length());
+       String unit = rest;
+        for(int x = 0; x < amount; x++){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unit, tile, activeMap, event, player, null));
+        }
+       event.getMessage().delete().queue();
+    }
     public static void riftAllUnitsButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String pos = buttonID.replace("riftAllUnits_", "").toLowerCase();
         riftAllUnitsInASystem(pos, event, activeMap, player, ident, null);
@@ -725,7 +738,7 @@ public class ButtonHelper {
         boolean shouldBeUnlocked = false;
         switch(faction){
             case "yssaril" -> {
-                if(player.getActionCards().size() > 7){
+                if(player.getActionCards().size() > 7 || (player.getExhaustedTechs().contains("mi") && player.getActionCards().size() > 6)){
                     shouldBeUnlocked = true;
                 }
             }
@@ -977,7 +990,10 @@ public class ButtonHelper {
         if(whatIsItFor.contains("mahactAgent")){
             String faction = whatIsItFor.replace("mahactAgent", "");
             player = Helper.getPlayerFromColorOrFaction(activeMap, faction);
-            msg = msg + " using Mahact agent";
+            msg =  ButtonHelper.getTrueIdentity(player, activeMap) + " " +msg + " using Mahact agent";
+            
+            
+            
         }
         RemoveCC.removeCC(event, player.getColor(), tile, activeMap);
          
@@ -1472,11 +1488,8 @@ public class ButtonHelper {
         Button tacticalAction = Button.success(finChecker+"tacticalAction", "Tactical Action ("+player.getTacticalCC()+")");
         int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(activeMap,player, event).size()-2;
         Button componentAction = Button.success(finChecker+"componentAction", "Component Action ("+numOfComponentActions+")");
-        if(player.getTacticalCC() > 0)
-        {
-            startButtons.add(tacticalAction);
-        }
         
+        startButtons.add(tacticalAction);
         startButtons.add(componentAction);
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
@@ -3522,7 +3535,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 Leader playerLeader = p1.getLeader(buttonID);
 		
                 if(buttonID.contains("agent")){
-                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent") && !buttonID.equalsIgnoreCase("xxchaagent")){
+                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent") && !buttonID.equalsIgnoreCase("arborecagent") && !buttonID.equalsIgnoreCase("xxchaagent")){
                         playerLeader.setExhausted(true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
                         StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
