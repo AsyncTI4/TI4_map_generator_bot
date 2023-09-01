@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
@@ -86,6 +87,24 @@ public class RevealAgenda extends AgendaSubcommandData {
                 else
                 {
                     notEmergency = true;
+                }
+                if(notEmergency){
+                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
+                     Player speaker = null;
+                    if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
+                        speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
+                    } 
+                    if(speaker != null){
+                        StringBuilder sb = new StringBuilder();
+                        java.util.Map.Entry<String, Integer> entry = activeMap.drawAgenda();
+                        sb.append("-----------\n");
+                        sb.append("Game: ").append(activeMap.getName()).append("\n");
+                        sb.append(event.getUser().getAsMention()).append("\n");
+                        sb.append("Drawn Agendas:\n");
+                        sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
+                        sb.append("\n");
+                        MessageHelper.sendMessageToChannel((MessageChannel) speaker.getCardsInfoThread(activeMap), sb.toString());
+                    }
                 }
 
             }
