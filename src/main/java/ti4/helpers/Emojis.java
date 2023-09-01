@@ -107,6 +107,11 @@ public class Emojis {
     public static final String AgendaBlack = "<:Agendablack:1060073912442036336>";
     public static final String PN = "<:PN:1054660504175521882>";
     public static final String PNALt = "<:PNALt:1064838292467613766>";
+    public static final String RelicCard = "<:RelicCard:1147194759903989912>";
+    public static final String CulturalCard = "<:CulturalCard:1147194826647928932>";
+    public static final String HazardousCard = "<:HazardousCard:1147194829479100557>";
+    public static final String IndustrialCard = "<:IndustrialCard:1147194830762545183>";
+    public static final String FrontierCard = "<:FrontierCard:1147194828417929397>";
 
     // OBJECTIVES
     public static final String SecretObjective = "<:Secretobjective:1054660535544729670>";
