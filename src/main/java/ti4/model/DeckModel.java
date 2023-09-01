@@ -46,4 +46,8 @@ public class DeckModel implements ModelInterface {
         Collections.shuffle(cardList);
         return cardList;
     }
+
+    public int getCardCount() {
+        return cardIDs.size();
+    }
 }

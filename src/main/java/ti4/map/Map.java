@@ -2406,8 +2406,6 @@ public class Map {
         planets.clear();
     }
 
-   
-
     @JsonIgnore
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
@@ -2607,5 +2605,114 @@ public class Map {
 
     public StrategyCardModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
+    }
+
+    public int getActionCardDeckSize() {
+        return getActionCards().size();
+    }
+
+    public int getActionCardFullDeckSize() {
+        DeckModel acDeckModel = Mapper.getDeck(getAcDeckID());
+        if (acDeckModel != null) return acDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getAgendaDeckSize() {
+        return getAgendas().size();
+    }
+
+    public int getAgendaFullDeckSize() {
+        DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
+        if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getPublicObjectives1DeckSize() {
+        return getPublicObjectives1().size();
+    }
+
+    public int getPublicObjectives1FullDeckSize() {
+        DeckModel po1DeckModel = Mapper.getDeck(getStage1PublicDeckID());
+        if (po1DeckModel != null) return po1DeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getPublicObjectives2DeckSize() {
+        return getPublicObjectives2().size();
+    }
+
+    public int getPublicObjectives2FullDeckSize() {
+        DeckModel po2DeckModel = Mapper.getDeck(getStage2PublicDeckID());
+        if (po2DeckModel != null) return po2DeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getRelicDeckSize() {
+        return getAllRelics().size();
+    }
+
+    public int getRelicFullDeckSize() {
+        DeckModel relicDeckModel = Mapper.getDeck(getRelicDeckID());
+        if (relicDeckModel != null) return relicDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getSecretObjectiveDeckSize() {
+        return getSecretObjectives().size();
+    }
+
+    public int getSecretObjectiveFullDeckSize() {
+        DeckModel soDeckModel = Mapper.getDeck(getSoDeckID());
+        if (soDeckModel != null) return soDeckModel.getCardCount();
+        return -1;
+    }
+
+    private int getExploreDeckSize(String exploreDeckID) {
+        return getExploreDeck(exploreDeckID).size();
+    }
+    
+    private int getExploreDeckFullSize(String exploreDeckID) {
+        DeckModel exploreDeckModel = Mapper.getDeck(exploreDeckID);
+        if (exploreDeckModel == null) return -1;
+        List<String> exploreDeck = new ArrayList<>();
+        for (String exploreCardID : exploreDeckModel.getCardIDs()) {
+            String exploreCard = Mapper.getExplore(exploreCardID);
+            if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
+                exploreDeck.add(exploreCard);
+            }
+        }
+        return exploreDeck.size();
+    }
+
+    public int getHazardousExploreDeckSize() {
+        return getExploreDeckSize(Constants.HAZARDOUS);
+    }
+
+    public int getHazardousExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.HAZARDOUS);
+    }
+
+    public int getCulturalExploreDeckSize() {
+        return getExploreDeckSize(Constants.CULTURAL);
+    }
+
+    public int getCulturalExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.CULTURAL);
+    }
+
+    public int getIndustrialExploreDeckSize() {
+        return getExploreDeckSize(Constants.INDUSTRIAL);
+    }
+
+    public int getIndustrialExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.INDUSTRIAL);
+    }
+
+    public int getFrontierExploreDeckSize() {
+        return getExploreDeckSize(Constants.FRONTIER);
+    }
+
+    public int getFrontierExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.FRONTIER);
     }
 }
