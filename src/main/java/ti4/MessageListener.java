@@ -64,7 +64,7 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (!MapGenerator.readyToReceiveCommands) {
-            event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").queue();
+            event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
             return;
         }
         event.getInteraction().deferReply().queue();
