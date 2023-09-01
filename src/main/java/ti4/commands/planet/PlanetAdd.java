@@ -1,6 +1,7 @@
 package ti4.commands.planet;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -17,6 +18,7 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlanetAdd extends PlanetAddRemove {
@@ -103,6 +105,38 @@ public class PlanetAdd extends PlanetAddRemove {
             player.setTg(player.getTg()+1);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
+        for(String law : activeMap.getLaws().keySet()){
+            if(law.equalsIgnoreCase("minister_exploration")){
+                if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
+                    String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
+                    player.setTg(player.getTg()+1);
+                    ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+                }
+            }
+        }
+        int numMechs = 0;
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+        if (unitHolder.getUnits() != null) {
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                numMechs =  unitHolder.getUnits().get(mechKey);
+            }
+        }
+        if(numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")){
+            
+            Button sdButton = Button.success("winnuStructure_sd_"+planet, "Place A SD on "+Helper.getPlanetRepresentation(planet,activeMap));
+            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+            Button pdsButton = Button.success("winnuStructure_pds_"+planet, "Place a PDS on "+Helper.getPlanetRepresentation(planet,activeMap));
+            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+            Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.add(sdButton);
+            buttons.add(pdsButton);
+            buttons.add(tgButton);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getTrueIdentity(player, activeMap)+" Use buttons to place structures equal to the amount of mechs you have", buttons );
+
+        }
         if (!alreadyOwned && !doubleCheck && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
@@ -126,7 +160,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if(planet.equalsIgnoreCase("mr")&& player.hasAbility("reclamation")){
              new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeMap);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Due to the reclamation ability, pds and SD have been added to rex. This is optional though.");
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Due to the reclamation ability, pds and SD have been added to Mecatol Rex. This is optional though.");
         }
     }
 }

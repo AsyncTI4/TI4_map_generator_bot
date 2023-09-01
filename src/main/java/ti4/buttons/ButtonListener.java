@@ -949,6 +949,19 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes, votes + 5);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("arboAgentIn_")) {
+            String pos = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
+            List<Button> buttons = ButtonHelperFactionSpecific.getUnitsToArboAgent(player, activeMap, event, activeMap.getTileByPosition(pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity+" select which unit you'd like to replace", buttons);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("arboAgentPutShip_")) {
+            ButtonHelperFactionSpecific.arboAgentPutShip(buttonID, event, activeMap, player, ident);
+        } else if (buttonID.startsWith("arboAgentOn_")) {
+            String pos = buttonID.split("_")[1];
+            String unit = buttonID.split("_")[2];
+            List<Button> buttons = ButtonHelperFactionSpecific.getArboAgentReplacementOptions(player, activeMap, event, activeMap.getTileByPosition(pos), unit);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity+" select which unit you'd like to place down", buttons);
+            event.getMessage().delete().queue();
             
         } else if (buttonID.startsWith("resolveWithNoEffect")) {
             String voteMessage = "Resolving agenda with no effect. Click the buttons for next steps.";
@@ -1188,6 +1201,13 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
             }
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("winnuStructure_")) {
+            String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
+            String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
+            new AddUnits().unitParsing(event, player.getColor(),
+            activeMap.getTile(AliasHandler.resolveTile(planet)), unit+ " " + planet , activeMap);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Placed a "+unit+ " on "+Helper.getPlanetRepresentation(planet, activeMap));
+            
         } else if (buttonID.startsWith("produceOneUnitInTile_")) {
             buttonID = buttonID.replace("produceOneUnitInTile_", "");
             String type = buttonID.split("_")[1];
@@ -2249,7 +2269,7 @@ public class ButtonListener extends ListenerAdapter {
                      ButtonHelper.checkACLimit(activeMap, event, player);
                     if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
                             ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
-                        }
+                    }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     String message = hasSchemingAbility
                             ? "Spent 1 " + commOrTg + " to draw " + count2
@@ -2510,6 +2530,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
                 }
                 case "tacticalAction" -> {
+                    if(player.getTacticalCC() < 1){
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" does not have any tactical cc.");
+                        return;
+                    }
                     activeMap.setNaaluAgent(false);
                     String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeMap);

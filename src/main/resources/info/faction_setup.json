@@ -524,7 +524,7 @@
     "startingFleet": "cv,2 dd,2 ff, 2 inf c,2 inf d,sd c,pds d",
     "commodities": 3,
     "factionTech": ["dsaugug", "dsauguy"],
-    "startingTech": ["aida", "sdn", "det", "pa"],
+    "startingTech": ["aida", "sdn"],
     "homePlanets": ["chrion", "demis"],
     "abilities": ["oracle_ai", "limited_vision", "probability_algorithms"],
     "leaders": ["augersagent", "augerscommander", "augershero"],
