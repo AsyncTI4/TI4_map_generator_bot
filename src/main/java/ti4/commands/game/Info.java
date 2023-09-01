@@ -52,8 +52,9 @@ public class Info extends GameSubcommandData{
         
         sb.append("### Setup: ").append(NEW_LINE);
         sb.append("VP Count: " + activeMap.getVp()).append(NEW_LINE);
+        sb.append("Private Game: " + privateGame).append(NEW_LINE);
         sb.append("Game Modes: " + activeMap.getGameModesText()).append(NEW_LINE);
-        if (privateGame == null || privateGame == false) {
+        if (privateGame) {
             sb.append("Map String: `" + Helper.getMapString(activeMap)).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
@@ -78,7 +79,7 @@ public class Info extends GameSubcommandData{
         sb.append("Text Size: " + activeMap.getLargeText()).append(NEW_LINE);
         sb.append("Output Verbosity: " + activeMap.getOutputVerbosity()).append(NEW_LINE);
         sb.append("CC/Plastic warnings: " + activeMap.getCCNPlasticLimit()).append(NEW_LINE);
-        if (privateGame == null || privateGame == false) {
+        if (privateGame) {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;
             for (Player player : activeMap.getRealPlayers()) {
@@ -104,7 +105,7 @@ public class Info extends GameSubcommandData{
         sb.append("Game Player Count: " + activeMap.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: " + activeMap.getRealPlayers().size()).append(NEW_LINE);
         sb.append("Map Images Generated: " + activeMap.getMapImageGenerationCount()).append(NEW_LINE);
-        sb.append("Strategy Card Trade Goods: `").append(activeMap.getScTradeGoods()).append("`").append(NEW_LINE);
+        sb.append("SC Trade Goods: `").append(activeMap.getScTradeGoods()).append("`").append(NEW_LINE);
         sb.append("Public Objectives: `").append(activeMap.getRevealedPublicObjectives()).append("`").append(NEW_LINE);
         sb.append("Laws: `").append(activeMap.getLaws()).append("`").append(NEW_LINE);
         sb.append("Laws Info: `").append(activeMap.getLawsInfo()).append("`").append(NEW_LINE);
