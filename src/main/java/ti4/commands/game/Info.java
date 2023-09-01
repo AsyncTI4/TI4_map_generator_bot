@@ -58,7 +58,7 @@ public class Info extends GameSubcommandData {
         sb.append("VP Count: " + activeMap.getVp()).append(NEW_LINE);
         sb.append("Private Game: " + privateGame).append(NEW_LINE);
         sb.append("Game Modes: " + activeMap.getGameModesText()).append(NEW_LINE);
-        if (privateGame) {
+        if (!privateGame) {
             sb.append("Map String: `" + Helper.getMapString(activeMap)).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
@@ -83,12 +83,12 @@ public class Info extends GameSubcommandData {
         sb.append("Text Size: " + activeMap.getLargeText()).append(NEW_LINE);
         sb.append("Output Verbosity: " + activeMap.getOutputVerbosity()).append(NEW_LINE);
         sb.append("CC/Plastic warnings: " + activeMap.getCCNPlasticLimit()).append(NEW_LINE);
-        if (privateGame) {
+        if (!privateGame) {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;
             for (Player player : activeMap.getRealPlayers()) {
                 sb.append("> `").append(index).append(".` ").append(Helper.getFactionIconFromDiscord(player.getFaction())).append(player.getUserName()).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
-                sb.append(" - *").append(player.getTotalVictoryPoints(activeMap)).append("VP* ");
+                if (player.getRoleIDForCommunity() != null) sb.append(" - Community Role: ").append(player.getRoleForCommunity().getName());
                 sb.append(NEW_LINE);
                 index++;
             }
