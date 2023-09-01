@@ -68,6 +68,7 @@ public class GameCommand implements Command {
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        if (activeMap == null) return;
         if (!undoCommand) {
             MapSaveLoadManager.saveMap(activeMap, event);
         }
