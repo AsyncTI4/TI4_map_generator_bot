@@ -2290,8 +2290,13 @@ public class Map {
     }
 
     @JsonIgnore
-    public Set<Player> getRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toSet());
+    public List<Player> getRealPlayers() {
+        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getNotRealPlayers() {
+        return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -2672,7 +2677,7 @@ public class Map {
     }
     
     private int getExploreDeckFullSize(String exploreDeckID) {
-        DeckModel exploreDeckModel = Mapper.getDeck(exploreDeckID);
+        DeckModel exploreDeckModel = Mapper.getDeck(getExplorationDeckID());
         if (exploreDeckModel == null) return -1;
         List<String> exploreDeck = new ArrayList<>();
         for (String exploreCardID : exploreDeckModel.getCardIDs()) {
