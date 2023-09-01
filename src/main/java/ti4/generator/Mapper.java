@@ -417,6 +417,8 @@ public class Mapper {
     public static String getExplore(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
+        id = id.replace("_", "");
+        
         return (String) explore.get(id);
     }
 

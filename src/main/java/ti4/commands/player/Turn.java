@@ -217,14 +217,18 @@ public class Turn extends PlayerSubcommandData {
         boolean sendReminder = false;
 
         StringBuilder sb = new StringBuilder("> "+Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Please react to ");
-
+        int count = 0;
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
                 sb.append(Helper.getSCBackRepresentation(activeMap, sc)); 
                 sendReminder = true;
+                count++;
             }
         }
-        sb.append(" above before doing anything else. Make sure to do it in the order they were played. You currently have "+player.getStrategicCC() + " CC in your strategy pool.");
+        sb.append(" above before doing anything else. You currently have "+player.getStrategicCC() + " CC in your strategy pool.");
+        if(count > 1){
+            sb.append(" Make sure to resolve the strategy cards in the order they were played.");
+        }
         return sendReminder ? sb.toString() : null;
     }
 
