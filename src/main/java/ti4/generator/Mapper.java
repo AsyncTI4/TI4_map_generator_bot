@@ -723,6 +723,10 @@ public class Mapper {
         return deckList;
     }
 
+    public static DeckModel getDeck(String deckID) {
+        return getDecks().get(deckID);
+    }
+
     public static HashMap<String, CombatModifierModel> getCombatModifiers() {
         HashMap<String, CombatModifierModel> combatModifiersList = new HashMap<>(combatModifiers);
         return combatModifiersList;
