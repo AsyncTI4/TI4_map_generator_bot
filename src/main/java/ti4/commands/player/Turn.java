@@ -67,7 +67,7 @@ public class Turn extends PlayerSubcommandData {
 
         }
         String nextMessage = pingNextPlayer(event, activeMap, mainPlayer);
-        if (!nextMessage.isEmpty()) sendMessage(nextMessage);
+        if (!nextMessage.isEmpty()) MessageHelper.sendMessageToChannel(event.getMessageChannel(), nextMessage);
     }
 
     public String pingNextPlayer(GenericInteractionCreateEvent event, Map activeMap, Player mainPlayer) {
@@ -86,21 +86,25 @@ public class Turn extends PlayerSubcommandData {
                 player.setPassed(true);
             }
         }
-
+        LinkedHashSet<Integer> naaluSCs = null;
         //DETERMINE IF NAALU IS PRESENT AND GET THEIR SC
         for (Player player : activeMap.getPlayers().values()) {
-            for (int sc : player.getSCs()) {
-                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    naaluSC = sc;
-                    naaluPresent = true;
-                    break;
-                }
+            int sc = player.getLowestSC();
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                naaluSC = sc;
+                naaluPresent = true;
+                naaluSCs = player.getSCs();
+                break;
             }
+            
         }
-        if (max == naaluSC) { //quick fix if Naalu picks for e.g. the 8, max is now 7
+        while(naaluSCs != null && naaluSCs.contains(max)){
             max--;
         }
+       // if (max == naaluSC) { //quick fix if Naalu picks for e.g. the 8, max is now 7
+        //    max--;
+       // }
 
         //FIND CURRENT PLAYER AND if they are holding the highest possible SC, it sets the next SC as 1, otherwise, sets the next SC as current SC+1. 
         for (Player player : activeMap.getPlayers().values()) {

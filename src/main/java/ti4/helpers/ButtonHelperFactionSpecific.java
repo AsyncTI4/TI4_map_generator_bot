@@ -331,6 +331,13 @@ public class ButtonHelperFactionSpecific {
         }
         
     }
+    public static List<Button> getCabalAgentButtonOptions(Player target, Map activeMap){
+        List<Button> units = new ArrayList<Button>();
+        int maxComms = target.getCommoditiesTotal();
+
+        
+        return units;
+    }
     public static void executeCabalHero(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
         String pos = buttonID.replace("cabalHeroTile_","");
         Tile tile = activeMap.getTileByPosition(pos);

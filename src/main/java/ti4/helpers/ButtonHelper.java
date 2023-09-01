@@ -127,7 +127,7 @@ public class ButtonHelper {
                 tileUnits.putAll(units);
                 for (java.util.Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
                     String key = unitEntry.getKey();
-                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || (!player.hasFF2Tech() && key.endsWith("ff.png"))) {
+                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || ((!player.hasFF2Tech() && key.endsWith("ff.png"))   || (cabal != null && key.endsWith("ff.png"))  )) {
                         continue;
                     }
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
@@ -2695,12 +2695,15 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                     && !player2.getLeaderByID("naaluhero").isLocked()) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
                         Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                + "Reminder this is the window to do Naalu Hero");
+                                + " Reminder this is the window to do Naalu Hero");
             }
             if (player2.getRelics() != null && player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored()) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
                         Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                + "Reminder this is the window to do Maw of Worlds");
+                                + " Reminder this is the window to do Maw of Worlds");
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeMap),
+                        Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
+                                + " You can use these buttons to resolve Maw Of Worlds", ButtonHelper.getMawButtons());
             }
             if (player2.getRelics() != null && player2.hasRelic("emphidia")) {
                 for (String pl : player2.getPlanets()) {
@@ -2713,7 +2716,10 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                             && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
                                 Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                        + "Reminder this is the window to purge Crown of Emphidia if you want to. Command to make a new custom public for crown is /status po_add_custom public_name:");
+                                        + "Reminder this is the window to purge Crown of Emphidia if you want to.");
+                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeMap),
+                        Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
+                                + " You can use these buttons to resolve Crown of Emphidia", ButtonHelper.getCrownButtons());
                     }
                 }
             }
@@ -2729,11 +2735,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                         Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
                                 + "Reminder this is the window to do manipulate investments.");
             }
-            if (player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored()) {
-                MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                        Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                + "Reminder this is the window to use maw of worlds.");
-            }
+            
             if (player2.getActionCards() != null && player2.getActionCards().keySet().contains("stability")) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
                         Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
@@ -2819,6 +2821,51 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         } else {
             MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
         }
+        for(Player player2 : activeMap.getRealPlayers()){
+            if (player2.getActionCards() != null && player2.getActionCards().keySet().contains("summit")
+                    && activeMap.isCustodiansScored()) {
+                MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
+                        Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
+                                + "Reminder this is the window to do summit");
+            }
+        }
+    }
+    public static List<Button> getMawButtons() {
+         List<Button> playerButtons = new ArrayList<>();
+        playerButtons.add(Button.success("resolveMaw", "Purge Maw of Worlds"));
+        playerButtons.add(Button.danger("deleteButtons", "Decline"));
+         return playerButtons;
+    }
+    public static List<Button> getCrownButtons() {
+         List<Button> playerButtons = new ArrayList<>();
+        playerButtons.add(Button.success("resolveCrownOfE", "Purge Crown"));
+        playerButtons.add(Button.danger("deleteButtons", "Decline"));
+        return playerButtons;
+    }
+
+    public static void resolveMaw(Map activeMap, Player player, ButtonInteractionEvent event) {
+
+        player.removeRelic("mawofworlds");
+        player.removeExhaustedRelic("mawofworlds");
+        for (String planet : player.getPlanets()) {
+            player.exhaustPlanet(planet);
+        }
+        activeMap.setComponentAction(true);
+        Button getTech = Button.success("acquireATech", "Get a tech");
+        List<Button> buttons = new ArrayList<Button>();
+        buttons.add(getTech);
+        buttons.add(Button.danger("deleteButtons", "Delete These"));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap)+" purged Maw Of Worlds.");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap)+" Use the button to get a tech", buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveCrownOfE(Map activeMap, Player player, ButtonInteractionEvent event) {
+        player.removeRelic("emphidia");
+        player.removeExhaustedRelic("emphidia");
+        Integer poIndex = activeMap.addCustomPO("Crown of Emphidia", 1);
+        activeMap.scorePublicObjective(player.getUserID(), poIndex);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap)+" scored Crown of Emphidia");
+        event.getMessage().delete().queue();
     }
 
     public static List<Button> getPlayersToTransact(Map activeMap, Player p) {
