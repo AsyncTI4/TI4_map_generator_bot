@@ -67,24 +67,26 @@ public class MessageListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
             return;
         }
-        event.getInteraction().deferReply().queue();
 
         String userID = event.getUser().getId();
+
+        // CHECK IF CHANNEL IS MATCHED TO A GAME
+        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
+            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
+            if (!isChannelOK) {
+                event.reply("Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123`").setEphemeral(true).queue();
+                return;
+            }
+        }
+
+        event.getInteraction().deferReply().queue();
+
         Member member = event.getMember();
 
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue();
             // BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
-        }
-
-        // CHECK IF CHANNEL IS MATCHED TO A GAME
-        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS)) { //SKIP /help COMMANDS
-            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
-            if (!isChannelOK) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
-                return;
-            }
         }
 
         CommandManager commandManager = CommandManager.getInstance();
@@ -108,12 +110,10 @@ public class MessageListener extends ListenerAdapter {
         MapManager mapManager = MapManager.getInstance();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
         Set<String> mapList = mapManager.getMapList().keySet();
-        StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
-
 
         MapFileDeleter.deleteFiles();
 
-        String gameID = channelNameTokenizer.nextToken();
+        String gameID = StringUtils.substringBefore(channelName, "-");
         boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
         if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
             return false;
