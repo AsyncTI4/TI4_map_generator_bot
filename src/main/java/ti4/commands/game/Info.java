@@ -15,7 +15,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 
-public class Info extends GameSubcommandData{
+public class Info extends GameSubcommandData {
     public static final String NEW_LINE = "\n";
 
     public Info() {
@@ -25,22 +25,26 @@ public class Info extends GameSubcommandData{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
         MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getUserActiveMap(event.getUser().getId());
-        StringBuilder sb = getGameInfo(gameOption, mapManager, activeMap, event);
+        Map activeMap = getActiveMap();
+        if (activeMap == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found.");
+            return;
+        }
+
+        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
+        if (gameNameOption != null && (activeMap == null || !activeMap.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase()))) {
+            activeMap = mapManager.getMap(gameNameOption.getAsString().toLowerCase());
+        }
+
+        StringBuilder sb = getGameInfo(activeMap, event);
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map activeMap, SlashCommandInteractionEvent event) {
-        StringBuilder sb = new StringBuilder();
+    public static StringBuilder getGameInfo(Map activeMap, SlashCommandInteractionEvent event) {
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-        if (activeMap == null && gameOption == null){
-            sb.append("Game not specified");
-            return sb;
-        } else if (activeMap == null ){
-            activeMap = mapManager.getMap(gameOption.getAsString());
-        }
+
+        StringBuilder sb = new StringBuilder();
         sb.append("## Game Info:").append(NEW_LINE);
         sb.append("### Name: " + activeMap.getName()).append(NEW_LINE);
         sb.append("Owner: " + activeMap.getOwnerName()).append(NEW_LINE);
