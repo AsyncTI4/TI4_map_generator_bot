@@ -223,6 +223,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
         cardID = cardID.replace("extra1", "");
+        cardID = cardID.replace("_", "");
         cardID = cardID.replace("extra2", "");
         switch (cardID) {
             case "lc1", "lc2" -> {
