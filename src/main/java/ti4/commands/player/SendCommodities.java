@@ -18,6 +18,7 @@ public class SendCommodities extends PlayerSubcommandData {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send Commodities").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
     }
 
     @Override
@@ -36,46 +37,47 @@ public class SendCommodities extends PlayerSubcommandData {
             return;
         }
 
-        OptionMapping optionComms = event.getOption(Constants.COMMODITIES);
-        if (optionComms != null) {
-            int sendCommodities = optionComms.getAsInt();
-            int commodities = player.getCommodities();
-            sendCommodities = Math.min(sendCommodities, commodities);
-            commodities -= sendCommodities;
-            player.setCommodities(commodities);
+        int sendCommodities = event.getOption(Constants.COMMODITIES, 0, OptionMapping::getAsInt);
+        int commodities = player.getCommodities();
+        sendCommodities = Math.min(sendCommodities, commodities);
+        commodities -= sendCommodities;
+        player.setCommodities(commodities);
 
-            if(!player.isPlayerMemberOfAlliance(player_)){
-                int targetTG = player_.getTg();
-                targetTG += sendCommodities;
-                player_.setTg(targetTG);
-            }else{
-                int targetTG = player_.getCommodities();
-                targetTG += sendCommodities;
-                if(targetTG > player_.getCommoditiesTotal()){
-                    targetTG = player_.getCommoditiesTotal();
-                }
-                player_.setCommodities(targetTG);
+        if(!player.isPlayerMemberOfAlliance(player_)){
+            int targetTG = player_.getTg();
+            targetTG += sendCommodities;
+            player_.setTg(targetTG);
+        }else{
+            int targetTG = player_.getCommodities();
+            targetTG += sendCommodities;
+            if(targetTG > player_.getCommoditiesTotal()){
+                targetTG = player_.getCommoditiesTotal();
             }
-            
-
-
-			String p1 = Helper.getPlayerRepresentation(player, activeMap);
-			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
-			String commString = sendCommodities + " " + Emojis.comm + " commodities";
-			String message =  p1 + " sent " + commString + " to " + p2;
-			sendMessage(message);
-            ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
-            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
-            ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, player, player_, sendCommodities, event);
-
-            if (activeMap.isFoWMode()) {
-                String fail = "Could not notify receiving player.";
-                String success = "The other player has been notified";
-                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-
-				// Add extra message for transaction visibility
-				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, commString, null);
-            }
+            player_.setCommodities(targetTG);
         }
+        
+        String p1 = Helper.getPlayerRepresentation(player, activeMap);
+        String p2 = Helper.getPlayerRepresentation(player_, activeMap);
+        String commString = sendCommodities + " " + Emojis.comm + " commodities";
+        String message =  p1 + " sent " + commString + " to " + p2;
+        sendMessage(message);
+        ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
+        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, player, player_, sendCommodities, event);
+
+        if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
+			ClearDebt.clearDebt(player_, player, sendCommodities);
+			sendMessage(Helper.getPlayerRepresentation(player_, activeMap) + " cleared " + sendCommodities + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeMap));
+		}
+
+        if (activeMap.isFoWMode()) {
+            String fail = "Could not notify receiving player.";
+            String success = "The other player has been notified";
+            MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+
+            // Add extra message for transaction visibility
+            FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, commString, null);
+        }
+        
     }
 }

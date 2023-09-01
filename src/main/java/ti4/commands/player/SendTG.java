@@ -18,8 +18,8 @@ public class SendTG extends PlayerSubcommandData {
 	public SendTG() {
 		super(Constants.SEND_TG, "Sent TG to player/faction");
 		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send TG")
-				.setAutoComplete(true).setRequired(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send TG").setAutoComplete(true).setRequired(true));
+		addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
 	}
 
 	@Override
@@ -38,37 +38,40 @@ public class SendTG extends PlayerSubcommandData {
 			return;
 		}
 
-		OptionMapping optionTG = event.getOption(Constants.TG);
-		if (optionTG != null) {
-			int sendTG = optionTG.getAsInt();
-			int tg = player.getTg();
-			sendTG = Math.min(sendTG, tg);
-			tg -= sendTG;
-			player.setTg(tg);
-			ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+		int sendTG = event.getOption(Constants.TG, 0, OptionMapping::getAsInt);
+		int tg = player.getTg();
+		sendTG = Math.min(sendTG, tg);
+		tg -= sendTG;
+		player.setTg(tg);
+		ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
 
-			int targetTG = player_.getTg();
-			targetTG += sendTG;
-			player_.setTg(targetTG);
-			ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
+		int targetTG = player_.getTg();
+		targetTG += sendTG;
+		player_.setTg(targetTG);
+		ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
 
-			String p1 = Helper.getPlayerRepresentation(player, activeMap);
-			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
-			if(player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")){
-				ButtonHelper.commanderUnlockCheck(player_, activeMap, "hacan", event);
-			}
-			String tgString = sendTG + " " + Emojis.tg + " trade goods";
-			String message =  p1 + " sent " + tgString + " to " + p2;
-			sendMessage(message);
-
-			if (activeMap.isFoWMode()) {
-				String fail = "Could not notify receiving player.";
-				String success = "The other player has been notified";
-				MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-
-				// Add extra message for transaction visibility
-				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, tgString, null);
-			}
+		String p1 = Helper.getPlayerRepresentation(player, activeMap);
+		String p2 = Helper.getPlayerRepresentation(player_, activeMap);
+		if(player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")){
+			ButtonHelper.commanderUnlockCheck(player_, activeMap, "hacan", event);
 		}
+		String tgString = sendTG + " " + Emojis.tg + " trade goods";
+		String message =  p1 + " sent " + tgString + " to " + p2;
+		sendMessage(message);
+
+		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
+			ClearDebt.clearDebt(player_, player, sendTG);
+			sendMessage(Helper.getPlayerRepresentation(player_, activeMap) + " cleared " + sendTG + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeMap));
+		}
+
+		if (activeMap.isFoWMode()) {
+			String fail = "Could not notify receiving player.";
+			String success = "The other player has been notified";
+			MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+
+			// Add extra message for transaction visibility
+			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, tgString, null);
+		}
+		
 	}
 }

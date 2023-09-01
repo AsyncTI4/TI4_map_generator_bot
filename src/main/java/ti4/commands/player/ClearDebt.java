@@ -1,9 +1,14 @@
 package ti4.commands.player;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -13,7 +18,8 @@ public class ClearDebt extends PlayerSubcommandData {
     public ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you clear Debt").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color having their debt cleared ").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_1, "Faction or Color clearing the debt").setAutoComplete(true));
     }
 
     @Override
@@ -21,6 +27,20 @@ public class ClearDebt extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player clearingPlayer = activeMap.getPlayer(getUser().getId());
         clearingPlayer = Helper.getGamePlayer(activeMap, clearingPlayer, event, null);
+        
+        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
+        if (factionColorOption != null) {
+            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
+            factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
+                    clearingPlayer = player_;
+                    break;
+                }
+            }
+        }
+        
         if (clearingPlayer == null) {
             sendMessage("Player could not be found");
             return;
@@ -28,7 +48,7 @@ public class ClearDebt extends PlayerSubcommandData {
 
         Player clearedPlayer = Helper.getPlayer(activeMap, clearingPlayer, event);
         if (clearedPlayer == null) {
-            sendMessage("Player to clear Debt could not be found");
+            sendMessage("Player to have debt cleared could not be found");
             return;
         }
 
@@ -45,7 +65,6 @@ public class ClearDebt extends PlayerSubcommandData {
 
         clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
         sendMessage(Helper.getPlayerRepresentation(clearingPlayer, activeMap) + " cleared " + debtCountToClear + " debt tokens owned by " + Helper.getPlayerRepresentation(clearedPlayer, activeMap));
-        
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {
