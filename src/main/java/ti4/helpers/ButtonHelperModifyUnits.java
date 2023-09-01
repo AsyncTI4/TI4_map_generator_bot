@@ -467,6 +467,36 @@ public class ButtonHelperModifyUnits {
         if(!skipbuild.equalsIgnoreCase("skipbuild")){
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message2, buttons);
         }
+
+
+        if(player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "titans", event);
+        }
+        if(player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "saar", event);
+        }
+        if(player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "mentak", event);
+        }
+        if(player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "l1z1x", event);
+        }
+        if(player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander") && unitLong.equalsIgnoreCase("warsun")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "muaat", event);
+        }
+        if(player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "argent", event);
+        }
+        if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
+        }
+        if(player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "arborec", event);
+        }
+
+
+
+
         event.getMessage().delete().queue();
     }
     public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
