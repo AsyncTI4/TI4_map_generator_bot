@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
+
+import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
@@ -33,5 +35,9 @@ public abstract class GameSubcommandData extends SubcommandData {
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        if (event.getOption(Constants.GAME_NAME) != null) {
+            activeMap = MapManager.getInstance().getMap(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
+        }
+        
     }
 }
