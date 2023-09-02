@@ -949,6 +949,10 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes, votes + 5);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("startCabalAgent_")) {
+            ButtonHelperFactionSpecific.startCabalAgent(player, activeMap, buttonID, event);
+         } else if (buttonID.startsWith("cabalAgentCapture_")) {
+            ButtonHelperFactionSpecific.resolveCabalAgentCapture(buttonID, player, activeMap, event);
         } else if (buttonID.startsWith("arboAgentIn_")) {
             String pos = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             List<Button> buttons = ButtonHelperFactionSpecific.getUnitsToArboAgent(player, activeMap, event, activeMap.getTileByPosition(pos));
@@ -2067,6 +2071,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.addFollowedSC(5);
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                     ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
+                    ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, player);
                 }
                 case "sc_refresh_and_wash" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish and Wash");
@@ -2081,6 +2086,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.addFollowedSC(5);
                     ButtonHelper.addReaction(event, false, false, "Replenishing and washing", "");
                     ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
+                    ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, player);
                 }
                 case "sc_follow" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -2121,6 +2127,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
                             + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
                     ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
+                    ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, player);
                 }
                 case "score_imperial" -> {
                     if (player == null || activeMap == null) {
