@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.io.File;
 import java.util.*;
@@ -2064,6 +2065,12 @@ public class ButtonHelper {
         return buttons;
     }
     public static String getIdent(Player player){
+        return Helper.getFactionIconFromDiscord(player.getFaction());
+    }
+    public static String getIdentOrColor(Player player, Map activeMap){
+        if(activeMap.isFoWMode()){
+            return StringUtils.capitalize(player.getColor());
+        }
         return Helper.getFactionIconFromDiscord(player.getFaction());
     }
      
