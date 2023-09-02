@@ -300,6 +300,12 @@ public class ButtonHelperFactionSpecific {
     }
     public static boolean isCabalBlockadedByPlayer(Player player, Map activeMap, Player cabal){
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, cabal, "csd");
+        if(tiles == null || tiles.isEmpty()){
+            tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, cabal, "sd");
+        }
+        if(tiles == null || tiles.isEmpty()){
+            return false;
+        }
         for(Tile tile : tiles){
             if(FoWHelper.playerHasShipsInSystem(player, tile) && !FoWHelper.playerHasShipsInSystem(cabal, tile)){
                 return true;
@@ -327,17 +333,11 @@ public class ButtonHelperFactionSpecific {
         if(activeMap.isFoWMode()){
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
         }else{
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
         }
         
     }
-    public static List<Button> getCabalAgentButtonOptions(Player target, Map activeMap){
-        List<Button> units = new ArrayList<Button>();
-        int maxComms = target.getCommoditiesTotal();
-
-        
-        return units;
-    }
+   
     public static void executeCabalHero(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
         String pos = buttonID.replace("cabalHeroTile_","");
         Tile tile = activeMap.getTileByPosition(pos);
@@ -455,6 +455,80 @@ public class ButtonHelperFactionSpecific {
         buttons.add(validTile2);
         return buttons;
     }
+    public static void cabalAgentInitiation(Map activeMap, Player p2){
+
+        for(Player cabal : activeMap.getRealPlayers()){
+            if (cabal == p2){
+                continue;
+            }
+            if(cabal.hasLeader("cabalagent") && !cabal.getLeader("cabalagent").isExhausted()){
+                List<Button> buttons = new ArrayList<Button>();
+                String msg = ButtonHelper.getTrueIdentity(cabal, activeMap) + " you have the ability to use cabal agent on "+ButtonHelper.getIdentOrColor(p2, activeMap)+" who has "+p2.getCommoditiesTotal()+" commodities";
+                buttons.add(Button.success("startCabalAgent_"+p2.getFaction(), "Use Agent"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(activeMap), msg, buttons);
+            }
+        }
+        
+    }
+    public static void startCabalAgent(Player cabal, Map activeMap, String buttonID, ButtonInteractionEvent event){
+        String faction = buttonID.split("_")[1];
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+        List<Button> buttons = getUnitsForCabalAgent(cabal, activeMap, event, p2);
+        String msg = ButtonHelper.getTrueIdentity(cabal, activeMap) + " use buttons to capture a ship";
+        MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(activeMap), msg, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static List<Button> getUnitsForCabalAgent(Player player, Map activeMap, GenericInteractionCreateEvent event, Player p2) {
+        List<Button> buttons = new ArrayList<Button>();
+        int maxComms = p2.getCommoditiesTotal();
+        String unit2 = "";
+        Button unitButton2;
+
+        unit2 = "destroyer";
+        if(maxComms> 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, p2, unit2) < 8){
+            unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+
+        unit2 = "cruiser";
+        if(maxComms> 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, p2, unit2) < 8){
+            unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+        unit2 = "carrier";
+        if(maxComms> 2 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, p2, unit2) < 4){
+            
+            unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+        unit2 = "dreadnought";
+        if(maxComms> 3&& ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, p2, unit2) < 5){
+           
+            unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+        unit2 = "flagship";
+        if(maxComms> 7 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, p2, unit2) < 1){
+            
+            unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            buttons.add(unitButton2);
+        }
+
+        return buttons;
+
+    }
+    public static void resolveCabalAgentCapture(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
+        String unit = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeMap), ButtonHelper.getTrueIdentity(p2, activeMap)+" a "+unit+" of yours has been captured by a cabal agent. Any comms you had have been washed.");
+        p2.setTg(p2.getTg()+p2.getCommodities());
+        p2.setCommodities(0);
+        cabalEatsUnit(p2, activeMap, player, 1, unit, event);
+        event.getMessage().delete().queue();
+    }
+
     public static List<Button> getUnitsToArboAgent(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -601,11 +675,14 @@ public class ButtonHelperFactionSpecific {
         }else{
             p2.setCommodities(p2.getCommoditiesTotal());
             ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, p2, event);
+            ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, p2);
             message = "Refreshed " +p2.getColor()+ "'s commodities";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
     }
+
+    
 
     public static void distantSuns(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String bID = buttonID.replace("distant_suns_", "");
@@ -1201,6 +1278,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(channel, message);
                 ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
+                ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, player);
 
             }
         }

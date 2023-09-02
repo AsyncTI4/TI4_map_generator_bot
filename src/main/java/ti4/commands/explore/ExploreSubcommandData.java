@@ -264,6 +264,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
+                ButtonHelperFactionSpecific.cabalAgentInitiation(activeMap, player);
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
