@@ -1845,7 +1845,6 @@ public class Map {
 
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
-        Collections.shuffle(relics_);
         relics_.remove(Constants.ENIGMATIC_DEVICE); //Legacy, deck no longer includes this - can be removed once all games before pbd682 are finished
         if (relics_.isEmpty()) {
             return "";
