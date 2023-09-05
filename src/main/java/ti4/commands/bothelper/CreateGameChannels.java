@@ -151,7 +151,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-
         //PLAYERS
         ArrayList<Member> members = new ArrayList<>();
         Member gameOwner = null;
@@ -174,14 +173,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (missingMembers.size() > 0) {
-            sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "** and then try this command again.\n");
+            sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "**\n");
             sendMessage(Helper.getGuildInviteURL(guild));
-            sendMessage("### Please add a reaction to your name below once you've joined!");
             for (Member member : missingMembers) {
                 sendMessage("> " + member.getAsMention());
             }
-            sendMessage("### Please ping @Bothelper again once everyone has joined!");
-            return;
         }
 
         //CREATE ROLE
@@ -192,6 +188,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //ADD PLAYERS TO ROLE
         for (Member member : members) {
+            if (missingMembers.contains(member)) continue; //skip members who aren't on the new server yet
             guild.addRoleToMember(member, role).complete();
         }
 
