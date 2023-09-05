@@ -103,6 +103,16 @@ public class BotLogger {
                     t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
                 }));
             }
+        } else {
+            if (e == null) {
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
         }
     }
 
