@@ -348,6 +348,9 @@ public class ButtonHelperFactionSpecific {
         HashMap<String, Integer> units = new HashMap<String, Integer>();
         units.putAll(units1);
         for(Player p2 : activeMap.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
             if(FoWHelper.playerHasShipsInSystem(p2, tile) && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeMap, cabal)){
                 ButtonHelper.riftAllUnitsInASystem(pos, event, activeMap, p2, Helper.getFactionIconFromDiscord(p2.getFaction()), cabal);
             }
@@ -461,7 +464,7 @@ public class ButtonHelperFactionSpecific {
             if (cabal == p2){
                 continue;
             }
-            if(cabal.hasLeader("cabalagent") && !cabal.getLeader("cabalagent").isExhausted()){
+            if(cabal.hasLeader("cabalagent", activeMap) && !cabal.getLeader("cabalagent").isExhausted()){
                 List<Button> buttons = new ArrayList<Button>();
                 String msg = ButtonHelper.getTrueIdentity(cabal, activeMap) + " you have the ability to use cabal agent on "+ButtonHelper.getIdentOrColor(p2, activeMap)+" who has "+p2.getCommoditiesTotal()+" commodities";
                 buttons.add(Button.success("startCabalAgent_"+p2.getFaction(), "Use Agent"));
@@ -669,7 +672,7 @@ public class ButtonHelperFactionSpecific {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
         Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
         String message = "";
-        if(p2.hasLeader("hacanagent")){
+        if(p2 == player){
             p2.setCommodities(p2.getCommodities()+2);
             message = trueIdentity+"Increased your commodities by two";
         }else{
@@ -892,6 +895,15 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), ident + " is resolving mitosis");
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message, buttons);
         event.getMessage().delete().queue();
+    }
+    public static boolean doesAnyoneHaveThisLeader(String leaderID, Map activeMap){
+        boolean someoneHasIt = false;
+        for(Player player : activeMap.getRealPlayers()){
+            if(player.hasLeader(leaderID)){
+                someoneHasIt = true;
+            }
+        }
+        return someoneHasIt;
     }
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Map activeMap, String finChecker) {
         List<Button> planetButtons = new ArrayList<>();

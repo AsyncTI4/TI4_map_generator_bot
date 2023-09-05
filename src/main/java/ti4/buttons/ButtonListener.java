@@ -1109,7 +1109,7 @@ public class ButtonListener extends ListenerAdapter {
                         Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
                         buttons.add(sarweenButton);
                     }
-                    if (player.hasLeader("winnuagent")&&!player.getLeaderByID("winnuagent").isExhausted()&&!buttonID.equalsIgnoreCase("muaatagent")) {
+                    if (player.hasLeader("winnuagent", activeMap)&&!player.getLeaderByID("winnuagent").isExhausted()&&!buttonID.equalsIgnoreCase("muaatagent")) {
                         Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
                         buttons.add(winnuButton);
                     }
@@ -1135,7 +1135,7 @@ public class ButtonListener extends ListenerAdapter {
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                     }
                     systemButtons2 = new ArrayList<Button>();
-                    if(player.hasLeader("sardakkagent")&&!player.getLeaderByID("sardakkagent").isExhausted()){
+                    if(player.hasLeader("sardakkagent", activeMap)&&!player.getLeaderByID("sardakkagent").isExhausted()){
                         String message = trueIdentity+" You can use the button do sardakkcommander";
                         systemButtons2.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeMap, player));
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
@@ -2589,7 +2589,7 @@ public class ButtonListener extends ListenerAdapter {
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                     }
                     if(activeMap.getNaaluAgent()){
-                        player = Helper.getPlayerFromUnlockedLeader(activeMap, "naaluagent");
+                        player = activeMap.getPlayer(activeMap.getActivePlayer());
                         activeMap.setNaaluAgent(false);
                     }
                     
@@ -2826,6 +2826,19 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "orbitolDropExhaust" -> {
                     ButtonHelperFactionSpecific.oribtalDropExhaust(buttonID, event, activeMap, player, ident);
+                }
+                case "dominusOrb" -> {
+                    activeMap.setDominusOrb(true);
+                    String purgeOrExhaust = "Purged ";
+                    String relicId = "dominusorb";
+                        player.removeRelic(relicId);
+                        player.removeExhaustedRelic(relicId);
+                    String relicName = Mapper.getRelic(relicId).split(";")[0];
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),purgeOrExhaust + Emojis.Relic + " relic: " + relicName);
+                    event.getMessage().delete().queue();
+                    String message = "Choose a system to move from.";
+                    List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
                 case "getDiscardButtonsACs" -> {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player, false));

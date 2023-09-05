@@ -93,6 +93,8 @@ public class Map {
     @ExportableField
     private boolean naaluAgent = false;
     @ExportableField
+    private boolean dominusOrb = false;
+    @ExportableField
     private boolean componentAction = false;
     @ExportableField
     private boolean baseGameMode = false;
@@ -776,6 +778,9 @@ public class Map {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }  
+    public boolean getDominusOrbStatus() {
+        return dominusOrb;
+    } 
 
     public boolean getComponentAction() {
         return componentAction;
@@ -783,6 +788,9 @@ public class Map {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setDominusOrb(boolean onStatus) {
+        dominusOrb = onStatus;
     }
 
     public void setComponentAction(boolean onStatus) {
