@@ -17,13 +17,13 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
-            checkIfNewUserIsInExistingGameAndAutoAddRole(event.getGuild(), event.getUser());
+            checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
             BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
         }
     }
 
-    private void checkIfNewUserIsInExistingGameAndAutoAddRole(Guild guild, User user) {
+    private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Map> mapsJoined = new ArrayList<>();
         for (Map map : MapManager.getInstance().getMapList().values()) {
             if (map.getPlayers().containsKey(user.getId())) {
@@ -32,6 +32,6 @@ public class UserJoinServerListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(map.getBotMapUpdatesThread(), "User join the server late! Welcome to the game, " + user.getAsMention() + "! Pinging you here so you can see the bot-map-updates channel.");
             }
         }
-        BotLogger.log("User:" + user.getName() + " joined server: " + guild.getName() + ". Maps joined:\n> " + mapsJoined.stream().map(Map::getName).toList());
+        if (!mapsJoined.isEmpty()) BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined:\n> " + mapsJoined.stream().map(Map::getName).toList());
     }
 }
