@@ -88,7 +88,7 @@ public class MapGenerator {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
 
-        jda.addEventListener(new MessageListener(), new ButtonListener());
+        jda.addEventListener(new MessageListener(), new ButtonListener(), new UserJoinServerListener());
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
