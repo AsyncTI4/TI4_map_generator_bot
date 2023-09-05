@@ -207,7 +207,7 @@ public class SCPlay extends PlayerSubcommandData {
                     empNMahButtons.add(0,emelpar);    
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
                 }
-                if(player3.hasLeader("mahactagent") && !player3.getLeader("mahactagent").isExhausted() && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0){
+                if(player3.hasLeader("mahactagent", activeMap) && !player3.getLeader("mahactagent").isExhausted() && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0){
                     empNMahButtons.add(0,mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
                 }
