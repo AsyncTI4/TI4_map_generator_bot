@@ -9,11 +9,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.message.BotLogger;
 
 public class UserJoinServerListener extends ListenerAdapter {
     
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        checkIfNewUserIsInExistingGameAndAutoAddRole(event.getGuild(), event.getUser());
+        try {
+            checkIfNewUserIsInExistingGameAndAutoAddRole(event.getGuild(), event.getUser());
+        } catch (Exception e) {
+            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+        }
     }
 
     private void checkIfNewUserIsInExistingGameAndAutoAddRole(Guild guild, User user) {
@@ -24,5 +29,6 @@ public class UserJoinServerListener extends ListenerAdapter {
                 Helper.fixGameChannelPermissions(guild, map);
             }
         }
+        BotLogger.log("User:" + user.getName() + " joined server: " + guild.getName() + ". Maps joined:\n> " + mapsJoined.stream().map(Map::getName).toList());
     }
 }
