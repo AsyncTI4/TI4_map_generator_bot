@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
@@ -875,7 +876,10 @@ public class Player {
     public Leader getLeader(String leaderIdOrType) {
         Leader leader = getLeaderByID(leaderIdOrType);
         if (leader == null) {
-            return getLeaderByType(leaderIdOrType);
+            leader = getLeaderByType(leaderIdOrType);
+        }
+        if (leader == null && leaderIdOrType.contains("agent")) {
+            leader = getLeaderByID("yssarilagent");
         }
         return leader;
     }
@@ -897,6 +901,14 @@ public class Player {
                 return leader;
             }
         }
+        if(leaderID.contains("agent")){
+            leaderID = "yssarilagent";
+            for (Leader leader : leaders) {
+                if (leader.getId().equals(leaderID)) {
+                    return leader;
+                }
+            }
+        }
         return null;
     }
 
@@ -909,6 +921,12 @@ public class Player {
     }
 
     public boolean hasLeader(String leaderID) {
+        return getLeaderIDs().contains(leaderID);
+    }
+    public boolean hasLeader(String leaderID, ti4.map.Map activeMap) {
+        if(getLeaderIDs().contains(leaderID) == false && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeMap)){
+            return getLeaderIDs().contains("yssarilagent");
+        }
         return getLeaderIDs().contains(leaderID);
     }
 

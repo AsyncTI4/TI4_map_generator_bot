@@ -38,6 +38,7 @@ public class Constants {
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
     public static final String SHUTDOWN = "shutdown";

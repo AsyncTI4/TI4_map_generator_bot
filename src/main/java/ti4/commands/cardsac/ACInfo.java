@@ -155,8 +155,14 @@ public class ACInfo extends ACCardsSubcommandData {
                 for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
                     ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+                    
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    sb.append(actionCard.getRepresentation());
+                    if(actionCard == null){
+                        sb.append("Something broke here");
+                    }else{
+                        sb.append(actionCard.getRepresentation());
+                    }
+                    
                     index++;
                 }
             }
@@ -178,11 +184,11 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
-            if (player.hasLeader("nekroagent")&&!player.getLeaderByID("nekroagent").isExhausted()) {
+            if (player.hasLeader("nekroagent", activeMap)&& !player.getLeaderByID("nekroagent").isExhausted()) {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
                 acButtons.add(nekroButton);
             }
-            if (player.hasLeader("hacanagent")&&!player.getLeaderByID("hacanagent").isExhausted()) {
+            if (player.hasLeader("hacanagent", activeMap)&&!player.getLeaderByID("hacanagent").isExhausted()) {
                 Button nekroButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
                 acButtons.add(nekroButton);
             }

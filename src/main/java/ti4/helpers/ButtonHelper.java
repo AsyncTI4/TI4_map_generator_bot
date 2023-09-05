@@ -309,11 +309,11 @@ public class ButtonHelper {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
-            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 0) {
+            if (player.hasLeader("keleresagent", activeMap)&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 0) {
                 Button lost1C = Button.danger("reduceComm_1", "Spend 1 comm");
                 buttons.add(lost1C);
             }
-            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 1) {
+            if (player.hasLeader("keleresagent", activeMap)&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 1) {
                 Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
                 buttons.add(lost2C);
             }
@@ -706,8 +706,11 @@ public class ButtonHelper {
 
     }
 
-     public static boolean NomadHeroCheck(Player player, Map activeMap, Tile tile) {
+     public static boolean NomadHeroAndDomOrbCheck(Player player, Map activeMap, Tile tile) {
         boolean isFSThere = false;
+        if(activeMap.getDominusOrbStatus()){
+            return true;
+        }
 
         if(player.hasLeader("nomadhero")){
             Leader playerLeader = player.getLeader("nomadhero");
@@ -1476,7 +1479,7 @@ public class ButtonHelper {
         if(player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")){
             endButtons.add(Button.success(finChecker+"exhaustTech_bs", "Exhaust Bio-Stims"));
         }
-        if(player.hasLeader("naazagent")&& !player.getLeader("naazagent").isExhausted()){
+        if(player.hasLeader("naazagent", activeMap)&& !player.getLeader("naazagent").isExhausted()){
             endButtons.add(Button.success(finChecker+"exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naaz"))));
         }
 
@@ -1485,6 +1488,7 @@ public class ButtonHelper {
     }
     public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
+        activeMap.setDominusOrb(false);
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Button.success(finChecker+"tacticalAction", "Tactical Action ("+player.getTacticalCC()+")");
         int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(activeMap,player, event).size()-2;
@@ -1842,17 +1846,21 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
-			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue()) || ButtonHelper.NomadHeroCheck(player, activeMap, tileEntry.getValue()))) {
+			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue()) || ButtonHelper.NomadHeroAndDomOrbCheck(player, activeMap, tileEntry.getValue()))) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Button.success(finChecker+"tacticalMoveFrom_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
                 buttons.add(validTile);
 			}
 		}
-        if (player.hasLeader("saaragent")&&!player.getLeaderByID("saaragent").isExhausted()) {
+        if (player.hasLeader("saaragent", activeMap)&&!player.getLeaderByID("saaragent").isExhausted()) {
             Button saarButton = Button.secondary("exhaustAgent_saaragent", "Use Saar Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
             buttons.add(saarButton);
         }
-        if (player.hasLeader("ghostagent")&&!player.getLeaderByID("ghostagent").isExhausted() && FoWHelper.doesTileHaveWHs(activeMap, activeMap.getActiveSystem(), player)) {
+        if (player.hasRelic("dominusorb")) {
+            Button domButton = Button.secondary("dominusOrb", "Purge Dominus Orb");
+            buttons.add(domButton);
+        }
+        if (player.hasLeader("ghostagent", activeMap)&&!player.getLeaderByID("ghostagent").isExhausted() && FoWHelper.doesTileHaveWHs(activeMap, activeMap.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("ghost")));
             buttons.add(ghostButton);
         }
@@ -2057,7 +2065,7 @@ public class ButtonHelper {
         buttons.add(buildButton);
         Button rift = Button.success(finChecker+"getRiftButtons_"+tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("grift")));
         buttons.add(rift);
-        if(player.hasLeader("sardakkagent")&&!player.getLeaderByID("sardakkagent").isExhausted()){
+        if(player.hasLeader("sardakkagent", activeMap)&&!player.getLeaderByID("sardakkagent").isExhausted()){
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeMap, player));
         }
         Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
@@ -3226,8 +3234,36 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 String factionEmoji =Helper.getFactionLeaderEmoji(leader);
                 if(leaderAbilityWindow.equalsIgnoreCase("ACTION:") || leaderName.contains("Ssruu"))
                 {
-                    Button lButton = Button.secondary(finChecker+prefix+"leader_"+leaderID, "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
-                    compButtons.add(lButton);
+                    if(leaderName.contains("Ssruu")){
+                        String led = "muaatagent";
+                        if(!p1.hasLeader(led) && p1.hasLeader(led, activeMap)){
+                            Button lButton = Button.secondary(finChecker+prefix+"leader_"+led, "Use "+leaderName+ " as Muaat agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
+                        led = "naaluagent";
+                        if(!p1.hasLeader(led) && p1.hasLeader(led, activeMap)){
+                            Button lButton = Button.secondary(finChecker+prefix+"leader_"+led, "Use "+leaderName+ " as Naalu agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
+                        led = "arborecagent";
+                        if(!p1.hasLeader(led) && p1.hasLeader(led, activeMap)){
+                            Button lButton = Button.secondary(finChecker+prefix+"leader_"+led, "Use "+leaderName+ " as Arborec agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
+                        led = "xxchaagent";
+                        if(!p1.hasLeader(led) && p1.hasLeader(led, activeMap)){
+                            Button lButton = Button.secondary(finChecker+prefix+"leader_"+led, "Use "+leaderName+ " as Xxcha agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
+                        led = "yssarilagent";
+                        Button lButton = Button.secondary(finChecker+prefix+"leader_"+led, "Use "+leaderName+ " as Unimplemented Component Agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                        compButtons.add(lButton);
+                        
+                    }else{
+                        Button lButton = Button.secondary(finChecker+prefix+"leader_"+leaderID, "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
+                        compButtons.add(lButton);
+                    }
+                    
                 }else if(leaderID.equalsIgnoreCase("mahactcommander") && p1.getTacticalCC() > 0 && ButtonHelper.getTilesWithYourCC(p1,activeMap,event).size()>0){
                      Button lButton = Button.secondary(finChecker+"mahactCommander", "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
                     compButtons.add(lButton);
