@@ -13,6 +13,7 @@ import ti4.message.BotLogger;
 
 public class UserJoinServerListener extends ListenerAdapter {
     
+    @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
             checkIfNewUserIsInExistingGameAndAutoAddRole(event.getGuild(), event.getUser());
