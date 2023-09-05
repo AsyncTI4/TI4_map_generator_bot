@@ -444,6 +444,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeMap.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.DOMINUS_ORB + " " + activeMap.getDominusOrbStatus());
+        writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeMap.getComponentAction());
         writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVATION_COUNT + " " + activeMap.getActivationCount());
@@ -1361,6 +1363,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeMap.setNaaluAgent(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.DOMINUS_ORB -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setDominusOrb(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
