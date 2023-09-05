@@ -45,35 +45,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
         addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.STRING, Constants.SERVER, "Server to create the channels on (Primary or Secondary) - default is smart selection").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = null;
-
-        // //SERVER TO CREATE ON
-        // OptionMapping serverOption = event.getOption(Constants.SERVER);
-        // if (serverOption != null ) {
-        //     if (serverOption.getAsString().equalsIgnoreCase("Primary")) {
-        //         guild = MapGenerator.guildPrimary;
-        //     } else if (serverOption.getAsString().equalsIgnoreCase("Secondary")) {
-        //         guild = MapGenerator.guildSecondary;
-        //     } else {
-        //         sendMessage("Bad server **" + serverOption.getAsString() + "**. Try again.");
-        //         return;
-        //     }
-        //     if (!serverCanHostNewGame(guild)) {
-        //         sendMessage("Server **" + guild.getName() + "** is not available for new games.");
-        //         return;
-        //     }
-        // } else {
-        //     guild = getNextAvailableServer();
-        //     if (guild == null) {
-        //         sendMessage("No server available for new games.");
-        //         return;
-        //     }
-        // }
 
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
