@@ -151,6 +151,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (missingMembers.size() > 0) {
             sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "**\n");
             sendMessage(Helper.getGuildInviteURL(guild));
+            sendMessage("The following players were not on the above server:");
             for (Member member : missingMembers) {
                 sendMessage("> " + member.getAsMention());
             }
