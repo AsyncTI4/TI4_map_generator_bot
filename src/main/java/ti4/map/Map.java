@@ -2146,7 +2146,7 @@ public class Map {
     }
 
     public void setRelics(ArrayList<String> deck) {
-        deck = new ArrayList<>(new HashSet<>(deck));
+        deck = new ArrayList<>(deck);
         relics = deck;
     }
 
@@ -2185,28 +2185,54 @@ public class Map {
         this.actionCards = actionCards;
     }
 
-    public void validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
         if (this.getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
-            return;
+            return false;
         }
         for (Player player : this.getPlayers().values()) {
             if (player.getActionCards().size() > 0) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
-                return;
+                return false;
             }
         }
         setAcDeckID(deck.getAlias());
         this.setActionCards(deck.getShuffledCardList());
+        return true;
     }
 
-    public void validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetRelicDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        for (Player player : this.getPlayers().values()) {
+            if (player.getRelics().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change relic deck while there are relics in player hands.");
+                return false;
+            }
+        }
+        setRelicDeckID(deck.getAlias());
+        this.setRelics(new ArrayList<>(deck.getShuffledCardList()));
+        return true;
+    }
+
+    public boolean validateAndSetSecretObjectiveDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        for (Player player : this.getPlayers().values()) {
+            if (player.getSecrets().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change secret objective deck while there are secret objectives in player hands.");
+                return false;
+            }
+        }
+        setSoDeckID(deck.getAlias());
+        this.setSecretObjectives(deck.getShuffledCardList());
+        return true;
+    }
+
+    public boolean validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
         if (this.getDiscardAgendas().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
-            return;
+            return false;
         }
         setAgendaDeckID(deck.getAlias());
         this.setAgendas(deck.getShuffledCardList());
+        return true;
     }
 
     @JsonSetter
