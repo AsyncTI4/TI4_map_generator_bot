@@ -73,7 +73,7 @@ public class GameCommand implements Command {
             MapSaveLoadManager.saveMap(activeMap, event);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING)) {
+        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
             MessageHelper.replyToMessage(event, file);
         }
     }

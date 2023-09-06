@@ -1444,7 +1444,7 @@
     "name": "Adrenaline Shots",
     "phase": "Action",
     "window": "After you exhaust 1 of your agents",
-    "text": "Ready that agent or gain 2 commodities.",
+    "text": "Ready that agent or unlock your commander.",
     "flavorText": "Suffi was exhausted from the haul. After months of casing trade vessels, she had finally found what those pesky Tribesmen had paid so handsomely for. One of her crew handed her a vial from the thousands that had been stashed away inconspicuously. Without hesitation, she drank deeply from it.",
     "source": "action_deck_2"
   },
@@ -1453,7 +1453,7 @@
     "name": "Adrenaline Shots",
     "phase": "Action",
     "window": "After you exhaust 1 of your agents",
-    "text": "Ready that agent or gain 2 commodities.",
+    "text": "Ready that agent or unlock your commander.",
     "flavorText": "Suffi was exhausted from the haul. After months of casing trade vessels, she had finally found what those pesky Tribesmen had paid so handsomely for. One of her crew handed her a vial from the thousands that had been stashed away inconspicuously. Without hesitation, she drank deeply from it.",
     "source": "action_deck_2"
   },
@@ -1470,8 +1470,8 @@
     "alias": "ancient_trade_routes",
     "name": "Ancient Trade Routes",
     "phase": "Action",
-    "window": "After you activate a system that does not contain planets",
-    "text": "Replenish your commodities. During this turn, you can negotiate transactions with players who are not your neighbor.",
+    "window": "At the start of your turn",
+    "text": "During this turn, you can negotiate transactions with players who are not your neighbor and players who resolve transactions gain 1 commodity.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary. The Nomad's coffers will be filled.\"",
     "source": "action_deck_2"
   },
@@ -1579,7 +1579,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 7 resources to gain 1 relic.",
+    "text": "Purge any 2 of your relic fragments and spend 3 resources to gain 1 relic.",
     "flavorText": "Carth breathed in the familiar air of Silver Sands. Home. Were it that he never had to leave. Were it that he was not here on such dark business.",
     "source": "action_deck_2"
   },
@@ -1597,7 +1597,7 @@
     "name": "Brutal Occupation",
     "phase": "Action",
     "window": "After you gain control of a planet",
-    "text": "Ready that planet and gain 2 commodities.",
+    "text": "Ready that planet or gain 2 commodities.",
     "flavorText": "Cabal cultists were known to quell threats of rebellion with stories of their penal colonies on the other side of the rift.",
     "source": "action_deck_2"
   },
@@ -1632,7 +1632,7 @@
     "alias": "close_quarters",
     "name": "Close Quarters",
     "phase": "Action",
-    "window": "At the start of a combat",
+    "window": "At the start of a combat you are participating in",
     "text": "Apply +3 to the result of each unit's combat rolls during this combat.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
@@ -1669,7 +1669,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for the resolved outcome gains 2 trade goods.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
     "flavorText": "As he signed the last of the costly trade deals, Mot Nesretep sank back into his chair. It was a gamble with the fate of the galaxy at stake, but his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -1678,7 +1678,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for the resolved outcome gains 2 trade goods.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
     "flavorText": "As he signed the last of the costly trade deals, Mot Nesretep sank back into his chair. It was a gamble with the fate of the galaxy at stake, but his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },
@@ -1786,7 +1786,7 @@
     "name": "Deflection Tactics",
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
-    "text": "Choose 1 strategy card. No player may choose that strategy card during this strategy phase, if they have another choice.",
+    "text": "Choose 1 strategy card. Other players must spend 1 strategy token to choose that strategy card during this strategy phase, if they have another choice.",
     "flavorText": "The old Tribesman's large eyes flickered in the light of the campfire as he spoke. \"The greatest form of persuasion lies in coercing another to believe the course of action you wish for them to take was their idea all along.\"",
     "source": "action_deck_2"
   },
@@ -1831,7 +1831,7 @@
     "name": "Fire for Effect",
     "phase": "Action",
     "window": "At the end of a round of space combat",
-    "text": "Your units may use their SPACE CANNON abilities against your opponent's ships.",
+    "text": "Your units use their SPACE CANNON abilities against your opponent's ships.",
     "flavorText": "Trrakan had stockpiled munitions for this moment. If the reports were correct, and their forces were able to stave off the invasion for long enough, the enemy would find themselves under near continuous fire.",
     "source": "action_deck_2"
   },
@@ -1840,7 +1840,7 @@
     "name": "Fire for Effect",
     "phase": "Action",
     "window": "At the end of a round of space combat",
-    "text": "Your units may use their SPACE CANNON abilities against your opponent's ships.",
+    "text": "Your units use their SPACE CANNON abilities against your opponent's ships.",
     "flavorText": "Trrakan had stockpiled munitions for this moment. If the reports were correct, and their forces were able to stave off the invasion for long enough, the enemy would find themselves under near continuous fire.",
     "source": "action_deck_2"
   },
@@ -1849,7 +1849,7 @@
     "name": "Firing Solution ",
     "phase": "Action",
     "window": "At the end of a round of space combat",
-    "text": "Your units may use their ANTI-FIGHTER BARRAGE abilities against your opponent's ships.",
+    "text": "Your units use their ANTI-FIGHTER BARRAGE abilities against your opponent's ships.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked on to the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
     "source": "action_deck_2"
   },
@@ -1939,7 +1939,7 @@
     "name": "Impeachment",
     "phase": "Strategy",
     "window": "At the end of the strategy phase",
-    "text": "If the \"Politics\" strategy card is in another player's play area, you may take it and give that player 1 of your other strategy cards; otherwise, choose 1 player to gain the speaker token.",
+    "text": "If the \"Politics\" strategy card is in another player's play area, take it and give that player 1 of your other strategy cards; otherwise, gain the speaker token.",
     "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
     "source": "action_deck_2"
   },
@@ -2092,7 +2092,7 @@
     "name": "Psychological Operations",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "No player may spend a command token to perform the secondary ability of your strategy card during this strategic action.",
+    "text": "Choose 1 player; that player cannot spend a command token to perform the secondary ability of your strategy card during this strategic action.",
     "flavorText": "Ssruu did not answer, not even with a change in expression, when asked how he could be certain that the others would forgo pressuring the Custodians.",
     "source": "action_deck_2"
   },
@@ -2101,7 +2101,7 @@
     "name": "Public Outcry",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "During this agenda, players may not abstain if they are able to cast votes, and those who vote for or predict the correct outcome of this agenda must discard 1 action card; if you discard an action card due to this effect, draw 1 action card.",
+    "text": "During this agenda, players cannot abstain if they are able to cast votes. If you did not cast votes for the resolved outcome of this agenda, each player who did must discard 1 action card.",
     "flavorText": "The public was split, and equally outraged. This was a game of cutting one's losses.",
     "source": "action_deck_2"
   },
@@ -2110,7 +2110,7 @@
     "name": "Public Outcry",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "During this agenda, players may not abstain if they are able to cast votes, and those who vote for or predict the correct outcome of this agenda must discard 1 action card; if you discard an action card due to this effect, draw 1 action card.",
+    "text": "During this agenda, players cannot abstain if they are able to cast votes. If you did not cast votes for the resolved outcome of this agenda, each player who did must discard 1 action card.",
     "flavorText": "The public was split, and equally outraged. This was a game of cutting one's losses.",
     "source": "action_deck_2"
   },
@@ -2227,7 +2227,7 @@
     "name": "Shock and Awe",
     "phase": "Action",
     "window": "Before you roll dice for Bombardment",
-    "text": "Choose 1 of your ships with Bombardment in the active system. That ship may roll 2 additional dice.",
+    "text": "Choose 1 of your ships with Bombardment in the active system; that ship rolls 2 additional dice.",
     "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
     "source": "action_deck_2"
   },
@@ -2272,7 +2272,7 @@
     "name": "Side Project",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 4 influence or resources to research a technology that has no prerequisites.",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
     "source": "action_deck_2"
   },
@@ -2281,7 +2281,7 @@
     "name": "Side Project",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 4 influence or resources to research a technology that has no prerequisites.",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
     "source": "action_deck_2"
   },
@@ -2290,7 +2290,7 @@
     "name": "Side Project",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 4 influence or resources to research a technology that has no prerequisites.",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
     "source": "action_deck_2"
   },
@@ -2299,7 +2299,7 @@
     "name": "Side Project",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 4 influence or resources to research a technology that has no prerequisites.",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
     "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
     "source": "action_deck_2"
   },
@@ -2317,7 +2317,7 @@
     "name": "Smuggler Routes",
     "phase": "Status",
     "window": "At the start of the status phase",
-    "text": "Choose and move 1 of your non-fighter ships to an adjacent system that does not contain another player's ships.",
+    "text": "Choose 1 revealed public objective. During this status phase, when a player scores that objective, gain 1 trade good and you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
     "flavorText": "\"From Dirzuga to massive Letani, the whole symphony in every spore. You want infantry? I've got plenty. But who cares? No big deal. I want more... I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
@@ -2344,7 +2344,7 @@
     "name": "Stasis Haul",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "Apply +1 to the capacity value of each of your ships during this tactical action.",
+    "text": "Apply +1 to the capacity value of each of your non-fighter ships during this tactical action.",
     "flavorText": "The cargo ships blasted out of the planet's gravity field. Their destination was weeks away, if not months. For all, it meant the promise of new life. For some, it would mean death.",
     "source": "action_deck_2"
   },
@@ -2452,7 +2452,7 @@
     "name": "Transference Protocol",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. Then, place a command token from your reinforcements in that system.",
+    "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units.",
     "flavorText": "Jace whistled a sign of admiration at the Admiral's logistical prowess, \"They never taught us that at the academy...\"",
     "source": "action_deck_2"
   },
@@ -2460,8 +2460,8 @@
     "alias": "virulent_gas_canisters",
     "name": "Virulent Gas Canisters",
     "phase": "Action",
-    "window": "Before your units use Bombardment or Space Cannon against another player's ground forces",
-    "text": "Apply +1 to the result of each die roll; hits produced by these rolls cannot be assigned to mechs.",
+    "window": "After your unit's Bombardment or Space Cannon ability produces a hit against another player's ground forces",
+    "text": "Destroy half of that player's infantry on that planet, rounded up.",
     "flavorText": "Dart and Tai knew the ancient canisters of Exterrix gas would come in handy.",
     "source": "action_deck_2"
   },
