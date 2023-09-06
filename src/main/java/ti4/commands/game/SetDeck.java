@@ -19,7 +19,7 @@ public class SetDeck extends GameSubcommandData {
     private List<String> deckTypes;
 
     public SetDeck() {
-        super(Constants.SET_DECK, "Change game decks");
+        super(Constants.SET_DECK, "Change game card decks");
         deckTypes = new ArrayList<>();
         addDefaultOption(Constants.AC_DECK, "AC");
         addDefaultOption(Constants.SO_DECK, "SO");
@@ -51,9 +51,8 @@ public class SetDeck extends GameSubcommandData {
                     DeckModel deckModel = Mapper.getDecks().get(value);
                     if (setDeck(event, activeMap, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
-                    }
-                    else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong, and the deck " + value + " could not be found, try executing the command again (without copy/pasting).");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
             }
@@ -61,7 +60,7 @@ public class SetDeck extends GameSubcommandData {
 
         if(CollectionUtils.isNotEmpty(changedDecks.keySet())) {
             List<String> changeMessage = new ArrayList<>();
-            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n> " + deck.getDescription()));
+            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n>>> " + deck.getDescription()));
             MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
     }
@@ -74,30 +73,34 @@ public class SetDeck extends GameSubcommandData {
     public static boolean setDeck(SlashCommandInteractionEvent event, Map activeMap, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
             switch (deckType) {
-                case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
+                case Constants.AC_DECK -> {
+                    return activeMap.validateAndSetActionCardDeck(event, deckModel);
+                }
                 case Constants.SO_DECK -> {
-                    activeMap.setSecretObjectives(deckModel.getShuffledCardList());
-                    activeMap.setSoDeckID(deckModel.getAlias());
+                    return activeMap.validateAndSetSecretObjectiveDeck(event, deckModel);
                 }
                 case Constants.STAGE_1_PUBLIC_DECK -> {
                     activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
                     activeMap.setStage1PublicDeckID(deckModel.getAlias());
+                    return true;
                 }
                 case Constants.STAGE_2_PUBLIC_DECK -> {
                     activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
                     activeMap.setStage2PublicDeckID(deckModel.getAlias());
+                    return true;
                 }
                 case Constants.RELIC_DECK -> {
-                    activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
-                    activeMap.setRelicDeckID(deckModel.getAlias());
+                    return activeMap.validateAndSetRelicDeck(event, deckModel);
                 }
-                case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
+                case Constants.AGENDA_DECK -> {
+                    return activeMap.validateAndSetAgendaDeck(event, deckModel);
+                }
                 case Constants.EXPLORATION_DECKS -> {
                     activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
                     activeMap.setExplorationDeckID(deckModel.getAlias());
+                    return true;
                 }
             }
-            return true;
         }
         return false;
     }
