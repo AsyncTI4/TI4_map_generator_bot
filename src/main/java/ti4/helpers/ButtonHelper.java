@@ -1257,7 +1257,7 @@ public class ButtonHelper {
         return buttons;
     }
      public static void checkFleetAndCapacity(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
-        return;
+        
         int armadaValue = 0;
         if(player.hasAbility("armada")){
             armadaValue = 2;
