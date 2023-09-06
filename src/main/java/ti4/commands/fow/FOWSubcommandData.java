@@ -47,7 +47,7 @@ public abstract class FOWSubcommandData extends SubcommandData {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+       // File file = GenerateMap.getInstance().saveImage(activeMap, event);
+      //  MessageHelper.replyToMessage(event, file);
     }
 }

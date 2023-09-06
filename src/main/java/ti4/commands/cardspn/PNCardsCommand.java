@@ -110,7 +110,7 @@ public class PNCardsCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap, event);
-        GenerateMap.getInstance().saveImage(activeMap, event);
+       // GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
     protected String getActionDescription() {
