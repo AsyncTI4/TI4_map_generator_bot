@@ -273,7 +273,7 @@ abstract public class AddRemoveUnits implements Command {
         }
         
         if(this.getActionDescription().toLowerCase().contains("add units")){
-             ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
+            // ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
         actionAfterAll(event, tile, color, activeMap);
     }
@@ -438,8 +438,8 @@ abstract public class AddRemoveUnits implements Command {
         }
        System.out.println(this.getActionDescription());
         if(this.getActionDescription().toLowerCase().contains("add units")){
-            System.out.println("sup2");
-             ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
+            
+           //  ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
        
     }
