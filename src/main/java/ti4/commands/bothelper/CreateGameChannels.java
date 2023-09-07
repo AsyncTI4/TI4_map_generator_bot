@@ -45,35 +45,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
         addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.STRING, Constants.SERVER, "Server to create the channels on (Primary or Secondary) - default is smart selection").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = null;
-
-        // //SERVER TO CREATE ON
-        // OptionMapping serverOption = event.getOption(Constants.SERVER);
-        // if (serverOption != null ) {
-        //     if (serverOption.getAsString().equalsIgnoreCase("Primary")) {
-        //         guild = MapGenerator.guildPrimary;
-        //     } else if (serverOption.getAsString().equalsIgnoreCase("Secondary")) {
-        //         guild = MapGenerator.guildSecondary;
-        //     } else {
-        //         sendMessage("Bad server **" + serverOption.getAsString() + "**. Try again.");
-        //         return;
-        //     }
-        //     if (!serverCanHostNewGame(guild)) {
-        //         sendMessage("Server **" + guild.getName() + "** is not available for new games.");
-        //         return;
-        //     }
-        // } else {
-        //     guild = getNextAvailableServer();
-        //     if (guild == null) {
-        //         sendMessage("No server available for new games.");
-        //         return;
-        //     }
-        // }
 
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
@@ -151,7 +127,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-
         //PLAYERS
         ArrayList<Member> members = new ArrayList<>();
         Member gameOwner = null;
@@ -174,14 +149,12 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (missingMembers.size() > 0) {
-            sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "** and then try this command again.\n");
+            sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "**\n");
             sendMessage(Helper.getGuildInviteURL(guild));
-            sendMessage("### Please add a reaction to your name below once you've joined!");
+            sendMessage("The following players were not on the above server:");
             for (Member member : missingMembers) {
                 sendMessage("> " + member.getAsMention());
             }
-            sendMessage("### Please ping @Bothelper again once everyone has joined!");
-            return;
         }
 
         //CREATE ROLE
@@ -192,6 +165,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //ADD PLAYERS TO ROLE
         for (Member member : members) {
+            if (missingMembers.contains(member)) continue; //skip members who aren't on the new server yet
             guild.addRoleToMember(member, role).complete();
         }
 

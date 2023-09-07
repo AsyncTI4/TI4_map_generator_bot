@@ -72,7 +72,7 @@ public class TechInfo extends TechSubcommandData {
         HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
         java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : playerTechs) {
-            String techType = Mapper.getTechType(tech);
+            String techType = Mapper.getTechType(tech).toString().toLowerCase();
             List<String> techList = techsFiltered.get(techType);
             if (techList == null) {
                 techList = new ArrayList<>();
@@ -80,6 +80,7 @@ public class TechInfo extends TechSubcommandData {
             techList.add(tech);
             techsFiltered.put(techType, techList);
         }
+        
         for (java.util.Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
             list.sort(new Comparator<String>() {
