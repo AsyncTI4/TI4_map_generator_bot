@@ -2017,4 +2017,24 @@ public class Helper {
         }
         return inviteUrl;
     }
+
+    public static String getTimeRepresentationToSeconds(long millis) {
+        long averageTurnTime = millis / 1000; //total seconds (truncates)
+        long seconds = averageTurnTime % 60;
+        averageTurnTime = averageTurnTime / 60; //total minutes (truncates)
+        long minutes = averageTurnTime % 60;
+        long hours = averageTurnTime / 60; //total hours (truncates)
+
+        return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
+    }
+
+    // the array double[] m MUST BE SORTED
+    public static long median(List<Long> turnTimes) {
+        int middle = turnTimes.size()/2;
+        if (turnTimes.size()%2 == 1) {
+            return turnTimes.get(middle);
+        } else {
+            return (turnTimes.get(middle - 1) + turnTimes.get(middle)) / 2;
+        }
+    }
 }
