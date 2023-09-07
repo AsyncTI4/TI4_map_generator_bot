@@ -454,6 +454,7 @@ public class MessageHelper {
     public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
+			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
             channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(channel, messageToSend);
@@ -463,6 +464,7 @@ public class MessageHelper {
 	public static void sendMessageEmbedsToThread(MessageChannelUnion channel, String threadName, List<MessageEmbed> embeds) {
 		if (channel == null || threadName == null || embeds == null || threadName.isEmpty() || embeds.isEmpty()) return;
 		if (channel instanceof TextChannel) {
+			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
             channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
 				.queueAfter(500, TimeUnit.MILLISECONDS, t -> {
 					for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message

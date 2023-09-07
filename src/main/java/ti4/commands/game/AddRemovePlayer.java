@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -55,6 +56,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 
         User user = event.getUser();
         action(event, activeMap, user);
+        Helper.fixGameChannelPermissions(event.getGuild(), activeMap);
         MapSaveLoadManager.saveMap(activeMap, event);
         MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
     }

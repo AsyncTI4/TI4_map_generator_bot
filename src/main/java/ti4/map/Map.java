@@ -1853,7 +1853,6 @@ public class Map {
 
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
-        Collections.shuffle(relics_);
         relics_.remove(Constants.ENIGMATIC_DEVICE); //Legacy, deck no longer includes this - can be removed once all games before pbd682 are finished
         if (relics_.isEmpty()) {
             return "";
@@ -2147,7 +2146,7 @@ public class Map {
     }
 
     public void setRelics(ArrayList<String> deck) {
-        deck = new ArrayList<>(new HashSet<>(deck));
+        deck = new ArrayList<>(deck);
         relics = deck;
     }
 
@@ -2186,28 +2185,54 @@ public class Map {
         this.actionCards = actionCards;
     }
 
-    public void validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
         if (this.getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
-            return;
+            return false;
         }
         for (Player player : this.getPlayers().values()) {
             if (player.getActionCards().size() > 0) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
-                return;
+                return false;
             }
         }
         setAcDeckID(deck.getAlias());
         this.setActionCards(deck.getShuffledCardList());
+        return true;
     }
 
-    public void validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetRelicDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        for (Player player : this.getPlayers().values()) {
+            if (player.getRelics().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change relic deck while there are relics in player hands.");
+                return false;
+            }
+        }
+        setRelicDeckID(deck.getAlias());
+        this.setRelics(new ArrayList<>(deck.getShuffledCardList()));
+        return true;
+    }
+
+    public boolean validateAndSetSecretObjectiveDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        for (Player player : this.getPlayers().values()) {
+            if (player.getSecrets().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change secret objective deck while there are secret objectives in player hands.");
+                return false;
+            }
+        }
+        setSoDeckID(deck.getAlias());
+        this.setSecretObjectives(deck.getShuffledCardList());
+        return true;
+    }
+
+    public boolean validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
         if (this.getDiscardAgendas().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
-            return;
+            return false;
         }
         setAgendaDeckID(deck.getAlias());
         this.setAgendas(deck.getShuffledCardList());
+        return true;
     }
 
     @JsonSetter
@@ -2298,8 +2323,13 @@ public class Map {
     }
 
     @JsonIgnore
-    public Set<Player> getRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toSet());
+    public List<Player> getRealPlayers() {
+        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getNotRealPlayers() {
+        return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -2413,8 +2443,6 @@ public class Map {
     public void clearPlanetsCache(){
         planets.clear();
     }
-
-   
 
     @JsonIgnore
     public Set<String> getPlanets() {
@@ -2571,7 +2599,8 @@ public class Map {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { //dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    leaders.add( pnOwner.getLeaderByType(Constants.COMMANDER) );
+                    Leader playerLeader = pnOwner.getLeaderByType(Constants.COMMANDER).orElse(null);
+                    leaders.add(playerLeader);
                 }
             }
         }
@@ -2581,11 +2610,12 @@ public class Map {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    leaders.add( otherPlayer.getLeaderByType(Constants.COMMANDER) );
+                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
+                    leaders.add(playerLeader);
                 }
             }
         }
-        leaders = leaders.stream().filter(leader -> !leader.isLocked()).collect(Collectors.toList());
+        leaders = leaders.stream().filter(leader -> leader != null && !leader.isLocked()).collect(Collectors.toList());
         return leaders;
     }
 
@@ -2615,5 +2645,114 @@ public class Map {
 
     public StrategyCardModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
+    }
+
+    public int getActionCardDeckSize() {
+        return getActionCards().size();
+    }
+
+    public int getActionCardFullDeckSize() {
+        DeckModel acDeckModel = Mapper.getDeck(getAcDeckID());
+        if (acDeckModel != null) return acDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getAgendaDeckSize() {
+        return getAgendas().size();
+    }
+
+    public int getAgendaFullDeckSize() {
+        DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
+        if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getPublicObjectives1DeckSize() {
+        return getPublicObjectives1().size();
+    }
+
+    public int getPublicObjectives1FullDeckSize() {
+        DeckModel po1DeckModel = Mapper.getDeck(getStage1PublicDeckID());
+        if (po1DeckModel != null) return po1DeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getPublicObjectives2DeckSize() {
+        return getPublicObjectives2().size();
+    }
+
+    public int getPublicObjectives2FullDeckSize() {
+        DeckModel po2DeckModel = Mapper.getDeck(getStage2PublicDeckID());
+        if (po2DeckModel != null) return po2DeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getRelicDeckSize() {
+        return getAllRelics().size();
+    }
+
+    public int getRelicFullDeckSize() {
+        DeckModel relicDeckModel = Mapper.getDeck(getRelicDeckID());
+        if (relicDeckModel != null) return relicDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getSecretObjectiveDeckSize() {
+        return getSecretObjectives().size();
+    }
+
+    public int getSecretObjectiveFullDeckSize() {
+        DeckModel soDeckModel = Mapper.getDeck(getSoDeckID());
+        if (soDeckModel != null) return soDeckModel.getCardCount();
+        return -1;
+    }
+
+    private int getExploreDeckSize(String exploreDeckID) {
+        return getExploreDeck(exploreDeckID).size();
+    }
+    
+    private int getExploreDeckFullSize(String exploreDeckID) {
+        DeckModel exploreDeckModel = Mapper.getDeck(getExplorationDeckID());
+        if (exploreDeckModel == null) return -1;
+        List<String> exploreDeck = new ArrayList<>();
+        for (String exploreCardID : exploreDeckModel.getCardIDs()) {
+            String exploreCard = Mapper.getExplore(exploreCardID);
+            if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
+                exploreDeck.add(exploreCard);
+            }
+        }
+        return exploreDeck.size();
+    }
+
+    public int getHazardousExploreDeckSize() {
+        return getExploreDeckSize(Constants.HAZARDOUS);
+    }
+
+    public int getHazardousExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.HAZARDOUS);
+    }
+
+    public int getCulturalExploreDeckSize() {
+        return getExploreDeckSize(Constants.CULTURAL);
+    }
+
+    public int getCulturalExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.CULTURAL);
+    }
+
+    public int getIndustrialExploreDeckSize() {
+        return getExploreDeckSize(Constants.INDUSTRIAL);
+    }
+
+    public int getIndustrialExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.INDUSTRIAL);
+    }
+
+    public int getFrontierExploreDeckSize() {
+        return getExploreDeckSize(Constants.FRONTIER);
+    }
+
+    public int getFrontierExploreFullDeckSize() {
+        return getExploreDeckFullSize(Constants.FRONTIER);
     }
 }
