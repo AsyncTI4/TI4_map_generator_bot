@@ -8,9 +8,6 @@ import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -338,11 +335,13 @@ public class ButtonListener extends ListenerAdapter {
             String faction = buttonID.replace("yinHeroTarget_", "");
             List<Button> buttons = new ArrayList<Button>();
             Player target = Helper.getPlayerFromColorOrFaction(activeMap, faction);
-            for(String planet : target.getPlanets()){
-                buttons.add(Button.success(finsFactionCheckerPrefix+"yinHeroPlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
+            if (target != null) {
+                for(String planet : target.getPlanets()){
+                    buttons.add(Button.success(finsFactionCheckerPrefix+"yinHeroPlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which planet to invade", buttons);
+                event.getMessage().delete().queue();
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which planet to invade", buttons);
-            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("yinHeroStart")) {
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "yinHeroTarget",null);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
@@ -430,22 +429,23 @@ public class ButtonListener extends ListenerAdapter {
             MessageChannel channel = ButtonHelper.getSCFollowChannel(activeMap, player, scnum);
             if(buttonID.contains("mahact")){
                 MessageHelper.sendMessageToChannel(channel, ident + " exhausted Mahact agent to follow SC#"+scnum);
-                Leader playerLeader = player.getLeader("mahactagent");
-                playerLeader.setExhausted(true);
-                for(Player p2 : activeMap.getPlayers().values()){
-                    for(Integer sc2 : p2.getSCs()){
-                        if(sc2 == scnum){
-                            List<Button> buttonsToRemoveCC = new ArrayList<>();
-                            String finChecker = "FFCC_"+player.getFaction() + "_";
-                            for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, activeMap, event)) {
-                                buttonsToRemoveCC.add(Button.success(finChecker+"removeCCFromBoard_mahactAgent"+p2.getFaction()+"_"+tile.getPosition(), "Remove CC from "+tile.getRepresentationForButtons(activeMap, player)));
+                Leader playerLeader = player.unsafeGetLeader("mahactagent");
+                if (playerLeader != null) {
+                    playerLeader.setExhausted(true);
+                    for(Player p2 : activeMap.getPlayers().values()){
+                        for(Integer sc2 : p2.getSCs()){
+                            if(sc2 == scnum){
+                                List<Button> buttonsToRemoveCC = new ArrayList<>();
+                                String finChecker = "FFCC_"+player.getFaction() + "_";
+                                for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, activeMap, event)) {
+                                    buttonsToRemoveCC.add(Button.success(finChecker+"removeCCFromBoard_mahactAgent"+p2.getFaction()+"_"+tile.getPosition(), "Remove CC from "+tile.getRepresentationForButtons(activeMap, player)));
+                                }
+                                MessageHelper.sendMessageToChannelWithButtons(channel, trueIdentity+" Use buttons to remove a CC", buttonsToRemoveCC);
                             }
-                            MessageHelper.sendMessageToChannelWithButtons(channel, trueIdentity+" Use buttons to remove a CC", buttonsToRemoveCC);
                         }
                     }
                 }
-                
-            }else{
+            } else {
                 MessageHelper.sendMessageToChannel(channel, trueIdentity + " exhausted Scepter of Empelar to follow SC#"+scnum);
                 player.addExhaustedRelic("emelpar");
             }
@@ -502,7 +502,6 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("movedNExplored_")) {
             String bID = buttonID.replace("movedNExplored_", "");
             String[] info = bID.split("_");
-            String message = "";
             new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player,
                     false, activeMap, 1, false);
             event.getMessage().delete().queue();
@@ -767,8 +766,9 @@ public class ButtonListener extends ListenerAdapter {
             if (editedMessage.contains("Click the names")) {
                 editedMessage = message;
             }
-            Leader playerLeader = player.getLeader("keleresagent");    
-            if(!playerLeader.isExhausted() ){
+
+            Leader playerLeader = player.getLeader("keleresagent").orElse(null);    
+            if (playerLeader != null && !playerLeader.isExhausted()) {
                 playerLeader.setExhausted(true);
                 StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                         .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -1109,7 +1109,7 @@ public class ButtonListener extends ListenerAdapter {
                         Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
                         buttons.add(sarweenButton);
                     }
-                    if (player.hasLeader("winnuagent", activeMap)&&!player.getLeaderByID("winnuagent").isExhausted()&&!buttonID.equalsIgnoreCase("muaatagent")) {
+                    if (player.hasUnexhaustedLeader("winnuagent", activeMap) && !buttonID.equalsIgnoreCase("muaatagent")) {
                         Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
                         buttons.add(winnuButton);
                     }
@@ -1129,22 +1129,23 @@ public class ButtonListener extends ListenerAdapter {
                 if (buttonID.contains("tacticalAction")) {
                     ButtonHelper.exploreDET(player, activeMap, event);
                     List<Button> systemButtons2 = new ArrayList<Button>();
-                    if(!activeMap.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")){
-                         String message = trueIdentity+" You can use the button to explore using crown of emphidia";
+                    if (!activeMap.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
+                         String message = trueIdentity + " You can use the button to explore using crown of emphidia";
                         systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                     }
                     systemButtons2 = new ArrayList<Button>();
-                    if(player.hasLeader("sardakkagent", activeMap)&&!player.getLeaderByID("sardakkagent").isExhausted()){
-                        String message = trueIdentity+" You can use the button do sardakkcommander";
+                    if (player.hasUnexhaustedLeader("sardakkagent", activeMap)) {
+                        String message = trueIdentity + " You can use the button do sardakkcommander";
                         systemButtons2.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeMap, player));
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                     }
                     
-                    if(activeMap.getNaaluAgent()){
+                    if (activeMap.getNaaluAgent()) {
                         player = Helper.getPlayerFromUnlockedLeader(activeMap, "naaluagent");
                         activeMap.setNaaluAgent(false);
                     }
+
                     String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
                     MessageChannel channel = event.getMessageChannel();
@@ -1247,10 +1248,12 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
             String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
             Player notYssaril = Helper.getPlayerFromColorOrFaction(activeMap, playerFaction);
-            String message = Helper.getPlayerRepresentation(notYssaril, activeMap, activeMap.getGuild(), true) + " the player of the yssaril hero has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded";
-             MessageHelper.sendMessageToChannel((MessageChannel)notYssaril.getCardsInfoThread(activeMap), message);
-            new DiscardACRandom().discardRandomAC(event, activeMap, notYssaril, 3);
-            event.getMessage().delete().queue();
+            if (notYssaril != null) {
+                String message = Helper.getPlayerRepresentation(notYssaril, activeMap, activeMap.getGuild(), true) + " the player of the yssaril hero has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded";
+                MessageHelper.sendMessageToChannel((MessageChannel)notYssaril.getCardsInfoThread(activeMap), message);
+                new DiscardACRandom().discardRandomAC(event, activeMap, notYssaril, 3);
+                event.getMessage().delete().queue();
+            }
         } else if (buttonID.startsWith("yssarilHeroInitialOffering_")) {
             List<Button> acButtons = new ArrayList<Button>();
             buttonID = buttonID.replace("yssarilHeroInitialOffering_", "");
@@ -1617,16 +1620,17 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
                     "Please select your rider target", activeMap, player, riderButtons);
             if (riderName.equalsIgnoreCase("Keleres Xxcha Hero")) {
-                Leader playerLeader = player.getLeader("keleresheroodlynn");
-                StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
-                        .append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                boolean purged = player.removeLeader(playerLeader);
-                if (purged) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            message.toString() + " - Leader Oodlynn has been purged");
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                            "Leader was not purged - something went wrong");
+                Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                if (playerLeader != null) {
+                    StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap));
+                    message.append(" played ");
+                    message.append(Helper.getLeaderFullRepresentation(playerLeader));
+                    boolean purged = player.removeLeader(playerLeader);
+                    if (purged) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString() + " - Leader Oodlynn has been purged");
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                    }
                 }
             }
             MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
@@ -2181,7 +2185,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "deal2SOToAll" -> {
                     new DealSOToAll().dealSOToAll(event, 2, activeMap);
                     event.getMessage().delete().queue();
-
                 }
                 case "startOfGameObjReveal" -> {
                      Player speaker = null;
@@ -2649,11 +2652,11 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         ButtonHelper.resolveEmpyCommanderCheck(player, activeMap, tile, event);
                         List<Button> empyButtons = new ArrayList<Button>();
-                        if (!activeMap.getMovedUnitsFromCurrentActivation().isEmpty() && (tile.getUnitHolders().values().size() == 1) && player.hasLeader("empyreanagent")&&!player.getLeaderByID("empyreanagent").isExhausted()) {
+                        if (!activeMap.getMovedUnitsFromCurrentActivation().isEmpty() && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent", activeMap)) {
                             Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("empyrean")));
                             empyButtons.add(empyButton);
                             empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
-                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" use button to exhaust Empy agent", empyButtons);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " use button to exhaust Empy agent", empyButtons);
                         }
                         systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
@@ -2666,8 +2669,6 @@ public class ButtonListener extends ListenerAdapter {
                                 if(player2 == player){
                                     player2 = players.get(1);
                                 }
-                                String messageCombat = "Resolve space combat.";
-                                MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
                                 String threadName =  activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getFaction()+"-vs-"+player2.getFaction();
                                 
                                 Player p1 = player;
@@ -2728,8 +2729,6 @@ public class ButtonListener extends ListenerAdapter {
                                 if(player2 == player){
                                     player2 = players.get(1);
                                 }
-                                String messageCombat = "Resolve ground combat.";
-                                MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
                                 String threadName =  activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getFaction()+"-vs-"+player2.getFaction();
                                 Player p1 = player;
                                 if(!activeMap.isFoWMode()){
@@ -2988,8 +2987,8 @@ public class ButtonListener extends ListenerAdapter {
     public void clearAllReactions(@NotNull ButtonInteractionEvent event) {
         Message mainMessage = event.getInteraction().getMessage();
         mainMessage.clearReactions().queue();
-        String messageId = mainMessage.getId();
-        RestAction<Message> messageRestAction = event.getChannel().retrieveMessageById(messageId);
+        //String messageId = mainMessage.getId();
+        //RestAction<Message> messageRestAction = event.getChannel().retrieveMessageById(messageId);
         // messageRestAction.queue(m -> {
         // RestAction<Void> voidRestAction = m.clearReactions();
         // voidRestAction.queue();

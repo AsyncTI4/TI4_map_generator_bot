@@ -62,42 +62,56 @@ public class BotLogger {
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
-        if (botLogChannel != null) {
-            if (event == null) { //NON-EVENT LOGS
-                if (e == null) {
-                    botLogChannel.sendMessage(msg).queue();
-                } else {
-                    botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
-            } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
-                if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
-                } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
-            } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                Button button = ((ButtonInteractionEvent) event).getButton();
-                if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
-                } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
+
+        if (botLogChannel == null) {
+            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + event.getGuild().getName() + "\nSending via webhook to main server.\n>" + msg);
+            return;
+        }
+
+        if (event == null) { //NON-EVENT LOGS
+            if (e == null) {
+                botLogChannel.sendMessage(msg).queue();
+            } else {
+                botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
+            String channelName = event.getChannel().getName();
+            String channelMention = event.getChannel().getAsMention();
+            String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
+            if (e == null) {
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
+            String channelName = event.getChannel().getName();
+            String channelMention = event.getChannel().getAsMention();
+            Button button = ((ButtonInteractionEvent) event).getButton();
+            if (e == null) {
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else {
+            if (e == null) {
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
             }
         }
     }

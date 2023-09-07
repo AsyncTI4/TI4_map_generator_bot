@@ -17,6 +17,7 @@ import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +45,6 @@ public class Player {
     private boolean isDummy = false;
 
     private String faction;
-    private Faction faction_;
-    //abilities
-    //factiontech
-    //home
 
     @Setter
     private String playerStatsAnchorPosition = null;
@@ -880,43 +877,52 @@ public class Player {
     }
 
     @Nullable
-    public Leader getLeader(String leaderIdOrType) {
-        Leader leader = getLeaderByID(leaderIdOrType);
-        if (leader == null) {
+    public Leader unsafeGetLeader(String leaderIdOrType) {
+        return getLeader(leaderIdOrType).orElse(null);
+    }
+
+    public Optional<Leader> getLeader(String leaderIdOrType) {
+        Optional<Leader> leader = getLeaderByID(leaderIdOrType);
+        if (leader.isEmpty()) {
             leader = getLeaderByType(leaderIdOrType);
         }
-        if (leader == null && leaderIdOrType.contains("agent")) {
+        if (leader.isEmpty() && leaderIdOrType.contains("agent")) {
             leader = getLeaderByID("yssarilagent");
         }
         return leader;
     }
 
-    @Nullable
-    public Leader getLeaderByType(String leaderType) {
-        for (Leader leader : leaders) {
-            if (leader.getType().equals(leaderType)) {
-                return leader;
-            }
+    public boolean hasUnexhaustedLeader(String leaderId, ti4.map.Map activeMap) {
+        if (hasLeader(leaderId, activeMap)) {
+            return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         }
-        return null;
+        return false;
     }
 
-    @Nullable
-    public Leader getLeaderByID(String leaderID) {
+    public Optional<Leader> getLeaderByType(String leaderType) {
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID)) {
-                return leader;
+            if (leader.getType().equals(leaderType)) {
+                return Optional.of(leader);
             }
         }
-        if(leaderID.contains("agent")){
+        return Optional.empty();
+    }
+
+    public Optional<Leader> getLeaderByID(String leaderID) {
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID)) {
+                return Optional.of(leader);
+            }
+        }
+        if (leaderID.contains("agent")){
             leaderID = "yssarilagent";
             for (Leader leader : leaders) {
                 if (leader.getId().equals(leaderID)) {
-                    return leader;
+                    return Optional.of(leader);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Leader> getLeaders() {
@@ -930,6 +936,7 @@ public class Player {
     public boolean hasLeader(String leaderID) {
         return getLeaderIDs().contains(leaderID);
     }
+
     public boolean hasLeader(String leaderID, ti4.map.Map activeMap) {
         if(getLeaderIDs().contains(leaderID) == false && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeMap)){
             return getLeaderIDs().contains("yssarilagent");
@@ -938,7 +945,7 @@ public class Player {
     }
 
     public boolean hasLeaderUnlocked(String leaderID) {
-        return hasLeader(leaderID) && !getLeader(leaderID).isLocked();
+        return hasLeader(leaderID) && !getLeader(leaderID).map(Leader::isLocked).orElse(true);
     }
 
     public void setLeaders(List<Leader> leaders) {
@@ -1312,12 +1319,14 @@ public class Player {
 
         doAdditionalThingsWhenAddingTech(techID);
     }
+
     public void addToFrankenPersonalBag(String thing) {
         if (frankenBagPersonal.contains(thing)) {
             return;
         }
         frankenBagPersonal.add(thing);
     }
+
     public void addToFrankenPassingBag(String thing) {
         if (frankenBagToPass.contains(thing)) {
             return;
@@ -1327,7 +1336,7 @@ public class Player {
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
-        if(techID.equalsIgnoreCase("iihq")){
+        if (techID != null && techID.equalsIgnoreCase("iihq")){
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
         }
@@ -1336,14 +1345,59 @@ public class Player {
         TechnologyModel techModel = Mapper.getTech(techID);
         if (techID == null) return;
 
-        if (Constants.UNIT_UPGRADE.equalsIgnoreCase(techModel.getType())) {
+        if (techModel.getType().equals(TechnologyType.UNITUPGRADE)) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            if (unitModel != null && unitModel.getUpgradesFromUnitId() != null) {
-                if (getUnitsOwned().contains(unitModel.getUpgradesFromUnitId())) {
-                    removeOwnedUnitByID(unitModel.getUpgradesFromUnitId());
+            if (unitModel != null && unitModel.getBaseType() != null) {
+                // Remove all non-faction-upgrade matching units
+                String asyncId = unitModel.getAsyncId();
+                List<UnitModel> unitsToRemove = getUnitsByAsyncID(asyncId).stream()
+                    .filter(unit -> unit.getFaction() == null || unit.getUpgradesFromUnitId() == null).toList();
+                for (UnitModel u : unitsToRemove) {
+                    removeOwnedUnitByID(u.getId());
                 }
+                
                 addOwnedUnitByID(unitModel.getId());
             }
+        }
+    }
+
+    // Provided because people make mistakes, also nekro exists, also weird homebrew exists
+    private void doAdditionalThingsWhenRemovingTech(String techID) {
+        // Remove Custodia Vigilia when un-researching IIHQ
+        if (techID != null && techID.equalsIgnoreCase("iihq")){
+            removePlanet("custodiavigilia");
+        }
+
+        // Update Owned Units when Researching a Unit Upgrade
+        TechnologyModel techModel = Mapper.getTech(techID);
+        if (techID == null) return;
+
+        if (techModel.getType().equals(TechnologyType.UNITUPGRADE)) {
+            UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
+            List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech).filter(tech -> tech.getBaseUpgrade().equals(unitModel.getBaseType())).toList();
+            removeOwnedUnitByID(unitModel.getId());
+
+            // Find another unit model to replace this lost model
+            String replacementUnit = unitModel.getBaseType(); // default
+            if (relevantTechs.isEmpty() && unitModel != null && unitModel.getBaseType() != null) {
+                // No other relevant unit upgrades
+                FactionModel factionSetup = getFactionSetupInfo();
+                String basicUnit = factionSetup.getUnits().stream().map(Mapper::getUnit)
+                    .filter(unit -> unit.getId().equals(unitModel.getBaseType()))
+                    .map(UnitModel::getId).findFirst()
+                    .orElse(replacementUnit);
+                replacementUnit = basicUnit;
+            }
+            else if (relevantTechs.size() > 0) {
+                // Ignore the case where there's multiple faction techs and also
+                replacementUnit = relevantTechs.stream()
+                    .sorted(TechnologyModel::sortFactionTechsFirst).findFirst()
+                    .map(TechnologyModel::getAlias)
+                    .map(Mapper::getUnitModelByTechUpgrade)
+                    .map(UnitModel::getId)
+                    .orElse(replacementUnit);
+            }
+            addOwnedUnitByID(replacementUnit);
         }
     }
 
@@ -1359,10 +1413,8 @@ public class Player {
     }
 
     public void removeTech(String tech) {
-        boolean isRemoved = techs.remove(tech);
-        if (isRemoved) removeTech(tech);
-        refreshTech(tech);
-        //TODO: Remove unitupgrade -> fix owned units
+        techs.remove(tech);
+        doAdditionalThingsWhenRemovingTech(tech);
     }
     public void removeElementFromBagToPass(String tech) {
         frankenBagToPass.remove(tech);
@@ -1492,6 +1544,14 @@ public class Player {
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
+    }
+
+    /**
+     * @return true if the player is: a "dummy", faction == null, color == null, & color == "null"
+     */
+    @JsonIgnore
+    public boolean isNotRealPlayer() {
+        return !isRealPlayer();
     }
 
     public void setFogFilter(String preference) {
