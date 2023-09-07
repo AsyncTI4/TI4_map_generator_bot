@@ -40,6 +40,13 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void offerMahactInfButtons(Player player, Map activeMap){
+        String message = ButtonHelper.getTrueIdentity(player, activeMap)+" Resolve Mahact infantry loss using the buttons";
+        Button convert2CommButton = Button.success("convert_1_comms" , "Convert 1 Commodity Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message, buttons);
+    }
      public static void KeleresIIHQCCGainCheck(Player player, Map activeMap) {
         for(Player p2 : activeMap.getRealPlayers()){
             if(p2 == player){

@@ -68,6 +68,11 @@ import ti4.model.TechnologyModel.TechnologyType;
 
 public class ButtonHelper {
     
+    public static void resolveInfantryDeath(Map activeMap, Player player, int amount){
+        for(int x = 0; x < amount; x++){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), rollInfantryRevival(activeMap, player));
+        }
+    }
 
     public static List<Button> getDacxiveButtons(Map activeMap, Player player, String planet){
         List<Button> buttons = new ArrayList<Button>();
@@ -222,6 +227,36 @@ public class ButtonHelper {
         
         return msg;
     }
+    public static String rollInfantryRevival(Map activeMap, Player player){
+       
+        Die d1 = new Die(6);
+        if(player.hasTech("so2")){
+            d1 = new Die(5);
+        }
+        String msg = Helper.getEmojiFromDiscord("infantry")+ " rolled a "+d1.getResult();
+        if(player.hasTech("cl2")){
+            msg = Helper.getEmojiFromDiscord("infantry") + " died";
+           
+        }
+        if(d1.isSuccess() || player.hasTech("cl2")){
+            msg = msg + " and revived. You will be prompted to place them on a planet in your HS at the start of your next turn.";
+            player.setStasisInfantry(player.getStasisInfantry()+1);
+        }else{
+            msg = msg + " and failed. No revival";
+        }
+        return ButtonHelper.getIdent(player)+" "+msg;
+    }
+
+    public static void placeInfantryFromRevival(Map activeMap, ButtonInteractionEvent event, Player player, String buttonID){
+        String planet = buttonID.split("_")[1];
+        Tile tile = Helper.getTileFromPlanet(planet, activeMap);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf "+planet, activeMap);
+        player.setStasisInfantry(player.getStasisInfantry()-1);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getIdent(player)+" Placed 1 infantry on "+Helper.getPlanetRepresentation(planet, activeMap)+". You have "+player.getStasisInfantry() + " infantry left to revive.");
+        if(player.getStasisInfantry() == 0){
+            event.getMessage().delete().queue();
+        }
+    }
 
 
     public static MessageChannel getSCFollowChannel(Map activeMap, Player player, int scNum){
@@ -261,6 +296,22 @@ public class ButtonHelper {
             }
         }
         return types;
+    }
+    public static List<Button> getPlaceStatusInfButtons(Map activeMap, Player player){
+        List<Button> buttons = new ArrayList<Button>();
+
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(player.getFaction()));
+        if(tile == null)
+        {
+            tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeMap);
+        }
+        for(UnitHolder unitHolder: tile.getUnitHolders().values()){
+            if(unitHolder instanceof Planet){
+                buttons.add(Button.success("statusInfRevival_"+unitHolder.getName(), "Place 1 infantry on "+Helper.getPlanetRepresentation(unitHolder.getName(), activeMap)));
+            }
+        }
+        return buttons;
+
     }
     public static List<Button> getArcExpButtons(Map activeMap, Player player){
         List<Button> buttons = new ArrayList<Button>();
@@ -1521,6 +1572,10 @@ public class ButtonHelper {
                 Button transit = Button.secondary(finChecker+"exhaustTech_td", "Exhaust Transit Diodes");
                 transit = transit.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
                 startButtons.add(transit);
+            }
+            if(player.getStasisInfantry() > 0){
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
+
             }
         }
 

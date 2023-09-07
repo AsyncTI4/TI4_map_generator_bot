@@ -118,7 +118,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeMap.setLatestWhenMsg("");
         activeMap.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(id, uniqueID));
-        String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters by pressing the buttons below. If you have an action card with those windows, you can simply play it.";
+        String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
 
         
         Date newTime = new Date();
@@ -128,15 +128,15 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         MessageHelper.sendMessageToChannel(channel, text);
 
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.nowhens, activeMap, whenButtons, "when");
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", activeMap, whenButtons, "when");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters",activeMap, afterButtons,"after");
 
         ListVoteCount.turnOrder(event, activeMap, channel);
         Button proceed = Button.danger( "proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Button.primary("transaction", "Transaction");
         proceedButtons.add(transaction);
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters. Also a transaction button", proceedButtons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
 
     }
 }
