@@ -51,6 +51,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class Helper {
 
@@ -1129,7 +1130,7 @@ public class Helper {
     }
 
     public static String getLeaderRepresentation(Player player, String leaderID, boolean includeTitle, boolean includeAbility) {
-        return getLeaderRepresentation(player.getLeader(leaderID), includeTitle, includeAbility, false);
+        return getLeaderRepresentation(player.getLeader(leaderID).orElse(null), includeTitle, includeAbility, false);
     }
 
     public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility) {
@@ -1507,11 +1508,11 @@ public class Helper {
 
         if (threadCount >= 975) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Server: **" + guild.getName() + "** thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
-            if (false) { // Here to keep in case it's needed.
-                BotLogger.log(ListOldThreads.getOldThreadsMessage(guild, closeCount));
-            } else {
-                BotLogger.log("> The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
-            }
+            // if (false) { // Here to keep in case it's needed.
+            //     BotLogger.log(ListOldThreads.getOldThreadsMessage(guild, closeCount));
+            // } else {
+            BotLogger.log("> The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
+            //}
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
     }
@@ -1622,11 +1623,11 @@ public class Helper {
         TechnologyModel tech = Mapper.getTechs().get(techID);
 
         String techName = tech.getName();
-        String techType = tech.getType();
+        TechnologyType techType = tech.getType();
         String techFaction = tech.getFaction();
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
 
@@ -1717,7 +1718,7 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<TechnologyModel>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
             String faction = tech.getFaction();
-            if (tech.getType().equalsIgnoreCase(techType)) {
+            if (tech.getType().toString().equalsIgnoreCase(techType)) {
                 if (!player.hasTech(tech.getAlias())) {
                     if (!faction.isEmpty()) {
                         if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && faction.equalsIgnoreCase("Keleres"))) {
@@ -1736,11 +1737,11 @@ public class Helper {
         TechnologyModel tech = Mapper.getTechs().get(techID);
 
         String techName = tech.getName();
-        String techType = tech.getType();
+        TechnologyType techType = tech.getType();
         String techFaction = tech.getFaction();
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         
         String techText = tech.getText();
         StringBuilder sb = new StringBuilder();
@@ -1780,7 +1781,7 @@ public class Helper {
     }
 
     public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(Constants.HERO);
+        Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();
             int scoredPOCount = 0;
@@ -1842,7 +1843,6 @@ public class Helper {
     }
 
     public static boolean mechCheck(String planetName, Map activeMap, Player player) {
-        String message = "";
         Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         int numMechs = 0;

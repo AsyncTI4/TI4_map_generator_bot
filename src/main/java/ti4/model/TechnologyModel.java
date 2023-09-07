@@ -3,12 +3,26 @@ package ti4.model;
 public class TechnologyModel implements ModelInterface {
     private String alias;
     private String name;
-    private String type;
+    private TechnologyType type;
     private String requirements;
     private String faction;
     private String baseUpgrade;
     private String source;
     private String text;
+
+    public enum TechnologyType {
+        UNITUPGRADE,
+        PROPULSION,
+        BIOTIC,
+        CYBERNETIC,
+        WARFARE,
+        NONE;
+        
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+    }
 
     public TechnologyModel() {}
 
@@ -31,7 +45,7 @@ public class TechnologyModel implements ModelInterface {
         return name; 
     }
 
-    public String getType() { 
+    public TechnologyType getType() { 
         return type; 
     }
 
@@ -53,5 +67,17 @@ public class TechnologyModel implements ModelInterface {
 
     public String getText() { 
         return text; 
+    }
+
+    
+    public static int sortFactionTechsFirst(TechnologyModel t1, TechnologyModel t2) {
+        if (t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 0;
+        if (!t1.getFaction().isEmpty() && !t2.getFaction().isEmpty()) return 0;
+        if (!t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 1;
+        return -1;
+    }
+
+    public static int sortFactionTechsLast(TechnologyModel t1, TechnologyModel t2) {
+        return sortFactionTechsFirst(t1, t2) * -1;
     }
 }

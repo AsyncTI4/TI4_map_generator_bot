@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -40,21 +39,20 @@ public class AddAllianceMember extends PlayerSubcommandData {
         
         for (String leaderID : player_.getLeaderIDs() ){
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
-                if(!leaderID.contains("mahact") && !player.hasAbility("edict")){
+                if (!leaderID.contains("mahact") && !player.hasAbility("edict")){
                     player.addLeader(leaderID);
-                    player.getLeader(leaderID).setLocked(false);
-                    
+                    player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
                 }
-                player_.getLeader(leaderID).setLocked(false);
+                player_.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
         for (String leaderID : player.getLeaderIDs() ){
             if (leaderID.contains("commander") && !player_.hasLeader(leaderID)) {
                 if(!leaderID.contains("mahact")&&!player_.hasAbility("edict")){
                     player_.addLeader(leaderID);
-                    player_.getLeader(leaderID).setLocked(false);
+                    player_.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
                 }
-                player.getLeader(leaderID).setLocked(false);
+                player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
         if(player.hasAbility("edict")){
