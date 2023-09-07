@@ -28,7 +28,7 @@ public class GenerateTile {
     private BufferedImage mainImage;
     private int width;
     private int height;
-    
+
     private final int extraX = 100;
     private final int extraY = 100;
     private final int tileHeight = 300;
@@ -37,7 +37,7 @@ public class GenerateTile {
 
     private int offsetX = 0;
     private int offsetY = 0;
-    
+
     private Boolean isFoWPrivate = null;
     private Player fowPlayer = null;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
@@ -87,10 +87,11 @@ public class GenerateTile {
         return saveImage(activeMap, 1, "000", event);
     }
 
-     public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
-            return saveImage(activeMap, context, focusTile, event, null);
-     }
-    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event,@Nullable Player p1) {
+    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
+        return saveImage(activeMap, context, focusTile, event, null);
+    }
+
+    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event, @Nullable Player p1) {
         init(context, focusTile);
         reset();
 
@@ -108,13 +109,13 @@ public class GenerateTile {
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(activeMap, event);
-                if(p1 != null){
+                if (p1 != null) {
                     player = p1;
                 }
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(activeMap, player, event, null);
-                if(p1 != null){
+                if (p1 != null) {
                     fowPlayer = p1;
                 }
                 Set<String> tilesToShow = FoWHelper.fowFilter(activeMap, fowPlayer);
@@ -123,7 +124,7 @@ public class GenerateTile {
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
                     if (fowPlayer != null) {
-                                tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                        tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
                     }
                 }
             }
@@ -132,13 +133,12 @@ public class GenerateTile {
         try {
             HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
             tileMap.remove(null);
-            
+
             Set<String> tiles = tileMap.keySet();
             Set<String> tilesWithExtra = new HashSet<String>(activeMap.getAdjacentTileOverrides().values());
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Tile));
             tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Extras));
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Units));
-            
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -150,9 +150,7 @@ public class GenerateTile {
 
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeMap.getName() + "_" + timeStamp + ".jpg";
-        try (
-                FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)
-        ) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
             final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
@@ -167,7 +165,7 @@ public class GenerateTile {
         return jpgFile;
     }
 
-    private Set<String> getTilesToShow(Map activeMap, int context, String focusTile) {
+    private static Set<String> getTilesToShow(Map activeMap, int context, String focusTile) {
         Set<String> tileSet = new HashSet<String>(Collections.singleton(focusTile));
         Set<String> tilesToCheck = new HashSet<String>(Collections.singleton(focusTile));
         for (int i = 0; i < context; i++) {
@@ -186,8 +184,9 @@ public class GenerateTile {
         return tileSet;
     }
 
-    private Player getFowPlayer(Map activeMap, @Nullable GenericInteractionCreateEvent event) {
-        if (event == null) return null;
+    private static Player getFowPlayer(Map activeMap, @Nullable GenericInteractionCreateEvent event) {
+        if (event == null)
+            return null;
         String user = event.getUser().getId();
         return activeMap.getPlayer(user);
     }
@@ -204,7 +203,7 @@ public class GenerateTile {
     }
 
     private void addTile(Tile tile, Map activeMap, TileStep step, boolean setupCheck) {
-        if (tile == null || tile.getTileID() == null){
+        if (tile == null || tile.getTileID() == null) {
             return;
         }
         try {
