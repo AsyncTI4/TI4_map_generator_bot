@@ -826,6 +826,12 @@ public class ButtonHelperModifyUnits {
                                     if(cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName())&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
                                         ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, unitEntry.getValue(), unitKey, event);
                                     }
+                                    if((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))&& unitKey.toLowerCase().contains("inf")){
+                                        ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeMap);
+                                    }
+                                    if(player.hasInf2Tech() && unitKey.toLowerCase().contains("inf")){
+                                        ButtonHelper.resolveInfantryDeath(activeMap, player, amount);
+                                    }
 
                                 }
                             }
@@ -889,6 +895,12 @@ public class ButtonHelperModifyUnits {
                 planetName = AliasHandler.resolvePlanet(planetName);
                 if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())&& FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)){
                     ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
+                }
+                if((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))&& unitkey.toLowerCase().contains("inf")){
+                    ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeMap);
+                }
+                if(player.hasInf2Tech() && unitkey.toLowerCase().contains("inf")){
+                    ButtonHelper.resolveInfantryDeath(activeMap, player, amount);
                 }
             }
             if(buttonLabel.toLowerCase().contains("damaged")){
