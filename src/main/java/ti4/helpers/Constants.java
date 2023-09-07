@@ -641,6 +641,7 @@ public class Constants {
     public static final String FRAGMENTS = "fragments";
     public static final String LIST_FRAGMENTS = "list_fragments";
     public static final String RELIC = "relic";
+    public static final String RELIC_ALL = "relic_all";
     public static final String RELIC_DECK = "relic_deck";
     public static final String RELICS = "relics";
     public static final String EXHAUSTED_RELICS = "exhausted_relics";

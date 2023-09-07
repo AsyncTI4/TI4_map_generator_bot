@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
-import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -25,6 +24,7 @@ import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class DataMigrationManager {
 
@@ -223,7 +223,7 @@ public class DataMigrationManager {
                 List<String> ownedUnitIDs = factionSetupInfo.getUnits();
 
                 List<TechnologyModel> playerTechs = player.getTechs().stream().map(techID -> Mapper.getTech(techID))
-                        .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                        .filter(tech -> tech.getType().equals(TechnologyType.UNITUPGRADE))
                         .collect(Collectors.toList());
 
                 for (TechnologyModel technologyModel : playerTechs) {
@@ -331,7 +331,7 @@ public class DataMigrationManager {
                 List<String> ownedUnitIDs = factionSetupInfo.getUnits();
 
                 List<TechnologyModel> playerTechs = player.getTechs().stream().map(techID -> Mapper.getTech(techID))
-                        .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                        .filter(tech -> tech.getType().equals(TechnologyType.UNITUPGRADE))
                         .collect(Collectors.toList());
 
                 for (TechnologyModel technologyModel : playerTechs) {

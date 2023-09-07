@@ -648,7 +648,7 @@ public class GenerateMap {
 
                         String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
                         drawPAImage(x + deltaX, y, pnFactionIcon);
-                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                        Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
                         }
@@ -774,7 +774,7 @@ public class GenerateMap {
                         String playerColor = player_.getColor();
                         String playerFaction = player_.getFaction();
                         if (playerColor != null && mahactCCs.contains(playerColor)) {
-                            Leader leader_ = player_.getLeader(Constants.COMMANDER);
+                            Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
                             if (leader_ != null) {
                                 boolean locked = leader_.isLocked();
                                 String imperiaColorFile = "pa_leaders_imperia";
@@ -1392,7 +1392,7 @@ public class GenerateMap {
         HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
         java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
-            String techType = Mapper.getTechType(tech);
+            String techType = Mapper.getTechType(tech).toString().toLowerCase();
             List<String> techList = techsFiltered.get(techType);
             if (techList == null) {
                 techList = new ArrayList<>();
@@ -1452,10 +1452,11 @@ public class GenerateMap {
 
             String techIcon;
             switch (techInformation.getType()) {
-                case Constants.WARFARE -> techIcon = Constants.WARFARE;
-                case Constants.PROPULSION -> techIcon = Constants.PROPULSION;
-                case Constants.CYBERNETIC -> techIcon = Constants.CYBERNETIC;
-                case Constants.BIOTIC -> techIcon = Constants.BIOTIC;
+                case WARFARE -> techIcon = Constants.WARFARE;
+                case PROPULSION -> techIcon = Constants.PROPULSION;
+                case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
+                case BIOTIC -> techIcon = Constants.BIOTIC;
+                case UNITUPGRADE -> techIcon = Constants.UNIT_UPGRADE;
                 default -> techIcon = "";
             }
 
