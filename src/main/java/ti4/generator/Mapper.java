@@ -12,6 +12,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.message.BotLogger;
 import ti4.model.*;
+import ti4.model.TechnologyModel.TechnologyType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -637,7 +638,7 @@ public class Mapper {
         return acNameList;
     }
 
-    public static String getTechType(String id) {
+    public static TechnologyType getTechType(String id) {
         return technologies.get(id).getType();
     }
 

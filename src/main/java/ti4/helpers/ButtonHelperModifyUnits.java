@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.map.Map;

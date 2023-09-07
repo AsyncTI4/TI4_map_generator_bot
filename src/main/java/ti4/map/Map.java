@@ -2599,7 +2599,8 @@ public class Map {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { //dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-                    leaders.add( pnOwner.getLeaderByType(Constants.COMMANDER) );
+                    Leader playerLeader = pnOwner.getLeaderByType(Constants.COMMANDER).orElse(null);
+                    leaders.add(playerLeader);
                 }
             }
         }
@@ -2609,11 +2610,12 @@ public class Map {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.equals(player)) continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    leaders.add( otherPlayer.getLeaderByType(Constants.COMMANDER) );
+                    Leader playerLeader = otherPlayer.getLeaderByType(Constants.COMMANDER).orElse(null);
+                    leaders.add(playerLeader);
                 }
             }
         }
-        leaders = leaders.stream().filter(leader -> !leader.isLocked()).collect(Collectors.toList());
+        leaders = leaders.stream().filter(leader -> leader != null && !leader.isLocked()).collect(Collectors.toList());
         return leaders;
     }
 

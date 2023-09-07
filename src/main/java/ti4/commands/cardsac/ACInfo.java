@@ -92,7 +92,7 @@ public class ACInfo extends ACCardsSubcommandData {
             return "";
         }
         String[] split = info.split(";");
-        String trapType = split[0];
+        //String trapType = split[0];
         String trapName = split[1];
         String trapText = split[2];
         String planet = trapCardsPlanets.get(trapID);
@@ -184,13 +184,13 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
-            if (player.hasLeader("nekroagent", activeMap)&& !player.getLeaderByID("nekroagent").isExhausted()) {
+            if (player.hasUnexhaustedLeader("nekroagent", activeMap)) {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
                 acButtons.add(nekroButton);
             }
-            if (player.hasLeader("hacanagent", activeMap)&&!player.getLeaderByID("hacanagent").isExhausted()) {
-                Button nekroButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
-                acButtons.add(nekroButton);
+            if (player.hasUnexhaustedLeader("hacanagent", activeMap)) {
+                Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                acButtons.add(hacanButton);
             }
         }
         return acButtons;

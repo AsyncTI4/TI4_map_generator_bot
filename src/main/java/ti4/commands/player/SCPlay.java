@@ -199,15 +199,15 @@ public class SCPlay extends PlayerSubcommandData {
             empNMahButtons.add(deleteB);
             Button emelpar = Button.danger("scepterE_follow_"+scToPlay, "Exhaust Scepter of Emelpar");
             Button mahactA = Button.danger("mahactA_follow_"+scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact")));
-            for(Player player3 : activeMap.getPlayers().values()){
-                if(player3 == player){
+            for (Player player3 : activeMap.getPlayers().values()) {
+                if (player3 == player) {
                     continue;
                 }
-                if(player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")){
+                if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.add(0,emelpar);    
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
                 }
-                if(player3.hasLeader("mahactagent", activeMap) && !player3.getLeader("mahactagent").isExhausted() && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0){
+                if (player3.hasUnexhaustedLeader("mahactagent", activeMap) && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0) {
                     empNMahButtons.add(0,mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
                 }
@@ -219,8 +219,8 @@ public class SCPlay extends PlayerSubcommandData {
         Button endTurn = Button.danger(finChecker+"turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
-        if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
-                conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
+        if (ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1) {
+            conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
         }
         conclusionButtons.add(deleteButton);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
