@@ -2568,7 +2568,7 @@
         "productionValue": 5,
         "capacityValue": 4,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it si destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
         "id": "saar_spacedock2",
@@ -2584,7 +2584,7 @@
         "productionValue": 7,
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it si destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
         "id": "saar_mech",
