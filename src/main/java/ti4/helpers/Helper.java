@@ -2018,14 +2018,25 @@ public class Helper {
         return inviteUrl;
     }
 
-    public static String getTimeRepresentationToSeconds(long millis) {
-        long averageTurnTime = millis / 1000; //total seconds (truncates)
-        long seconds = averageTurnTime % 60;
-        averageTurnTime = averageTurnTime / 60; //total minutes (truncates)
-        long minutes = averageTurnTime % 60;
-        long hours = averageTurnTime / 60; //total hours (truncates)
+    public static String getTimeRepresentationToSeconds(long totalMillis) {
+        long totalSeconds = totalMillis / 1000; //total seconds (truncates)
+        long seconds = totalSeconds % 60;
+        long totalMinutes = totalSeconds / 60; //total minutes (truncates)
+        long minutes = totalMinutes % 60;
+        long hours = totalMinutes / 60; //total hours (truncates)
 
         return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
+    }
+
+    public static String getTimeRepresentationToMillis(long totalMillis) {
+        long millis = totalMillis % 1000;
+        long totalSeconds = totalMillis / 1000; //total seconds (truncates)
+        long seconds = totalSeconds % 60;
+        long totalMinutes = totalSeconds / 60; //total minutes (truncates)
+        long minutes = totalMinutes % 60;
+        long hours = totalMinutes / 60; //total hours (truncates)
+
+        return String.format("%02dh:%02dm:%02ds:%03d", hours, minutes, seconds, millis);
     }
 
     // the array double[] m MUST BE SORTED
