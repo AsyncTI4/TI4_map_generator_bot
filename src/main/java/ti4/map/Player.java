@@ -876,10 +876,10 @@ public class Player {
 
     public Optional<Leader> getLeader(String leaderIdOrType) {
         Optional<Leader> leader = getLeaderByID(leaderIdOrType);
-        if (leader == null) {
+        if (leader.isEmpty()) {
             leader = getLeaderByType(leaderIdOrType);
         }
-        if (leader == null && leaderIdOrType.contains("agent")) {
+        if (leader.isEmpty() && leaderIdOrType.contains("agent")) {
             leader = getLeaderByID("yssarilagent");
         }
         return leader;
