@@ -1269,7 +1269,7 @@ public class ButtonListener extends ListenerAdapter {
             acButtons.add(Button.danger("yssarilHeroRejection_"+player.getFaction(), "Reject " + acName +" and force them to discard of 3 random ACs"));
             String message = Helper.getPlayerRepresentation(yssaril, activeMap, activeMap.getGuild(), true) + " "+offerName +" has offered you the action card "+ acName + " for your Yssaril Hero play. Use buttons to accept or reject it";
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel)yssaril.getCardsInfoThread(activeMap), message, acButtons);
-            event.getMessage().delete().queue();//"statusInfRevival_"
+            event.getMessage().delete().queue();
          } else if (buttonID.startsWith("statusInfRevival_")) {
             ButtonHelper.placeInfantryFromRevival(activeMap, event, player, buttonID);
         } else if (buttonID.startsWith("genericReact")) {
