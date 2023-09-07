@@ -15,6 +15,7 @@ import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 
 import org.apache.commons.lang3.StringUtils;
@@ -110,6 +111,9 @@ public class Player {
     private List<String> relics = new ArrayList<>();
     private List<String> exhaustedRelics = new ArrayList<>();
     private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
+
+    private List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
+    private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
 
     //BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"
     private boolean hasFoundCulFrag = false;
@@ -1602,5 +1606,20 @@ public class Player {
     public String getPlayerStatsAnchorPosition() {
         if ("null".equals(playerStatsAnchorPosition)) return null;
         return playerStatsAnchorPosition;
+    }
+
+    public List<TemporaryCombatModifierModel> getNewTempCombatModifiers(){
+        return newTempCombatModifiers;
+    }
+    public List<TemporaryCombatModifierModel> getTempCombatModifiers(){
+        return tempCombatModifiers;
+    }
+    
+    public boolean removeTempMod(TemporaryCombatModifierModel tempMod){
+        return tempCombatModifiers.remove(tempMod);
+    }
+
+    public void setTempCombatModifiers(List<TemporaryCombatModifierModel> tempMods){
+        tempCombatModifiers = new ArrayList<TemporaryCombatModifierModel>(tempMods);
     }
 }

@@ -10,15 +10,18 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.player.AbilityInfo;
+import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
@@ -70,7 +73,7 @@ public class CombatModHelper {
         return false;
     }
 
-    public static void ProcessNewTemporaryMods(Player player, TileModel tile, UnitHolder holder){
+    public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder){
         List<TemporaryCombatModifierModel> modsToUseNow = new ArrayList<>();
         // player.unusedCombatModifiers.add(any, player.numTurns)
         //....
@@ -84,7 +87,7 @@ public class CombatModHelper {
         //         - check against conditions - then use 
         //         - otherwise remove from recoop (for one_combat, this changes as soon as unit_holder changes, for one_tactical_action this changes when system is different)
 
-        List<TemporaryCombatModifierModel> unusedMods = player.getUnusedTemporaryCombatModifiers();
+        List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();
         unusedMods = unusedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns()).collect(Collectors.toList());
         for (TemporaryCombatModifierModel mod : unusedMods) {            
             mod.setUseInSystem(tile.getId());
@@ -93,28 +96,73 @@ public class CombatModHelper {
             
             modsToUseNow.add(mod);
         }
+        player.setTempCombatModifiers(modsToUseNow);
     }
 
-    public static void ProcessExistingTemporaryMods(Player player, TileModel tile, UnitHolder holder){
-        List<TemporaryCombatModifierModel> usedMods = player.getUsedTemporaryCombatModifiers();
-        usedMods = usedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns()).collect(Collectors.toList());
-        for (TemporaryCombatModifierModel mod : unusedMods) {            
-
-            if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_ROUND){
-                //remove 
-            }else if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_COMBAT 
-                 && mod.getUseInUnitHolder() == holder.getName()
-                 && mod.getUseInSystem() == tile.getId()){
-                    //use again
-            }
-            else if(mod.getModifier().getPersistanceType() == Constants.MOD_TEMP_ONE_TACTILE_ACTION 
-                 && mod.getUseInSystem() == tile.getId()){
-                    //use again
-            }
-            else{
-                //remove
+    public static void EnsureValidTempMods(Player player, TileModel tile, UnitHolder holder){
+        List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
+        
+        tempMods = tempMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns()).collect(Collectors.toList());
+        for (TemporaryCombatModifierModel mod : tempMods) {            
+            switch (mod.getModifier().getPersistanceType()) {
+                case Constants.MOD_TEMP_ONE_COMBAT:
+                    if(!mod.getUseInUnitHolder().equals(holder.getName())
+                    || !mod.getUseInSystem().equals(tile.getId())){
+                        player.removeTempMod(mod);
+                    }
+                    break;
+                case Constants.MOD_TEMP_ONE_TACTILE_ACTION:
+                    if(!mod.getUseInSystem().equals(tile.getId())){
+                        player.removeTempMod(mod);
+                    }
+                    break;
             }
         }
+    }
+
+    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(Player player, TileModel tile, UnitHolder holder){
+        EnsureValidTempMods(player, tile, holder);
+        List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
+        List<NamedCombatModifierModel> currentRoundResults = new ArrayList<>(); 
+        for (TemporaryCombatModifierModel mod : tempMods) {
+            currentRoundResults.add(new NamedCombatModifierModel(mod.getModifier(), GetModfierRelatedDisplayName(player, mod.getRelatedID(), mod.getRelatedType())));
+            if(mod.getModifier().getPersistanceType().equals(Constants.MOD_TEMP_ONE_ROUND)){
+                player.removeTempMod(mod);
+            }
+        }
+        return currentRoundResults;
+    }
+
+    public static String GetModfierRelatedDisplayName(Player player, String relatedID, String relatedType){
+        String displayName = "";
+        switch (relatedType) {
+            case Constants.AGENDA:
+                AgendaModel agenda = Mapper.getAgenda(relatedID);
+                displayName = Emojis.Agenda + " " + agenda.getName();
+                break;
+            case Constants.AC:
+                ActionCardModel actionCard = Mapper.getActionCard(relatedID);
+                displayName = Emojis.ActionCard + " " + actionCard.getName();
+                break;
+            case Constants.TECH: 
+                displayName = Helper.getTechRepresentationLong(relatedID);
+                break;
+            case Constants.RELIC:
+                displayName = Helper.getRelicRepresentation(relatedID);
+                break;
+            case Constants.ABILITY: 
+                displayName = AbilityInfo.getAbilityRepresentation(relatedID);
+            case Constants.UNIT:
+                UnitModel unit = Mapper.getUnit(relatedID);
+                displayName = Helper.getEmojiFromDiscord(unit.getBaseType()) + " "
+                                                + unit.getName() + " " + unit.getAbility();
+            case Constants.LEADER:
+                displayName = Helper.getLeaderRepresentation(player, relatedID, true, true);
+                
+            default:
+                break;
+        }   
+        return displayName;
     }
 
     /// Retrieves Always on modifiers, 

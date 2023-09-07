@@ -877,4 +877,7 @@ public class Constants {
     public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
     public static final String STATS_ANCHOR_LOCATION = "stats_anchor_location";
     public static final String SET_STATS_ANCHOR = "set_stats_anchor";
+    public static final Object MOD_TEMP_ONE_ROUND = "ONE_ROUND";
+    public static final String MOD_TEMP_ONE_TACTILE_ACTION = "ONE_TACTILE_ACTION";
+    public static final String MOD_TEMP_ONE_COMBAT = "ONE_COMBAT";
 }
