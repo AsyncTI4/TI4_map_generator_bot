@@ -13,7 +13,8 @@ public class AgendaModel implements ModelInterface {
     private String text2;
     private String source;
 
-    public AgendaModel() {}
+    public AgendaModel() {
+    }
 
     public boolean isValid() {
         return alias != null
@@ -53,19 +54,39 @@ public class AgendaModel implements ModelInterface {
         return source;
     }
 
+    public String getSourceEmoji() {
+        switch (source) {
+            case "absol":
+                return Emojis.Absol;
+            case "PoK":
+                return Emojis.Agenda;
+            default:
+                return Emojis.AsyncTI4Logo;
+        }
+    }
+
+    public String footnote() {
+        switch (alias) {
+            case "mutiny":
+                return "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
+            case "seed_empire":
+                return "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
+            case "censure":
+                return "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
+            default:
+                return null;
+        }
+    }
+
     public String getRepresentation(@Nullable Integer uniqueID) {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append("**__");
         if (uniqueID != null) {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        switch (source) {
-            case "absol" -> sb.append(Emojis.Absol);
-            case "PoK" -> sb.append(Emojis.AgendaWhite);
-            default -> sb.append(Emojis.AsyncTI4Logo);
-        }
+        sb.append(getSourceEmoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -77,12 +98,7 @@ public class AgendaModel implements ModelInterface {
             String arg = text2.replace("Against:", "**Against:**");
             sb.append("> ").append(arg).append("\n");
         }
-
-        switch (alias) {
-            case ("mutiny") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`").append("\n");
-            case ("seed_empire") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`").append("\n");
-            case ("censure") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`").append("\n");
-        }
+        if (footnote() != null) sb.append(footnote());
 
         return sb.toString();
     }

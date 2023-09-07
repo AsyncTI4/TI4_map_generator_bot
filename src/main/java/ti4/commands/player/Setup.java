@@ -21,7 +21,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
@@ -88,32 +87,32 @@ public class Setup extends PlayerSubcommandData {
 
         FactionModel setupInfo = player.getFactionSetupInfo();
 
-        //HOME SYSTEM
+        // HOME SYSTEM
         String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
         if (!PositionMapper.isTilePositionValid(positionHS)) {
             sendMessage("Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
-        
+
         String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
         activeMap.setTile(tile);
         player.setPlayerStatsAnchorPosition(positionHS);
 
-        //HANDLE GHOSTS' HOME SYSTEM LOCATION
-        if ("ghost".equals(faction)){
+        // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        if ("ghost".equals(faction)) {
 
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
             activeMap.setTile(tile);
         }
 
-        //STARTING COMMODITIES
+        // STARTING COMMODITIES
         player.setCommoditiesTotal(setupInfo.getCommodities());
-        
-        //STARTING PLANETS
+
+        // STARTING PLANETS
         for (String planet : setupInfo.getHomePlanets()) {
-            if (planet.isEmpty()){
+            if (planet.isEmpty()) {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
@@ -123,17 +122,17 @@ public class Setup extends PlayerSubcommandData {
 
         player.getExhaustedPlanets().clear();
 
-        //STARTING UNITS
+        // STARTING UNITS
         addUnits(setupInfo, tile, color, event);
         if (!activeMap.isFoWMode()) {
             sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }
-        
-        //STARTING TECH
+
+        // STARTING TECH
         for (String tech : setupInfo.getStartingTech()) {
-            if (tech.trim().isEmpty()){
+            if (tech.trim().isEmpty()) {
                 continue;
             }
             player.addTech(tech);
@@ -144,18 +143,18 @@ public class Setup extends PlayerSubcommandData {
         if (setSpeaker) {
             activeMap.setSpeaker(player.getUserID());
             sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap));
-        }        
+        }
 
-        //STARTING PNs
+        // STARTING PNs
         player.initPNs(activeMap);
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         player.setPromissoryNotesOwned(playerPNs);
 
-        //STARTING OWNED UNITS
+        // STARTING OWNED UNITS
         HashSet<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
-        //SEND STUFF
+        // SEND STUFF
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);
         LeaderInfo.sendLeadersInfo(activeMap, player, event);

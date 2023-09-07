@@ -35,14 +35,12 @@ public class ResourceHelper {
     public File getResource(String name) {
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream stream = classLoader.getResourceAsStream(name);
-        try
-        {
+        try {
             if (stream == null) {
                 throw new Exception("Cannot find file " + name);
             }
             return new File(stream.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -95,7 +93,7 @@ public class ResourceHelper {
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (new Random().nextInt(Constants.EYE_CHANCE) == 0) {
-                return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD,Constants.UNIT_DD_EYE ), "Could not find eye file");
+                return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
             }
         }
         String unitPath = unitCache.get(name);
@@ -106,6 +104,7 @@ public class ResourceHelper {
         unitCache.put(name, unit);
         return unit;
     }
+
     @Nullable
     public String getCCFile(String name) {
         String ccPath = ccCache.get(name);
@@ -164,12 +163,11 @@ public class ResourceHelper {
     @Nullable
     public String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
-        if (resourceFile.exists()){
+        if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
-        }
-        else {
-           // System.out.println("Could not find resource file " + name + " in folder " + folder);
-            System.out.println(errorDescription);
+        } else {
+            // System.out.println("Could not find resource file " + name + " in folder " + folder);
+            // System.out.println(errorDescription);
         }
         return null;
     }
