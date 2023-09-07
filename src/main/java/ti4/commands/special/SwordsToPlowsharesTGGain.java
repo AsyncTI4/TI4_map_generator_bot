@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -55,10 +56,16 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         player.setTg(fTG);
                         message = message + ident+" removed "+numTG+" infantry from "+Helper.getPlanetRepresentation(unitHolder.getName(), activeMap)+" and gained that many tg (" + cTG + "->" + fTG + "). \n";
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
+                        if(player.hasInf2Tech() ){
+                            ButtonHelper.resolveInfantryDeath(activeMap, player, numTG);
+                        }
                        
                     }
                 }
             }  
+        }
+        if((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))){
+            ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeMap);
         }
          MessageChannel channel = activeMap.getMainGameChannel();
             if(activeMap.isFoWMode()){
