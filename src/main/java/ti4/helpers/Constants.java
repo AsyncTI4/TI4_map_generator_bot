@@ -881,4 +881,5 @@ public class Constants {
     public static final String IGNORE_ENDED_GAMES = "ignore_ended_games";
     public static final String MEDIAN_TURN_TIME = "median_turn_time";
     public static final String SHOW_MEDIAN = "show_median";
+    public static final String SHOW_AVERAGE_TURN_TIME = "show_average_turn_time";
 }
