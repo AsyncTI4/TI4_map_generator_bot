@@ -1266,7 +1266,9 @@ public class ButtonListener extends ListenerAdapter {
             acButtons.add(Button.danger("yssarilHeroRejection_"+player.getFaction(), "Reject " + acName +" and force them to discard of 3 random ACs"));
             String message = Helper.getPlayerRepresentation(yssaril, activeMap, activeMap.getGuild(), true) + " "+offerName +" has offered you the action card "+ acName + " for your Yssaril Hero play. Use buttons to accept or reject it";
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel)yssaril.getCardsInfoThread(activeMap), message, acButtons);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue();//"statusInfRevival_"
+         } else if (buttonID.startsWith("statusInfRevival_")) {
+            ButtonHelper.placeInfantryFromRevival(activeMap, event, player, buttonID);
         } else if (buttonID.startsWith("genericReact")) {
             String message = activeMap.isFoWMode() ? "Turned down window" : null;
             ButtonHelper.addReaction(event, false, false, message, "");
@@ -2239,6 +2241,20 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                     }
                 }
+                case "convert_1_comms" -> {
+                    String message = "";
+                    if (player.getCommodities() > 0) {
+                        player.setCommodities(player.getCommodities() - 1);
+                        player.setTg(player.getTg() + 1);
+                        message = "Converted 1 Commodities to 1 tg ("+(player.getTg()-1)+"->"+player.getTg()+")";
+                    } else {
+                        player.setTg(player.getTg() + player.getCommodities());
+                        player.setCommodities(0);
+                        message = "Had no commidities to convert into tg";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + message);
+                    
+                }
                 case "gain_1_comms" -> {
                     String message = "";
                     if (player.getCommodities() + 1 > player.getCommoditiesTotal()) {
@@ -2246,7 +2262,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = "Gained No Commodities (at max already)";
                     } else {
                         player.setCommodities(player.getCommodities() + 1);
-                        message = "Gained 1 Commodity";
+                        message = " Gained 1 Commodity ("+(player.getCommodities()-1)+"->"+player.getCommodities()+")";
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
                     event.getMessage().delete().queue();
@@ -2254,6 +2270,17 @@ public class ButtonListener extends ListenerAdapter {
                         String pF = Helper.getFactionIconFromDiscord(player.getFaction());
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                     }
+                }
+                case "gain_1_comm_from_MahactInf" -> {
+                    String message = "";
+                    if (player.getCommodities() + 1 > player.getCommoditiesTotal()) {
+                        player.setCommodities(player.getCommoditiesTotal());
+                        message = " Gained No Commodities (at max already)";
+                    } else {
+                        player.setCommodities(player.getCommodities() + 1);
+                        message = " Gained 1 Commodity ("+(player.getCommodities()-1)+"->"+player.getCommodities()+")";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + message);
                 }
                 case "comm_for_AC" -> {
                     boolean hasSchemingAbility = player.hasAbility("scheming");

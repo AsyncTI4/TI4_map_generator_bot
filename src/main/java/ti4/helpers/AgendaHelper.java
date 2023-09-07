@@ -408,9 +408,9 @@ public class AgendaHelper {
         Button concludeExhausting = Button.danger(finsFactionCheckerPrefix + "delete_buttons_" + votes,
                 "Done exhausting planets.");
         Button OopsMistake = Button.success("refreshVotes_" + votes,
-                "I made a mistake and want to ready some planets");
+                "Ready planets");
          Button OopsMistake2 = Button.success("outcome_" + activeMap.getLatestOutcomeVotedFor(),
-                "I made a mistake and want to choose a different amount of votes");
+                "Change # of votes");
         voteActionRow.add(exhausteverything);
         voteActionRow.add(concludeExhausting);
         voteActionRow.add(OopsMistake);
@@ -791,10 +791,10 @@ public class AgendaHelper {
 
      public static List<Button> getWhenButtons(Map activeMap) {
         Button playWhen = Button.danger("play_when", "Play When");
-        Button noWhen = Button.primary("no_when", "No Whens")
+        Button noWhen = Button.primary("no_when", "No Whens (for now)")
                 .withEmoji(Emoji.fromFormatted(Emojis.noafters));
         Button noWhenPersistent = Button
-                .primary("no_when_persistent", "No Whens No Matter What (for this agenda)")
+                .primary("no_when_persistent", "No Whens (for this agenda)")
                 .withEmoji(Emoji.fromFormatted(Emojis.noafters));
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         Player quasher = Helper.getPlayerFromAbility(activeMap, "quash");
@@ -835,11 +835,11 @@ public class AgendaHelper {
             afterButtons.add(playKeleresHero);
         }
 
-        Button noAfter = Button.primary("no_after", "No Afters")
+        Button noAfter = Button.primary("no_after", "No Afters (for now)")
                 .withEmoji(Emoji.fromFormatted(Emojis.noafters));
         afterButtons.add(noAfter);
         Button noAfterPersistent = Button
-                .primary("no_after_persistent", "No Afters No Matter What (for this agenda)")
+                .primary("no_after_persistent", "No Afters (for this agenda)")
                 .withEmoji(Emoji.fromFormatted(Emojis.noafters));
         afterButtons.add(noAfterPersistent);
         

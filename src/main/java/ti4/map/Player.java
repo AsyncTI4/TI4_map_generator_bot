@@ -202,6 +202,13 @@ public class Player {
         }
         return false;
     }
+    public boolean hasInf2Tech() {//"dszeliinf"
+        if(getTechs().contains("cl2") ||getTechs().contains("so2") ||getTechs().contains("inf2") || getTechs().contains("lw2")|| getTechs().contains("dscymiinf") || getTechs().contains("dszeliinf"))
+        {
+            return true; 
+        }
+        return false;
+    }
     public boolean hasWarsunTech() {
         if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws") || getFaction().equalsIgnoreCase("muaat"))
         {
