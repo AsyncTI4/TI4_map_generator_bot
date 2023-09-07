@@ -2,6 +2,7 @@ package ti4.commands.statistics;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -20,37 +21,34 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AverageTurnTime extends StatisticsSubcommandData {
+public class MedianTurnTime extends StatisticsSubcommandData {
 
-    public AverageTurnTime() {
-        super(Constants.AVERAGE_TURN_TIME, "Average turn time accross all games for all players");
+    public MedianTurnTime() {
+        super(Constants.MEDIAN_TURN_TIME, "Median turn time accross all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_MEDIAN, "True to also show median next to average (default = false)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String text = getAverageTurnTimeText(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Median Turn Time", text);
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
         HashMap<String, Map> maps = MapManager.getInstance().getMapList();
 
-        HashMap<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
+        HashMap<String, Integer> playerTurnCount = new HashMap<>();
+
         HashMap<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         Predicate<Map> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
         for (Map map : maps.values().stream().filter(endedGamesFilter).toList()) {
             for (Player player : map.getPlayers().values()) {
                 Entry<Integer, Long> playerTurnTime = java.util.Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
-                playerTurnTimes.merge(player.getUserID(), playerTurnTime, (oldEntry, newEntry) -> java.util.Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
-                
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
                 playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
@@ -58,41 +56,31 @@ public class AverageTurnTime extends StatisticsSubcommandData {
                     value.add(averageTurnTime);
                     return value;
                 });
+                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), (oldValue, newValue) -> oldValue + newValue);
             }
         }
 
         HashMap<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream().map(e -> java.util.Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Average Turn Time:**__\n");
+        sb.append("## __**Median Turn Time:**__\n");
         
         int index = 1;
-        Comparator<Entry<String, Entry<Integer, Long>>> comparator = (o1, o2) -> {
-            int o1TurnCount = o1.getValue().getKey();
-            int o2TurnCount = o2.getValue().getKey();
-            long o1total = o1.getValue().getValue();
-            long o2total = o2.getValue().getValue();
-            if (o1TurnCount == 0 || o2TurnCount == 0) return -1;
-
-            Long total1 = o1total/o1TurnCount;
-            Long total2 = o2total/o2TurnCount;
-            return total1.compareTo(total2);
+        Comparator<Entry<String, Long>> comparator = (o1, o2) -> {
+            return o1.getValue().compareTo(o2.getValue());
         };
+        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
-        for (Entry<String, Entry<Integer, Long>> userTurnCountTotalTime : playerTurnTimes.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
-            User user = MapGenerator.jda.getUserById(userTurnCountTotalTime.getKey());
-            int turnCount = userTurnCountTotalTime.getValue().getKey();
-            long totalMillis = userTurnCountTotalTime.getValue().getValue();
+        for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream().filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
+            User user = MapGenerator.jda.getUserById(userMedianTurnTime.getKey());
+            long totalMillis = userMedianTurnTime.getValue();
+            int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 
             if (user == null || turnCount == 0 || totalMillis == 0) continue;
             
-            long averageTurnTime = totalMillis / turnCount;
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            sb.append(Helper.getTimeRepresentationToSeconds(averageTurnTime));
-            if (showMedian) sb.append(" (median: ").append(Helper.getTimeRepresentationToSeconds(playerMedianTurnTimes.get(userTurnCountTotalTime.getKey()))).append(")");
+            sb.append(Helper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
             sb.append("` ").append(user.getEffectiveName());
             sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");

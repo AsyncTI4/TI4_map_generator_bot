@@ -22,17 +22,19 @@ public class ListMyGames extends HelpSubcommandData {
         super(Constants.LIST_MY_GAMES, "List all of your games you are currently in");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_MY_TURN, "True to only show games where it is your turn"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_AVERAGE_TURN_TIME, "True to show average turn time as well (default = false)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean onlyMyTurn = event.getOption(Constants.IS_MY_TURN, false, OptionMapping::getAsBoolean);
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        boolean showAverageTurnTime = event.getOption(Constants.SHOW_AVERAGE_TURN_TIME, false, OptionMapping::getAsBoolean);
         User user = event.getUser();
         String userID = user.getId();
 
-        Predicate<Map> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer().equals(userID) : m -> true;
-        Predicate<Map> endedGamesFilter = includeEndedGames ? m -> !m.isFoWMode() && m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
+        Predicate<Map> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
+        Predicate<Map> endedGamesFilter = includeEndedGames ? m -> m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
 
         Comparator<Map> mapSort = new Comparator<Map>() {
             @Override
@@ -46,21 +48,41 @@ public class ListMyGames extends HelpSubcommandData {
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (Map playerMap : maps) {
-            sb.append(Helper.rightpad("`" + index + ".`", 6)).append(getPlayerMapListRepresentation(playerMap, userID, event)).append("\n");
+            sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`").append(getPlayerMapListRepresentation(playerMap, userID, showAverageTurnTime)).append("\n");
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Game List", sb.toString());
     }
 
-    private String getPlayerMapListRepresentation(Map playerMap, String userID, GenericInteractionCreateEvent event) {
+    private String getPlayerMapListRepresentation(Map playerMap, String userID, boolean showAverageTurnTime) {
         Player player = playerMap.getPlayer(userID);
         if (player == null) return "";
+        String gameNameAndChannelLink = playerMap.getActionsChannel() == null ? playerMap.getName() : playerMap.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
-        sb.append("**").append(playerMap.getName()).append("**:  ");
-        sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(" ").append(playerMap.getActionsChannel() == null ? "" : playerMap.getActionsChannel().getAsMention());
-        if (playerMap.getActivePlayer() == null ? false : playerMap.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
-        if (playerMap.isHasEnded()) sb.append(" - GAME HAS ENDED");
+        sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+        sb.append("**").append(gameNameAndChannelLink).append("**");
+        if (playerMap.getActivePlayer() == null ? false : playerMap.getActivePlayer().equals(userID)) sb.append("  **[__IT IS YOUR TURN__]**");
+        if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
+        if (playerMap.isHasEnded()) sb.append("  [GAME HAS ENDED]");
         return sb.toString();
+    }
+
+    private static String playerAverageMapTurnLength(Player player) {
+        long totalMillis = player.getTotalTurnTime();
+        int numTurns = player.getNumberTurns();
+        if (numTurns == 0 || totalMillis == 0) {
+            return String.format("%02dh:%02dm:%02ds", 0, 0, 0);
+        }
+
+        long total = totalMillis / numTurns;
+
+        total = total / 1000; //total seconds (truncates)
+        long seconds = total % 60;
+
+        total = total / 60; //total minutes (truncates)
+        long minutes = total % 60;
+        long hours = total / 60; //total hours (truncates)
+        return String.format("%02dh:%02dm:%02ds", hours, minutes, seconds);
     }
 
 }
