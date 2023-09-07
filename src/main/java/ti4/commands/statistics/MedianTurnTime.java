@@ -26,17 +26,20 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     public MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time accross all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String text = getAverageTurnTimeText(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Median Turn Time", text);
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
         HashMap<String, Map> maps = MapManager.getInstance().getMapList();
+
+        HashMap<String, Integer> playerTurnCount = new HashMap<>();
 
         HashMap<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
@@ -53,6 +56,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
                     value.add(averageTurnTime);
                     return value;
                 });
+                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), (oldValue, newValue) -> oldValue + newValue);
             }
         }
 
@@ -65,17 +69,20 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         Comparator<Entry<String, Long>> comparator = (o1, o2) -> {
             return o1.getValue().compareTo(o2.getValue());
         };
+        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream().filter(o -> o.getValue() != 0).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
+        for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream().filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
             User user = MapGenerator.jda.getUserById(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
+            int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 
-            if (user == null || totalMillis == 0) continue;
+            if (user == null || turnCount == 0 || totalMillis == 0) continue;
             
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(Helper.getTimeRepresentationToSeconds(userMedianTurnTime.getValue()));
             sb.append("` ").append(user.getEffectiveName());
+            sb.append("   [").append(turnCount).append(" total turns]");
             sb.append("\n");
             index++;     
         }
