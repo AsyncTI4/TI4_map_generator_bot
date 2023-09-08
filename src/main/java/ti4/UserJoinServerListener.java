@@ -1,6 +1,7 @@
 package ti4;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -10,7 +11,6 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 
 public class UserJoinServerListener extends ListenerAdapter {
     
@@ -29,7 +29,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (map.getGuild() != null && map.getGuild().equals(guild) && map.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(map);
                 Helper.fixGameChannelPermissions(guild, map);
-                MessageHelper.sendMessageToChannel(map.getBotMapUpdatesThread(), "User join the server late! Welcome to the game, " + user.getAsMention() + "! Pinging you here so you can see the bot-map-updates channel.");
+                map.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
             }
         }
         if (!mapsJoined.isEmpty()) BotLogger.log("User: *" + user.getName() + "* joined server: **" + guild.getName() + "**. Maps joined:\n> " + mapsJoined.stream().map(Map::getName).toList());
