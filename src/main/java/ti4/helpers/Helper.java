@@ -2039,13 +2039,14 @@ public class Helper {
         return String.format("%02dh:%02dm:%02ds:%03d", hours, minutes, seconds, millis);
     }
 
-    // the array double[] m MUST BE SORTED
     public static long median(List<Long> turnTimes) {
-        int middle = turnTimes.size()/2;
-        if (turnTimes.size()%2 == 1) {
-            return turnTimes.get(middle);
+        List<Long> turnTimesSorted = new ArrayList<>(turnTimes);
+        Collections.sort(turnTimesSorted);
+        int middle = turnTimesSorted.size()/2;
+        if (turnTimesSorted.size()%2 == 1) {
+            return turnTimesSorted.get(middle);
         } else {
-            return (turnTimes.get(middle - 1) + turnTimes.get(middle)) / 2;
+            return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
         }
     }
 }
