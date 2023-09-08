@@ -700,7 +700,14 @@ public class Helper {
             unitButtons.add(ff2Button);
         }
         
+        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
 
+            if(player.hasUnexhaustedLeader("argentagent", activeMap)){
+                        Button argentButton = Button.success("FFCC_"+player.getFaction()+"_"+"exhaustAgent_argentagent_"+tile.getPosition(), "Use Argent Agent");
+                        argentButton = argentButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("argent")));
+                        unitButtons.add(argentButton);
+            }
+        }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
                 String colorID = Mapper.getColorID(player.getColor());
@@ -737,6 +744,8 @@ public class Helper {
                 Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeMap) );
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
+
+                
             }
             else if(ButtonHelper.canIBuildGFInSpace(activeMap, player, tile, warfareNOtherstuff) && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space"+tile.getPosition(), "Produce 1 Infantry in space");
