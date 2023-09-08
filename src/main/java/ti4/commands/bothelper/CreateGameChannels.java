@@ -314,7 +314,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-        //return pbdNumbers.stream().filter(num -> num != 1000).toList(); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
+        return pbdNumbers;
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
