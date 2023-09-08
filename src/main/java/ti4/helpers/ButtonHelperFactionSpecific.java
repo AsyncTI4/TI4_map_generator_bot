@@ -369,6 +369,47 @@ public class ButtonHelperFactionSpecific {
 
     }
 
+    public static void resolveSolCommander(Player player, Map activeMap, String buttonID, ButtonInteractionEvent event){
+        String planet = buttonID.split("_")[1];
+        Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf "+planet, activeMap);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " placed 1 infantry on "+Helper.getPlanetRepresentation(planet, activeMap) + " using Sol Commander");
+    }
+
+    public static void resolveInitialIndoctrinationQuestion(Player player, Map activeMap, String buttonID, ButtonInteractionEvent event){
+        String planet = buttonID.split("_")[1];
+        List<Button> options = new ArrayList<Button>();
+        options.add(Button.success("indoctrinate_"+planet+"_infantry", "Indoctrinate to place an infantry"));
+        options.add(Button.success("indoctrinate_"+planet+"_mech", "Indoctrinate to place a mech"));
+        options.add(Button.danger("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeMap)+" use buttons to resolve indoctrination", options);
+    }
+    public static void resolveFollowUpIndoctrinationQuestion(Player player, Map activeMap, String buttonID, ButtonInteractionEvent event){
+        String planet = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 "+unit+" "+planet, activeMap);
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
+            if(FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)){
+                new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry "+planet, activeMap);
+            }
+        }
+        List<Button> options =ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+        if(player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "yin", event);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " replaced 1 of their opponent's infantry with 1 "+unit+" on "+Helper.getPlanetRepresentation(planet, activeMap) + " using indoctrination");
+        options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeMap)+" pay for indoctrination.", options);
+        event.getMessage().delete().queue();
+    }
+
+    
+
+
     public static List<Button> getCabalHeroButtons(Player player, Map activeMap){
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> empties = new ArrayList<Button>();
@@ -955,6 +996,42 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), successMessage);
         event.getMessage().delete().queue();
     }
+
+    public static void resolveMercerMove(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+        String planetDestination = buttonID.split("_")[1];
+        String planetRemoval = buttonID.split("_")[2];
+        String unit = buttonID.split("_")[3];
+        new RemoveUnits().unitParsing(event, player.getColor(), Helper.getTileFromPlanet(planetRemoval, activeMap), unit+" "+planetRemoval, activeMap);
+        new AddUnits().unitParsing(event, player.getColor(), Helper.getTileFromPlanet(planetDestination, activeMap), unit+" "+planetDestination, activeMap);
+        MessageHelper.sendMessageToChannel(event.getChannel(), ident + " moved 1 "+unit + " from "+Helper.getPlanetRepresentation(planetRemoval, activeMap)+" to "+Helper.getPlanetRepresentation(planetDestination, activeMap));
+    }
+
+    public static void addArgentAgentButtons(Tile tile, Player player, Map activeMap){
+        Set<String> tiles = FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), player, false);
+        List<Button> unitButtons = new ArrayList<Button>();
+        for(String pos : tiles){
+            Tile tile2 = activeMap.getTileByPosition(pos);
+           
+            for(UnitHolder unitHolder : tile2.getUnitHolders().values()){
+                if(unitHolder.getName().equalsIgnoreCase("space")){
+                    continue;
+                }
+                Planet planetReal =  (Planet) unitHolder;
+                String planet = planetReal.getName();    
+                if (planetReal != null  && player.getPlanets(activeMap).contains(planet)) {
+                    String pp = unitHolder.getName();
+                    Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_place_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
+                    inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    unitButtons.add(inf1Button);
+                    Button mfButton = Button.success("FFCC_"+player.getFaction()+"_place_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                    mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                    unitButtons.add(mfButton);
+                }
+            }
+        }
+        unitButtons.add(Button.danger("deleteButtons_spitItOut", "Done Using Argent Agent"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getTrueIdentity(player, activeMap) + " use buttons to place ground forces via argent agent", unitButtons);
+    }
     
 
     public static void exhaustAgent(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
@@ -1075,6 +1152,39 @@ public class ButtonHelperFactionSpecific {
             String successMessage = ident + " placed 2 " + Helper.getEmojiFromDiscord("infantry") + " on " + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), successMessage);
         }
+        if (agent.equalsIgnoreCase("argentagent")) {
+            String pos = rest.replace("argentagent_","");
+            Tile tile = activeMap.getTileByPosition(pos);
+            ButtonHelperFactionSpecific.addArgentAgentButtons(tile, player, activeMap);
+        }
+        if (agent.equalsIgnoreCase("nomadagentmercer")) {
+            String posNPlanet = rest.replace("nomadagentmercer_","");
+            String pos = posNPlanet.split("_")[0];
+            String planetName = posNPlanet.split("_")[1];
+            List<Button> buttons = new ArrayList<Button>();
+            for(String planet : player.getPlanets()){
+                if (planet == planetName || planet.toLowerCase().contains("custodiavigilia")){
+                    continue;
+                }
+                if(ButtonHelper.getNumberOfInfantryOnPlanet(planet, activeMap, player) > 0){
+                    buttons.add(Button.success("mercerMove_"+planetName+"_"+planet+"_infantry","Move Infantry from "+Helper.getPlanetRepresentation(planet, activeMap) +" to "+Helper.getPlanetRepresentation(planetName, activeMap)));
+                }
+                if(ButtonHelper.getNumberOfMechsOnPlanet(planet, activeMap, player) > 0){
+                    buttons.add(Button.success("mercerMove_"+planetName+"_"+planet+"_mech","Move mech from "+Helper.getPlanetRepresentation(planet, activeMap) +" to "+Helper.getPlanetRepresentation(planetName, activeMap)));
+                }
+            }
+            buttons.add(Button.danger("deleteButtons", "Done moving to this planet"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getTrueIdentity(player, activeMap) +" use buttons to resolve move of mercer units to this planet", buttons);
+        }
+        if (agent.equalsIgnoreCase("l1z1xagent")) {
+            String posNPlanet = rest.replace("l1z1xagent_","");
+            String pos = posNPlanet.split("_")[0];
+            String planetName = posNPlanet.split("_")[1];
+            new RemoveUnits().unitParsing(event, player.getColor(), activeMap.getTileByPosition(pos), "1 infantry " + planetName, activeMap);
+            new AddUnits().unitParsing(event, player.getColor(), activeMap.getTileByPosition(pos), "1 mech " + planetName, activeMap);
+            String successMessage = ident + " replaced 1 " + Helper.getEmojiFromDiscord("infantry") + " on " + Helper.getPlanetRepresentation(planetName, activeMap) + " with 1 mech.";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), successMessage);
+        }
 
         if (agent.equalsIgnoreCase("muaatagent")) {
             String faction = rest.replace("muaatagent_","");
@@ -1121,7 +1231,7 @@ public class ButtonHelperFactionSpecific {
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
+            if (buttonIndex > -1 && !agent.equalsIgnoreCase("nomadagentmercer")) {
                 buttonRow.remove(buttonIndex);
             }
             if (buttonRow.size() > 0) {
@@ -1288,6 +1398,43 @@ public class ButtonHelperFactionSpecific {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
                 buttons.add(Button.success("exhaustAgent_sardakkagent_"+activeMap.getActiveSystem()+"_"+planetId, "Use Sardakk Agent on "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+            }
+        }
+
+        return buttons;
+
+    }
+    public static List<Button> getMercerAgentInitialButtons(Map activeMap, Player player) {
+         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null  && player.getPlanets(activeMap).contains(planet)) {
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+                buttons.add(Button.success("exhaustAgent_nomadagentmercer_"+activeMap.getActiveSystem()+"_"+planetId, "Use Nomad Agent General Mercer on "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
+            }
+        }
+
+        return buttons;
+    }
+    public static List<Button> getL1Z1XAgentButtons(Map activeMap, Player player) {
+         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null  && player.getPlanets(activeMap).contains(planet) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planet)) {
+                String planetId = planetReal.getName();
+                String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+                buttons.add(Button.success("exhaustAgent_l1z1xagent_"+activeMap.getActiveSystem()+"_"+planetId, "Use L1Z1X Agent on "+planetRepresentation).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("l1z1x"))));
             }
         }
 

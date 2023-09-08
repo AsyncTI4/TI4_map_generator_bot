@@ -540,7 +540,30 @@ public class ButtonHelper {
         }
     }
 
-    
+    public static int getNumberOfInfantryOnPlanet(String planetName, Map activeMap, Player player){
+        String colorID = Mapper.getColorID(player.getColor());
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeMap);
+        String infKey = colorID + "_gf.png";
+        int numInf = 0;
+        if (unitHolder != null && unitHolder.getUnits() != null) {
+            if (unitHolder.getUnits().get(infKey) != null) {
+                numInf = unitHolder.getUnits().get(infKey);
+            }
+        }
+        return numInf;
+    }
+    public static int getNumberOfMechsOnPlanet(String planetName, Map activeMap, Player player){
+        String colorID = Mapper.getColorID(player.getColor());
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeMap);
+        String mechKey = colorID + "_mf.png";
+        int numMechs = 0;  
+        if (unitHolder.getUnits() != null) {
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                numMechs = unitHolder.getUnits().get(mechKey);
+            }
+        }
+        return numMechs;
+    }
 
 
     public static int resolveOnActivationEnemyAbilities(Map activeMap, Tile activeSystem, Player player, boolean justChecking) {
@@ -797,6 +820,9 @@ public class ButtonHelper {
                 }
             }
             case "zealots" -> {
+                shouldBeUnlocked = true;
+            }
+            case "yin" -> {
                 shouldBeUnlocked = true;
             }
             case "dihmohn" -> {
@@ -1294,6 +1320,8 @@ public class ButtonHelper {
             String finChecker = "FFCC_"+p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"nekroStealTech_"+p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
         }
+        
+
         if ((p2.hasAbility("edict") || p2.hasAbility("imperia"))  && !activeMap.isFoWMode()) {
             String finChecker = "FFCC_"+p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"mahactStealCC_"+p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
@@ -1309,10 +1337,41 @@ public class ButtonHelper {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
                 nameOfHolder  = Helper.getPlanetRepresentation(unitH.getName(), activeMap);
+                if (activeMap.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && groundOrSpace.equalsIgnoreCase("ground")) {
+                    String finChecker = "FFCC_"+p1.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker+"utilizeSolCommander_"+unitH.getName(), "Use Sol Commander on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+                }
+                if (activeMap.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeMap.isFoWMode()&& groundOrSpace.equalsIgnoreCase("ground")) {
+                    String finChecker = "FFCC_"+p2.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker+"utilizeSolCommander_"+unitH.getName(), "Use Sol Commander on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+                }
+                if (p1.hasAbility("indoctrination") && groundOrSpace.equalsIgnoreCase("ground")) {
+                    String finChecker = "FFCC_"+p1.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker+"initialIndoctrination_"+unitH.getName(), "Indoctrinate on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+                }
+                if (p2.hasAbility("indoctrination") && !activeMap.isFoWMode()&& groundOrSpace.equalsIgnoreCase("ground")) {
+                    String finChecker = "FFCC_"+p2.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker+"initialIndoctrination_"+unitH.getName(), "Indoctrinate on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+                }
             }
             buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Basic Combat ("+nameOfHolder+")"));
         }        
         return buttons;
+    }
+
+    public static boolean isPlanetLegendaryOrHome(String planetName, Map activeMap){
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeMap);
+        Planet planetHolder = (Planet) unitHolder;
+        boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary"));
+        boolean oneOfThree = false;
+        Planet planetReal = planetHolder;
+        if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+            oneOfThree = true;
+        }
+        if(!planetReal.getName().toLowerCase().contains("rex") && !planetReal.getName().toLowerCase().contains("mr") && !oneOfThree){
+            hasAbility = true;
+        }
+        return hasAbility;
     }
     
     public static void checkFleetAndCapacity(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
@@ -2127,9 +2186,19 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("sardakkagent", activeMap)) {
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeMap, player));
         }
+        if (player.hasUnexhaustedLeader("nomadagentmercer", activeMap)) {
+            buttons.addAll(ButtonHelperFactionSpecific.getMercerAgentInitialButtons(activeMap, player));
+        }
         Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
         buttons.add(concludeMove);
         return buttons;
+    }
+    public static UnitHolder getUnitHolderFromPlanetName(String planetName, Map activeMap){
+        Tile tile = Helper.getTileFromPlanet(AliasHandler.resolvePlanet(planetName), activeMap);
+        if(tile == null){
+            return null;
+        }
+        return tile.getUnitHolders().get(planetName);
     }
     public static String getIdent(Player player){
         return Helper.getFactionIconFromDiscord(player.getFaction());

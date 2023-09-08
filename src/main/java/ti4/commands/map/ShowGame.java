@@ -85,8 +85,6 @@ public class ShowGame implements Command {
     }
     public void simpleShowGame(Map activeMap, GenericInteractionCreateEvent event, DisplayType displayType){
         File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
-        
-            MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
        
             List<Button> buttonsWeb = new ArrayList<Button>();
             if(!activeMap.isFoWMode()){
