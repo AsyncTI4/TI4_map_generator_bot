@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.helpers.*;
-import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -22,7 +21,6 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -36,7 +34,15 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -1143,9 +1149,8 @@ public class GenerateMap {
                     bulkUnitCount = unitCount;
                 }
                 try {
-                    float scaleOfUnit = 1.0f;
                     String unitPath = Tile.getUnitPath(unitID);
-                    image = resizeImage(ImageIO.read(new File(unitPath)), scaleOfUnit);
+                    image = ImageIO.read(new File(unitPath));
                 } catch (Exception e) {
                     BotLogger.log("Could not parse unit file for: " + unitID, e);
                 }
@@ -1440,14 +1445,7 @@ public class GenerateMap {
                 public int compare(String tech1, String tech2) {
                     TechnologyModel tech1Info = techInfo.get(tech1);
                     TechnologyModel tech2Info = techInfo.get(tech2);
-                    try {
-                        int t1 = tech1Info.getRequirements().length();
-                        int t2 = tech2Info.getRequirements().length();
-                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info.getName().compareTo(tech2Info.getName())) : 1);
-                    } catch (Exception e) {
-                        // do nothing
-                    }
-                    return 0;
+                    return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
                 }
             });
         }

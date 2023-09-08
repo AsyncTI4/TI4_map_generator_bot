@@ -19,8 +19,8 @@ import ti4.model.TechnologyModel;
 
 public class TechInfo extends TechSubcommandData {
     public TechInfo() {
-		super(Constants.INFO, "Send tech information to your Cards Info channel");
-	}
+        super(Constants.INFO, "Send tech information to your Cards Info channel");
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -80,7 +80,7 @@ public class TechInfo extends TechSubcommandData {
             techList.add(tech);
             techsFiltered.put(techType, techList);
         }
-        
+
         for (java.util.Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
             list.sort(new Comparator<String>() {
@@ -88,14 +88,7 @@ public class TechInfo extends TechSubcommandData {
                 public int compare(String tech1, String tech2) {
                     TechnologyModel tech1Info = techInfo.get(tech1);
                     TechnologyModel tech2Info = techInfo.get(tech2);
-                    try {
-                        int t1 = tech1Info.getRequirements().length();
-                        int t2 = tech2Info.getRequirements().length();
-                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info.getName().compareTo(tech2Info.getName())) : 1);
-                    } catch (Exception e) {
-                        //do nothing
-                    }
-                    return 0;
+                    return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
                 }
             });
         }
