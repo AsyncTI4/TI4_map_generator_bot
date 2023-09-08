@@ -32,7 +32,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CreateGameChannels extends BothelperSubcommandData {
-    public CreateGameChannels(){
+    public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
@@ -149,7 +149,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (missingMembers.size() > 0) {
-            sendMessage("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **" + guild.getName() + "**\n");
+            sendMessage(
+                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **"
+                    + guild.getName() + "**\n");
             sendMessage(Helper.getGuildInviteURL(guild));
             sendMessage("The following players were not on the above server:");
             for (Member member : missingMembers) {
@@ -171,12 +173,12 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CREATE GAME
         Map newMap = GameCreate.createNewGame(event, gameName, gameOwner);
-        
+
         //ADD PLAYERS
         for (Member member : members) {
             newMap.addPlayer(member.getId(), member.getEffectiveName());
         }
-        
+
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         newMap.setCustomName(gameFunName);
@@ -188,29 +190,30 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleID, permission, 0)
-        .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newMap.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleID, permission, 0)
-        .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newMap.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
-        .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-        .complete();
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .complete();
         newMap.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
         StringBuilder tabletalkGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - table talk channel\n");
         tabletalkGetStartedMessage.append("This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n");
         tabletalkGetStartedMessage.append("If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n");
-        tabletalkGetStartedMessage.append("Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n");
+        tabletalkGetStartedMessage
+            .append("Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n");
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) chatChannel, tabletalkGetStartedMessage.toString());
 
         // INTRODUCTION TO ACTIONS CHANNEL
@@ -243,7 +246,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
         message.append("> " + botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
-        
+
         MapSaveLoadManager.saveMap(newMap, event);
     }
 
@@ -255,7 +258,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
-    
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
@@ -312,9 +314,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-        return pbdNumbers.stream().filter(num -> num != 1000).toList(); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
+        //return pbdNumbers.stream().filter(num -> num != 1000).toList(); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
     }
-  
+
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
@@ -359,8 +361,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
-        if (guild != null   && serverHasRoomForNewRole(guild)
-                            && serverHasRoomForNewChannels(guild)) {
+        if (guild != null && serverHasRoomForNewRole(guild)
+            && serverHasRoomForNewChannels(guild)) {
             return true;
         }
         return false;
@@ -399,7 +401,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
         return "PBD #" + lowerBound + "-" + upperBound;
     }
-    
+
     public static List<Category> getAllAvailablePBDCategories() {
         List<Category> categories = MapGenerator.jda.getCategories().stream()
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
