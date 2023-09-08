@@ -603,6 +603,12 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getTech_")) {
             String tech = buttonID.replace("getTech_", "");
             String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
+            TechnologyModel techM = Mapper.getTechs().get(tech);
+            if(techM.getRequirements()!= null && techM.getRequirements().length() > 1){
+                if(player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "zealots", event);
+                }
+            }
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
             player.addTech(AliasHandler.resolveTech(tech));
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, tech, activeMap);
@@ -1770,6 +1776,9 @@ public class ButtonListener extends ListenerAdapter {
                             + " Use the buttons to select which player you wish to transact with";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
+                }
+                case "combatDrones" -> {
+                    ButtonHelperModifyUnits.resolvingCombatDrones(event, activeMap, player, ident, buttonLabel);
                 }
                 case "acquireATech" -> {
 
