@@ -164,6 +164,14 @@ public class AgendaHelper {
 
                 }
             }
+            if(activeMap.getLaws().size() > 0){
+                for(Player player : activeMap.getRealPlayers()){
+                    if(player.getLeaderIDs().contains("edyncommander") && !player.hasLeaderUnlocked("edyncommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "edyn", event);
+                    }
+                }
+            }
+            
         } else {
 
             if (activeMap.getCurrentAgendaInfo().contains("Player")) {
@@ -293,6 +301,13 @@ public class AgendaHelper {
         }
         String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
         List<Player> riders = AgendaHelper.getWinningRiders(summary, winner, activeMap, event);
+         List<Player> voters = AgendaHelper.getWinningVoters(winner, activeMap);
+        voters.addAll(riders);
+        for (Player player : voters) {
+            if(player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "dihmohn", event);
+            }
+        }
         String ridSum = "People had riders to resolve.";
         for (Player rid : riders) {
             String rep = Helper.getPlayerRepresentation(rid, activeMap, event.getGuild(), true);

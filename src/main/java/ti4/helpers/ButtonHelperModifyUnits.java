@@ -559,6 +559,32 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
+    public static void resolvingCombatDrones(ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
+        Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
+        int numff = 0;
+        for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+            if(unitHolder instanceof Planet){
+                continue;
+            }
+            
+            String colorID = Mapper.getColorID(player.getColor());
+            String ffKey = colorID + "_ff.png";
+            if (unitHolder.getUnits() != null) {
+                if (unitHolder.getUnits().get(ffKey) != null) {
+                    numff = unitHolder.getUnits().get(ffKey);
+                }
+            }
+        }
+        if(numff > 0){
+            new RemoveUnits().unitParsing(event, player.getColor(), tile, numff + " fighters", activeMap);
+            new AddUnits().unitParsing(event, player.getColor(), tile, numff + " infantry", activeMap);
+        }
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Turned "+numff+ " fighters into infantry using the combat drone ability");
+                event.getMessage().editMessage(event.getMessage().getContentRaw())
+                            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+
+    }
     public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
         String remove = "Move";
         HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();

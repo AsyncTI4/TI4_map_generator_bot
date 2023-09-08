@@ -79,16 +79,16 @@ abstract public class AddRemoveToken implements Command {
 
                 File file = GenerateMap.getInstance().saveImage(activeMap, event);
                 //MessageHelper.replyToMessage(event, file);
-                if(activeMap.isFoWMode()){
-                    MessageHelper.sendFileToChannel(event.getChannel(), file);
-                }else{
+                
                     List<Button> buttonsWeb = new ArrayList<Button>();
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                    buttonsWeb.add(linkToWebsite);
+                    if(!activeMap.isFoWMode()){
+                        Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                        buttonsWeb.add(linkToWebsite);
+                    }
                     buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
                     buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
                     MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
-                }
+                
             } else {
                 MessageHelper.replyToMessage(event, "Tile needs to be specified.");
             }
