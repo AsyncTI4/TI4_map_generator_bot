@@ -26,7 +26,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Map> mapsJoined = new ArrayList<>();
         for (Map map : MapManager.getInstance().getMapList().values()) {
-            if (map.getPlayers().containsKey(user.getId())) {
+            if (map.getGuild() != null && map.getGuild().equals(guild) && map.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(map);
                 Helper.fixGameChannelPermissions(guild, map);
                 MessageHelper.sendMessageToChannel(map.getBotMapUpdatesThread(), "User join the server late! Welcome to the game, " + user.getAsMention() + "! Pinging you here so you can see the bot-map-updates channel.");
