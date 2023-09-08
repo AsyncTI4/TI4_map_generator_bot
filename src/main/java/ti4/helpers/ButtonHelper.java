@@ -712,6 +712,9 @@ public class ButtonHelper {
         if(player.getRelics().contains("absol_codex")){
             limit = limit+5;
         }
+        if(player.getRelics().contains("e6-g0_network")){
+            limit = limit+2;
+        }
         if(player.getAc() > limit){
             MessageChannel channel = activeMap.getMainGameChannel();
             if(activeMap.isFoWMode()){
@@ -731,16 +734,16 @@ public class ButtonHelper {
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
                     foundsomething = true;
-                    if(activeMap.isFoWMode()){
-                        MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
-                    }else{
+                    
                         List<Button> buttonsWeb = new ArrayList<Button>();
-                        Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                        buttonsWeb.add(linkToWebsite);
+                        if(!activeMap.isFoWMode()){
+                            Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                            buttonsWeb.add(linkToWebsite);
+                        }
                         buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
                         buttonsWeb.add(Button.secondary("showGameAgain","Show Game")); 
                         MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
-                    }
+                    
                 }
             }
         } else {
@@ -748,16 +751,16 @@ public class ButtonHelper {
             foundsomething = true;
         }
         if (!foundsomething) {
-            if(activeMap.isFoWMode()){
-                MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
-            }else{
+            
                 List<Button> buttonsWeb = new ArrayList<Button>();
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                buttonsWeb.add(linkToWebsite);
+                if(!activeMap.isFoWMode()){
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                    buttonsWeb.add(linkToWebsite);
+                }
                 buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
                 buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
                 MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "",buttonsWeb);
-            }
+            
         }
 
     }
@@ -787,6 +790,17 @@ public class ButtonHelper {
                 if(player.getActionCards().size() > 7 || (player.getExhaustedTechs().contains("mi") && player.getActionCards().size() > 6)){
                     shouldBeUnlocked = true;
                 }
+            }
+            case "edyn" -> {
+                if(activeMap.getLaws().size() > 0){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "zealots" -> {
+                shouldBeUnlocked = true;
+            }
+            case "dihmohn" -> {
+                shouldBeUnlocked = true;
             }
             case "letnev" -> {
                 shouldBeUnlocked = true;
@@ -1573,10 +1587,6 @@ public class ButtonHelper {
                 transit = transit.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
                 startButtons.add(transit);
             }
-            if(player.getStasisInfantry() > 0){
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
-
-            }
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
@@ -1919,7 +1929,10 @@ public class ButtonHelper {
         java.util.Map<String, Integer> displacedUnits =  activeMap.getMovedUnitsFromCurrentActivation();
         java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
-        tile = MoveUnits.flipMallice(event, tile, activeMap);
+        if(!activeMap.getMovedUnitsFromCurrentActivation().isEmpty()){
+            tile = MoveUnits.flipMallice(event, tile, activeMap);
+        }
+        
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return buttons;
@@ -2021,6 +2034,10 @@ public class ButtonHelper {
         }
         Button rift = Button.success(finChecker+"getRiftButtons_"+tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("grift")));
         buttons.add(rift);
+        if(player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)){
+            Button combatDrones = Button.primary(finChecker+"combatDrones", "Use Combat Drones Ability");
+            buttons.add(combatDrones);
+        }
         Button concludeMove = Button.secondary(finChecker+"doneLanding", "Done landing troops");
         buttons.add(concludeMove);
         if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
@@ -2707,7 +2724,9 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             else{
                    
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));     
-                    
+                    if(privatePlayer.getStasisInfantry() > 0){
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeMap), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, privatePlayer));
+                        }
                 }
 
         } else {
@@ -2726,7 +2745,9 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                     {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
                         MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
-
+                        if(privatePlayer.getStasisInfantry() > 0){
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeMap), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, privatePlayer));
+                        }
                     }
                     else
                     {
