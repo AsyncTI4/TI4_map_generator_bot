@@ -51,7 +51,7 @@ public class AddTileList implements Command {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        
+
         String tileList = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         tileList = tileList.replaceAll(",", "");
         HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveMap);
@@ -102,7 +102,7 @@ public class AddTileList implements Command {
         }
 
         new AddFrontierTokens().parsingForTile(event, userActiveMap);
-        
+
         MapSaveLoadManager.saveMap(userActiveMap, event);
 
         File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
@@ -115,9 +115,9 @@ public class AddTileList implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Add tile list to generate map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format")
-                                .setRequired(true))
+            Commands.slash(getActionID(), "Add tile list to generate map")
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format")
+                    .setRequired(true))
 
         );
     }

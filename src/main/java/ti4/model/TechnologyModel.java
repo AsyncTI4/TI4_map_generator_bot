@@ -11,20 +11,16 @@ public class TechnologyModel implements ModelInterface {
     private String text;
 
     public enum TechnologyType {
-        UNITUPGRADE,
-        PROPULSION,
-        BIOTIC,
-        CYBERNETIC,
-        WARFARE,
-        NONE;
-        
+        UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
+
         @Override
         public String toString() {
             return super.toString().toLowerCase();
         }
     }
 
-    public TechnologyModel() {}
+    public TechnologyModel() {
+    }
 
     public boolean isValid() {
         return alias != null
@@ -41,35 +37,43 @@ public class TechnologyModel implements ModelInterface {
         return alias;
     }
 
-    public String getName() { 
-        return name; 
+    public String getName() {
+        return name;
     }
 
-    public TechnologyType getType() { 
-        return type; 
+    public TechnologyType getType() {
+        return type;
     }
 
-    public String getRequirements() { 
-        return requirements; 
+    public String getRequirements() {
+        return requirements;
     }
 
-    public String getFaction() { 
-        return faction; 
+    public String getFaction() {
+        return faction;
     }
 
-    public String getBaseUpgrade() { 
-        return baseUpgrade; 
+    public String getBaseUpgrade() {
+        return baseUpgrade;
     }
 
-    public String getSource() { 
-        return source; 
+    public String getSource() {
+        return source;
     }
 
-    public String getText() { 
-        return text; 
+    public String getText() {
+        return text;
     }
 
-    
+    public static int sortTechsByRequirements(TechnologyModel t1, TechnologyModel t2) {
+        int r1 = t1.getRequirements().length();
+        int r2 = t2.getRequirements().length();
+        if (r1 != r2) return r1 < r2 ? -1 : 1;
+
+        int factionOrder = sortFactionTechsFirst(t1, t2);
+        return factionOrder == 0 ? t1.getName().compareTo(t2.getName()) : factionOrder;
+    }
+
     public static int sortFactionTechsFirst(TechnologyModel t1, TechnologyModel t2) {
         if (t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 0;
         if (!t1.getFaction().isEmpty() && !t2.getFaction().isEmpty()) return 0;
