@@ -604,7 +604,7 @@ public class ButtonListener extends ListenerAdapter {
             String tech = buttonID.replace("getTech_", "");
             String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
             TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
-            if (techM != null && techM.getRequirements() != null && techM.getRequirements().length() > 1) {
+            if(techM != null && techM.getRequirements()!= null && techM.getRequirements().length() > 1){
                 if(player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")){
                     ButtonHelper.commanderUnlockCheck(player, activeMap, "zealots", event);
                 }
