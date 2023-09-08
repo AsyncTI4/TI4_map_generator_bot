@@ -603,8 +603,8 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getTech_")) {
             String tech = buttonID.replace("getTech_", "");
             String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
-            TechnologyModel techM = Mapper.getTechs().get(tech);
-            if (techM != null && techM.getRequirements() != null && techM.getRequirements().length() > 1) {
+            TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
+            if(techM != null && techM.getRequirements()!= null && techM.getRequirements().length() > 1){
                 if(player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")){
                     ButtonHelper.commanderUnlockCheck(player, activeMap, "zealots", event);
                 }
@@ -922,6 +922,14 @@ public class ButtonListener extends ListenerAdapter {
             outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, "outcome", null);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("indoctrinate_")) {
+            ButtonHelperFactionSpecific.resolveFollowUpIndoctrinationQuestion(player, activeMap, buttonID, event);
+        } else if (buttonID.startsWith("initialIndoctrination_")) {
+            ButtonHelperFactionSpecific.resolveInitialIndoctrinationQuestion(player, activeMap, buttonID, event);
+        } else if (buttonID.startsWith("utilizeSolCommander_")) {
+            ButtonHelperFactionSpecific.resolveSolCommander(player, activeMap, buttonID, event);
+         } else if (buttonID.startsWith("mercerMove_")) {
+            ButtonHelperFactionSpecific.resolveMercerMove(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("tiedPlanets_")) {
             buttonID = buttonID.replace("tiedPlanets_", "");
             buttonID = buttonID.replace("delete_buttons_outcomeTie*_", "");
@@ -1142,8 +1150,13 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     systemButtons2 = new ArrayList<Button>();
                     if (player.hasUnexhaustedLeader("sardakkagent", activeMap)) {
-                        String message = trueIdentity + " You can use the button do sardakkcommander";
+                        String message = trueIdentity + " You can use the button to do sardakk agent";
                         systemButtons2.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeMap, player));
+                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+                    }
+                    if (player.hasUnexhaustedLeader("nomadagentmercer", activeMap)) {
+                        String message = trueIdentity + " You can use the button to do General Mercer";
+                        systemButtons2.addAll(ButtonHelperFactionSpecific.getMercerAgentInitialButtons(activeMap, player));
                          MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                     }
                     
@@ -1490,6 +1503,11 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage);
             }
             List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeMap, event);
+            List<Button> button3 = ButtonHelperFactionSpecific.getL1Z1XAgentButtons(activeMap, player);
+            if (player.hasUnexhaustedLeader("l1z1xagent", activeMap) && !button3.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeMap)+" You can use buttons to resolve L1 Agent if you want",
+                        button3);
+            }
             if (player.getTechs().contains("sdn") && !button2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink",
                         button2);
@@ -2373,6 +2391,18 @@ public class ButtonListener extends ListenerAdapter {
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
                     event.getMessage().editMessage(editedMessage).queue();
+                }
+                case "exhauste6g0network" -> {
+                    player.addExhaustedRelic("e6-g0_network");
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getIdent(player)+" Chose to exhaust e6-g0_network");
+                    String message = "Use buttons to draw an AC";
+                    List<Button> buttons = new ArrayList<Button>();
+                    if(player.hasAbility("scheming")){
+                        buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+                    }else{
+                        buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getIdent(player)+" "+message, buttons);
                 }
                 case "increase_tactic_cc" -> {
                     String originalCCs = Helper.getPlayerCCs(player);

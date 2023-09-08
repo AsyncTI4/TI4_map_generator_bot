@@ -192,6 +192,9 @@ public class ACInfo extends ACCardsSubcommandData {
                 Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
                 acButtons.add(hacanButton);
             }
+            if(player.hasRelicReady("e6-g0_network")){
+                acButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
+            }
         }
         return acButtons;
     }
