@@ -76,6 +76,15 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
+                    if(player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeMap)){
+                        String msg2 = Helper.getPlayerRepresentation(player_, activeMap) + " lost shard and lost a victory point. "+Helper.getPlayerRepresentation(player, activeMap) +" gained shard and a victory point.";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg2);
+                        player_.removeRelic("shard");
+                        player.addRelic("shard");
+                        int shardID = activeMap.getRevealedPublicObjectives().get("Shard of the Throne");
+                        activeMap.unscorePublicObjective(player_.getUserID(), shardID);
+                        activeMap.scorePublicObjective(player.getUserID(), shardID);
+                    }
                     String msg = Helper.getPlayerRepresentation(player_, activeMap) + " has a window to play reparations for the taking of the planet "+planet+" (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
                     if (moveTitanPN){
