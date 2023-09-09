@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class RemoveBorderAnomaly extends MapSubcommandData {
@@ -17,9 +17,9 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
-        if (!activeMap.getTileMap().containsKey(tile)) {
+        if (!activeGame.getTileMap().containsKey(tile)) {
             MessageHelper.replyToMessage(event, "Map does not contain that tile");
             return;
         }
@@ -40,7 +40,7 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
             return;
         }
 
-        activeMap.removeBorderAnomaly(tile, directionVal);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        activeGame.removeBorderAnomaly(tile, directionVal);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

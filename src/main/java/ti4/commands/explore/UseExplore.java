@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -23,18 +23,18 @@ public class UseExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         @SuppressWarnings("ConstantConditions")
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
-        if (activeMap.pickExplore(id) != null) {
+        if (activeGame.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
             String planetName = null;
             if (planetOption != null) {
                 planetName = planetOption.getAsString();
             }
             Tile tile = null;
-            if (activeMap.getPlanets().contains(planetName)) {
-                for (Tile tile_ : activeMap.getTileMap().values()) {
+            if (activeGame.getPlanets().contains(planetName)) {
+                for (Tile tile_ : activeGame.getTileMap().values()) {
                     if (tile != null) {
                         break;
                     }
@@ -50,10 +50,10 @@ public class UseExplore extends ExploreSubcommandData {
                     return;
                 }
             }
-            Player player = activeMap.getPlayer(event.getUser().getId());
-            player = Helper.getGamePlayer(activeMap, player, event, null);
+            Player player = activeGame.getPlayer(event.getUser().getId());
+            player = Helper.getGamePlayer(activeGame, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id), player, activeMap);
+            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id), player, activeGame);
         } else {
             sendMessage("Invalid card ID");
         }

@@ -22,7 +22,7 @@ import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -54,7 +54,7 @@ public class CombatRoll extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         OptionMapping mods = event.getOption(Constants.COMBAT_MODIFIERS);
@@ -62,9 +62,9 @@ public class CombatRoll extends SpecialSubcommandData {
         OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
 
         String userID = getUser().getId();
-        Player player = activeMap.getPlayer(userID);
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(userID);
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
 
          if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
@@ -79,7 +79,7 @@ public class CombatRoll extends SpecialSubcommandData {
             customMods = parseCustomUnitMods(mods.getAsString());
         }
 
-        HashMap<String, Integer> extraRollsParsed = new HashMap<String, Integer>();
+        HashMap<String, Integer> extraRollsParsed = new HashMap<>();
         if (extraRollsOption != null) {
             extraRollsParsed = parseUnits(extraRollsOption.getAsString());
         }
@@ -91,17 +91,17 @@ public class CombatRoll extends SpecialSubcommandData {
 
         // Get tile info
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Tile " + tileOption.getAsString() + " not found");
             return;
         }
 
-        secondHalfOfCombatRoll(player, activeMap, event, tile, unitHolderName, extraRollsParsed, customMods);
+        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods);
     }
 
-    public void secondHalfOfCombatRoll(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
+    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         String tileName = tile.getTilePath();
@@ -116,7 +116,7 @@ public class CombatRoll extends SpecialSubcommandData {
         }
         
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
-        if (activeMap.getLaws().containsKey("articles_war")) {
+        if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> unit.getAlias().equals("naaz_mech_space"))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !e.getKey().getAlias().equals("naaz_mech_space"))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
@@ -126,16 +126,16 @@ public class CombatRoll extends SpecialSubcommandData {
         if(unitsByQuantity.size() == 0){
             String fightingOnUnitHolderName = unitHolderName;
             if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){
-                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeMap);
+                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
             + "Ping bothelper if this seems to be in error.");
 
             return;
         }
-        Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
+        Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeGame);
         
-        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeMap);
+        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeGame);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
@@ -144,7 +144,7 @@ public class CombatRoll extends SpecialSubcommandData {
         String message = String.format("%s combat rolls for %s on %s %s:  \n",
                 StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
                 tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeMap);
+        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeGame);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         message = StringUtils.removeEnd(message, ";\n");
@@ -192,7 +192,7 @@ public class CombatRoll extends SpecialSubcommandData {
     }
 
     private HashMap<String, Integer> parseUnits(String unitList) {
-        HashMap<String, Integer> resultList = new HashMap<String, Integer>();
+        HashMap<String, Integer> resultList = new HashMap<>();
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {

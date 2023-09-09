@@ -21,7 +21,7 @@ public class SCTradeGoods extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         OptionMapping tgOption = event.getOption(Constants.TG);
@@ -39,33 +39,33 @@ public class SCTradeGoods extends StatusSubcommandData {
             }
             int sc = scOption.getAsInt();
             int tg = tgOption.getAsInt();
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             if (!scTradeGoods.containsKey(sc)){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
                 return;
             }
             Set<Integer> scPicked = new HashSet<>();
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 scPicked.addAll(player_.getSCs());
             }
             if (scPicked.contains(sc)){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card is already picked, can't add Trade Goods");
                 return;
             }
-            activeMap.setScTradeGood(sc, tg);
+            activeGame.setScTradeGood(sc, tg);
             return;
         }
 
-        LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+        LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
         Set<Integer> scPicked = new HashSet<>();
-        for (Player player_ : activeMap.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             scPicked.addAll(player_.getSCs());
         }
         for (Integer scNumber :  scTradeGoods.keySet()) {
             if (!scPicked.contains(scNumber)){
                 Integer tgCount = scTradeGoods.get(scNumber);
                 tgCount = tgCount == null ? 1 : tgCount + 1;
-                activeMap.setScTradeGood(scNumber, tgCount);
+                activeGame.setScTradeGood(scNumber, tgCount);
             }
         }
     }

@@ -8,9 +8,9 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -23,7 +23,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         addOption(OptionType.STRING, Constants.POSITION, "Tile position on map", true);
     }
 
-    abstract protected void tileAction(Tile tile, String position, Map userActiveMap);
+    abstract protected void tileAction(Tile tile, String position, Game userActiveGame);
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -33,17 +33,17 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             return;
         }
         String userID = member.getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Map userActiveMap = tileParsing(event, userID, mapManager);
-            if (userActiveMap == null) return;
-            MapSaveLoadManager.saveMap(userActiveMap, event);
+            Game userActiveGame = tileParsing(event, userID, gameManager);
+            if (userActiveGame == null) return;
+            GameSaveLoadManager.saveMap(userActiveGame, event);
         }
     }
 
-    protected Map tileParsing(SlashCommandInteractionEvent event, String userID, MapManager mapManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
         if (!PositionMapper.isTilePositionValid(position)) {
@@ -63,21 +63,18 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             tile.addToken("token_custodian.png", "mr");
         }
 
-        Map userActiveMap = mapManager.getUserActiveMap(userID);
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
         Boolean isFowPrivate = null;
-        if (userActiveMap.isFoWMode() && event != null) {
-            isFowPrivate = false;
-            if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
-                isFowPrivate = true;
-            }
+        if (userActiveGame.isFoWMode()) {
+            isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         if (isFowPrivate != null && isFowPrivate) {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return null;
         }
 
-        tileAction(tile, position, userActiveMap);
-        userActiveMap.rebuildTilePositionAutoCompleteList();
-        return userActiveMap;
+        tileAction(tile, position, userActiveGame);
+        userActiveGame.rebuildTilePositionAutoCompleteList();
+        return userActiveGame;
     }
 }

@@ -4,14 +4,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.PlayerSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.TechnologyModel;
 
@@ -32,18 +30,18 @@ public abstract class TechAddRemove extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
 
-        player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null){
-            sendMessage("Player/Faction/Color could not be found in map:" + activeMap.getName());
+            sendMessage("Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
 
@@ -53,10 +51,10 @@ public abstract class TechAddRemove extends TechSubcommandData {
         parseParameter(event, player, event.getOption(Constants.TECH4));
         
         if(player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "nekro", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "nekro", event);
         }
         if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "jolnar", event);
             }
     }
 

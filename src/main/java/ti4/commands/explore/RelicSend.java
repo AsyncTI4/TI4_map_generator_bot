@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -25,7 +25,7 @@ public class RelicSend extends GenericRelicAction {
     }
 
     public void doAction(Player player1, SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         String targetFaction = event.getOption(Constants.FACTION_COLOR_2, null, OptionMapping::getAsString);
         String sourceFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
@@ -35,7 +35,7 @@ public class RelicSend extends GenericRelicAction {
         if (sourceFaction != null) {
             String factionColor = AliasHandler.resolveColor(sourceFaction.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player1 = player_;
                     break;
@@ -48,7 +48,7 @@ public class RelicSend extends GenericRelicAction {
         if (targetFaction != null) {
             String factionColor = AliasHandler.resolveColor(targetFaction.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player2 = player_;
                     break;
@@ -80,17 +80,17 @@ public class RelicSend extends GenericRelicAction {
         switch (relicID) {
             case "shard" -> {
                 shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
+                shardPublicObjectiveID = activeGame.getCustomPublicVP().get(shardCustomPOName);
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
+                shardPublicObjectiveID = activeGame.getCustomPublicVP().get(shardCustomPOName);
             }
         }
-        if (shardCustomPOName != null && shardPublicObjectiveID != null && activeMap.getCustomPublicVP().containsKey(shardCustomPOName) && activeMap.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
-            activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-            activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        if (shardCustomPOName != null && shardPublicObjectiveID != null && activeGame.getCustomPublicVP().containsKey(shardCustomPOName) && activeGame.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
+            activeGame.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+            activeGame.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
         }
 
         if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
@@ -99,8 +99,8 @@ public class RelicSend extends GenericRelicAction {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player1, activeMap));
-        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(player2, activeMap));
+        sb.append(Helper.getPlayerRepresentation(player1, activeGame));
+        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(player2, activeGame));
         sb.append("\n").append(Helper.getRelicRepresentation(relicID));
         sendMessage(sb.toString());
     }

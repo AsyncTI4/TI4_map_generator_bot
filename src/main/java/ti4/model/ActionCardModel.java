@@ -53,7 +53,7 @@ public class ActionCardModel implements ModelInterface {
 
     public String getRepresentation() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.ActionCard).append("__**" + name + "**__").append(" *(").append(phase).append(" Phase)*: ");
+        sb.append(Emojis.ActionCard).append("__**").append(name).append("**__").append(" *(").append(phase).append(" Phase)*: ");
         sb.append("_").append(window).append(":_ ").append(text).append("\n");
         return sb.toString();
     }

@@ -29,7 +29,7 @@ public class TTPGConfig {
     @JsonProperty("baseMagen")
     private Boolean baseMagen;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("codex1")
     public Boolean getCodex1() {

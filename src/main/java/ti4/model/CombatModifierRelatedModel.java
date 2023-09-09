@@ -1,9 +1,6 @@
 package ti4.model;
 
-import java.util.List;
-
 import lombok.Data;
-import ti4.map.Player;
 
 @Data
 public class CombatModifierRelatedModel implements ModelInterface {

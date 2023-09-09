@@ -22,33 +22,33 @@ public class TrapToken extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
-        trapForPlanet(event, activeMap, Constants.PLANET, Constants.LIZHO_TRAP_ID, player);
+        trapForPlanet(event, activeGame, Constants.PLANET, Constants.LIZHO_TRAP_ID, player);
 
     }
 
-    private void trapForPlanet(SlashCommandInteractionEvent event, Map activeMap, String planet, String lizhoTrapId, Player player) {
+    private void trapForPlanet(SlashCommandInteractionEvent event, Game activeGame, String planet, String lizhoTrapId, Player player) {
         OptionMapping planetOption = event.getOption(planet);
         if (planetOption == null){
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeMap.getPlanets().contains(planetName)) {
+        if (!activeGame.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : activeMap.getTileMap().values()) {
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (tile != null) {
                 break;
             }

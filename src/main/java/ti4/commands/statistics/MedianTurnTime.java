@@ -2,7 +2,7 @@ package ti4.commands.statistics;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
@@ -16,8 +16,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -37,42 +37,41 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        HashMap<String, Map> maps = MapManager.getInstance().getMapList();
+        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
 
-        HashMap<String, Integer> playerTurnCount = new HashMap<>();
+        Map<String, Integer> playerTurnCount = new HashMap<>();
 
-        HashMap<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
+        Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
 
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        Predicate<Map> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Map map : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : map.getPlayers().values()) {
+        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
+            for (Player player : game.getPlayers().values()) {
                 Entry<Integer, Long> playerTurnTime = java.util.Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
                 playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new java.util.HashSet<Long>();
+                    if (value == null) value = new java.util.HashSet<>();
                     value.add(averageTurnTime);
                     return value;
                 });
-                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), (oldValue, newValue) -> oldValue + newValue);
+                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
             }
         }
 
-        HashMap<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream().map(e -> java.util.Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
+        Map<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
         StringBuilder sb = new StringBuilder();
 
         sb.append("## __**Median Turn Time:**__\n");
         
         int index = 1;
-        Comparator<Entry<String, Long>> comparator = (o1, o2) -> {
-            return o1.getValue().compareTo(o2.getValue());
-        };
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream().filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
+        for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream()
+            .filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow)
+            .sorted(Entry.comparingByValue()).limit(topLimit).toList()) {
             User user = MapGenerator.jda.getUserById(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());

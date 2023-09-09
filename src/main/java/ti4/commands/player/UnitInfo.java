@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
@@ -21,37 +21,37 @@ public class UnitInfo extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        sendUnitInfo(activeMap, player, event);
+        sendUnitInfo(activeGame, player, event);
     }
 
-    public static void sendUnitInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendUnitInfo(activeMap, player);
+    public static void sendUnitInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendUnitInfo(activeGame, player);
     }
 
-    public static void sendUnitInfo(Map activeMap, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " pressed `" + event.getButton().getId() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendUnitInfo(activeMap, player);
+    public static void sendUnitInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " pressed `" + event.getButton().getId() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendUnitInfo(activeGame, player);
     }
 
-    public static void sendUnitInfo(Map activeMap, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeMap, player, getUnitMessageEmbeds(player));
+    public static void sendUnitInfo(Game activeGame, Player player) {
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, getUnitMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getUnitMessageEmbeds(Player player) {
-        List<MessageEmbed> messageEmbeds = new ArrayList<MessageEmbed>();
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (UnitModel unitModel : player.getUnitsOwned().stream().sorted().map(unitID -> Mapper.getUnit(unitID)).toList()) { // Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
+        for (UnitModel unitModel : player.getUnitsOwned().stream().sorted().map(Mapper::getUnit).toList()) { // Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
             MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(false);
             messageEmbeds.add(unitRepresentationEmbed);
         }

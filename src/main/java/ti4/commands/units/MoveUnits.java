@@ -31,7 +31,7 @@ public class MoveUnits extends AddRemoveUnits {
     private boolean priorityDmg = true;
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
         unitsDamage = new HashMap<>();
         toAction = false;
         OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
@@ -44,25 +44,24 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList, activeMap);
+        unitParsing(event, color, tile, unitList, activeGame);
 
         String tileID = null;
         String tileOption = event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString);
         if (tileOption != null) { //get TILE_TO
             tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString).toLowerCase(), " ");
             tileID = AliasHandler.resolveTile(tileOption);
-            tile = getTile(event, tileID, activeMap);
         } else { //USE TILE_FROM
             tileID = tile.getTileID();
-            tile = getTile(event, tileID, activeMap);
         }
+        tile = getTile(event, tileID, activeGame);
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");
             return;
         }
 
-        tile = flipMallice(event, tile, activeMap);
+        tile = flipMallice(event, tile, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
@@ -97,7 +96,7 @@ public class MoveUnits extends AddRemoveUnits {
                 //Do nothing, as no unit was moved to
             }
             default -> {
-                unitParsing(event, color, tile, unitList, activeMap);
+                unitParsing(event, color, tile, unitList, activeGame);
             }
         }
 
@@ -113,20 +112,20 @@ public class MoveUnits extends AddRemoveUnits {
             }
         }
         if (!retreat) {
-            removeTacticsCC(event, color, tile, activeMap);
+            removeTacticsCC(event, color, tile, activeGame);
         }
 
         AddCC.addCC(event, color, tile, false);
-        Helper.isCCCountCorrect(event, activeMap, color);
+        Helper.isCCCountCorrect(event, activeGame, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
     }
 
-    public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Map activeMap) {
+    public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Game activeGame) {
         if ("82a".equals(tile.getTileID())){
             String position = tile.getPosition();
-            activeMap.removeTile(position);
+            activeGame.removeTile(position);
 
 
             String planetTileName = AliasHandler.resolveTile("82b");
@@ -142,14 +141,14 @@ public class MoveUnits extends AddRemoveUnits {
                 return null;
             }
             tile = new Tile(planetTileName, position);
-            activeMap.setTile(tile);
+            activeGame.setTile(tile);
         }
         return tile;
     }
-    public static Tile flipMallice(ButtonInteractionEvent event, Tile tile, Map activeMap) {
+    public static Tile flipMallice(ButtonInteractionEvent event, Tile tile, Game activeGame) {
         if ("82a".equals(tile.getTileID())){
             String position = tile.getPosition();
-            activeMap.removeTile(position);
+            activeGame.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82b");
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
@@ -163,13 +162,13 @@ public class MoveUnits extends AddRemoveUnits {
                 return null;
             }
             tile = new Tile(planetTileName, position);
-            activeMap.setTile(tile);
+            activeGame.setTile(tile);
         }
         return tile;
     }
 
-    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
-        for (Player player : activeMap.getPlayers().values()) {
+    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (color.equals(player.getColor())) {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
@@ -185,13 +184,13 @@ public class MoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
 
     }
 
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
         if (toAction) {
             tile.addUnit(planetName, unitID, count);
             tile.addUnitDamage(planetName, unitID, unitsDamage.get(unitID));

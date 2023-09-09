@@ -47,7 +47,7 @@ import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Storage;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -250,7 +250,7 @@ public class MapGenerator {
         }
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
-        MapSaveLoadManager.loadMaps();
+        GameSaveLoadManager.loadMaps();
 
         BotLogger.log("BOT CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations(); 
@@ -262,23 +262,20 @@ public class MapGenerator {
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
-                    MapGenerator.readyToReceiveCommands = false;
-                    MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
-                    TimeUnit.SECONDS.sleep(5);
-                    MapSaveLoadManager.saveMaps();
-                    MessageHelper.sendMessageToBotLogWebhook("MAPS HAVE BEEN SAVED");
-                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS COMPLETE");
-                    mainThread.join();
-                    //
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
+                MapGenerator.readyToReceiveCommands = false;
+                MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
+                TimeUnit.SECONDS.sleep(5);
+                GameSaveLoadManager.saveMaps();
+                MessageHelper.sendMessageToBotLogWebhook("MAPS HAVE BEEN SAVED");
+                MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS COMPLETE");
+                mainThread.join();
+                //
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
+        }));
     }
 }

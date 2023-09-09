@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.Permission;
@@ -25,9 +26,9 @@ import ti4.MapGenerator;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -141,7 +142,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(m -> m.getId()).toList();
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         List<Member> missingMembers = new ArrayList<>();
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
@@ -172,16 +173,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CREATE GAME
-        Map newMap = GameCreate.createNewGame(event, gameName, gameOwner);
+        Game newGame = GameCreate.createNewGame(event, gameName, gameOwner);
 
         //ADD PLAYERS
         for (Member member : members) {
-            newMap.addPlayer(member.getId(), member.getEffectiveName());
+            newGame.addPlayer(member.getId(), member.getEffectiveName());
         }
 
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
-        newMap.setCustomName(gameFunName);
+        newGame.setCustomName(gameFunName);
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
@@ -193,20 +194,20 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
-        newMap.setTableTalkChannelID(chatChannel.getId());
+        newGame.setTableTalkChannelID(chatChannel.getId());
 
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
-        newMap.setMainGameChannelID(actionsChannel.getId());
+        newGame.setMainGameChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
             .complete();
-        newMap.setBotMapUpdatesThreadID(botThread.getId());
+        newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
         StringBuilder tabletalkGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - table talk channel\n");
@@ -241,13 +242,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
-        message.append("> " + role.getName() + "\n");
-        message.append("> " + chatChannel.getAsMention()).append("\n");
-        message.append("> " + actionsChannel.getAsMention()).append("\n");
-        message.append("> " + botThread.getAsMention()).append("\n");
+        message.append("> ").append(role.getName()).append("\n");
+        message.append("> ").append(chatChannel.getAsMention()).append("\n");
+        message.append("> ").append(actionsChannel.getAsMention()).append("\n");
+        message.append("> ").append(botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
 
-        MapSaveLoadManager.saveMap(newMap, event);
+        GameSaveLoadManager.saveMap(newGame, event);
     }
 
     private static String getNextGameName() {
@@ -272,15 +273,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        HashSet<String> mapNames = new HashSet<>(MapManager.getInstance().getMapList().keySet());
+        HashSet<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
         gameAndRoleNames.addAll(mapNames);
 
         //CHECK
-        if (mapNames.contains(name)) {
-            return true;
-        } else {
-            return false;
-        }
+        return mapNames.contains(name);
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
@@ -304,7 +301,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
+        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
             .filter(mapName -> mapName.startsWith("pbd"))
             .toList();
         for (String mapName : mapNames) {
@@ -339,7 +336,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
+        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
             .filter(mapName -> mapName.startsWith("fow"))
             .toList();
         for (String mapName : mapNames) {
@@ -362,11 +359,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
-        if (guild != null && serverHasRoomForNewRole(guild)
-            && serverHasRoomForNewChannels(guild)) {
-            return true;
-        }
-        return false;
+        return guild != null && serverHasRoomForNewRole(guild)
+            && serverHasRoomForNewChannels(guild);
     }
 
     private static boolean serverHasRoomForNewRole(Guild guild) {
@@ -404,10 +398,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     public static List<Category> getAllAvailablePBDCategories() {
-        List<Category> categories = MapGenerator.jda.getCategories().stream()
+
+        return MapGenerator.jda.getCategories().stream()
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();
-
-        return categories;
     }
 }

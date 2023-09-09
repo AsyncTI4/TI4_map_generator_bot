@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class ShowDiscardActionCards extends ACCardsSubcommandData {
@@ -14,12 +14,12 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         StringBuilder sb = new StringBuilder();
         sb.append("Action card discard list: ").append("\n");
         int index = 1;
-        for (java.util.Map.Entry<String, Integer> ac : activeMap.getDiscardActionCards().entrySet()) {
+        for (java.util.Map.Entry<String, Integer> ac : activeGame.getDiscardActionCards().entrySet()) {
             sb.append("`").append(index).append(".").append(Helper.leftpad("("+ac.getValue(), 4)).append(")` - ");
             sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
             index++;

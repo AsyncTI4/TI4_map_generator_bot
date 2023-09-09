@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 import java.util.stream.Collectors;
@@ -25,10 +25,10 @@ public interface Command {
     default void logBack(SlashCommandInteractionEvent event) {
         User user = event.getUser();
         String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
         String activeMap = "";
-        if (userActiveMap != null){
-            activeMap =  "Game: " + userActiveMap.getName();
+        if (userActiveGame != null){
+            activeMap =  "Game: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + ". " +activeMap+ " " +
                 event.getName() + " " + event.getOptions().stream()

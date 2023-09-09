@@ -17,7 +17,7 @@ public class AddCustomPO extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
         if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
@@ -42,7 +42,7 @@ public class AddCustomPO extends StatusSubcommandData {
         }
         int vp = vpOption.getAsInt();
 
-        Integer poIndex = activeMap.addCustomPO(poName, vp);
+        Integer poIndex = activeGame.addCustomPO(poName, vp);
         StringBuilder sb = new StringBuilder();
         sb.append("**Public Objective added:**").append("\n");
         sb.append("(").append(poIndex).append(") ").append("\n");

@@ -9,9 +9,9 @@ import ti4.commands.Command;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -38,10 +38,10 @@ public class StatusCommand implements Command {
     public void logBack(SlashCommandInteractionEvent event) {
         User user = event.getUser();
         String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
         String activeMap = "";
-        if (userActiveMap != null) {
-            activeMap = "Active map: " + userActiveMap.getName();
+        if (userActiveGame != null) {
+            activeMap = "Active map: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
                 event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
@@ -83,10 +83,10 @@ public class StatusCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, file, false, message, message != null);
     }
 

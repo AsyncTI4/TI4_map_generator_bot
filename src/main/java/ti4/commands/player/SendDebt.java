@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public class SendDebt extends PlayerSubcommandData {
@@ -18,15 +18,15 @@ public class SendDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player sendingPlayer = activeMap.getPlayer(getUser().getId());
-        sendingPlayer = Helper.getGamePlayer(activeMap, sendingPlayer, event, null);
+        Game activeGame = getActiveMap();
+        Player sendingPlayer = activeGame.getPlayer(getUser().getId());
+        sendingPlayer = Helper.getGamePlayer(activeGame, sendingPlayer, event, null);
         if (sendingPlayer == null) {
             sendMessage("Player could not be found");
             return;
         }
 
-        Player receivingPlayer = Helper.getPlayer(activeMap, sendingPlayer, event);
+        Player receivingPlayer = Helper.getPlayer(activeGame, sendingPlayer, event);
         if (receivingPlayer == null) {
             sendMessage("Player to send Debt could not be found");
             return;
@@ -39,7 +39,7 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-        sendMessage(Helper.getPlayerRepresentation(sendingPlayer, activeMap) + " sent " + debtCountToSend + " debt tokens to " + Helper.getPlayerRepresentation(receivingPlayer, activeMap));
+        sendMessage(Helper.getPlayerRepresentation(sendingPlayer, activeGame) + " sent " + debtCountToSend + " debt tokens to " + Helper.getPlayerRepresentation(receivingPlayer, activeGame));
         
     }
 

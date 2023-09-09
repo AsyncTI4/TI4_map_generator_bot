@@ -36,7 +36,7 @@ public class TTPGObjectives {
     @JsonProperty("Other")
     private List<String> other = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("Public Objectives I")
     public List<String> getPublicObjectivesI() {

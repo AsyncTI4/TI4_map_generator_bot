@@ -26,7 +26,7 @@ public class ListRelics extends HelpSubcommandData {
         HashMap<String, String> relicList = Mapper.getRelics();
         List<String> searchedList = relicList.entrySet().stream()
             .map(e -> e.getKey() + " = " + Helper.getRelicRepresentation(e.getKey()))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
         
         String searchDescription = searchString == null ? "" : " search: " + searchString;
