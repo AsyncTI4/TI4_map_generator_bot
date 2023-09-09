@@ -227,7 +227,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         botGetStartedMessage.append("This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n");
         botGetStartedMessage.append("### __Use the following commands to get started:__\n");
         botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
-        botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
+        botGetStartedMessage.append("> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
         botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
         botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
         botGetStartedMessage.append("> `/tech add` for factions who need to add tech\n");
@@ -315,6 +315,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         return pbdNumbers;
+        //return pbdNumbers.stream().filter(num -> num != 1000).toList();
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {

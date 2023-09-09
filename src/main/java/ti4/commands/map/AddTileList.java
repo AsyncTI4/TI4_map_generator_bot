@@ -4,11 +4,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
-import ti4.commands.Command;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
@@ -25,16 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class AddTileList implements Command {
-
-    @Override
-    public String getActionID() {
-        return Constants.ADD_TILE_LIST;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+public class AddTileList extends MapSubcommandData {
+    public AddTileList() {
+        super(Constants.ADD_TILE_LIST, "Add tile list to generate map");
+        addOption(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format", true);
     }
 
     @Override
@@ -108,17 +98,5 @@ public class AddTileList implements Command {
         File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
         MessageHelper.replyToMessage(event, file);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-            Commands.slash(getActionID(), "Add tile list to generate map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format")
-                    .setRequired(true))
-
-        );
     }
 }
