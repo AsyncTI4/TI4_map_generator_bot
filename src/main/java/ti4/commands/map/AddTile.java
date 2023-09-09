@@ -8,12 +8,10 @@ import ti4.map.UnitHolder;
 
 import java.util.HashMap;
 
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-
 public class AddTile extends AddRemoveTile {
     public AddTile() {
         super(Constants.ADD_TILE, "Add tile to map");
-        addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
+        //addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
     }
 
     @Override
@@ -24,10 +22,10 @@ public class AddTile extends AddRemoveTile {
     }
 
     public static void addCustodianToken(Tile tile) {
-        if (tile.getTileID().equals("18")){
+        if (tile.getTileID().equals("18")) {
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
-                if (unitHolder instanceof Planet && unitHolder.getName().equals("mr")){
+                if (unitHolder instanceof Planet && unitHolder.getName().equals("mr")) {
                     unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                 }
             }
