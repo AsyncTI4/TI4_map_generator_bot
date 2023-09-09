@@ -18,7 +18,7 @@ public class SwapStage1 extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
         OptionMapping loc2 = event.getOption(Constants.LOCATION2);
         activeGame.swapStage1(loc1.getAsInt(), loc2.getAsInt());

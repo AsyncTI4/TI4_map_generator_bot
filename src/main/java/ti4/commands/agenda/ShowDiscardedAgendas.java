@@ -15,7 +15,7 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Discarded Agendas:**__\n");
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();

@@ -1,7 +1,6 @@
 package ti4.commands.tech;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class TechInfo extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);

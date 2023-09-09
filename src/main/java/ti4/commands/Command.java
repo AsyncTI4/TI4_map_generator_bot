@@ -26,11 +26,11 @@ public interface Command {
         User user = event.getUser();
         String userName = user.getName();
         Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeMap = "";
+        String activeGame = "";
         if (userActiveGame != null){
-            activeMap =  "Game: " + userActiveGame.getName();
+            activeGame =  "Game: " + userActiveGame.getName();
         }
-        String commandExecuted = "User: " + userName + ". " +activeMap+ " " +
+        String commandExecuted = "User: " + userName + ". " +activeGame+ " " +
                 event.getName() + " " + event.getOptions().stream()
                 .map(OptionMapping::getAsString)
                 .collect(Collectors.joining(" "));

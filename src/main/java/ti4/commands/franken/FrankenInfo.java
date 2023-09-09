@@ -13,7 +13,7 @@ public class FrankenInfo extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String threadName = activeGame.getName() + " - Franken Info";
         MessageHelper.sendMessageToThread(event.getChannel(), threadName, getFrankenInfo(activeGame));
     }

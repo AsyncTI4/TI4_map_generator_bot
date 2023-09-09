@@ -19,7 +19,7 @@ public class PingActivePlayer extends FOWSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         String playerID = activeGame.getActivePlayer();
         if (playerID == null) {

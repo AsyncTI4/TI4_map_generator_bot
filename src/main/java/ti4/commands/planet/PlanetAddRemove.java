@@ -38,7 +38,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
@@ -133,7 +133,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 default -> Emojis.planet + " " + planet;
             };
         } else {
-            return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveMap());
+            return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveGame());
         }
     }
 
@@ -150,13 +150,13 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
             switch (spendAs.toLowerCase()) {
                 case "r", "resources" -> {
                     for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetResources(planetID, getActiveMap());
+                        sum += Helper.getPlanetResources(planetID, getActiveGame());
                     }
                     message.append(Helper.getResourceEmoji(sum)).append(" resources").toString();
                 }
                 case "i", "influence" -> {
                     for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetInfluence(planetID, getActiveMap());
+                        sum += Helper.getPlanetInfluence(planetID, getActiveGame());
                     }
                     message.append(Helper.getInfluenceEmoji(sum)).append(" influence").toString();
                 }
@@ -166,7 +166,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 case "t", "techskip" -> message.append(" a tech skip").toString();
                 case "toes" -> { //For HolyT
                     for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetInfluence(planetID, getActiveMap());
+                        sum += Helper.getPlanetInfluence(planetID, getActiveGame());
                     }
                     message.append(Helper.getToesEmoji(sum)).append(" toes").toString();
                 }

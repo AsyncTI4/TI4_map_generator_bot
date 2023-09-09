@@ -17,7 +17,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {

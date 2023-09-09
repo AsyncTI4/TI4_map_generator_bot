@@ -78,7 +78,7 @@ public class DrawAgenda extends AgendaSubcommandData {
             int providedCount = option.getAsInt();
             count = providedCount > 0 ? providedCount : 1;
         }
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         drawAgenda((GenericInteractionCreateEvent) event, count, activeGame, player);
     }

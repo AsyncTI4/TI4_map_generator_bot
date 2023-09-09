@@ -26,7 +26,7 @@ public class PersonalCleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         runStatusCleanup(activeGame);
     }
 

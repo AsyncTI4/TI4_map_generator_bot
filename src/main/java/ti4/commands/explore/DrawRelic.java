@@ -23,7 +23,7 @@ public class DrawRelic extends GenericRelicAction {
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         drawRelicAndNotify(player, event, activeGame);
     }
 

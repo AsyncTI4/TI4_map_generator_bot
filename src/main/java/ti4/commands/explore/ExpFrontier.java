@@ -22,7 +22,7 @@ public class ExpFrontier extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Tile tile = getTile(event, tileName, activeGame);
 
         Player player = activeGame.getPlayer(getUser().getId());

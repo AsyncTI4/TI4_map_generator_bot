@@ -20,7 +20,7 @@ public abstract class HelpSubcommandData extends SubcommandData {
         super(name, description);
     }
 
-    public Game getActiveMap() {
+    public Game getActiveGame() {
         return activeGame;
     }
 

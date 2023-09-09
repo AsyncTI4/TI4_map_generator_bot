@@ -16,7 +16,7 @@ public class RemoveAllCustomAdjacentTiles extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");

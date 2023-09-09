@@ -14,7 +14,7 @@ public class RemoveExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();

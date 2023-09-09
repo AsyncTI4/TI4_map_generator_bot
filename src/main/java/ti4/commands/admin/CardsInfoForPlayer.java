@@ -20,7 +20,7 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption != null) {
             User user = playerOption.getAsUser();

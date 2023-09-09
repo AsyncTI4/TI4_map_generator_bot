@@ -34,7 +34,7 @@ public class SystemInfo extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         int context = 0;
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);

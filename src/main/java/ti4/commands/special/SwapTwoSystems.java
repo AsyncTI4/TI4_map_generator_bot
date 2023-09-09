@@ -23,7 +23,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");

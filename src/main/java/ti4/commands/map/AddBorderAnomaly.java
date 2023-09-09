@@ -19,7 +19,7 @@ public class AddBorderAnomaly extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
         if (!activeGame.getTileMap().containsKey(tile)) {
             MessageHelper.replyToMessage(event, "Map does not contain that tile");

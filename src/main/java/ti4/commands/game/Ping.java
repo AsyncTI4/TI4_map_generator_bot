@@ -14,8 +14,8 @@ public class Ping extends GameSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Helper.fixGameChannelPermissions(event.getGuild(), getActiveMap());
-        pingGame(event, getActiveMap());
+        Helper.fixGameChannelPermissions(event.getGuild(), getActiveGame());
+        pingGame(event, getActiveGame());
     }
 
     public void pingGame(GenericInteractionCreateEvent event, Game activeGame) {

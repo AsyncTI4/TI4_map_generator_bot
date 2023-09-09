@@ -20,7 +20,7 @@ public class ResetAgendas extends AgendaSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveMap().resetAgendas();
-        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveMap().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+        getActiveGame().resetAgendas();
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
     }
 }

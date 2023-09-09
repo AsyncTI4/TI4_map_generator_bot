@@ -23,7 +23,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         dealSOToAll(event, count, activeGame);
     }

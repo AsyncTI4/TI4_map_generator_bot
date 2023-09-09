@@ -17,7 +17,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         if(activeGame.isFoWMode()){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");

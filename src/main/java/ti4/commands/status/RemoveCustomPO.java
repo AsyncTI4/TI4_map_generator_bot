@@ -16,7 +16,7 @@ public class RemoveCustomPO extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {

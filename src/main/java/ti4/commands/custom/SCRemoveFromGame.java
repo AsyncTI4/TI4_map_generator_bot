@@ -17,7 +17,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveMap();
+		Game activeGame = getActiveGame();
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {

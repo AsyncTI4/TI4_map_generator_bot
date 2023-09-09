@@ -38,7 +38,7 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         if (!activeGame.isMapOpen()) {
             sendMessage("Can do faction setup only when map is open and not locked. Use `/game set_status open`");
             return;

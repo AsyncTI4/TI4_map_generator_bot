@@ -20,7 +20,7 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         List<Tile> tilesToSet = new ArrayList<>();
         //first ring
         for(int y = 1; y < 4; y++){

@@ -17,7 +17,7 @@ public class SoAddToGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String soID = event.getOption(Constants.SO_ID,null, OptionMapping::getAsString);
         if (soID == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");

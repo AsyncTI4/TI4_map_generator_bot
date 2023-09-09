@@ -25,7 +25,7 @@ public class CombatInfo extends CombatSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         // if (activeMap.isFoWMode()) {
         //     sendMessage("This is disabled for FoW for now.");
         //     return;

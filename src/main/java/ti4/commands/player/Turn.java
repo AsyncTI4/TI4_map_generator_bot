@@ -40,7 +40,7 @@ public class Turn extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player mainPlayer = activeGame.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(activeGame, mainPlayer, event, null);
         mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);

@@ -32,7 +32,7 @@ public class Setup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
         if (playerCount != null) {
@@ -135,7 +135,7 @@ public class Setup extends GameSubcommandData {
         OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
         if (largeText != null) {
             String large = largeText.getAsString();
-            getActiveMap().setLargeText(large);
+            getActiveGame().setLargeText(large);
         }
 
 
@@ -162,16 +162,16 @@ public class Setup extends GameSubcommandData {
 
         Boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, null, OptionMapping::getAsBoolean);
         if (isTIGLGame != null && isTIGLGame) {
-            getActiveMap().setCompetitiveTIGLGame(true);
+            getActiveGame().setCompetitiveTIGLGame(true);
         }
 
         OptionMapping absolModeOption = event.getOption(Constants.ABSOL_MODE);
         if (absolModeOption != null) {
-            getActiveMap().setAbsolMode(absolModeOption.getAsBoolean());
-            getActiveMap().setAgendaDeckID("agendas_absol");
-            getActiveMap().resetAgendas();
-            getActiveMap().setRelicDeckID("relics_absol");
-            getActiveMap().resetRelics();
+            getActiveGame().setAbsolMode(absolModeOption.getAsBoolean());
+            getActiveGame().setAgendaDeckID("agendas_absol");
+            getActiveGame().resetAgendas();
+            getActiveGame().setRelicDeckID("relics_absol");
+            getActiveGame().resetRelics();
         }
 
         OptionMapping discordantStarsOption = event.getOption(Constants.DISCORDANT_STARS_MODE);

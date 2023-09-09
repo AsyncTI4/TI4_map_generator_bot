@@ -24,7 +24,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);

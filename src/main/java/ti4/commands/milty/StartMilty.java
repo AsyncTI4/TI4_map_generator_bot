@@ -51,7 +51,7 @@ public class StartMilty extends MiltySubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
         int sliceCount = activeGame.getPlayerCountForMap() + 2;
@@ -306,7 +306,7 @@ public class StartMilty extends MiltySubcommandData {
         } catch (IOException e) {
             BotLogger.log("Could not save generated slice image", e);
         }
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String absolutePath = file.getParent() + "/" + activeGame.getName() + "_slices.jpg";
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {

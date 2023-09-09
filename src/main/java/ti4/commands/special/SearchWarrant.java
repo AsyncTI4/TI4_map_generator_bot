@@ -17,7 +17,7 @@ public class SearchWarrant extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
