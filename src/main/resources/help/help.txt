@@ -4,49 +4,49 @@ To create game use:
 /create_game gameName vpCount(optional) <- creates game and can set VP count of game, optional
 To set active game use:
 /set_game gameName <- Map name can only contain a-z A-Z 0-9 symbols
-Now automatically sets active game in channels that go: gameName-game-updates
-so in any channel that is named like this, you don't need to set active game, it automatically sets for you
+Now automatically sets active map in channels that go: gameName-map-updates
+so in any channel that is named like this, you don't need to set active map, it automatically sets for you
 so switching between games is much easier.
 
 /game set_game_status status gameName(Optional)
 status: open or locked
-Status open, means anyone can edit game, can join game as player;
-Status locked means, only joined players and game creator can edit game. No more players can join
-Game auto locks open game if it's does not have community mode, when any SC card is picked if was open, will get locked.
-/game join gameName <- join an open game to be able to edit even if game is locked
-/game leave gameName <- leave an open game
-/game info gameName <- information of game, status if open/locked and player list
-/game add @playerName... gameName <- add single or multiple players to game, gameName is optional and can bet set if no activeGame present
-/game remove  @playerName... gameName <- remove single or multiple players to game, gameName is optional and can bet set if no activeGame present
+Status open, means anyone can edit map, can join map as player;
+Status locked means, only joined players and map creator can edit map. No more players can join
+Game auto locks open map if it's does not have community mode, when any SC card is picked if was open, will get locked.
+/game join gameName <- join an open map to be able to edit even if map is locked
+/game leave gameName <- leave an open map
+/game info gameName <- information of map, status if open/locked and player list
+/game add @playerName... gameName <- add single or multiple players to game, gameName is optional and can bet set if no activeMap present
+/game remove  @playerName... gameName <- remove single or multiple players to game, gameName is optional and can bet set if no activeMap present
 /game set_order @playerName1 @playerName2 .....gameName
 Add all players in order for game
 /game sc_count <- sets game SC count, used if game requires more than 8 Strategy cards, default is 8
-/game setup display_type(optional) vpCount(optional) player_count_for_map(optional) community_mode(optional) alliance_mode(optional) <- sets default display type for game. All (game + player stats), game or player stats, Sets Game VP count (10 default), alliance mode turns off auto planet add to player area when last unit is left on planet
-player_count_for_map set player game count 6 (default) or 8 for bigger game
+/game setup display_type(optional) vpCount(optional) player_count_for_map(optional) community_mode(optional) alliance_mode(optional) <- sets default display type for game. All (map + player stats), map or player stats, Sets Game VP count (10 default), alliance mode turns off auto planet add to player area when last unit is left on planet
+player_count_for_map set player map count 6 (default) or 8 for bigger map
 community_mode is for games were multiple players handle single faction
 /game setup community_mode:YES
 then
 /game community_setup player1 role1 channel1
-player1 is dummy player in game or real, role1 is the team role and channel1 is team channel
+player1 is dummy player in map or real, role1 is the team role and channel1 is team channel
 can setup up to 8 at once
 
 /game replace FACTION_COLOR @replacementPlayer <- can replace a player in game (faction/color), only game players can do command
 /game setup game_custom_name @custom text <- can add custom text to game
 
-For easy of setup suggest first command after game creation use
-/game add_tile setup 0
+For easy of setup suggest first command after map creation use
+/map add_tile setup 0
 This adds a template with positions
 
 Now additional commands:
-/game add_tile tileName positionOnMap
-(We using somno template positions on game. from setup template and you see positions.
+/map add_tile tileName positionOnMap
+(We using somno template positions on map. from setup template and you see positions.
 Also we support TopLeft, TopRight, BottomLeft and BottomRight positions coresponding to TL, TR, BL, BR
 Mecatol position is MR)
-/game add_tile_list tileList <- tile list is code from game Generators like TTS uses, example: https://ti4-game-generator.derekpeterson.ca/
+/map add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
 You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /remove_tile tileName or position
-/delete_game <-deletes your game, only can delete the game you created
-/show_game gameName(optional) display_type(optional) <- displays the game game, display_type can be set to all, game, stats. Displays game + player stats, just game or just player stats
+/delete_game <-deletes your game, only can delete the map you created
+/show_game gameName(optional) display_type(optional) <- displays the game map, display_type can be set to all, map, stats. Displays map + player stats, just map or just player stats
 If you have active game set, it shows your active game if no game name is defines
 /add_cc colorList(factionList) tile or position <- add's cc to system: colorList can be pink,red,black as example/
 /remove_cc colorList(FactionList) tile or position <- remove's cc from system: colorList can be pink,red,black as example/
@@ -119,7 +119,7 @@ Attachement tokens can only be added to planets
 faction_or_color tag helps to define for which player you want to set stats. FOR SELF not needed, needed only if you set for other players
 /player setup faction color hs_tile_position(optional) keleres_hs(options) <- needs to set player faction and color
 /player sc_play faction_color(optional) <- plays your SC that you have in game
-/player sc_pick scNumber <- adds your pick to game. Does not generate game
+/player sc_pick scNumber <- adds your pick to game. Does not generate map
 /player sc_follow <- removes 1 cc from strategy tokens
 /player send_tg faction <- take tg from your existing ones and send(add) to target faction tg
 /player send_commodities faction <- take commodities from your existing ones and send(add) to target faction tg
@@ -183,8 +183,8 @@ Cards commands
 /agenda look_at_bottom <- shows bottom agenda, no action possible
 /agenda show_discarded <- shows discarded agendas and the id's
 /agenda reveal <- reveals agenda to all with ID and automatically puts in discard pile
-/agenda add_law agendaID optionalTextForElected <- add's law to game game and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
-/agenda remove_law agendaID <- removes law from game and puts in discard, ID is showed in game
+/agenda add_law agendaID optionalTextForElected <- add's law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
+/agenda remove_law agendaID <- removes law from game and puts in discard, ID is showed in map
 /agenda vote_count <- lists vote count, only if planets are used in bot
 /agenda shuffle_deck <- shuffles agenda deck
 /agenda reset_deck <- reset agenda deck and discards to new state
@@ -258,8 +258,8 @@ Its workaround for that single explore
 
 /help documentation <- show documentation file
 /help setup_templates <- show setup_templates file
-/help list_tiles <- lists all tiles, use starting number id to add to game
-/help list_games <- lists all available games that are created
+/help list_tiles <- lists all tiles, use starting number id to add to map
+/help list_games <- lists all available maps that are created
 /help list_planets <- lists all available planets
 /help list_units <- lists all possible units
 
