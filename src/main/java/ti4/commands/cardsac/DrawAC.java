@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -19,9 +19,9 @@ public class DrawAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -33,12 +33,12 @@ public class DrawAC extends ACCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
         for (int i = 0; i < count; i++) {
-            activeMap.drawActionCard(player.getUserID());
+            activeGame.drawActionCard(player.getUserID());
         }
-        ACInfo.sendActionCardInfo(activeMap, player);
-         ButtonHelper.checkACLimit(activeMap, event, player);
+        ACInfo.sendActionCardInfo(activeGame, player);
+         ButtonHelper.checkACLimit(activeGame, event, player);
         if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
         }
     }
 }

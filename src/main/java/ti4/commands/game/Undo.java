@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class Undo extends GameSubcommandData{
@@ -19,13 +19,13 @@ public class Undo extends GameSubcommandData{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MapManager mapManager = MapManager.getInstance();
-        Map userActiveMap = mapManager.getUserActiveMap(event.getUser().getId());
-        if (userActiveMap == null){
+        GameManager gameManager = GameManager.getInstance();
+        Game userActiveGame = gameManager.getUserActiveGame(event.getUser().getId());
+        if (userActiveGame == null){
             MessageHelper.replyToMessage(event, "Must set active Game");
             return;
         }
-        if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+        if (!event.getChannel().getName().startsWith(userActiveGame.getName()+"-")){
             MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
             return;
         }
@@ -36,9 +36,9 @@ public class Undo extends GameSubcommandData{
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + userActiveMap.getLatestCommand());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + userActiveGame.getLatestCommand());
 
-        MapSaveLoadManager.undo(userActiveMap);
-        userActiveMap = MapManager.getInstance().getMap(userActiveMap.getName());
+        GameSaveLoadManager.undo(userActiveGame);
+        userActiveGame = GameManager.getInstance().getGame(userActiveGame.getName());
     }
 }

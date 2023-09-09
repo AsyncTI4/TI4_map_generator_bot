@@ -110,7 +110,7 @@ public class MiltyDraftManager {
         red.clear();
     }
 
-    private class PlayerDraft {
+    private static class PlayerDraft {
         private String faction;
         private MiltyDraftSlice slice;
         private int order;

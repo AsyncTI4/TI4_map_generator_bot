@@ -26,7 +26,7 @@ public class ListLeaders extends HelpSubcommandData {
         HashMap<String, String> leaderList = Mapper.getLeaderRepresentations();
         List<String> searchedList = leaderList.entrySet().stream()
             .map(e -> "`" + e.getKey() + "`= " + Helper.getEmojiFromDiscord(e.getKey()) + e.getValue())
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

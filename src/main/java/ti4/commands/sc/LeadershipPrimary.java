@@ -8,7 +8,7 @@ import ti4.commands.player.Stats;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -31,9 +31,9 @@ public class LeadershipPrimary extends SCSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
+		Game activeGame = getActiveGame();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
 		if (player == null) {
 			MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
 			return;
@@ -58,11 +58,11 @@ public class LeadershipPrimary extends SCSubcommandData {
 							"Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
-						stats.setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC,
+						stats.setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC,
 								player::getTacticalCC, tokenizer.nextToken(), true);
-						stats.setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
+						stats.setValue(event, activeGame, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
 								tokenizer.nextToken(), true);
-						stats.setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC,
+						stats.setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC,
 								player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -71,22 +71,22 @@ public class LeadershipPrimary extends SCSubcommandData {
 				}
 			}
 			if (optionT != null) {
-				stats.setValue(event, activeMap, player, optionT, player::setTacticalCC, player::getTacticalCC);
+				stats.setValue(event, activeGame, player, optionT, player::setTacticalCC, player::getTacticalCC);
 			}
 			if (optionF != null) {
-				stats.setValue(event, activeMap, player, optionF, player::setFleetCC, player::getFleetCC);
+				stats.setValue(event, activeGame, player, optionF, player::setFleetCC, player::getFleetCC);
 			}
 			if (optionS != null) {
-				stats.setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC);
+				stats.setValue(event, activeGame, player, optionS, player::setStrategicCC, player::getStrategicCC);
 			}
 		}
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
-			stats.setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
+			stats.setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 		}
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
 		if (optionC != null) {
-			stats.setValue(event, activeMap, player, optionC, player::setCommodities, player::getCommodities);
+			stats.setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
 		}
 
 	}

@@ -13,7 +13,7 @@ public class UnitRemove extends UnitAddRemove {
 
     @Override
     public void doAction(Player player, List<String> unitIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" removed units:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" removed units:\n");
         for (String unitID : unitIDs) {
             if (!player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player did not have this unit)");

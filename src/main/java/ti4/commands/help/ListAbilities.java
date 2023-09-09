@@ -26,7 +26,7 @@ public class ListAbilities extends HelpSubcommandData {
         HashMap<String, String> abilityList = Mapper.getFactionAbilities();
         List<String> searchedList = abilityList.entrySet().stream()
             .map(e -> AbilityInfo.getAbilityRepresentation(e.getKey()))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

@@ -6,7 +6,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -17,7 +17,7 @@ import java.util.StringTokenizer;
 
 public class AddControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();

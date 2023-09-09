@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +11,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import ti4.generator.Mapper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
@@ -32,13 +31,13 @@ public class CombatHelper {
 
         HashMap<UnitModel, Integer> output = null;
        
-        output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        output = new HashMap<>(unitsInCombat.entrySet().stream()
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         
-        Set<String> duplicates = new HashSet<String>();
+        Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
-            .map(unit -> unit.getBaseType())
+            .map(UnitModel::getBaseType)
             .collect(Collectors.toList());
         for(int x = 1; x < dupes.size(); x++){
             String dupe = dupes.get(x);
@@ -62,27 +61,27 @@ public class CombatHelper {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-            entry -> new ImmutablePair<UnitModel, Integer>
-            (
-                player.getPriorityUnitByAsyncID(entry.getKey()),
-                entry.getValue()
-            )
+            entry -> new ImmutablePair<>
+                (
+                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    entry.getValue()
+                )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output = null;
         if (unitHolder.getName() == Constants.SPACE) {
-            output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
-                    .filter(entry -> entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
-            output = new HashMap<UnitModel, Integer>(unitsInCombat.entrySet().stream()
-                    .filter(entry -> entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
-        Set<String> duplicates = new HashSet<String>();
+        Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
-            .map(unit -> unit.getBaseType())
+            .map(UnitModel::getBaseType)
             .collect(Collectors.toList());
         List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
@@ -106,14 +105,14 @@ public class CombatHelper {
         return output;
     }
 
-    public static Player GetOpponent(Player player, UnitHolder unitHolder, Map activeMap) {
+    public static Player GetOpponent(Player player, UnitHolder unitHolder, Game activeGame) {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
         Optional<String> opponentColor = unitHolder.getUnitColorsOnHolder().stream()
                 .filter(color -> !color.equals(playerColorID))
                 .findFirst();
         if (opponentColor.isPresent()) {
-            Optional<Player> potentialPlayer = activeMap.getRealPlayers().stream()
+            Optional<Player> potentialPlayer = activeGame.getRealPlayers().stream()
                     .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(opponentColor.get()))
                     .findFirst();
             if(potentialPlayer.isPresent()){
@@ -125,7 +124,7 @@ public class CombatHelper {
 
     public static String RollForUnits(java.util.Map<UnitModel, Integer> units,
             HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
-            Map activeMap) {
+            Game activeGame) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
@@ -139,7 +138,7 @@ public class CombatHelper {
                 .collect(Collectors.toList());
         if (!extraRolls.isEmpty()) {
             result += "With ";
-            ArrayList<String> extraRollMessages = new ArrayList<String>();
+            ArrayList<String> extraRollMessages = new ArrayList<>();
             for (UnitModel unit : unitsWithExtraRolls) {
                 String plusPrefix = "+";
                 Integer numExtraRolls = extraRolls.get(unit.getAsyncId());
@@ -159,7 +158,7 @@ public class CombatHelper {
             int numOfUnit = entry.getValue();
 
             int toHit = unit.getCombatHitsOn();
-            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeMap);
+            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeGame);
             int extraRollsForUnit = 0;
             if (extraRolls.containsKey(unit.getAsyncId())) {
                 extraRollsForUnit = extraRolls.get(unit.getAsyncId());
@@ -175,9 +174,7 @@ public class CombatHelper {
             }
 
             int[] hitRolls = Arrays.stream(resultRolls)
-                    .filter(roll -> {
-                        return roll >= toHit - modifierToHit;
-                    })
+                    .filter(roll -> roll >= toHit - modifierToHit)
                     .toArray();
 
             String rollsSuffix = "";

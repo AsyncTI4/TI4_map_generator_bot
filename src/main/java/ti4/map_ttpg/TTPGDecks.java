@@ -52,7 +52,7 @@ public class TTPGDecks {
     @JsonProperty("card.legendary_planet")
     private TTPGCardLegendaryPlanet cardLegendaryPlanet;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("card.objective.public_1")
     public TTPGCardObjectivePublic1 getCardObjectivePublic1() {

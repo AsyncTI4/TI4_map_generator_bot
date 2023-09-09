@@ -6,10 +6,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.GameSaveLoadManager;
 
 public class PingActivePlayer extends FOWSubcommandData {
 
@@ -19,21 +19,21 @@ public class PingActivePlayer extends FOWSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
-        String playerID = activeMap.getActivePlayer();
+        String playerID = activeGame.getActivePlayer();
         if (playerID == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player player = activeMap.getPlayer(playerID);
+        Player player = activeGame.getPlayer(playerID);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player playerOrig = activeMap.getPlayer(getUser().getId());
-        playerOrig = Helper.getGamePlayer(activeMap, player, event, null);
-        long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
+        Player playerOrig = activeGame.getPlayer(getUser().getId());
+        playerOrig = Helper.getGamePlayer(activeGame, player, event, null);
+        long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
             samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());
@@ -42,15 +42,15 @@ public class PingActivePlayer extends FOWSubcommandData {
         if (milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
-            String ping = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " this is a gentle reminder that it is your turn.";
-            if (activeMap.isFoWMode()) {
+            String ping = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " this is a gentle reminder that it is your turn.";
+            if (activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
-                MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
+                MessageHelper.sendPrivateMessageToPlayer(player, activeGame, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
-            activeMap.setLastActivePlayerPing(new Date());
-            MapSaveLoadManager.saveMap(activeMap);
+            activeGame.setLastActivePlayerPing(new Date());
+            GameSaveLoadManager.saveMap(activeGame);
         }
     }
 

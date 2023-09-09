@@ -8,7 +8,6 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
-import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -16,7 +15,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
@@ -39,8 +38,8 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        if (!activeMap.isMapOpen()) {
+        Game activeGame = getActiveGame();
+        if (!activeGame.isMapOpen()) {
             sendMessage("Can do faction setup only when map is open and not locked. Use `/game set_status open`");
             return;
         }
@@ -59,15 +58,15 @@ public class Setup extends PlayerSubcommandData {
             sendMessage("Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
         }
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
 
-        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+        LinkedHashMap<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
@@ -96,7 +95,7 @@ public class Setup extends PlayerSubcommandData {
 
         String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
-        activeMap.setTile(tile);
+        activeGame.setTile(tile);
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
@@ -104,7 +103,7 @@ public class Setup extends PlayerSubcommandData {
 
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
-            activeMap.setTile(tile);
+            activeGame.setTile(tile);
         }
 
         // STARTING COMMODITIES
@@ -116,7 +115,7 @@ public class Setup extends PlayerSubcommandData {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
-            new PlanetAdd().doAction(player, planetResolved, activeMap);
+            new PlanetAdd().doAction(player, planetResolved, activeGame);
             player.refreshPlanet(planetResolved);
         }
 
@@ -124,8 +123,8 @@ public class Setup extends PlayerSubcommandData {
 
         // STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if (!activeMap.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
+        if (!activeGame.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeGame) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }
@@ -141,12 +140,12 @@ public class Setup extends PlayerSubcommandData {
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
 
         if (setSpeaker) {
-            activeMap.setSpeaker(player.getUserID());
-            sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap));
+            activeGame.setSpeaker(player.getUserID());
+            sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeGame));
         }
 
         // STARTING PNs
-        player.initPNs(activeMap);
+        player.initPNs(activeGame);
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         player.setPromissoryNotesOwned(playerPNs);
 
@@ -155,11 +154,11 @@ public class Setup extends PlayerSubcommandData {
         player.setUnitsOwned(playerOwnedUnits);
 
         // SEND STUFF
-        AbilityInfo.sendAbilityInfo(activeMap, player, event);
-        TechInfo.sendTechInfo(activeMap, player, event);
-        LeaderInfo.sendLeadersInfo(activeMap, player, event);
-        UnitInfo.sendUnitInfo(activeMap, player, event);
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
+        AbilityInfo.sendAbilityInfo(activeGame, player, event);
+        TechInfo.sendTechInfo(activeGame, player, event);
+        LeaderInfo.sendLeadersInfo(activeGame, player, event);
+        UnitInfo.sendUnitInfo(activeGame, player, event);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
     }
 
     private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {

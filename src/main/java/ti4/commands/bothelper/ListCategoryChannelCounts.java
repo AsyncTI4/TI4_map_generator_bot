@@ -22,7 +22,7 @@ public class ListCategoryChannelCounts extends BothelperSubcommandData {
         List<Category> categories = guild.getCategories();
         for (Category category : categories) {
             int channelCount = category.getChannels().size();
-            sb.append("> **" + category.getName() + "**: " + channelCount + "/" + maxChannels + getPercentage(channelCount, maxChannels)).append("\n");
+            sb.append("> **").append(category.getName()).append("**: ").append(channelCount).append("/").append(maxChannels).append(getPercentage(channelCount, maxChannels)).append("\n");
         }
         sendMessage(sb.toString());
     }

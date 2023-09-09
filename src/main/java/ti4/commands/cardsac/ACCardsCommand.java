@@ -11,9 +11,9 @@ import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -39,8 +39,8 @@ public class ACCardsCommand implements Command {
     public static boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
-            MapManager mapManager = MapManager.getInstance();
-            if (!mapManager.isUserWithActiveMap(userID)) {
+            GameManager gameManager = GameManager.getInstance();
+            if (!gameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
@@ -53,18 +53,18 @@ public class ACCardsCommand implements Command {
                     }
                 }
             }
-            Map userActiveMap = mapManager.getUserActiveMap(userID);
-            if (userActiveMap.isCommunityMode()){
-                Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);
-                if (player == null || !userActiveMap.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            if (userActiveGame.isCommunityMode()){
+                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
+                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;
                 }
-            } else if (!userActiveMap.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
-            if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+            if (!event.getChannel().getName().startsWith(userActiveGame.getName()+"-")){
                 MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
                 return false;
             }
@@ -77,12 +77,12 @@ public class ACCardsCommand implements Command {
     public void logBack(SlashCommandInteractionEvent event) {
         User user = event.getUser();
         String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
-        String activeMap = "";
-        if (userActiveMap != null) {
-            activeMap = "Active map: " + userActiveMap.getName();
+        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        String activeGame = "";
+        if (userActiveGame != null) {
+            activeGame = "Active map: " + userActiveGame.getName();
         }
-        String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
+        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
                 event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
@@ -110,8 +110,8 @@ public class ACCardsCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 

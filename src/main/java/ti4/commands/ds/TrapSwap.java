@@ -22,10 +22,10 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -37,24 +37,24 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeMap.getPlanets().contains(planetName)) {
+        if (!activeGame.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
         String planetName2 = planetOption2.getAsString();
-        if (!activeMap.getPlanets().contains(planetName2)) {
+        if (!activeGame.getPlanets().contains(planetName2)) {
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
         }
 
-        UnitHolder unitHolder = getUnitHolder(event, activeMap, planetName);
+        UnitHolder unitHolder = getUnitHolder(event, activeGame, planetName);
         if (unitHolder == null){
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
-        UnitHolder unitHolder2 = getUnitHolder(event, activeMap, planetName2);
+        UnitHolder unitHolder2 = getUnitHolder(event, activeGame, planetName2);
         if (unitHolder2 == null){
             MessageHelper.replyToMessage(event, "Planet2 not found in map");
             return;
@@ -86,10 +86,10 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
     }
 
     @Nullable
-    private static UnitHolder getUnitHolder(SlashCommandInteractionEvent event, Map activeMap, String planetName) {
+    private static UnitHolder getUnitHolder(SlashCommandInteractionEvent event, Game activeGame, String planetName) {
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : activeMap.getTileMap().values()) {
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (tile != null) {
                 break;
             }

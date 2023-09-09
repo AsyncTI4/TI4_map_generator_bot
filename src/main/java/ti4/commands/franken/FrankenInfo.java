@@ -2,7 +2,7 @@ package ti4.commands.franken;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -13,16 +13,16 @@ public class FrankenInfo extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        String threadName = activeMap.getName() + " - Franken Info";
-        MessageHelper.sendMessageToThread(event.getChannel(), threadName, getFrankenInfo(activeMap));
+        Game activeGame = getActiveGame();
+        String threadName = activeGame.getName() + " - Franken Info";
+        MessageHelper.sendMessageToThread(event.getChannel(), threadName, getFrankenInfo(activeGame));
     }
 
-    public static String getFrankenInfo(Map activeMap) {
+    public static String getFrankenInfo(Game activeGame) {
         StringBuilder sb = new StringBuilder();
-        sb.append("# __Franken Info for ").append(activeMap.getName()).append("__\n");
+        sb.append("# __Franken Info for ").append(activeGame.getName()).append("__\n");
 
-        for (Player player : activeMap.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             sb.append("## ").append(player.getUserName()).append("\n");
             //stuff for each player
         }

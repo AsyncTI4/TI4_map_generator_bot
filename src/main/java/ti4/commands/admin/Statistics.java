@@ -1,11 +1,12 @@
 package ti4.commands.admin;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -31,13 +32,13 @@ public class Statistics extends AdminSubcommandData {
         BufferedImage fakeImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = fakeImage.getGraphics();
 
-        HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
-        for (Map activeMap : mapList.values()) {
-            if (activeMap.getName().startsWith("pbd")) {
-                int vp = activeMap.getVp();
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        for (Game activeGame : mapList.values()) {
+            if (activeGame.getName().startsWith("pbd")) {
+                int vp = activeGame.getVp();
                 HashMap<Player, Integer> userVPs = new HashMap<>();
-                GenerateMap.getInstance().objectives(activeMap, 0, graphics, userVPs, false);
-                for (Player player : activeMap.getPlayers().values()) {
+                GenerateMap.getInstance().objectives(activeGame, 0, graphics, userVPs, false);
+                for (Player player : activeGame.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
                     if (faction != null && color != null && !faction.isEmpty() && !faction.equals("null")) {
@@ -65,7 +66,7 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 if (findWinner) {
-                    Date date = new Date(activeMap.getLastModifiedDate());
+                    Date date = new Date(activeGame.getLastModifiedDate());
                     Date currentDate = new Date();
                     long time_difference = currentDate.getTime() - date.getTime();
                     // Calculate time difference in days
@@ -118,12 +119,4 @@ public class Statistics extends AdminSubcommandData {
                 .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
-
-    private class Stats {
-        private String faction;
-        private String color;
-
-        private int VPCount;
-    }
-
 }

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -19,33 +19,33 @@ public class RelicInfo extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        sendRelicInfo(activeMap, player, event);
+        sendRelicInfo(activeGame, player, event);
     }
 
-    public static void sendRelicInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendRelicInfo(activeMap, player);
+    public static void sendRelicInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendRelicInfo(activeGame, player);
     }
 
-    public static void sendRelicInfo(Map activeMap, Player player) {
+    public static void sendRelicInfo(Game activeGame, Player player) {
         //RELIC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getRelicInfoText(player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getRelicInfoText(player));
 
         //BUTTONS
         String purgeRelicMessage = "_ _\nClick a button below to exhaust or purge a Relic";
-        List<Button> relicButtons = getRelicButtons(activeMap, player);
+        List<Button> relicButtons = getRelicButtons(activeGame, player);
         if (relicButtons != null && !relicButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(purgeRelicMessage, relicButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
@@ -65,7 +65,7 @@ public class RelicInfo extends ExploreSubcommandData {
         return sb.toString();
     }
 
-    private static List<Button> getRelicButtons(Map activeMap, Player player) {
+    private static List<Button> getRelicButtons(Game activeGame, Player player) {
         return null;
     }
 }

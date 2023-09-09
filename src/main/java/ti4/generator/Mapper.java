@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.*;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -129,16 +130,16 @@ public class Mapper {
         });
     }
 
-    public static List<String> getColourFactionPromissoryNoteIDs(ti4.map.Map activeMap, String color, String faction) {
+    public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
-                    if (activeMap.isAbsolMode() && pn.getAlias().endsWith("_ps") && !pn.getSource().equalsIgnoreCase("Absol")) {
+                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && !pn.getSource().equalsIgnoreCase("Absol")) {
                         continue;
                     }
-                    if (!activeMap.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource().equalsIgnoreCase("Absol")) {
+                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource().equalsIgnoreCase("Absol")) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -158,9 +159,7 @@ public class Mapper {
 
     public static List<String> getAllPromissoryNoteIDs() {
         List<String> pnList = new ArrayList<>();
-        for (String pnID : promissoryNotes.keySet()) {
-            pnList.add(pnID);
-        }
+        pnList.addAll(promissoryNotes.keySet());
         return pnList;
     }
 
@@ -224,8 +223,7 @@ public class Mapper {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
         if(wormhole == null){
-            Set<String> empty = new HashSet<String>();
-            return empty;
+            return new HashSet<>();
         }
 
         return TileHelper.getAllTiles().values().stream()
@@ -396,8 +394,7 @@ public class Mapper {
         if ((promStr == null) || !promStr.contains(";")) {
             return promStr;
         }
-        String pns = promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction() + promissoryNotes.get(id).getColour();
-        return pns;
+        return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction() + promissoryNotes.get(id).getColour();
     }
 
     public static String getPromissoryNoteOwner(String id) {
@@ -505,8 +502,7 @@ public class Mapper {
     }
 
     public static HashMap<String, SecretObjectiveModel> getSecretObjectives() {
-        HashMap<String, SecretObjectiveModel> soList = new HashMap<>(secretObjectives);
-        return soList;
+        return new HashMap<>(secretObjectives);
     }
 
     public static HashMap<String, SecretObjectiveModel> getSecretObjectives(String extra) {
@@ -582,13 +578,13 @@ public class Mapper {
         }
         return agendaList;
     }
-    public static HashMap<String, String> getAgendaJustNames(ti4.map.Map activeMap) {
+    public static HashMap<String, String> getAgendaJustNames(Game activeGame) {
         HashMap<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
-            if(activeMap.isAbsolMode() && agenda.getAlias().contains("absol_")){
+            if(activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")){
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
-            if(!activeMap.isAbsolMode() && !agenda.getAlias().contains("absol_")){
+            if(!activeGame.isAbsolMode() && !agenda.getAlias().contains("absol_")){
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
             
@@ -598,9 +594,6 @@ public class Mapper {
     @Nullable
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
-        if (ccPath == null) {
-            return null;
-        }
         return ccPath;
     }
 
@@ -618,8 +611,7 @@ public class Mapper {
     }
 
     public static HashMap<String, ActionCardModel> getActionCards() {
-        HashMap<String, ActionCardModel> acList = new HashMap<>(actionCards);
-        return acList;
+        return new HashMap<>(actionCards);
     }
 
     public static HashMap<String, ActionCardModel> getActionCards(String extra) {
@@ -660,8 +652,7 @@ public class Mapper {
 
 
     public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
-        HashMap<String, PublicObjectiveModel> poList = new HashMap<>(publicObjectives);
-        return poList;
+        return new HashMap<>(publicObjectives);
     }
 
     public static HashMap<String, String> getPublicObjectivesStage1() {
@@ -720,13 +711,11 @@ public class Mapper {
     }
 
     public static HashMap<String, AgendaModel> getAgendas() {
-        HashMap<String, AgendaModel> agendaList = new HashMap<>(agendas);
-        return agendaList;
+        return new HashMap<>(agendas);
     }
 
     public static HashMap<String, DeckModel> getDecks() {
-        HashMap<String, DeckModel> deckList = new HashMap<>(decks);
-        return deckList;
+        return new HashMap<>(decks);
     }
 
     public static DeckModel getDeck(String deckID) {
@@ -734,8 +723,7 @@ public class Mapper {
     }
 
     public static HashMap<String, CombatModifierModel> getCombatModifiers() {
-        HashMap<String, CombatModifierModel> combatModifiersList = new HashMap<>(combatModifiers);
-        return combatModifiersList;
+        return new HashMap<>(combatModifiers);
     }
 
     public static HashMap<String, String> getFactionAbilities() {

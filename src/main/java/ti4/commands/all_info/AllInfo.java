@@ -19,8 +19,8 @@ import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -39,8 +39,8 @@ public class AllInfo implements Command {
     public static boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
-            MapManager mapManager = MapManager.getInstance();
-            if (!mapManager.isUserWithActiveMap(userID)) {
+            GameManager gameManager = GameManager.getInstance();
+            if (!gameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
@@ -53,18 +53,18 @@ public class AllInfo implements Command {
                     }
                 }
             }
-            Map userActiveMap = mapManager.getUserActiveMap(userID);
-            if (userActiveMap.isCommunityMode()){
-                Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);
-                if (player == null || !userActiveMap.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            if (userActiveGame.isCommunityMode()){
+                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
+                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;
                 }
-            } else if (!userActiveMap.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
-            if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+            if (!event.getChannel().getName().startsWith(userActiveGame.getName()+"-")){
                 MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
                 return false;
             }
@@ -76,35 +76,35 @@ public class AllInfo implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = null;
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        Game activeGame = null;
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            activeMap = mapManager.getUserActiveMap(userID);
-            String color = Helper.getColor(activeMap, event);
+            activeGame = gameManager.getUserActiveGame(userID);
+            String color = Helper.getColor(activeGame, event);
             if (!Mapper.isColorValid(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
         }
 
-        Player player = activeMap.getPlayer(userID);
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Player player = activeGame.getPlayer(userID);
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        AbilityInfo.sendAbilityInfo(activeMap, player);
-        LeaderInfo.sendLeadersInfo(activeMap, player);
-        TechInfo.sendTechInfo(activeMap, player);
-        RelicInfo.sendRelicInfo(activeMap, player);
-        SOInfo.sendSecretObjectiveInfo(activeMap, player);
-        ACInfo.sendActionCardInfo(activeMap, player);
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        AbilityInfo.sendAbilityInfo(activeGame, player);
+        LeaderInfo.sendLeadersInfo(activeGame, player);
+        TechInfo.sendTechInfo(activeGame, player);
+        RelicInfo.sendRelicInfo(activeGame, player);
+        SOInfo.sendSecretObjectiveInfo(activeGame, player);
+        ACInfo.sendActionCardInfo(activeGame, player);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
     }
 
     protected String getActionDescription() {

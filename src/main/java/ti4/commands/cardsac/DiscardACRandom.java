@@ -9,7 +9,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -25,9 +25,9 @@ public class DiscardACRandom extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -45,10 +45,10 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
             return;
         }
-        discardRandomAC(event, activeMap, player, count);
+        discardRandomAC(event, activeGame, player, count);
         
     }
-    public void discardRandomAC(GenericInteractionCreateEvent event, Map activeMap, Player player, int count){
+    public void discardRandomAC(GenericInteractionCreateEvent event, Game activeGame, Player player, int count){
         if(count < 1){
             return;
         }
@@ -60,7 +60,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             ArrayList<String> cards_ = new ArrayList<>(actionCards_.keySet());
             Collections.shuffle(cards_);
             String acID = cards_.get(0);
-            boolean removed = activeMap.discardActionCard(player.getUserID(), actionCards_.get(acID));
+            boolean removed = activeGame.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");
                 return;
@@ -68,7 +68,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
             count--;
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), sb.toString());
-        ACInfo.sendActionCardInfo(activeMap, player);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
+        ACInfo.sendActionCardInfo(activeGame, player);
     }
 }

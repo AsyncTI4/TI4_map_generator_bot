@@ -10,7 +10,7 @@ public class FixGameChannelPermissions extends BothelperSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Helper.fixGameChannelPermissions(event.getGuild(), getActiveMap());
+        Helper.fixGameChannelPermissions(event.getGuild(), getActiveGame());
         sendMessage("Channel Permissions Fixed");
     }
 }

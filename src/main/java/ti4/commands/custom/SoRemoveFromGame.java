@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class SoRemoveFromGame extends CustomSubcommandData {
@@ -16,14 +16,14 @@ public class SoRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.SO_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
             return;
         }
-        boolean removed = activeMap.removeSOFromGame(soOption.getAsString());
+        boolean removed = activeGame.removeSOFromGame(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
         } else {

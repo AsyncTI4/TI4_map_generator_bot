@@ -55,27 +55,20 @@ public class AgendaModel implements ModelInterface {
     }
 
     public String getSourceEmoji() {
-        switch (source) {
-            case "absol":
-                return Emojis.Absol;
-            case "PoK":
-                return Emojis.Agenda;
-            default:
-                return Emojis.AsyncTI4Logo;
-        }
+      return switch (source) {
+        case "absol" -> Emojis.Absol;
+        case "PoK" -> Emojis.Agenda;
+        default -> Emojis.AsyncTI4Logo;
+      };
     }
 
     public String footnote() {
-        switch (alias) {
-            case "mutiny":
-                return "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
-            case "seed_empire":
-                return "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
-            case "censure":
-                return "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
-            default:
-                return null;
-        }
+      return switch (alias) {
+        case "mutiny" -> "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
+        case "seed_empire" -> "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
+        case "censure" -> "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
+        default -> null;
+      };
     }
 
     public String getRepresentation(@Nullable Integer uniqueID) {

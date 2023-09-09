@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
 
@@ -20,14 +20,14 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption != null) {
             User user = playerOption.getAsUser();
-            Player player = activeMap.getPlayer(user.getId());
-            CardsInfo.sendCardsInfo(activeMap, player, event);
+            Player player = activeGame.getPlayer(user.getId());
+            CardsInfo.sendCardsInfo(activeGame, player, event);
         }
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
         sendMessage("Cards Info sent");
     }
 }

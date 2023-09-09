@@ -35,23 +35,23 @@ public class AddTileList extends MapSubcommandData {
             return;
         }
         String userID = member.getId();
-        MapManager mapManager = MapManager.getInstance();
-        Map userActiveMap = mapManager.getUserActiveMap(userID);
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
 
         String tileList = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         tileList = tileList.replaceAll(",", "");
-        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveMap);
+        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveGame);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;
         }
 
         List<String> badTiles = new ArrayList<>();
-        userActiveMap.clearTileMap();
+        userActiveGame.clearTileMap();
         for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue().toLowerCase();
             if (tileID.equals("-1")) {
@@ -73,7 +73,7 @@ public class AddTileList extends MapSubcommandData {
             }
             Tile tile = new Tile(tileID, position);
             AddTile.addCustodianToken(tile);
-            userActiveMap.setTile(tile);
+            userActiveGame.setTile(tile);
         }
 
         if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles.toString() + "\n");
@@ -81,21 +81,21 @@ public class AddTileList extends MapSubcommandData {
         try {
             Tile tile;
             tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
-            userActiveMap.setTile(tile);
+            userActiveGame.setTile(tile);
             if (!tileList.startsWith("{") && !tileList.contains("}")) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                 AddTile.addCustodianToken(tile);
-                userActiveMap.setTile(tile);
+                userActiveGame.setTile(tile);
             }
         } catch (Exception e) {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
-        new AddFrontierTokens().parsingForTile(event, userActiveMap);
+        new AddFrontierTokens().parsingForTile(event, userActiveGame);
 
-        MapSaveLoadManager.saveMap(userActiveMap, event);
+        GameSaveLoadManager.saveMap(userActiveGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
+        File file = GenerateMap.getInstance().saveImage(userActiveGame, event);
         MessageHelper.replyToMessage(event, file);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
     }

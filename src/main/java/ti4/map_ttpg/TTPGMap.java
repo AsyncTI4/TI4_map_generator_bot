@@ -60,7 +60,7 @@ public class TTPGMap {
     @JsonProperty("unpickedStrategyCards")
     private TTPGUnpickedStrategyCards unpickedStrategyCards;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("players")
     public List<TTPGPlayer> getPlayers() {

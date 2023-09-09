@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -18,7 +18,7 @@ public class CheckChannels extends FOWSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         if (FoWHelper.isPrivateGame(event) != null && FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
@@ -27,7 +27,7 @@ public class CheckChannels extends FOWSubcommandData {
         StringBuilder output = new StringBuilder();
         output.append("**__Currently set channels:__**\n>>> ");
         boolean first = true;
-        for (Player player : activeMap.getPlayers().values()) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (!first) output.append("\n");
             first = false;
 

@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
@@ -24,9 +24,9 @@ public class SendPN extends PNCardsSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
+		Game activeGame = getActiveGame();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
 		if (player == null) {
 			sendMessage("Player could not be found");
 			return;
@@ -77,22 +77,22 @@ public class SendPN extends PNCardsSubcommandData {
 			return;
 		}
 
-		Player targetPlayer = Helper.getPlayer(activeMap, null, event);
+		Player targetPlayer = Helper.getPlayer(activeGame, null, event);
 		if (targetPlayer == null) {
 			sendMessage("No such Player in game");
 			return;
 		}
 
-		Player pnOwner = activeMap.getPNOwner(id);
+		Player pnOwner = activeGame.getPNOwner(id);
 		if (player.getPromissoryNotesInPlayArea().contains(id) ) {
 			if (!targetPlayer.equals(pnOwner)) {
 				sendMessage("Promissory Notes in Play Area can only be sent to the owner of the PN");
 				return;
 			}
 		}
-		ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+		ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 		player.removePromissoryNote(id);
-		ButtonHelperFactionSpecific.pillageCheck(targetPlayer, activeMap);
+		ButtonHelperFactionSpecific.pillageCheck(targetPlayer, activeGame);
 		targetPlayer.setPromissoryNote(id);
 
 		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
@@ -100,25 +100,25 @@ public class SendPN extends PNCardsSubcommandData {
 			targetPlayer.setPromissoryNotesInPlayArea(id);
 		}
 
-		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
-		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+		PNInfo.sendPromissoryNoteInfo(activeGame, targetPlayer, false);
+		PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
 
 		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
-		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + extraText + " to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
-		if (activeMap.isFoWMode()) {
+		String message = Helper.getPlayerRepresentation(player, activeGame) + " sent " + Emojis.PN + extraText + " to " + Helper.getPlayerRepresentation(targetPlayer, activeGame);
+		if (activeGame.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";
-			MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, event, message, fail, success);
+			MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeGame, event, message, fail, success);
 			sendMessage("PN sent");
 		} else {
 			sendMessage(message);
 		}
 
 		// FoW specific pinging
-		if (activeMap.isFoWMode()) {
+		if (activeGame.isFoWMode()) {
 			String extra = null;
 			if (id.endsWith("_sftt")) extra = "Scores changed.";
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + extraText + "PN", extra);
+			FoWHelper.pingPlayersTransaction(activeGame, event, player, targetPlayer, Emojis.PN + extraText + "PN", extra);
 		}
 	}
 }

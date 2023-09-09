@@ -12,7 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -25,9 +25,9 @@ public class RemoveSweepToken extends InstallationSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player could not be found");
             return;
@@ -36,7 +36,7 @@ public class RemoveSweepToken extends InstallationSubcommandData {
         OptionMapping option = event.getOption(Constants.TILE_NAME);
         String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
         String tileID = AliasHandler.resolveTile(tileOption);
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) return;
 
         String sweepToken = Mapper.getSweepID(player.getColor());

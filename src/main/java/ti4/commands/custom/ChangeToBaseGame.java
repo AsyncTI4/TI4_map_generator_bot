@@ -8,8 +8,8 @@ import ti4.commands.game.SetDeck;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class ChangeToBaseGame extends CustomSubcommandData {
@@ -20,7 +20,7 @@ public class ChangeToBaseGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping codexOption = event.getOption(Constants.REMOVE_CODEX_AC);
         String codex = "";
         if (codexOption != null) {
@@ -30,11 +30,11 @@ public class ChangeToBaseGame extends CustomSubcommandData {
             }
 
         }
-        activeMap.setBaseGameMode(true);
-        Helper.removePoKComponents(activeMap, codex);
-        SetDeck.setDeck(event, activeMap, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
+        activeGame.setBaseGameMode(true);
+        Helper.removePoKComponents(activeGame, codex);
+        SetDeck.setDeck(event, activeGame, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
     }
 }

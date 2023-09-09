@@ -22,42 +22,42 @@ public class ExpFrontier extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
-        Map activeMap = getActiveMap();
-        Tile tile = getTile(event, tileName, activeMap);
+        Game activeGame = getActiveGame();
+        Tile tile = getTile(event, tileName, activeGame);
 
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        expFront(event, tile, activeMap, player);
+        expFront(event, tile, activeGame, player);
         
     }
 
-    public void expFront(GenericInteractionCreateEvent event, Tile tile, Map activeMap, Player player) {
+    public void expFront(GenericInteractionCreateEvent event, Tile tile, Game activeGame, Player player) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-            String cardID = activeMap.drawExplore(Constants.FRONTIER);
+            String cardID = activeGame.drawExplore(Constants.FRONTIER);
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
-            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeMap)).append(":\n");
+            messageText.append("Frontier *(tile ").append(tile.getPosition()).append(")* explored by ").append(Helper.getPlayerRepresentation(player, activeGame)).append(":\n");
             messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
+            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
     }
-    public void expFrontAlreadyDone(GenericInteractionCreateEvent event, Tile tile, Map activeMap, Player player, String cardID) {
+    public void expFrontAlreadyDone(GenericInteractionCreateEvent event, Tile tile, Game activeGame, Player player, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
-            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeMap)).append(":\n");
+            messageText.append("Frontier *(tile ").append(tile.getPosition()).append(")* explored by ").append(Helper.getPlayerRepresentation(player, activeGame)).append(":\n");
             messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
+            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }

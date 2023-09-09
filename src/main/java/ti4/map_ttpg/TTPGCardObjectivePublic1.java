@@ -20,7 +20,7 @@ public class TTPGCardObjectivePublic1 {
     @JsonProperty("deck")
     private List<String> deck;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("deck")
     public List<String> getDeck() {

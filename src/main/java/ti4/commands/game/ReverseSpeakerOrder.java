@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class ReverseSpeakerOrder extends GameSubcommandData {
@@ -23,8 +23,8 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
             return;
         }
         User user = event.getUser();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Game activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
 
-        activeMap.setReverseSpeakerOrder(!activeMap.isReverseSpeakerOrder());
+        activeGame.setReverseSpeakerOrder(!activeGame.isReverseSpeakerOrder());
     }
 }
