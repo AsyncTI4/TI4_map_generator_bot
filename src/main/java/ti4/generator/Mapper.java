@@ -499,12 +499,12 @@ public class Mapper {
         return split[2];
     }
 
-    public static HashMap<String, SecretObjectiveModel> getSecretObjectives() {
+    public static Map<String, SecretObjectiveModel> getSecretObjectives() {
         return new HashMap<>(secretObjectives);
     }
 
-    public static HashMap<String, SecretObjectiveModel> getSecretObjectives(String extra) {
-        HashMap<String, SecretObjectiveModel> soList = new HashMap<>();
+    public static Map<String, SecretObjectiveModel> getSecretObjectives(String extra) {
+        Map<String, SecretObjectiveModel> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
             soList.put(entry.getKey() + extra, entry.getValue());
         }
@@ -516,8 +516,8 @@ public class Mapper {
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getFactionRepresentations() {
-        HashMap<String, String> factions = new HashMap<>();
+    public static Map<String, String> getFactionRepresentations() {
+        Map<String, String> factions = new HashMap<>();
         for (Map.Entry<Object, Object> entry : faction_representation.entrySet()) {
             factions.put((String) entry.getKey(), (String) entry.getValue());
         }
