@@ -14,7 +14,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 
@@ -28,10 +28,10 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
@@ -43,7 +43,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(StringUtils.substringBefore(tileOption.getAsString().toLowerCase(), " "));
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             sendMessage("Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
@@ -56,18 +56,18 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap));
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame));
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved " + Helper.getEmojiFromDiscord(tokenName) + " to " + tile.getRepresentation());
-        for (Tile tile_ : activeMap.getTileMap().values()) {
+        sb.append(" moved ").append(Helper.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentation());
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                sb.append(" (from " + tile_.getRepresentation() + ")");
+                sb.append(" (from ").append(tile_.getRepresentation()).append(")");
                 break;
             }
         }
         sendMessage(sb.toString());
         if(player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")){
-                ButtonHelper.commanderUnlockCheck(player, activeMap, "ghost", event);
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "ghost", event);
         }
     }
 

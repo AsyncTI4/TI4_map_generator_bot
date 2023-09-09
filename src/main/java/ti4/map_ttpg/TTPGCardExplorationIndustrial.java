@@ -23,7 +23,7 @@ public class TTPGCardExplorationIndustrial {
     @JsonProperty("discard")
     private List<String> discard;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("deck")
     public List<String> getDeck() {

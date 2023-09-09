@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -20,26 +20,26 @@ public class AbilityInfo extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        sendAbilityInfo(activeMap, player, event);
+        sendAbilityInfo(activeGame, player, event);
     }
 
-    public static void sendAbilityInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendAbilityInfo(activeMap, player);
+    public static void sendAbilityInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendAbilityInfo(activeGame, player);
     }
 
-    public static void sendAbilityInfo(Map activeMap, Player player) {
+    public static void sendAbilityInfo(Game activeGame, Player player) {
         //ABILITY INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getAbilityInfoText(player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getAbilityInfoText(player));
     }
 
     private static String getAbilityInfoText(Player player) {

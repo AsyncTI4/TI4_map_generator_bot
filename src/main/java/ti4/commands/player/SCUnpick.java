@@ -9,7 +9,7 @@ import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -25,22 +25,22 @@ public class SCUnpick extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
-		player = Helper.getPlayer(activeMap, player, event);
+		Game activeGame = getActiveMap();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
+		player = Helper.getPlayer(activeGame, player, event);
 		if (player == null) {
 			sendMessage("Player could not be found");
 			return;
 		}
 
-        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
 
-        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+        Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
                 .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
                 .collect(Collectors.toList());
-        int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
 
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scUnpicked = option.getAsInt();
@@ -68,7 +68,7 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
+                msgExtra += Helper.getPlayerRepresentation(player_, activeGame, event.getGuild(), true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -83,9 +83,9 @@ public class SCUnpick extends PlayerSubcommandData {
 
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
-            msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
+            msgExtra += Helper.getGamePing(event, activeGame) + "\nAll players picked SC";
 
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
@@ -96,7 +96,7 @@ public class SCUnpick extends PlayerSubcommandData {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {
                     Integer tgCount = scTradeGoods.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
-                    activeMap.setScTradeGood(scNumber, tgCount);
+                    activeGame.setScTradeGood(scNumber, tgCount);
                 }
             }
 
@@ -104,7 +104,7 @@ public class SCUnpick extends PlayerSubcommandData {
             int lowestSC = 100;
             for (Player player_ : activePlayers) {
                 int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeMap, Integer.toString(playersLowestSC));
+                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeGame, Integer.toString(playersLowestSC));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
                     nextPlayer = player_; //no further processing, this player has the 0 token
                     break;
@@ -117,23 +117,23 @@ public class SCUnpick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
+                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
                 privatePlayer = nextPlayer;
-                activeMap.updateActivePlayer(nextPlayer);
+                activeGame.updateActivePlayer(nextPlayer);
             }
         }
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
             if (allPicked) {
-                msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeMap, event.getGuild(), true) + " UP NEXT";
+                msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeGame, event.getGuild(), true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeGame, event, msgExtra, fail, success);
         } else {
             if (allPicked) {
-                ListTurnOrder.turnOrder(event, activeMap);
+                ListTurnOrder.turnOrder(event, activeGame);
             }
             if (!msgExtra.isEmpty()) {
                 sendMessage(msgExtra);

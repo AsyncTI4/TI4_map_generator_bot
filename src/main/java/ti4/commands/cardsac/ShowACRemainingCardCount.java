@@ -2,7 +2,7 @@ package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class ShowACRemainingCardCount extends ACCardsSubcommandData {
@@ -12,9 +12,9 @@ public class ShowACRemainingCardCount extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
-        String sb = "Action cards count in deck is: " + activeMap.getActionCards().size();
+        String sb = "Action cards count in deck is: " + activeGame.getActionCards().size();
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

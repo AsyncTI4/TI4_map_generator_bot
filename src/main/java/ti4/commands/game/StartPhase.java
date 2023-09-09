@@ -10,7 +10,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class StartPhase extends GameSubcommandData {
@@ -21,34 +21,34 @@ public class StartPhase extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         String phase = event.getOption(Constants.SPECIFIC_PHASE, null, OptionMapping::getAsString);
-        startPhase(event, activeMap, phase);
+        startPhase(event, activeGame, phase);
     }
 
-    public static void startPhase(GenericInteractionCreateEvent event, Map activeMap, String phase) {
+    public static void startPhase(GenericInteractionCreateEvent event, Game activeGame, String phase) {
         switch (phase) {
             case "strategy" -> {
-                ButtonHelper.startStrategyPhase(event, activeMap);
+                ButtonHelper.startStrategyPhase(event, activeGame);
             }
             case "voting" -> {
-                AgendaHelper.startTheVoting(activeMap, event);
+                AgendaHelper.startTheVoting(activeGame, event);
             }
             case "finSpecial" -> {
-                ButtonHelper.fixRelics(activeMap);
+                ButtonHelper.fixRelics(activeGame);
             }
             case "statusScoring" -> {
-                new Turn().showPublicObjectivesWhenAllPassed(event, activeMap, activeMap.getMainGameChannel());
-                activeMap.updateActivePlayer(null);
+                new Turn().showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
+                activeGame.updateActivePlayer(null);
             }
             case "statusHomework" -> {
-                ButtonHelper.startStatusHomework(event, activeMap);
+                ButtonHelper.startStatusHomework(event, activeGame);
             }
             case "agendaResolve" -> {
-                AgendaHelper.resolveTime(event, activeMap, null);
+                AgendaHelper.resolveTime(event, activeGame, null);
             }
             case "action" -> {
-                ButtonHelper.startActionPhase(event, activeMap);
+                ButtonHelper.startActionPhase(event, activeGame);
             }
             default -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");

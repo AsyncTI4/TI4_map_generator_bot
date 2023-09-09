@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
@@ -24,40 +24,40 @@ public class TechInfo extends TechSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        sendTechInfo(activeMap, player, event);
+        sendTechInfo(activeGame, player, event);
     }
 
-    public static void sendTechInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendTechInfo(activeMap, player);
+    public static void sendTechInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendTechInfo(activeGame, player);
     }
 
-    public static void sendTechInfo(Map activeMap, Player player) {
+    public static void sendTechInfo(Game activeGame, Player player) {
         //TECH INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTechInfoText(player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getTechInfoText(player));
 
         //BUTTONS
         String exhaustTechMsg = "_ _\nClick a button below to exhaust an Action Card";
-        List<Button> techButtons = getTechButtons(activeMap, player);
+        List<Button> techButtons = getTechButtons(activeGame, player);
         if (techButtons != null && !techButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(exhaustTechMsg, techButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
     }
 
-    private static List<Button> getTechButtons(Map activeMap, Player player) {
+    private static List<Button> getTechButtons(Game activeGame, Player player) {
         return null;
     }
 
@@ -83,13 +83,10 @@ public class TechInfo extends TechSubcommandData {
 
         for (java.util.Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
-            list.sort(new Comparator<String>() {
-                @Override
-                public int compare(String tech1, String tech2) {
-                    TechnologyModel tech1Info = techInfo.get(tech1);
-                    TechnologyModel tech2Info = techInfo.get(tech2);
-                    return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
-                }
+            list.sort((tech1, tech2) -> {
+                TechnologyModel tech1Info = techInfo.get(tech1);
+                TechnologyModel tech2Info = techInfo.get(tech2);
+                return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
             });
         }
 

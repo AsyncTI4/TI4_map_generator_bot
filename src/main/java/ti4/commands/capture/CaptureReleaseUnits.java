@@ -26,20 +26,20 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            String color = Helper.getColor(activeMap, event);
+            Game activeGame = gameManager.getUserActiveGame(userID);
+            String color = Helper.getColor(activeGame, event);
             if (!Mapper.isColorValid(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
 
-            Player player = activeMap.getPlayer(getUser().getId());
-            player = Helper.getGamePlayer(activeMap, player, event.getMember(), getUser().getId());
+            Player player = activeGame.getPlayer(getUser().getId());
+            player = Helper.getGamePlayer(activeGame, player, event.getMember(), getUser().getId());
             if (player == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
                 return;

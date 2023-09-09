@@ -7,9 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 abstract public class JoinLeave extends GameSubcommandData {
@@ -21,18 +20,18 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        if (!activeMap.isMapOpen()) {
+        Game activeGame = getActiveMap();
+        if (!activeGame.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
             return;
         }
         User user = event.getUser();
-        action(activeMap, user);
-        Helper.fixGameChannelPermissions(event.getGuild(), activeMap);
-        MapSaveLoadManager.saveMap(activeMap, event);
-        MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
+        action(activeGame, user);
+        Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
+        GameSaveLoadManager.saveMap(activeGame, event);
+        MessageHelper.replyToMessage(event, getResponseMessage(activeGame, user));
     }
-    abstract protected String getResponseMessage(Map activeMap, User user);
+    abstract protected String getResponseMessage(Game activeGame, User user);
 
-    abstract protected void action(Map activeMap, User user);
+    abstract protected void action(Game activeGame, User user);
 }

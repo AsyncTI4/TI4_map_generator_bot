@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -50,10 +50,10 @@ public class BothelperCommand implements Command {
     public void logBack(SlashCommandInteractionEvent event) {
         User user = event.getUser();
         String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
         String activeMap = "";
-        if (userActiveMap != null) {
-            activeMap = "Active map: " + userActiveMap.getName();
+        if (userActiveGame != null) {
+            activeMap = "Active map: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
                 event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()

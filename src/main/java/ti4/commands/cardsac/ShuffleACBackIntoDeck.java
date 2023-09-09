@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
@@ -17,7 +17,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
@@ -27,7 +27,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : activeMap.getDiscardActionCards().entrySet()) {
+        for (java.util.Map.Entry<String, Integer> so : activeGame.getDiscardActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -36,13 +36,13 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        boolean picked = activeMap.shuffleActionCardBackIntoDeck(acIndex);
+        boolean picked = activeGame.shuffleActionCardBackIntoDeck(acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append(" ");
+        sb.append("Game: ").append(activeGame.getName()).append(" ");
         sb.append("Player: ").append(getUser().getName()).append("\n");
         sb.append("Card shuffled back into deck from discards: ");
         sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");

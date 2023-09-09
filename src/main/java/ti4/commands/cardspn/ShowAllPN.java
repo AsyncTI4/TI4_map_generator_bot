@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -22,14 +22,14 @@ public class ShowAllPN extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        Player targetPlayer = Helper.getPlayer(activeMap, null, event);
+        Player targetPlayer = Helper.getPlayer(activeGame, null, event);
         if (targetPlayer == null) {
             sendMessage("Target player not found");
             return;
@@ -41,12 +41,12 @@ public class ShowAllPN extends PNCardsSubcommandData {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
 
-        showAll(player, targetPlayer, activeMap, longPNDisplay);
+        showAll(player, targetPlayer, activeGame, longPNDisplay);
     }
 
-    public void showAll(Player player, Player targetPlayer, Map activeMap, boolean longPNDisplay) {
+    public void showAll(Player player, Player targetPlayer, Game activeGame, boolean longPNDisplay) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Promissory Notes:").append("\n");
         List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
@@ -57,7 +57,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             index++;
         }
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeMap, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, "All PNs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "All PNs shown to player");
     }
 }

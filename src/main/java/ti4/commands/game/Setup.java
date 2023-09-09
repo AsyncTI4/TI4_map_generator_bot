@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class Setup extends GameSubcommandData {
@@ -32,7 +32,7 @@ public class Setup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
         if (playerCount != null) {
@@ -40,7 +40,7 @@ public class Setup extends GameSubcommandData {
             if (count < 2 || count > 30) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify between 2 or 30 players.");
             } else {
-                activeMap.setPlayerCountForMap(count);
+                activeGame.setPlayerCountForMap(count);
             }
         }
 
@@ -52,7 +52,7 @@ public class Setup extends GameSubcommandData {
             } else if (count > 20){
                 count = 20;
             }
-            activeMap.setVp(count);
+            activeGame.setVp(count);
         }
 
         DisplayType displayType = null;
@@ -67,7 +67,7 @@ public class Setup extends GameSubcommandData {
             } else if (temp.equals(DisplayType.stats.getValue())) {
                 displayType = DisplayType.stats;
             } else if (temp.equals("none")) {
-                activeMap.setDisplayTypeForced(null);
+                activeGame.setDisplayTypeForced(null);
                 return;
             }
         }
@@ -75,9 +75,9 @@ public class Setup extends GameSubcommandData {
         if (communityOption != null){
             String communityMode = communityOption.getAsString();
             if ("YES".equals(communityMode)){
-                activeMap.setCommunityMode(true);
+                activeGame.setCommunityMode(true);
             } else if ("FALSE".equals(communityMode)){
-                activeMap.setCommunityMode(false);
+                activeGame.setCommunityMode(false);
             }
         }
 
@@ -85,9 +85,9 @@ public class Setup extends GameSubcommandData {
         if (allianceOption != null){
             String alliaceMode = allianceOption.getAsString();
             if ("YES".equals(alliaceMode)){
-                activeMap.setAllianceMode(true);
+                activeGame.setAllianceMode(true);
             } else if ("FALSE".equals(alliaceMode)){
-                activeMap.setAllianceMode(false);
+                activeGame.setAllianceMode(false);
             }
         }
 
@@ -95,9 +95,9 @@ public class Setup extends GameSubcommandData {
         if (fowOption != null){
             String fowMode = fowOption.getAsString();
             if ("YES".equals(fowMode)){
-                activeMap.setFoWMode(true);
+                activeGame.setFoWMode(true);
             } else if ("FALSE".equals(fowMode)){
-                activeMap.setFoWMode(false);
+                activeGame.setFoWMode(false);
             }
         }
 
@@ -105,9 +105,9 @@ public class Setup extends GameSubcommandData {
         if (stratPings != null){
             String stratP = stratPings.getAsString();
             if ("YES".equalsIgnoreCase(stratP)){
-                activeMap.setStratPings(true);
+                activeGame.setStratPings(true);
             } else if ("FALSE".equalsIgnoreCase(stratP)){
-                activeMap.setStratPings(false);
+                activeGame.setStratPings(false);
             }
         }
 
@@ -115,9 +115,9 @@ public class Setup extends GameSubcommandData {
         if (ccNPlastic != null){
             String ccNP = ccNPlastic.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)){
-                activeMap.setCCNPlasticLimit(true);
+                activeGame.setCCNPlasticLimit(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)){
-                activeMap.setCCNPlasticLimit(false);
+                activeGame.setCCNPlasticLimit(false);
             }
         }
 
@@ -126,9 +126,9 @@ public class Setup extends GameSubcommandData {
         if (homebrewSC != null){
             String ccNP = homebrewSC.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)){
-                activeMap.setHomeBrewSCMode(true);
+                activeGame.setHomeBrewSCMode(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)){
-                activeMap.setHomeBrewSCMode(false);
+                activeGame.setHomeBrewSCMode(false);
             }
         }
 
@@ -143,21 +143,21 @@ public class Setup extends GameSubcommandData {
         if (pingHours != null) {
             int pinghrs = pingHours.getAsInt();
             if (pinghrs == 0) {
-                activeMap.setAutoPing(false);
-                activeMap.setAutoPingSpacer(pinghrs);
+                activeGame.setAutoPing(false);
+                activeGame.setAutoPingSpacer(pinghrs);
             } else {
-                activeMap.setAutoPing(true);
+                activeGame.setAutoPing(true);
                 if (pinghrs < 1){
                     pinghrs = 1;
                 }
-                activeMap.setAutoPingSpacer(pinghrs);
+                activeGame.setAutoPingSpacer(pinghrs);
             }
         }
 
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);
         if (customOption != null){
             String customName = customOption.getAsString();
-            activeMap.setCustomName(customName);
+            activeGame.setCustomName(customName);
         }
 
         Boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, null, OptionMapping::getAsBoolean);
@@ -176,17 +176,17 @@ public class Setup extends GameSubcommandData {
 
         OptionMapping discordantStarsOption = event.getOption(Constants.DISCORDANT_STARS_MODE);
         if (discordantStarsOption != null) {
-            activeMap.setDiscordantStarsMode(discordantStarsOption.getAsBoolean());
+            activeGame.setDiscordantStarsMode(discordantStarsOption.getAsBoolean());
         }
 
         if (displayType != null) {
-            activeMap.setDisplayTypeForced(displayType);
+            activeGame.setDisplayTypeForced(displayType);
         }
 
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
-        if (betaTestMode != null) activeMap.setTestBetaFeaturesMode(betaTestMode);
+        if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
 
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
-        if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeMap.setOutputVerbosity(verbosity);
+        if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeGame.setOutputVerbosity(verbosity);
     }
 }

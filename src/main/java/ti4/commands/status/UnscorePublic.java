@@ -19,10 +19,10 @@ public class UnscorePublic extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -34,7 +34,7 @@ public class UnscorePublic extends StatusSubcommandData {
             return;
         }
 
-        boolean scored = activeMap.unscorePublicObjective(player.getUserID(), option.getAsInt());
+        boolean scored = activeGame.unscorePublicObjective(player.getUserID(), option.getAsInt());
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
         }

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import ti4.generator.GenerateMap.TileStep;
 import ti4.helpers.*;
-import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 
@@ -83,42 +82,42 @@ public class GenerateTile {
         return instance;
     }
 
-    public File saveImage(Map activeMap, @Nullable SlashCommandInteractionEvent event) {
-        return saveImage(activeMap, 1, "000", event);
+    public File saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
+        return saveImage(activeGame, 1, "000", event);
     }
 
-    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
-        return saveImage(activeMap, context, focusTile, event, null);
+    public File saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
+        return saveImage(activeGame, context, focusTile, event, null);
     }
 
-    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event, @Nullable Player p1) {
+    public File saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event, @Nullable Player p1) {
         init(context, focusTile);
         reset();
 
-        tilesToDisplay = new HashMap<>(activeMap.getTileMap());
-        Set<String> systemsInRange = getTilesToShow(activeMap, context, focusTile);
-        Set<String> keysToRemove = new HashSet<String>(tilesToDisplay.keySet());
+        tilesToDisplay = new HashMap<>(activeGame.getTileMap());
+        Set<String> systemsInRange = getTilesToShow(activeGame, context, focusTile);
+        Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
         keysToRemove.removeAll(systemsInRange);
         for (String tile_ : keysToRemove) {
             tilesToDisplay.remove(tile_);
         }
 
         // Resolve fog of war vision limitations
-        if (activeMap.isFoWMode() && event != null) {
+        if (activeGame.isFoWMode() && event != null) {
             isFoWPrivate = false;
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
-                Player player = getFowPlayer(activeMap, event);
+                Player player = getFowPlayer(activeGame, event);
                 if (p1 != null) {
                     player = p1;
                 }
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
-                fowPlayer = Helper.getGamePlayer(activeMap, player, event, null);
+                fowPlayer = Helper.getGamePlayer(activeGame, player, event, null);
                 if (p1 != null) {
                     fowPlayer = p1;
                 }
-                Set<String> tilesToShow = FoWHelper.fowFilter(activeMap, fowPlayer);
+                Set<String> tilesToShow = FoWHelper.fowFilter(activeGame, fowPlayer);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
@@ -135,21 +134,21 @@ public class GenerateTile {
             tileMap.remove(null);
 
             Set<String> tiles = tileMap.keySet();
-            Set<String> tilesWithExtra = new HashSet<String>(activeMap.getAdjacentTileOverrides().values());
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Tile));
-            tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Extras));
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Units));
+            Set<String> tilesWithExtra = new HashSet<>(activeGame.getAdjacentTileOverrides().values());
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Tile));
+            tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Units));
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
-            graphics.drawString(activeMap.getName() + " " + timeStamp, 0, 34);
+            graphics.drawString(activeGame.getName() + " " + timeStamp, 0, 34);
         } catch (Exception e) {
-            BotLogger.log(activeMap.getName() + ": Could not save generated system info image");
+            BotLogger.log(activeGame.getName() + ": Could not save generated system info image");
         }
 
         String timeStamp = getTimeStamp();
-        String absolutePath = Storage.getMapImageDirectory() + "/" + activeMap.getName() + "_" + timeStamp + ".jpg";
+        String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
@@ -165,13 +164,13 @@ public class GenerateTile {
         return jpgFile;
     }
 
-    private static Set<String> getTilesToShow(Map activeMap, int context, String focusTile) {
-        Set<String> tileSet = new HashSet<String>(Collections.singleton(focusTile));
-        Set<String> tilesToCheck = new HashSet<String>(Collections.singleton(focusTile));
+    private static Set<String> getTilesToShow(Game activeGame, int context, String focusTile) {
+        Set<String> tileSet = new HashSet<>(Collections.singleton(focusTile));
+        Set<String> tilesToCheck = new HashSet<>(Collections.singleton(focusTile));
         for (int i = 0; i < context; i++) {
-            Set<String> nextTiles = new HashSet<String>();
+            Set<String> nextTiles = new HashSet<>();
             for (String tile : tilesToCheck) {
-                Set<String> adj = FoWHelper.traverseAdjacencies(activeMap, true, tile);
+                Set<String> adj = FoWHelper.traverseAdjacencies(activeGame, true, tile);
                 for (String tile_ : adj) {
                     if (!tileSet.contains(tile_)) {
                         tileSet.add(tile_);
@@ -184,11 +183,11 @@ public class GenerateTile {
         return tileSet;
     }
 
-    private static Player getFowPlayer(Map activeMap, @Nullable GenericInteractionCreateEvent event) {
+    private static Player getFowPlayer(Game activeGame, @Nullable GenericInteractionCreateEvent event) {
         if (event == null)
             return null;
         String user = event.getUser().getId();
-        return activeMap.getPlayer(user);
+        return activeGame.getPlayer(user);
     }
 
     @NotNull
@@ -198,11 +197,11 @@ public class GenerateTile {
         return output == null ? "" : output;
     }
 
-    private void addTile(Tile tile, Map activeMap, TileStep step) {
-        addTile(tile, activeMap, step, false);
+    private void addTile(Tile tile, Game activeGame, TileStep step) {
+        addTile(tile, activeGame, step, false);
     }
 
-    private void addTile(Tile tile, Map activeMap, TileStep step, boolean setupCheck) {
+    private void addTile(Tile tile, Game activeGame, TileStep step, boolean setupCheck) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }
@@ -210,13 +209,13 @@ public class GenerateTile {
             String position = tile.getPosition();
             Point positionPoint = PositionMapper.getTilePosition(position);
             if (positionPoint == null) {
-                throw new Exception("Could not map tile to a position on the map: " + activeMap.getName());
+                throw new Exception("Could not map tile to a position on the map: " + activeGame.getName());
             }
 
             int tileX = positionPoint.x + offsetX - GenerateMap.TILE_PADDING;
             int tileY = positionPoint.y + offsetY - GenerateMap.TILE_PADDING;
 
-            BufferedImage tileImage = GenerateMap.partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
+            BufferedImage tileImage = GenerateMap.partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
 
         } catch (IOException e) {

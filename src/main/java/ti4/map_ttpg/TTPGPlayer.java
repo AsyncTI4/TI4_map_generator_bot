@@ -87,7 +87,7 @@ public class TTPGPlayer {
     @JsonProperty("maxCommodities")
     private Integer maxCommodities;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("laws")
     public List<String> getLaws() {

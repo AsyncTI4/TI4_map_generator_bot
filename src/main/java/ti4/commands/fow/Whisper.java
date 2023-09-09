@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -26,14 +26,14 @@ public class Whisper extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(activeMap, player, event);
+        Player player_ = Helper.getPlayer(activeGame, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player to send message to could not be found");
             return;
@@ -48,12 +48,12 @@ public class Whisper extends FOWSubcommandData {
         if (anon != null) {
             anonY = anon.getAsString();
         }
-        Whisper.sendWhisper(activeMap, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
+        Whisper.sendWhisper(activeGame, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
     }
 
-    public static void sendWhisper(Map activeMap, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
+    public static void sendWhisper(Game activeGame, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message = "";
-        String realIdentity = Helper.getPlayerRepresentation(player_, activeMap, guild, true);
+        String realIdentity = Helper.getPlayerRepresentation(player_, activeGame, guild, true);
         String player1 = Helper.getColourAsMention(guild, player.getColor());
 
         if (anonY.compareToIgnoreCase("y") == 0) {
@@ -61,7 +61,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             message = "Attention " + realIdentity + "! " + player1 + " says: " + msg;
         }
-        if (activeMap.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             String fail = "Could not notify receiving player.";
             String success = "";
             String player2 = Helper.getColourAsMention(guild, player_.getColor());
@@ -70,7 +70,7 @@ public class Whisper extends FOWSubcommandData {
             } else {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
-            MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, feedbackChannel, message, fail, success);
+            MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, feedbackChannel, message, fail, success);
         }
     }
 

@@ -13,7 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -24,15 +24,15 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         event.deferReply();
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         User user = getUser();
-        Player player = activeMap.getPlayer(user.getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Player player = activeGame.getPlayer(user.getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
            sendMessage("Player could not be found");
             return;
         }
-        String leaderInfo = getLeaderInfo(activeMap, player);
+        String leaderInfo = getLeaderInfo(activeGame, player);
 
         if (event != null) {
             OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
@@ -40,36 +40,36 @@ public class LeaderInfo extends LeaderSubcommandData {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
-        sendLeadersInfo(activeMap, player, event);
+        sendLeadersInfo(activeGame, player, event);
     }
 
-    public static void sendLeadersInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendLeadersInfo(activeMap, player);
+    public static void sendLeadersInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendLeadersInfo(activeGame, player);
     }
 
-    public static void sendLeadersInfo(Map activeMap, Player player) {
+    public static void sendLeadersInfo(Game activeGame, Player player) {
         //LEADERS INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getLeaderInfo(activeMap, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getLeaderInfo(activeGame, player));
 
         //BUTTONS
         String leaderPlayMsg = "_ _\nClick a button below to exhaust or purge a Leader";
-        List<Button> leaderButtons = getLeaderButtons(activeMap, player);
+        List<Button> leaderButtons = getLeaderButtons(activeGame, player);
         if (leaderButtons != null && !leaderButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(leaderPlayMsg, leaderButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
     }
 
-    private static List<Button> getLeaderButtons(Map activeMap, Player player) {
+    private static List<Button> getLeaderButtons(Game activeGame, Player player) {
         return null;
     }
 
-    public static String getLeaderInfo(Map activeMap, Player player) {
+    public static String getLeaderInfo(Game activeGame, Player player) {
         // LEADERS
         StringBuilder leaderSB = new StringBuilder();
         leaderSB.append("_ _\n");
@@ -98,7 +98,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                         String[] split = pnData.split(";");
                         if (split.length < 2) continue;
                         String colour = split[1];
-                        for (Player player_ : activeMap.getPlayers().values()) {
+                        for (Player player_ : activeGame.getPlayers().values()) {
                             if (player_.getColor().equalsIgnoreCase(colour)) {
                                 Leader playerLeader = player_.unsafeGetLeader(Constants.COMMANDER);
                                 if (playerLeader == null) continue;
@@ -119,7 +119,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         if (player.hasLeader("yssarilagent")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Other Faction's Agents:**").append("\n");
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ != player) {
                     Leader playerLeader = player.unsafeGetLeader(Constants.AGENT);
                     Leader otherPlayerAgent = player_.unsafeGetLeader(Constants.AGENT);
@@ -137,7 +137,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         if (player.hasAbility("imperia")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Imperia Commanders:**").append("\n");
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ != player) {
                     if (player.getMahactCC().contains(player_.getColor())) {
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);

@@ -8,7 +8,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -25,10 +25,10 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -40,7 +40,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
@@ -49,7 +49,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         //Remove all other players ground force units from the tile in question
         OptionMapping destroyOption = event.getOption(Constants.DESTROY_OTHER_UNITS);
         if (destroyOption == null || destroyOption.getAsBoolean()) {
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ != player) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (!unitHolder.getName().equals(Constants.SPACE)) {
@@ -60,10 +60,10 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             }
         }
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        activeMap.removeTile(tile.getPosition());
+        activeGame.removeTile(tile.getPosition());
 
         //Add the zelian asteroid field to the map and copy over the space unitholder
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
-        activeMap.setTile(asteroidTile);
+        activeGame.setTile(asteroidTile);
     }
 }

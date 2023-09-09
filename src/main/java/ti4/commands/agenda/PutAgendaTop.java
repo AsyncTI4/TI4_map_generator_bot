@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class PutAgendaTop extends AgendaSubcommandData {
@@ -20,15 +20,15 @@ public class PutAgendaTop extends AgendaSubcommandData {
     }
 
 
-    public void putTop(GenericInteractionCreateEvent event, int agendaID, Map activeMap) {
-        boolean success = activeMap.putAgendaTop(agendaID);
-        if (success && !activeMap.isFoWMode()) {
+    public void putTop(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
+        boolean success = activeGame.putAgendaTop(agendaID);
+        if (success && !activeGame.isFoWMode()) {
 
-            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Agenda put on top");
+            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on top");
 
-            List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+            List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
             if (threadChannels == null) return;
-            String threadName = activeMap.getName()+"-round-"+activeMap.getRound()+"-politics";
+            String threadName = activeGame.getName()+"-round-"+ activeGame.getRound()+"-politics";
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
@@ -38,20 +38,20 @@ public class PutAgendaTop extends AgendaSubcommandData {
 
 
         } else {
-            if (!activeMap.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
+            if (!activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Agenda ID found");
             }
 
         }
     }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        putTop(event, option.getAsInt(),activeMap);
+        putTop(event, option.getAsInt(), activeGame);
     }
 }

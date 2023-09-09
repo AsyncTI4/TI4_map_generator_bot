@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class DiscardSpecificAgenda extends CustomSubcommandData {
@@ -16,14 +16,14 @@ public class DiscardSpecificAgenda extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
 
         OptionMapping soOption = event.getOption(Constants.AGENDA_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Agenda");
             return;
         }
-        boolean removed = activeMap.discardSpecificAgenda(soOption.getAsString());
+        boolean removed = activeGame.discardSpecificAgenda(soOption.getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda discarded from game deck");
         } else {

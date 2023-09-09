@@ -2,7 +2,7 @@ package ti4.commands.planet;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 
@@ -12,9 +12,9 @@ public class PlanetRemove extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map activeMap) {
+    public void doAction(Player player, String planet, Game activeGame) {
         player.removePlanet(planet);
-        UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
         removePlayerControlToken(player, unitHolder);
     }
 

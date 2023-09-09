@@ -7,7 +7,6 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
 
 public class UnitTokenPosition implements Serializable {

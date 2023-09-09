@@ -25,7 +25,7 @@ public class CombatInfo extends CombatSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         // if (activeMap.isFoWMode()) {
         //     sendMessage("This is disabled for FoW for now.");
         //     return;
@@ -35,14 +35,14 @@ public class CombatInfo extends CombatSubcommandData {
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+            Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
             }
-            Player player = activeMap.getPlayer(getUser().getId());
-            player = Helper.getGamePlayer(activeMap, player, event, null);
-            player = Helper.getPlayer(activeMap, player, event);
+            Player player = activeGame.getPlayer(getUser().getId());
+            player = Helper.getGamePlayer(activeGame, player, event, null);
+            player = Helper.getPlayer(activeGame, player, event);
             if (player == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
                 return;
@@ -58,10 +58,10 @@ public class CombatInfo extends CombatSubcommandData {
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
             java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+            Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
             String baseRoll = "d10hv";
             String playerColor = player.getColor();
-            String playerColorKey = getFactionColorId(activeMap, colorToId, playerColor, event);
+            String playerColorKey = getFactionColorId(activeGame, colorToId, playerColor, event);
             sb.append("Possible roll command for combat - modifiers, upgrades, or faction specific units may change these\n");
             sb.append("Please verify the below command before copy/paste/running it - this is **BETA/WIP**\n");
             for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -103,7 +103,7 @@ public class CombatInfo extends CombatSubcommandData {
                             }
                             if (combatNum != "10") {
                                 sb_roll.append(diceRolls).append(baseRoll).append(combatNum).append("?");
-                                sb_roll.append(unitEntry.getValue() + " " + playerColor + " " + unitType + "(s);\n");
+                                sb_roll.append(unitEntry.getValue()).append(" ").append(playerColor).append(" ").append(unitType).append("(s);\n");
                             }
                         }
                     }
@@ -116,7 +116,7 @@ public class CombatInfo extends CombatSubcommandData {
         }
     }
 
-    private String getFactionColorId(Map activeMap, java.util.Map<String, String> colorToId, String playerColor, SlashCommandInteractionEvent event) {
+    private String getFactionColorId(Game activeGame, java.util.Map<String, String> colorToId, String playerColor, SlashCommandInteractionEvent event) {
 
         String colorKeyValue = "";
         for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {

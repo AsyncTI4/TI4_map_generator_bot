@@ -27,7 +27,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
         HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         List<String> searchedList = soList.entrySet().stream()
             .map(e -> e.getKey() + " = " + SOInfo.getSecretObjectiveRepresentation(e.getKey()))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

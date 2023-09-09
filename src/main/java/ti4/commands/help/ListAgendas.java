@@ -27,7 +27,7 @@ public class ListAgendas extends HelpSubcommandData {
         HashMap<String, AgendaModel> agendaList = Mapper.getAgendas();
         List<String> searchedList = agendaList.keySet().stream()
             .map(agendaKey -> agendaKey + " = " + Helper.getAgendaRepresentation(agendaKey))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

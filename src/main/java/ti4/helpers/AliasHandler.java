@@ -93,15 +93,13 @@ public class AliasHandler {
                 aliasProperties.load(input);
                 if (keys){
                     for (Object key : aliasProperties.keySet()) {
-                        if (key instanceof String) {
-                            String valueString = (String) key;
+                        if (key instanceof String valueString) {
                             list.add(valueString);
                         }
                     }
                 } else {
                     for (Object value : aliasProperties.values()) {
-                        if (value instanceof String) {
-                            String valueString = (String) value;
+                        if (value instanceof String valueString) {
                             list.add(valueString);
                         }
                     }
@@ -369,7 +367,7 @@ public class AliasHandler {
     public static String resolveTTPGPosition(String position) {
         String aliasID = ttpgPositionAliasList.get(position);
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
-        return aliasID != null ? aliasID : null;
+        return aliasID;
     }
 
     public static Map<String, String> getPlanetAliasEntryList() {

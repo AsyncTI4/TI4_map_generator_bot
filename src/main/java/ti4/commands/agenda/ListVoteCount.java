@@ -7,14 +7,10 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.*;
-import java.util.Map.Entry;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {
@@ -23,23 +19,23 @@ public class ListVoteCount extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        turnOrder(event, activeMap);
+        Game activeGame = getActiveMap();
+        turnOrder(event, activeGame);
     }
 
-    public static void turnOrder(SlashCommandInteractionEvent event, Map activeMap) {
-        turnOrder(event, activeMap, event.getChannel());
+    public static void turnOrder(SlashCommandInteractionEvent event, Game activeGame) {
+        turnOrder(event, activeGame, event.getChannel());
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Map activeMap, MessageChannel channel) {
-        List<Player> orderList = AgendaHelper.getVotingOrder(activeMap);
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel) {
+        List<Player> orderList = AgendaHelper.getVotingOrder(activeGame);
         StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
-            sb.append(Helper.getPlayerRepresentation(player, activeMap));
-            if (player.getUserID().equals(activeMap.getSpeaker())) sb.append(Emojis.SpeakerToken);
-            sb.append(AgendaHelper.getPlayerVoteText(activeMap, player));
+            sb.append(Helper.getPlayerRepresentation(player, activeGame));
+            if (player.getUserID().equals(activeGame.getSpeaker())) sb.append(Emojis.SpeakerToken);
+            sb.append(AgendaHelper.getPlayerVoteText(activeGame, player));
             sb.append("\n");
             itemNo++;
         }

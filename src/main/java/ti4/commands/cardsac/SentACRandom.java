@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -26,9 +26,9 @@ public class SentACRandom extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -40,7 +40,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         }
         Collections.shuffle(actionCards);
         String acID = actionCards.get(0);
-        Player player_ = Helper.getPlayer(activeMap, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
@@ -53,13 +53,13 @@ public class SentACRandom extends ACCardsSubcommandData {
         }
 
 		// FoW specific pinging
-		if (activeMap.isFoWMode()) {
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, Emojis.ActionCard + " Action Card", null);
+		if (activeGame.isFoWMode()) {
+			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, Emojis.ActionCard + " Action Card", null);
 		}
 
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
-        ACInfo.sendActionCardInfo(activeMap, player_);
-        ACInfo.sendActionCardInfo(activeMap, player);
+        ACInfo.sendActionCardInfo(activeGame, player_);
+        ACInfo.sendActionCardInfo(activeGame, player);
     }
 }

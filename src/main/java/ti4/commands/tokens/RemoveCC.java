@@ -10,7 +10,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -18,33 +18,33 @@ import java.util.ArrayList;
 
 public class RemoveCC extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
         for (String color : colors) {
             String ccID = Mapper.getCCID(color);
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
             }
-            if (activeMap.isFoWMode()) {
+            if (activeGame.isFoWMode()) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has removed a token in the system");
+                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
             }
 
             tile.removeCC(ccID);
-            Helper.isCCCountCorrect(event, activeMap, color);
+            Helper.isCCCountCorrect(event, activeGame, color);
         }
     }
 
-    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Map activeMap) {
+    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Game activeGame) {
        
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-        if (activeMap.isFoWMode()) {
+        if (activeGame.isFoWMode()) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has removed a token in the system");
+            FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
         }
         tile.removeCC(ccID);
         

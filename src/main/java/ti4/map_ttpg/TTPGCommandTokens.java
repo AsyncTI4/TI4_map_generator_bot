@@ -26,7 +26,7 @@ public class TTPGCommandTokens {
     @JsonProperty("strategy")
     private Integer strategy;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("tactics")
     public Integer getTactics() {

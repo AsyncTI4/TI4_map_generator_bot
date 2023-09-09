@@ -23,10 +23,10 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveMap();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -39,7 +39,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
             colorString = colorString.replace(" ", "");
             StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
             while (colorTokenizer.hasMoreTokens()) {
-                String color = Helper.getColorFromString(activeMap, colorTokenizer.nextToken());
+                String color = Helper.getColorFromString(activeGame, colorTokenizer.nextToken());
                 if (!colors.contains(color)) {
                     colors.add(color);
                     if (!Mapper.isColorValid(color)) {
@@ -48,11 +48,11 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
                     }
                 }
             }
-            action(event, colors, activeMap, player);
+            action(event, colors, activeGame, player);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
         }
     }
 
-    abstract void action(SlashCommandInteractionEvent event, ArrayList<String> color, Map activeMap, Player player);
+    abstract void action(SlashCommandInteractionEvent event, ArrayList<String> color, Game activeGame, Player player);
 }

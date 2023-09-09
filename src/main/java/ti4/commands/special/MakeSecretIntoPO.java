@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -21,7 +21,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");
@@ -33,7 +33,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         Player playerWithSO = null;
 
 
-        for (java.util.Map.Entry<String, Player> playerEntry : activeMap.getPlayers().entrySet()) {
+        for (java.util.Map.Entry<String, Player> playerEntry : activeGame.getPlayers().entrySet()) {
             Player player_ = playerEntry.getValue();
             LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player_.getSecretsScored());
             for (java.util.Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
@@ -53,16 +53,16 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
             return;
         }
-        activeMap.addToSoToPoList(soName);
-        Integer poIndex = activeMap.addCustomPO(soName, 1);
-        activeMap.scorePublicObjective(playerWithSO.getUserID(), poIndex);
+        activeGame.addToSoToPoList(soName);
+        Integer poIndex = activeGame.addCustomPO(soName, 1);
+        activeGame.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
         String sb = "**Public Objective added from Secret:**" + "\n" +
                 "(" + poIndex + ") " + "\n" +
                 Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        SOInfo.sendSecretObjectiveInfo(activeMap, playerWithSO, event);
+        SOInfo.sendSecretObjectiveInfo(activeGame, playerWithSO, event);
 
     }
 }

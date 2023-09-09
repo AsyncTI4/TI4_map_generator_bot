@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class SwapStage2 extends CustomSubcommandData {
@@ -18,11 +18,11 @@ public class SwapStage2 extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveMap();
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
         OptionMapping loc2 = event.getOption(Constants.LOCATION2);
-        activeMap.swapStage2(loc1.getAsInt(), loc2.getAsInt());
+        activeGame.swapStage2(loc1.getAsInt(), loc2.getAsInt());
         MessageHelper.sendMessageToChannel(event.getChannel(), "Objectives at position "+loc1.getAsInt()+" and position "+ loc2.getAsInt() + " swapped.");
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

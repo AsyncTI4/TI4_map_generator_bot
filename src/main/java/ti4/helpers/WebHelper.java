@@ -8,7 +8,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
@@ -45,11 +45,11 @@ public class WebHelper {
 
     }
 
-    public static void putData(String gameId, Map activeMap) {
+    public static void putData(String gameId, Game activeGame) {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, Object> exportableFieldMap = activeMap.getExportableFieldMap();
+            HashMap<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
             String json = mapper.writeValueAsString( exportableFieldMap );
 
             HttpClient client = HttpClient.newHttpClient();

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public class ClearDebt extends PlayerSubcommandData {
@@ -24,16 +24,16 @@ public class ClearDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player clearingPlayer = activeMap.getPlayer(getUser().getId());
-        clearingPlayer = Helper.getGamePlayer(activeMap, clearingPlayer, event, null);
+        Game activeGame = getActiveMap();
+        Player clearingPlayer = activeGame.getPlayer(getUser().getId());
+        clearingPlayer = Helper.getGamePlayer(activeGame, clearingPlayer, event, null);
         
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     clearingPlayer = player_;
                     break;
@@ -46,7 +46,7 @@ public class ClearDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player clearedPlayer = Helper.getPlayer(activeMap, clearingPlayer, event);
+        Player clearedPlayer = Helper.getPlayer(activeGame, clearingPlayer, event);
         if (clearedPlayer == null) {
             sendMessage("Player to have debt cleared could not be found");
             return;
@@ -64,7 +64,7 @@ public class ClearDebt extends PlayerSubcommandData {
         }
 
         clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
-        sendMessage(Helper.getPlayerRepresentation(clearingPlayer, activeMap) + " cleared " + debtCountToClear + " debt tokens owned by " + Helper.getPlayerRepresentation(clearedPlayer, activeMap));
+        sendMessage(Helper.getPlayerRepresentation(clearingPlayer, activeGame) + " cleared " + debtCountToClear + " debt tokens owned by " + Helper.getPlayerRepresentation(clearedPlayer, activeGame));
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {

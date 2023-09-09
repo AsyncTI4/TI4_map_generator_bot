@@ -45,7 +45,7 @@ public class GlobalSettings {
     public static void loadSettings() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader reader = mapper.reader();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
         };
 
         try {
