@@ -152,28 +152,22 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getValuesText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCostText());
-        sb.append(getMoveText());
-        sb.append(getProductionText());
-        sb.append(getCapacityText());
-        return sb.toString();
+      return getCostText() +
+          getMoveText() +
+          getProductionText() +
+          getCapacityText();
     }
 
     private String getDiceText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCombatText());
-        sb.append(getAFBText());
-        sb.append(getBombardText());
-        sb.append(getSpaceCannonText());
-        return sb.toString();
+      return getCombatText() +
+          getAFBText() +
+          getBombardText() +
+          getSpaceCannonText();
     }
     
     private String getOtherText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getPlanetaryShieldText());
-        sb.append(getSustainDamageText());
-        return sb.toString();
+      return getPlanetaryShieldText() +
+          getSustainDamageText();
     }
 
     private String getCostText() {

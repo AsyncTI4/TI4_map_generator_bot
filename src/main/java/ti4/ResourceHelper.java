@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class ResourceHelper {
-    private static ResourceHelper resourceHelper = null;
+    private static ResourceHelper resourceHelper;
     private HashMap<String, String> unitCache = new HashMap<>();
     private HashMap<String, String> tileCache = new HashMap<>();
     private HashMap<String, String> ccCache = new HashMap<>();

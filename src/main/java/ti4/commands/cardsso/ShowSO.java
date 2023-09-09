@@ -1,4 +1,5 @@
 package ti4.commands.cardsso;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,7 +34,7 @@ public class ShowSO extends SOCardsSubcommandData {
 
         int soIndex = option.getAsInt();
         String soID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 soID = so.getKey();
             }
@@ -44,11 +45,10 @@ public class ShowSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Secret Objectives:").append("\n");
-        sb.append(SOInfo.getSecretObjectiveRepresentation(soID)).append("\n");
+      String sb = "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Secret Objectives:" + "\n" +
+          SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
         player.setSecret(soID);
 
         Player player_ = Helper.getPlayer(activeGame, null, event);
@@ -59,6 +59,6 @@ public class ShowSO extends SOCardsSubcommandData {
         
         sendMessage("SO shown to player");
         SOInfo.sendSecretObjectiveInfo(activeGame, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
     }
 }

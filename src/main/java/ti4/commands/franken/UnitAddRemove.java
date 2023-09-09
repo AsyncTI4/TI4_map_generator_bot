@@ -36,7 +36,7 @@ public abstract class UnitAddRemove extends FrankenSubcommandData {
         }
 
         unitIDs.removeIf(StringUtils::isEmpty);
-        unitIDs.removeIf(unitID -> !Mapper.getUnits().keySet().contains(unitID));
+        unitIDs.removeIf(unitID -> !Mapper.getUnits().containsKey(unitID));
 
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());

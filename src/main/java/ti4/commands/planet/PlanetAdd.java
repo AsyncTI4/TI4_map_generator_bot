@@ -35,7 +35,7 @@ public class PlanetAdd extends PlanetAddRemove {
         boolean doubleCheck = Helper.isAllianceModeAndPreviouslyOwnedCheck(activeGame, planet);
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
-        if (planet.equals("mirage")){
+        if ("mirage".equals(planet)){
             activeGame.clearPlanetsCache();
         }
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
@@ -106,7 +106,7 @@ public class PlanetAdd extends PlanetAddRemove {
         {
             alreadyOwned = false;
         }
-        if(activeGame.getActivePlayer() != null && !(activeGame.getActivePlayer().equalsIgnoreCase("")) && player.hasAbility("scavenge") && event != null)
+        if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && event != null)
         {
             String fac = Helper.getFactionIconFromDiscord(player.getFaction());
             
@@ -115,7 +115,7 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
         }
         for(String law : activeGame.getLaws().keySet()){
-            if(law.equalsIgnoreCase("minister_exploration")){
+            if("minister_exploration".equalsIgnoreCase(law)){
                 if(activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
@@ -146,7 +146,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to place structures equal to the amount of mechs you have", buttons );
 
         }
-        if (!alreadyOwned && !doubleCheck && (!planet.equals("mirage"))&& !activeGame.isBaseGameMode()) {
+        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet))&& !activeGame.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal);
             if (event != null && buttons != null && !buttons.isEmpty()) {
@@ -163,10 +163,10 @@ public class PlanetAdd extends PlanetAddRemove {
         if(player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeGame, "sardakk", event);
         }
-        if(planet.equalsIgnoreCase("mr")&&player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
+        if("mr".equalsIgnoreCase(planet)&&player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
             ButtonHelper.commanderUnlockCheck(player, activeGame, "winnu", event);
         }
-        if(planet.equalsIgnoreCase("mr")&& player.hasAbility("reclamation")){
+        if("mr".equalsIgnoreCase(planet)&& player.hasAbility("reclamation")){
              new AddUnits().unitParsing(event, player.getColor(),
                             activeGame.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Due to the reclamation ability, pds and SD have been added to Mecatol Rex. This is optional though.");

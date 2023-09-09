@@ -30,7 +30,7 @@ public class ListActionCards extends HelpSubcommandData {
             .sorted().toList();          
             
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Action Card List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Action Card List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_action_cards" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

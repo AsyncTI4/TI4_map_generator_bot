@@ -47,7 +47,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
             return;
         }
 
-        ArrayList<OptionMapping> planetOptions = new ArrayList<>();
+        List<OptionMapping> planetOptions = new ArrayList<>();
         planetOptions.add(event.getOption(Constants.PLANET));
         planetOptions.add(event.getOption(Constants.PLANET2));
         planetOptions.add(event.getOption(Constants.PLANET3));
@@ -171,7 +171,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                     message.append(Helper.getToesEmoji(sum)).append(" toes").toString();
                 }
                 default -> message.append(spendAs).toString();
-            };
+            }
             return message.toString();
         }
         return "";

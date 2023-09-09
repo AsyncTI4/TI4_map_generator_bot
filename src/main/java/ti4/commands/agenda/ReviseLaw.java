@@ -33,7 +33,7 @@ public class ReviseLaw extends AgendaSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
 
-        String optionText = null;
+        String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected) {

@@ -35,14 +35,14 @@ public class SetDeck extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        java.util.Map<String, DeckModel> changedDecks = new HashMap<>();
+        Map<String, DeckModel> changedDecks = new HashMap<>();
 
         this.deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
                     StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
-                    activeGame.setHomeBrewSCMode(!value.equals("pok") && !value.equals("base_game"));
+                    activeGame.setHomeBrewSCMode(!"pok".equals(value) && !"base_game".equals(value));
                     activeGame.setScTradeGoods(new LinkedHashMap<>());
                     activeGame.setScSetID(strategyCardModel.getAlias());
 

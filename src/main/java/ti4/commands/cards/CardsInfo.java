@@ -1,5 +1,6 @@
 package ti4.commands.cards;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -42,7 +43,7 @@ public class CardsInfo implements Command {
             }
             Member member = event.getMember();
             if (member != null) {
-                java.util.List<Role> roles = member.getRoles();
+                List<Role> roles = member.getRoles();
                 for (Role role : MapGenerator.adminRoles) {
                     if (roles.contains(role)) {
                         return true;
@@ -73,7 +74,7 @@ public class CardsInfo implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
-        Game activeGame = null;
+        Game activeGame;
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;

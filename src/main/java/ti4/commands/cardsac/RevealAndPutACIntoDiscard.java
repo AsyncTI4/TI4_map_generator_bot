@@ -22,11 +22,10 @@ public class RevealAndPutACIntoDiscard extends ACCardsSubcommandData {
             return;
         }
         String acID = activeGame.drawActionCardAndDiscard();
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append(" ");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Revealed and discarded Action card: ");
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+      String sb = "Game: " + activeGame.getName() + " " +
+          "Player: " + player.getUserName() + "\n" +
+          "Revealed and discarded Action card: " +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
     }
 }

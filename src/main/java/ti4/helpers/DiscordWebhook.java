@@ -364,7 +364,7 @@ public class DiscordWebhook {
 
     private static class JSONObject {
 
-        private final HashMap<String, Object> map = new HashMap<>();
+        private final Map<String, Object> map = new HashMap<>();
 
         void put(String key, Object value) {
             if (value != null) {
@@ -390,7 +390,7 @@ public class DiscordWebhook {
                 } else if (val instanceof Boolean) {
                     builder.append(val);
                 } else if (val instanceof JSONObject) {
-                    builder.append(val.toString());
+                    builder.append(val);
                 } else if (val.getClass().isArray()) {
                     builder.append("[");
                     int len = Array.getLength(val);

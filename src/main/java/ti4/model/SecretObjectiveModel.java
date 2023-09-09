@@ -8,9 +8,7 @@ public class SecretObjectiveModel implements ModelInterface {
     private int points;
     private String source;
 
-    public SecretObjectiveModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
             && phase != null

@@ -1,5 +1,6 @@
 package ti4.commands.explore;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
@@ -26,13 +27,13 @@ public class ExpInfo extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        ArrayList<String> types = new ArrayList<>();
+        List<String> types = new ArrayList<>();
         OptionMapping reqType = event.getOption(Constants.TRAIT);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
 
         boolean over = false;
         if (override != null) {
-           over = override.getAsString().equalsIgnoreCase("TRUE");
+           over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
         if (reqType != null) {
             types.add(reqType.getAsString());
@@ -56,9 +57,9 @@ public class ExpInfo extends ExploreSubcommandData {
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             info.append(listNames(deck)).append("\n");
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
+            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(discardCount).append(")\n");
             info.append(listNames(discard)).append("\n_ _\n");
 
 
@@ -66,12 +67,12 @@ public class ExpInfo extends ExploreSubcommandData {
                 sendMessage(info.toString());
             }
         }
-        if (player != null && activeGame.getCurrentPhase().equalsIgnoreCase("action") && !over && activeGame.isFoWMode()) {
+        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
             }
     }
 
-    private String listNames(ArrayList<String> deck) {
+    private String listNames(List<String> deck) {
         StringBuilder sb = new StringBuilder();
         for (String cardID : deck) {
             String card = Mapper.getExplore(cardID);

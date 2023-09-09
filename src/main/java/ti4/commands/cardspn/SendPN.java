@@ -1,5 +1,6 @@
 package ti4.commands.cardspn;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -42,7 +43,7 @@ public class SendPN extends PNCardsSubcommandData {
 		int pnIndex;
 		try {
 			pnIndex = Integer.parseInt(value);
-			for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
+			for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
 				if (so.getValue().equals(pnIndex)) {
 					id = so.getKey();
 				}
@@ -50,7 +51,7 @@ public class SendPN extends PNCardsSubcommandData {
 		} catch (Exception e) {
 			boolean foundSimilarName = false;
 			String cardName = "";
-			for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+			for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
 				String pnName = Mapper.getPromissoryNote(pn.getKey(), false);
 				if (pnName != null) {
 					pnName = pnName.toLowerCase();

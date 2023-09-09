@@ -59,11 +59,11 @@ public class HeroPlay extends LeaderAction {
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
-            sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
+            sendMessage(message + " - Leader will be PURGED after status cleanup");
         } else {
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                sendMessage(message.toString() + " - Leader " + leaderID + " has been purged");
+                sendMessage(message + " - Leader " + leaderID + " has been purged");
             } else {
                 sendMessage("Leader was not purged - something went wrong");
             }

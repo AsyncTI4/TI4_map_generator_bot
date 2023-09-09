@@ -107,8 +107,7 @@ public class CombatRoll extends SpecialSubcommandData {
         String tileName = tile.getTilePath();
         tileName = tileName.substring(tileName.indexOf("_") + 1);
         tileName = tileName.substring(0, tileName.indexOf(".png"));
-        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
-        StringBuilder sb = new StringBuilder();
+        String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if(combatOnHolder == null){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
@@ -117,15 +116,15 @@ public class CombatRoll extends SpecialSubcommandData {
         
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
         if (activeGame.getLaws().containsKey("articles_war")) {
-            if (unitsByQuantity.keySet().stream().anyMatch(unit -> unit.getAlias().equals("naaz_mech_space"))) {
-                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !e.getKey().getAlias().equals("naaz_mech_space"))
+            if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
+                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Helper.getFactionIconFromDiscord("naaz") + " Z-Grav Eidolon due to Articles of War agenda.");
             }
         }
         if(unitsByQuantity.size() == 0){
             String fightingOnUnitHolderName = unitHolderName;
-            if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){
+            if(!unitHolderName.equalsIgnoreCase(Constants.SPACE)){
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
@@ -146,7 +145,7 @@ public class CombatRoll extends SpecialSubcommandData {
                 tile.getPosition(), Emojis.RollDice);
         message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeGame);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
@@ -180,13 +179,11 @@ public class CombatRoll extends SpecialSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
 
-            if (unit != null) {
-                CombatModifierModel combatModifier = new CombatModifierModel();
-                combatModifier.setValue(count);
-                combatModifier.setScope(unit);
-                combatModifier.setPersistanceType("CUSTOM");
-                resultList.add(new NamedCombatModifierModel(combatModifier, ""));
-            }
+            CombatModifierModel combatModifier = new CombatModifierModel();
+            combatModifier.setValue(count);
+            combatModifier.setScope(unit);
+            combatModifier.setPersistanceType("CUSTOM");
+            resultList.add(new NamedCombatModifierModel(combatModifier, ""));
         }
         return resultList;
     }
@@ -215,9 +212,7 @@ public class CombatRoll extends SpecialSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
 
-            if (unit != null) {
-                resultList.put(unit, count);
-            }
+            resultList.put(unit, count);
         }
         return resultList;
     }

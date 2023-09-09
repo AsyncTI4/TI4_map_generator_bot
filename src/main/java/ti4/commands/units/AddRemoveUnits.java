@@ -122,7 +122,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -147,7 +147,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -262,7 +262,7 @@ abstract public class AddRemoveUnits implements Command {
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
-                FoWHelper.pingSystem(activeGame, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
+                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), message);
                   if (count <10) {
                     activeGame.setPingSystemCounter(count);
                     activeGame.setTileAsPinged(count, tile.getPosition());
@@ -285,7 +285,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -310,7 +310,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -427,7 +427,7 @@ abstract public class AddRemoveUnits implements Command {
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
-                FoWHelper.pingSystem(activeGame, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
+                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), message);
                   if (count <10) {
                     activeGame.setPingSystemCounter(count);
                     activeGame.setTileAsPinged(count, tile.getPosition());
@@ -482,7 +482,7 @@ abstract public class AddRemoveUnits implements Command {
             unitHolderIDs.remove(Constants.SPACE);
             String finalPlanetName = planetName;
             List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
-                    .collect(Collectors.toList());
+                    .toList();
             if (validUnitHolderIDs.size() == 1) {
                 planetName = validUnitHolderIDs.get(0);
             } else if (validUnitHolderIDs.size() > 1) {

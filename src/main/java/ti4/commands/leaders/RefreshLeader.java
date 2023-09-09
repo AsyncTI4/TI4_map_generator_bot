@@ -31,7 +31,7 @@ public class RefreshLeader extends LeaderAction {
                     .append(" readied ")
                     .append(Helper.getLeaderShortRepresentation(playerLeader));
             if (tgCount > 0) {
-                message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
+                message.append(" - ").append(tgCount).append(Emojis.tg).append(" transferred from leader to player");
             }
             sendMessage(message.toString());
         } else {

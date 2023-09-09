@@ -32,7 +32,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
-                    MessageHelper.sendMessageToChannel((MessageChannel)threadChannel_, "Agenda put on top");
+                    MessageHelper.sendMessageToChannel(threadChannel_, "Agenda put on top");
                 }
             }
 

@@ -11,9 +11,7 @@ public class DeckModel implements ModelInterface {
     private String description;
     private List<String> cardIDs;
 
-    public DeckModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
             && type != null

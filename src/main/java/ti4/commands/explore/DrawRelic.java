@@ -30,7 +30,7 @@ public class DrawRelic extends GenericRelicAction {
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame) {
         String relicID = activeGame.drawRelic();
         if (relicID.isEmpty()) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getMessageChannel(), "Relic deck is empty");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
             return;
         }
         relicID = relicID.replace("extra1","");

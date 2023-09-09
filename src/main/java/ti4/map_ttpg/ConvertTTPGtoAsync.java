@@ -8,6 +8,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -16,7 +18,6 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -37,7 +38,7 @@ import ti4.message.BotLogger;
 
 public class ConvertTTPGtoAsync {
 
-    private static final ArrayList<String> validColours = new ArrayList<>() {{
+    private static final List<String> validColours = new ArrayList<>() {{
         add("W"); //White
         add("B"); //Blue
         add("P"); //Purple
@@ -48,7 +49,7 @@ public class ConvertTTPGtoAsync {
         add("K"); //Pink
     }};
 
-    private static final ArrayList<String> validUnits = new ArrayList<>() {{
+    private static final List<String> validUnits = new ArrayList<>() {{
         add("c"); //carrier
         add("d"); //dreadnought
         add("f"); //fighter
@@ -64,7 +65,7 @@ public class ConvertTTPGtoAsync {
         add("y"); //destroyer
     }};
 
-    private static final ArrayList<String> validAttachments = new ArrayList<>() {{
+    private static final List<String> validAttachments = new ArrayList<>() {{
         add("C"); //cybernetic_research_facility_face
         add("I"); //biotic_research_facility_face
         add("O"); //propulsion_research_facility_face
@@ -94,7 +95,7 @@ public class ConvertTTPGtoAsync {
         add("z"); //dmz
     }};
 
-    public static final java.util.Map<String,String> fakePlayers = new HashMap<>() {
+    public static final Map<String,String> fakePlayers = new HashMap<>() {
         {
             put("481860200169472030", "PrisonerOne");
             put("150809002974904321", "Holytispoon");
@@ -199,8 +200,8 @@ public class ConvertTTPGtoAsync {
         //PLAYERS
         int index = ttpgMap.getPlayers().size() - 2;
         for (Entry<String,String> fakePlayer : fakePlayers.entrySet()) {
-            asyncGame.addPlayer(fakePlayer.getKey().toString(), fakePlayer.getValue().toString());
-            Player asyncPlayer = asyncGame.getPlayer(fakePlayer.getKey().toString());
+            asyncGame.addPlayer(fakePlayer.getKey(), fakePlayer.getValue());
+            Player asyncPlayer = asyncGame.getPlayer(fakePlayer.getKey());
             TTPGPlayer ttpgPlayer = ttpgMap.getPlayers().get(index);
 
             //PLAYER STATS
@@ -254,7 +255,7 @@ public class ConvertTTPGtoAsync {
             for (String ttpgLaw : ttpgPlayer.getLaws()) {
                 String asyncLaw = AliasHandler.resolveAgenda(ttpgLaw);
                 electedPlayers.put(asyncLaw, asyncPlayer.getFaction());
-                if (asyncLaw.equals("warrant")) asyncPlayer.setSearchWarrant();
+                if ("warrant".equals(asyncLaw)) asyncPlayer.setSearchWarrant();
             }
 
             //PLAYER SUPPORT FOR THE THRONE
@@ -270,40 +271,40 @@ public class ConvertTTPGtoAsync {
             }
 
             //PLAYER LEADERS
-            if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) {
+            if (!"keleres".equals(asyncPlayer.getFaction()) && !"nomad".equals(asyncPlayer.getFaction())) {
                 // asyncPlayer.unsafeGetLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
-                asyncPlayer.unsafeGetLeader("commander").setLocked(!ttpgPlayer.getLeaders().getCommander().equals("unlocked"));
-                asyncPlayer.unsafeGetLeader("hero").setLocked(!ttpgPlayer.getLeaders().getHero().equals("unlocked"));
-            } else if (asyncPlayer.getFaction().equals("keleres")) {
+                asyncPlayer.unsafeGetLeader("commander").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
+                asyncPlayer.unsafeGetLeader("hero").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
+            } else if ("keleres".equals(asyncPlayer.getFaction())) {
                 String subFaction = ttpgPlayer.getFactionShort().toLowerCase();
                 switch (subFaction) {
                     case "keleres - argent" -> {
                         System.out.println(subFaction);
-                        asyncPlayer.unsafeGetLeader("kuuasi").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.unsafeGetLeader("kuuasi").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("odlynn");
                         asyncPlayer.removeLeader("harka");
                     }
                     case "keleres - xxcha" -> {
                         System.out.println(subFaction);
-                        asyncPlayer.unsafeGetLeader("odlynn").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.unsafeGetLeader("odlynn").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("kuuasi");
                         asyncPlayer.removeLeader("harka");
                     }
                     case "keleres - mentak" -> {
                         System.out.println(subFaction);
-                        asyncPlayer.unsafeGetLeader("harka").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.unsafeGetLeader("harka").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
                         asyncPlayer.removeLeader("kuuasi");
                         asyncPlayer.removeLeader("odlynn");
                     }
                 }
-            } else if (asyncPlayer.getFaction().equals("nomad")) { //need an example before we do this
+            } else if ("nomad".equals(asyncPlayer.getFaction())) { //need an example before we do this
                 // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
-                asyncPlayer.unsafeGetLeader("commander").setLocked(!ttpgPlayer.getLeaders().getCommander().equals("unlocked"));
-                asyncPlayer.unsafeGetLeader("hero").setLocked(!ttpgPlayer.getLeaders().getHero().equals("unlocked"));
+                asyncPlayer.unsafeGetLeader("commander").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getCommander()));
+                asyncPlayer.unsafeGetLeader("hero").setLocked(!"unlocked".equals(ttpgPlayer.getLeaders().getHero()));
             }
 
             //PURGE HERO IF PURGED
-            if (ttpgPlayer.getLeaders().getHero().equals("purged")) asyncPlayer.removeLeader(Constants.HERO);
+            if ("purged".equals(ttpgPlayer.getLeaders().getHero())) asyncPlayer.removeLeader(Constants.HERO);
 
             //PLAYER CUSTODIAN POINTS
             Integer ttpgCustodianPoints = ttpgPlayer.getCustodiansPoints();
@@ -329,7 +330,7 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.clearPromissoryNotes();
 
             //PLAYER HANDCARDS and TABLECARDS
-            ArrayList<String> handAndTableCards = new ArrayList<>(){{
+            List<String> handAndTableCards = new ArrayList<>(){{
                 addAll(ttpgPlayer.getHandCards());
                 addAll(ttpgPlayer.getTableCards());
             }};
@@ -385,7 +386,7 @@ public class ConvertTTPGtoAsync {
         }
 
         // ACTION CARD DECK
-        ArrayList<String> actionCards = new ArrayList<>() {{
+        List<String> actionCards = new ArrayList<>() {{
             addAll(ttpgMap.getDecks().getCardAction().getDeck());
             replaceAll(AliasHandler::resolveActionCard);
         }};
@@ -393,7 +394,7 @@ public class ConvertTTPGtoAsync {
         asyncGame.setActionCards(actionCards);
 
         // ACTION CARD DISCARD
-        ArrayList<String> ttpgActionDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
+        List<String> ttpgActionDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
         ArrayList<String> actionDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgActionDiscards)) addAll(ttpgActionDiscards);
             replaceAll(AliasHandler::resolveActionCard);
@@ -401,7 +402,7 @@ public class ConvertTTPGtoAsync {
         asyncGame.setDiscardActionCards(actionDiscards);
 
         // AGENDA DECK
-        ArrayList<String> agendaCards = new ArrayList<>() {{
+        List<String> agendaCards = new ArrayList<>() {{
             addAll(ttpgMap.getDecks().getCardAgenda().getDeck());
             replaceAll(AliasHandler::resolveAgenda);
         }};
@@ -409,8 +410,8 @@ public class ConvertTTPGtoAsync {
         asyncGame.setAgendas(agendaCards);
 
         // AGENDA DISCARD
-        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAgenda().getDiscard();
-        ArrayList<String> ttpgLawsInPlay = (ArrayList<String>) ttpgMap.getLaws();
+        List<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAgenda().getDiscard();
+        List<String> ttpgLawsInPlay = (ArrayList<String>) ttpgMap.getLaws();
         ArrayList<String> agendaDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
             if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
@@ -426,10 +427,10 @@ public class ConvertTTPGtoAsync {
         }
 
         // EXPLORATION DECK
-        ArrayList<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
-        ArrayList<String> ttpgExploreHazardousCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
-        ArrayList<String> ttpgExploreIndustrialCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
-        ArrayList<String> ttpgExploreFrontierCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
+        List<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
+        List<String> ttpgExploreHazardousCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
+        List<String> ttpgExploreIndustrialCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
+        List<String> ttpgExploreFrontierCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
         ArrayList<String> exploreCards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
             if (Objects.nonNull(ttpgExploreHazardousCards)) addAll(ttpgExploreHazardousCards);
@@ -441,10 +442,10 @@ public class ConvertTTPGtoAsync {
         asyncGame.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD
-        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
-        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
-        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
-        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
+        List<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
+        List<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
+        List<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
+        List<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
         ArrayList<String> exploreDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
             if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
@@ -455,7 +456,7 @@ public class ConvertTTPGtoAsync {
         asyncGame.setExploreDiscard(exploreDiscards);
 
         // RELIC DECK
-        ArrayList<String> ttpgRelicCards = (ArrayList<String>) ttpgMap.getDecks().getCardRelic().getDeck();
+        List<String> ttpgRelicCards = (ArrayList<String>) ttpgMap.getDecks().getCardRelic().getDeck();
         ArrayList<String> relicCards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
             replaceAll(AliasHandler::resolveRelic);
@@ -464,21 +465,21 @@ public class ConvertTTPGtoAsync {
         asyncGame.setRelics(relicCards);
 
         // STAGE 1 PUBLIC OBJECTIVE DECK
-        ArrayList<String> publicCardsStage1 = new ArrayList<>() {{
+        List<String> publicCardsStage1 = new ArrayList<>() {{
             addAll(ttpgMap.getObjectives().getPublicObjectivesII());
             replaceAll(AliasHandler::resolveObjective);
         }};
         asyncGame.getPublicObjectives1().removeAll(publicCardsStage1);
 
         // STAGE 2 PUBLIC OBJECTIVE DECK
-        ArrayList<String> publicCardsStage2 = new ArrayList<>() {{
+        List<String> publicCardsStage2 = new ArrayList<>() {{
             addAll(ttpgMap.getObjectives().getPublicObjectivesII());
             replaceAll(AliasHandler::resolveObjective);
         }};
         asyncGame.getPublicObjectives2().removeAll(publicCardsStage2);
 
         // SECRET OBJECTIVE DECK
-        ArrayList<String> secretCards = new ArrayList<>() {{
+        List<String> secretCards = new ArrayList<>() {{
             addAll(ttpgMap.getDecks().getCardObjectiveSecret().getDeck());
             replaceAll(AliasHandler::resolveObjective);
         }};
@@ -597,14 +598,14 @@ public class ConvertTTPGtoAsync {
             //Find attachments, and split off region
             Matcher matcherAttachments = regionAttachmentsPattern.matcher(regionContents);
             boolean hasAttachments = matcherAttachments.find();
-            String attachments = null;
-            System.out.println("         hasAttachments: " + Boolean.toString(hasAttachments));
+            String attachments;
+            System.out.println("         hasAttachments: " + hasAttachments);
             if (hasAttachments) {
                 regionContents = matcherAttachments.group(1);
                 attachments = matcherAttachments.group(2);
                 for (Character attachment : attachments.toCharArray()) {
                     if (!validAttachments.contains(attachment)) {
-                        String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
+                        String attachment_proper = attachment + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
                         String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
 
@@ -629,7 +630,7 @@ public class ConvertTTPGtoAsync {
                             // asyncMap.clearPlanetsCache();
                         }
                     } else {
-                        System.out.println("                character not recognized:  " + Character.toString(attachment));
+                        System.out.println("                character not recognized:  " + attachment);
                     }
 
                 }
@@ -655,10 +656,10 @@ public class ConvertTTPGtoAsync {
                     regionCount = Integer.valueOf(str);
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
-                    if (!colour.equals("")){ //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
-                        if (str.equals("t")) { //CC
+                    if (!"".equals(colour)){ //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
+                        if ("t".equals(str)) { //CC
                             tile.addCC(Mapper.getCCID(colour));
-                        } else if (str.equals("o")) { //control_token
+                        } else if ("o".equals(str)) { //control_token
                             tile.addToken(Mapper.getControlID(colour), AliasHandler.resolvePlanet(planetAlias));
                         } else { // is a unit
                             System.out.println("                unit:  " + AliasHandler.resolveTTPGUnit(str));
@@ -678,7 +679,7 @@ public class ConvertTTPGtoAsync {
                     }
 
                 } else if (validAttachments.contains(str)) { //attachments that were there that didn't match the RegEx above
-                    if (str.equals("e")) { //frontier token
+                    if ("e".equals(str)) { //frontier token
                         System.out.println("attempt to add frontier token to " + tile.getPosition());
                         // tile.addToken(Mapper.getTokenPath(Constants.FRONTIER), Constants.SPACE);
                         AddToken.addToken(null, tile, Constants.FRONTIER, null);

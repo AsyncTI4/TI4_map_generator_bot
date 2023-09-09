@@ -42,7 +42,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         for (TextChannel channel : channels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(channel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `").append(latestActivityTime.toString()).append(" (").append(duration.toDays()).append(" days ago)`  ").append(channel.getAsMention()).append("\n");
+            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toDays()).append(" days ago)`  ").append(channel.getAsMention()).append("\n");
         }
         return sb.toString();
     }

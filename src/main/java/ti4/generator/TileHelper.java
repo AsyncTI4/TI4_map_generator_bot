@@ -1,5 +1,7 @@
 package ti4.generator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.Storage;
 import ti4.model.PlanetModel;
@@ -15,19 +17,19 @@ import java.util.stream.Stream;
 
 public class TileHelper {
 
-    private static java.util.Map<String, TileModel> allTiles = new HashMap<>();
-    private static java.util.Map<String, PlanetModel> allPlanets = new HashMap<>();
+    private static Map<String, TileModel> allTiles = new HashMap<>();
+    private static Map<String, PlanetModel> allPlanets = new HashMap<>();
 
     public static void init() {
         initPlanetsFromJson();
         initTilesFromJson();
     }
 
-    public static java.util.Map<String, PlanetModel> getAllPlanets() {
+    public static Map<String, PlanetModel> getAllPlanets() {
         return allPlanets;
     }
 
-    public static java.util.Map<String, TileModel> getAllTiles() {
+    public static Map<String, TileModel> getAllTiles() {
         return allTiles;
     }
 
@@ -35,7 +37,7 @@ public class TileHelper {
         ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "planets" + File.separator;
-        List<File> files = new java.util.ArrayList<>();
+        List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
         if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
@@ -62,7 +64,7 @@ public class TileHelper {
         ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
-        List<File> files = new java.util.ArrayList<>();
+        List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
         if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {

@@ -40,7 +40,7 @@ public class ExhaustLeader extends LeaderAction {
 			messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
 					.append(" was placed on top of the leader");
 			if (playerLeader.getTgCount() != optionTG.getAsInt()) {
-				messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg)
+				messageText.append(" _(").append(playerLeader.getTgCount()).append(Emojis.tg)
 						.append(" total)_\n");
 			}
 		}

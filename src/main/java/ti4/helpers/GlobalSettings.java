@@ -10,11 +10,12 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import java.util.Map;
 
 public class GlobalSettings {
-    private static HashMap<String, Object> settings = new HashMap<>();
+    private static Map<String, Object> settings = new HashMap<>();
 
-    private static synchronized File getFile() {
+    private static File getFile() {
         return new File(Storage.getStoragePath() + "/global_settings.json");
     }
 
@@ -28,7 +29,7 @@ public class GlobalSettings {
         return clazz.cast(settings.get(attr));
     }
     public static <T> void setSetting(String attr, T val) {
-        settings.put(attr, (Object) val);
+        settings.put(attr, val);
     }
 
     public static void saveSettings() {

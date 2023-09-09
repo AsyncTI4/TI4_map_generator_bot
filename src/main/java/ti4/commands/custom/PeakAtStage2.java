@@ -30,11 +30,10 @@ public class PeakAtStage2 extends CustomSubcommandData {
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
         String obj = activeGame.peakAtStage2(loc1.getAsInt());
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
-        sb.append(" **Stage 2 Public Objective at location ").append(loc1.getAsInt()).append("**").append("\n");
-        sb.append(po.getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), sb.toString());
+      String sb = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) +
+          " **Stage 2 Public Objective at location " + loc1.getAsInt() + "**" + "\n" +
+          po.getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), sb);
         
     }
 }

@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -46,7 +47,7 @@ public class ACCardsCommand implements Command {
             }
             Member member = event.getMember();
             if (member != null) {
-                java.util.List<Role> roles = member.getRoles();
+                List<Role> roles = member.getRoles();
                 for (Role role : MapGenerator.adminRoles) {
                     if (roles.contains(role)) {
                         return true;

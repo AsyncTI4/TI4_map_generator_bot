@@ -175,7 +175,7 @@ public class AutoCompleteProvider {
             }          
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
+                Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
                 List<Command.Choice> options = publicObjectives.entrySet().stream()
                         .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -225,7 +225,7 @@ public class AutoCompleteProvider {
             }
             case Constants.UNIT_ID, Constants.UNIT_ID_1, Constants.UNIT_ID_2, Constants.UNIT_ID_3, Constants.UNIT_ID_4, Constants.UNIT_ID_5 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                java.util.Map<String, UnitModel> units = Mapper.getUnits();
+                Map<String, UnitModel> units = Mapper.getUnits();
                 List<Command.Choice> options = units.values().stream()
                         .filter(unit -> (unit.getId() + " " + unit.getName()).toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -268,7 +268,7 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 } else {
                     List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !value.getKey().equals("ds")))
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !"ds".equals(value.getKey())))
                         .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
@@ -280,7 +280,7 @@ public class AutoCompleteProvider {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
-                java.util.Map<String, String> planets = Mapper.getPlanetRepresentations();
+                Map<String, String> planets = Mapper.getPlanetRepresentations();
                 if (activeGame != null && !activeGame.isFoWMode()) {
                     planetIDs = activeGame.getPlanets();
                     List<Command.Choice> options = planets.entrySet().stream()
@@ -491,7 +491,7 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                String latestCommand = "";
+                String latestCommand;
                 if (activeGame.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
                     latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
@@ -613,7 +613,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
                 List<Command.Choice> options = decks.values().stream()
-                        .filter(scSet -> !scSet.getAlias().equals("template"))
+                        .filter(scSet -> !"template".equals(scSet.getAlias()))
                         .filter(value -> value.getAlias().contains(enteredValue))
                         .map((scSet) -> new Command.Choice(scSet.getName(), scSet.getAlias()))
                         .limit(25)
@@ -622,8 +622,8 @@ public class AutoCompleteProvider {
             }
             case Constants.BORDER_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                java.util.Map<String, String> anomalies = Arrays.stream(BorderAnomalyModel.BorderAnomalyType.values()) //Search string:name
-                        .filter(anomalyType -> !anomalyType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW ))
+                Map<String, String> anomalies = Arrays.stream(BorderAnomalyModel.BorderAnomalyType.values()) //Search string:name
+                        .filter(anomalyType -> anomalyType != BorderAnomalyModel.BorderAnomalyType.ARROW)
                         .collect(Collectors.toMap(BorderAnomalyModel.BorderAnomalyType::toSearchString,
                                 BorderAnomalyModel.BorderAnomalyType::getName));
                 List<Command.Choice> options = anomalies.entrySet().stream()

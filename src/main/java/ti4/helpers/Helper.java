@@ -73,7 +73,7 @@ public class Helper {
             if (player != null) return player;
             return initialPlayer;
         }
-        java.util.List<Role> roles = member.getRoles();
+        List<Role> roles = member.getRoles();
         for (Player player : players) {
             if (roles.contains(player.getRoleForCommunity())) {
                 return player;
@@ -116,7 +116,7 @@ public class Helper {
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
             for (Player player_ : activeGame.getPlayers().values()) {
-                if(factionColor.equalsIgnoreCase("keleres"))
+                if("keleres".equalsIgnoreCase(factionColor))
                 {
                     if (Objects.equals(factionColor+"a", player_.getFaction())) {
                     player = player_;
@@ -146,7 +146,7 @@ public class Helper {
     }
      public static boolean isSaboAllowed(Game activeGame, Player player) {
        
-        if(activeGame.getName().equalsIgnoreCase("pbd100")){
+        if("pbd100".equalsIgnoreCase(activeGame.getName())){
             return true;
         }
         if(activeGame.getDiscardActionCards().containsKey("sabo1") && activeGame.getDiscardActionCards().containsKey("sabo2") && activeGame.getDiscardActionCards().containsKey("sabo3") && activeGame.getDiscardActionCards().containsKey("sabo4")){
@@ -257,12 +257,8 @@ public class Helper {
     public static String getAdjacencyOverridePath(int direction) {
         String file = "adjacent_";
         switch (direction) {
-            case 0 -> file += "north.png";
-            case 1 -> file += "north.png";
-            case 2 -> file += "south.png";
-            case 3 -> file += "south.png";
-            case 4 -> file += "south.png";
-            case 5 -> file += "north.png";
+            case 0, 5, 1 -> file += "north.png";
+            case 2, 4, 3 -> file += "south.png";
         }
         String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", file, "Could not find adjacency file for direction: " + direction);
         if (tokenPath == null) {
@@ -288,7 +284,7 @@ public class Helper {
     }
 
     public static String getRoleMentionByName(Guild guild,  String roleName) {
-        if(roleName == null || guild.getRolesByName(roleName, true) == null){
+        if(roleName == null || guild.getRolesByName(roleName, true).isEmpty()){
             return "@Oopsidoops no name";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
@@ -322,7 +318,7 @@ public class Helper {
     }
 
     public static String getSCAsMention(Guild guild, int sc, Game activeGame) {
-        if(getRoleMentionByName(guild, getSCName(sc, activeGame)) != null){
+        if(!getRoleMentionByName(guild, getSCName(sc, activeGame)).isEmpty()){
             return getRoleMentionByName(guild, getSCName(sc, activeGame));
         }else{
             return "@SC #"+sc;
@@ -345,7 +341,7 @@ public class Helper {
     }
 
     public static String getSCName(int sc, Game activeGame) {
-        if (Optional.ofNullable(activeGame.getScSetID()).isPresent() && !activeGame.getScSetID().equals("null")) {
+        if (Optional.ofNullable(activeGame.getScSetID()).isPresent() && !"null".equals(activeGame.getScSetID())) {
             return Mapper.getStrategyCardSets().get(activeGame.getScSetID()).getCardValues().get(sc);
         }
         return "" + sc;
@@ -367,10 +363,10 @@ public class Helper {
 
     public static File getSCImageFile(Integer sc, Game activeGame) {
         String scSet = activeGame.getScSetID();
-        if(Optional.ofNullable(activeGame.getScSetID()).isEmpty() || activeGame.getScSetID().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
+        if(Optional.ofNullable(activeGame.getScSetID()).isEmpty() || "null".equals(activeGame.getScSetID())) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean pbd100or500 = activeGame.getName().equals("pbd100") || activeGame.getName().equals("pbd500") && !scSet.equals("tribunal");
+        boolean pbd100or500 = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         String scAsString = String.valueOf(sc);
         if(pbd100or500) {
             char scValue = String.valueOf(sc).charAt(0);
@@ -387,7 +383,7 @@ public class Helper {
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
-        Emoji emojiToUse = null;
+        Emoji emojiToUse;
         String playerFaction = player.getFaction();
         emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
         String messageId = message.getId();
@@ -436,8 +432,7 @@ public class Helper {
             case "argent" -> Emojis.Argent;
             case "cabal" -> Emojis.Cabal;
             case "empyrean" -> Emojis.Empyrean;
-            case "ghost" -> Emojis.Ghost;
-            case "creuss" -> Emojis.Ghost;
+            case "ghost", "creuss" -> Emojis.Ghost;
             case "hacan" -> Emojis.Hacan;
             case "jolnar" -> Emojis.Jolnar;
             case "l1z1x" -> Emojis.L1Z1X;
@@ -460,16 +455,12 @@ public class Helper {
 
             case "lazax" -> Emojis.Lazax;
 
-            case "keleres" -> Emojis.Keleres;
-            case "keleresa" -> Emojis.Keleres;
-            case "keleresm" -> Emojis.Keleres;
-            case "keleresx" -> Emojis.Keleres;
+            case "keleres", "keleresx", "keleresm", "keleresa" -> Emojis.Keleres;
 
             case "augers" -> Emojis.augers;
             case "axis" -> Emojis.axis;
             case "bentor" -> Emojis.bentor;
-            case "blex" -> Emojis.blex;
-            case "kyro" -> Emojis.blex;
+            case "blex", "kyro" -> Emojis.blex;
             case "celdauri" -> Emojis.celdauri;
             case "cheiran" -> Emojis.cheiran;
             case "cymiae" -> Emojis.cymiae;
@@ -537,12 +528,12 @@ public class Helper {
         planet = planet.replace("-", "");
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
-        if(planet2 == null || unitHolder == null){
+        if(planet2 == null){
             return planet + " bot error. Tell fin";
         }
         String planetProper = Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
 
-        return (Objects.isNull(planetProper) ? planet : planetProper);
+        return planetProper;
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game activeGame) {
@@ -586,7 +577,7 @@ public class Helper {
     }
     public static String getPlayerDependingOnFog(Game activeGame, Player player)
     {
-        String ident = "";
+        String ident;
 
         if(activeGame.isFoWMode())
         {
@@ -621,7 +612,7 @@ public class Helper {
             if(activeGame.getScTradeGoods().get(sc) > 0 && !activeGame.isFoWMode()){
                 label = "[has "+ activeGame.getScTradeGoods().get(sc)+" tg]";
             }
-            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
+            if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
                 
                 button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, label).withEmoji(scEmoji);
             } else {
@@ -667,7 +658,7 @@ public class Helper {
         boolean regulated = activeGame.getLaws().containsKey("conscription") ||  activeGame.getLaws().containsKey("absol_conscription");
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
-        if(!warfareNOtherstuff.equalsIgnoreCase("muaatagent"))
+        if(!"muaatagent".equalsIgnoreCase(warfareNOtherstuff))
         {
             if(player.hasWarsunTech()) {
                 Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_warsun_"+tp, "Produce Warsun" );
@@ -693,13 +684,13 @@ public class Helper {
         Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_fighter_"+tp, "Produce 1 Fighter" );
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
-        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !regulated && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+        if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)&& !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
             Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Produce 2 Fighters" );
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
             unitButtons.add(ff2Button);
         }
         
-        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+        if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff)&& !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
 
             if(player.hasUnexhaustedLeader("argentagent", activeGame)){
                         Button argentButton = Button.success("FFCC_"+player.getFaction()+"_"+"exhaustAgent_argentagent_"+tile.getPosition(), "Use Argent Agent");
@@ -708,23 +699,23 @@ public class Helper {
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder instanceof Planet planet && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
+            if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 String colorID = Mapper.getColorID(player.getColor());
                 String sdKey =  colorID+ "_sd.png";
                 String csdKey =  colorID+ "_csd.png";
-                if(player.getFaction().equalsIgnoreCase("cabal")){
+                if("cabal".equalsIgnoreCase(player.getFaction())){
                     sdKey = csdKey;
                 }
 
-                if (warfareNOtherstuff.equalsIgnoreCase("warfare")) {
+                if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
 
-                    if ((planet.getUnits().get(sdKey) == null || planet.getUnits().get(sdKey) == 0) && !player.getFaction().equalsIgnoreCase("saar")) {
+                    if ((planet.getUnits().get(sdKey) == null || planet.getUnits().get(sdKey) == 0) && !"saar".equalsIgnoreCase(player.getFaction())) {
                         continue;
                     }
                 }
                 
                 String pp = planet.getName();
-                if (warfareNOtherstuff.equalsIgnoreCase("genericBuild")) {
+                if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button sdButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_sd_"+pp, "Place 1 Space Dock on "+Helper.getPlanetRepresentation(pp, activeGame));
                     sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
                     unitButtons.add(sdButton);
@@ -735,7 +726,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeGame));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !regulated && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeGame) );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
@@ -746,11 +737,11 @@ public class Helper {
 
                 
             }
-            else if(ButtonHelper.canIBuildGFInSpace(activeGame, player, tile, warfareNOtherstuff) && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
+            else if(ButtonHelper.canIBuildGFInSpace(activeGame, player, tile, warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space"+tile.getPosition(), "Produce 1 Infantry in space");
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_space"+tile.getPosition(), "Produce 2 Infantry in space" );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
@@ -760,7 +751,7 @@ public class Helper {
                 unitButtons.add(mfButton);
             }
         }
-        if(placePrefix.equalsIgnoreCase("place")){
+        if("place".equalsIgnoreCase(placePrefix)){
             Button DoneProducingUnits = Button.danger("deleteButtons_"+warfareNOtherstuff, "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
         }
@@ -1102,16 +1093,12 @@ public class Helper {
         return getEmojiFromDiscord(leader.getId());
     }
 
-    public static String getFactionLeaderEmoji(String leaderID) {
-        return getFactionLeaderEmoji(leaderID);
-    }
-
     public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         String leaderID = leader.getId();
 
-        String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
+        String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID);
         if (leaderRep == null) {
-            BotLogger.log("Invalid `leaderID=" + leaderID.toString() + "` caught within `Helper.getLeaderRepresentation`");
+            BotLogger.log("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
             return leader.getId();
         }
 
@@ -1163,12 +1150,12 @@ public class Helper {
     }
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
-        String scEmojiName = "SC" + String.valueOf(strategy_card);
+        String scEmojiName = "SC" + strategy_card;
         return Helper.getEmojiFromDiscord(scEmojiName);
     }
 
     public static String getSCBackEmojiFromInteger(Integer strategy_card) {
-        String scEmojiName = "SC" + String.valueOf(strategy_card) + "Back";
+        String scEmojiName = "SC" + strategy_card + "Back";
         return Helper.getEmojiFromDiscord(scEmojiName);
     }
 
@@ -1183,7 +1170,7 @@ public class Helper {
             return 0;
         }
         HashMap<String, Tile> tileMap = activeGame.getTileMap();
-        for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+        for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
             Tile tile = tileEntry.getValue();
             boolean hasCC = AddCC.hasCC(null, color, tile);
             if (hasCC) {
@@ -1256,17 +1243,17 @@ public class Helper {
             }
         }
 
-        List<String> sortedTilePositions = tilePositions.stream().sorted(Comparator.comparingInt(Integer::parseInt)).collect(Collectors.toList());
-        HashMap<String, Tile> tileMap = new HashMap<>(activeGame.getTileMap());
+        List<String> sortedTilePositions = tilePositions.stream().sorted(Comparator.comparingInt(Integer::parseInt)).toList();
+        Map<String, Tile> tileMap = new HashMap<>(activeGame.getTileMap());
         StringBuilder sb = new StringBuilder();
         for (String position : sortedTilePositions) {
             boolean missingTile = true;
             for (Tile tile : tileMap.values()){
                 if (tile.getPosition().equals(position)){
                     String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if (position.equalsIgnoreCase("000") && tileID.equalsIgnoreCase("18")) { //Mecatol Rex in Centre Position
+                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { //Mecatol Rex in Centre Position
                         sb.append("{18}");
-                    } else if (position.equalsIgnoreCase("000") && !tileID.equalsIgnoreCase("18")) { //Something else is in the Centre Position
+                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { //Something else is in the Centre Position
                         sb.append("{").append(tileID).append("}");
                     } else {
                         sb.append(tileID);
@@ -1275,7 +1262,7 @@ public class Helper {
                     break;
                 }
             }
-            if (missingTile && position.equalsIgnoreCase("000")) {
+            if (missingTile && "000".equalsIgnoreCase(position)) {
                 sb.append("{-1}");
             } else if (missingTile) {
                 sb.append("-1");
@@ -1286,7 +1273,7 @@ public class Helper {
     }
 
     public static Integer getPlayerResourcesAvailable(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1307,7 +1294,7 @@ public class Helper {
     }
 
     public static Integer getPlayerResourcesTotal(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -1327,7 +1314,7 @@ public class Helper {
     }
 
     public static Integer getPlayerOptimalResourcesAvailable(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1343,7 +1330,7 @@ public class Helper {
     }
 
     public static Integer getPlayerOptimalResourcesTotal(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -1359,7 +1346,7 @@ public class Helper {
     }
 
     public static Integer getPlayerInfluenceAvailable(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1380,7 +1367,7 @@ public class Helper {
     }
 
     public static Integer getPlayerInfluenceTotal(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -1401,7 +1388,7 @@ public class Helper {
     }
 
     public static Integer getPlayerOptimalInfluenceAvailable(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1416,7 +1403,7 @@ public class Helper {
     }
 
     public static Integer getPlayerOptimalInfluenceTotal(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -1432,7 +1419,7 @@ public class Helper {
     }
 
     public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
@@ -1447,7 +1434,7 @@ public class Helper {
     }
 
     public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game activeGame) {
-        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -1462,15 +1449,14 @@ public class Helper {
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Game activeGame) {
-        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player, activeGame)).append(":\n");
-        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, activeGame)).append("/").append(getPlayerResourcesTotal(player, activeGame)).append("  Optimal: ").append(getPlayerOptimalResourcesAvailable(player, activeGame)).append("/").append(getPlayerOptimalResourcesTotal(player, activeGame)).append("\n");
-        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, activeGame)).append("/").append(getPlayerInfluenceTotal(player, activeGame)).append("  Optimal: ").append(getPlayerOptimalInfluenceAvailable(player, activeGame)).append("/").append(getPlayerOptimalInfluenceTotal(player, activeGame)).append("\n");
-        return sb.toString();
+        return getPlayerRepresentation(player, activeGame) + ":\n" +
+            "Resources: " + getPlayerResourcesAvailable(player, activeGame) + "/" + getPlayerResourcesTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalResourcesAvailable(player, activeGame) + "/" + getPlayerOptimalResourcesTotal(player, activeGame) + "\n" +
+            "Influence: " + getPlayerInfluenceAvailable(player, activeGame) + "/" + getPlayerInfluenceTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalInfluenceAvailable(player, activeGame) + "/" + getPlayerOptimalInfluenceTotal(player, activeGame) + "\n";
     }
 
-    public static HashMap<String, Integer> getLastEntryInHashMap(LinkedHashMap<String, Integer> linkedHashMap) {
+    public static HashMap<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
         int count = 1;
-        for (java.util.Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
+        for (Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
             if (count == linkedHashMap.size()) {
                 HashMap<String, Integer> lastEntry = new HashMap<>();
                 lastEntry.put(it.getKey(), it.getValue());
@@ -1539,7 +1525,7 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game activeGame) {
-        if (activeGame != null && !activeGame.isFoWMode() && !activeGame.isCommunityMode()) {
+        if (!activeGame.isFoWMode() && !activeGame.isCommunityMode()) {
             String gameName = activeGame.getName();
             List<Role> roles = guild.getRolesByName(gameName, true);
             Role role = null;
@@ -1560,11 +1546,11 @@ public class Helper {
     }
 
     public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game activeGame) {
-        TextChannel tableTalkChannel = (TextChannel) activeGame.getTableTalkChannel();
+        TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, activeGame, tableTalkChannel);
         }
-        TextChannel actionsChannel = (TextChannel) activeGame.getMainGameChannel();
+        TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (actionsChannel != null) {
             addPlayerPermissionsToGameChannel(guild, activeGame, actionsChannel);
         }
@@ -1604,7 +1590,7 @@ public class Helper {
         try {
         for (ThreadChannel threadChannel : threadChannels) {
             if (threadChannel.getId().equals(messageID)) {
-                return (GuildMessageChannel) threadChannel;
+                return threadChannel;
                 }
             }
             return (GuildMessageChannel) messageChannel;
@@ -1649,7 +1635,7 @@ public class Helper {
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
             String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
-            Button techB = null;
+            Button techB;
             switch (techType) {
                 case "propulsion" -> {
                     techB = Button.primary(buttonID, techName);
@@ -1719,7 +1705,7 @@ public class Helper {
             if (tech.getType().toString().equalsIgnoreCase(techType)) {
                 if (!player.hasTech(tech.getAlias())) {
                     if (!faction.isEmpty()) {
-                        if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && faction.equalsIgnoreCase("Keleres"))) {
+                        if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && "Keleres".equalsIgnoreCase(faction))) {
                             techs.add(tech);
                         }
                     } else {
@@ -1742,10 +1728,8 @@ public class Helper {
         String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         
         String techText = tech.getText();
-        StringBuilder sb = new StringBuilder();
-        sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji).append("\n");
-        sb.append("> ").append(techText).append("\n");
-        return sb.toString();
+        return techEmoji + "**" + techName + "**" + factionEmoji + "\n" +
+            "> " + techText + "\n";
     }
 
     public static String getAgendaRepresentation(@NotNull String agendaID) {
@@ -1785,7 +1769,7 @@ public class Helper {
             int scoredPOCount = 0;
             HashMap<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-                if (Mapper.getPublicObjectivesStage1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().keySet().contains(scoredPublic.getKey())) {
+                if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
                     if (scoredPublic.getValue().contains(player.getUserID())) {
                         scoredPOCount++;
                     }
@@ -1813,7 +1797,7 @@ public class Helper {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     break;
@@ -1874,7 +1858,7 @@ public class Helper {
     public static boolean playerHasProductionUnitInSystem(Tile tile, Game activeGame, Player player) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
+        String mechKey;
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
             mechKey = colorID + "_sd.png";
@@ -1885,7 +1869,7 @@ public class Helper {
             if (unitHolder.getUnits().get(mechKey) != null) {
                 return true;
             }
-            if(player.getFaction().equalsIgnoreCase("arborec")){
+            if("arborec".equalsIgnoreCase(player.getFaction())){
                 mechKey = colorID + "_mf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
@@ -1928,7 +1912,7 @@ public class Helper {
      */
     public static List<String> getListFromCSV(String commaSeparatedString) {
         StringTokenizer tokenizer = new StringTokenizer(commaSeparatedString, ",");
-        ArrayList<String> values = new ArrayList<>();
+        List<String> values = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
             values.add(tokenizer.nextToken().trim());
         }
@@ -1936,14 +1920,14 @@ public class Helper {
     }
 
     public static void removePoKComponents(Game activeGame, String codex) {
-        boolean removeCodex = codex != null && codex.equalsIgnoreCase("y");
+        boolean removeCodex = "y".equalsIgnoreCase(codex);
 
         //removing Action Cards
         HashMap<String,ActionCardModel> actionCards = Mapper.getActionCards();
         for (ActionCardModel ac : actionCards.values()) {
-            if (ac.getSource().equals("pok")) {
+            if ("pok".equals(ac.getSource())) {
                 activeGame.removeACFromGame(ac.getAlias());
-            } else if (ac.getSource().equals("codex1") && removeCodex) {
+            } else if ("codex1".equals(ac.getSource()) && removeCodex) {
                 activeGame.removeACFromGame(ac.getAlias());
             }
         }
@@ -1951,7 +1935,7 @@ public class Helper {
         //removing SOs
         HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         for (SecretObjectiveModel so : soList.values()) {
-            if (so.getSource().equals("pok")) {
+            if ("pok".equals(so.getSource())) {
                 activeGame.removeSOFromGame(so.getAlias());
             }
         }
@@ -1959,7 +1943,7 @@ public class Helper {
         //removing POs
         HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
         for (PublicObjectiveModel po : poList.values()) {
-            if (po.getSource().equals("pok")) {
+            if ("pok".equals(po.getSource())) {
                 if (po.getPoints() == 1) {
                     activeGame.removePublicObjective1(po.getAlias());
                 }

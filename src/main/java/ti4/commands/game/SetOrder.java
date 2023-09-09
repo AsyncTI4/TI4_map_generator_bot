@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -75,7 +76,7 @@ public class SetOrder extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
-    private void setPlayerOrder(LinkedHashMap<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
+    private void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
         if (option1 != null) {
             String id = option1.getAsUser().getId();
             Player player = players.get(id);
@@ -85,6 +86,4 @@ public class SetOrder extends GameSubcommandData {
             }
         }
     }
-
-    ;
 }

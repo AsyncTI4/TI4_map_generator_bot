@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -52,7 +53,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " scored " + Emojis.SecretObjectiveAlt + " ");
-        for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
+        for (Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }

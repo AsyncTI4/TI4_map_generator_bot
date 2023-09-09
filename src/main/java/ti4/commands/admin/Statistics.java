@@ -41,7 +41,7 @@ public class Statistics extends AdminSubcommandData {
                 for (Player player : activeGame.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
-                    if (faction != null && color != null && !faction.isEmpty() && !faction.equals("null")) {
+                    if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
                         factionCount.putIfAbsent(faction, 1);
                         factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
 
@@ -50,7 +50,7 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 boolean findWinner = true;
-                for (java.util.Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
+                for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
                     Integer vpScore = entry.getValue();
                     if (vp <= vpScore) {
                         String color = entry.getKey().getColor();
@@ -74,7 +74,7 @@ public class Statistics extends AdminSubcommandData {
                     if (days_difference > 30) {
                         Integer maxVP = userVPs.values().stream().max(Integer::compareTo).orElse(0);
                         if (userVPs.values().stream().filter(value -> value.equals(maxVP)).count() == 1) {
-                            for (java.util.Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
+                            for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
                                 Integer vpScore = entry.getValue();
                                 if (maxVP.equals(vpScore)) {
                                     String color = entry.getKey().getColor();
@@ -102,20 +102,20 @@ public class Statistics extends AdminSubcommandData {
 
     }
 
-    private static void sendStatistics(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
+    private static void sendStatistics(SlashCommandInteractionEvent event, Map<String, Integer> factionCount, String text) {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(java.util.Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(Helper.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    private static void sendStatisticsColor(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
+    private static void sendStatisticsColor(SlashCommandInteractionEvent event, Map<String, Integer> factionCount, String text) {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(java.util.Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }

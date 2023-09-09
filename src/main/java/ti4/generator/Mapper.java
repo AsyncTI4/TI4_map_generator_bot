@@ -105,7 +105,7 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, HashMap<String, T> objectMap, Class<T> target, String error) {
+    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target, String error) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getInfoFile(jsonFileName);
@@ -136,10 +136,10 @@ public class Mapper {
         if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
-                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && !pn.getSource().equalsIgnoreCase("Absol")) {
+                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && !"Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
-                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource().equalsIgnoreCase("Absol")) {
+                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && "Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -158,14 +158,12 @@ public class Mapper {
     }
 
     public static List<String> getAllPromissoryNoteIDs() {
-        List<String> pnList = new ArrayList<>();
-        pnList.addAll(promissoryNotes.keySet());
-        return pnList;
+        return new ArrayList<>(promissoryNotes.keySet());
     }
 
     public static boolean isColorValid(String color) {
         String property = colors.getProperty(color);
-        return property != null && !property.equals("null");
+        return property != null && !"null".equals(property);
     }
 
     public static boolean isFaction(String faction) {
@@ -203,7 +201,7 @@ public class Mapper {
         for (String dir : directions) {
             List<String> info = Arrays.stream(dir.split(",")).toList();
             List<Boolean> connections = new ArrayList<>();
-            for (String value : info) connections.add(value.equals("1"));
+            for (String value : info) connections.add("1".equals(value));
             data.add(connections);
         }
         return data;
@@ -432,7 +430,7 @@ public class Mapper {
     public static RelicModel getRelicObject(String id) {
         String relicString = getRelic(id);
 
-        StringTokenizer tokenizer = new StringTokenizer((String) relicString, ";");
+        StringTokenizer tokenizer = new StringTokenizer(relicString, ";");
         String name = tokenizer.nextToken();
         String effect = tokenizer.nextToken();
         String shortName = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
@@ -593,8 +591,7 @@ public class Mapper {
     }
     @Nullable
     public static String getCCPath(String ccID) {
-        String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
-        return ccPath;
+        return ResourceHelper.getInstance().getCCFile(ccID);
     }
 
     @Nullable
@@ -669,7 +666,7 @@ public class Mapper {
         for (Map.Entry<String, PublicObjectiveModel> entry : publicObjectives.entrySet()) {
             PublicObjectiveModel po = entry.getValue();
             if (requiredStage == po.getPoints()) {
-                poList.put((String) entry.getKey(), po.getName());
+                poList.put(entry.getKey(), po.getName());
             }
         }
         return poList;
@@ -679,7 +676,7 @@ public class Mapper {
         HashMap<String, String> expList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : explore.entrySet()) {
             StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            expList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+            expList.put(entry.getKey() +extra, tokenizer.nextToken());
         }
         return expList;
     }
@@ -696,7 +693,7 @@ public class Mapper {
         HashMap<String, String> relicList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : relics.entrySet()) {
             StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            relicList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+            relicList.put(entry.getKey() +extra, tokenizer.nextToken());
         }
         return relicList;
     }

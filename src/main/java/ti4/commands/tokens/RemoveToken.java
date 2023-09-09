@@ -59,7 +59,7 @@ public class RemoveToken extends AddRemoveToken {
             } else {
                 Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
                 if (unitHolderIDs.size() == 2) {
-                    HashSet<String> unitHolders = new HashSet<>(unitHolderIDs);
+                    Set<String> unitHolders = new HashSet<>(unitHolderIDs);
                     unitHolders.remove(Constants.SPACE);
                     unitHolder = unitHolders.iterator().next();
                 } else {

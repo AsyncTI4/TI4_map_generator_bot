@@ -20,15 +20,15 @@ import ti4.model.PlanetModel;
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
 
-    private int resourcesOriginal = 0;
-    private int influenceOriginal = 0;
-    private int resourcesModifier = 0;
-    private int influenceModifier = 0;
+    private int resourcesOriginal;
+    private int influenceOriginal;
+    private int resourcesModifier;
+    private int influenceModifier;
     private String originalPlanetType = "";
     private String originalTechSpeciality = "";
     private ArrayList<String> planetType = new ArrayList<>();
     private ArrayList<String> techSpeciality = new ArrayList<>();
-    private boolean hasAbility = false;
+    private boolean hasAbility;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {

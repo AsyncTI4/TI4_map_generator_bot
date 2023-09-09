@@ -24,7 +24,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
             return;
         }
         List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
-        List<String> currentSecrets = new ArrayList<String>(defaultSecrets);
+        List<String> currentSecrets = new ArrayList<>(defaultSecrets);
         for(Player player : activeGame.getPlayers().values()){
             if(player == null){
                 continue;

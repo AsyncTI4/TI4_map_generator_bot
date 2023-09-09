@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.List;
 import ti4.generator.Mapper;
 
 import java.awt.*;
@@ -187,7 +188,7 @@ abstract public class UnitHolder {
                 .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
     }
 
-    public java.util.List<String> getUnitColorsOnHolder() {
+    public List<String> getUnitColorsOnHolder() {
         return getUnits().keySet().stream()
                 .map(this::getUnitColor)
                 .distinct()

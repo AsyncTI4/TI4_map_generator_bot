@@ -35,7 +35,7 @@ public class ListMyGames extends HelpSubcommandData {
         Predicate<Game> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer() != null && m.getActivePlayer().equals(userID) : m -> true;
         Predicate<Game> endedGamesFilter = includeEndedGames ? m -> m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
 
-        Comparator<Game> mapSort = (map1, map2) -> map1.getName().compareTo(map2.getName());
+        Comparator<Game> mapSort = Comparator.comparing(Game::getName);
 
         List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream().filter(onlyMyTurnFilter).filter(endedGamesFilter).sorted(mapSort).toList();
 

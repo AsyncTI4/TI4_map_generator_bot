@@ -17,7 +17,7 @@ public class MiltyDraftManager {
     private List<MiltyDraftSlice> slices = new ArrayList<>();
 
     private List<Player> draftOrder = new ArrayList<>();
-    private int draftIndex = 0;
+    private int draftIndex;
     private List<Player> draftRandomOrder = new ArrayList<>();
     private Map<Player, PlayerDraft> draft = new HashMap<>();
 

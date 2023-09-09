@@ -30,7 +30,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
 
         List<String> secretObjectives = new ArrayList<>(activeGame.getSecretObjective(player.getUserID()).keySet());
         Collections.shuffle(secretObjectives);
-        LinkedHashMap<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeGame.getScoredSecretObjective(player.getUserID()));
+        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeGame.getScoredSecretObjective(player.getUserID()));
         for (String id : activeGame.getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
@@ -39,15 +39,13 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
-        if (secretObjectives != null) {
-            for (String so : secretObjectives) {
-                sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
-                player.setSecret(so);
-                index++;
-            }
+        for (String so : secretObjectives) {
+            sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
+            player.setSecret(so);
+            index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
-        for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
+        for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
             sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
