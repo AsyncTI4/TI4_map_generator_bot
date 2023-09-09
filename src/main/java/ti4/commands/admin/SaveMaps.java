@@ -2,7 +2,7 @@ package ti4.commands.admin;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.GameSaveLoadManager;
 
 public class SaveMaps extends AdminSubcommandData {
 
@@ -12,7 +12,7 @@ public class SaveMaps extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MapSaveLoadManager.saveMaps();
+        GameSaveLoadManager.saveMaps();
         sendMessage("Saved all maps");
     }
 }

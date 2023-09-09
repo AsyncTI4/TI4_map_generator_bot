@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -21,31 +21,27 @@ public class SwapSC extends SpecialSubcommandData {
     }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         //resolve player1
         Player player1 = null; //OG player
         OptionMapping player1option = event.getOption(Constants.FACTION_COLOR_2);
         if (player1option == null) {
-            player1 = activeMap.getPlayer(getUser().getId());
-            player1 = Helper.getGamePlayer(activeMap, player1, event, null);
-            if (player1 == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-                return;
-            }
+            player1 = activeGame.getPlayer(getUser().getId());
+            player1 = Helper.getGamePlayer(activeGame, player1, event, null);
         } else {
             String factionColor = AliasHandler.resolveColor(player1option.getAsString().toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player1 = player_;
                     break;
                 }
             }
-            if (player1 == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-                return;
-            }
+        }
+        if (player1 == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
         }
 
         //resolve player2
@@ -54,7 +50,7 @@ public class SwapSC extends SpecialSubcommandData {
         if (player2option != null) {
             String factionColor = AliasHandler.resolveColor(player2option.getAsString().toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     player2 = player_;
                     break;
@@ -91,9 +87,9 @@ public class SwapSC extends SpecialSubcommandData {
         player2.removeSC(player2SC);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player1, activeMap)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(player2, activeMap)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(player2, activeMap)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(player1, activeMap)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
+        sb.append(Helper.getPlayerRepresentation(player1, activeGame)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(player2, activeGame)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player2, activeGame)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player1, activeGame)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         // ListTurnOrder.turnOrder(event, activeMap);
     }

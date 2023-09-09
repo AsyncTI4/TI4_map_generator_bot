@@ -3,12 +3,10 @@ package ti4.commands.bothelper;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.MapGenerator;
 import ti4.generator.Mapper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
@@ -37,8 +35,8 @@ public class JazzCommand extends BothelperSubcommandData {
             }
         }
 
-        Map activeMap = getActiveMap();
-        String agendaID = activeMap.getNextAgenda(false);
+        Game activeGame = getActiveGame();
+        String agendaID = activeGame.getNextAgenda(false);
         AgendaModel agenda = Mapper.getAgenda(agendaID);
         String image = Emoji.fromFormatted(Emojis.Scout).asCustom().getImageUrl();
 
@@ -53,9 +51,9 @@ public class JazzCommand extends BothelperSubcommandData {
         eb.setDescription(desc.toString());
         eb.setFooter(agenda.footnote());
 
-        for (Player p : activeMap.getPlayers().values()) {
+        for (Player p : activeGame.getPlayers().values()) {
             String title = Helper.getFactionIconFromDiscord(p.getFaction()) + " " + p.getUserName();
-            eb.addField(title, AgendaHelper.getPlayerVoteText(activeMap, p), false);
+            eb.addField(title, AgendaHelper.getPlayerVoteText(activeGame, p), false);
         }
 
         MessageCreateBuilder mcb = new MessageCreateBuilder();

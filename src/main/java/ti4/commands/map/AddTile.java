@@ -1,7 +1,7 @@
 package ti4.commands.map;
 
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -15,9 +15,9 @@ public class AddTile extends AddRemoveTile {
     }
 
     @Override
-    protected void tileAction(Tile tile, String position, Map userActiveMap) {
-        userActiveMap.removeTile(position); //remove old tile first to clean up associated planet ownership
-        userActiveMap.setTile(tile);
+    protected void tileAction(Tile tile, String position, Game userActiveGame) {
+        userActiveGame.removeTile(position); //remove old tile first to clean up associated planet ownership
+        userActiveGame.setTile(tile);
         addCustodianToken(tile);
     }
 

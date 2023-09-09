@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import okhttp3.internal.ws.RealWebSocket.Message;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -35,8 +34,8 @@ public class Replace extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         User callerUser = event.getUser();
 
-        Map activeMap = getActiveMap();
-        Collection<Player> players = activeMap.getPlayers().values();
+        Game activeGame = getActiveGame();
+        Collection<Player> players = activeGame.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -44,6 +43,7 @@ public class Replace extends GameSubcommandData {
             for (Role role : MapGenerator.bothelperRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
+                    break;
                 }
             }
         }
@@ -59,7 +59,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
         
-        Player removedPlayer = Helper.getPlayer(activeMap, null, event);
+        Player removedPlayer = Helper.getPlayer(activeGame, null, event);
         if (removedPlayer == null){
             MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
             return;
@@ -67,15 +67,15 @@ public class Replace extends GameSubcommandData {
         User addedUser = addOption.getAsUser();
         boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
         if (!notRealPlayer) {
-            if (activeMap.getPlayer(addedUser.getId()).getFaction() == null) {
-                activeMap.removePlayer(addedUser.getId());
+            if (activeGame.getPlayer(addedUser.getId()).getFaction() == null) {
+                activeGame.removePlayer(addedUser.getId());
             }
         }
         
         //REMOVE ROLE
         Guild guild = event.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
-        List<Role> roles = guild.getRolesByName(activeMap.getName(), true);
+        List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
         if (removedMember != null && roles != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
         }
@@ -92,9 +92,9 @@ public class Replace extends GameSubcommandData {
             return;
         }
             
-        message = "Game: " + activeMap.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
-        Player player = activeMap.getPlayer(removedPlayer.getUserID());
-        LinkedHashMap<String, List<String>> scoredPublicObjectives = activeMap.getScoredPublicObjectives();
+        message = "Game: " + activeGame.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
+        Player player = activeGame.getPlayer(removedPlayer.getUserID());
+        LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
         for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());
@@ -106,21 +106,21 @@ public class Replace extends GameSubcommandData {
         player.setUserID(addedUser.getId());
         player.setTotalTurnTime(0);
         player.setNumberTurns(0);
-        if (removedPlayer.getUserID().equals(activeMap.getSpeaker())) {
-            activeMap.setSpeaker(addedUser.getId());
+        if (removedPlayer.getUserID().equals(activeGame.getSpeaker())) {
+            activeGame.setSpeaker(addedUser.getId());
         }
-        if (removedPlayer.getUserID().equals(activeMap.getActivePlayer())) {
+        if (removedPlayer.getUserID().equals(activeGame.getActivePlayer())) {
             // do not update stats for this action
-            activeMap.setActivePlayer(addedUser.getId());
+            activeGame.setActivePlayer(addedUser.getId());
         }
 
-        Helper.fixGameChannelPermissions(event.getGuild(), activeMap);
-        MapSaveLoadManager.saveMap(activeMap, event);
-        MapSaveLoadManager.reload(activeMap);
-        if (FoWHelper.isPrivateGame(activeMap)) {
+        Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
+        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.reload(activeGame);
+        if (FoWHelper.isPrivateGame(activeGame)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
-            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), message);
+            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
         }
     }
 }

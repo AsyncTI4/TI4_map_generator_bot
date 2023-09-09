@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -61,9 +61,9 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        if (activeMap == null) return;
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        if (activeGame == null) return;
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, file);
     }
 

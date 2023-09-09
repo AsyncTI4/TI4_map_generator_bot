@@ -25,17 +25,17 @@ public class SetStatus extends GameSubcommandData{
         String mapName;
         if (gameOption != null) {
             mapName = event.getOptions().get(0).getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
                 return;
             }
         } else {
-            Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
-            if (userActiveMap == null){
+            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
+            if (userActiveGame == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = userActiveMap.getName();
+            mapName = userActiveGame.getName();
         }
 
         OptionMapping mapStatusOption = event.getOption(Constants.GAME_STATUS);
@@ -45,21 +45,21 @@ public class SetStatus extends GameSubcommandData{
         }
         String status = mapStatusOption.getAsString().toLowerCase();
 
-        MapManager mapManager = MapManager.getInstance();
-        Map mapToChangeStatusFor = mapManager.getMap(mapName);
+        GameManager gameManager = GameManager.getInstance();
+        Game gameToChangeStatusFor = gameManager.getGame(mapName);
 
         try {
-            MapStatus mapStatus = MapStatus.valueOf(status);
-            if (mapStatus == MapStatus.open) {
-                mapToChangeStatusFor.setMapStatus(MapStatus.open);
-            } else if (mapStatus == MapStatus.locked) {
-                mapToChangeStatusFor.setMapStatus(MapStatus.locked);
+            GameStatus gameStatus = GameStatus.valueOf(status);
+            if (gameStatus == GameStatus.open) {
+                gameToChangeStatusFor.setGameStatus(GameStatus.open);
+            } else if (gameStatus == GameStatus.locked) {
+                gameToChangeStatusFor.setGameStatus(GameStatus.locked);
             }
         } catch (Exception e){
             MessageHelper.replyToMessage(event, "Map: " + mapName + " status was not changed, as invalid status entered.");
             return;
         }
-        MapSaveLoadManager.saveMap(mapToChangeStatusFor, event);
-        MessageHelper.replyToMessage(event, "Map: "+ mapName +" status changed to: " + mapToChangeStatusFor.getMapStatus());
+        GameSaveLoadManager.saveMap(gameToChangeStatusFor, event);
+        MessageHelper.replyToMessage(event, "Map: "+ mapName +" status changed to: " + gameToChangeStatusFor.getGameStatus());
     }
 }

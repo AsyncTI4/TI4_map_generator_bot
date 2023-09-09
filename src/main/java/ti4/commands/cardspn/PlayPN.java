@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.PromissoryNoteModel;
 
@@ -22,9 +22,9 @@ public class PlayPN extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
@@ -82,10 +82,10 @@ public class PlayPN extends PNCardsSubcommandData {
             player.setPromissoryNotesInPlayArea(pnID);
         } else { //return to owner
             player.removePromissoryNote(pnID);
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_.getPromissoryNotesOwned().contains(pnID)) {
                     player_.setPromissoryNote(pnID);
-                    PNInfo.sendPromissoryNoteInfo(activeMap, player_, false, event);
+                    PNInfo.sendPromissoryNoteInfo(activeGame, player_, false, event);
                     pnOwner = player_.getFaction();
                     break;
                 }
@@ -94,9 +94,9 @@ public class PlayPN extends PNCardsSubcommandData {
         
        
 
-        String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note: "+pnName+"\n");
-        sb.append(emojiToUse + Emojis.PN);
+        String emojiToUse = activeGame.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: "+pnName+"\n");
+        sb.append(emojiToUse).append(Emojis.PN);
         String pnText = "";
 
         pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
@@ -108,12 +108,12 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         //Fog of war ping
-		if (activeMap.isFoWMode()) {
+		if (activeGame.isFoWMode()) {
             // Add extra message for visibility
-			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, sb.toString());
 		}
 
         sendMessage(sb.toString());
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
     }
 }

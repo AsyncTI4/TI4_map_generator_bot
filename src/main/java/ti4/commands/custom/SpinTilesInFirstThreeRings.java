@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -20,8 +20,8 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        List<Tile> tilesToSet = new ArrayList<Tile>();
+        Game activeGame = getActiveGame();
+        List<Tile> tilesToSet = new ArrayList<>();
         //first ring
         for(int y = 1; y < 4; y++){
             for(int x = 1; x < (y*6+1); x++){
@@ -30,9 +30,9 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
                 }
                 Tile tile;
                 if(x < 10){
-                    tile = activeMap.getTileByPosition(y+"0"+x);
+                    tile = activeGame.getTileByPosition(y+"0"+x);
                 }else{
-                    tile = activeMap.getTileByPosition(y+""+x);
+                    tile = activeGame.getTileByPosition(y+""+x);
                 }
                 if(y==2){
                     if((x-y) < 1){
@@ -59,12 +59,12 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
             }
         }
         for(Tile tile : tilesToSet){
-            activeMap.setTile(tile);
+            activeGame.setTile(tile);
         }
-        activeMap.rebuildTilePositionAutoCompleteList();
-        MapSaveLoadManager.saveMap(activeMap, event);
+        activeGame.rebuildTilePositionAutoCompleteList();
+        GameSaveLoadManager.saveMap(activeGame, event);
         DisplayType displayType = DisplayType.map;
-        File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
         MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 }

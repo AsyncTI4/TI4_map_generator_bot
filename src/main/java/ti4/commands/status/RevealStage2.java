@@ -21,12 +21,12 @@ public class RevealStage2 extends StatusSubcommandData {
     }
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        java.util.Map.Entry<String, Integer> objective = activeGame.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeMap));
+        sb.append(Helper.getGamePing(event, activeGame));
         sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
         sb.append("(").append(objective.getValue()).append(") ");
         sb.append(po.getRepresentation()).append("\n");
@@ -36,7 +36,7 @@ public class RevealStage2 extends StatusSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

@@ -26,7 +26,7 @@ public class ListPublicObjectives extends HelpSubcommandData {
         HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
         List<String> searchedList = poList.entrySet().stream()
             .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
         
         String searchDescription = searchString == null ? "" : " search: " + searchString;

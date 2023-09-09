@@ -40,7 +40,7 @@ public class TTPGUnpickedStrategyCards {
     @JsonProperty("Politics")
     private Integer politics;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("Leadership")
     public Integer getLeadership() {

@@ -77,10 +77,7 @@ public class Tile {
     @Nullable
     public String getAttachmentPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
-        if (tokenPath == null) {
-//            LoggerHandler.log("Could not find attachment token: " + tokenID);
-            return null;
-        }
+        //            LoggerHandler.log("Could not find attachment token: " + tokenID);
         return tokenPath;
     }
 
@@ -151,7 +148,7 @@ public class Tile {
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            if (unitHolder.removeToken(tokenID)) return true;
+            return unitHolder.removeToken(tokenID);
         }
         return false;
     }
@@ -302,11 +299,11 @@ public class Tile {
         }
         return null;
     }
-    public String getRepresentationForButtons(Map activeMap, Player player) {
+    public String getRepresentationForButtons(Game activeGame, Player player) {
         try {
-            if(activeMap.isFoWMode())
+            if(activeGame.isFoWMode())
             {
-                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeMap, player);
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeGame, player);
                 if(tilesToShow.contains(getPosition()))
                 {
                     return getPosition() + " (" + getRepresentation() + ")";

@@ -6,12 +6,12 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 
 public abstract class GameSubcommandData extends SubcommandData {
 
-    private Map activeMap;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -22,8 +22,8 @@ public abstract class GameSubcommandData extends SubcommandData {
         super(name, description);
     }
 
-    public Map getActiveMap() {
-        return activeMap;
+    public Game getActiveGame() {
+        return activeGame;
     }
 
     public User getUser() {
@@ -34,9 +34,9 @@ public abstract class GameSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
         if (event.getOption(Constants.GAME_NAME) != null) {
-            activeMap = MapManager.getInstance().getMap(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
+            activeGame = GameManager.getInstance().getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
         }
         
     }

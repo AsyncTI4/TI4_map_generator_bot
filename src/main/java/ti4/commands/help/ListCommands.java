@@ -29,7 +29,7 @@ public class ListCommands extends HelpSubcommandData {
         StringBuilder sb = new StringBuilder("__**Command List**__");
         List<Command> commands = event.getGuild().retrieveCommands().complete();
         int commandCount = commands.size();
-        sb.append(" (" + commandCount + "/50)\n");
+        sb.append(" (").append(commandCount).append("/50)\n");
 
         //COMMANDS
         for (Command command : commands) {
@@ -39,7 +39,7 @@ public class ListCommands extends HelpSubcommandData {
             int optionCount = options.size();
 
             String commandText = "`/" + command.getFullCommandName() + "` : **" + command.getDescription() + "**";
-            if (searchString == null || commandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(commandText + " (").append(subcommandCount).append("/25)\n");
+            if (searchString == null || commandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(commandText).append(" (").append(subcommandCount).append("/25)\n");
             commandCount++;
 
             //COMMAND OPTIONS

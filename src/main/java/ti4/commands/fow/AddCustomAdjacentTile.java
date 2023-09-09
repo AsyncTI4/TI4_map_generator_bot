@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
         if (primaryTileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
@@ -45,18 +45,18 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         adjacentTiles = adjacentTiles.replace(" ", "");
         String[] tilesSplit = adjacentTiles.split(",");
         List<String> tiles = Arrays.asList(tilesSplit);
-        activeMap.addCustomAdjacentTiles(primaryTile, tiles);
+        activeGame.addCustomAdjacentTiles(primaryTile, tiles);
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
         if (twoWayOption != null && twoWayOption.getAsBoolean()){
             for (String tile : tiles) {
-                LinkedHashMap<String, List<String>> customAdjacentTiles = activeMap.getCustomAdjacentTiles();
+                LinkedHashMap<String, List<String>> customAdjacentTiles = activeGame.getCustomAdjacentTiles();
                 List<String> customTiles = customAdjacentTiles.get(tile);
                 if (customTiles == null){
                     customTiles = new ArrayList<>();
                 }
                 if (!customTiles.contains(primaryTile)){
                     customTiles.add(primaryTile);
-                    activeMap.addCustomAdjacentTiles(tile, customTiles);
+                    activeGame.addCustomAdjacentTiles(tile, customTiles);
                 }
             }
         }

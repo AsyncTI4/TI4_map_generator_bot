@@ -26,7 +26,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        List<String> allRelics = getActiveMap().getAllRelics();
+        List<String> allRelics = getActiveGame().getAllRelics();
         if (allRelics.contains(relicId) || Constants.ENIGMATIC_DEVICE.equals(relicId)) {
             if (!Constants.ENIGMATIC_DEVICE.equals(relicId)) {
                 allRelics.remove(relicId);

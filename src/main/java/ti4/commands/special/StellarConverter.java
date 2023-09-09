@@ -18,10 +18,10 @@ public class StellarConverter extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -32,13 +32,13 @@ public class StellarConverter extends SpecialSubcommandData {
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeMap.getPlanets().contains(planetName)) {
+        if (!activeGame.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : activeMap.getTileMap().values()) {
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (tile != null) {
                 break;
             }
@@ -55,9 +55,9 @@ public class StellarConverter extends SpecialSubcommandData {
             return;
         }
 
-        activeMap.removePlanet(unitHolder);
+        activeGame.removePlanet(unitHolder);
         tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
-        MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "You feel a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "You feel a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
     }
 
     @Override

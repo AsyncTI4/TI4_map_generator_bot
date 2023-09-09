@@ -33,7 +33,7 @@ public class ListPlanets extends HelpSubcommandData {
                 return "> " + e.getKey();
             }
         })
-        .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+        .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
         .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -36,25 +36,25 @@ public class SetOrder extends GameSubcommandData {
         String mapName;
         if (gameOption != null) {
             mapName = event.getOptions().get(0).getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
                 return;
             }
         } else {
-            Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
-            if (userActiveMap == null){
+            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
+            if (userActiveGame == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = userActiveMap.getName();
+            mapName = userActiveGame.getName();
         }
 
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getMap(mapName);
+        GameManager gameManager = GameManager.getInstance();
+        Game activeGame = gameManager.getGame(mapName);
 
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeMap.getPlayers());
-        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeMap.getPlayers());
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
         try {
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER1));
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER2));
@@ -67,11 +67,11 @@ public class SetOrder extends GameSubcommandData {
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
             }
-            activeMap.setPlayers(newPlayerOrder);
+            activeGame.setPlayers(newPlayerOrder);
         } catch (Exception e){
-            activeMap.setPlayers(playersBackup);
+            activeGame.setPlayers(playersBackup);
         }
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 

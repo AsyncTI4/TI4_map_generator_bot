@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.generator.Mapper;
 
@@ -25,10 +25,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Map activeMap = getActiveMap();
-		Player activePlayer = activeMap.getPlayer(getUser().getId());
-		activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(activeMap, activePlayer, event);
+		Game activeGame = getActiveGame();
+		Player activePlayer = activeGame.getPlayer(getUser().getId());
+		activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
+		activePlayer = Helper.getPlayer(activeGame, activePlayer, event);
 		if (activePlayer == null){
 			sendMessage("Player not found in game.");
 			return;
@@ -39,8 +39,8 @@ public class PurgeFragments extends ExploreSubcommandData {
 		if (countOption != null) {
 			count = countOption.getAsInt();
 		}
-		List<String> fragmentsToPurge = new ArrayList<String>();
-		List<String> unknowns = new ArrayList<String>();
+		List<String> fragmentsToPurge = new ArrayList<>();
+		List<String> unknowns = new ArrayList<>();
 		ArrayList<String> playerFragments = activePlayer.getFragments();
 		for (String id : playerFragments) {
 			String[] cardInfo = Mapper.getExplore(id).split(";");
@@ -67,13 +67,13 @@ public class PurgeFragments extends ExploreSubcommandData {
 			activePlayer.removeFragment(id);
 		}
 
-		String message = Helper.getPlayerRepresentation(activePlayer, activeMap) + " purged fragments: " + fragmentsToPurge.toString();
+		String message = Helper.getPlayerRepresentation(activePlayer, activeGame) + " purged fragments: " + fragmentsToPurge.toString();
 		sendMessage(message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {
 			if (drawRelicOption.getAsBoolean()) {
-				DrawRelic.drawRelicAndNotify(activePlayer, event, activeMap);
+				DrawRelic.drawRelicAndNotify(activePlayer, event, activeGame);
 			}
 		}
 	}

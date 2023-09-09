@@ -6,7 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,9 +24,9 @@ public class ShowRemainingRelics extends GenericRelicAction {
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        List<String> allRelics = new ArrayList<>(getActiveMap().getAllRelics());
+        List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
         allRelics.remove(Constants.ENIGMATIC_DEVICE);
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         Integer deckCount = allRelics.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
@@ -47,10 +47,10 @@ public class ShowRemainingRelics extends GenericRelicAction {
                 text.append("- ").append(relicData[0]).append("\n");
             }
         }
-        Player player2 = activeMap.getPlayer(getUser().getId());
-        player2 = Helper.getGamePlayer(activeMap, player2, event, null);
+        Player player2 = activeGame.getPlayer(getUser().getId());
+        player2 = Helper.getGamePlayer(activeGame, player2, event, null);
 
-        if (player != null && activeMap.getCurrentPhase().equalsIgnoreCase("action") && !over && activeMap.isFoWMode()) {
+        if (player != null && activeGame.getCurrentPhase().equalsIgnoreCase("action") && !over && activeGame.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
                 sendMessage(text.toString());

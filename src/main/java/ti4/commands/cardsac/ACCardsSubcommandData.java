@@ -6,15 +6,15 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public abstract class ACCardsSubcommandData extends SubcommandData {
 
     private SlashCommandInteractionEvent event;
-    private Map activeMap;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -25,8 +25,8 @@ public abstract class ACCardsSubcommandData extends SubcommandData {
         super(name, description);
     }
 
-    public Map getActiveMap() {
-        return activeMap;
+    public Game getActiveGame() {
+        return activeGame;
     }
 
     public User getUser() {
@@ -46,10 +46,10 @@ public abstract class ACCardsSubcommandData extends SubcommandData {
     public void preExecute(SlashCommandInteractionEvent event) {
         this.event = event;
         user = event.getUser();
-        activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
         Helper.checkThreadLimitAndArchive(event.getGuild());
 
-        Player player = Helper.getGamePlayer(activeMap, null, event, user.getId());
+        Player player = Helper.getGamePlayer(activeGame, null, event, user.getId());
         if (player != null) {
             user = MapGenerator.jda.getUserById(player.getUserID());
         }

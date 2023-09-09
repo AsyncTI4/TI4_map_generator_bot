@@ -10,7 +10,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
@@ -19,7 +19,7 @@ import java.util.*;
 
 public class RemoveToken extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
 
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
@@ -30,7 +30,7 @@ public class RemoveToken extends AddRemoveToken {
             String tokenPath = tile.getAttachmentPath(tokenID);
             if (tokenPath != null) {
                 removeToken(event, tile, tokenID, true);
-                activeMap.clearPlanetsCache();
+                activeGame.clearPlanetsCache();
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
                 tokenPath = tile.getTokenPath(tokenID);
@@ -43,7 +43,7 @@ public class RemoveToken extends AddRemoveToken {
                     removeToken(event, tile, tokenID, false);
                 }
                 removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
-                activeMap.clearPlanetsCache();
+                activeGame.clearPlanetsCache();
             }
         } else {
             MessageHelper.replyToMessage(event, "Token not specified.");

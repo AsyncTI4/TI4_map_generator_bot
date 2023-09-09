@@ -146,7 +146,7 @@ public class CreatePlanet extends BothelperSubcommandData {
 
         unitTokenPosition.addPosition("pd", new Point(planetX-33, planetY+12));
         unitTokenPosition.addPosition("pd", new Point(planetX-18, planetY+12));
-        unitTokenPosition.addPosition("pd", new Point(planetX +0, planetY+12));
+        unitTokenPosition.addPosition("pd", new Point(planetX, planetY+12));
         unitTokenPosition.addPosition("pd", new Point(planetX-22, planetY+25));
         unitTokenPosition.addPosition("pd", new Point(planetX -5, planetY+25));
 
@@ -154,7 +154,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         unitTokenPosition.addPosition("mf", new Point(planetX-14, planetY-58));
         unitTokenPosition.addPosition("mf", new Point(planetX-37, planetY-45));
         unitTokenPosition.addPosition("mf", new Point(planetX-20, planetY-45));
-        unitTokenPosition.addPosition("mf", new Point(planetX +0, planetY-45));
+        unitTokenPosition.addPosition("mf", new Point(planetX, planetY-45));
 
         unitTokenPosition.addPosition("tkn_gf", new Point(planetX-19, planetY-17));
         unitTokenPosition.addPosition("tkn_gf", new Point(planetX-50, planetY-17));

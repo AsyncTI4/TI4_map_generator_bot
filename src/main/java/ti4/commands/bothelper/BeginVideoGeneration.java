@@ -25,7 +25,7 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
         sjr.setJobName("video-" + game );
         sjr.setJobDefinition("getting-started-wizard-job-definition:11");
         sjr.setJobQueue("ti4-video-queue");
-        HashMap<String, String> hm = new HashMap<String,String>();
+        HashMap<String, String> hm = new HashMap<>();
         hm.put("game", game);
         sjr.setParameters(hm);
         client.submitJob(sjr);

@@ -26,7 +26,7 @@ public class TTPGLeaders {
     @JsonProperty("hero")
     private String hero = "purged";
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("agent")
     public String getAgent() {

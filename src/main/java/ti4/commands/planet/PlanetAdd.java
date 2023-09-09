@@ -12,7 +12,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
@@ -27,18 +27,18 @@ public class PlanetAdd extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map activeMap) {
-      doAction(player, planet, activeMap, null);
+    public void doAction(Player player, String planet, Game activeGame) {
+      doAction(player, planet, activeGame, null);
     }
 
-    public void doAction(Player player, String planet, Map activeMap, GenericInteractionCreateEvent event) {
-        boolean doubleCheck = Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planet);
+    public void doAction(Player player, String planet, Game activeGame, GenericInteractionCreateEvent event) {
+        boolean doubleCheck = Helper.isAllianceModeAndPreviouslyOwnedCheck(activeGame, planet);
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if (planet.equals("mirage")){
-            activeMap.clearPlanetsCache();
+            activeGame.clearPlanetsCache();
         }
-        UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
         String color = player.getColor();
         boolean moveTitanPN = false;
         if (unitHolder != null && color != null && !"null".equals(color)) {
@@ -51,14 +51,14 @@ public class PlanetAdd extends PlanetAddRemove {
                 moveTitanPN = true;
             } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
-                activeMap.scorePublicObjective(player.getUserID(), 0);
-                MessageChannel channel = activeMap.getMainGameChannel();
-                if(activeMap.isFoWMode()){
+                activeGame.scorePublicObjective(player.getUserID(), 0);
+                MessageChannel channel = activeGame.getMainGameChannel();
+                if(activeGame.isFoWMode()){
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeMap)+" scored custodians!");
-                String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
-                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+                MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeGame)+" scored custodians!");
+                String message2 = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
                 Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
                 if(!player.hasAbility("reclamation")){
@@ -67,7 +67,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
         boolean alreadyOwned = false;
-        for (Player player_ : activeMap.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
                 if (planets.contains(planet)) {
@@ -76,17 +76,17 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if(player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeMap)){
-                        String msg2 = Helper.getPlayerRepresentation(player_, activeMap) + " lost shard and lost a victory point. "+Helper.getPlayerRepresentation(player, activeMap) +" gained shard and a victory point.";
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg2);
+                    if(player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame)){
+                        String msg2 = Helper.getPlayerRepresentation(player_, activeGame) + " lost shard and lost a victory point. "+Helper.getPlayerRepresentation(player, activeGame) +" gained shard and a victory point.";
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
                         player_.removeRelic("shard");
                         player.addRelic("shard");
-                        int shardID = activeMap.getRevealedPublicObjectives().get("Shard of the Throne");
-                        activeMap.unscorePublicObjective(player_.getUserID(), shardID);
-                        activeMap.scorePublicObjective(player.getUserID(), shardID);
+                        int shardID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
+                        activeGame.unscorePublicObjective(player_.getUserID(), shardID);
+                        activeGame.scorePublicObjective(player.getUserID(), shardID);
                     }
-                    String msg = Helper.getPlayerRepresentation(player_, activeMap) + " has a window to play reparations for the taking of the planet "+planet+" (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
+                    String msg = Helper.getPlayerRepresentation(player_, activeGame) + " has a window to play reparations for the taking of the planet "+planet+" (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
                     if (moveTitanPN){
                        if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)){
                            player_.removePromissoryNote(Constants.TERRAFORM);
@@ -98,29 +98,29 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
         if((alreadyOwned || player.hasAbility("contagion_blex")) && player.hasTech("dxa")){
-            String msg10 = ButtonHelper.getTrueIdentity(player, activeMap) + " you may have an opportunity to use Dacxive Animators on "+Helper.getPlanetRepresentation(planet, activeMap) +". Click to confirm a combat occurred and to add an infantry or delete these buttons";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), msg10, ButtonHelper.getDacxiveButtons(activeMap, player, planet));
+            String msg10 = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have an opportunity to use Dacxive Animators on "+Helper.getPlanetRepresentation(planet, activeGame) +". Click to confirm a combat occurred and to add an infantry or delete these buttons";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg10, ButtonHelper.getDacxiveButtons(activeGame, player, planet));
         }
 
-        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "naazcommander"))
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander"))
         {
             alreadyOwned = false;
         }
-        if(activeMap.getActivePlayer() != null && !(activeMap.getActivePlayer().equalsIgnoreCase("")) && player.hasAbility("scavenge") && event != null)
+        if(activeGame.getActivePlayer() != null && !(activeGame.getActivePlayer().equalsIgnoreCase("")) && player.hasAbility("scavenge") && event != null)
         {
             String fac = Helper.getFactionIconFromDiscord(player.getFaction());
             
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
             player.setTg(player.getTg()+1);
-            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+            ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
         }
-        for(String law : activeMap.getLaws().keySet()){
+        for(String law : activeGame.getLaws().keySet()){
             if(law.equalsIgnoreCase("minister_exploration")){
-                if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
+                if(activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
-                    ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+                    ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                 }
             }
         }
@@ -134,42 +134,42 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if(numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")){
             
-            Button sdButton = Button.success("winnuStructure_sd_"+planet, "Place A SD on "+Helper.getPlanetRepresentation(planet,activeMap));
+            Button sdButton = Button.success("winnuStructure_sd_"+planet, "Place A SD on "+Helper.getPlanetRepresentation(planet, activeGame));
             sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
-            Button pdsButton = Button.success("winnuStructure_pds_"+planet, "Place a PDS on "+Helper.getPlanetRepresentation(planet,activeMap));
+            Button pdsButton = Button.success("winnuStructure_pds_"+planet, "Place a PDS on "+Helper.getPlanetRepresentation(planet, activeGame));
             pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
             Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
-            List<Button> buttons = new ArrayList<Button>();
+            List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);
             buttons.add(pdsButton);
             buttons.add(tgButton);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ButtonHelper.getTrueIdentity(player, activeMap)+" Use buttons to place structures equal to the amount of mechs you have", buttons );
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to place structures equal to the amount of mechs you have", buttons );
 
         }
-        if (!alreadyOwned && !doubleCheck && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
+        if (!alreadyOwned && !doubleCheck && (!planet.equals("mirage"))&& !activeGame.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
-            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
+            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal);
             if (event != null && buttons != null && !buttons.isEmpty()) {
-                String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeMap);
+                String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
         }
         if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "sol", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "sol", event);
         }
         if(player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "xxcha", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "xxcha", event);
         }
         if(player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "sardakk", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "sardakk", event);
         }
         if(planet.equalsIgnoreCase("mr")&&player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "winnu", event);
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "winnu", event);
         }
         if(planet.equalsIgnoreCase("mr")&& player.hasAbility("reclamation")){
              new AddUnits().unitParsing(event, player.getColor(),
-                            activeMap.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeMap);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Due to the reclamation ability, pds and SD have been added to Mecatol Rex. This is optional though.");
+                            activeGame.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeGame);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Due to the reclamation ability, pds and SD have been added to Mecatol Rex. This is optional though.");
         }
     }
 }

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class SetThreadName extends CustomSubcommandData {
@@ -18,18 +18,17 @@ public class SetThreadName extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping soOption = event.getOption(Constants.THREAD_NAME);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Thread Name");
             return;
         }
         String name = soOption.getAsString();
-        if (event.getMessageChannel() instanceof ThreadChannel) {
-            ThreadChannel channel = (ThreadChannel) event.getMessageChannel();
+        if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
-            if(activeMap != null){
-                manager.setName(activeMap.getName()+"-"+name).queue();
+            if(activeGame != null){
+                manager.setName(activeGame.getName()+"-"+name).queue();
             }else{
                 manager.setName(name).queue();
             }

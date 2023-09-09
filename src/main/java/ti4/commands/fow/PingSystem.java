@@ -24,9 +24,9 @@ public class PingSystem extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -50,12 +50,12 @@ public class PingSystem extends FOWSubcommandData {
         }
 
         //get players adjacent
-        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position, true);
+        List<Player> players = FoWHelper.getAdjacentPlayers(activeGame, position, true);
         List<Player> failList = new ArrayList<>();
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " - System " + position + " has been pinged:\n> " + message;
-            boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
+            String playerMessage = Helper.getPlayerRepresentation(player_, activeGame, event.getGuild(), true) + " - System " + position + " has been pinged:\n> " + message;
+            boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
             if (success) {
                 successfulCount++;
             } else {
