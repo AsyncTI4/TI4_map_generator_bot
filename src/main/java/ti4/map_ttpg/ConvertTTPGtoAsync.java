@@ -602,8 +602,8 @@ public class ConvertTTPGtoAsync {
             if (hasAttachments) {
                 regionContents = matcherAttachments.group(1);
                 attachments = matcherAttachments.group(2);
-                for (Character attachment : attachments.toCharArray()) {
-                    if (!validAttachments.contains(attachment)) {
+                for (char attachment : attachments.toCharArray()) {
+                    if (!validAttachments.contains(String.valueOf(attachment))) {
                         String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
                         String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
