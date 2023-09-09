@@ -1,8 +1,8 @@
 package ti4.commands.help;
 
-import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,7 +23,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
+        Map<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         List<String> searchedList = soList.keySet().stream()
             .map(secretObjectiveModel -> secretObjectiveModel + " = " + SOInfo.getSecretObjectiveRepresentation(secretObjectiveModel))
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString))

@@ -49,23 +49,23 @@ public class AutoCompleteProvider {
             }
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                HashMap<String, String> factions = Mapper.getFactionRepresentations();
+                Map<String, String> factions = Mapper.getFactionRepresentations();
+                List<Command.Choice> options;
                 if (activeGame != null && activeGame.isDiscordantStarsMode()) {
-                    List<Command.Choice> options = factions.entrySet().stream()
-                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
-                            .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
+                    options = factions.entrySet().stream()
+                        .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                        .collect(Collectors.toList());
                 } else {
-                    List<Command.Choice> options = factions.entrySet().stream()
-                            .filter(Predicate.not(token -> token.getValue().toUpperCase().endsWith("(DS)")))
-                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
-                            .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
+                    options = factions.entrySet().stream()
+                        .filter(Predicate.not(token -> token.getValue().toUpperCase().endsWith("(DS)")))
+                        .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                        .collect(Collectors.toList());
                 }
+                event.replyChoices(options).queue();
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
                 if (activeGame == null) {

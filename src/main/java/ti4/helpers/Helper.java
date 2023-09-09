@@ -1920,7 +1920,7 @@ public class Helper {
         }
 
         //removing SOs
-        HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
+        Map<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         for (SecretObjectiveModel so : soList.values()) {
             if ("pok".equals(so.getSource())) {
                 activeGame.removeSOFromGame(so.getAlias());
