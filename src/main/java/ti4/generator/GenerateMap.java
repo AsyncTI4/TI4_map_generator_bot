@@ -2269,7 +2269,7 @@ public class GenerateMap {
                         case 1 -> x = 801;
                         case 2 -> x = 1598;
                     }
-                    Player promissoryNoteOwner = activeMap.getPNOwner(id);
+                    Player promissoryNoteOwner = activeGame.getPNOwner(id);
                     if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
                         BotLogger.log(activeGame.getName() + " " + player.getUserName()
                             + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
