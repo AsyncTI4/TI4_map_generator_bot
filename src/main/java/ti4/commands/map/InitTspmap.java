@@ -1,7 +1,5 @@
 package ti4.commands.map;
 
-import java.util.HashMap;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -43,23 +41,23 @@ public class InitTspmap extends MapSubcommandData {
         activeMap.setTile(new Tile(AliasHandler.resolveTile("87a3"), "106"));
 
         //ring 2
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("HL_HORIZON_3"), "204"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("HL_HORIZON_0"), "210"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("hl_horizon_3"), "204"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("hl_horizon_0"), "210"));
 
         //ring 3
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("87B3"), "309"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("87b3"), "309"));
 
         //ring 4
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("84B0"), "407"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("83A2"), "411"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("83A2"), "415"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("84B0"), "419"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("84b0"), "407"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("83a2"), "411"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("83a2"), "415"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("84b0"), "419"));
 
         //ring 5, corners
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("89A0"), "505"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("89A0"), "512"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("89A0"), "520"));
-        activeMap.setTile(new Tile(AliasHandler.resolveTile("89A0"), "527"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("89a0"), "505"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("89a0"), "512"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("89a0"), "520"));
+        activeMap.setTile(new Tile(AliasHandler.resolveTile("89a0"), "527"));
     }
 
     public void addTspmapEdgeAdjacencies(Map activeMap) {
