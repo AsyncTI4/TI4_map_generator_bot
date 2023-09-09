@@ -64,11 +64,11 @@ public class PingSystem extends FOWSubcommandData {
         }
 
         if (successfulCount < players.size()) {
-            MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM.");
             StringBuilder sb = new StringBuilder();
             for (Player p : failList) {
                 sb.append(p.getUserName()).append(" ");
             }
+            MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM. Failed for: " + sb);
         } else {
             MessageHelper.replyToMessage(event, "Successfully sent all pings.");
         }
