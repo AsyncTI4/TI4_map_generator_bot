@@ -25,7 +25,7 @@ public class ChangeToBaseGame extends CustomSubcommandData {
         String codex = "";
         if (codexOption != null) {
             codex = codexOption.getAsString();
-            if (codex.equalsIgnoreCase("y")) {
+            if ("y".equalsIgnoreCase(codex)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex ACs.");
             }
 

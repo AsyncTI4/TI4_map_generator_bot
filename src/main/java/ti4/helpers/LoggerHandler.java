@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.util.logging.*;
 
 public class LoggerHandler {
-    private static Logger logger = null;
-    private static LoggerHandler loggerHandler = null;
+    private static Logger logger;
+    private static LoggerHandler loggerHandler;
 
     private LoggerHandler() {
         //noinspection ConstantConditions

@@ -1,5 +1,6 @@
 package ti4.commands.cardspn;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -32,7 +33,7 @@ public class PurgePN extends PNCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String id = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 id = so.getKey();
             }

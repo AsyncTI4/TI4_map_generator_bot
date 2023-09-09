@@ -5,14 +5,14 @@ import ti4.map.Tile;
 public class MiltyDraftTile {
     private Tile tile;
     private TierList tierList;
-    private int resources = 0;
-    private int influence = 0;
-    private double milty_resources = 0.0;
-    private double milty_influence = 0.0;
-    private boolean hasAlphaWH = false;
-    private boolean hasBetaWH = false;
-    private boolean hasOtherWH = false;
-    private boolean isLegendary = false;
+    private int resources;
+    private int influence;
+    private double milty_resources;
+    private double milty_influence;
+    private boolean hasAlphaWH;
+    private boolean hasBetaWH;
+    private boolean hasOtherWH;
+    private boolean isLegendary;
 
     public Tile getTile() {
         return tile;

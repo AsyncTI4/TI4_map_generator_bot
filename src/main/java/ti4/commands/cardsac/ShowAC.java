@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -37,7 +38,7 @@ public class ShowAC extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
             if (ac.getValue().equals(acIndex)) {
                 acID = ac.getKey();
             }
@@ -48,14 +49,12 @@ public class ShowAC extends ACCardsSubcommandData {
             return;
         }
 
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("---------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Cards:").append("\n");
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
-        sb.append("---------\n");
+      String sb = "---------\n" +
+          "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Action Cards:" + "\n" +
+          Mapper.getActionCard(acID).getRepresentation() + "\n" +
+          "---------\n";
         player.setActionCard(acID);
 
         Player player_ = Helper.getPlayer(activeGame, null, event);
@@ -70,6 +69,6 @@ public class ShowAC extends ACCardsSubcommandData {
         }
         
         ACInfo.sendActionCardInfo(activeGame, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
     }
 }

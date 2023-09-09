@@ -53,6 +53,5 @@ public class CheckChannels extends FOWSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

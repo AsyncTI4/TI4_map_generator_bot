@@ -85,7 +85,7 @@ public class AliasHandler {
      * @param keys true ->  load [key] into the list
      * @param keys false -> load [value1,value2,value3] into the list
      */
-    private static void readAliasFile(String fileName, ArrayList<String> list, boolean keys) {
+    private static void readAliasFile(String fileName, List<String> list, boolean keys) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
@@ -115,7 +115,7 @@ public class AliasHandler {
      * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
      * @param errorMessage error message provided
      */
-    private static void readAliasFile(String fileName, HashMap<String, String> aliasList, String errorMessage) {
+    private static void readAliasFile(String fileName, Map<String, String> aliasList, String errorMessage) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
@@ -152,7 +152,7 @@ public class AliasHandler {
     }
 
     public static String resolveTile(String name) {
-        if(name.equalsIgnoreCase("mirage"))
+        if("mirage".equalsIgnoreCase(name))
         {
             return name;
         }
@@ -225,7 +225,7 @@ public class AliasHandler {
 
     public static String resolvePlanet(String name) {
         if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
-        if(name != null && name.equalsIgnoreCase("gamma")){
+        if("gamma".equalsIgnoreCase(name)){
             return name;
         }
         String aliasID = allPlanetAliases.get(name.toLowerCase());
@@ -239,7 +239,7 @@ public class AliasHandler {
 
     public static String resolveAttachment(String name) {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
-        if(name != null && name.equalsIgnoreCase("gamma")){
+        if("gamma".equalsIgnoreCase(name)){
             return name;
         }
         if (aliasID != null) {
@@ -365,9 +365,8 @@ public class AliasHandler {
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */
     public static String resolveTTPGPosition(String position) {
-        String aliasID = ttpgPositionAliasList.get(position);
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
-        return aliasID;
+        return ttpgPositionAliasList.get(position);
     }
 
     public static Map<String, String> getPlanetAliasEntryList() {

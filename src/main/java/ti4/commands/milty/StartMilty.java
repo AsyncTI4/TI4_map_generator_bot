@@ -40,7 +40,7 @@ public class StartMilty extends MiltySubcommandData {
 
     public static final int SLICE_GENERATION_CYCLES = 100;
 
-    private boolean anomalies_can_touch = false;
+    private boolean anomalies_can_touch;
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
@@ -403,7 +403,7 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private void initDraftTiles(MiltyDraftManager draftManager) {
-        java.util.Map<String, TileModel> allTiles = TileHelper.getAllTiles();
+        Map<String, TileModel> allTiles = TileHelper.getAllTiles();
         for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
             String tileID = tileModel.getId();
             if (isValid(tileModel, tileID)) {
@@ -413,9 +413,9 @@ public class StartMilty extends MiltySubcommandData {
             MiltyDraftTile draftTile = new MiltyDraftTile();
             if (wormholes != null) {
                 for (WormholeModel.Wormhole wormhole : wormholes) {
-                    if (WormholeModel.Wormhole.ALPHA.equals(wormhole)) {
+                    if (WormholeModel.Wormhole.ALPHA == wormhole) {
                         draftTile.setHasAlphaWH(true);
-                    } else if (WormholeModel.Wormhole.BETA.equals(wormhole)) {
+                    } else if (WormholeModel.Wormhole.BETA == wormhole) {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);

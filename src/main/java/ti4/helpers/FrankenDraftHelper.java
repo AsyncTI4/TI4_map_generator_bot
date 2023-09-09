@@ -19,7 +19,7 @@ public class FrankenDraftHelper {
     public static List<String> getRandomFactionAbilities(int count, List<String> alreadyHeld){
         List<String> factionAbilities = new ArrayList<>();
         HashMap<String, String> abilities = Mapper.getFactionAbilities();
-        List<String> keys = new ArrayList<String>(abilities.keySet());
+        List<String> keys = new ArrayList<>(abilities.keySet());
         keys.removeAll(alreadyHeld);
         for(int x = 0; x < count; x++){
             boolean foundOne = false;
@@ -38,7 +38,7 @@ public class FrankenDraftHelper {
      public static List<String> getRandomLeaderType(int count, List<String> alreadyHeld, String leaderType){
         List<String> desiredThing = new ArrayList<>();
         HashMap<String, String> allDesiredThings = Mapper.getLeaderRepresentations();
-         List<String> keys = new ArrayList<String>(allDesiredThings.keySet());
+         List<String> keys = new ArrayList<>(allDesiredThings.keySet());
         keys.removeAll(alreadyHeld);
         keys.removeIf(key -> !key.contains(leaderType));
         for(int x = 0; x < count; x++){
@@ -52,7 +52,7 @@ public class FrankenDraftHelper {
     public static List<String> getRandomUnitType(int count, List<String> alreadyHeld, String unitType){
         List<String> desiredThing = new ArrayList<>();
         HashMap<String, String> allDesiredThings = Mapper.getUnitRepresentations();
-        List<String> keys = new ArrayList<String>(allDesiredThings.keySet());
+        List<String> keys = new ArrayList<>(allDesiredThings.keySet());
         keys.removeAll(alreadyHeld);
         keys.removeIf(key -> !key.contains(unitType));
         for(int x = 0; x < count; x++){
@@ -99,13 +99,13 @@ public class FrankenDraftHelper {
         HashMap<String, TechnologyModel> allDesiredThings = Mapper.getTechs();
         HashMap<String, TechnologyModel> allDesiredThings2 = Mapper.getTechs();
         for(TechnologyModel bleh : allDesiredThings2.values()){
-            if(bleh.getFaction() == null || bleh.getFaction().equalsIgnoreCase(""));
+            if(bleh.getFaction() == null || "".equalsIgnoreCase(bleh.getFaction()));
             {
                 String key = bleh.getAlias();
                 allDesiredThings.remove(key);
             }
         }
-        List<String> keys = new ArrayList<String>(allDesiredThings.keySet());
+        List<String> keys = new ArrayList<>(allDesiredThings.keySet());
         keys.removeAll(alreadyHeld);
         for(int x = 0; x < count; x++){
             int randNum = new Random().nextInt(0,keys.size());

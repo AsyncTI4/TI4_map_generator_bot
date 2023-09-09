@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,10 +34,10 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         Player playerWithSO = null;
 
 
-        for (java.util.Map.Entry<String, Player> playerEntry : activeGame.getPlayers().entrySet()) {
+        for (Map.Entry<String, Player> playerEntry : activeGame.getPlayers().entrySet()) {
             Player player_ = playerEntry.getValue();
-            LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player_.getSecretsScored());
-            for (java.util.Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
+            Map<String, Integer> secretsScored = new LinkedHashMap<>(player_.getSecretsScored());
+            for (Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
                 if (soEntry.getValue() == soID) {
                     soName = soEntry.getKey();
                     playerWithSO = player_;

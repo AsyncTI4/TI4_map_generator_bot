@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,7 +34,7 @@ public class DiscardAC extends ACCardsSubcommandData {
         }
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -49,11 +50,10 @@ public class DiscardAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Player: ").append(player.getUserName()).append(" - ");
-        sb.append("Discarded Action Card:").append("\n");
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+      String sb = "Player: " + player.getUserName() + " - " +
+          "Discarded Action Card:" + "\n" +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
         ACInfo.sendActionCardInfo(activeGame, player);
     }
 }

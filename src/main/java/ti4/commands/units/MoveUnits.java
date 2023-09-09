@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class MoveUnits extends AddRemoveUnits {
 
-    private boolean toAction = false;
+    private boolean toAction;
     private HashMap<String, Integer> unitsDamage = new HashMap<>();
     private boolean priorityDmg = true;
 
@@ -46,7 +46,7 @@ public class MoveUnits extends AddRemoveUnits {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList, activeGame);
 
-        String tileID = null;
+        String tileID;
         String tileOption = event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString);
         if (tileOption != null) { //get TILE_TO
             tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString).toLowerCase(), " ");
@@ -74,8 +74,7 @@ public class MoveUnits extends AddRemoveUnits {
         } else { //USE UNIT_NAMES_FROM LIST
             //CLEAN PLANETS FROM THE UNITLIST
             System.out.println(unitList);
-            unitList = Arrays.asList(StringUtils.splitPreserveAllTokens(unitList, ","))
-                        .stream().map(String::trim).map(s -> {
+            unitList = Arrays.stream(StringUtils.splitPreserveAllTokens(unitList, ",")).map(String::trim).map(s -> {
                             if (Arrays.asList(s.split(" ", -1)).size() > 2) {
                                 return StringUtils.substringBeforeLast(s, " ");
                             }
@@ -226,7 +225,7 @@ public class MoveUnits extends AddRemoveUnits {
                 Integer unitCountInSystem = unitHolder.getUnits().get(unitID);
                 if (unitCountInSystem != null) {
                     Integer unitDamageCountInSystem =null;
-                    if(unitHolder != null && unitHolder.getUnitDamage()!= null)
+                    if(unitHolder.getUnitDamage() != null)
                     {
                         unitDamageCountInSystem=unitHolder.getUnitDamage().get(unitID);
                     }

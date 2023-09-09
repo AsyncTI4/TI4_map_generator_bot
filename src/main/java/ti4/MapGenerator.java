@@ -62,23 +62,18 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
-    public static Guild guildPrimary = null;
-    public static Guild guildSecondary = null;
-    public static Guild guild3rd = null;
-    public static Guild guildFogOfWar = null;
-    public static Guild guildCommunityPlays = null;
-    public static String adminID;
+    public static Guild guildPrimary;
+    public static Guild guildSecondary;
+    public static Guild guild3rd;
+    public static Guild guildFogOfWar;
+    public static Guild guildCommunityPlays;
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
     public static List<Role> bothelperRoles = new ArrayList<>();
 
-    public static boolean readyToReceiveCommands = false;
+    public static boolean readyToReceiveCommands;
 
-    public static void main(String[] args)
-            throws LoginException {
-
-
-        // Load settings
+    public static void main(String[] args) throws LoginException {
         GlobalSettings.loadSettings();
 
         jda = JDABuilder.createDefault(args[0])
@@ -117,6 +112,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
+        adminRoles.add(jda.getRoleById("1149705227625316352"));
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -138,8 +134,6 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
-
-
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddUnits());

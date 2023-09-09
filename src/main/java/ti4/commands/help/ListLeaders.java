@@ -30,7 +30,7 @@ public class ListLeaders extends HelpSubcommandData {
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Leader List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Leader List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_leaders" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

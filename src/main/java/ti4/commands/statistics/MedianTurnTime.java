@@ -1,7 +1,7 @@
 package ti4.commands.statistics;
 
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -48,11 +48,11 @@ public class MedianTurnTime extends StatisticsSubcommandData {
 
         for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
             for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = java.util.Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
+                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
                 playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new java.util.HashSet<>();
+                    if (value == null) value = new HashSet<>();
                     value.add(averageTurnTime);
                     return value;
                 });

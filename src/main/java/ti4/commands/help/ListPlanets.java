@@ -37,7 +37,7 @@ public class ListPlanets extends HelpSubcommandData {
         .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Planet List__**\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Planet List__**\n" + String.join("\n", searchedList);
 
         if (searchedList.size() > 5) {
             String threadName = "/help list_planets" + searchDescription;

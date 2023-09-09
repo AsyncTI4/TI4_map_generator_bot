@@ -60,7 +60,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         boolean over = false;
         OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);
-        if(overRider != null && overRider.getAsString().equalsIgnoreCase("YES"))
+        if(overRider != null && "YES".equalsIgnoreCase(overRider.getAsString()))
         {
             over = true;
         }
@@ -115,7 +115,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                         //Send Buttons to decide which one to explore
                         String message = "Please decide which card to resolve.";
 
-                        if (activeGame != null && !activeGame.isFoWMode() &&(event.getChannel() !=  activeGame.getActionsChannel())) {
+                        if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
                             
                             String pF = Helper.getFactionIconFromDiscord(player.getFaction());
                             
@@ -143,16 +143,14 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet cannot be explored");
             return;
         }
-        StringBuilder messageText = new StringBuilder();
-        messageText.append(Helper.getPlayerRepresentation(player, activeGame)).append(" explored ");
-        messageText.append(Helper.getEmojiFromDiscord(drawColor));
-        messageText.append("Planet ").append(Helper.getPlanetRepresentationPlusEmoji(planetName)).append(" *(tile ").append(tile.getPosition()).append(")*:\n");
-        messageText.append("> ").append(displayExplore(cardID));
-        resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeGame);
+        String messageText = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
+            Helper.getEmojiFromDiscord(drawColor) +
+            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
+            "> " + displayExplore(cardID);
+        resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
         }
-        return;
     }
 }

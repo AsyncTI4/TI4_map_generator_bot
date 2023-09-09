@@ -12,7 +12,7 @@ public class DiscordantStarsHelper {
             if (player.hasAbility(Constants.GARDEN_WORLDS)) {
                 for (Tile tile : activeGame.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                        if (unitHolder != null && unitHolder instanceof Planet planet) {
+                        if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
                                 if (planet.hasGroundForces() && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                     planet.removeToken(Constants.GARDEN_WORLDS_PNG);

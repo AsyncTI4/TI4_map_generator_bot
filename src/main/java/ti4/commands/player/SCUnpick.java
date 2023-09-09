@@ -38,7 +38,7 @@ public class SCUnpick extends PlayerSubcommandData {
         boolean isFowPrivateGame = (privateGame != null && privateGame);
 
         Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
-                .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
+                .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !"null".equals(player_.getColor()))
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
 

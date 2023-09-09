@@ -39,11 +39,6 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             return;
         }
 
-        if (player == null){
-            sendMessage("Player could not be found");
-            return;
-        }
-                
         // break down choices into + or - from their original inputs
         if (policy1 != null) 
         {
@@ -100,7 +95,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         
         // go through each option and set the policy accordingly
         if (pol1 != null) {
-            if (pol1.equals("-"))
+            if ("-".equals(pol1))
             {   
                 if(player.hasAbility("policy_the_people_connect")) 
                 {
@@ -110,7 +105,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 player.addAbility("policy_the_people_control");
                 sendMessage("added Policy - The People: Control (-).");
             }       
-                else if (pol1.equals("+"))
+                else if ("+".equals(pol1))
                 {   
                     if(player.hasAbility("policy_the_people_control"))
                     {
@@ -122,7 +117,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 }
         }
         if (pol2 != null) {
-            if (pol2.equals("-"))
+            if ("-".equals(pol2))
             {   
                 if(player.hasAbility("policy_the_environment_preserve")) 
                 {
@@ -132,7 +127,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 player.addAbility("policy_the_environment_plunder");
                 sendMessage("added Policy - The Environment: Plunder (-).");
             }
-            else if (pol2.equals("+"))
+            else if ("+".equals(pol2))
                 {
                     if(player.hasAbility("policy_the_environment_plunder"))
                     {
@@ -144,7 +139,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 }
         }
         if (pol3 != null){
-            if (pol3.equals("-"))
+            if ("-".equals(pol3))
             {   
                 if(player.hasAbility("policy_the_economy_empower"))
                 {
@@ -162,7 +157,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     sendMessage("added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
                 }
             }            
-            else if (pol3.equals("+"))
+            else if ("+".equals(pol3))
                 {   
                     if(player.hasAbility("policy_the_economy_exploit"))
                     {
@@ -178,11 +173,11 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
 
         public String convertChoice(String inputChoice) {
             if (inputChoice == null) { return null;}
-            if ((inputChoice.equals("exploit")) || (inputChoice.equals("plunder")) || (inputChoice.equals("control")) || (inputChoice.equals("-")))
+            if (("exploit".equals(inputChoice)) || ("plunder".equals(inputChoice)) || ("control".equals(inputChoice)) || ("-".equals(inputChoice)))
                 {
                   return "-";
                 }
-            if ((inputChoice.equals("empower")) || (inputChoice.equals("preserve")) || (inputChoice.equals("connect")) || (inputChoice.equals("+")))  {
+            if (("empower".equals(inputChoice)) || ("preserve".equals(inputChoice)) || ("connect".equals(inputChoice)) || ("+".equals(inputChoice)))  {
               return "+";
                 }
             return null;

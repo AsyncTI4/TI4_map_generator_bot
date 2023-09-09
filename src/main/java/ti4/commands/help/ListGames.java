@@ -13,7 +13,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -66,7 +65,7 @@ public class ListGames extends HelpSubcommandData {
         } else {
             sb.append(filteredSetOfMaps.stream()
                 .filter(map -> includeEndedGames || !map.getValue().isHasEnded())
-                .sorted(java.util.Map.Entry.comparingByKey())
+                .sorted(Map.Entry.comparingByKey())
                 .map(map -> getRepresentationText(mapList, map.getKey()))
                 .collect(Collectors.joining("\n")));
         }

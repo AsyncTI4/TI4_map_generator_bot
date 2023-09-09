@@ -12,7 +12,7 @@ import java.util.List;
 public class UnitTokenPosition implements Serializable {
     private String unitHolderName;
     private LinkedHashMap<String, List<Point>> coordinateMap = new LinkedHashMap<>();
-    private boolean removeUnitCoordinate = true;
+    private boolean removeUnitCoordinate;
 
     @JsonCreator
     public UnitTokenPosition(@JsonProperty("unitHolderName") String unitHolderName,

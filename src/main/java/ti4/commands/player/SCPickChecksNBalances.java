@@ -19,7 +19,7 @@ public class SCPickChecksNBalances {
     {
         Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-        String msg = "";
+        String msg;
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
@@ -28,9 +28,8 @@ public class SCPickChecksNBalances {
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true));
-        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(activeGame, scPicked));
+      String sb = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) +
+          " Picked: " + Helper.getSCFrontRepresentation(activeGame, scPicked);
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
@@ -101,7 +100,7 @@ public class SCPickChecksNBalances {
                 activeGame.setCurrentPhase("action");
             }
         }
-        msg = sb.toString();
+        msg = sb;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         //SEND EXTRA MESSAGE

@@ -37,7 +37,7 @@ public class Announce extends FOWSubcommandData {
         OptionMapping anon = event.getOption(Constants.ANON);
         if (ms != null) {
             String msg = ms.getAsString();
-            String message = "";
+            String message;
             if (anon != null) {
                 String anonY = anon.getAsString();
 
@@ -56,6 +56,5 @@ public class Announce extends FOWSubcommandData {
     }
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

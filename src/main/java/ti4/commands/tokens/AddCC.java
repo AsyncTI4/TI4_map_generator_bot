@@ -72,7 +72,7 @@ public class AddCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode() && ping) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);

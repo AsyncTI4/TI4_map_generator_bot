@@ -5,7 +5,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDu
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import ti4.MapGenerator;
 import ti4.helpers.Helper;
 
@@ -18,7 +20,7 @@ public class BotLogger {
      * @param msg - message to send to the #bot-log channel
      */
     public static void log(String msg) {
-        log((GenericInteractionCreateEvent) null, msg, null);
+        log(null, msg, null);
     }
 
     /** Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
@@ -27,7 +29,7 @@ public class BotLogger {
      * @e - Exception
      */
     public static void log(String msg, Exception e) {
-        log((GenericInteractionCreateEvent) null, msg, e);
+        log(null, msg, e);
     }
 
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
@@ -80,7 +82,7 @@ public class BotLogger {
         } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
             String channelName = event.getChannel().getName();
             String channelMention = event.getChannel().getAsMention();
-            String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
+            String commandString = ((CommandInteractionPayload) event).getCommandString();
             if (e == null) {
                 botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
             } else {
@@ -93,7 +95,7 @@ public class BotLogger {
         } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
             String channelName = event.getChannel().getName();
             String channelMention = event.getChannel().getAsMention();
-            Button button = ((ButtonInteractionEvent) event).getButton();
+            Button button = ((ButtonInteraction) event).getButton();
             if (e == null) {
                 botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
             } else {
@@ -129,7 +131,7 @@ public class BotLogger {
                 }
             }
         }
-        if ((botLogChannel == null || event == null) && MapGenerator.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
+        if (botLogChannel == null && MapGenerator.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
             for (TextChannel textChannel : MapGenerator.guildPrimary.getTextChannels()) {
                 if ("bot-log".equals(textChannel.getName())) {
                     botLogChannel = textChannel;

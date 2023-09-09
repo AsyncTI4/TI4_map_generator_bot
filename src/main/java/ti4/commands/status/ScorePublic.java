@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -78,7 +79,7 @@ public class ScorePublic extends StatusSubcommandData {
 	public static String getNameNEMoji(Game activeGame, int poID){
 		String id = "";
 		LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
-		for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+		for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(poID)) {
                 id = po.getKey();
                 break;

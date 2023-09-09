@@ -19,9 +19,9 @@ public class PurgeLeader extends LeaderAction {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame))
-                    .append(" purged ").append(Helper.getLeaderShortRepresentation(playerLeader));
-            sendMessage(message.toString());
+          String message = Helper.getPlayerRepresentation(player, activeGame) +
+              " purged " + Helper.getLeaderShortRepresentation(playerLeader);
+            sendMessage(message);
         } else {
             sendMessage("Leader not found");
         }

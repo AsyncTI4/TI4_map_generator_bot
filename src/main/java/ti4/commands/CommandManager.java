@@ -5,7 +5,7 @@ import java.util.List;
 
 public class CommandManager {
     private List<Command> commandList = new ArrayList<>();
-    private static CommandManager manager = null;
+    private static CommandManager manager;
 
     private CommandManager() {
     }

@@ -66,7 +66,7 @@ public class Setup extends GameSubcommandData {
                 displayType = DisplayType.map;
             } else if (temp.equals(DisplayType.stats.getValue())) {
                 displayType = DisplayType.stats;
-            } else if (temp.equals("none")) {
+            } else if ("none".equals(temp)) {
                 activeGame.setDisplayTypeForced(null);
                 return;
             }

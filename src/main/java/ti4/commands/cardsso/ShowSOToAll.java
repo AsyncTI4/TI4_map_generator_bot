@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,14 +34,14 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         int soIndex = option.getAsInt();
         String soID = null;
         boolean scored = false;
-        for (java.util.Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 soID = so.getKey();
                 break;
             }
         }
         if (soID == null){
-            for (java.util.Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
+            for (Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
                 if (so.getValue().equals(soIndex)) {
                     soID = so.getKey();
                     scored = true;

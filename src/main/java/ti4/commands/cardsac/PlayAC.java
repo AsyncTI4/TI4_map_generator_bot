@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -61,7 +62,7 @@ public class PlayAC extends ACCardsSubcommandData {
         int acIndex = -1;
         try {
             acIndex = Integer.parseInt(value);
-            for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
                 if (so.getValue().equals(acIndex)) {
                     acID = so.getKey();
                 }
@@ -69,7 +70,7 @@ public class PlayAC extends ACCardsSubcommandData {
         } catch (Exception e) {
             boolean foundSimilarName = false;
             String cardName = "";
-            for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
                 String actionCardName = Mapper.getActionCardName(ac.getKey());
                 if (actionCardName != null) {
                     actionCardName = actionCardName.toLowerCase();
@@ -115,13 +116,13 @@ public class PlayAC extends ACCardsSubcommandData {
         Button sabotageButton = Button.danger("sabotage_ac_"+actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromUnit(activeGame, "empyrean_mech");
-        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeGame, player, empy) && !activeGame.getLaws().keySet().contains("articles_war")) {
+        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeGame, player, empy) && !activeGame.getLaws().containsKey("articles_war")) {
             Button empyButton = Button.secondary("sabotage_empy_"+actionCardTitle, "Cancel "+actionCardTitle+" With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(empyButton);
             Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
             empyButtons.add(refuse);
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) empy.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(empy, activeGame, activeGame.getGuild(), true)+"You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.", empyButtons);
+            MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(empy, activeGame, activeGame.getGuild(), true)+"You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.", empyButtons);
 
         }
         String instinctTrainingID = "it";
@@ -134,7 +135,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 xxchaButtons.add(instinctButton);
                 Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
                 xxchaButtons.add(refuse);
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)+"You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel", xxchaButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)+"You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel", xxchaButtons);
             }
 
         }
@@ -159,7 +160,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 for(int sc = 1; sc < 9; sc++){
                     Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
                     Button button;
-                    if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                    if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                         button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
                     } else {
                         button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, activeGame));
@@ -202,7 +203,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeGame, whenButtons, "when");
 
             }
-            if(actionCardWindow.equalsIgnoreCase("Action")){
+            if("Action".equalsIgnoreCase(actionCardWindow)){
                 String message = "Use buttons to end turn or do another action.";
                 List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
                 MessageChannel channel2 = activeGame.getMainGameChannel();

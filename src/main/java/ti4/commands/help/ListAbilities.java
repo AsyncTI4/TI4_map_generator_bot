@@ -24,13 +24,13 @@ public class ListAbilities extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, String> abilityList = Mapper.getFactionAbilities();
-        List<String> searchedList = abilityList.entrySet().stream()
-            .map(e -> AbilityInfo.getAbilityRepresentation(e.getKey()))
+        List<String> searchedList = abilityList.keySet().stream()
+            .map(AbilityInfo::getAbilityRepresentation)
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Ability List__**\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Ability List__**\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_abilities" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

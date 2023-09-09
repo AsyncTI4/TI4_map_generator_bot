@@ -2,6 +2,8 @@ package ti4.commands.special;
 
 import java.util.ArrayList;
 
+import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,28 +35,28 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        if (!(player.getFaction().equalsIgnoreCase("keleresm") || player.getFaction().equalsIgnoreCase("keleres"))) {
+        if (!("keleresm".equalsIgnoreCase(player.getFaction()) || "keleres".equalsIgnoreCase(player.getFaction()))) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
             return;
         }
         int originalACDeckCount = activeGame.getActionCards().size();
         StringBuilder acRevealMessage = new StringBuilder("The following non-component action cards were revealed before drawing three component action cards:\n");
         StringBuilder acDrawMessage = new StringBuilder("The following component action cards were drawn into their hand:\n");
-        ArrayList<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
+        List<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
         int componentActionACCount = 0;
-        Integer index = 1;
+        int index = 1;
         boolean noMoreComponentActionCards = false;
         while (componentActionACCount < 3) {
             Integer acID = null;
             String acKey = null;
-            for (java.util.Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeGame.drawActionCard(player.getUserID())).entrySet()) {
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeGame.drawActionCard(player.getUserID())).entrySet()) {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
             ActionCardModel actionCard = Mapper.getActionCard(acKey);
             String acName = actionCard.getName();
             String acWindow = actionCard.getWindow();
-            if (acWindow.equalsIgnoreCase("Action")) {
+            if ("Action".equalsIgnoreCase(acWindow)) {
                 acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
                 componentActionACCount++;
             } else {
@@ -91,28 +93,28 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
-        if (!(player.getFaction().equalsIgnoreCase("keleresm") || player.getFaction().equalsIgnoreCase("keleres"))) {
+        if (!("keleresm".equalsIgnoreCase(player.getFaction()) || "keleres".equalsIgnoreCase(player.getFaction()))) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
             return;
         }
         int originalACDeckCount = activeGame.getActionCards().size();
         StringBuilder acRevealMessage = new StringBuilder("The following non-component action cards were revealed before drawing three component action cards:\n");
         StringBuilder acDrawMessage = new StringBuilder("The following component action cards were drawn into their hand:\n");
-        ArrayList<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
+        List<String> cardsToShuffleBackIntoDeck = new ArrayList<>();
         int componentActionACCount = 0;
-        Integer index = 1;
+        int index = 1;
         boolean noMoreComponentActionCards = false;
         while (componentActionACCount < 3) {
             Integer acID = null;
             String acKey = null;
-            for (java.util.Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeGame.drawActionCard(player.getUserID())).entrySet()) {
+            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeGame.drawActionCard(player.getUserID())).entrySet()) {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
             ActionCardModel actionCard = Mapper.getActionCard(acKey);
             String acName = actionCard.getName();
             String acWindow = actionCard.getWindow();
-            if (acWindow.equalsIgnoreCase("Action")) {
+            if ("Action".equalsIgnoreCase(acWindow)) {
                 acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
                 componentActionACCount++;
             } else {

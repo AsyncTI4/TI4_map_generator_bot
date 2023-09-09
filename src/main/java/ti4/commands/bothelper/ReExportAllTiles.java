@@ -14,7 +14,7 @@ public class ReExportAllTiles extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if(event.getOption(Constants.CONFIRM).getAsString().equals("YES")) {
+        if("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             TileHelper.exportAllPlanets();
             TileHelper.exportAllTiles();
         }

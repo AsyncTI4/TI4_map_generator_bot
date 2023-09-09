@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -38,7 +39,7 @@ public class SentAC extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }

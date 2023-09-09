@@ -24,9 +24,6 @@ public class CombatModifierModel implements ModelInterface {
     private String scopeExcept;
     private String condition;
 
-    public CombatModifierModel() {
-    }
-
     public boolean isValid() {
         return type != null
                 && value != null
@@ -47,7 +44,7 @@ public class CombatModifierModel implements ModelInterface {
             }
         } else {
             if (StringUtils.isBlank(getScope())
-                    || getScope().equals("all")
+                    || "all".equals(getScope())
                     || getScope().equals(unit.getAsyncId())) {
                 isInScope = true;
             }

@@ -50,8 +50,8 @@ public class PositionMapper {
         }
     }
 
-    public static java.util.Map<String, Point> getTilePlanetPositions(String tileID) {
-        if (tileID.equals("nombox")) {
+    public static Map<String, Point> getTilePlanetPositions(String tileID) {
+        if ("nombox".equals(tileID)) {
             return null;
         }
         return TileHelper.getAllPlanets().values().stream()
@@ -154,7 +154,7 @@ public class PositionMapper {
 
 
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
-        if(planetName.equals("space"))
+        if("space".equals(planetName))
             return null;
         UnitTokenPosition pos = TileHelper.getAllPlanets().get(planetName).getUnitPositions();
         return SerializationUtils.clone(pos);

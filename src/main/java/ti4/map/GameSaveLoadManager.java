@@ -23,6 +23,8 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +42,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
 
 public class GameSaveLoadManager {
 
@@ -71,7 +72,7 @@ public class GameSaveLoadManager {
 
     public static void saveMaps() {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (java.util.Map.Entry<String, Game> mapEntry : mapList.entrySet()) {
+        for (Map.Entry<String, Game> mapEntry : mapList.entrySet()) {
             saveMap(mapEntry.getValue(), true, null);
         }
     }
@@ -89,9 +90,9 @@ public class GameSaveLoadManager {
         if (event != null && !keepModifiedDate) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
-                activeGame.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());
+                activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
-                activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteractionEvent) event).getButton().getId());
+                activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId());
             } else {
                 activeGame.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
@@ -107,8 +108,7 @@ public class GameSaveLoadManager {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Game game2 = activeGame.copy();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game2.getName() + JSON), game2);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
         } catch (IOException e) {
             // BotLogger.log(map.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY");
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class GameSaveLoadManager {
                 writer.write(System.lineSeparator());
                 saveMapInfo(writer, activeGame, keepModifiedDate);
 
-                for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+                for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                     Tile tile = tileEntry.getValue();
                     saveTile(writer, tile);
                 }
@@ -300,7 +300,7 @@ public class GameSaveLoadManager {
         HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
 
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
+        for (Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_PLAYED + " " + sb);
@@ -309,7 +309,7 @@ public class GameSaveLoadManager {
 
         HashMap<String, String> agendaVoteInfo = activeGame.getCurrentAgendaVotes();
         StringBuilder sb2 = new StringBuilder();
-        for (java.util.Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
+        for (Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
@@ -317,7 +317,7 @@ public class GameSaveLoadManager {
 
         HashMap<String, Integer> displaced1System = activeGame.getCurrentMovedUnitsFrom1System();
         StringBuilder sb3 = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
+        for (Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
             sb3.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
@@ -325,7 +325,7 @@ public class GameSaveLoadManager {
 
         HashMap<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
         StringBuilder sb4 = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
+        for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
             sb4.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.DISPLACED_UNITS_ACTIVATION + " " + sb4);
@@ -339,14 +339,14 @@ public class GameSaveLoadManager {
         writeCards(activeGame.getLaws(), writer, Constants.LAW);
 
         sb = new StringBuilder();
-        for (java.util.Map.Entry<String, String> entry : activeGame.getLawsInfo().entrySet()) {
+        for (Map.Entry<String, String> entry : activeGame.getLawsInfo().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.LAW_INFO + " " + sb);
         writer.write(System.lineSeparator());
 
         sb = new StringBuilder();
-        for (java.util.Map.Entry<Integer, Integer> entry : activeGame.getScTradeGoods().entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : activeGame.getScTradeGoods().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_TRADE_GOODS + " " + sb);
@@ -384,7 +384,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
-        for (java.util.Map.Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             sb1.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -392,7 +392,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacentTiles = new StringBuilder();
-        for (java.util.Map.Entry<String, List<String>> entry : activeGame.getCustomAdjacentTiles().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : activeGame.getCustomAdjacentTiles().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -402,7 +402,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
-        for (java.util.Map.Entry<Pair<String, Integer>, String> entry : activeGame.getAdjacentTileOverrides().entrySet()) {
+        for (Map.Entry<Pair<String, Integer>, String> entry : activeGame.getAdjacentTileOverrides().entrySet()) {
             adjacencyOverrides.append(entry.getKey().getLeft()).append("-");
             adjacencyOverrides.append(entry.getKey().getRight()).append("-");
             adjacencyOverrides.append(entry.getValue()).append(";");
@@ -510,7 +510,7 @@ public class GameSaveLoadManager {
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
         HashMap<String, Player> players = activeGame.getPlayers();
-        for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
+        for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
 
@@ -638,7 +638,7 @@ public class GameSaveLoadManager {
             UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
             StringBuilder units = new StringBuilder();
             if (unitHolder != null){
-                for (java.util.Map.Entry<String, Integer> entry : unitHolder.getUnits().entrySet()) {
+                for (Map.Entry<String, Integer> entry : unitHolder.getUnits().entrySet()) {
                     units.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
                 }
             }
@@ -690,7 +690,7 @@ public class GameSaveLoadManager {
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
                 fogOfWarSystems.append(",");
-                fogOfWarSystems.append(label == null || label.equals("") ? "." : label);
+                fogOfWarSystems.append(label == null || "".equals(label) ? "." : label);
                 fogOfWarSystems.append(";");
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
@@ -711,27 +711,27 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCards(LinkedHashMap<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
+    private static void writeCards(Map<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> entry : cardList.entrySet()) {
+        for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCardsStrings(LinkedHashMap<String, String> cardList, FileWriter writer, String saveID) throws IOException {
+    private static void writeCardsStrings(Map<String, String> cardList, FileWriter writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, String> entry : cardList.entrySet()) {
+        for (Map.Entry<String, String> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());
     }
 
-    private static String getStringRepresentationOfMap(java.util.Map<String, Integer> map) {
+    private static String getStringRepresentationOfMap(Map<String, Integer> map) {
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> entry : map.entrySet()) {
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         return sb.toString();
@@ -751,7 +751,7 @@ public class GameSaveLoadManager {
             writer.write(unitHolder.getName());
             writer.write(System.lineSeparator());
             HashMap<String, Integer> units = unitHolder.getUnits();
-            for (java.util.Map.Entry<String, Integer> entry : units.entrySet()) {
+            for (Map.Entry<String, Integer> entry : units.entrySet()) {
                 writer.write(entry.getKey() + " " + entry.getValue());
                 writer.write(System.lineSeparator());
             }
@@ -761,7 +761,7 @@ public class GameSaveLoadManager {
             writer.write(UNITDAMAGE);
             writer.write(System.lineSeparator());
             HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
-            for (java.util.Map.Entry<String, Integer> entry : unitDamage.entrySet()) {
+            for (Map.Entry<String, Integer> entry : unitDamage.entrySet()) {
                 writer.write(entry.getKey() + " " + entry.getValue());
                 writer.write(System.lineSeparator());
             }
@@ -849,7 +849,7 @@ public class GameSaveLoadManager {
     }
 
     public static void loadMaps() {
-        HashMap<String, Game> mapList = new HashMap<>();
+        Map<String, Game> mapList = new HashMap<>();
         if (loadFromJSON) {
             File[] jsonfiles = readAllMapJSONFiles();
             if (jsonfiles != null) {
@@ -1096,17 +1096,16 @@ public class GameSaveLoadManager {
                 case Constants.CUSTOM_ADJACENT_TILES -> {
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
                     LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
-                    for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
+                    for (Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
                         String key = entry.getKey();
-                        List<String> migrated = new ArrayList<>();
-                        migrated.addAll(entry.getValue());
+                        List<String> migrated = new ArrayList<>(entry.getValue());
                         adjacentTilesMigrated.put(key, migrated);
                     }
 
                     activeGame.setCustomAdjacentTiles(adjacentTilesMigrated);
                 }
                 case Constants.BORDER_ANOMALIES -> {
-                    if(info.equals("[]"))
+                    if("[]".equals(info))
                         break;
                     ObjectMapper mapper = new ObjectMapper();
                     try {
@@ -1122,7 +1121,7 @@ public class GameSaveLoadManager {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
-                case Constants.REVERSE_SPEAKER_ORDER -> activeGame.setReverseSpeakerOrder(info.equals("true"));
+                case Constants.REVERSE_SPEAKER_ORDER -> activeGame.setReverseSpeakerOrder("true".equals(info));
                 case Constants.AGENDAS -> activeGame.setAgendas(getCardList(info));
                 case Constants.AC_DISCARDED -> activeGame.setDiscardActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> activeGame.setDiscardAgendas(getParsedCards(info));
@@ -1217,7 +1216,7 @@ public class GameSaveLoadManager {
                         int activationCount = Integer.parseInt(info);
                         activeGame.setActivationCount(activationCount);
                     } catch (Exception e) {
-                        activeGame.setActivationCount(0);;
+                        activeGame.setActivationCount(0);
                     }
                 }
                 case Constants.VP_COUNT -> {
@@ -1251,7 +1250,7 @@ public class GameSaveLoadManager {
                     while (vote_info.hasMoreTokens()) {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo = null;
+                        String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
                             outcome = dataInfo.nextToken();
                         }
@@ -1266,7 +1265,7 @@ public class GameSaveLoadManager {
                     while (vote_info.hasMoreTokens()) {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo = null;
+                        String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
                             outcome = dataInfo.nextToken();
                         }
@@ -1281,7 +1280,7 @@ public class GameSaveLoadManager {
                     while (vote_info.hasMoreTokens()) {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo = null;
+                        String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
                             outcome = dataInfo.nextToken();
                         }
@@ -1566,7 +1565,7 @@ public class GameSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
-                    java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>();
+                    Map<String, Integer> debtTokens = new LinkedHashMap<>();
                     while (debtToken.hasMoreTokens()) {
                         StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
                         String colour = debtInfo.nextToken();

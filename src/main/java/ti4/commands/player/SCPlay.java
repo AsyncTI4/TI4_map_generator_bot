@@ -67,7 +67,7 @@ public class SCPlay extends PlayerSubcommandData {
     public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player) {
         Integer scToDisplay = scToPlay;
         String pbd100group = null;
-        boolean pbd100or500 = activeGame.getName().equals("pbd100") || activeGame.getName().equals("pbd500");
+        boolean pbd100or500 = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName());
         if (pbd100or500) {
             scToDisplay = scToPlay / 10;
             int groupNum = scToPlay % 10;
@@ -119,7 +119,7 @@ public class SCPlay extends PlayerSubcommandData {
                 continue;
             }
             String faction = player2.getFaction();
-            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+            if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
             player2.removeFollowedSC(scToPlay);
         }
 
@@ -135,7 +135,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
         }
-        if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
+        if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
         if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
         final Player player_ = player;
@@ -165,7 +165,7 @@ public class SCPlay extends PlayerSubcommandData {
                                     Button transaction = Button.primary("transaction", "Transaction");
                                     scButtons.add(transaction);
                                 }
-                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "These buttons will work inside the thread", scButtons);
+                                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
                             }
                         }
                     }
@@ -230,7 +230,7 @@ public class SCPlay extends PlayerSubcommandData {
             for (Player player2 : activeGame.getPlayers().values()) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
-                        if (!player2.ownsPromissoryNote("acq") && pn.equalsIgnoreCase("acq")) {
+                        if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
                             String acqMessage = Helper.getPlayerRepresentation(player2, activeGame, event.getGuild(), true) + " reminder you can use Winnu's PN!";
                             if (activeGame.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);

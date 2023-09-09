@@ -34,7 +34,6 @@ public class SetThreadName extends CustomSubcommandData {
             }
         }else{
             MessageHelper.sendMessageToChannel(event.getChannel(), "Run this command in the thread you are changing");
-            return;
         }
 
     }

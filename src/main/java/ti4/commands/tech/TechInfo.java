@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -69,7 +70,7 @@ public class TechInfo extends TechSubcommandData {
         }
 
         HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
-        java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
+        Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : playerTechs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
             List<String> techList = techsFiltered.get(techType);
@@ -80,7 +81,7 @@ public class TechInfo extends TechSubcommandData {
             techsFiltered.put(techType, techList);
         }
 
-        for (java.util.Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
             list.sort((tech1, tech2) -> {
                 TechnologyModel tech1Info = techInfo.get(tech1);

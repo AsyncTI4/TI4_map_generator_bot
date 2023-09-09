@@ -34,11 +34,11 @@ public class GenerateTile {
     private final int tileWidth = 345;
     private final int tileExtraWidth = 260;
 
-    private int offsetX = 0;
-    private int offsetY = 0;
+    private int offsetX;
+    private int offsetY;
 
-    private Boolean isFoWPrivate = null;
-    private Player fowPlayer = null;
+    private Boolean isFoWPrivate;
+    private Player fowPlayer;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
 
     private static GenerateTile instance;
@@ -136,7 +136,7 @@ public class GenerateTile {
             Set<String> tiles = tileMap.keySet();
             Set<String> tilesWithExtra = new HashSet<>(activeGame.getAdjacentTileOverrides().values());
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Tile));
-            tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
+            tilesWithExtra.forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Units));
 
             graphics.setFont(Storage.getFont32());
@@ -194,7 +194,7 @@ public class GenerateTile {
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
         String output = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-        return output == null ? "" : output;
+        return output;
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {

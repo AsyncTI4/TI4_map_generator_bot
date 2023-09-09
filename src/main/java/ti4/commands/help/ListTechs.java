@@ -25,13 +25,13 @@ public class ListTechs extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, TechnologyModel> techList = Mapper.getTechs();
-        List<String> searchedList = techList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + Helper.getTechRepresentationLong(e.getKey()))
+        List<String> searchedList = techList.keySet().stream()
+            .map(technologyModel -> technologyModel + " = " + Helper.getTechRepresentationLong(technologyModel))
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Tech List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Tech List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_techs" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

@@ -1,5 +1,6 @@
 package ti4.commands.agenda;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -20,7 +21,7 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
         sb.append("__**Discarded Agendas:**__\n");
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         int index = 1;
-        for (java.util.Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
+        for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
             sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
             index++;
         }

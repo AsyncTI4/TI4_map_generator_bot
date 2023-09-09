@@ -25,13 +25,13 @@ public class ListSecretObjectives extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
-        List<String> searchedList = soList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + SOInfo.getSecretObjectiveRepresentation(e.getKey()))
+        List<String> searchedList = soList.keySet().stream()
+            .map(secretObjectiveModel -> secretObjectiveModel + " = " + SOInfo.getSecretObjectiveRepresentation(secretObjectiveModel))
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Secret Objective List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Secret Objective List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 5) {
             String threadName = "/help list_secret_objectives" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

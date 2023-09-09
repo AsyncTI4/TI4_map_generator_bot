@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Map;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -46,11 +47,10 @@ public class WebHelper {
     }
 
     public static void putData(String gameId, Game activeGame) {
-
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
-            String json = mapper.writeValueAsString( exportableFieldMap );
+            Map<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
+            String json = mapper.writeValueAsString(exportableFieldMap);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -58,16 +58,11 @@ public class WebHelper {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response = client.send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             BotLogger.log("Could not put data to web server", e);
         }
-
-
     }
-
 
     public static void putMap(String gameId, BufferedImage img) {
         putMap(gameId, img, false, null);

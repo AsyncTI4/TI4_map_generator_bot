@@ -30,28 +30,27 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
-        } else {
-            Game activeGame = gameManager.getUserActiveGame(userID);
-            String color = Helper.getColor(activeGame, event);
-            if (!Mapper.isColorValid(color)) {
-                MessageHelper.replyToMessage(event, "Color/Faction not valid");
-                return;
-            }
-
-            Player player = activeGame.getPlayer(getUser().getId());
-            player = Helper.getGamePlayer(activeGame, player, event.getMember(), getUser().getId());
-            if (player == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-                return;
-            }
-
-            Tile tile = player.getNomboxTile();
-            if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player nombox could not be found");
-                return;
-            }
-            subExecute(event, tile);
         }
+        Game activeGame = gameManager.getUserActiveGame(userID);
+        String color = Helper.getColor(activeGame, event);
+        if (!Mapper.isColorValid(color)) {
+            MessageHelper.replyToMessage(event, "Color/Faction not valid");
+            return;
+        }
+
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event.getMember(), getUser().getId());
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            return;
+        }
+
+        Tile tile = player.getNomboxTile();
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player nombox could not be found");
+            return;
+        }
+        subExecute(event, tile);
     }
 
     public String getPlayerColor(GenericInteractionCreateEvent event){

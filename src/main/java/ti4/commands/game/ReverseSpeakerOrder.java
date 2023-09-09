@@ -18,7 +18,7 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if(!event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString).equals("YES")) {
+        if(!"YES".equals(event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString))) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with YES");
             return;
         }
