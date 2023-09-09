@@ -503,14 +503,6 @@ public class Mapper {
         return new HashMap<>(secretObjectives);
     }
 
-    public static Map<String, SecretObjectiveModel> getSecretObjectives(String extra) {
-        Map<String, SecretObjectiveModel> soList = new HashMap<>();
-        for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
-            soList.put(entry.getKey() + extra, entry.getValue());
-        }
-        return soList;
-    }
-
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanets().values().stream()
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
