@@ -3,10 +3,6 @@ package ti4.commands.map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,10 +12,8 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class RemoveTile extends AddRemoveTile {
-
-    @Override
-    public String getActionID() {
-        return Constants.REMOVE_TILE;
+    public RemoveTile() {
+        super(Constants.REMOVE_TILE, "Remove tile from map");
     }
 
     @Override
@@ -41,22 +35,5 @@ public class RemoveTile extends AddRemoveTile {
             tileAction(null, position, userActiveMap);
         }
         return userActiveMap;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map. Can handle comma-separated list.")
-                                .setRequired(true))
-
-        );
-    }
-
-    @Override
-    protected String getActionDescription() {
-        return "Remove tile from map";
     }
 }

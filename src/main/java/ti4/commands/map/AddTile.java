@@ -8,11 +8,12 @@ import ti4.map.UnitHolder;
 
 import java.util.HashMap;
 
-public class AddTile extends AddRemoveTile {
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
-    @Override
-    public String getActionID() {
-        return Constants.ADD_TILE;
+public class AddTile extends AddRemoveTile {
+    public AddTile() {
+        super(Constants.ADD_TILE, "Add tile to map");
+        addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
     }
 
     @Override
@@ -31,10 +32,5 @@ public class AddTile extends AddRemoveTile {
                 }
             }
         }
-    }
-
-    @Override
-    protected String getActionDescription() {
-        return "Add tile to map";
     }
 }

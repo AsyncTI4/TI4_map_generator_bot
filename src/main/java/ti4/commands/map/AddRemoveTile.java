@@ -3,11 +3,7 @@ package ti4.commands.map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
-import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -21,11 +17,15 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 
-abstract public class AddRemoveTile implements Command {
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+import org.jetbrains.annotations.NotNull;
+
+abstract public class AddRemoveTile extends MapSubcommandData {
+    public AddRemoveTile(@NotNull String name, @NotNull String description) {
+        super(name, description);
+        addOption(OptionType.STRING, Constants.POSITION, "Tile position on map", true);
     }
+    
+    abstract protected void tileAction(Tile tile, String position, Map userActiveMap);
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -84,19 +84,4 @@ abstract public class AddRemoveTile implements Command {
         userActiveMap.rebuildTilePositionAutoCompleteList();
         return userActiveMap;
     }
-
-    abstract protected void tileAction(Tile tile, String position, Map userActiveMap);
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true))
-        );
-    }
-
-    abstract protected String getActionDescription();
 }
