@@ -13,12 +13,12 @@ public class StrategyCardModel implements ModelInterface{
 
     @Override
     public boolean isValid() {
-        return cardValues.size() > 0 && StringUtils.isNotBlank(this.name) && StringUtils.isNotBlank(this.alias);
+        return cardValues.size() > 0 && StringUtils.isNotBlank(name) && StringUtils.isNotBlank(alias);
     }
 
     @Override
     public String getAlias() {
-        return this.alias;
+        return alias;
     }
 
     public String getSCName(int scNumber) {

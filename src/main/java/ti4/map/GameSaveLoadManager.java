@@ -803,7 +803,6 @@ public class GameSaveLoadManager {
         File folder = Storage.getMapImageDirectory();
         if (folder == null) {
             try {
-                //noinspection ConstantConditions
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();
                 }
@@ -819,7 +818,6 @@ public class GameSaveLoadManager {
         File folder = Storage.getMapsJSONDirectory();
         if (folder == null) {
             try {
-                //noinspection ConstantConditions
                 if (folder.createNewFile()) {
                     folder = Storage.getMapImageDirectory();
                 }
@@ -1291,9 +1289,7 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.GAME_CUSTOM_NAME -> activeGame.setCustomName(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> {
-                    activeGame.setPlayersWhoHitPersistentNoAfter(info);
-                }
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> activeGame.setPlayersWhoHitPersistentNoAfter(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> activeGame.setPlayersWhoHitPersistentNoWhen(info);
                 case Constants.TABLE_TALK_CHANNEL ->  activeGame.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> activeGame.setMainGameChannelID(info);

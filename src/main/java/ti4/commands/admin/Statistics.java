@@ -24,10 +24,10 @@ public class Statistics extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        HashMap<String, Integer> factionCount = new HashMap<>();
-        HashMap<String, Integer> winnerFactionCount = new HashMap<>();
-        HashMap<String, Integer> colorCount = new HashMap<>();
-        HashMap<String, Integer> winnerColorCount = new HashMap<>();
+        Map<String, Integer> factionCount = new HashMap<>();
+        Map<String, Integer> winnerFactionCount = new HashMap<>();
+        Map<String, Integer> colorCount = new HashMap<>();
+        Map<String, Integer> winnerColorCount = new HashMap<>();
 
         BufferedImage fakeImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = fakeImage.getGraphics();

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommandManager {
-    private List<Command> commandList = new ArrayList<>();
+    private final List<Command> commandList = new ArrayList<>();
     private static CommandManager manager;
 
     private CommandManager() {

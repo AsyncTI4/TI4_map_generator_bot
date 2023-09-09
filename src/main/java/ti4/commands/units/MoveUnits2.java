@@ -122,9 +122,7 @@ public class MoveUnits2 extends AddRemoveUnits {
             case "0", "none" -> {
                 //Do nothing, as no unit was moved to
             }
-            default -> {
-                unitParsing(event, color, tile, unitList, activeGame);
-            }
+            default -> unitParsing(event, color, tile, unitList, activeGame);
         }
 
         OptionMapping optionCC = event.getOption(Constants.CC_USE);

@@ -68,11 +68,11 @@ public class GenerateMap {
     private int mapWidth;
     private int heightForGameInfo;
     private static int scoreTokenWidth;
-    private int extraX = 300;
-    private int extraY = 200;
-    private static Point tilePositionPoint = new Point(230, 295);
-    private static Point labelPositionPoint = new Point(90, 295);
-    private static Point numberPositionPoint = new Point(40, 27);
+    private final int extraX = 300;
+    private final int extraY = 200;
+    private static final Point tilePositionPoint = new Point(230, 295);
+    private static final Point labelPositionPoint = new Point(90, 295);
+    private static final Point numberPositionPoint = new Point(40, 27);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
     private int minX = -1;
@@ -84,7 +84,6 @@ public class GenerateMap {
     private Boolean isFoWPrivate;
     private Player fowPlayer;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
-    private static HashMap<String, String> unitIDToID = new HashMap<>();
 
     private final boolean debug = true;
     private long debugStartTime;
@@ -96,21 +95,21 @@ public class GenerateMap {
     private static GenerateMap instance;
 
     private GenerateMap() {
+        ImageIO.setUseCache(false);
+        String controlID = Mapper.getControlID("red");
         try {
-            ImageIO.setUseCache(false);
-            String controlID = Mapper.getControlID("red");
             BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.45f);
             scoreTokenWidth = bufferedImage.getWidth();
         } catch (IOException e) {
-            BotLogger.log("Could read file data for setup file", e);
+
         }
         init(null);
         resetImage();
     }
 
     private void init(Game activeGame) {
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+        Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
 
         mapHeight = width8;
         mapWidth = height8;
@@ -136,10 +135,6 @@ public class GenerateMap {
             if ((mapHeight - extraY) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + extraY)) {
                 mapWidth += extraX;
                 extraRow = true;
-            }
-
-            if (mapWidth < 2500) {
-                mapWidth = 2500;
             }
         }
         width = mapWidth;
@@ -225,7 +220,7 @@ public class GenerateMap {
                 if (debug) debugTime = System.nanoTime();
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
                 String setup = tileMap.keySet().stream()
-                    .filter(key -> "0".equals(key))
+                    .filter("0"::equals)
                     .findFirst()
                     .orElse(null);
                 if (setup != null) {
@@ -307,9 +302,9 @@ public class GenerateMap {
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (
             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
             }
@@ -340,8 +335,7 @@ public class GenerateMap {
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
-        String output = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-        return output;
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
     @Nullable
@@ -462,9 +456,7 @@ public class GenerateMap {
                         if (count == 5)
                             break;
                         switch (count) {
-                            case 2 -> {
-                                col = 1;
-                            }
+                            case 2 -> col = 1;
                             case 3 -> {
                                 row = 1;
                                 col = 0;
@@ -1591,7 +1583,6 @@ public class GenerateMap {
     private void drawFactionIconImage(int x, int y, String resourceName, float scale, float opacity) {
         try {
             String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
-            @SuppressWarnings("ConstantConditions")
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             resourceBufferedImage = resizeImage(resourceBufferedImage, scale);
             Graphics2D g2 = (Graphics2D) graphics;
@@ -1607,7 +1598,6 @@ public class GenerateMap {
         try {
             String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
             if (Optional.ofNullable(resourcePath).isPresent()) {
-                @SuppressWarnings("ConstantConditions")
                 BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
                 graphics.drawImage(resourceBufferedImage, x, y, null);
             } else {
@@ -1630,7 +1620,6 @@ public class GenerateMap {
     private void drawPAImage(int x, int y, String resourceName) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
-            @SuppressWarnings("ConstantConditions")
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
@@ -1641,7 +1630,6 @@ public class GenerateMap {
     private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
-            @SuppressWarnings("ConstantConditions")
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
@@ -2368,7 +2356,7 @@ public class GenerateMap {
         int x,
         int y,
         Game activeGame,
-        LinkedHashMap<String, Player> players,
+        Map<String, Player> players,
         List<String> scoredPlayerID,
         boolean multiScoring,
         Integer objectiveWorth,
@@ -2676,7 +2664,7 @@ public class GenerateMap {
                 if (tileIsFroggy)
                     return tileOutput;
 
-                ArrayList<Rectangle> rectangles = new ArrayList<>();
+                List<Rectangle> rectangles = new ArrayList<>();
                 Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
 
@@ -2732,7 +2720,7 @@ public class GenerateMap {
         return new Point(x, y);
     }
 
-    public static BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
+    public static BufferedImage resizeImage(BufferedImage originalImage, float percent) {
         int scaledWidth = (int) (originalImage.getWidth() * percent);
         int scaledHeight = (int) (originalImage.getHeight() * percent);
         Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_DEFAULT);
@@ -2841,7 +2829,7 @@ public class GenerateMap {
 
     private static void addControl(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, List<Rectangle> rectangles, Game activeGame, Player frogPlayer, Boolean isFrogPrivate) {
         BufferedImage controlToken;
-        ArrayList<String> controlList = new ArrayList<>(unitHolder.getControlList());
+        List<String> controlList = new ArrayList<>(unitHolder.getControlList());
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         BufferedImage factionImage;
         if (unitTokenPosition != null) {
@@ -2970,7 +2958,7 @@ public class GenerateMap {
     }
 
     private static void addPlanetToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, List<Rectangle> rectangles) {
-        ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
+        List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
                 return -1;
@@ -3180,10 +3168,7 @@ public class GenerateMap {
                 Point position = unitTokenPosition.getPosition(unitID);
                 boolean fighterOrInfantry = unitID.contains("_tkn_ff.png") || unitID.contains("_tkn_gf.png");
                 if (isSpace && position != null && !fighterOrInfantry) {
-                    String id = unitIDToID.get(unitID);
-                    if (id == null) {
-                        id = unitID.substring(unitID.indexOf("_"));
-                    }
+                    String id = unitID.substring(unitID.indexOf("_"));
                     Point point = unitOffset.get(id);
                     if (point == null) {
                         point = new Point(0, 0);

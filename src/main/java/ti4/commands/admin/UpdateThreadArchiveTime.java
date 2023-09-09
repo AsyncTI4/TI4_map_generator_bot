@@ -48,7 +48,7 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
             return;
         }
 
-        final AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
+        AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(tc -> tc.getName().toLowerCase().contains(searchString) && tc.getAutoArchiveDuration() != autoArchiveDuration_).toList();
 
         StringBuilder sb = new StringBuilder("**__Threads Updated__**\n");

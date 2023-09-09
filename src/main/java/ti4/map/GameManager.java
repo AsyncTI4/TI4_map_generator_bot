@@ -6,7 +6,7 @@ import java.util.Map;
 public class GameManager {
 
     private static GameManager gameManager;
-    private static Map<String, String> userNameToGameName = new HashMap<>();
+    private static final Map<String, String> userNameToGameName = new HashMap<>();
     private Map<String, Game> gameNameToGame = new HashMap<>();
 
     private GameManager() {

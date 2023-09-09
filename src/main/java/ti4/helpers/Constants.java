@@ -92,10 +92,10 @@ public class Constants {
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
 
-    public static String ALPHA = "alpha";
-    public static String BETA = "beta";
+    public static final String ALPHA = "alpha";
+    public static final String BETA = "beta";
     public static String GAMMA = "gamma";
-    public static String DELTA = "delta";
+    public static final String DELTA = "delta";
     public static String EPSILON = "whepsilon";
     public static String NARROWS = "whnarrows";
     public static String PROBABILITY = "whprobability";

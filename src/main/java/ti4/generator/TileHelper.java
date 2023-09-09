@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 public class TileHelper {
 
-    private static Map<String, TileModel> allTiles = new HashMap<>();
-    private static Map<String, PlanetModel> allPlanets = new HashMap<>();
+    private static final Map<String, TileModel> allTiles = new HashMap<>();
+    private static final Map<String, PlanetModel> allPlanets = new HashMap<>();
 
     public static void init() {
         initPlanetsFromJson();

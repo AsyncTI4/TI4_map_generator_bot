@@ -5,7 +5,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -47,8 +46,6 @@ public class ShowRemainingRelics extends GenericRelicAction {
                 text.append("- ").append(relicData[0]).append("\n");
             }
         }
-        Player player2 = activeGame.getPlayer(getUser().getId());
-        player2 = Helper.getGamePlayer(activeGame, player2, event, null);
 
         if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");

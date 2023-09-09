@@ -16,7 +16,7 @@ import ti4.model.StrategyCardModel;
 
 public class SetDeck extends GameSubcommandData {
 
-    private List<String> deckTypes;
+    private final List<String> deckTypes;
 
     public SetDeck() {
         super(Constants.SET_DECK, "Change game card decks");
@@ -37,7 +37,7 @@ public class SetDeck extends GameSubcommandData {
 
         Map<String, DeckModel> changedDecks = new HashMap<>();
 
-        this.deckTypes.forEach(deckType -> {
+        deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
@@ -67,7 +67,7 @@ public class SetDeck extends GameSubcommandData {
 
     private void addDefaultOption(String constantName, String descName) {
         addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
-        this.deckTypes.add(constantName);
+        deckTypes.add(constantName);
     }
 
     public static boolean setDeck(SlashCommandInteractionEvent event, Game activeGame, String deckType, DeckModel deckModel) {

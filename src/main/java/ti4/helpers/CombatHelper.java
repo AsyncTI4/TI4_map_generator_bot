@@ -153,6 +153,7 @@ public class CombatHelper {
 
         // Actually roll for each unit
         int totalHits = 0;
+        StringBuilder resultBuilder = new StringBuilder(result);
         for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -215,14 +216,15 @@ public class CombatHelper {
                 upgradedUnitName = String.format(" %s", unit.getName());
             }
             String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
-            result += String.format("%s %s%s %s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
-                    unitTypeHitsInfo,
-                    Arrays.toString(resultRolls), hitRolls.length, rollsSuffix);
+            resultBuilder.append(String.format("%s %s%s %s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
+                unitTypeHitsInfo,
+                Arrays.toString(resultRolls), hitRolls.length, rollsSuffix));
         }
+        result = resultBuilder.toString();
 
-        String hitEmojis = "";
+        StringBuilder hitEmojis = new StringBuilder();
         for (int i = 0; i < totalHits; i++) {
-            hitEmojis += ":boom:";
+            hitEmojis.append(":boom:");
         }
         result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
         return result;

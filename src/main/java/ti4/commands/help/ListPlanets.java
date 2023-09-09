@@ -2,7 +2,6 @@ package ti4.commands.help;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;

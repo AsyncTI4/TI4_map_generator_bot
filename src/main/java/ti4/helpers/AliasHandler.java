@@ -15,26 +15,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AliasHandler {
-    private static HashMap<String, String> tilemapAliasList = new HashMap<>();
-    private static HashMap<String, String> unitAliasList = new HashMap<>();
-    private static ArrayList<String> unitValuesList = new ArrayList<>();
-    private static Map<String, String> unitListForHelp = new HashMap<>();
-    private static HashMap<String, String> cctokenAliasList = new HashMap<>();
-    private static HashMap<String, String> attachmentAliasList = new HashMap<>();
-    private static HashMap<String, String> tokenAliasList = new HashMap<>();
-    private static HashMap<String, String> factionAliasList = new HashMap<>();
-    private static HashMap<String, String> colorAliasList = new HashMap<>();
-    private static HashMap<String, String> techAliasList = new HashMap<>();
-    private static HashMap<String, String> actionCardAliasList = new HashMap<>();
-    private static HashMap<String, String> agendaAliasList = new HashMap<>();
-    private static HashMap<String, String> explorationAliasList = new HashMap<>();
-    private static HashMap<String, String> relicAliasList = new HashMap<>();
-    private static HashMap<String, String> objectiveAliasList = new HashMap<>();
-    private static HashMap<String, String> promissoryAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgPositionAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
+
+    private static final Map<String, String> tilemapAliasList = new HashMap<>();
+    private static final Map<String, String> unitAliasList = new HashMap<>();
+    private static final List<String> unitValuesList = new ArrayList<>();
+    private static final Map<String, String> unitListForHelp = new HashMap<>();
+    private static final Map<String, String> cctokenAliasList = new HashMap<>();
+    private static final Map<String, String> attachmentAliasList = new HashMap<>();
+    private static final Map<String, String> tokenAliasList = new HashMap<>();
+    private static final Map<String, String> factionAliasList = new HashMap<>();
+    private static final Map<String, String> colorAliasList = new HashMap<>();
+    private static final Map<String, String> techAliasList = new HashMap<>();
+    private static final Map<String, String> actionCardAliasList = new HashMap<>();
+    private static final Map<String, String> agendaAliasList = new HashMap<>();
+    private static final Map<String, String> explorationAliasList = new HashMap<>();
+    private static final Map<String, String> relicAliasList = new HashMap<>();
+    private static final Map<String, String> objectiveAliasList = new HashMap<>();
+    private static final Map<String, String> promissoryAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgPositionAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
     private static final Map<String, String> allTileAliases = new HashMap<>();
     private static final Map<String, String> allPlanetAliases = new HashMap<>();
 
@@ -209,7 +210,7 @@ public class AliasHandler {
         }
     }
 
-    public static ArrayList<String> getUnitValuesList() {
+    public static List<String> getUnitValuesList() {
         return unitValuesList;
     }
 

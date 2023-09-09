@@ -35,7 +35,6 @@ public class ExpPlanet extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping planetOption = event.getOption(Constants.PLANET);
-        @SuppressWarnings("ConstantConditions")
         String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
         Game activeGame = getActiveGame();
         if (!activeGame.getPlanets().contains(planetName)) {

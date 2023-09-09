@@ -25,17 +25,15 @@ public class SCUnpick extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveGame();
-		Player player = activeGame.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeGame, player, event, null);
-		player = Helper.getPlayer(activeGame, player, event);
-		if (player == null) {
-			sendMessage("Player could not be found");
-			return;
-		}
-
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
+        if (player == null) {
+          sendMessage("Player could not be found");
+          return;
+        }
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
 
         Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
                 .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !"null".equals(player_.getColor()))
@@ -52,9 +50,6 @@ public class SCUnpick extends PlayerSubcommandData {
             return;
         }
 
-        // return; //force end this for now, let players manage next to pick until look at this again
-
-        String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;

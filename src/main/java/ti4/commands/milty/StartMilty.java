@@ -311,13 +311,13 @@ public class StartMilty extends MiltySubcommandData {
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
-            final BufferedImage image = ImageIO.read(fileInputStream);
+            BufferedImage image = ImageIO.read(fileInputStream);
             fileInputStream.close();
 
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
 
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");

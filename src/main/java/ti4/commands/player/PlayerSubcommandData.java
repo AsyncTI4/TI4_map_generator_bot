@@ -32,7 +32,7 @@ public abstract class PlayerSubcommandData extends SubcommandData {
     }
 
     public SlashCommandInteractionEvent getEvent() {
-        return this.event;
+        return event;
     }
 
     /**

@@ -48,7 +48,7 @@ public class Whisper extends FOWSubcommandData {
         if (anon != null) {
             anonY = anon.getAsString();
         }
-        Whisper.sendWhisper(activeGame, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
+        sendWhisper(activeGame, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
     }
 
     public static void sendWhisper(Game activeGame, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {

@@ -9,17 +9,17 @@ import java.util.Map;
 
 public class MiltyDraftManager {
 
-    private List<MiltyDraftTile> high = new ArrayList<>();
-    private List<MiltyDraftTile> mid = new ArrayList<>();
-    private List<MiltyDraftTile> low = new ArrayList<>();
-    private List<MiltyDraftTile> red = new ArrayList<>();
+    private final List<MiltyDraftTile> high = new ArrayList<>();
+    private final List<MiltyDraftTile> mid = new ArrayList<>();
+    private final List<MiltyDraftTile> low = new ArrayList<>();
+    private final List<MiltyDraftTile> red = new ArrayList<>();
 
-    private List<MiltyDraftSlice> slices = new ArrayList<>();
+    private final List<MiltyDraftSlice> slices = new ArrayList<>();
 
     private List<Player> draftOrder = new ArrayList<>();
     private int draftIndex;
     private List<Player> draftRandomOrder = new ArrayList<>();
-    private Map<Player, PlayerDraft> draft = new HashMap<>();
+    private final Map<Player, PlayerDraft> draft = new HashMap<>();
 
     private List<String> factionDraft = new ArrayList<>();
 
@@ -79,7 +79,7 @@ public class MiltyDraftManager {
     }
 
     public void setDraftRandomOrder(List<Player> draftOrder){
-        this.draftRandomOrder = draftOrder;
+        draftRandomOrder = draftOrder;
 
         for (Player player : draftOrder) {
             draft.put(player, new PlayerDraft());

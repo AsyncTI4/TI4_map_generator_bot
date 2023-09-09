@@ -25,22 +25,22 @@ import ti4.model.WormholeModel;
 
 public class FoWHelper {
 
-	public static Boolean isPrivateGame(GenericInteractionCreateEvent event) {
+	public static boolean isPrivateGame(GenericInteractionCreateEvent event) {
 		if (event == null) {
-			return null;
+			return false;
 		}
 		return isPrivateGame(null, null, event.getChannel());
 	}
 
-	public static Boolean isPrivateGame(GenericCommandInteractionEvent event) {
+	public static boolean isPrivateGame(GenericCommandInteractionEvent event) {
 		return isPrivateGame(null, event);
 	}
 
-	public static Boolean isPrivateGame(@Nullable Game activeGame, GenericInteractionCreateEvent event) {
+	public static boolean isPrivateGame(@Nullable Game activeGame, GenericInteractionCreateEvent event) {
 		return isPrivateGame(activeGame, event, null);
 	}
 
-	public static Boolean isPrivateGame(Game activeGame) {
+	public static boolean isPrivateGame(Game activeGame) {
 		return isPrivateGame(activeGame, null, null);
 	}
 
@@ -91,14 +91,14 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
-			if (FoWHelper.playerIsInSystem(activeGame, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(activeGame, tileEntry.getValue(), player)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
 
 		Set<String> tilePositionsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
 		for (String tilePos : tilesWithPlayerUnitsPlanets) {
-			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeGame, tilePos, player, true);
+			Set<String> adjacentTiles = getAdjacentTiles(activeGame, tilePos, player, true);
 			tilePositionsToShow.addAll(adjacentTiles);
 		}
 
@@ -119,14 +119,14 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
-			if (FoWHelper.playerIsInSystem(activeGame, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(activeGame, tileEntry.getValue(), player)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
 
 		Set<String> tilePositionsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
 		for (String tilePos : tilesWithPlayerUnitsPlanets) {
-			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeGame, tilePos, player, true);
+			Set<String> adjacentTiles = getAdjacentTiles(activeGame, tilePos, player, true);
 			tilePositionsToShow.addAll(adjacentTiles);
 		}
 
@@ -201,8 +201,7 @@ public class FoWHelper {
 		return mahactCCs.contains(player.getColor());
 	}
 
-	public static Boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
-		Boolean isFoWPrivate = null;
+	public static boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
@@ -214,13 +213,13 @@ public class FoWHelper {
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			activeGame = GameManager.getInstance().getGame(gameName);
 			if (activeGame == null) {
-				return isFoWPrivate;
+				return false;
 			}
 		}
 		if (activeGame.isFoWMode() && channel_ != null || event != null) {
-			isFoWPrivate = channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
+			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
 		}
-		return isFoWPrivate;
+		return false;
 	}
 
 	/** Return a list of tile positions that are adjacent to a source position.
@@ -333,8 +332,6 @@ public class FoWHelper {
 
 
 	public static boolean doesTileHaveWHs(Game activeGame, String position, Player player) {
-		Set<String> adjacentPositions = new HashSet<>();
-		Set<Tile> allTiles = new HashSet<>(activeGame.getTileMap().values());
 		Tile tile = activeGame.getTileByPosition(position);
 
 		String ghostFlagship = null;
@@ -382,8 +379,6 @@ public class FoWHelper {
 
 
 	public static boolean doesTileHaveAlphaOrBeta(Game activeGame, String position, Player player) {
-		Set<String> adjacentPositions = new HashSet<>();
-		Set<Tile> allTiles = new HashSet<>(activeGame.getTileMap().values());
 		Tile tile = activeGame.getTileByPosition(position);
 
 		String ghostFlagship = null;
@@ -811,8 +806,8 @@ public class FoWHelper {
 
 			// let's figure out what they can see!
 			initializeFog(activeGame, player_, false);
-			boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeGame, sendingPlayer, player_);
-			boolean receiverVisible = FoWHelper.canSeeStatsOfPlayer(activeGame, receivingPlayer, player_);
+			boolean senderVisible = canSeeStatsOfPlayer(activeGame, sendingPlayer, player_);
+			boolean receiverVisible = canSeeStatsOfPlayer(activeGame, receivingPlayer, player_);
 
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
@@ -850,6 +845,6 @@ public class FoWHelper {
 		if (viewer == player) return false;
 		if ("null".equals(viewer.getColor())) return false;
 		initializeFog(activeGame, viewer, false);
-		return FoWHelper.canSeeStatsOfPlayer(activeGame, player, viewer);
+		return canSeeStatsOfPlayer(activeGame, player, viewer);
 	}
 }

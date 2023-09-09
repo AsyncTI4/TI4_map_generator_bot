@@ -34,7 +34,6 @@ public class BotLogger {
 
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      */
     public static void log(GenericInteractionCreateEvent event, String msg) {
         log(event, msg, null);
@@ -43,7 +42,6 @@ public class BotLogger {
     /** Sends just the stack trace the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * <p> Will create a thread and post the full Stack Trace
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      */
     public static void log(GenericInteractionCreateEvent event, Exception e) {
         log(event, null, e);
@@ -52,7 +50,6 @@ public class BotLogger {
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      *  <p> Will create a thread and post the full Stack Trace when supplied with an Exception
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      * @param e Exception
      */
     public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
@@ -119,8 +116,6 @@ public class BotLogger {
     }
 
     /** Retreives either the event's guild's #bot-log channel, or, if that is null, the Primary server's #bot-log channel.
-     * @param event
-     * @return
      */
     private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
         TextChannel botLogChannel = null;

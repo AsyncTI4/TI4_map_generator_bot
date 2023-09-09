@@ -92,10 +92,8 @@ public class SCPick extends PlayerSubcommandData {
         secondHalfOfSCPick(event, player, activeGame, scPicked);
     }
 
-    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked)
-    {
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
+    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         String msg;
         String msgExtra = "";
         boolean allPicked = true;

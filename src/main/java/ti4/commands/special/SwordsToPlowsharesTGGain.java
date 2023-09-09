@@ -37,7 +37,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
     public void doSwords(Player player, GenericInteractionCreateEvent event, Game activeGame){
         List<String> planets = player.getPlanets();
         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
-        String message = "";
+        StringBuilder message = new StringBuilder();
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())){
@@ -54,7 +54,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         int cTG = player.getTg();
                         int fTG = cTG+numTG;
                         player.setTg(fTG);
-                        message = message + ident+" removed "+numTG+" infantry from "+Helper.getPlanetRepresentation(unitHolder.getName(), activeGame)+" and gained that many tg (" + cTG + "->" + fTG + "). \n";
+                        message.append(ident).append(" removed ").append(numTG).append(" infantry from ").append(Helper.getPlanetRepresentation(unitHolder.getName(), activeGame)).append(" and gained that many tg (").append(cTG).append("->").append(fTG).append("). \n");
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
                         if(player.hasInf2Tech() ){
                             ButtonHelper.resolveInfantryDeath(activeGame, player, numTG);
@@ -71,7 +71,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
             if(activeGame.isFoWMode()){
                 channel = player.getPrivateChannel();
             }
-            MessageHelper.sendMessageToChannel(channel,message );
+            MessageHelper.sendMessageToChannel(channel, message.toString());
         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 
     }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +19,7 @@ import ti4.map.UnitHolder;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -73,7 +73,7 @@ public class CombatModHelper {
     /// Retrieves Always on modifiers, 
     /// based on the player's info (techs, owned relics, active leaders, units), current laws in play, units in combat, and opponent race abilities)
     public static List<NamedCombatModifierModel> CalculateAutomaticMods(Player player, Player opponent,
-            HashMap<UnitModel, Integer> unitsByQuantity,
+            Map<UnitModel, Integer> unitsByQuantity,
             TileModel tile,
             Game activeGame) {
         List<NamedCombatModifierModel> alwaysOnMods = new ArrayList<>();
@@ -251,19 +251,15 @@ public class CombatModHelper {
                 }
                 case Constants.UNIT_TECH -> scalingCount = player.getTechs().stream()
                     .map(Mapper::getTech)
-                    .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                    .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
                     // TODO: Doesnt seem like an easier way to do this? Seems slow.
                     String colorID = Mapper.getColorID(player.getColor());
                     for (Tile tile : activeGame.getTileMap().values()) {
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-
-                            HashMap<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+                            Map<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
                             for (Entry<String, Integer> unitEntry : unitsOnHolder.entrySet()) {
-                                Integer count = unitEntry.getValue();
-                                if (count == null) {
-                                }
                                 if ("dd".equals(unitEntry.getKey())) {
                                     scalingCount += unitEntry.getValue();
                                 }
@@ -276,7 +272,7 @@ public class CombatModHelper {
                         // TODO:If player.getunittech existed, you could reuse it here.
                         scalingCount = opponent.getTechs().stream()
                             .map(Mapper::getTech)
-                            .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                            .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                             .count();
                     }
                 }
@@ -298,9 +294,8 @@ public class CombatModHelper {
         return (int) value;
     }
     public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods, List<UnitModel> units){
-        
         return mods.stream()
-                .filter(model -> CombatModHelper.IsModInScopeForUnits(units, model.getModifier()))
+                .filter(model -> IsModInScopeForUnits(units, model.getModifier()))
                 .toList();
     }
 }

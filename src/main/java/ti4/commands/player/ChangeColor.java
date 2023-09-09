@@ -25,7 +25,6 @@ public class ChangeColor extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        @SuppressWarnings("ConstantConditions")
         String newColour = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(newColour)) {
             sendMessage("Color not valid");
@@ -139,7 +138,7 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addUnit(replacedKey, value);
                 }
 
-                HashSet<String> controlList = new HashSet<>(unitHolder.getControlList());
+                Set<String> controlList = new HashSet<>(unitHolder.getControlList());
                 for (String control : controlList) {
                     if (!control.contains(oldColorID)) continue;
                     unitHolder.removeControl(control);
@@ -148,7 +147,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
 
                 
-                HashSet<String> ccList = new HashSet<>(unitHolder.getCCList());
+                Set<String> ccList = new HashSet<>(unitHolder.getCCList());
                 for (String cc : ccList) {
                     unitHolder.removeCC(cc);
                     cc = cc.replace(oldColorSuffix, newColorSuffix);

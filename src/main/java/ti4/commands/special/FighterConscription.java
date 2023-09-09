@@ -99,15 +99,17 @@ public class FighterConscription extends SpecialSubcommandData {
             msg += " Please check fleet size and capacity in each of the systems: ";
         }
         boolean first = true;
-        for (Tile tile : tilesAffected) {
+      StringBuilder msgBuilder = new StringBuilder(msg);
+      for (Tile tile : tilesAffected) {
             if (first) {
-                msg += "\n> **" + tile.getPosition() + "**";
+                msgBuilder.append("\n> **").append(tile.getPosition()).append("**");
                 first = false;
             } else {
-                msg += ", **" + tile.getPosition() + "**";
+                msgBuilder.append(", **").append(tile.getPosition()).append("**");
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+      msg = msgBuilder.toString();
+      MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @Override

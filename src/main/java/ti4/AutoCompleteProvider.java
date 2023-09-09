@@ -37,9 +37,7 @@ public class AutoCompleteProvider {
         }
 
         switch (optionName) {
-            case Constants.SETTING_TYPE -> {
-                event.replyChoiceStrings("string","number","bool").queue();
-            }
+            case Constants.SETTING_TYPE -> event.replyChoiceStrings("string","number","bool").queue();
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
@@ -80,9 +78,9 @@ public class AutoCompleteProvider {
                     factionColors.addAll(Mapper.getColors());
 
                     List<String> factionColorsRetain = new ArrayList<>();
-                    Boolean privateGame = FoWHelper.isPrivateGame(activeGame, null, event.getChannel());
+                    boolean privateGame = FoWHelper.isPrivateGame(activeGame, null, event.getChannel());
                     for (Player player_ : activeGame.getPlayers().values()) {
-                        if (privateGame == null || !privateGame) {
+                        if (!privateGame) {
                             factionColorsRetain.add(player_.getFaction());
                         }
                         factionColorsRetain.add(player_.getColor());
@@ -633,12 +631,8 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.VERBOSITY -> {
-                event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
-            }
-            case Constants.AUTO_ARCHIVE_DURATION -> {
-                event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
-            }
+            case Constants.VERBOSITY -> event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
+            case Constants.AUTO_ARCHIVE_DURATION -> event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
                         .map(PlanetTypeModel.PlanetType::toString)

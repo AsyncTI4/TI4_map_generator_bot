@@ -222,7 +222,6 @@ public class PositionMapper {
     }
 
     /**
-     * @param tileID
      * @return List of tiles adjacent to tileID in clockwise compass order: [N, NE, SE, S, SW, NW]
      */
     public static List<String> getAdjacentTilePositions(String tileID) {

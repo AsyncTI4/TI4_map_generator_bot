@@ -150,9 +150,9 @@ public class GenerateTile {
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
             }
@@ -193,8 +193,7 @@ public class GenerateTile {
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
-        String output = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-        return output;
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {

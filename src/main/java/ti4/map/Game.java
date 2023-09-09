@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.MapGenerator;
@@ -768,8 +767,8 @@ public class Game {
     }
 
     @JsonIgnore
-    public List<Integer> getPlayedSCs() {
-        return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
+    public Set<Integer> getPlayedSCs() {
+        return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
     public DisplayType getDisplayTypeForced() {
