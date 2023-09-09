@@ -9,6 +9,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 
 public class InitTspmap extends MapSubcommandData {
     public InitTspmap() {
@@ -19,21 +20,22 @@ public class InitTspmap extends MapSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        if (option == null || !"YES".equals(option.getAsString())) {
+            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            return;
+        }
 
-        boolean override = false;
-        Boolean overrideOption = event.getOption("override", null, OptionMapping::getAsBoolean);
-        override = overrideOption == null ? false : overrideOption;
-
-        initializeMap(activeMap, override);
-        addTspmapHyperlanes(activeMap, override);
+        initializeMap(activeMap);
+        addTspmapHyperlanes(activeMap);
         addTspmapEdgeAdjacencies(activeMap);
     }
 
-    public void initializeMap(Map activeMap, boolean override) {
+    public void initializeMap(Map activeMap) {
         activeMap.clearAdjacentTileOverrides();
     }
 
-    public void addTspmapHyperlanes(Map activeMap, boolean override) {
+    public void addTspmapHyperlanes(Map activeMap) {
         //ring 1
         activeMap.setTile(new Tile(AliasHandler.resolveTile("87a5"), "102"));
         activeMap.setTile(new Tile(AliasHandler.resolveTile("87a0"), "103"));
