@@ -23,7 +23,7 @@ public class RemoveUnits extends CaptureReleaseUnits {
             @Override
             protected String recheckColorForUnit(String unit, String color, GenericInteractionCreateEvent event) {
                 if (unit.contains("ff") || unit.contains("gf")) {
-                    return RemoveUnits.this.getPlayerColor(event);
+                    return getPlayerColor(event);
                 }
                 return color;
             }

@@ -287,7 +287,7 @@ public class ButtonHelperFactionSpecific {
             player.setTg(player.getTg()+1);
             String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-            ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+            pillageCheck(player, activeGame);
         }
      }
      public static List<Button> getEmpyHeroButtons(Player player, Game activeGame){
@@ -346,16 +346,14 @@ public class ButtonHelperFactionSpecific {
         Tile tile = activeGame.getTileByPosition(pos);
         UnitHolder space = tile.getUnitHolders().get("space");
         HashMap<String, Integer> units1 = space.getUnits();
-        String cID = Mapper.getColorID(player.getColor());
-        HashMap<String, Integer> units = new HashMap<>(units1);
         for(Player p2 : activeGame.getRealPlayers()){
             if(p2 == player){
                 continue;
             }
-            if(FoWHelper.playerHasShipsInSystem(p2, tile) && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeGame, player)){
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && !isCabalBlockadedByPlayer(p2, activeGame, player)){
                 ButtonHelper.riftAllUnitsInASystem(pos, event, activeGame, p2, Helper.getFactionIconFromDiscord(p2.getFaction()), player);
             }
-            if(FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeGame, player)){
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && isCabalBlockadedByPlayer(p2, activeGame, player)){
                 String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" has failed to eat units owned by " + Helper.getPlayerRepresentation(player, activeGame) + " because they were blockaded. Wah-wah.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
             }
@@ -463,8 +461,8 @@ public class ButtonHelperFactionSpecific {
                         channel = receiver.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
-                    ButtonHelperFactionSpecific.pillageCheck(sender, activeGame);
-                    ButtonHelperFactionSpecific.pillageCheck(receiver, activeGame);
+                    pillageCheck(sender, activeGame);
+                    pillageCheck(receiver, activeGame);
                 }
             }
         }
@@ -482,7 +480,7 @@ public class ButtonHelperFactionSpecific {
             else{
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             }
-            ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+            pillageCheck(player, activeGame);
         }
     }
 
@@ -715,7 +713,7 @@ public class ButtonHelperFactionSpecific {
         }else{
             p2.setCommodities(p2.getCommoditiesTotal());
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, p2, event);
-            ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, p2);
+            cabalAgentInitiation(activeGame, p2);
             message = "Refreshed " +p2.getColor()+ "'s commodities";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -925,7 +923,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
     public static void resolveMitosisMech(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String finChecker){
-        List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getPlanetPlaceUnitButtonsForMechMitosis(player, activeGame, finChecker));
+        List<Button> buttons = new ArrayList<>(getPlanetPlaceUnitButtonsForMechMitosis(player, activeGame, finChecker));
         String message = ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to replace 1 infantry with a mech";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ident + " is resolving mitosis");
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
@@ -1061,7 +1059,7 @@ public class ButtonHelperFactionSpecific {
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg()+2);
-            ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+            pillageCheck(player, activeGame);
             String message = trueIdentity+" increased your tgs by 2 ("+(player.getTg()-2)+"->"+player.getTg()+"). Use buttons in your cards info thread to discard an AC";
             MessageHelper.sendMessageToChannel(channel2, message);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
@@ -1086,7 +1084,7 @@ public class ButtonHelperFactionSpecific {
             String pos = posNFaction.split("_")[0];
             String faction = posNFaction.split("_")[1];
             Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true)+" Use buttons to resolve yin agent", ButtonHelperFactionSpecific.getYinAgentButtons(p2, activeGame, pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true)+" Use buttons to resolve yin agent", getYinAgentButtons(p2, activeGame, pos));
         }
 
         if ("naaluagent".equalsIgnoreCase(agent)) {
@@ -1142,7 +1140,7 @@ public class ButtonHelperFactionSpecific {
         if ("argentagent".equalsIgnoreCase(agent)) {
             String pos = rest.replace("argentagent_","");
             Tile tile = activeGame.getTileByPosition(pos);
-            ButtonHelperFactionSpecific.addArgentAgentButtons(tile, player, activeGame);
+            addArgentAgentButtons(tile, player, activeGame);
         }
         if ("nomadagentmercer".equalsIgnoreCase(agent)) {
             String posNPlanet = rest.replace("nomadagentmercer_","");
@@ -1206,7 +1204,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
             String message = "Use buttons to select which tile to use arborec agent in";
-            List<Button> buttons = ButtonHelperFactionSpecific.getTilesToArboAgent(p2, activeGame, event);
+            List<Button> buttons = getTilesToArboAgent(p2, activeGame, event);
             MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true) + message, buttons);
         }
 
@@ -1435,9 +1433,9 @@ public class ButtonHelperFactionSpecific {
                 player.setCommodities(player.getCommoditiesTotal());
                 String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " due to your council patronage ability, 1tg has been added to your total and your commodities have been refreshed";
                 MessageHelper.sendMessageToChannel(channel, message);
-                ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                pillageCheck(player, activeGame);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
-                ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
+                cabalAgentInitiation(activeGame, player);
 
             }
         }
@@ -1464,7 +1462,6 @@ public class ButtonHelperFactionSpecific {
                  Tile adjT = activeGame.getTileMap().get(adjTile);
                  if(FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT))
                  {
-                     isNextTo = true;
                      return true;
                  }
              }
@@ -1517,7 +1514,7 @@ public class ButtonHelperFactionSpecific {
         String successMessage = "Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + "->"
                 + (player.getStrategicCC() - 1) + ")";
         player.setStrategicCC(player.getStrategicCC() - 1);
-        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+        resolveMuaatCommanderCheck(player, activeGame, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
         if ("destroyer".equals(unit)) {

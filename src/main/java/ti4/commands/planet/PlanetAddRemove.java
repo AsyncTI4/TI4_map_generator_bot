@@ -93,9 +93,6 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     public abstract void doAction(Player player, String techID, Game activeGame);
 
     /** Customize the initial header response depending on ActionID (which /player planet_* action is used)
-     * @param activeGame
-     * @param player
-     * @return
      */
     private String getActionHeaderMessage(Game activeGame, Player player) {
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" ");
@@ -111,7 +108,6 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     }
 
     /** Customize the message depending on ActionID and planet name
-     * @param planet
      * @return special message depending on which action was used and which planet was targeted
      */
     private String resolvePlanetMessage(String planet) {
@@ -141,7 +137,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
      * @param event - if "spend_as" option is used for "planet_exhaust"
      * @return message describing what the planets were exhausted for
      */
-    private String resolveSpendAs(SlashCommandInteractionEvent event, LinkedHashSet<String> planetIDs) {
+    private String resolveSpendAs(SlashCommandInteractionEvent event, Set<String> planetIDs) {
         OptionMapping option = event.getOption(Constants.SPEND_AS);
         if (option != null) {
             StringBuilder message = new StringBuilder(", spent as ");
@@ -160,9 +156,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                     }
                     message.append(Helper.getInfluenceEmoji(sum)).append(" influence").toString();
                 }
-                case "v", "votes" -> {
-                    message.append(" votes").toString();
-                }
+                case "v", "votes" -> message.append(" votes").toString();
                 case "t", "techskip" -> message.append(" a tech skip").toString();
                 case "toes" -> { //For HolyT
                     for (String planetID : planetIDs) {

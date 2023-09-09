@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -109,7 +108,7 @@ public class ButtonHelperModifyUnits {
         //activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos1), amount, planet, key, player.getColor(), false);
 
-        List<Button> systemButtons = ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, activeGame, event, pos1, pos2);
+        List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, activeGame, event, pos1, pos2);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Retreated "+amount+ " "+unitkey + " on "+planet +" to "+ activeGame.getTileByPosition(pos2).getRepresentationForButtons(activeGame,player));
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
@@ -820,12 +819,10 @@ public class ButtonHelperModifyUnits {
                     for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                         String name = entry.getKey();
                         String representation = planetRepresentations.get(name);
-                        if (representation == null){
-                        }
                         UnitHolder unitHolder = entry.getValue();
                         HashMap<String, Integer> units1 = unitHolder.getUnits();
                         Map<String, Integer> units = new HashMap<>(units1);
-                        if (unitHolder instanceof Planet planet) {
+                        if (unitHolder instanceof Planet) {
                             for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                                 String key = unitEntry.getKey();
                                 if (key.contains(cID)) {
@@ -855,13 +852,8 @@ public class ButtonHelperModifyUnits {
                                     if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {                         
                                         String unitKey = key.replace(cID+"_", "");                    
                                         int totalUnits = unitEntry.getValue();
-                                        int amount = unitEntry.getValue();
                                         unitKey  = unitKey.replace(".png", "");
                                         unitKey = ButtonHelper.getUnitName(unitKey);
-                                        int damagedUnits = 0;
-                                        if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
-                                            damagedUnits = unitHolder.getUnitDamage().get(key);
-                                        }
                                         String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
                                         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
                                         if(cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){

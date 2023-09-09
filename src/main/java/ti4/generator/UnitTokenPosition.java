@@ -10,9 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class UnitTokenPosition implements Serializable {
-    private String unitHolderName;
+    private final String unitHolderName;
     private LinkedHashMap<String, List<Point>> coordinateMap = new LinkedHashMap<>();
-    private boolean removeUnitCoordinate;
+    private final boolean removeUnitCoordinate;
 
     @JsonCreator
     public UnitTokenPosition(@JsonProperty("unitHolderName") String unitHolderName,
@@ -32,8 +32,8 @@ public class UnitTokenPosition implements Serializable {
         this.removeUnitCoordinate = removeUnitCoordinate;
     }
 
-    public String getUnitHolderName() { return this.unitHolderName; }
-    public LinkedHashMap<String, List<Point>> getCoordinateMap() { return this.coordinateMap; }
+    public String getUnitHolderName() { return unitHolderName; }
+    public LinkedHashMap<String, List<Point>> getCoordinateMap() { return coordinateMap; }
 
     /*public ArrayList<String> getUnitOrder() {
         ArrayList<String> unitOrder = new ArrayList<>();
@@ -43,7 +43,7 @@ public class UnitTokenPosition implements Serializable {
         return unitOrder;
     }*/
 
-    public boolean getRemoveUnitCoordinate() { return this.removeUnitCoordinate; }
+    public boolean getRemoveUnitCoordinate() { return removeUnitCoordinate; }
     public int getPositionCount(String id) {
         return coordinateMap.get(id).size();
     }

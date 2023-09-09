@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import javax.security.auth.login.LoginException;
-
 public class MapGenerator {
 
     public static JDA jda;
@@ -67,13 +65,13 @@ public class MapGenerator {
     public static Guild guild3rd;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static List<Role> adminRoles = new ArrayList<>();
-    public static List<Role> developerRoles = new ArrayList<>();
-    public static List<Role> bothelperRoles = new ArrayList<>();
+    public static final List<Role> adminRoles = new ArrayList<>();
+    public static final List<Role> developerRoles = new ArrayList<>();
+    public static final List<Role> bothelperRoles = new ArrayList<>();
 
     public static boolean readyToReceiveCommands;
 
-    public static void main(String[] args) throws LoginException {
+    public static void main(String[] args) {
         GlobalSettings.loadSettings();
 
         jda = JDABuilder.createDefault(args[0])
@@ -259,7 +257,7 @@ public class MapGenerator {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
-                MapGenerator.readyToReceiveCommands = false;
+                readyToReceiveCommands = false;
                 MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(5);
                 GameSaveLoadManager.saveMaps();

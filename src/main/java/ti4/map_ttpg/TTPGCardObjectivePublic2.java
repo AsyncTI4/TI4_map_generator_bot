@@ -20,7 +20,7 @@ public class TTPGCardObjectivePublic2 {
     @JsonProperty("deck")
     private List<String> deck;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("deck")
     public List<String> getDeck() {
@@ -34,12 +34,12 @@ public class TTPGCardObjectivePublic2 {
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+        return additionalProperties;
     }
 
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+        additionalProperties.put(name, value);
     }
 
 }

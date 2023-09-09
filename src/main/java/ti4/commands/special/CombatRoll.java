@@ -3,6 +3,7 @@ package ti4.commands.special;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -101,12 +102,8 @@ public class CombatRoll extends SpecialSubcommandData {
         secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods);
     }
 
-    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
-
-        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
-        String tileName = tile.getTilePath();
-        tileName = tileName.substring(tileName.indexOf("_") + 1);
-        tileName = tileName.substring(0, tileName.indexOf(".png"));
+    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName,
+            HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if(combatOnHolder == null){
@@ -114,7 +111,7 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
         
-        HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
         if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
@@ -133,7 +130,8 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeGame);
-        
+
+        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeGame);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());

@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
 import ti4.commands.cardsac.ACInfo_Legacy;
-import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -144,8 +143,6 @@ public class MessageHelper {
 				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
 				return;
 			}
-			String gameName = event.getChannel().getName();
-			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
@@ -353,7 +350,6 @@ public class MessageHelper {
 	 *
 	 * @param messageText any non-null, non-empty string
 	 * @param maxLength   maximum length, any positive integer
-	 * @return
 	 */
 	private static List<String> splitLargeText(String messageText, int maxLength) {
 		List<String> texts = new ArrayList<>();
@@ -452,9 +448,9 @@ public class MessageHelper {
 			if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
 			if (channel instanceof TextChannel) {
 						Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
-            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
+            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
-            MessageHelper.sendMessageToChannel(channel, messageToSend);
+            sendMessageToChannel(channel, messageToSend);
         }
     }
 

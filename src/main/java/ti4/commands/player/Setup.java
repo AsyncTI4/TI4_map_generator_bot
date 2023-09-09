@@ -44,7 +44,6 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        @SuppressWarnings("ConstantConditions")
         String factionOption = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (factionOption != null) factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");
         String faction = AliasHandler.resolveFaction(factionOption);
@@ -52,7 +51,6 @@ public class Setup extends PlayerSubcommandData {
             sendMessage("Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactions());
             return;
         }
-        @SuppressWarnings("ConstantConditions")
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(color)) {
             sendMessage("Color `" + color + "` is not valid. Options are: " + Mapper.getColors());

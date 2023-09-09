@@ -61,11 +61,11 @@ public class Player {
 
     private Set<Integer> followedSCs = new HashSet<>();
 
-    private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
-    private LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
-    private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
+    private final LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private HashSet<String> abilities = new HashSet<>();
     private HashSet<String> exhaustedAbilities = new HashSet<>();
@@ -85,9 +85,9 @@ public class Player {
     private List<Leader> leaders = new ArrayList<>();
 
     private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); //colour, count
-    private HashMap<String, String> fow_seenTiles = new HashMap<>();
-    private HashMap<String, Integer> unitCaps = new HashMap<>();
-    private HashMap<String, String> fow_customLabels = new HashMap<>();
+    private final HashMap<String, String> fow_seenTiles = new HashMap<>();
+    private final HashMap<String, Integer> unitCaps = new HashMap<>();
+    private final HashMap<String, String> fow_customLabels = new HashMap<>();
     private String fowFogFilter;
     private boolean fogInitialized;
 
@@ -117,7 +117,7 @@ public class Player {
     private int numberOfTurns;
     private long totalTimeSpent;
 
-    private Tile nomboxTile = new Tile("nombox", "nombox");
+    private final Tile nomboxTile = new Tile("nombox", "nombox");
 
     public Player() {
     }
@@ -973,12 +973,12 @@ public class Player {
     }
     public void addAllianceMember(String color) {
         if (!"null".equals(color)) {
-            this.allianceMembers = allianceMembers+color;
+            allianceMembers = allianceMembers+color;
         }
     }
     public void setAllianceMembers(String color) {
         if (!"null".equals(color)) {
-            this.allianceMembers = color;
+            allianceMembers = color;
         }
     }
     public String getAllianceMembers() {
@@ -986,7 +986,7 @@ public class Player {
     }
     public void removeAllianceMember(String color) {
         if (!"null".equals(color)) {
-            this.allianceMembers = allianceMembers.replace(color, "");
+            allianceMembers = allianceMembers.replace(color, "");
         }
     }
 
@@ -1102,11 +1102,11 @@ public class Player {
     }
 
     public void addFollowedSC(Integer sc) {
-        this.followedSCs.add(sc);
+        followedSCs.add(sc);
     }
 
     public void removeFollowedSC(Integer sc) {
-        this.followedSCs.remove(sc);
+        followedSCs.remove(sc);
     }
 
     public boolean hasFollowedSC(int sc) {
@@ -1114,11 +1114,11 @@ public class Player {
     }
 
     public void clearFollowedSCs() {
-        this.followedSCs.clear();
+        followedSCs.clear();
     }
 
     public Set<Integer> getFollowedSCs() {
-        return this.followedSCs;
+        return followedSCs;
     }
 
     @JsonIgnore
@@ -1566,7 +1566,7 @@ public class Player {
 
     @JsonIgnore
     public String getAutoCompleteRepresentation(boolean reset) {
-        if (reset || this.autoCompleteRepresentation == null) {
+        if (reset || autoCompleteRepresentation == null) {
             String faction = getFaction();
             if (faction == null || "null".equals(faction)) {
                 faction = "No Faction";
@@ -1586,11 +1586,11 @@ public class Player {
             setAutoCompleteRepresentation(representation);
             return getAutoCompleteRepresentation();
         }
-        return this.autoCompleteRepresentation;
+        return autoCompleteRepresentation;
     }
 
     public void setAutoCompleteRepresentation(String representation) {
-        this.autoCompleteRepresentation = representation;
+        autoCompleteRepresentation = representation;
     }
 
     //BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"

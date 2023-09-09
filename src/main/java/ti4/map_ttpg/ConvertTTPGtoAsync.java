@@ -394,8 +394,8 @@ public class ConvertTTPGtoAsync {
         asyncGame.setActionCards(actionCards);
 
         // ACTION CARD DISCARD
-        List<String> ttpgActionDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
-        ArrayList<String> actionDiscards = new ArrayList<>() {{
+        List<String> ttpgActionDiscards = ttpgMap.getDecks().getCardAction().getDiscard();
+        List<String> actionDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgActionDiscards)) addAll(ttpgActionDiscards);
             replaceAll(AliasHandler::resolveActionCard);
         }};
@@ -410,9 +410,9 @@ public class ConvertTTPGtoAsync {
         asyncGame.setAgendas(agendaCards);
 
         // AGENDA DISCARD
-        List<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAgenda().getDiscard();
-        List<String> ttpgLawsInPlay = (ArrayList<String>) ttpgMap.getLaws();
-        ArrayList<String> agendaDiscards = new ArrayList<>() {{
+        List<String> ttpgAgendaDiscards = ttpgMap.getDecks().getCardAgenda().getDiscard();
+        List<String> ttpgLawsInPlay = ttpgMap.getLaws();
+        List<String> agendaDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
             if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
             replaceAll(AliasHandler::resolveAgenda);
@@ -427,11 +427,11 @@ public class ConvertTTPGtoAsync {
         }
 
         // EXPLORATION DECK
-        List<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
-        List<String> ttpgExploreHazardousCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
-        List<String> ttpgExploreIndustrialCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
-        List<String> ttpgExploreFrontierCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
-        ArrayList<String> exploreCards = new ArrayList<>() {{
+        List<String> ttpgExploreCulturalCards = ttpgMap.getDecks().getCardExplorationCultural().getDeck();
+        List<String> ttpgExploreHazardousCards = ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
+        List<String> ttpgExploreIndustrialCards = ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
+        List<String> ttpgExploreFrontierCards = ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
+        List<String> exploreCards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
             if (Objects.nonNull(ttpgExploreHazardousCards)) addAll(ttpgExploreHazardousCards);
             if (Objects.nonNull(ttpgExploreIndustrialCards)) addAll(ttpgExploreIndustrialCards);
@@ -442,10 +442,10 @@ public class ConvertTTPGtoAsync {
         asyncGame.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD
-        List<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
-        List<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
-        List<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
-        List<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
+        List<String> ttpgExploreCulturalDiscards = ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
+        List<String> ttpgExploreHazardousDiscards = ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
+        List<String> ttpgExploreIndustrialDiscards = ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
+        List<String> ttpgExploreFrontierDiscards = ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
         ArrayList<String> exploreDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
             if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
@@ -456,7 +456,7 @@ public class ConvertTTPGtoAsync {
         asyncGame.setExploreDiscard(exploreDiscards);
 
         // RELIC DECK
-        List<String> ttpgRelicCards = (ArrayList<String>) ttpgMap.getDecks().getCardRelic().getDeck();
+        List<String> ttpgRelicCards = ttpgMap.getDecks().getCardRelic().getDeck();
         ArrayList<String> relicCards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
             replaceAll(AliasHandler::resolveRelic);
@@ -541,7 +541,6 @@ public class ConvertTTPGtoAsync {
             return null;
         }
 
-        Tile tile = null;
         String tileID = AliasHandler.resolveTile(matcher.group(1));
         String ttpgXPosition = matcher.group(2);
         String ttpgYPosition = matcher.group(3);
@@ -557,10 +556,9 @@ public class ConvertTTPGtoAsync {
                 tileID = "82b"; //TODO: If 82 hasunits or control, then 82b, otherwise, 82a
                 asyncPosition = "tl"; //hardcode top left for now
             }
-            case "51" -> { //Creuss
+            case "51" -> //Creuss
                 //TODO: move DeltaWH if exists in tileList
                 asyncPosition = "tr"; //hardcode top right for now
-            }
             case "17" -> { //DeltaWH
                 //TODO: move Creuss if exists in tileList - i.e. if 17 is near BL, put 51 in BL
             }
@@ -572,11 +570,11 @@ public class ConvertTTPGtoAsync {
 
         if (asyncPosition == null) {
             System.out.println("    Could not map: " + ttpgPosition);
-            return tile;
+            return null;
         }
 
         //PER REGION/PLANET/UNITHOLDER
-        tile = new Tile(tileID, asyncPosition);
+        Tile tile = new Tile(tileID, asyncPosition);
         String tileContents = matcher.group(4);
         int index = 0;
         String[] regions = tileContents.split(";");
@@ -740,7 +738,7 @@ public class ConvertTTPGtoAsync {
         return true;
     }
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static ObjectMapper getDefaultObjectMapper(){
 

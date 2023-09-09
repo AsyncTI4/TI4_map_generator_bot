@@ -40,7 +40,7 @@ public class TTPGUnpickedStrategyCards {
     @JsonProperty("Politics")
     private Integer politics;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("Leadership")
     public Integer getLeadership() {
@@ -124,12 +124,12 @@ public class TTPGUnpickedStrategyCards {
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+        return additionalProperties;
     }
 
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+        additionalProperties.put(name, value);
     }
 
 }

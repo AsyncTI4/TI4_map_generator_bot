@@ -14,29 +14,29 @@ import java.util.Set;
 
 /**
  * Class used to execute Discord Webhooks with low effort
- * https://gist.github.com/k3kdude/fba6f6b37594eae3d6f9475330733bdb
- *
+ * <a href="https://gist.github.com/k3kdude/fba6f6b37594eae3d6f9475330733bdb">...</a>
+ * <p>
  * EXAMPLE USAGE:
-        DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/...");
-        webhook.setContent("Any message!");
-        webhook.setAvatarUrl("https://your.awesome/image.png");
-        webhook.setUsername("Custom Usernames!");
-        webhook.setTts(true);
-        webhook.addEmbed(new DiscordWebhook.EmbedObject()
-            .setTitle("Title")
-            .setDescription("This is a description")
-            .setColor(Color.RED)
-            .addField("1st Field", "Inline", true)
-            .addField("2nd Field", "Inline", true)
-            .addField("3rd Field", "No-Inline", false)
-            .setThumbnail("https://kryptongta.com/images/kryptonlogo.png")
-            .setFooter("Footer text", "https://kryptongta.com/images/kryptonlogodark.png")
-            .setImage("https://kryptongta.com/images/kryptontitle2.png")
-            .setAuthor("Author Name", "https://kryptongta.com", "https://kryptongta.com/images/kryptonlogowide.png")
-            .setUrl("https://kryptongta.com"));
-        webhook.addEmbed(new DiscordWebhook.EmbedObject()
-            .setDescription("Just another added embed object!"));
-        webhook.execute(); //Handle exception
+ DiscordWebhook webhook = new DiscordWebho<a href="ok("https://discordapp.com/api/webho">...</a>oks/...");
+ webhook.setContent("Any message!");
+ webhook.setAvatarU<a href="rl("https://your.awesome/image">...</a>.png");
+ webhook.setUsername("Custom Usernames!");
+ webhook.setTts(true);
+ webhook.addEmbed(new DiscordWebhook.EmbedObject()
+ .setTitle("Title")
+ .setDescription("This is a description")
+ .setColor(Color.RED)
+ .addField("1st Field", "Inline", true)
+ .addField("2nd Field", "Inline", true)
+ .addField("3rd Field", "No-Inline", false)
+ .setThumbna<a href="il("https://kryptongta.com/images/kryptonlogo">...</a>.png")
+ .setFooter("Footer text<a href="",">"https://kryptongta.com/images/kryptonlogodark</a>.png")
+ .setIma<a href="ge("https://kryptongta.com/images/kryptontitle2">...</a>.png")
+ .setAuthor("Author Name<a href="",">"https://kryp<a href="tongta</a>.com",">"https://kryptongta.com/images/k</a>ryptonlogowide.png")
+ .setU<a href="rl("https://kryptongta">...</a>.com"));
+ webhook.addEmbed(new DiscordWebhook.EmbedObject()
+ .setDescription("Just another added embed object!"));
+ webhook.execute(); //Handle exception
  */
 public class DiscordWebhook {
 
@@ -45,7 +45,7 @@ public class DiscordWebhook {
     private String username;
     private String avatarUrl;
     private boolean tts;
-    private List<EmbedObject> embeds = new ArrayList<>();
+    private final List<EmbedObject> embeds = new ArrayList<>();
 
     /**
      * Constructs a new DiscordWebhook instance
@@ -73,25 +73,25 @@ public class DiscordWebhook {
     }
 
     public void addEmbed(EmbedObject embed) {
-        this.embeds.add(embed);
+        embeds.add(embed);
     }
 
     public void execute() throws IOException {
-        if (this.content == null && this.embeds.isEmpty()) {
+        if (content == null && embeds.isEmpty()) {
             throw new IllegalArgumentException("Set content or add at least one EmbedObject");
         }
 
         JSONObject json = new JSONObject();
 
-        json.put("content", this.content);
-        json.put("username", this.username);
-        json.put("avatar_url", this.avatarUrl);
-        json.put("tts", this.tts);
+        json.put("content", content);
+        json.put("username", username);
+        json.put("avatar_url", avatarUrl);
+        json.put("tts", tts);
 
-        if (!this.embeds.isEmpty()) {
+        if (!embeds.isEmpty()) {
             List<JSONObject> embedObjects = new ArrayList<>();
 
-            for (EmbedObject embed : this.embeds) {
+            for (EmbedObject embed : embeds) {
                 JSONObject jsonEmbed = new JSONObject();
 
                 jsonEmbed.put("title", embed.getTitle());
@@ -188,7 +188,7 @@ public class DiscordWebhook {
         private Thumbnail thumbnail;
         private Image image;
         private Author author;
-        private List<Field> fields = new ArrayList<>();
+        private final List<Field> fields = new ArrayList<>();
 
         public String getTitle() {
             return title;
@@ -247,33 +247,33 @@ public class DiscordWebhook {
         }
 
         public EmbedObject setFooter(String text, String icon) {
-            this.footer = new Footer(text, icon);
+            footer = new Footer(text, icon);
             return this;
         }
 
         public EmbedObject setThumbnail(String url) {
-            this.thumbnail = new Thumbnail(url);
+            thumbnail = new Thumbnail(url);
             return this;
         }
 
         public EmbedObject setImage(String url) {
-            this.image = new Image(url);
+            image = new Image(url);
             return this;
         }
 
         public EmbedObject setAuthor(String name, String url, String icon) {
-            this.author = new Author(name, url, icon);
+            author = new Author(name, url, icon);
             return this;
         }
 
         public EmbedObject addField(String name, String value, boolean inline) {
-            this.fields.add(new Field(name, value, inline));
+            fields.add(new Field(name, value, inline));
             return this;
         }
 
         private static class Footer {
-            private String text;
-            private String iconUrl;
+            private final String text;
+            private final String iconUrl;
 
             private Footer(String text, String iconUrl) {
                 this.text = text;
@@ -290,7 +290,7 @@ public class DiscordWebhook {
         }
 
         private static class Thumbnail {
-            private String url;
+            private final String url;
 
             private Thumbnail(String url) {
                 this.url = url;
@@ -302,7 +302,7 @@ public class DiscordWebhook {
         }
 
         private static class Image {
-            private String url;
+            private final String url;
 
             private Image(String url) {
                 this.url = url;
@@ -314,9 +314,9 @@ public class DiscordWebhook {
         }
 
         private static class Author {
-            private String name;
-            private String url;
-            private String iconUrl;
+            private final String name;
+            private final String url;
+            private final String iconUrl;
 
             private Author(String name, String url, String iconUrl) {
                 this.name = name;
@@ -338,9 +338,9 @@ public class DiscordWebhook {
         }
 
         private static class Field {
-            private String name;
-            private String value;
-            private boolean inline;
+            private final String name;
+            private final String value;
+            private final boolean inline;
 
             private Field(String name, String value, boolean inline) {
                 this.name = name;

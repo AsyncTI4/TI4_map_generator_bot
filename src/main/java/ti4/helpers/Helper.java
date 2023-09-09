@@ -223,7 +223,7 @@ public class Helper {
         } else {
             String userID = event.getUser().getId();
             Player foundPlayer = activeGame.getPlayers().values().stream().filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
-            foundPlayer = Helper.getGamePlayer(activeGame, foundPlayer, event, null);
+            foundPlayer = getGamePlayer(activeGame, foundPlayer, event, null);
             if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }
@@ -373,11 +373,8 @@ public class Helper {
             scAsString = String.valueOf(scValue);
         }
 
-        File scFile = new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + scAsString + ".png", "Could not find SC image!"));
-        if (Optional.ofNullable(scFile).isEmpty()) {
-            return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards", "sadFace.png", ""));
-        }
-        return scFile;
+        return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet +
+            "_" + scAsString + ".png", "Could not find SC image!"));
     }
 
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
@@ -385,7 +382,7 @@ public class Helper {
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
         Emoji emojiToUse;
         String playerFaction = player.getFaction();
-        emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
+        emojiToUse = Emoji.fromFormatted(getFactionIconFromDiscord(playerFaction));
         String messageId = message.getId();
 
         if (activeGame.isFoWMode()) {
@@ -394,7 +391,7 @@ public class Helper {
                 if (player_ == player) break;
                 index++;
             }
-            emojiToUse = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            emojiToUse = Emoji.fromFormatted(getRandomizedEmoji(index, messageId));
         }
 
         return emojiToUse;
@@ -520,7 +517,7 @@ public class Helper {
 
     public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
-        return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+        return getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
     public static String getPlanetRepresentation(String planet, Game activeGame) {
         planet = planet.toLowerCase().replace(" ", "");
@@ -531,9 +528,8 @@ public class Helper {
         if(planet2 == null){
             return planet + " bot error. Tell fin";
         }
-        String planetProper = Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
 
-        return planetProper;
+        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
     }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game activeGame) {
@@ -570,7 +566,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Button.success("refresh_"+planet, Helper.getPlanetRepresentation(planet, activeGame));
+            Button button = Button.success("refresh_"+planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -585,7 +581,7 @@ public class Helper {
         }
         else
         {
-            ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            ident = getFactionIconFromDiscord(player.getFaction());
         }
         return ident;
     }
@@ -627,7 +623,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("spend_"+planet, Helper.getPlanetRepresentation(planet, activeGame));
+            Button button = Button.danger("spend_"+planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -637,7 +633,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
         for (String planet : planets) {
-            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame));
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -662,31 +658,31 @@ public class Helper {
         {
             if(player.hasWarsunTech()) {
                 Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_warsun_"+tp, "Produce Warsun" );
-                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
+                wsButton = wsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("warsun")));
                 unitButtons.add(wsButton);
             }
             Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_flagship_"+tp, "Produce Flagship" );
-            fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
+            fsButton = fsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("flagship")));
             unitButtons.add(fsButton);
         }
         Button dnButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_dreadnought_"+tp, "Produce Dreadnought" );
-        dnButton = dnButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("dreadnought")));
+        dnButton = dnButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("dreadnought")));
         unitButtons.add(dnButton);
         Button cvButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_carrier_"+tp, "Produce Carrier" );
-        cvButton = cvButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("carrier")));
+        cvButton = cvButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("carrier")));
         unitButtons.add(cvButton);
         Button caButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_cruiser_"+tp, "Produce Cruiser" );
-        caButton = caButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("cruiser")));
+        caButton = caButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("cruiser")));
         unitButtons.add(caButton);
         Button ddButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_destroyer_"+tp, "Produce Destroyer" );
-        ddButton = ddButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("destroyer")));
+        ddButton = ddButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("destroyer")));
         unitButtons.add(ddButton);
         Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_fighter_"+tp, "Produce 1 Fighter" );
-        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
         if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)&& !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
             Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Produce 2 Fighters" );
-            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
             unitButtons.add(ff2Button);
         }
         
@@ -694,7 +690,7 @@ public class Helper {
 
             if(player.hasUnexhaustedLeader("argentagent", activeGame)){
                         Button argentButton = Button.success("FFCC_"+player.getFaction()+"_"+"exhaustAgent_argentagent_"+tile.getPosition(), "Use Argent Agent");
-                        argentButton = argentButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("argent")));
+                        argentButton = argentButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("argent")));
                         unitButtons.add(argentButton);
             }
         }
@@ -716,38 +712,38 @@ public class Helper {
                 
                 String pp = planet.getName();
                 if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
-                    Button sdButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_sd_"+pp, "Place 1 Space Dock on "+Helper.getPlanetRepresentation(pp, activeGame));
-                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+                    Button sdButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_sd_"+pp, "Place 1 Space Dock on "+ getPlanetRepresentation(pp, activeGame));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("spacedock")));
                     unitButtons.add(sdButton);
-                    Button pdsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_pds_"+pp, "Place 1 PDS on "+Helper.getPlanetRepresentation(pp, activeGame));
-                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+                    Button pdsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_pds_"+pp, "Place 1 PDS on "+ getPlanetRepresentation(pp, activeGame));
+                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("pds")));
                     unitButtons.add(pdsButton);
                 }
-                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeGame));
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+ getPlanetRepresentation(pp, activeGame));
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
                 if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
-                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeGame) );
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+ getPlanetRepresentation(pp, activeGame) );
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
                 }
-                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeGame) );
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_"+pp, "Produce Mech on "+ getPlanetRepresentation(pp, activeGame) );
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
 
                 
             }
             else if(ButtonHelper.canIBuildGFInSpace(activeGame, player, tile, warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space"+tile.getPosition(), "Produce 1 Infantry in space");
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
                 if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_space"+tile.getPosition(), "Produce 2 Infantry in space" );
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_space"+tile.getPosition(), "Produce Mech in space" );
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
             }
         }
@@ -764,8 +760,8 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         for (String planet : planets) {
-            if (!Helper.getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
-                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, Helper.getPlanetRepresentation(planet, activeGame) + " System");
+            if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
+                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, getPlanetRepresentation(planet, activeGame) + " System");
                 planetButtons.add(button);
             }
 
@@ -1063,8 +1059,8 @@ public class Helper {
 
     // One representation to rule them all
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame);
-        if (privateGame != null && privateGame && !overrideFow){
+        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
+        if (privateGame && !overrideFow){
             return getColourAsMention(guild, player.getColor());
         }
 
@@ -1081,8 +1077,8 @@ public class Helper {
     }
 
     private static String defaultPlayerRepresentation(Player player, Guild guild) {
-        StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
-        sb.append(" ").append(Helper.getPlayerPing(player));
+        StringBuilder sb = new StringBuilder(getFactionIconFromDiscord(player.getFaction()));
+        sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
         }
@@ -1151,12 +1147,12 @@ public class Helper {
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
         String scEmojiName = "SC" + strategy_card;
-        return Helper.getEmojiFromDiscord(scEmojiName);
+        return getEmojiFromDiscord(scEmojiName);
     }
 
     public static String getSCBackEmojiFromInteger(Integer strategy_card) {
         String scEmojiName = "SC" + strategy_card + "Back";
-        return Helper.getEmojiFromDiscord(scEmojiName);
+        return getEmojiFromDiscord(scEmojiName);
     }
 
     public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game activeGame, String color) {
@@ -1608,8 +1604,8 @@ public class Helper {
         TechnologyType techType = tech.getType();
         String techFaction = tech.getFaction();
         String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
+        String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
 
@@ -1617,19 +1613,15 @@ public class Helper {
         List<Button> techButtons = new ArrayList<>();
 
         techs.sort((tech1, tech2) -> {
-            try {
-                int req1 = tech1.getRequirements().length();
-                int req2 = tech2.getRequirements().length();
-                if (req1 < req2) {
-                    return -1;
-                }
-                if (req2 < req1) {
-                    return 1;
-                }
-                return tech1.getName().compareTo(tech2.getName());
-            } catch (Exception e) {
+            int req1 = tech1.getRequirements().length();
+            int req2 = tech2.getRequirements().length();
+            if (req1 < req2) {
+                return -1;
             }
-            return 0;
+            if (req2 < req1) {
+                return 1;
+            }
+            return tech1.getName().compareTo(tech2.getName());
         });
 
         for (TechnologyModel tech : techs) {
@@ -1689,9 +1681,7 @@ public class Helper {
                         case "fs" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.flagship));
                     }
                 }
-                default -> {
-                    techB = Button.secondary(buttonID, techName);
-                }
+                default -> techB = Button.secondary(buttonID, techName);
             }
             techButtons.add(techB);
         }
@@ -1724,8 +1714,8 @@ public class Helper {
         TechnologyType techType = tech.getType();
         String techFaction = tech.getFaction();
         String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
+        String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         
         String techText = tech.getText();
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n" +
@@ -1753,11 +1743,9 @@ public class Helper {
 
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> {
-                message.append("Run the following commands to use Nanoforge:\n")
-                       .append("     `/explore relic_purge relic: nanoforge`\n")
-                       .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
-            }
+            case "nanoforge" -> message.append("Run the following commands to use Nanoforge:\n")
+                   .append("     `/explore relic_purge relic: nanoforge`\n")
+                   .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
         }
         return message.toString();
     }
@@ -1907,7 +1895,6 @@ public class Helper {
     }
 
     /**
-     * @param commaSeparatedString
      * @return List of Strings
      */
     public static List<String> getListFromCSV(String commaSeparatedString) {
@@ -1955,7 +1942,6 @@ public class Helper {
     }
 
     /**
-     * @param commaSeparatedString
      * @return Set of Strings (no duplicates)
      */
     public static Set<String> getSetFromCSV(String commaSeparatedString) {

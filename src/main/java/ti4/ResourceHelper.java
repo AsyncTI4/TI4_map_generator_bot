@@ -6,21 +6,20 @@ import ti4.helpers.Storage;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Random;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;
-    private HashMap<String, String> unitCache = new HashMap<>();
-    private HashMap<String, String> tileCache = new HashMap<>();
-    private HashMap<String, String> ccCache = new HashMap<>();
-    private HashMap<String, String> attachmentCache = new HashMap<>();
-    private HashMap<String, String> tokenCache = new HashMap<>();
-    private HashMap<String, String> factionCache = new HashMap<>();
-    private HashMap<String, String> generalCache = new HashMap<>();
-    private HashMap<String, String> planetCache = new HashMap<>();
-    private HashMap<String, String> paCache = new HashMap<>();
+    private final HashMap<String, String> unitCache = new HashMap<>();
+    private final HashMap<String, String> tileCache = new HashMap<>();
+    private final HashMap<String, String> ccCache = new HashMap<>();
+    private final HashMap<String, String> attachmentCache = new HashMap<>();
+    private final HashMap<String, String> tokenCache = new HashMap<>();
+    private final HashMap<String, String> factionCache = new HashMap<>();
+    private final HashMap<String, String> generalCache = new HashMap<>();
+    private final HashMap<String, String> planetCache = new HashMap<>();
+    private final HashMap<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -30,21 +29,6 @@ public class ResourceHelper {
             resourceHelper = new ResourceHelper();
         }
         return resourceHelper;
-    }
-
-    public File getResource(String name) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream stream = classLoader.getResourceAsStream(name);
-        try {
-            if (stream == null) {
-                throw new Exception("Cannot find file " + name);
-            }
-            return new File(stream.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return null;
     }
 
     @Nullable

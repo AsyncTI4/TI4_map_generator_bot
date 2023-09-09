@@ -133,7 +133,7 @@ public class Mapper {
     public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
-        if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+        if (isColorValid(color) && isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && !"Absol".equalsIgnoreCase(pn.getSource())) {
@@ -180,7 +180,7 @@ public class Mapper {
     }
 
     public static List<String> getFrontierTileIds() {
-        final List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
+        List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
                 .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
                 .filter(tileModel -> tileModel.getPlanetIds().size() == 0)

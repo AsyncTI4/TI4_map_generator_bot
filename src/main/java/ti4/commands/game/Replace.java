@@ -83,7 +83,7 @@ public class Replace extends GameSubcommandData {
         
         //ADD ROLE
         Member addedMember = guild.getMemberById(addedUser.getId());
-        if (roles != null && roles.size() == 1) {
+        if (roles.size() == 1) {
             guild.addRoleToMember(addedMember, roles.get(0)).queue();
         }
         

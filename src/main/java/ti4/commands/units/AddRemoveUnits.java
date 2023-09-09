@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -258,7 +257,7 @@ abstract public class AddRemoveUnits implements Command {
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 String message = colorMention + " has modified units in the system. ";
-                if(this.getActionDescription().contains("add_units")){
+                if(getActionDescription().contains("add_units")){
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
@@ -270,7 +269,7 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
         
-        if(this.getActionDescription().toLowerCase().contains("add units")){
+        if(getActionDescription().toLowerCase().contains("add units")){
             // ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
         actionAfterAll(event, tile, color, activeGame);
@@ -423,7 +422,7 @@ abstract public class AddRemoveUnits implements Command {
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 String message = colorMention + " has modified units in the system. ";
-                if(this.getActionDescription().contains("add_units")){
+                if(getActionDescription().contains("add_units")){
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
@@ -434,8 +433,8 @@ abstract public class AddRemoveUnits implements Command {
                   }
             }
         }
-       System.out.println(this.getActionDescription());
-        if(this.getActionDescription().toLowerCase().contains("add units")){
+       System.out.println(getActionDescription());
+        if(getActionDescription().toLowerCase().contains("add units")){
             
            //  ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }

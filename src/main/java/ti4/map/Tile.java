@@ -20,10 +20,10 @@ import java.util.List;
 public class Tile {
     private final String tileID;
     private String position;
-    private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    private final HashMap<String, UnitHolder> unitHolders = new HashMap<>();
 
-    private HashMap<Player,Boolean> fog = new HashMap<>();
-    private HashMap<Player,String> fogLabel = new HashMap<>();
+    private final HashMap<Player,Boolean> fog = new HashMap<>();
+    private final HashMap<Player,String> fogLabel = new HashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
@@ -213,7 +213,7 @@ public class Tile {
 
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
-        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
+        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
         if (fullHyperlaneData.size() == 0) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {
@@ -268,10 +268,10 @@ public class Tile {
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
 
-        if ("82b".equals(this.tileID) || "51".equals(this.tileID)) { //mallice || creuss
+        if ("82b".equals(tileID) || "51".equals(tileID)) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
-        if ("82a".equals(this.tileID)) { //mallicelocked
+        if ("82a".equals(tileID)) { //mallicelocked
             fowTileID = "fowc" + fogTileColorSuffix;
         }
 

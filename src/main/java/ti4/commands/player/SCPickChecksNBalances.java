@@ -15,10 +15,8 @@ import java.util.stream.Collectors;
 
 public class SCPickChecksNBalances {
 
-    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked)
-    {
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
+    public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         String msg;
         String msgExtra = "";
         boolean allPicked = true;

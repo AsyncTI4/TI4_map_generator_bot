@@ -26,8 +26,8 @@ public class Planet extends UnitHolder {
     private int influenceModifier;
     private String originalPlanetType = "";
     private String originalTechSpeciality = "";
-    private ArrayList<String> planetType = new ArrayList<>();
-    private ArrayList<String> techSpeciality = new ArrayList<>();
+    private final ArrayList<String> planetType = new ArrayList<>();
+    private final ArrayList<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility;
 
     @JsonCreator

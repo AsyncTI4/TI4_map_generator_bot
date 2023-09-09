@@ -152,12 +152,7 @@ public class MessageListener extends ListenerAdapter {
         // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
         if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
             List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (attachments.isEmpty()) {
-                return; // no attachments on the message!
-            } else if (!"json".equalsIgnoreCase(attachments.get(0).getFileExtension())) {
-                // MessageHelper.sendMessageToChannel(event.getChannel(), "File is not a JSON file. Will not be saved.");
-                return;
-            } else { //write to file
+            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.get(0).getFileExtension())) { //write to file
                 String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
                 String fileName = "ttpgexport_" + currentDateTime + ".json";
                 String filePath =  Storage.getTTPGExportDirectory() + "/" + fileName;

@@ -77,8 +77,7 @@ public class Turn extends PlayerSubcommandData {
         int naaluSC = 0;
         Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
 
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = privateGame != null && privateGame;
+        boolean isFowPrivateGame  = FoWHelper.isPrivateGame(activeGame, event);
 
         //MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : activeGame.getPlayers().values()) {
@@ -253,13 +252,10 @@ public class Turn extends PlayerSubcommandData {
             }
             if (po_name == null) {
                 Integer integer = customPublicVP.get(key);
-                if (integer != null) {
-                    if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
-                        //Don't add it for now
-                    } else {
-                        po_name = key;
-                        poStatus = 2;
-                    }
+                if (integer != null && !key.toLowerCase().contains("custodian") && !key.toLowerCase().contains("imperial")
+                    && !key.contains("Shard of the Throne")) {
+                    po_name = key;
+                    poStatus = 2;
                 }
             }
             if (po_name != null) {
@@ -271,11 +267,9 @@ public class Turn extends PlayerSubcommandData {
                 } else if (poStatus == 1) { //Stage 2 Objectives
                     objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                     poButtons2.add(objectiveButton);
-                } else if (poStatus == 2) { //Other Objectives
+                } else { //Other Objectives
                     objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                     poButtonsCustom.add(objectiveButton);
-                } else {
-
                 }
             }
         }

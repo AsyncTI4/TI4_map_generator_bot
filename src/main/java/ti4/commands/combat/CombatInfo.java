@@ -9,12 +9,9 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
-
-import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,10 +24,6 @@ public class CombatInfo extends CombatSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        // if (activeMap.isFoWMode()) {
-        //     sendMessage("This is disabled for FoW for now.");
-        //     return;
-        // }
         for (OptionMapping tileOption : event.getOptions()) {
             if (tileOption == null){
                 continue;
@@ -58,8 +51,6 @@ public class CombatInfo extends CombatSubcommandData {
             sb_roll.append("/roll roll_command:");
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
-            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
             String baseRoll = "d10hv";
             String playerColor = player.getColor();
             String playerColorKey = getFactionColorId(activeGame, colorToId, playerColor, event);
@@ -68,12 +59,9 @@ public class CombatInfo extends CombatSubcommandData {
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 UnitHolder unitHolder = entry.getValue();
-
-                HashMap<String, Integer> units = unitHolder.getUnits();
+                Map<String, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-
                     String key = unitEntry.getKey();
-
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
                         String combatNum = "10";
                         Integer diceRolls = unitEntry.getValue();
@@ -118,7 +106,6 @@ public class CombatInfo extends CombatSubcommandData {
     }
 
     private String getFactionColorId(Game activeGame, Map<String, String> colorToId, String playerColor, SlashCommandInteractionEvent event) {
-
         String colorKeyValue = "";
         for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
             String colorKey = colorEntry.getKey();

@@ -50,7 +50,7 @@ public class UnitModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return this.id != null && !this.id.isEmpty() && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
+        return id != null && !id.isEmpty() && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
     @Override

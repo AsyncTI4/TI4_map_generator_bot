@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -229,7 +228,7 @@ public class DataMigrationManager {
                     UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
                     if (upgradedUnit != null) {
                         if (StringUtils.isNotBlank(upgradedUnit.getBaseType())) {
-                            Integer upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getBaseType());
+                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getBaseType());
                             if (upgradesFromUnitIndex >= 0) {
                                 ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
                             }
@@ -337,7 +336,7 @@ public class DataMigrationManager {
                     UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
                     if (upgradedUnit != null) {
                         if (StringUtils.isNotBlank(upgradedUnit.getUpgradesFromUnitId())) {
-                            Integer upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId());
+                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId());
                             if (upgradesFromUnitIndex >= 0) {
                                 ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
                             }

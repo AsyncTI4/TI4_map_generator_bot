@@ -138,19 +138,18 @@ public class SCPlay extends PlayerSubcommandData {
         if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
         if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
-        final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player_, message_);
+            Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message_);
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
-                player_.addFollowedSC(scToPlay);
+                player.addFollowedSC(scToPlay);
             }
 
             if (activeGame.isFoWMode()) {
                 // in fow, send a message back to the player that includes their emoji
                 String response = "SC played.";
                 response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
-                MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, response);
+                MessageHelper.sendPrivateMessageToPlayer(player, activeGame, response);
             } else {
                 // only do thread in non-fow games
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
