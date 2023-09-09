@@ -19,7 +19,7 @@ public class RevealSpecificStage2 extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping soOption = event.getOption(Constants.PO_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify PO");
@@ -27,11 +27,10 @@ public class RevealSpecificStage2 extends CustomSubcommandData {
         }
         java.util.Map.Entry<String, Integer> objective = activeGame.revealSpecificStage2(soOption.getAsString());
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeGame));
-        sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
-        sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(po.getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannelAndPin(activeGame.getMainGameChannel(), sb.toString());
+        String s = Helper.getGamePing(event, activeGame) +
+            " **Stage 2 Public Objective Revealed**" + "\n" +
+            "(" + objective.getValue() + ") " +
+            po.getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannelAndPin(activeGame.getMainGameChannel(), s);
     }
 }

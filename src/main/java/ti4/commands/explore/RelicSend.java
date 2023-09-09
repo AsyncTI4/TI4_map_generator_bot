@@ -25,7 +25,7 @@ public class RelicSend extends GenericRelicAction {
     }
 
     public void doAction(Player player1, SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         String targetFaction = event.getOption(Constants.FACTION_COLOR_2, null, OptionMapping::getAsString);
         String sourceFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);

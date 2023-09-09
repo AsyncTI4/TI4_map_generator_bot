@@ -18,13 +18,13 @@ public class TechExhaust extends TechAddRemove {
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         player.exhaustTech(techID);
         if(techID.equalsIgnoreCase("mi")){
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom",null);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select who you would like to mageon.", buttons);
         }
         
-        sendMessage(Helper.getPlayerRepresentation(player, getActiveMap()) + " exhausted tech: " + Helper.getTechRepresentation(techID));
+        sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " exhausted tech: " + Helper.getTechRepresentation(techID));
     }
 }

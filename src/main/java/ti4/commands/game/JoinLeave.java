@@ -20,7 +20,7 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         if (!activeGame.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
             return;

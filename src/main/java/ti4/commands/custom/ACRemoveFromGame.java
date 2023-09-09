@@ -16,7 +16,7 @@ public class ACRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping soOption = event.getOption(Constants.AC_ID);
         if (soOption == null) {

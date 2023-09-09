@@ -45,7 +45,7 @@ public class Stats extends PlayerSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 
-		Game activeGame = getActiveMap();
+		Game activeGame = getActiveGame();
 		Player player = activeGame.getPlayer(getUser().getId());
 		player = Helper.getGamePlayer(activeGame, player, event, null);
 		player = Helper.getPlayer(activeGame, player, event);
@@ -215,7 +215,7 @@ public class Stats extends PlayerSubcommandData {
 	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
 		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " player's current stats:\n");
 
-		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
+		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveGame()));
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.tg).append(player.getTg());
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -226,7 +226,7 @@ public class Stats extends PlayerSubcommandData {
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc: player.getSCs()) {
-				if (getActiveMap().getScPlayed() != null && !getActiveMap().getScPlayed().isEmpty() && getActiveMap().getScPlayed().get(sc) != null) {
+				if (getActiveGame().getScPlayed() != null && !getActiveGame().getScPlayed().isEmpty() && getActiveGame().getScPlayed().get(sc) != null) {
 					sb.append(Helper.getSCBackEmojiFromInteger(sc));
 				} else {
 					sb.append(Helper.getSCEmojiFromInteger(sc));
@@ -237,7 +237,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 		sb.append("\n");
 		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Speaker: `").append(getActiveGame().getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");

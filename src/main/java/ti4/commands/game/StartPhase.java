@@ -21,7 +21,7 @@ public class StartPhase extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String phase = event.getOption(Constants.SPECIFIC_PHASE, null, OptionMapping::getAsString);
         startPhase(event, activeGame, phase);
     }

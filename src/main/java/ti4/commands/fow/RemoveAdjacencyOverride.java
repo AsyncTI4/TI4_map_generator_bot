@@ -17,7 +17,7 @@ public class RemoveAdjacencyOverride extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
         if (primaryTileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");

@@ -24,7 +24,7 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         event.deferReply();
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         User user = getUser();
         Player player = activeGame.getPlayer(user.getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);

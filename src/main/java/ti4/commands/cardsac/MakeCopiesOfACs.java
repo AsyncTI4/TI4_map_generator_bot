@@ -21,7 +21,7 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;

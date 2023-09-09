@@ -13,7 +13,7 @@ public class PNRemove extends PNAddRemove {
 
     @Override
     public void doAction(Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" removed PNs:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" removed PNs:\n");
         for (String pnID : pnIDs) {
             if (!player.ownsPromissoryNote(pnID)) {
                 sb.append("> ").append(pnID).append(" (player did not own this PN)");

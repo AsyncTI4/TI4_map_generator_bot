@@ -33,7 +33,7 @@ public class Cleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         runStatusCleanup(activeGame);
     }
 
@@ -112,7 +112,7 @@ public class Cleanup extends StatusSubcommandData {
     @Override
 
     public void reply(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         int prevRound = activeGame.getRound() - 1;
 
         StatusCommand.reply(event, "End of round " + prevRound + " status phase.");

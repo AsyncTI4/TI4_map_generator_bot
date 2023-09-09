@@ -24,7 +24,7 @@ public class ClearDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player clearingPlayer = activeGame.getPlayer(getUser().getId());
         clearingPlayer = Helper.getGamePlayer(activeGame, clearingPlayer, event, null);
         

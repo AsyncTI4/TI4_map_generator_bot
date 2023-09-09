@@ -16,7 +16,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         Player activePlayer = activeGame.getPlayer(getUser().getId());
         activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
         if (activePlayer == null) {

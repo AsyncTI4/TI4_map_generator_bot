@@ -32,7 +32,7 @@ public class SendFragments extends ExploreSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveMap();
+		Game activeGame = getActiveGame();
 		User activeUser = getUser();
         Player sender = activeGame.getPlayers().get(activeUser.getId());
         sender = Helper.getGamePlayer(activeGame, sender, event, null);

@@ -23,7 +23,7 @@ public class UseExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         @SuppressWarnings("ConstantConditions")
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
         if (activeGame.pickExplore(id) != null) {

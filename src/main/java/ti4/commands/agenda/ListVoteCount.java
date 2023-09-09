@@ -19,7 +19,7 @@ public class ListVoteCount extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         turnOrder(event, activeGame);
     }
 

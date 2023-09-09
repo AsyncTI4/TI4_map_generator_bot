@@ -23,7 +23,7 @@ public class Cleanup extends AgendaSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
                LinkedHashMap<String, Player> players = activeGame.getPlayers();
         for (Player player : players.values()) {
             player.cleanExhaustedPlanets(false);

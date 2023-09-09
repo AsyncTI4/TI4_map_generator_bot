@@ -35,7 +35,7 @@ public class JazzCommand extends BothelperSubcommandData {
             }
         }
 
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         String agendaID = activeGame.getNextAgenda(false);
         AgendaModel agenda = Mapper.getAgenda(agendaID);
         String image = Emoji.fromFormatted(Emojis.Scout).asCustom().getImageUrl();

@@ -22,7 +22,7 @@ public abstract class BothelperSubcommandData extends SubcommandData {
         return user;
     }
 
-    public Game getActiveMap() {
+    public Game getActiveGame() {
         return activeGame;
     }
 

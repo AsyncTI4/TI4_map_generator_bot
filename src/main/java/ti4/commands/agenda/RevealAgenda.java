@@ -28,7 +28,7 @@ public class RevealAgenda extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping revealFromBottomOption = event.getOption(Constants.REVEAL_FROM_BOTTOM);
         boolean revealFromBottom = false;
         if (revealFromBottomOption != null) {

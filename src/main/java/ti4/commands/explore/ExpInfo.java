@@ -25,7 +25,7 @@ public class ExpInfo extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveMap();
+        Game activeGame = getActiveGame();
         ArrayList<String> types = new ArrayList<>();
         OptionMapping reqType = event.getOption(Constants.TRAIT);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);

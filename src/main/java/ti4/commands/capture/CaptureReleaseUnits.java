@@ -55,7 +55,7 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
     }
 
     public String getPlayerColor(GenericInteractionCreateEvent event){
-        Player player = getActiveMap().getPlayer(getUser().getId());
+        Player player = getActiveGame().getPlayer(getUser().getId());
         return player.getColor();
     }
 
