@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.ResourceHelper;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -15,16 +14,15 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.io.File;
-
 import org.jetbrains.annotations.NotNull;
 
 abstract public class AddRemoveTile extends MapSubcommandData {
     public AddRemoveTile(@NotNull String name, @NotNull String description) {
         super(name, description);
+        addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
         addOption(OptionType.STRING, Constants.POSITION, "Tile position on map", true);
     }
-    
+
     abstract protected void tileAction(Tile tile, String position, Map userActiveMap);
 
     @Override
@@ -42,8 +40,6 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             Map userActiveMap = tileParsing(event, userID, mapManager);
             if (userActiveMap == null) return;
             MapSaveLoadManager.saveMap(userActiveMap, event);
-            File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
-            MessageHelper.replyToMessage(event, file);
         }
     }
 
@@ -63,7 +59,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         Tile tile = new Tile(planetTileName, position);
-        if (planetTileName.equals("18")){
+        if (planetTileName.equals("18")) {
             tile.addToken("token_custodian.png", "mr");
         }
 

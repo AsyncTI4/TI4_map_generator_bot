@@ -3,13 +3,10 @@ package ti4.commands.map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.io.File;
 
 public class RemoveBorderAnomaly extends MapSubcommandData {
     public RemoveBorderAnomaly() {
@@ -38,14 +35,12 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
             case "northwest" -> directionVal = 5;
         }
 
-        if(directionVal == -1) {
+        if (directionVal == -1) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction");
             return;
         }
 
         activeMap.removeBorderAnomaly(tile, directionVal);
         MapSaveLoadManager.saveMap(activeMap, event);
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
     }
 }

@@ -14,6 +14,7 @@ import ti4.message.MessageHelper;
 public class RemoveTile extends AddRemoveTile {
     public RemoveTile() {
         super(Constants.REMOVE_TILE, "Remove tile from map");
+        removeOptionByName(Constants.TILE_NAME);
     }
 
     @Override

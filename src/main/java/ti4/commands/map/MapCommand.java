@@ -37,7 +37,7 @@ public class MapCommand implements Command {
         User user = event.getUser();
         String userName = user.getName();
         String commandExecuted = "User: " + userName + " executed command.\n" +
-                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -45,7 +45,7 @@ public class MapCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getType().equals(OptionType.USER)){
+        if (option.getType().equals(OptionType.USER)) {
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -78,6 +78,7 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveTile());
         subcommands.add(new AddBorderAnomaly());
         subcommands.add(new RemoveBorderAnomaly());
+        subcommands.add(new InitTspmap());
         return subcommands;
     }
 
