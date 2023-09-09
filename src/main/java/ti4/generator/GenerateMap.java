@@ -2276,24 +2276,24 @@ public class GenerateMap {
                         case 1 -> x = 801;
                         case 2 -> x = 1598;
                     }
-                    String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
+                    //String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
                     Player promissoryNoteOwner = activeMap.getPNOwner(id);
                     if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
                         BotLogger.log(activeMap.getName() + " " + player.getUserName()
                             + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
                         continue;
                     }
-                    StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
-                    for (Player player_ : players.values()) {
-                        if (player_ != player) {
-                            String playerColor = player_.getColor();
-                            String playerFaction = player_.getFaction();
-                            if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
-                                playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
-                                name.append(playerFaction).append(" (").append(playerColor).append(")");
-                            }
-                        }
-                    }
+                    //StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
+                    //for (Player player_ : players.values()) {
+                    //    if (player_ != player) {
+                    //        String playerColor = player_.getColor();
+                    //        String playerFaction = player_.getFaction();
+                    //        if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
+                    //            playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
+                    //            name.append(playerFaction).append(" (").append(playerColor).append(")");
+                    //        }
+                    //    }
+                    //}
                     boolean multiScoring = false;
                     drawScoreControlMarkers(x + 515, y, activeMap, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true, graphics, userVPs);
                     column[0]++;
