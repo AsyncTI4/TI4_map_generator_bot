@@ -94,8 +94,8 @@ public class RevealAgenda extends AgendaSubcommandData {
                         sb.append("-----------\n");
                         sb.append("Game: ").append(activeGame.getName()).append("\n");
                         sb.append(event.getUser().getAsMention()).append("\n");
-                        sb.append("Game: ").append(activeMap.getName()).append("\n");
-                        sb.append(ButtonHelper.getTrueIdentity(speaker, activeMap)).append("\n");
+                        sb.append("Game: ").append(activeGame.getName()).append("\n");
+                        sb.append(ButtonHelper.getTrueIdentity(speaker, activeGame)).append("\n");
                         sb.append("Drawn Agendas:\n");
                         sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                         sb.append("\n");
