@@ -2849,6 +2849,7 @@ public class ButtonListener extends ListenerAdapter {
                         int stratCC = player.getStrategicCC();
                         player.setStrategicCC(stratCC - 1);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Quashed agenda. Strategic CCs went from " + stratCC + " -> " + (stratCC - 1));
+                        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
                         new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
                         event.getMessage().delete().queue();
                     }

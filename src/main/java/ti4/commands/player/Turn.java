@@ -187,11 +187,12 @@ public class Turn extends PlayerSubcommandData {
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeGame, event, text, fail, success);
                     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
+                    
+                    if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
+                    }
                     if(player.getStasisInfantry() > 0){
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
-                    }
-                    if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
-                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
                     }
 
                     activeGame.setPingSystemCounter(0);
@@ -204,6 +205,12 @@ public class Turn extends PlayerSubcommandData {
                     if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
                     }
+                    if(player.getStasisInfantry() > 0){
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
+                    }
+                    
+                    
+                    return "";
                 }
                 return "";
             }
