@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 
 public class ShuffleExpBackIntoDeck extends ExploreSubcommandData {
 
@@ -16,14 +16,14 @@ public class ShuffleExpBackIntoDeck extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
             String card = Mapper.getExplore(id);
             if (card != null) {
-                activeMap.addExplore(id);
+                activeGame.addExplore(id);
                 sb.append("Card shuffled into exploration deck: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());

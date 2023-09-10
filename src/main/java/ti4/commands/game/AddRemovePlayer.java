@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 abstract public class AddRemovePlayer extends GameSubcommandData {
@@ -35,32 +35,32 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         String mapName;
         if (gameOption != null) {
             mapName = event.getOptions().get(0).getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }
         } else {
-            Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
-            if (userActiveMap == null){
+            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
+            if (userActiveGame == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = userActiveMap.getName();
+            mapName = userActiveGame.getName();
         }
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getMap(mapName);
-        if (!activeMap.isMapOpen()) {
+        GameManager gameManager = GameManager.getInstance();
+        Game activeGame = gameManager.getGame(mapName);
+        if (!activeGame.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can only add/remove players when game status is 'open'.");
             return;
         }
 
         User user = event.getUser();
-        action(event, activeMap, user);
-        Helper.fixGameChannelPermissions(event.getGuild(), activeMap);
-        MapSaveLoadManager.saveMap(activeMap, event);
-        MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
+        action(event, activeGame, user);
+        Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
+        GameSaveLoadManager.saveMap(activeGame, event);
+        MessageHelper.replyToMessage(event, getResponseMessage(activeGame, user));
     }
-    abstract protected String getResponseMessage(Map activeMap, User user);
+    abstract protected String getResponseMessage(Game activeGame, User user);
 
-    abstract protected void action(SlashCommandInteractionEvent event, Map activeMap, User user);
+    abstract protected void action(SlashCommandInteractionEvent event, Game activeGame, User user);
 }

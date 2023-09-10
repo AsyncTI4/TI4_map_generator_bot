@@ -22,21 +22,21 @@ public class RiseOfMessiah extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doRise(player, event, activeMap);
+        doRise(player, event, activeGame);
         
     }
 
-    public void doRise(Player player, GenericInteractionCreateEvent event, Map activeMap){
-        List<String> planets = player.getPlanets(activeMap);
-        for (Tile tile : activeMap.getTileMap().values()) {
+    public void doRise(Player player, GenericInteractionCreateEvent event, Game activeGame){
+        List<String> planets = player.getPlanets(activeGame);
+        for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())){
                     HashSet<String> tokenList = unitHolder.getTokenList();
@@ -50,7 +50,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
                     if (ignorePlanet){
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+unitHolder.getName(), activeMap);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+unitHolder.getName(), activeGame);
                 }
             }
         }

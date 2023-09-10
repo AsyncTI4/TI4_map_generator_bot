@@ -11,8 +11,6 @@ public class ActionCardModel implements ModelInterface {
     private String flavorText;
     private String source;
 
-    public ActionCardModel() {}
-
     public boolean isValid() {
         return alias != null
             && name != null
@@ -52,9 +50,7 @@ public class ActionCardModel implements ModelInterface {
     }
 
     public String getRepresentation() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.ActionCard).append("__**" + name + "**__").append(" *(").append(phase).append(" Phase)*: ");
-        sb.append("_").append(window).append(":_ ").append(text).append("\n");
-        return sb.toString();
+        return Emojis.ActionCard + "__**" + name + "**__" + " *(" + phase + " Phase)*: " +
+            "_" + window + ":_ " + text + "\n";
     }
 }

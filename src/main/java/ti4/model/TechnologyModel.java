@@ -19,10 +19,7 @@ public class TechnologyModel implements ModelInterface {
         }
     }
 
-    public TechnologyModel() {
-    }
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
             && text != null

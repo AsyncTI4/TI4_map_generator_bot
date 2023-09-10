@@ -27,45 +27,45 @@ import org.apache.commons.lang3.StringUtils;
 
 public class MoveUnits2 extends AddRemoveUnits {
 
-    private boolean toAction = false;
+    private boolean toAction;
     private HashMap<String, Integer> unitsDamage = new HashMap<>();
     private boolean priorityDmg = true;
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
 
-        Map activeMap = mapManager.getUserActiveMap(userID);
-        String color = Helper.getColor(activeMap, event);
+        Game activeGame = gameManager.getUserActiveGame(userID);
+        String color = Helper.getColor(activeGame, event);
         if (!Mapper.isColorValid(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");
             return;
         }
 
         String tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_FROM, null, OptionMapping::getAsString).toLowerCase(), " ");
-        if (tileOption != null) tileOption = StringUtils.substringBefore(tileOption.toLowerCase(), " "); //if discord sends bad autocomplete, e.g. 304 (Atlas), just grab the 304
+        tileOption = StringUtils.substringBefore(tileOption.toLowerCase(), " "); //if discord sends bad autocomplete, e.g. 304 (Atlas), just grab the 304
         String tileID = AliasHandler.resolveTile(tileOption);
-        Tile tile = getTileObject(event, tileID, activeMap);
+        Tile tile = getTileObject(event, tileID, activeGame);
         if (tile == null) return;
 
-        unitParsingForTile(event, color, tile, activeMap);
+        unitParsingForTile(event, color, tile, activeGame);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, file);
 
     }
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
         unitsDamage = new HashMap<>();
         toAction = false;
         OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
@@ -78,25 +78,24 @@ public class MoveUnits2 extends AddRemoveUnits {
         }
 
         String unitList = event.getOption(Constants.UNIT_NAMES_FROM).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList, activeMap);
+        unitParsing(event, color, tile, unitList, activeGame);
         
-        String tileID = null;
+        String tileID;
         String tileOption = event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString);
         if (tileOption != null) { //get TILE_TO
             tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString).toLowerCase(), " ");
             tileID = AliasHandler.resolveTile(tileOption);
-            tile = getTile(event, tileID, activeMap);
         } else { //USE TILE_FROM
             tileID = tile.getTileID();
-            tile = getTile(event, tileID, activeMap);
         }
+        tile = getTile(event, tileID, activeGame);
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");
             return;
         }
 
-        tile = flipMallice(event, tile, activeMap);
+        tile = flipMallice(event, tile, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
@@ -109,8 +108,7 @@ public class MoveUnits2 extends AddRemoveUnits {
         } else { //USE UNIT_NAMES_FROM LIST
             //CLEAN PLANETS FROM THE UNITLIST
             System.out.println(unitList);
-            unitList = Arrays.asList(StringUtils.splitPreserveAllTokens(unitList, ","))
-                        .stream().map(String::trim).map(s -> {
+            unitList = Arrays.stream(StringUtils.splitPreserveAllTokens(unitList, ",")).map(String::trim).map(s -> {
                             if (Arrays.asList(s.split(" ", -1)).size() > 2) {
                                 return StringUtils.substringBeforeLast(s, " ");
                             }
@@ -124,9 +122,7 @@ public class MoveUnits2 extends AddRemoveUnits {
             case "0", "none" -> {
                 //Do nothing, as no unit was moved to
             }
-            default -> {
-                unitParsing(event, color, tile, unitList, activeMap);
-            }
+            default -> unitParsing(event, color, tile, unitList, activeGame);
         }
 
         OptionMapping optionCC = event.getOption(Constants.CC_USE);
@@ -141,20 +137,20 @@ public class MoveUnits2 extends AddRemoveUnits {
             }
         }
         if (!retreat) {
-            removeTacticsCC(event, color, tile, activeMap);
+            removeTacticsCC(event, color, tile, activeGame);
         }
 
         AddCC.addCC(event, color, tile, false);
-        Helper.isCCCountCorrect(event, activeMap, color);
+        Helper.isCCCountCorrect(event, activeGame, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
     }
 
-    public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Map activeMap) {
+    public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Game activeGame) {
         if ("82a".equals(tile.getTileID())){
             String position = tile.getPosition();
-            activeMap.removeTile(position);
+            activeGame.removeTile(position);
 
 
             String planetTileName = AliasHandler.resolveTile("82b");
@@ -170,13 +166,13 @@ public class MoveUnits2 extends AddRemoveUnits {
                 return null;
             }
             tile = new Tile(planetTileName, position);
-            activeMap.setTile(tile);
+            activeGame.setTile(tile);
         }
         return tile;
     }
 
-    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
-        for (Player player : activeMap.getPlayers().values()) {
+    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Game activeGame) {
+        for (Player player : activeGame.getPlayers().values()) {
             if (color.equals(player.getColor())) {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
@@ -192,13 +188,13 @@ public class MoveUnits2 extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
 
     }
 
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
         if (toAction) {
             tile.addUnit(planetName, unitID, count);
             tile.addUnitDamage(planetName, unitID, unitsDamage.get(unitID));

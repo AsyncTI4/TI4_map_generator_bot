@@ -3,7 +3,7 @@ package ti4.commands.cardsso;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 import java.util.*;
@@ -15,9 +15,9 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
@@ -28,26 +28,24 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
 
         sb.append("Player: ").append(player.getUserName()).append("\n");
 
-        List<String> secretObjectives = new ArrayList<>(activeMap.getSecretObjective(player.getUserID()).keySet());
+        List<String> secretObjectives = new ArrayList<>(activeGame.getSecretObjective(player.getUserID()).keySet());
         Collections.shuffle(secretObjectives);
-        LinkedHashMap<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeMap.getScoredSecretObjective(player.getUserID()));
-        for (String id : activeMap.getSoToPoList()) {
+        Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeGame.getScoredSecretObjective(player.getUserID()));
+        for (String id : activeGame.getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
 
-        sb.append(Helper.getPlayerRepresentation(player, activeMap));
+        sb.append(Helper.getPlayerRepresentation(player, activeGame));
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
-        if (secretObjectives != null) {
-            for (String so : secretObjectives) {
-                sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
-                player.setSecret(so);
-                index++;
-            }
+        for (String so : secretObjectives) {
+            sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
+            player.setSecret(so);
+            index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
-        for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
+        for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
             sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }

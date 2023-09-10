@@ -3,7 +3,7 @@ package ti4.commands.leaders;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Leader;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public class LockLeader extends LeaderAction {
@@ -12,7 +12,7 @@ public class LockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         if (playerLeader == null) {
             sendMessage("Leader not found");

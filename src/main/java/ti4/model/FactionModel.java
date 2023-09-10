@@ -17,9 +17,7 @@ public class FactionModel implements ModelInterface {
     private List<String> promissoryNotes;
     private List<String> units;
 
-    public FactionModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && factionName != null
             && homeSystem != null
@@ -54,30 +52,30 @@ public class FactionModel implements ModelInterface {
     }
 
     public List<String> getFactionTech() {
-        return new ArrayList<String>(factionTech);
+        return new ArrayList<>(factionTech);
     }
 
     public List<String> getStartingTech() {
-        return new ArrayList<String>(startingTech);
+        return new ArrayList<>(startingTech);
     }
 
     public List<String> getHomePlanets() {
-        return new ArrayList<String>(homePlanets);
+        return new ArrayList<>(homePlanets);
     }
 
     public List<String> getAbilities() {
-        return new ArrayList<String>(abilities);
+        return new ArrayList<>(abilities);
     }
 
     public List<String> getLeaders() {
-        return new ArrayList<String>(leaders);
+        return new ArrayList<>(leaders);
     }
 
     public List<String> getPromissoryNotes() {
-        return new ArrayList<String>(promissoryNotes);
+        return new ArrayList<>(promissoryNotes);
     }
 
     public List<String> getUnits() {
-        return new ArrayList<String>(units);
+        return new ArrayList<>(units);
     }
 }

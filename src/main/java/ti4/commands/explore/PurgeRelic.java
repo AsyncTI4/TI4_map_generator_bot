@@ -28,9 +28,7 @@ public class PurgeRelic extends GenericRelicAction {
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
         String[] relicData = Mapper.getRelic(relicId).split(";");
-        StringBuilder message = new StringBuilder();
-        message.append(Helper.getPlayerRepresentation(player, getActiveMap())).append(" purged relic Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
-        sendMessage(message.toString());
-        RelicInfo.sendRelicInfo(getActiveMap(), player, event);
+      sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData[0] + "**__\n> " + relicData[1] + "\n");
+        RelicInfo.sendRelicInfo(getActiveGame(), player, event);
     }
 }

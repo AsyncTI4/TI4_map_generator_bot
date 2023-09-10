@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -47,7 +47,7 @@ public class GameCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getType().equals(OptionType.USER)){
+        if (option.getType() == OptionType.USER){
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -67,12 +67,12 @@ public class GameCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        if (activeMap == null) return;
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        if (activeGame == null) return;
         if (!undoCommand) {
-            MapSaveLoadManager.saveMap(activeMap, event);
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
             MessageHelper.replyToMessage(event, file);
         }

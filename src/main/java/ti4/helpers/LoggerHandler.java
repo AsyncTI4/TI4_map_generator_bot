@@ -9,19 +9,17 @@ import java.io.InputStream;
 import java.util.logging.*;
 
 public class LoggerHandler {
-    private static Logger logger = null;
-    private static LoggerHandler loggerHandler = null;
+    private static Logger logger;
+    private static LoggerHandler loggerHandler;
 
     private LoggerHandler() {
-        //noinspection ConstantConditions
-        String logFilePropertiesPath = ResourceHelper.getInstance().getInfoFile("logging.properties");
+      String logFilePropertiesPath = ResourceHelper.getInstance().getInfoFile("logging.properties");
 
         try (InputStream stream = new FileInputStream(logFilePropertiesPath)) {
             LogManager.getLogManager().readConfiguration(stream);
             logger = Logger.getLogger(LoggerHandler.class.getName());
             File logFilePath = Storage.getLoggerFile();
             System.out.println("Initializing log file to  " + logFilePath.getAbsolutePath());
-            @SuppressWarnings("ConstantConditions")
             FileHandler fileHandler = new FileHandler(logFilePath.getAbsolutePath(), true);
             fileHandler.setFormatter(new SimpleFormatter());
             logger.addHandler(fileHandler);

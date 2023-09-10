@@ -1,5 +1,6 @@
-package ti4.commands.map;
+package ti4.commands.uncategorized;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,9 +11,9 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class DeleteGame implements Command {
@@ -29,7 +30,7 @@ public class DeleteGame implements Command {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
-        if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+        if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
             MessageHelper.replyToMessage(event, "Map with such name not found");
             return false;
         }
@@ -49,28 +50,29 @@ public class DeleteGame implements Command {
             return;
         }
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
-        Map mapToDelete = MapManager.getInstance().getMap(mapName);
-        if (mapToDelete == null) {
+        Game gameToDelete = GameManager.getInstance().getGame(mapName);
+        if (gameToDelete == null) {
             MessageHelper.replyToMessage(event, "Map: " + mapName + " was not found.");
             return;
         }
         Member member_ = event.getMember();
         boolean isAdmin = false;
         if (member_ != null) {
-            java.util.List<Role> roles = member_.getRoles();
+            List<Role> roles = member_.getRoles();
             for (Role role : MapGenerator.adminRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
+                    break;
                 }
             }
         }
-        if (!mapToDelete.getOwnerID().equals(member.getId()) && !isAdmin){
+        if (!gameToDelete.getOwnerID().equals(member.getId()) && !isAdmin){
             MessageHelper.replyToMessage(event, "Map: " + mapName + " can be deleted by it's creator or admin.");
             return;
         }
 
-        if (MapSaveLoadManager.deleteMap(mapName)) {
-            MapManager.getInstance().deleteMap(mapName);
+        if (GameSaveLoadManager.deleteMap(mapName)) {
+            GameManager.getInstance().deleteGame(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");
         } else {
             MessageHelper.replyToMessage(event, "Map could not be deleted");

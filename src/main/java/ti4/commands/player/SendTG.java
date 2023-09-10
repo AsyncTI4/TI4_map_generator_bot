@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -25,14 +25,14 @@ public class SendTG extends PlayerSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
+		Game activeGame = getActiveGame();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
 		if (player == null) {
 			sendMessage("Player could not be found");
 			return;
 		}
-		Player player_ = Helper.getPlayer(activeMap, player, event);
+		Player player_ = Helper.getPlayer(activeGame, player, event);
 		if (player_ == null) {
 			sendMessage("Player to send TG/Commodities could not be found");
 			return;
@@ -43,17 +43,17 @@ public class SendTG extends PlayerSubcommandData {
 		sendTG = Math.min(sendTG, tg);
 		tg -= sendTG;
 		player.setTg(tg);
-		ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+		ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 
 		int targetTG = player_.getTg();
 		targetTG += sendTG;
 		player_.setTg(targetTG);
-		ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
+		ButtonHelperFactionSpecific.pillageCheck(player_, activeGame);
 
-		String p1 = Helper.getPlayerRepresentation(player, activeMap);
-		String p2 = Helper.getPlayerRepresentation(player_, activeMap);
+		String p1 = Helper.getPlayerRepresentation(player, activeGame);
+		String p2 = Helper.getPlayerRepresentation(player_, activeGame);
 		if(player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")){
-			ButtonHelper.commanderUnlockCheck(player_, activeMap, "hacan", event);
+			ButtonHelper.commanderUnlockCheck(player_, activeGame, "hacan", event);
 		}
 		String tgString = sendTG + " " + Emojis.tg + " trade goods";
 		String message =  p1 + " sent " + tgString + " to " + p2;
@@ -61,16 +61,16 @@ public class SendTG extends PlayerSubcommandData {
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
 			ClearDebt.clearDebt(player_, player, sendTG);
-			sendMessage(Helper.getPlayerRepresentation(player_, activeMap) + " cleared " + sendTG + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeMap));
+			sendMessage(Helper.getPlayerRepresentation(player_, activeGame) + " cleared " + sendTG + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeGame));
 		}
 
-		if (activeMap.isFoWMode()) {
+		if (activeGame.isFoWMode()) {
 			String fail = "Could not notify receiving player.";
 			String success = "The other player has been notified";
-			MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+			MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, event.getChannel(), message, fail, success);
 
 			// Add extra message for transaction visibility
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, tgString, null);
+			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, tgString, null);
 		}
 		
 	}

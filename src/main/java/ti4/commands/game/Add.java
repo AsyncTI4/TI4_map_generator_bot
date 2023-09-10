@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 
 public class Add extends AddRemovePlayer {
 
@@ -13,28 +13,28 @@ public class Add extends AddRemovePlayer {
     }
 
 
-    protected String getResponseMessage(Map activeMap, User user) {
-        return user.getName() + " added players to game: " + activeMap.getName() + " - successful";
+    protected String getResponseMessage(Game activeGame, User user) {
+        return user.getName() + " added players to game: " + activeGame.getName() + " - successful";
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Map activeMap, User user) {
-        addExtraUser(event, activeMap, Constants.PLAYER1);
-        addExtraUser(event, activeMap, Constants.PLAYER2);
-        addExtraUser(event, activeMap, Constants.PLAYER3);
-        addExtraUser(event, activeMap, Constants.PLAYER4);
-        addExtraUser(event, activeMap, Constants.PLAYER5);
-        addExtraUser(event, activeMap, Constants.PLAYER6);
-        addExtraUser(event, activeMap, Constants.PLAYER7);
-        addExtraUser(event, activeMap, Constants.PLAYER8);
+    protected void action(SlashCommandInteractionEvent event, Game activeGame, User user) {
+        addExtraUser(event, activeGame, Constants.PLAYER1);
+        addExtraUser(event, activeGame, Constants.PLAYER2);
+        addExtraUser(event, activeGame, Constants.PLAYER3);
+        addExtraUser(event, activeGame, Constants.PLAYER4);
+        addExtraUser(event, activeGame, Constants.PLAYER5);
+        addExtraUser(event, activeGame, Constants.PLAYER6);
+        addExtraUser(event, activeGame, Constants.PLAYER7);
+        addExtraUser(event, activeGame, Constants.PLAYER8);
     }
 
-    private void addExtraUser(SlashCommandInteractionEvent event, Map activeMap, String playerID) {
+    private void addExtraUser(SlashCommandInteractionEvent event, Game activeGame, String playerID) {
         OptionMapping option;
         option = event.getOption(playerID);
         if (option != null){
             User extraUser = option.getAsUser();
-            activeMap.addPlayer(extraUser.getId(), extraUser.getName());
+            activeGame.addPlayer(extraUser.getId(), extraUser.getName());
         }
     }
 }

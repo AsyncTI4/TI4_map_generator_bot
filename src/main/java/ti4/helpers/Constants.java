@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -71,6 +72,7 @@ public class Constants {
     public static final String REVERSE_SPEAKER_ORDER = "reverse_speaker_order";
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
     public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
+    public static final String INIT_TSPMAP = "init_tspmap";
     public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
@@ -84,17 +86,16 @@ public class Constants {
     public static final String REMOVE = "remove";
     public static final String SWAP = "swap";
 
-
     public static final String SET_SETTING = "setting";
     public static final String SET_UNIT_CAP = "set_unit_cap";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
 
-    public static String ALPHA = "alpha";
-    public static String BETA = "beta";
+    public static final String ALPHA = "alpha";
+    public static final String BETA = "beta";
     public static String GAMMA = "gamma";
-    public static String DELTA = "delta";
+    public static final String DELTA = "delta";
     public static String EPSILON = "whepsilon";
     public static String NARROWS = "whnarrows";
     public static String PROBABILITY = "whprobability";
@@ -105,7 +106,7 @@ public class Constants {
     public static String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
     public static String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
     public static String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static String CUSTOM_ERONOUS_WHTHETA= "custom_eronous_whtheta";
+    public static String CUSTOM_ERONOUS_WHTHETA = "custom_eronous_whtheta";
     public static String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
@@ -127,7 +128,7 @@ public class Constants {
     public static final String TILE_NAME_5 = "tile_name_5";
     public static final String TILE_NAME_TO = "tile_name_to";
     public static final String EXTRA_RINGS = "extra_rings";
-    
+
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
@@ -255,7 +256,6 @@ public class Constants {
     public static final String SWAP_SYSTEMS = "swap_systems";
     public static final String ADJUST_ROUND_NUMBER = "adjust_round_number";
 
-
     public static final String MAHACT_CC = "mahact_cc";
     public static final String ADD_CC_TO_FS = "mahact_cc_to_fs";
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
@@ -345,6 +345,7 @@ public class Constants {
     public static final String CUSTOM_SECONDARY = "custom_secondary";
 
     public static final String GAME = "game";
+    public static final String MAP = "map";
     public static final String INFO = "info";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
@@ -360,7 +361,7 @@ public class Constants {
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
     public static final String ACTIVE_PLAYER = "active_player";
-    public static final String ACTIVE_SYSTEM= "active_system";
+    public static final String ACTIVE_SYSTEM = "active_system";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
 
@@ -501,7 +502,6 @@ public class Constants {
     public static final String SHOW_DISCARDED = "show_discarded";
     public static final String ELECTED = "elected";
 
-
     public static final String STATUS = "status";
     public static final String SYSTEM = "system";
     public static final String CLEANUP = "cleanup";
@@ -517,7 +517,7 @@ public class Constants {
     public static final String LOCATION2 = "location2";
     public static final String PEAK_AT_STAGE1 = "peak_at_stage1";
     public static final String PEAK_AT_STAGE2 = "peak_at_stage2";
-   
+
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";
@@ -661,7 +661,7 @@ public class Constants {
     public static final String COMMANDER = "commander";
     public static final String HERO = "hero";
     public static final String ENVOY = "envoy";
-    public static final ArrayList<String> leaderList = new ArrayList<>();
+    public static final List<String> leaderList = new ArrayList<>();
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -741,7 +741,7 @@ public class Constants {
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
-    public static final String CC_N_PLASTIC_LIMIT= "cc_n_plastic_limit";
+    public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
@@ -759,21 +759,21 @@ public class Constants {
     public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
     public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
-    public static final String STATS_USERNAME="userName";
+    public static final String STATS_USERNAME = "userName";
     public static final String STATS_FACTION = "faction";
-    public static final String STATS_VP ="vp";
-    public static final String STATS_CC="cc";
-    public static final String STATS_SPEAKER="speaker";
-    public static final String STATS_SC="sc";
-    public static final String STATS_PASSED="passed";
-    public static final String STATS_SO="so";
+    public static final String STATS_VP = "vp";
+    public static final String STATS_CC = "cc";
+    public static final String STATS_SPEAKER = "speaker";
+    public static final String STATS_SC = "sc";
+    public static final String STATS_PASSED = "passed";
+    public static final String STATS_SO = "so";
     public static final String SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX = "sc_3_assign_speaker_to_";
 
     public static final String VERBOSITY = "verbosity";
     public static final String VERBOSITY_VERBOSE = "verbose";
     public static final String VERBOSITY_AVERAGE = "average";
     public static final String VERBOSITY_MINIMAL = "minimal";
-    public static final ArrayList<String> VERBOSITY_OPTIONS = new ArrayList<>();
+    public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
     static {
         VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
         VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);
@@ -829,7 +829,7 @@ public class Constants {
     public static final String SET_POLICY = "set_policy";
     public static final String SET_PEOPLE = "set_people";
     public static final String SET_ENVIRONMENT = "set_environment";
-    public static final String SET_ECONOMY = "set_economy";    
+    public static final String SET_ECONOMY = "set_economy";
     public static final String SIGIL = "token_ds_sigil.png";
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
@@ -849,7 +849,6 @@ public class Constants {
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
 
-
     public static final String OBSERVER = "observer";
     public static final String ADD_REMOVE = "add_remove";
 
@@ -865,10 +864,10 @@ public class Constants {
     public static final String MOD_HAS_FRAGILE = "has_ability_fragile";
     public static final String MOD_OPPONENT_NO_CC_FLEET = "opponent_no_cc_fleet";
     public static final String MOD_UNITS_TWO_MATCHING_NOT_FF = "units_two_matching_not_ff";
-    
+
     public static final String MIGRATION_NAME = "migration_name";
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
-    
+
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";
     public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";

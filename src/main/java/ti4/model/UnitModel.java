@@ -50,7 +50,7 @@ public class UnitModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return this.id != null && !this.id.isEmpty() && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
+        return id != null && !id.isEmpty() && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
     @Override
@@ -63,8 +63,7 @@ public class UnitModel implements ModelInterface {
         String factionEmoji = Helper.getEmojiFromDiscord(faction);
         String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
 
-        String representation = unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
-        return representation;
+      return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
     
     public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
@@ -153,28 +152,22 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getValuesText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCostText());
-        sb.append(getMoveText());
-        sb.append(getProductionText());
-        sb.append(getCapacityText());
-        return sb.toString();
+      return getCostText() +
+          getMoveText() +
+          getProductionText() +
+          getCapacityText();
     }
 
     private String getDiceText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getCombatText());
-        sb.append(getAFBText());
-        sb.append(getBombardText());
-        sb.append(getSpaceCannonText());
-        return sb.toString();
+      return getCombatText() +
+          getAFBText() +
+          getBombardText() +
+          getSpaceCannonText();
     }
     
     private String getOtherText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getPlanetaryShieldText());
-        sb.append(getSustainDamageText());
-        return sb.toString();
+      return getPlanetaryShieldText() +
+          getSustainDamageText();
     }
 
     private String getCostText() {

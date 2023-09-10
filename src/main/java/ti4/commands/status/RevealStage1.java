@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,24 +22,23 @@ public class RevealStage1 extends StatusSubcommandData {
     }
 
     public void revealS1(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
 
-        java.util.Map.Entry<String, Integer> objective = activeMap.revealState1();
+        Map.Entry<String, Integer> objective = activeGame.revealState1();
 
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeMap));
-        sb.append(" **Stage 1 Public Objective Revealed**").append("\n");
-        sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(po.getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannelAndPin(channel, sb.toString());
+      String sb = Helper.getGamePing(event, activeGame) +
+          " **Stage 1 Public Objective Revealed**" + "\n" +
+          "(" + objective.getValue() + ") " +
+          po.getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannelAndPin(channel, sb);
     }
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

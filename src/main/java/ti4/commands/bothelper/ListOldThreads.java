@@ -2,11 +2,13 @@ package ti4.commands.bothelper;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -22,7 +24,7 @@ public class ListOldThreads extends BothelperSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
+        int channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 1000) {
             sendMessage("Please choose a number between 1 and 1000");
             return;
@@ -36,7 +38,7 @@ public class ListOldThreads extends BothelperSubcommandData {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
                             .filter(filter)
-                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                             .limit(channelCount)
                             .toList();
 
@@ -44,7 +46,7 @@ public class ListOldThreads extends BothelperSubcommandData {
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toHours() + " hours ago)`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
+            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **").append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }
@@ -53,7 +55,7 @@ public class ListOldThreads extends BothelperSubcommandData {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
                             .filter(filter)
-                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                             .limit(1)
                             .toList();
 

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class SoAddToGame extends CustomSubcommandData {
@@ -17,7 +17,7 @@ public class SoAddToGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         String soID = event.getOption(Constants.SO_ID,null, OptionMapping::getAsString);
         if (soID == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
@@ -28,8 +28,8 @@ public class SoAddToGame extends CustomSubcommandData {
             return;
         }
 
-        activeMap.addSOToGame(soID);
-        if (activeMap.getSecretObjectives().contains(soID)) {
+        activeGame.addSOToGame(soID);
+        if (activeGame.getSecretObjectives().contains(soID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "SO was not added for an unknown reason");

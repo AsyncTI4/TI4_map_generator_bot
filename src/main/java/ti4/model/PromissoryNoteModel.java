@@ -11,11 +11,9 @@ public class PromissoryNoteModel implements ModelInterface {
     private Boolean playArea;
     private String attachment;
     private String source;
-    private String text; 
+    private String text;
 
-    public PromissoryNoteModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
             && (faction != null && colour != null)

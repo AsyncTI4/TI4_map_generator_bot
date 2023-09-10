@@ -5,7 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -15,17 +15,16 @@ public class RelicLookAtTop extends GenericRelicAction {
     }
 
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        List<String> relicDeck = activeMap.getAllRelics();
+        Game activeGame = getActiveGame();
+        List<String> relicDeck = activeGame.getAllRelics();
         relicDeck.remove(Constants.ENIGMATIC_DEVICE);
         if (relicDeck.isEmpty()) {
             sendMessage("Relic deck is empty");
             return;
         }
         String relicID = relicDeck.get(0);
-        StringBuilder sb = new StringBuilder();
-        sb.append("**Relic - Look at Top**\n").append(Helper.getPlayerRepresentation(player, activeMap)).append("\n");
-        sb.append(Helper.getRelicRepresentation(relicID));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
+      String sb = "**Relic - Look at Top**\n" + Helper.getPlayerRepresentation(player, activeGame) + "\n" +
+          Helper.getRelicRepresentation(relicID);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb);
     }
 }

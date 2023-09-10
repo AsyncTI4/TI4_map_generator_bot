@@ -23,10 +23,10 @@ public class StasisInfantry extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -34,12 +34,12 @@ public class StasisInfantry extends SpecialSubcommandData {
 
         OptionMapping option = event.getOption(Constants.COUNT);
         if (option != null) {
-            setValue(event, activeMap, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
+            setValue(event, activeGame, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
         }
 
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+    public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);

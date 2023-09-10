@@ -6,6 +6,7 @@ import com.amazonaws.services.batch.AWSBatch;
 import com.amazonaws.services.batch.AWSBatchClientBuilder;
 import com.amazonaws.services.batch.model.SubmitJobRequest;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -25,7 +26,7 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
         sjr.setJobName("video-" + game );
         sjr.setJobDefinition("getting-started-wizard-job-definition:11");
         sjr.setJobQueue("ti4-video-queue");
-        HashMap<String, String> hm = new HashMap<String,String>();
+        Map<String, String> hm = new HashMap<>();
         hm.put("game", game);
         sjr.setParameters(hm);
         client.submitJob(sjr);

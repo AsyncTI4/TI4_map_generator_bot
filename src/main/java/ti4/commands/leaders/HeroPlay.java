@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.map.Game;
 import ti4.map.Leader;
-import ti4.map.Map;
 import ti4.map.Player;
 
 public class HeroPlay extends LeaderAction {
@@ -16,15 +16,15 @@ public class HeroPlay extends LeaderAction {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
 
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        action(event, "hero", activeMap, player);
+        action(event, "hero", activeGame, player);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class HeroPlay extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         
         if (playerLeader == null) {
@@ -54,16 +54,16 @@ public class HeroPlay extends LeaderAction {
         }
 
         sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
-            sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
+            sendMessage(message + " - Leader will be PURGED after status cleanup");
         } else {
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                sendMessage(message.toString() + " - Leader " + leaderID + " has been purged");
+                sendMessage(message + " - Leader " + leaderID + " has been purged");
             } else {
                 sendMessage("Leader was not purged - something went wrong");
             }

@@ -1,6 +1,6 @@
 package ti4.commands.special;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -35,7 +35,7 @@ public class SystemInfo extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         int context = 0;
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
@@ -50,7 +50,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = AddUnits.getTile(event, tileID, activeMap);
+            Tile tile = AddUnits.getTile(event, tileID, activeGame);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
@@ -61,11 +61,11 @@ public class SystemInfo extends SpecialSubcommandData {
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
-            java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
-            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            java.util.Map<String, String> colorToId = Mapper.getColorToId();
-            Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-            for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            Map<String, String> colorToId = Mapper.getColorToId();
+            Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
+            for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 String representation = planetRepresentations.get(name);
                 if (representation == null){
@@ -73,7 +73,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 UnitHolder unitHolder = entry.getValue();
                 if (unitHolder instanceof Planet planet) {
-                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, activeMap));
+                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, activeGame));
                     sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
                 } else {
                     sb.append(representation);
@@ -85,7 +85,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Command Counters: ");
                         hasCC = true;
                     }
-                    addtFactionIcon(activeMap, sb, colorToId, cc, privateGame);
+                    addtFactionIcon(activeGame, sb, colorToId, cc, privateGame);
                 }
                 if (hasCC) {
                     sb.append("\n");
@@ -96,19 +96,19 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Control Counters: ");
                         hasControl = true;
                     }
-                    addtFactionIcon(activeMap, sb, colorToId, control, privateGame);
+                    addtFactionIcon(activeGame, sb, colorToId, control, privateGame);
                 }
                 if (hasControl) {
                     sb.append("\n");
                 }
                 boolean hasToken = false;
-                java.util.Map<String, String> tokensToName = Mapper.getTokensToName();
+                Map<String, String> tokensToName = Mapper.getTokensToName();
                 for (String token : unitHolder.getTokenList()) {
                     if (!hasToken){
                         sb.append("Tokens: ");
                         hasToken = true;
                     }
-                    for (java.util.Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                    for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
                         String key = entry_.getKey();
                         String value = entry_.getValue();
                         if (token.contains(key)){
@@ -122,31 +122,31 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
 
                 HashMap<String, Integer> units = unitHolder.getUnits();
-                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
 
                     String key = unitEntry.getKey();
 
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
                         if (key.endsWith(unitRepresentationKey)) {
-                            addtFactionIcon(activeMap, sb, colorToId, key, privateGame);
+                            addtFactionIcon(activeGame, sb, colorToId, key, privateGame);
                             sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
                         }
                     }
                 }
                 sb.append("----------\n");
             }
-            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
-            if(!activeMap.isFoWMode()){
-                for(Player player : activeMap.getRealPlayers()){
+            if(!activeGame.isFoWMode()){
+                for(Player player : activeGame.getRealPlayers()){
 
-                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeMap, tile);
+                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
                     if(players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())){
                         Player player2 = players.get(0);
                         if(player2 == player){
                             player2 = players.get(1);
                         }
-                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition(), player, player2, "space");
+                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame,  tile.getPosition(), player, player2, "space");
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         break;
                     }
@@ -157,13 +157,13 @@ public class SystemInfo extends SpecialSubcommandData {
         }
     }
 
-    private static void addtFactionIcon(Map activeMap, StringBuilder sb, java.util.Map<String, String> colorToId, String key, Boolean privateGame) {
+    private static void addtFactionIcon(Game activeGame, StringBuilder sb, Map<String, String> colorToId, String key, Boolean privateGame) {
 
-        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
+        for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
             String colorKey = colorEntry.getKey();
             String color = colorEntry.getValue();
             if (key.contains(colorKey)){
-                for (Player player_ : activeMap.getPlayers().values()) {
+                for (Player player_ : activeGame.getPlayers().values()) {
                     if (Objects.equals(player_.getColor(), color)) {
                         if (privateGame != null && privateGame) {
                             sb.append(" (").append(color).append(") ");

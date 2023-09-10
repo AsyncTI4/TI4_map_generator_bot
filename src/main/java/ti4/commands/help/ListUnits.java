@@ -26,7 +26,7 @@ public class ListUnits extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
-        List<MessageEmbed> messageEmbeds = new ArrayList<MessageEmbed>();
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
             MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);

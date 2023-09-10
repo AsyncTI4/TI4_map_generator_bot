@@ -45,10 +45,10 @@ public class Stats extends PlayerSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
-		player = Helper.getPlayer(activeMap, player, event);
+		Game activeGame = getActiveGame();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
+		player = Helper.getPlayer(activeGame, player, event);
 		if (player == null) {
 			sendMessage("Player could not be found");
 			return;
@@ -61,10 +61,10 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(factionColorOption);
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty()) {
-			if (activeMap.isFoWMode()) {
-				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeMap));
+			if (activeGame.isFoWMode()) {
+				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeGame));
 			} else {
-				sendMessage(getPlayersCurrentStatsText(player, activeMap));
+				sendMessage(getPlayersCurrentStatsText(player, activeGame));
 			}
 			return;
 		}
@@ -79,37 +79,36 @@ public class Stats extends PlayerSubcommandData {
 		} else {
 			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
 			if (optionCC != null) {
-				@SuppressWarnings("ConstantConditions")
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
 				if (tokenizer.countTokens() != 3) {
 					sendMessage("Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
-						setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
-						setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
-						setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						sendMessage("Not number entered, check CC count again");
 					}
 				}
-				Helper.isCCCountCorrect(event, activeMap, player.getColor());
+				Helper.isCCCountCorrect(event, activeGame, player.getColor());
 			}
 			if (optionT != null) {
-				setValue(event, activeMap, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
+				setValue(event, activeGame, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
 			}
 			if (optionF != null) {
-				setValue(event, activeMap, player, optionF, player::setFleetCC, player::getFleetCC, true);
+				setValue(event, activeGame, player, optionF, player::setFleetCC, player::getFleetCC, true);
 			}
 			if (optionS != null) {
-				setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
+				setValue(event, activeGame, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " updated CCs: " + originalCCString + " -> " + newCCString);
+				sendMessage(Helper.getPlayerRepresentation(player, activeGame) + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
-				Helper.isCCCountCorrect(event, activeMap, player.getColor());
+				Helper.isCCCountCorrect(event, activeGame, player.getColor());
 			}
 		}
 		optionMappings.remove(optionCC);
@@ -118,20 +117,20 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionS);
 		if (optionMappings.isEmpty()) return;
 
-		sendMessage(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " player stats changed:");
+		sendMessage(Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " player stats changed:");
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
 			if(optionTG.getAsString().contains("+")){
-				ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+				ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 			}
-			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
+			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 
 		}
 
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
 		if (optionC != null) {
-			setValue(event, activeMap, player, optionC, player::setCommodities, player::getCommodities);
+			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
 		}
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -149,7 +148,7 @@ public class Stats extends PlayerSubcommandData {
 			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
 			String value = optionSpeaker.getAsString().toLowerCase();
 			if ("y".equals(value) || "yes".equals(value)) {
-				activeMap.setSpeaker(player.getUserID());
+				activeGame.setSpeaker(player.getUserID());
 			} else {
 				message.append(", which is not a valid input. Please use one of: y/yes");
 			}
@@ -171,31 +170,29 @@ public class Stats extends PlayerSubcommandData {
 			sendMessage(message.toString());
 		}
 		
-		pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
+		pickSC(event, activeGame, player, event.getOption(Constants.STRATEGY_CARD));
 
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
 		if (optionSCPlayed != null) {
 			StringBuilder message = new StringBuilder();
 			int sc = optionSCPlayed.getAsInt();
 			if (sc > 0) {
-				boolean scIsPlayed = activeMap.getScPlayed().get(sc);
+				boolean scIsPlayed = activeGame.getScPlayed().get(sc);
 				if (!scIsPlayed) {
-					activeMap.setSCPlayed(sc, true);
-					message.append("> flipped " + Helper.getSCEmojiFromInteger(sc) + " to "
-							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
+					activeGame.setSCPlayed(sc, true);
+					message.append("> flipped ").append(Helper.getSCEmojiFromInteger(sc)).append(" to ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" (played)");
 				} else {
-					activeMap.setSCPlayed(sc, false);
+					activeGame.setSCPlayed(sc, false);
 
-					for (Player player_ : activeMap.getPlayers().values()) {
+					for (Player player_ : activeGame.getPlayers().values()) {
 						if (!player_.isRealPlayer()) {
 							continue;
 						}
 						String faction = player_.getFaction();
-						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+						if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
 						player_.addFollowedSC(sc);
 					}
-					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
-							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
+					message.append("> flipped ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" to ").append(Helper.getSCEmojiFromInteger(sc)).append(" (unplayed)");
 				}
 			} else {
 				message.append(
@@ -206,18 +203,17 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionDummy = event.getOption(Constants.DUMMY);
 		if (optionDummy != null) {
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionDummy));
 			boolean value = optionDummy.getAsBoolean();
 			player.setDummy(value);
-			sendMessage(message.toString());
+			sendMessage(getGeneralMessage(event, player, optionDummy));
 		}
 
 	}
 
-	private String getPlayersCurrentStatsText(Player player, Map activeMap) {
-		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " player's current stats:\n");
+	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
+		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " player's current stats:\n");
 
-		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
+		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveGame()));
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.tg).append(player.getTg());
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -228,7 +224,7 @@ public class Stats extends PlayerSubcommandData {
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc: player.getSCs()) {
-				if (getActiveMap().getScPlayed() != null && !getActiveMap().getScPlayed().isEmpty() && getActiveMap().getScPlayed().get(sc) != null) {
+				if (getActiveGame().getScPlayed() != null && !getActiveGame().getScPlayed().isEmpty() && getActiveGame().getScPlayed().get(sc) != null) {
 					sb.append(Helper.getSCBackEmojiFromInteger(sc));
 				} else {
 					sb.append(Helper.getSCEmojiFromInteger(sc));
@@ -239,7 +235,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 		sb.append("\n");
 		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Speaker: `").append(getActiveGame().getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
@@ -263,25 +259,25 @@ public class Stats extends PlayerSubcommandData {
 	@Override
 	public void reply(SlashCommandInteractionEvent event) {
 		String userID = event.getUser().getId();
-		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-		MapSaveLoadManager.saveMap(activeMap, event);
+		Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+		GameSaveLoadManager.saveMap(activeGame, event);
 
-		GenerateMap.getInstance().saveImage(activeMap, event);
+		GenerateMap.getInstance().saveImage(activeGame, event);
 	}
 
-	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
 		if (optionSC == null) {
 			return false;
 		}
-		if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
-			activeMap.setMapStatus(MapStatus.open);
+		if (activeGame.isMapOpen() && !activeGame.isCommunityMode()) {
+			activeGame.setGameStatus(GameStatus.open);
 		}
 		int scNumber = optionSC.getAsInt();
-		return secondHalfOfPickSC(event, activeMap, player, scNumber);
+		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber) {
-		LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
+		LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
 			return false;
@@ -291,7 +287,7 @@ public class Stats extends PlayerSubcommandData {
 			return false;
 		}
 
-		LinkedHashMap<String, Player> players = activeMap.getPlayers();
+		LinkedHashMap<String, Player> players = activeGame.getPlayers();
 		for (Player playerStats : players.values()) {
 			if (playerStats.getSCs().contains(scNumber)) {
 				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
@@ -300,47 +296,47 @@ public class Stats extends PlayerSubcommandData {
 		}
 
 		player.addSC(scNumber);
-		if (activeMap.isFoWMode()) {
+		if (activeGame.isFoWMode()) {
 			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
-			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 		
 		Integer tgCount = scTradeGoods.get(scNumber);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
-			if (activeMap.isFoWMode()) {
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player, activeGame)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
+			if (activeGame.isFoWMode()) {
 				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 
 			player.setTg(tg);
 			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
-				ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
 			}
-			ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+			ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 		}
 		return true;
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier) {
-		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), false);
+		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
-		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
+		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, String optionName,
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, String optionName,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
 			String explanation = "";
 			if(value.contains("?")){	
-				explanation = value.substring(value.indexOf("?")+1, value.length());
+				explanation = value.substring(value.indexOf("?")+1);
 				value = value.substring(0, value.indexOf("?")).replace(" ", "");		
 			}
 			
@@ -350,8 +346,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(number);
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				if (activeGame.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
 			} else {
 				int newNumber = existingNumber + number;
@@ -359,8 +355,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(newNumber);
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				if (activeGame.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
 			}
 		} catch (Exception e) {
@@ -369,13 +365,13 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-							+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
+		if(explanation == null || "".equalsIgnoreCase(explanation)){
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+							+ existingNumber + ", a change of " + (setToNumber - existingNumber)
 							+ ")_";
 		}else{
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
 				+ ")_ for the reason of: "+explanation;
 		}
 		
@@ -389,12 +385,12 @@ public class Stats extends PlayerSubcommandData {
 		} else if (changeNumber < 0) {
 			changeDescription = "decreased";
 		}
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_";
+		if(explanation == null || "".equalsIgnoreCase(explanation)){
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_";
 		}else{
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_ for the reason of: "+explanation; 
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_ for the reason of: "+explanation;
 		}
 		
 	}
