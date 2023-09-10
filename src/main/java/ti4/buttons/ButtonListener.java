@@ -2229,6 +2229,8 @@ public class ButtonListener extends ListenerAdapter {
                     if(speaker == null){
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button (command is /player stats speaker:y)");
                         return;
+                    }else{
+
                     }
                     new RevealStage1().revealS1(event, activeMap.getMainGameChannel());
                     new RevealStage1().revealS1(event, activeMap.getMainGameChannel());
@@ -2866,6 +2868,7 @@ public class ButtonListener extends ListenerAdapter {
                     int stratCC = player.getStrategicCC();
                     player.setStrategicCC(stratCC-1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Quashed agenda. Strategic CCs went from "+stratCC+ " -> "+(stratCC-1));
+                    ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
                     new RevealAgenda().revealAgenda(event, false, activeMap, activeMap.getMainGameChannel());
                     event.getMessage().delete().queue();
                 }

@@ -210,8 +210,8 @@ public class SCPick extends PlayerSubcommandData {
             else{
                    
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event)); 
-                if(player.getStasisInfantry() > 0){
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
+                if(privatePlayer.getStasisInfantry() > 0){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeMap), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, privatePlayer));
                 }    
                     
             }
@@ -228,9 +228,9 @@ public class SCPick extends PlayerSubcommandData {
                 } else {
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
                     MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
-                    if(player.getStasisInfantry() > 0){
-                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
-                    }
+                    if(privatePlayer.getStasisInfantry() > 0){
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeMap), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, privatePlayer));
+                    }  
                 }
             }
         }

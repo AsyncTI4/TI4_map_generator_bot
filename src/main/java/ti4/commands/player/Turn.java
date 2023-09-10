@@ -188,11 +188,12 @@ public class Turn extends PlayerSubcommandData {
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
                     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
-                    if(player.getStasisInfantry() > 0){
-                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
-                    }
+                    
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
+                    }
+                    if(player.getStasisInfantry() > 0){
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
                     }
 
                     activeMap.setPingSystemCounter(0);
@@ -205,6 +206,9 @@ public class Turn extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
+                    }
+                    if(player.getStasisInfantry() > 0){
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeMap, player));
                     }
                     
                     
