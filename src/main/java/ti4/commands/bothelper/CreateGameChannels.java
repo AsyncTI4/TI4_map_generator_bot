@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
+import java.util.Set;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,7 +18,6 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -50,11 +50,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Guild guild = null;
+        Guild guild;
 
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
-        String gameName = null;
+        String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
             if (gameOrRoleAlreadyExists(gameName)) {
@@ -129,7 +129,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //PLAYERS
-        ArrayList<Member> members = new ArrayList<>();
+        List<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
@@ -210,43 +210,41 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setBotMapUpdatesThreadID(botThread.getId());
 
         // INTRODUCTION TO TABLETALK CHANNEL
-        StringBuilder tabletalkGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - table talk channel\n");
-        tabletalkGetStartedMessage.append("This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n");
-        tabletalkGetStartedMessage.append("If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n");
-        tabletalkGetStartedMessage
-            .append("Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n");
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) chatChannel, tabletalkGetStartedMessage.toString());
+        String tabletalkGetStartedMessage = role.getAsMention() + " - table talk channel\n" +
+            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n" +
+            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n" +
+            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
+        MessageHelper.sendMessageToChannelAndPin(chatChannel, tabletalkGetStartedMessage);
 
         // INTRODUCTION TO ACTIONS CHANNEL
-        StringBuilder actionsGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - actions channel\n");
-        actionsGetStartedMessage.append("This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n");
-        actionsGetStartedMessage.append("Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n");
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) actionsChannel, actionsGetStartedMessage.toString());
+        String actionsGetStartedMessage = role.getAsMention() + " - actions channel\n" +
+            "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
+            "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
+        MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
 
         // INTRODUCTION TO BOT-MAP THREAD
-        StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
-        botGetStartedMessage.append("This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n");
-        botGetStartedMessage.append("### __Use the following commands to get started:__\n");
-        botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
-        botGetStartedMessage.append("> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
-        botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
-        botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
-        botGetStartedMessage.append("> `/tech add` for factions who need to add tech\n");
-        botGetStartedMessage.append("\n");
-        botGetStartedMessage.append("### __Other helpful commands:__\n");
-        botGetStartedMessage.append("> `/game replace` to replace a player in the game with a new one\n");
-        botGetStartedMessage.append("> `/role remove` to remove the game role to any replaced players\n");
-        botGetStartedMessage.append("> `/role add` to add the game role to any replacing players\n");
+        String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +
+            "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n" +
+            "### __Use the following commands to get started:__\n" +
+            "> `/game setup` to set player count and additional options\n" +
+            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
+            "> `/game set_order` to set the starting speaker order\n" +
+            "> `/player setup` to set player faction and colour\n" +
+            "> `/tech add` for factions who need to add tech\n" +
+            "\n" +
+            "### __Other helpful commands:__\n" +
+            "> `/game replace` to replace a player in the game with a new one\n" +
+            "> `/role remove` to remove the game role to any replaced players\n" +
+            "> `/role add` to add the game role to any replacing players\n";
         // botGetStartedMessage.append("> `/status po_reveal_stage1` to reveal the first" + Emojis.Public1 + "Stage 1 Public Objective\n");
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, botGetStartedMessage.toString());
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
-        StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
-        message.append("> ").append(role.getName()).append("\n");
-        message.append("> ").append(chatChannel.getAsMention()).append("\n");
-        message.append("> ").append(actionsChannel.getAsMention()).append("\n");
-        message.append("> ").append(botThread.getAsMention()).append("\n");
-        sendMessage(message.toString());
+        String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
+            "> " + chatChannel.getAsMention() + "\n" +
+            "> " + actionsChannel.getAsMention() + "\n" +
+            "> " + botThread.getAsMention() + "\n";
+        sendMessage(message);
 
         GameSaveLoadManager.saveMap(newGame, event);
     }
@@ -262,7 +260,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
-        ArrayList<String> gameAndRoleNames = new ArrayList<>();
+        List<String> gameAndRoleNames = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
         for (Guild guild : guilds) {
@@ -273,7 +271,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        HashSet<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
+        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
         gameAndRoleNames.addAll(mapNames);
 
         //CHECK

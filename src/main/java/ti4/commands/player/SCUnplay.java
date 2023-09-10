@@ -51,7 +51,7 @@ public class SCUnplay extends PlayerSubcommandData {
                 continue;
             }
             String faction = player_.getFaction();
-            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+            if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
             player_.addFollowedSC(scToUnplay);
         }
 

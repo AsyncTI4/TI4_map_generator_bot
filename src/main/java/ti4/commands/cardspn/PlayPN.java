@@ -1,5 +1,6 @@
 package ti4.commands.cardspn;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -37,7 +38,7 @@ public class PlayPN extends PNCardsSubcommandData {
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {
-            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
+            longPNDisplay = "y".equalsIgnoreCase(longPNOption.getAsString()) || "yes".equalsIgnoreCase(longPNOption.getAsString());
         }
 
         String value = option.getAsString().toLowerCase();
@@ -45,7 +46,7 @@ public class PlayPN extends PNCardsSubcommandData {
         int pnIndex;
         try {
             pnIndex = Integer.parseInt(value);
-            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+            for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
                 if (pn.getValue().equals(pnIndex)) {
                     pnID = pn.getKey();
                 }
@@ -53,7 +54,7 @@ public class PlayPN extends PNCardsSubcommandData {
         } catch (Exception e) {
             boolean foundSimilarName = false;
             String cardName = "";
-            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+            for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
                 String pnName = Mapper.getPromissoryNote(pn.getKey(), false);
                 if (pnName != null) {
                     pnName = pnName.toLowerCase();
@@ -97,13 +98,13 @@ public class PlayPN extends PNCardsSubcommandData {
         String emojiToUse = activeGame.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: "+pnName+"\n");
         sb.append(emojiToUse).append(Emojis.PN);
-        String pnText = "";
+        String pnText;
 
         pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
         sb.append(pnText).append("\n");
 
         //TERRAFORM TIP
-        if (pnID.equalsIgnoreCase("terraform")) {
+        if ("terraform".equalsIgnoreCase(pnID)) {
             sb.append("`/add_token token:titanspn`\n");
         }
 

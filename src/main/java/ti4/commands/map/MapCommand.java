@@ -45,7 +45,7 @@ public class MapCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getType().equals(OptionType.USER)) {
+        if (option.getType() == OptionType.USER) {
             return option.getAsUser().getName();
         }
         return option.getAsString();

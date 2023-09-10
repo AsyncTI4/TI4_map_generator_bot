@@ -31,8 +31,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player playerOrig = activeGame.getPlayer(getUser().getId());
-        playerOrig = Helper.getGamePlayer(activeGame, player, event, null);
+        Player playerOrig = Helper.getGamePlayer(activeGame, player, event, null);
         long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
@@ -56,6 +55,5 @@ public class PingActivePlayer extends FOWSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

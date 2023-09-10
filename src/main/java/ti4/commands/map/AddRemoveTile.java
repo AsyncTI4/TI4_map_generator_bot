@@ -59,7 +59,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         Tile tile = new Tile(planetTileName, position);
-        if (planetTileName.equals("18")) {
+        if ("18".equals(planetTileName)) {
             tile.addToken("token_custodian.png", "mr");
         }
 

@@ -3,6 +3,7 @@ package ti4.commands.leaders;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -34,11 +35,9 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
         String leaderInfo = getLeaderInfo(activeGame, player);
 
-        if (event != null) {
-            OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
-            if (option != null && option.getAsBoolean()) {
-                MessageHelper.sendMessageToUser(leaderInfo, user);
-            }
+        OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
+        if (option != null && option.getAsBoolean()) {
+            MessageHelper.sendMessageToUser(leaderInfo, user);
         }
         sendLeadersInfo(activeGame, player, event);
     }
@@ -91,7 +90,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
             //PLAY AREA PROMISSORY NOTES
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+            for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                     String pnData = Mapper.getPromissoryNote(pn.getKey(), false);
                     if (pnData.contains("Alliance")) {

@@ -28,10 +28,10 @@ public class UnlockLeader extends LeaderAction {
         if (playerLeader != null){
             playerLeader.setLocked(false);
             MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame))
-                    .append(" unlocked ")
-                    .append(Helper.getLeaderFullRepresentation(playerLeader));
-            MessageHelper.sendMessageToChannel(channel, message.toString());
+          String message = Helper.getPlayerRepresentation(player, activeGame) +
+              " unlocked " +
+              Helper.getLeaderFullRepresentation(playerLeader);
+            MessageHelper.sendMessageToChannel(channel, message);
             if (playerLeader.isExhausted()){
                 MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
             }

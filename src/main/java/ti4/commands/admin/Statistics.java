@@ -24,10 +24,10 @@ public class Statistics extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        HashMap<String, Integer> factionCount = new HashMap<>();
-        HashMap<String, Integer> winnerFactionCount = new HashMap<>();
-        HashMap<String, Integer> colorCount = new HashMap<>();
-        HashMap<String, Integer> winnerColorCount = new HashMap<>();
+        Map<String, Integer> factionCount = new HashMap<>();
+        Map<String, Integer> winnerFactionCount = new HashMap<>();
+        Map<String, Integer> colorCount = new HashMap<>();
+        Map<String, Integer> winnerColorCount = new HashMap<>();
 
         BufferedImage fakeImage = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = fakeImage.getGraphics();
@@ -41,7 +41,7 @@ public class Statistics extends AdminSubcommandData {
                 for (Player player : activeGame.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
-                    if (faction != null && color != null && !faction.isEmpty() && !faction.equals("null")) {
+                    if (faction != null && color != null && !faction.isEmpty() && !"null".equals(faction)) {
                         factionCount.putIfAbsent(faction, 1);
                         factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
 
@@ -50,7 +50,7 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 boolean findWinner = true;
-                for (java.util.Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
+                for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
                     Integer vpScore = entry.getValue();
                     if (vp <= vpScore) {
                         String color = entry.getKey().getColor();
@@ -74,7 +74,7 @@ public class Statistics extends AdminSubcommandData {
                     if (days_difference > 30) {
                         Integer maxVP = userVPs.values().stream().max(Integer::compareTo).orElse(0);
                         if (userVPs.values().stream().filter(value -> value.equals(maxVP)).count() == 1) {
-                            for (java.util.Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
+                            for (Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
                                 Integer vpScore = entry.getValue();
                                 if (maxVP.equals(vpScore)) {
                                     String color = entry.getKey().getColor();
@@ -102,20 +102,20 @@ public class Statistics extends AdminSubcommandData {
 
     }
 
-    private static void sendStatistics(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
+    private static void sendStatistics(SlashCommandInteractionEvent event, Map<String, Integer> factionCount, String text) {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(java.util.Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(Helper.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
-    private static void sendStatisticsColor(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
+    private static void sendStatisticsColor(SlashCommandInteractionEvent event, Map<String, Integer> factionCount, String text) {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(java.util.Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }

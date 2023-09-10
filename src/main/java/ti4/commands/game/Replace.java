@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -39,7 +40,7 @@ public class Replace extends GameSubcommandData {
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
-            java.util.List<Role> roles = member.getRoles();
+            List<Role> roles = member.getRoles();
             for (Role role : MapGenerator.bothelperRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
@@ -76,18 +77,18 @@ public class Replace extends GameSubcommandData {
         Guild guild = event.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
-        if (removedMember != null && roles != null && roles.size() == 1) {
+        if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
         }
         
         //ADD ROLE
         Member addedMember = guild.getMemberById(addedUser.getId());
-        if (addedUser != null && roles != null && roles.size() == 1) {
+        if (roles.size() == 1) {
             guild.addRoleToMember(addedMember, roles.get(0)).queue();
         }
         
-        String message = "";
-        if (!players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) || !players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
+        String message;
+        if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) || players.stream().anyMatch(player -> player.getUserID().equals(addedUser.getId()))) {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
             return;
         }
@@ -95,7 +96,7 @@ public class Replace extends GameSubcommandData {
         message = "Game: " + activeGame.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
         Player player = activeGame.getPlayer(removedPlayer.getUserID());
         LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
-        for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
+        for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());
             if (removed){

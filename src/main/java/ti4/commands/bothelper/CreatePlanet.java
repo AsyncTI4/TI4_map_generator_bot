@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -67,21 +68,21 @@ public class CreatePlanet extends BothelperSubcommandData {
             );
         } catch (Exception e) {
             BotLogger.log("Something went wrong creating the planet! "
-                    + e.getMessage() + "\n" + e.getStackTrace());
+                    + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
         }
         if(Optional.ofNullable(planet).isPresent()) {
             try {
                 exportPlanetModelToJson(planet);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong exporting the planet to json! "
-                        + e.getMessage() + "\n" +e.getStackTrace());
+                        + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             try {
                 TileHelper.addNewPlanetToList(planet);
                 AliasHandler.addNewPlanetAliases(planet);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the planet to the active planets list! " +
-                        e.getMessage() + "\n" + e.getStackTrace());
+                        e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             sendMessage("Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
                     "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```");

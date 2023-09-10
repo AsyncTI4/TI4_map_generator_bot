@@ -34,7 +34,7 @@ public abstract class FrankenSubcommandData extends SubcommandData {
     }
 
     public SlashCommandInteractionEvent getEvent() {
-        return this.event;
+        return event;
     }
 
     /**

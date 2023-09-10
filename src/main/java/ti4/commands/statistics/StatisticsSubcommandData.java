@@ -49,6 +49,5 @@ public abstract class StatisticsSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

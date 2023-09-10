@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -53,8 +54,8 @@ public class FighterConscription extends SpecialSubcommandData {
                 }
                 // Check if space area contains capacity units or another player's units
                 if ("space".equals(unitHolder.getName())) {
-                    HashMap<String, Integer> units = unitHolder.getUnits();
-                    for (java.util.Map.Entry<String, Integer> unit : units.entrySet()) {
+                    Map<String, Integer> units = unitHolder.getUnits();
+                    for (Map.Entry<String, Integer> unit : units.entrySet()) {
                         String name = unit.getKey();
                         Integer quantity = unit.getValue();
                         if (name.startsWith(colorID) && quantity != null && quantity > 0) {
@@ -98,15 +99,17 @@ public class FighterConscription extends SpecialSubcommandData {
             msg += " Please check fleet size and capacity in each of the systems: ";
         }
         boolean first = true;
-        for (Tile tile : tilesAffected) {
+      StringBuilder msgBuilder = new StringBuilder(msg);
+      for (Tile tile : tilesAffected) {
             if (first) {
-                msg += "\n> **" + tile.getPosition() + "**";
+                msgBuilder.append("\n> **").append(tile.getPosition()).append("**");
                 first = false;
             } else {
-                msg += ", **" + tile.getPosition() + "**";
+                msgBuilder.append(", **").append(tile.getPosition()).append("**");
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+      msg = msgBuilder.toString();
+      MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @Override

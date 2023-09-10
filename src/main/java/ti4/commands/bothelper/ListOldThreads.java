@@ -46,7 +46,7 @@ public class ListOldThreads extends BothelperSubcommandData {
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `").append(latestActivityTime.toString()).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **").append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
+            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **").append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }

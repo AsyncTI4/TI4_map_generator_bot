@@ -10,9 +10,7 @@ public class PublicObjectiveModel implements ModelInterface {
     private int points;
     private String source;
 
-    public PublicObjectiveModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
             && phase != null

@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class MapFileDeleter {
-    public static Set<File> filesToDelete = new HashSet<>();
+    public static final Set<File> filesToDelete = new HashSet<>();
 
     public static void deleteFiles() {
         for (File file : filesToDelete) {

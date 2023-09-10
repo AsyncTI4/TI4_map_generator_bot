@@ -3,9 +3,9 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,17 +19,18 @@ import ti4.map.UnitHolder;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatModHelper {
-    public static String GetModifiersText(String prefixText, java.util.Map<UnitModel, Integer> units,
+    public static String GetModifiersText(String prefixText, Map<UnitModel, Integer> units,
             List<NamedCombatModifierModel> modifiers) {
         String result = "";
         if (!modifiers.isEmpty()) {
 
             result += prefixText;
-            ArrayList<String> modifierMessages = new ArrayList<>();
+            List<String> modifierMessages = new ArrayList<>();
             for (NamedCombatModifierModel namedModifier : modifiers) {
                 CombatModifierModel mod = namedModifier.getModifier();
                 String unitScope = mod.getScope(); 
@@ -72,7 +73,7 @@ public class CombatModHelper {
     /// Retrieves Always on modifiers, 
     /// based on the player's info (techs, owned relics, active leaders, units), current laws in play, units in combat, and opponent race abilities)
     public static List<NamedCombatModifierModel> CalculateAutomaticMods(Player player, Player opponent,
-            HashMap<UnitModel, Integer> unitsByQuantity,
+            Map<UnitModel, Integer> unitsByQuantity,
             TileModel tile,
             Game activeGame) {
         List<NamedCombatModifierModel> alwaysOnMods = new ArrayList<>();
@@ -114,7 +115,7 @@ public class CombatModHelper {
         List<AgendaModel> lawAgendasTargetingPlayer = activeGame.getLawsInfo().entrySet().stream()
                 .filter(entry -> entry.getValue().equals(player.getFaction()))
                 .map(entry -> Mapper.getAgenda(entry.getKey()))
-                .collect(Collectors.toList());
+                .toList();
         for (AgendaModel agenda : lawAgendasTargetingPlayer) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo(Constants.AGENDA, agenda.getAlias()))
@@ -171,7 +172,7 @@ public class CombatModHelper {
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-            Player opponent, Game activeGame, HashMap<UnitModel, Integer> unitsByQuantity) {
+            Player opponent, Game activeGame, Map<UnitModel, Integer> unitsByQuantity) {
         boolean meetsCondition = false;
         String condition = "";
         if(modifier != null && modifier.getCondition() != null){
@@ -208,7 +209,7 @@ public class CombatModHelper {
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 if (unitsByQuantity.entrySet().size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
-                    meetsCondition = unitByQuantity.getValue() == 2 && !unitByQuantity.getKey().getAsyncId().equals("ff");
+                    meetsCondition = unitByQuantity.getValue() == 2 && !"ff".equals(unitByQuantity.getKey().getAsyncId());
                 }
             }
             default -> meetsCondition = true;
@@ -238,7 +239,7 @@ public class CombatModHelper {
                         List<List<String>> scoredPOUserLists = new ArrayList<>();
                         for (Entry<String, List<String>> entry : activeGame.getScoredPublicObjectives().entrySet()) {
                             // Ensure its actually a revealed PO not imperial or a relic
-                            if (!customPublicVPList.containsKey(entry.getKey().toString())) {
+                            if (!customPublicVPList.containsKey(entry.getKey())) {
                                 scoredPOUserLists.add(entry.getValue());
                             }
                         }
@@ -250,21 +251,16 @@ public class CombatModHelper {
                 }
                 case Constants.UNIT_TECH -> scalingCount = player.getTechs().stream()
                     .map(Mapper::getTech)
-                    .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                    .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
                     // TODO: Doesnt seem like an easier way to do this? Seems slow.
                     String colorID = Mapper.getColorID(player.getColor());
                     for (Tile tile : activeGame.getTileMap().values()) {
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-
-                            HashMap<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+                            Map<String, Integer> unitsOnHolder = unitHolder.getUnitAsyncIdsOnHolder(colorID);
                             for (Entry<String, Integer> unitEntry : unitsOnHolder.entrySet()) {
-                                Integer count = unitEntry.getValue();
-                                if (count == null) {
-                                    count = 0;
-                                }
-                                if (unitEntry.getKey().equals("dd")) {
+                                if ("dd".equals(unitEntry.getKey())) {
                                     scalingCount += unitEntry.getValue();
                                 }
                             }
@@ -276,7 +272,7 @@ public class CombatModHelper {
                         // TODO:If player.getunittech existed, you could reuse it here.
                         scalingCount = opponent.getTechs().stream()
                             .map(Mapper::getTech)
-                            .filter(tech -> tech.getType().equals(Constants.UNIT_UPGRADE))
+                            .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
                             .count();
                     }
                 }
@@ -298,9 +294,8 @@ public class CombatModHelper {
         return (int) value;
     }
     public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods, List<UnitModel> units){
-        
         return mods.stream()
-                .filter(model -> CombatModHelper.IsModInScopeForUnits(units, model.getModifier()))
+                .filter(model -> IsModInScopeForUnits(units, model.getModifier()))
                 .toList();
     }
 }

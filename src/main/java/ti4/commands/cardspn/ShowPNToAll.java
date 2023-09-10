@@ -1,5 +1,6 @@
 package ti4.commands.cardspn;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -34,7 +35,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         int soIndex = option.getAsInt();
         String acID = null;
         boolean scored = false;
-        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 acID = so.getKey();
                 break;
@@ -46,15 +47,13 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Promissory Note:").append("\n");
-
-        sb.append(Mapper.getPromissoryNote(acID)).append("\n");
+      String sb = "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Promissory Note:" + "\n" +
+          Mapper.getPromissoryNote(acID) + "\n";
         if (!scored) {
             player.setPromissoryNote(acID);
         }
-        sendMessage(sb.toString());
+        sendMessage(sb);
     }
 }

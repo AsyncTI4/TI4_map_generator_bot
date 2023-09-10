@@ -25,7 +25,6 @@ public class ChangeColor extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        @SuppressWarnings("ConstantConditions")
         String newColour = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(newColour)) {
             sendMessage("Color not valid");
@@ -63,7 +62,7 @@ public class ChangeColor extends PlayerSubcommandData {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
             
             LinkedHashMap<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+            for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 String key = pn.getKey();
                 Integer value = pn.getValue();
                 String newKey = key;
@@ -94,7 +93,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
             }
 
-            java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
+            Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
             for (String colour : debtTokens.keySet()) {
                 if (colour.equals(oldColor)) {
                     Integer count = debtTokens.get(colour);
@@ -119,8 +118,8 @@ public class ChangeColor extends PlayerSubcommandData {
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 
-                HashMap<String, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
-                for (java.util.Map.Entry<String, Integer> unitDmg : unitDamage.entrySet()) {
+                Map<String, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
+                for (Map.Entry<String, Integer> unitDmg : unitDamage.entrySet()) {
                     String key = unitDmg.getKey();
                     if (!key.startsWith(oldColorID)) continue;
                     Integer value = unitDmg.getValue();
@@ -129,8 +128,8 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addUnitDamage(replacedKey, value);
                 }
 
-                HashMap<String, Integer> units = new HashMap<>(unitHolder.getUnits());
-                for (java.util.Map.Entry<String, Integer> unit : units.entrySet()) {
+                Map<String, Integer> units = new HashMap<>(unitHolder.getUnits());
+                for (Map.Entry<String, Integer> unit : units.entrySet()) {
                     String key = unit.getKey();
                     if (!key.startsWith(oldColorID)) continue;
                     Integer value = unit.getValue();
@@ -139,7 +138,7 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addUnit(replacedKey, value);
                 }
 
-                HashSet<String> controlList = new HashSet<>(unitHolder.getControlList());
+                Set<String> controlList = new HashSet<>(unitHolder.getControlList());
                 for (String control : controlList) {
                     if (!control.contains(oldColorID)) continue;
                     unitHolder.removeControl(control);
@@ -148,7 +147,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
 
                 
-                HashSet<String> ccList = new HashSet<>(unitHolder.getCCList());
+                Set<String> ccList = new HashSet<>(unitHolder.getCCList());
                 for (String cc : ccList) {
                     unitHolder.removeCC(cc);
                     cc = cc.replace(oldColorSuffix, newColorSuffix);

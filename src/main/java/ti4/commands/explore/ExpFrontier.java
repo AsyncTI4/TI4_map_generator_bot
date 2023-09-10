@@ -41,10 +41,9 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeGame.drawExplore(Constants.FRONTIER);
-            StringBuilder messageText = new StringBuilder(Emojis.Frontier);
-            messageText.append("Frontier *(tile ").append(tile.getPosition()).append(")* explored by ").append(Helper.getPlayerRepresentation(player, activeGame)).append(":\n");
-            messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeGame);
+          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeGame) + ":\n" +
+              displayExplore(cardID);
+            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
@@ -54,17 +53,16 @@ public class ExpFrontier extends ExploreSubcommandData {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-            StringBuilder messageText = new StringBuilder(Emojis.Frontier);
-            messageText.append("Frontier *(tile ").append(tile.getPosition()).append(")* explored by ").append(Helper.getPlayerRepresentation(player, activeGame)).append(":\n");
-            messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeGame);
+          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeGame) + ":\n" +
+              displayExplore(cardID);
+            resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
     }
 
     public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
-        if (player != null && ("ed1".equals(cardID) || "ed2".equals(cardID))) {
+        if ("ed1".equals(cardID) || "ed2".equals(cardID)) {
             player.addRelic(Constants.ENIGMATIC_DEVICE);
             return true;
         }

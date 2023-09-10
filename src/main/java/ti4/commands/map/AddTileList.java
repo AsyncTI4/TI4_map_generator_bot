@@ -1,5 +1,6 @@
 package ti4.commands.map;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -52,12 +53,12 @@ public class AddTileList extends MapSubcommandData {
 
         List<String> badTiles = new ArrayList<>();
         userActiveGame.clearTileMap();
-        for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
+        for (Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue().toLowerCase();
-            if (tileID.equals("-1")) {
+            if ("-1".equals(tileID)) {
                 continue;
             }
-            if (tileID.equals("0")) {
+            if ("0".equals(tileID)) {
                 tileID = "0g";
             }
             if (!TileHelper.getAllTiles().containsKey(tileID)) {
@@ -76,7 +77,7 @@ public class AddTileList extends MapSubcommandData {
             userActiveGame.setTile(tile);
         }
 
-        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles.toString() + "\n");
+        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
 
         try {
             Tile tile;

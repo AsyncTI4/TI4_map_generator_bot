@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -59,7 +59,6 @@ public class PNInfo extends PNCardsSubcommandData {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
             if(owner == player){
-                continue;
             }else{
                 Button transact;
                 if(activeGame.isFoWMode()){
@@ -74,7 +73,7 @@ public class PNInfo extends PNCardsSubcommandData {
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
-        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeGame), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 
    
@@ -92,7 +91,7 @@ public class PNInfo extends PNCardsSubcommandData {
             if (promissoryNotes.isEmpty()) {
                 sb.append("> None");
             } else {
-                for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                     if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                         sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
                         sb.append(getPromissoryNoteRepresentation(activeGame, pn.getKey(), longFormat));
@@ -106,7 +105,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
-                    for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                    for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                         if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                             sb.append("`").append(index).append(".");
                             sb.append("(").append(pn.getValue()).append(")`");
@@ -155,7 +154,7 @@ public class PNInfo extends PNCardsSubcommandData {
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
         }
         
-        if (longFormat || Mapper.isFaction(pnModel.getFaction().toLowerCase()) || pnModel.getSource().equalsIgnoreCase("Absol")) sb.append("      ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnModel.getFaction().toLowerCase()) || "Absol".equalsIgnoreCase(pnModel.getSource())) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }

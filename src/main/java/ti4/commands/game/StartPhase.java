@@ -28,31 +28,17 @@ public class StartPhase extends GameSubcommandData {
 
     public static void startPhase(GenericInteractionCreateEvent event, Game activeGame, String phase) {
         switch (phase) {
-            case "strategy" -> {
-                ButtonHelper.startStrategyPhase(event, activeGame);
-            }
-            case "voting" -> {
-                AgendaHelper.startTheVoting(activeGame, event);
-            }
-            case "finSpecial" -> {
-                ButtonHelper.fixRelics(activeGame);
-            }
+            case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
+            case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
+            case "finSpecial" -> ButtonHelper.fixRelics(activeGame);
             case "statusScoring" -> {
                 new Turn().showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
                 activeGame.updateActivePlayer(null);
             }
-            case "statusHomework" -> {
-                ButtonHelper.startStatusHomework(event, activeGame);
-            }
-            case "agendaResolve" -> {
-                AgendaHelper.resolveTime(event, activeGame, null);
-            }
-            case "action" -> {
-                ButtonHelper.startActionPhase(event, activeGame);
-            }
-            default -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
-            }
+            case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);
+            case "agendaResolve" -> AgendaHelper.resolveTime(event, activeGame, null);
+            case "action" -> ButtonHelper.startActionPhase(event, activeGame);
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
         }
     }
 }

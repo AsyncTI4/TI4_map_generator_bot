@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -86,7 +86,6 @@ public class GameEnd extends GameSubcommandData {
         userActiveGame.setAutoPingSpacer(0);
         //SEND THE MAP IMAGE
         File file = GenerateMap.getInstance().saveImage(userActiveGame, DisplayType.all, event);
-        FileUpload fileUpload = FileUpload.fromData(file);
         MessageHelper.replyToMessage(event, file);
 
         //CREATE POST IN #THE-PBD-CHRONICLES
@@ -109,11 +108,14 @@ public class GameEnd extends GameSubcommandData {
         {
             //INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                try (FileUpload fileUpload = FileUpload.fromData(file)) {
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                } catch (IOException e) {
+                    BotLogger.log(event, "Error from fileUpload: " + e.getMessage());
+                }
                 m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
                 String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-                
             });
         }
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
@@ -126,17 +128,15 @@ public class GameEnd extends GameSubcommandData {
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
-                MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
+                MessageHelper.sendMessageToChannel(threadChannel_,
                         "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
             }
         }
-            
-        
-        
+
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
-        TextChannel tableTalkChannel = (TextChannel) userActiveGame.getTableTalkChannel();
-        TextChannel actionsChannel = (TextChannel) userActiveGame.getMainGameChannel();
+        TextChannel tableTalkChannel = userActiveGame.getTableTalkChannel();
+        TextChannel actionsChannel = userActiveGame.getMainGameChannel();
         if (inLimboCategory != null) {
             if (inLimboCategory.getChannels().size() > 40) {
                 String holytispoonMention = event.getJDA().getUserById("150809002974904321").getAsMention();

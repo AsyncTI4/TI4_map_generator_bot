@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -27,7 +28,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : activeGame.getDiscardActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : activeGame.getDiscardActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -41,11 +42,10 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append(" ");
-        sb.append("Player: ").append(getUser().getName()).append("\n");
-        sb.append("Card shuffled back into deck from discards: ");
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+      String sb = "Game: " + activeGame.getName() + " " +
+          "Player: " + getUser().getName() + "\n" +
+          "Card shuffled back into deck from discards: " +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

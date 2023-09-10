@@ -7,7 +7,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-
 public class ListTurnStats extends StatusSubcommandData {
     public ListTurnStats() {
         super(Constants.TURN_STATS, "List average amount of time players take on their turns");
@@ -16,7 +15,7 @@ public class ListTurnStats extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        if (FoWHelper.isPrivateGame(event) != null && FoWHelper.isPrivateGame(event)) {
+        if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }
@@ -45,20 +44,18 @@ public class ListTurnStats extends StatusSubcommandData {
         }
 
         long total = totalMillis / numTurns;
-        long millis = total % 1000;;
+        long millis = total % 1000;
 
-        total = total / 1000; //total seconds (truncates)
+      total = total / 1000; //total seconds (truncates)
         long seconds = total % 60;
 
         total = total / 60; //total minutes (truncates)
         long minutes = total % 60;
         long hours = total / 60; //total hours (truncates)
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("> ").append(player.getUserName()).append(": `");
-        sb.append(String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis));
-        sb.append("` (").append(numTurns).append(" turns)");
-        return sb.toString();
+      return "> " + player.getUserName() + ": `" +
+          String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis) +
+          "` (" + numTurns + " turns)";
     }
 
     @Override

@@ -13,9 +13,6 @@ public class AgendaModel implements ModelInterface {
     private String text2;
     private String source;
 
-    public AgendaModel() {
-    }
-
     public boolean isValid() {
         return alias != null
             && name != null

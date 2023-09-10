@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -42,7 +43,7 @@ public class StellarConverter extends SpecialSubcommandData {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
@@ -50,7 +51,7 @@ public class StellarConverter extends SpecialSubcommandData {
                 }
             }
         }
-        if (tile == null || unitHolder == null) {
+        if (tile == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }

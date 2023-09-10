@@ -32,7 +32,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
             sendMessage("SO ID needs to be specified");
             return;
         }
-        User user = null;
+        User user;
         if (playerOption == null) {
           //  sendMessage("Player option was null");
            // return;
@@ -42,7 +42,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         {
            user = playerOption.getAsUser();
         }
-        if(optionPurge != null && optionPurge.getAsString().equals("YES"))
+        if(optionPurge != null && "YES".equals(optionPurge.getAsString()))
         {
             if(activeGame.purgeSpecificSecretObjective(option.getAsString()))
             {

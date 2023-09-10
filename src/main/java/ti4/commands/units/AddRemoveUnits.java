@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -122,7 +121,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -147,7 +146,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -258,11 +257,11 @@ abstract public class AddRemoveUnits implements Command {
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 String message = colorMention + " has modified units in the system. ";
-                if(this.getActionDescription().contains("add_units")){
+                if(getActionDescription().contains("add_units")){
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
-                FoWHelper.pingSystem(activeGame, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
+                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), message);
                   if (count <10) {
                     activeGame.setPingSystemCounter(count);
                     activeGame.setTileAsPinged(count, tile.getPosition());
@@ -270,7 +269,7 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
         
-        if(this.getActionDescription().toLowerCase().contains("add units")){
+        if(getActionDescription().toLowerCase().contains("add units")){
             // ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
         actionAfterAll(event, tile, color, activeGame);
@@ -285,7 +284,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -310,7 +309,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -423,19 +422,19 @@ abstract public class AddRemoveUnits implements Command {
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 String message = colorMention + " has modified units in the system. ";
-                if(this.getActionDescription().contains("add_units")){
+                if(getActionDescription().contains("add_units")){
                     message = message + " Specific units modified include: "+unitList;
                 }
                 message = message + "Refresh map to see what changed ";
-                FoWHelper.pingSystem(activeGame, (GenericInteractionCreateEvent) event, tile.getPosition(), message);
+                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), message);
                   if (count <10) {
                     activeGame.setPingSystemCounter(count);
                     activeGame.setTileAsPinged(count, tile.getPosition());
                   }
             }
         }
-       System.out.println(this.getActionDescription());
-        if(this.getActionDescription().toLowerCase().contains("add units")){
+       System.out.println(getActionDescription());
+        if(getActionDescription().toLowerCase().contains("add units")){
             
            //  ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
         }
@@ -482,7 +481,7 @@ abstract public class AddRemoveUnits implements Command {
             unitHolderIDs.remove(Constants.SPACE);
             String finalPlanetName = planetName;
             List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
-                    .collect(Collectors.toList());
+                    .toList();
             if (validUnitHolderIDs.size() == 1) {
                 planetName = validUnitHolderIDs.get(0);
             } else if (validUnitHolderIDs.size() > 1) {

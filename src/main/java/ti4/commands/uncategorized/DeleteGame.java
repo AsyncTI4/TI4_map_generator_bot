@@ -1,5 +1,6 @@
 package ti4.commands.uncategorized;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -57,7 +58,7 @@ public class DeleteGame implements Command {
         Member member_ = event.getMember();
         boolean isAdmin = false;
         if (member_ != null) {
-            java.util.List<Role> roles = member_.getRoles();
+            List<Role> roles = member_.getRoles();
             for (Role role : MapGenerator.adminRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;

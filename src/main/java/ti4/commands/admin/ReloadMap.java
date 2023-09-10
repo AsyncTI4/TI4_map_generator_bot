@@ -38,7 +38,6 @@ public class ReloadMap extends AdminSubcommandData {
 
         } else {
             sendMessage("No Game specified.");
-            return;
         }
     }
 }

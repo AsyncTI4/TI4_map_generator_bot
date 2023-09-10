@@ -1,5 +1,6 @@
 package ti4.commands.tokens;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.units.AddRemoveUnits;
@@ -25,7 +26,7 @@ public class AddControl extends AddRemoveToken {
         } else {
             Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
             if (unitHolderIDs.size() == 2){
-                HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
+                Set<String> unitHolder = new HashSet<>(unitHolderIDs);
                 unitHolder.remove(Constants.SPACE);
                 addControlToken(event, colors, tile, unitHolder.iterator().next());
             } else {
@@ -38,7 +39,7 @@ public class AddControl extends AddRemoveToken {
         }
     }
 
-    private void addControlToken(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, String planetInfo) {
+    private void addControlToken(SlashCommandInteractionEvent event, List<String> colors, Tile tile, String planetInfo) {
         planetInfo = planetInfo.replace(" ", "");
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {

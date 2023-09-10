@@ -2,6 +2,7 @@ package ti4.commands.special;
 
 import java.util.List;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -64,7 +65,7 @@ public class SleeperToken extends SpecialSubcommandData {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();

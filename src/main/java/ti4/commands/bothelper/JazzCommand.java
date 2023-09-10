@@ -25,9 +25,9 @@ public class JazzCommand extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!event.getUser().getId().equals("228999251328368640")) {
+        if (!"228999251328368640".equals(event.getUser().getId())) {
             String jazz = MapGenerator.jda.getUserById("228999251328368640").getAsMention();
-            if (event.getUser().getId().equals("150809002974904321")) {
+            if ("150809002974904321".equals(event.getUser().getId())) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz + ", but you are an honorary jazz so you may proceed");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz);

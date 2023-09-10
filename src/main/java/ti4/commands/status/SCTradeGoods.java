@@ -31,8 +31,7 @@ public class SCTradeGoods extends StatusSubcommandData {
                 return;
 
             }
-            //noinspection ConstantConditions
-            if (tgOption == null) {
+          if (tgOption == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Trade Good Count");
                 return;
 

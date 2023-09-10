@@ -27,7 +27,7 @@ public class PutDiscardBackIntoDeckAgendas extends AgendaSubcommandData {
         OptionMapping option2 = event.getOption(Constants.SHUFFLE_AGENDAS);
         boolean success = false;
         if (option2 != null) {
-            if(option2.getAsString().equalsIgnoreCase("YES"))
+            if("YES".equalsIgnoreCase(option2.getAsString()))
             {
                 success = activeGame.shuffleBackIntoDeck(option.getAsInt());
             }

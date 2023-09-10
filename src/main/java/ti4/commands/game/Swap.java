@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -39,7 +40,7 @@ public class Swap extends GameSubcommandData {
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
-            java.util.List<Role> roles = member.getRoles();
+            List<Role> roles = member.getRoles();
             for (Role role : MapGenerator.adminRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
@@ -82,7 +83,7 @@ public class Swap extends GameSubcommandData {
                  message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
                 Player player = activeGame.getPlayer(removedPlayer.getUserID());
                 LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
-                for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
+                for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
                     List<String> value = poEntry.getValue();
                     boolean removed = value.remove(removedPlayer.getUserID());
                     boolean removed2 = value.remove(swapperPlayer.getUserID());
@@ -97,7 +98,7 @@ public class Swap extends GameSubcommandData {
                     player.setDummy(false);
                     swapperPlayer.setDummy(true);
                 }
-                LinkedHashSet<Integer> holder = new LinkedHashSet<Integer>(player.getSCs());
+                LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
                 player.setSCs(swapperPlayer.getSCs());
                 swapperPlayer.setSCs(holder);
                 swapperPlayer.setUserName(removedPlayer.getUserName());
@@ -109,7 +110,7 @@ public class Swap extends GameSubcommandData {
                     if(!activeGame.isFoWMode())
                     {
                         try {
-                            if (activeGame.getLatestTransactionMsg() != null && activeGame.getLatestTransactionMsg() != "") {
+                            if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
                                 activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
                                 activeGame.setLatestTransactionMsg("");
                             }

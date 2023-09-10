@@ -5,13 +5,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -99,7 +97,7 @@ public class DataMigrationManager {
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
         int playerCount = activeGame.getRealPlayers().size();
 
-        ArrayList<String> setup = null;
+        ArrayList<String> setup;
         if (playerCount == 6 && activeGame.getRingCount() == 3) {
             setup = setup6p;
         }
@@ -130,7 +128,7 @@ public class DataMigrationManager {
     public static Boolean migrateAbsolDeckIDs_210823(Game game) {
         boolean mapNeededMigrating = false;
 
-        if (game.isAbsolMode() && !game.getRelicDeckID().equals("relics_absol") && !game.getAgendaDeckID().equals("agendas_absol")) {
+        if (game.isAbsolMode() && !"relics_absol".equals(game.getRelicDeckID()) && !"agendas_absol".equals(game.getAgendaDeckID())) {
             mapNeededMigrating = true;
             game.setRelicDeckID("relics_absol");
             game.setAgendaDeckID("agendas_absol");
@@ -143,7 +141,7 @@ public class DataMigrationManager {
     public static Boolean migrateNullSCDeckToPoK_210823(Game game) {
         boolean mapNeededMigrating = false;
 
-        if (game.getScSetID() == null || game.getScSetID().equals("null")) {
+        if (game.getScSetID() == null || "null".equals(game.getScSetID())) {
             mapNeededMigrating = true;
             game.setScSetID("pok");
         }
@@ -164,11 +162,11 @@ public class DataMigrationManager {
                 FactionModel factionSetupInfo = player.getFactionSetupInfo();
 
                 // Trying to assign an accurate Faction Model for old keleres players.
-                if (factionSetupInfo == null && player.getFaction().equals("keleres")) {
+                if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
                     List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
-                            .filter(factionID -> factionID.startsWith("keleres") && !factionID.equals("keleres"))
+                            .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
                             .map(Mapper::getFactionSetup)
-                            .collect(Collectors.toList());
+                            .toList();
 
                     // guess subfaction based on homeplanet
                     for (FactionModel factionModel : keleresSubfactions) {
@@ -190,7 +188,7 @@ public class DataMigrationManager {
                         List<String> subfactionHomePlanetsWithoutKeleresSuffix = factionModel.getHomePlanets()
                                 .stream()
                                 .map(alias -> alias.substring(0, alias.length() - 1))
-                                .collect(Collectors.toList());
+                                .toList();
 
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                                 .findFirst();
@@ -223,15 +221,15 @@ public class DataMigrationManager {
                 List<String> ownedUnitIDs = factionSetupInfo.getUnits();
 
                 List<TechnologyModel> playerTechs = player.getTechs().stream().map(Mapper::getTech)
-                        .filter(tech -> tech.getType().equals(TechnologyType.UNITUPGRADE))
-                        .collect(Collectors.toList());
+                        .filter(tech -> tech.getType() == TechnologyType.UNITUPGRADE)
+                        .toList();
 
                 for (TechnologyModel technologyModel : playerTechs) {
                     UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
                     if (upgradedUnit != null) {
                         if (StringUtils.isNotBlank(upgradedUnit.getBaseType())) {
-                            Integer upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getBaseType());
-                            if (upgradesFromUnitIndex != null && upgradesFromUnitIndex >= 0) {
+                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getBaseType());
+                            if (upgradesFromUnitIndex >= 0) {
                                 ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
                             }
                             else {
@@ -272,11 +270,11 @@ public class DataMigrationManager {
                 FactionModel factionSetupInfo = player.getFactionSetupInfo();
 
                 // Trying to assign an accurate Faction Model for old keleres players.
-                if (factionSetupInfo == null && player.getFaction().equals("keleres")) {
+                if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
                     List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
-                            .filter(factionID -> factionID.startsWith("keleres") && !factionID.equals("keleres"))
+                            .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
                             .map(Mapper::getFactionSetup)
-                            .collect(Collectors.toList());
+                            .toList();
 
                     // guess subfaction based on homeplanet
                     for (FactionModel factionModel : keleresSubfactions) {
@@ -298,7 +296,7 @@ public class DataMigrationManager {
                         List<String> subfactionHomePlanetsWithoutKeleresSuffix = factionModel.getHomePlanets()
                                 .stream()
                                 .map(alias -> alias.substring(0, alias.length() - 1))
-                                .collect(Collectors.toList());
+                                .toList();
 
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                                 .findFirst();
@@ -331,15 +329,15 @@ public class DataMigrationManager {
                 List<String> ownedUnitIDs = factionSetupInfo.getUnits();
 
                 List<TechnologyModel> playerTechs = player.getTechs().stream().map(Mapper::getTech)
-                        .filter(tech -> tech.getType().equals(TechnologyType.UNITUPGRADE))
-                        .collect(Collectors.toList());
+                        .filter(tech -> tech.getType() == TechnologyType.UNITUPGRADE)
+                        .toList();
 
                 for (TechnologyModel technologyModel : playerTechs) {
                     UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
                     if (upgradedUnit != null) {
                         if (StringUtils.isNotBlank(upgradedUnit.getUpgradesFromUnitId())) {
-                            Integer upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId());
-                            if (upgradesFromUnitIndex != null && upgradesFromUnitIndex >= 0) {
+                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId());
+                            if (upgradesFromUnitIndex >= 0) {
                                 ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
                             }
                         } else {
@@ -372,13 +370,13 @@ public class DataMigrationManager {
             List<String> ownedUnitIDs = new ArrayList<>(player.getUnitsOwned());
             for (String unitID : ownedUnitIDs) {
                 int unitIndex = ownedUnitIDs.indexOf(unitID);
-                if (!unitID.equals("keleres_flagship")
+                if (!"keleres_flagship".equals(unitID)
                         && unitID.startsWith("keleres")
                         && unitID.endsWith("_flagship")) {
                     ownedUnitIDs.set(unitIndex, "keleres_flagship");
                     mapNeededMigrating = true;
                 }
-                if (!unitID.equals("keleres_mech")
+                if (!"keleres_mech".equals(unitID)
                         && unitID.startsWith("keleres")
                         && unitID.endsWith("_mech")) {
                     ownedUnitIDs.set(unitIndex, "keleres_mech");

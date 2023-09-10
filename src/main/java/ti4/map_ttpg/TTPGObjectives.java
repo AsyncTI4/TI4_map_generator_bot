@@ -24,19 +24,19 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class TTPGObjectives {
 
     @JsonProperty("Public Objectives I")
-    private List<String> publicObjectivesI = null;
+    private List<String> publicObjectivesI;
     @JsonProperty("Public Objectives II")
-    private List<String> publicObjectivesII = null;
+    private List<String> publicObjectivesII;
     @JsonProperty("Secret Objectives")
-    private List<String> secretObjectives = null;
+    private List<String> secretObjectives;
     @JsonProperty("Agenda")
-    private List<String> agenda = null;
+    private List<String> agenda;
     @JsonProperty("Relics")
-    private List<String> relics = null;
+    private List<String> relics;
     @JsonProperty("Other")
-    private List<String> other = null;
+    private List<String> other;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("Public Objectives I")
     public List<String> getPublicObjectivesI() {
@@ -100,12 +100,12 @@ public class TTPGObjectives {
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+        return additionalProperties;
     }
 
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+        additionalProperties.put(name, value);
     }
 
 }
