@@ -223,9 +223,7 @@ public class CombatHelper {
         result = resultBuilder.toString();
 
         StringBuilder hitEmojis = new StringBuilder();
-        for (int i = 0; i < totalHits; i++) {
-            hitEmojis.append(":boom:");
-        }
+        hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
         result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
         return result;
     }

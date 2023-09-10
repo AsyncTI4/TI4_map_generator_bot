@@ -1,6 +1,5 @@
 package ti4.generator;
 
-
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Mapper {
-    private static final Properties tiles = new Properties();
+
     private static final Properties unitImageSuffixes = new Properties();
     private static final Properties colors = new Properties();
     private static final Properties cc_tokens = new Properties();
@@ -47,7 +46,7 @@ public class Mapper {
     private static final Properties ds_handcards = new Properties();
 
     //TODO: (Jazz) Finish moving all files over from properties to json
-    private static final HashMap<String, DeckModel> decks = new HashMap<>();
+    private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
@@ -529,14 +528,6 @@ public class Mapper {
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getMiltyDraftTiles() {
-        HashMap<String, String> tiles = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : miltyDraft.entrySet()) {
-            tiles.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return tiles;
-    }
-
     public static HashMap<String, String> getUnitRepresentations() {
         HashMap<String, String> units = new HashMap<>();
         for (Map.Entry<Object, Object> entry : unit_representation.entrySet()) {
@@ -664,15 +655,6 @@ public class Mapper {
         return poList;
     }
 
-    public static HashMap<String, String> getExplores(String extra) {
-        HashMap<String, String> expList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : explore.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            expList.put(entry.getKey() +extra, tokenizer.nextToken());
-        }
-        return expList;
-    }
-
     public static HashMap<String, String> getExplores() {
         HashMap<String, String> expList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : explore.entrySet()) {
@@ -729,30 +711,5 @@ public class Mapper {
                 .map(token -> (String) token)
                 .sorted()
                 .collect(Collectors.toList());
-    }
-
-    public static Set<Object> getAllTileIDs() {
-        return tiles.keySet();
-    }
-
-    public static String getTilesList() {
-        return "__**Tiles:**__\n> " + TileHelper.getAllTiles().values().stream()
-                .map(TileModel::getImagePath)
-                .sorted()
-                .collect(Collectors.joining("\n> "));
-    }
-
-    public static String getPlanetList() {
-        return "__**Planets:**__\n> " + AliasHandler.getPlanetKeyList().stream()
-                .sorted()
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("\n> "));
-    }
-
-    public static String getUnitList() {
-        return "__**Units:**__\n> " + AliasHandler.getUnitValuesList().stream()
-                .sorted()
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("\n> "));
     }
 }
