@@ -9,14 +9,14 @@ import java.io.File;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.generator.GenerateMap;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public abstract class InstallationSubcommandData extends SubcommandData {
 
-    private Map activeMap;
+    private Game activeGame;
     private User user;
 
     public String getActionID() {
@@ -27,8 +27,8 @@ public abstract class InstallationSubcommandData extends SubcommandData {
         super(name, description);
     }
 
-    public Map getActiveMap() {
-        return activeMap;
+    public Game getActiveGame() {
+        return activeGame;
     }
 
     public User getUser() {
@@ -39,15 +39,15 @@ public abstract class InstallationSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        activeGame = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, file);
     }
 }

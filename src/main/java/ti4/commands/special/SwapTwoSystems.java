@@ -23,7 +23,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -36,14 +36,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tileIDTo = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeMap);
+        Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeGame);
         if (tileTo == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileIDTo:  `" + tileID + "`. Tile not found");
             return;
@@ -53,11 +53,11 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         String positionTo = tileTo.getPosition();
         tile.setPosition(positionTo);
         tileTo.setPosition(position);
-        activeMap.setTile(tile);
-        activeMap.setTile(tileTo);
-        activeMap.rebuildTilePositionAutoCompleteList();
+        activeGame.setTile(tile);
+        activeGame.setTile(tileTo);
+        activeGame.rebuildTilePositionAutoCompleteList();
         DisplayType displayType = DisplayType.map;
-        File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
         MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 }

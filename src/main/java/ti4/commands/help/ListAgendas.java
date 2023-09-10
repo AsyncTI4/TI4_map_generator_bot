@@ -2,7 +2,6 @@ package ti4.commands.help;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -27,11 +26,11 @@ public class ListAgendas extends HelpSubcommandData {
         HashMap<String, AgendaModel> agendaList = Mapper.getAgendas();
         List<String> searchedList = agendaList.keySet().stream()
             .map(agendaKey -> agendaKey + " = " + Helper.getAgendaRepresentation(agendaKey))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Agenda List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Agenda List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_agendas" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

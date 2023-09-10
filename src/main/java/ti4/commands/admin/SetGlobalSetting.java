@@ -23,11 +23,11 @@ public class SetGlobalSetting extends AdminSubcommandData {
         OptionMapping type = event.getOption(Constants.SETTING_TYPE);
 
         if (setting != null && value != null && type != null) {
-            if (type.getAsString().equals("string"))
+            if ("string".equals(type.getAsString()))
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
-            if (type.getAsString().equals("number"))
+            if ("number".equals(type.getAsString()))
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
-            if (type.getAsString().equals("bool"))  //TODO: Fix This, it doesn't work.
+            if ("bool".equals(type.getAsString()))  //TODO: Fix This, it doesn't work.
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsBoolean());
             GlobalSettings.saveSettings();
         } else {

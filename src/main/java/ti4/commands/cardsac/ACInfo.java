@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -11,7 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -26,38 +27,38 @@ public class ACInfo extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
-        sendActionCardInfo(activeMap, player, event);
+        sendActionCardInfo(activeGame, player, event);
         sendMessage("AC Info Sent");
     }
 
-    public static void sendActionCardInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendActionCardInfo(activeMap, player);
-        sendTrapCardInfo(activeMap, player);
+    public static void sendActionCardInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendActionCardInfo(activeGame, player);
+        sendTrapCardInfo(activeGame, player);
     }
 
-    public static void sendActionCardInfo(Map activeMap, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendActionCardInfo(activeMap, player);
-        sendTrapCardInfo(activeMap, player);
+    public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used something";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendActionCardInfo(activeGame, player);
+        sendTrapCardInfo(activeGame, player);
     }
 
-    private static void sendTrapCardInfo(Map activeMap, Player player) {
+    private static void sendTrapCardInfo(Game activeGame, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { //Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTrapCardInfo(activeMap, player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getTrapCardInfo(activeGame, player));
         }
     }
 
-    private static String getTrapCardInfo(Map activeMap, Player player) {
+    private static String getTrapCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
 
@@ -72,7 +73,7 @@ public class ACInfo extends ACCardsSubcommandData {
             if (trapCards.isEmpty()) {
                 sb.append("> None");
             } else {
-                for (java.util.Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
+                for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
@@ -86,7 +87,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static String getTrapCardRepresentation(String trapID, LinkedHashMap<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
-        java.util.Map<String, String> dsHandcards = Mapper.getDSHandcards();
+        Map<String, String> dsHandcards = Mapper.getDSHandcards();
         String info = dsHandcards.get(trapID);
         if (info == null) {
             return "";
@@ -98,7 +99,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String planet = trapCardsPlanets.get(trapID);
         sb.append("__**").append(trapName).append("**__").append(" - ").append(trapText);
         if (planet != null) {
-            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             String representation = planetRepresentations.get(planet);
             if (representation == null) {
                 representation = planet;
@@ -112,33 +113,33 @@ public class ACInfo extends ACCardsSubcommandData {
         return sb.toString();
     }
 
-    public static void sendActionCardInfo(Map activeMap, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " pressed button: " + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendActionCardInfo(activeMap, player);
-        sendTrapCardInfo(activeMap, player);
+    public static void sendActionCardInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " pressed button: " + event.getButton().getLabel();
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendActionCardInfo(activeGame, player);
+        sendTrapCardInfo(activeGame, player);
     }
 
-    public static void sendActionCardInfo(Map activeMap, Player player) {
+    public static void sendActionCardInfo(Game activeGame, Player player) {
         //AC INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getActionCardInfo(activeMap, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getActionCardInfo(activeGame, player));
 
         //BUTTONS
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
-        List<Button> acButtons = getPlayActionCardButtons(activeMap, player);
-        if (acButtons != null && !acButtons.isEmpty()) {
+        List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
+        if (!acButtons.isEmpty()) {
             
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
 
-        sendTrapCardInfo(activeMap, player);
+        sendTrapCardInfo(activeGame, player);
     }
 
-    private static String getActionCardInfo(Map activeMap, Player player) {
+    private static String getActionCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
 
@@ -152,7 +153,7 @@ public class ACInfo extends ACCardsSubcommandData {
             if (actionCards.isEmpty()) {
                 sb.append("> None");
             } else {
-                for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
                     ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
                     
@@ -171,11 +172,11 @@ public class ACInfo extends ACCardsSubcommandData {
         return sb.toString();
     }
 
-    private static List<Button> getPlayActionCardButtons(Map activeMap, Player player) {
+    private static List<Button> getPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -184,11 +185,11 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
-            if (player.hasUnexhaustedLeader("nekroagent", activeMap)) {
+            if (player.hasUnexhaustedLeader("nekroagent", activeGame)) {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
                 acButtons.add(nekroButton);
             }
-            if (player.hasUnexhaustedLeader("hacanagent", activeMap)) {
+            if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
                 Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
                 acButtons.add(hacanButton);
             }
@@ -198,24 +199,24 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-    public static List<Button> getActionPlayActionCardButtons(Map activeMap, Player player) {
+    public static List<Button> getActionPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null && actionCardWindow.equalsIgnoreCase("Action")) {
+                if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
         return acButtons;
     }
-    public static List<Button> getDiscardActionCardButtons(Map activeMap, Player player, boolean doingAction) {
+    public static List<Button> getDiscardActionCardButtons(Game activeGame, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         String stall = "";
@@ -223,7 +224,7 @@ public class ACInfo extends ACCardsSubcommandData {
             stall = "stall";
         }
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -234,11 +235,11 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-     public static List<Button> getYssarilHeroActionCardButtons(Map activeMap, Player yssaril, Player notYssaril) {
+     public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -249,11 +250,11 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-    public static List<Button> getToBeStolenActionCardButtons(Map activeMap, Player player) {
+    public static List<Button> getToBeStolenActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);

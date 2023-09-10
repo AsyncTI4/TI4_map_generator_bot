@@ -14,8 +14,8 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class AddCC extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
         boolean usedTactics = false;
         for (String color : colors) {
             OptionMapping option = event.getOption(Constants.CC_USE);
@@ -32,13 +32,11 @@ public class AddCC extends AddRemoveToken {
                 usedTactics = true;
                 String value = option.getAsString().toLowerCase();
                 switch (value) {
-                    case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                        MoveUnits.removeTacticsCC(event, color, tile, activeMap);
-                    }
+                    case "t/tactics", "t", "tactics", "tac", "tact" -> MoveUnits.removeTacticsCC(event, color, tile, activeGame);
                 }
             }
             addCC(event, color, tile);
-            Helper.isCCCountCorrect(event, activeMap, color);
+            Helper.isCCCountCorrect(event, activeGame, color);
         }
     }
 
@@ -55,28 +53,28 @@ public class AddCC extends AddRemoveToken {
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
-        Map activeMap = MapManager.getInstance().getMap(gameName);
+        Game activeGame = GameManager.getInstance().getGame(gameName);
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-        if (activeMap.isFoWMode() && ping) {
+        if (activeGame.isFoWMode() && ping) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
     }
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-        if (activeMap.isFoWMode() && ping) {
+        if (activeGame.isFoWMode() && ping) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
     }

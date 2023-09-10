@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -67,21 +68,21 @@ public class CreatePlanet extends BothelperSubcommandData {
             );
         } catch (Exception e) {
             BotLogger.log("Something went wrong creating the planet! "
-                    + e.getMessage() + "\n" + e.getStackTrace());
+                    + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
         }
         if(Optional.ofNullable(planet).isPresent()) {
             try {
                 exportPlanetModelToJson(planet);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong exporting the planet to json! "
-                        + e.getMessage() + "\n" +e.getStackTrace());
+                        + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             try {
                 TileHelper.addNewPlanetToList(planet);
                 AliasHandler.addNewPlanetAliases(planet);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the planet to the active planets list! " +
-                        e.getMessage() + "\n" + e.getStackTrace());
+                        e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             sendMessage("Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
                     "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```");
@@ -146,7 +147,7 @@ public class CreatePlanet extends BothelperSubcommandData {
 
         unitTokenPosition.addPosition("pd", new Point(planetX-33, planetY+12));
         unitTokenPosition.addPosition("pd", new Point(planetX-18, planetY+12));
-        unitTokenPosition.addPosition("pd", new Point(planetX +0, planetY+12));
+        unitTokenPosition.addPosition("pd", new Point(planetX, planetY+12));
         unitTokenPosition.addPosition("pd", new Point(planetX-22, planetY+25));
         unitTokenPosition.addPosition("pd", new Point(planetX -5, planetY+25));
 
@@ -154,7 +155,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         unitTokenPosition.addPosition("mf", new Point(planetX-14, planetY-58));
         unitTokenPosition.addPosition("mf", new Point(planetX-37, planetY-45));
         unitTokenPosition.addPosition("mf", new Point(planetX-20, planetY-45));
-        unitTokenPosition.addPosition("mf", new Point(planetX +0, planetY-45));
+        unitTokenPosition.addPosition("mf", new Point(planetX, planetY-45));
 
         unitTokenPosition.addPosition("tkn_gf", new Point(planetX-19, planetY-17));
         unitTokenPosition.addPosition("tkn_gf", new Point(planetX-50, planetY-17));

@@ -5,8 +5,8 @@ import java.util.*;
 public class DiceHelper {
 
     public static class Die {
-        private int threshold;
-        private int result;
+        private final int threshold;
+        private final int result;
 
         Die(int threshold) {
             this.threshold = threshold;

@@ -20,10 +20,10 @@ import java.util.List;
 public class Tile {
     private final String tileID;
     private String position;
-    private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    private final HashMap<String, UnitHolder> unitHolders = new HashMap<>();
 
-    private HashMap<Player,Boolean> fog = new HashMap<>();
-    private HashMap<Player,String> fogLabel = new HashMap<>();
+    private final HashMap<Player,Boolean> fog = new HashMap<>();
+    private final HashMap<Player,String> fogLabel = new HashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
@@ -51,7 +51,7 @@ public class Tile {
     private void initPlanetsAndSpace(String tileID) {
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+        Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
         if(Optional.ofNullable(tilePlanetPositions).isPresent())
             tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
@@ -61,9 +61,7 @@ public class Tile {
     public static String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
-            if (unitID != null) {
-                BotLogger.log("Could not find unit: " + unitID);
-            }
+            BotLogger.log("Could not find unit: " + unitID);
             return null;
         }
         return unitPath;
@@ -76,12 +74,8 @@ public class Tile {
 
     @Nullable
     public String getAttachmentPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
-        if (tokenPath == null) {
-//            LoggerHandler.log("Could not find attachment token: " + tokenID);
-            return null;
-        }
-        return tokenPath;
+        //            LoggerHandler.log("Could not find attachment token: " + tokenID);
+        return ResourceHelper.getInstance().getAttachmentFile(tokenID);
     }
 
     @Nullable
@@ -151,7 +145,7 @@ public class Tile {
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            if (unitHolder.removeToken(tokenID)) return true;
+            return unitHolder.removeToken(tokenID);
         }
         return false;
     }
@@ -219,8 +213,8 @@ public class Tile {
 
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
-        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
-        if (fullHyperlaneData == null || fullHyperlaneData.size() == 0) {
+        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
+        if (fullHyperlaneData.size() == 0) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {
             return Collections.emptyList();
@@ -274,10 +268,10 @@ public class Tile {
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
 
-        if (this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
+        if ("82b".equals(tileID) || "51".equals(tileID)) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
-        if (this.tileID.equals("82a")) { //mallicelocked
+        if ("82a".equals(tileID)) { //mallicelocked
             fowTileID = "fowc" + fogTileColorSuffix;
         }
 
@@ -302,11 +296,11 @@ public class Tile {
         }
         return null;
     }
-    public String getRepresentationForButtons(Map activeMap, Player player) {
+    public String getRepresentationForButtons(Game activeGame, Player player) {
         try {
-            if(activeMap.isFoWMode())
+            if(activeGame.isFoWMode())
             {
-                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeMap, player);
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeGame, player);
                 if(tilesToShow.contains(getPosition()))
                 {
                     return getPosition() + " (" + getRepresentation() + ")";

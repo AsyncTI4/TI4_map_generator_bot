@@ -13,7 +13,7 @@ public class AbilityRemove extends AbilityAddRemove {
 
     @Override
     public void doAction(Player player, List<String> abilityIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" removed abilities:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" removed abilities:\n");
         for (String abilityID : abilityIDs) {
             if (!player.hasAbility(abilityID)) {
                 sb.append("> ").append(abilityID).append(" (player did not have this ability)");

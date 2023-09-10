@@ -23,10 +23,10 @@ public class DiploSystem extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -38,18 +38,18 @@ public class DiploSystem extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
-        for (Player player_ : activeMap.getPlayers().values()) {
+        for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 String color = player_.getColor();
                 if (Mapper.isColorValid(color)) {
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, activeMap, color);
+                    Helper.isCCCountCorrect(event, activeGame, color);
                 }
             }
         }

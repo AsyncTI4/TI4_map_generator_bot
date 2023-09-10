@@ -12,8 +12,6 @@ import ti4.model.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,7 +70,7 @@ public class TestResourceHelper {
         TileHelper.init();
 
         Collection<PlanetModel> allPlanets = TileHelper.getAllPlanets().values();
-        Map<String, Map<String, List<BigDecimal>>> allPlanetsWithDistances = new HashMap<>();
+        //Map<String, Map<String, List<BigDecimal>>> allPlanetsWithDistances = new HashMap<>();
 
         for(PlanetModel planet : allPlanets) {
             UnitTokenPosition positions = planet.getUnitPositions();
@@ -81,15 +79,14 @@ public class TestResourceHelper {
                 continue;
             }
 
-            Map<String, List<BigDecimal>> distanceMap = new HashMap<>();
+            //Map<String, List<BigDecimal>> distanceMap = new HashMap<>();
             Map<String, List<String>> relativePositionMap = new HashMap<>();
 
-            positions.getCoordinateMap().forEach((category, points) -> {
-                List<BigDecimal> distances = (points.stream().map(point -> point.distance(planetCenter.x, planetCenter.y))
-                        .map(dist -> new BigDecimal(dist).setScale(0, RoundingMode.HALF_UP)).toList());
-
-                distanceMap.put(category, distances);
-            });
+            //positions.getCoordinateMap().forEach((category, points) -> {
+            //    List<BigDecimal> distances = (points.stream().map(point -> point.distance(planetCenter.x, planetCenter.y))
+            //            .map(dist -> new BigDecimal(dist).setScale(0, RoundingMode.HALF_UP)).toList());
+            //    distanceMap.put(category, distances);
+            //});
 
             positions.getCoordinateMap().forEach((category, points) -> {
                 List<String> relativePos = (points.stream().map(point ->
@@ -102,8 +99,7 @@ public class TestResourceHelper {
             String key = "att";
             System.out.print(String.format("%12s", planet.getId()) + " - ");
             System.out.println(relativePositionMap.get(key));
-            allPlanetsWithDistances.put(planet.getId(), distanceMap);
+            //allPlanetsWithDistances.put(planet.getId(), distanceMap);
         }
-        //System.out.println(allPlanetsWithDistances.entrySet());
     }
 }

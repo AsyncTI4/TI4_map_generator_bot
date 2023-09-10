@@ -4,10 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 
 public class ExploreAndDiscard extends ExploreSubcommandData {
     public ExploreAndDiscard() {
@@ -30,8 +29,8 @@ public class ExploreAndDiscard extends ExploreSubcommandData {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();
-            Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-            String cardID = activeMap.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
+            Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+            String cardID = activeGame.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             sb.append(displayExplore(cardID)).append(System.lineSeparator());
         }
         sb.append("Cards have been discarded. Resolve effects and/or purge manually.\n");

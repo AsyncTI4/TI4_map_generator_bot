@@ -5,9 +5,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 
 public class SaveMap extends AdminSubcommandData {
 
@@ -22,13 +22,13 @@ public class SaveMap extends AdminSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 sendMessage("Game with such name does not exists, use /list_games");
                 return;
             }
-            Map activeMap = MapManager.getInstance().getMap(mapName);
-            MapSaveLoadManager.saveMap(activeMap, event);
-            sendMessage("Save map: " + activeMap.getName());
+            Game activeGame = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            sendMessage("Save map: " + activeGame.getName());
 
         } else {
             sendMessage("No Game specified.");

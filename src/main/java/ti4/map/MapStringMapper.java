@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class MapStringMapper {
-    public static HashMap<String, String> getMappedTilesToPosition(String tileListAsString, Map userActiveMap) {
+    public static HashMap<String, String> getMappedTilesToPosition(String tileListAsString, Game userActiveGame) {
         HashMap<String, String> mappedTiles = new HashMap<>();
         StringTokenizer tokenizer = new StringTokenizer(tileListAsString, " ");
 

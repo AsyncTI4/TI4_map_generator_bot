@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -25,20 +25,19 @@ public class ReloadMap extends AdminSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 sendMessage("Game with such name does not exists, use /list_games");
 
                 return;
             }
-            Map activeMap = MapManager.getInstance().getMap(mapName);
-            MapSaveLoadManager.reload(activeMap);
-            activeMap = MapManager.getInstance().getMap(mapName);
-            File file = GenerateMap.getInstance().saveImage(activeMap, event);
+            Game activeGame = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.reload(activeGame);
+            activeGame = GameManager.getInstance().getGame(mapName);
+            File file = GenerateMap.getInstance().saveImage(activeGame, event);
             MessageHelper.replyToMessage(event, file);
 
         } else {
             sendMessage("No Game specified.");
-            return;
         }
     }
 }

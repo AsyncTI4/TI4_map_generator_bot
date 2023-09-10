@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,7 +10,7 @@ import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -22,9 +23,9 @@ public class ShowAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -37,7 +38,7 @@ public class ShowAC extends ACCardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
             if (ac.getValue().equals(acIndex)) {
                 acID = ac.getKey();
             }
@@ -48,17 +49,15 @@ public class ShowAC extends ACCardsSubcommandData {
             return;
         }
 
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("---------\n");
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Cards:").append("\n");
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
-        sb.append("---------\n");
+      String sb = "---------\n" +
+          "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Action Cards:" + "\n" +
+          Mapper.getActionCard(acID).getRepresentation() + "\n" +
+          "---------\n";
         player.setActionCard(acID);
 
-        Player player_ = Helper.getPlayer(activeMap, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
@@ -69,7 +68,7 @@ public class ShowAC extends ACCardsSubcommandData {
             return;
         }
         
-        ACInfo.sendActionCardInfo(activeMap, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
+        ACInfo.sendActionCardInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
     }
 }

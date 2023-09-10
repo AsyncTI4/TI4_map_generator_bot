@@ -20,7 +20,7 @@ public class ResetDrawStateAgendas extends AgendaSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveMap().resetDrawStateAgendas();
+        getActiveGame().resetDrawStateAgendas();
         MessageHelper.replyToMessage(event, "Agenda draw state reset.");
     }
 }

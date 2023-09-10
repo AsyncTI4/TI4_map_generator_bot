@@ -7,15 +7,14 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class GameCreate extends GameSubcommandData {
@@ -38,7 +37,7 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
         }
-        if (MapManager.getInstance().getMapList().containsKey(mapName)) {
+        if (GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
             MessageHelper.replyToMessage(event, "Game with such name exist already, choose different name");
             return;
         }
@@ -47,40 +46,40 @@ public class GameCreate extends GameSubcommandData {
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
     }
 
-    public static Map createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
-        Map newMap = new Map();
+    public static Game createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
+        Game newGame = new Game();
         String ownerID = gameOwner.getId();
-        newMap.setOwnerID(ownerID);
-        newMap.setOwnerName(gameOwner.getEffectiveName());
-        newMap.setName(mapName);
-        newMap.setAutoPing(true);
-        newMap.setAutoPingSpacer(36);
-        MapManager mapManager = MapManager.getInstance();
-        mapManager.addMap(newMap);
-        boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
-        newMap.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
+        newGame.setOwnerID(ownerID);
+        newGame.setOwnerName(gameOwner.getEffectiveName());
+        newGame.setName(mapName);
+        newGame.setAutoPing(true);
+        newGame.setAutoPingSpacer(36);
+        GameManager gameManager = GameManager.getInstance();
+        gameManager.addGame(newGame);
+        boolean setMapSuccessful = gameManager.setGameForUser(ownerID, mapName);
+        newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
-        MapSaveLoadManager.saveMap(newMap, event);
+        GameSaveLoadManager.saveMap(newGame, event);
         if(MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).size() > 0){
             TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
             List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
             if (threadChannels == null){
-                return newMap;
+                return newGame;
             }
             String threadName = "game-starts-and-ends";
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
+                    MessageHelper.sendMessageToChannel(threadChannel_,
                             "Game: **" + mapName + "** on server **" + event.getGuild().getName() + "** has been created.");
                 }
             }
         }
         
-        return newMap;
+        return newGame;
     }
     
 }

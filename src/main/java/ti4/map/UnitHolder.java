@@ -1,11 +1,9 @@
 package ti4.map;
 
+import java.util.List;
 import ti4.generator.Mapper;
-import ti4.helpers.Constants;
-import ti4.model.UnitModel;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -19,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = Space.class, name = "space"),
         @JsonSubTypes.Type(value = Planet.class, name = "planet")
@@ -190,12 +188,11 @@ abstract public class UnitHolder {
                 .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
     }
 
-    public java.util.List<String> getUnitColorsOnHolder() {
-        java.util.List<String> unitColors = getUnits().keySet().stream()
-                .map(unit -> getUnitColor(unit))
+    public List<String> getUnitColorsOnHolder() {
+        return getUnits().keySet().stream()
+                .map(this::getUnitColor)
                 .distinct()
                 .collect(Collectors.toList());
-        return unitColors;
     }
 
     public String getUnitAliasId(String unitHolderString) {

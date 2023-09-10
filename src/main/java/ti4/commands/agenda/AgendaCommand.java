@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -36,12 +36,12 @@ public class AgendaCommand implements Command {
     public void logBack(SlashCommandInteractionEvent event) {
         User user = event.getUser();
         String userName = user.getName();
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
-        String activeMap = "";
-        if (userActiveMap != null) {
-            activeMap = "Active map: " + userActiveMap.getName();
+        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
+        String activeGame = "";
+        if (userActiveGame != null) {
+            activeGame = "Active map: " + userActiveGame.getName();
         }
-        String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
+        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
                 event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
@@ -69,9 +69,9 @@ public class AgendaCommand implements Command {
             }
         }
 
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        if (activeMap != null) {
-            MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        if (activeGame != null) {
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
         if (executedCommand != null) {
             // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());

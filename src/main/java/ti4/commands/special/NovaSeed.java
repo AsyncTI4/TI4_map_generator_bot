@@ -22,10 +22,10 @@ public class NovaSeed extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -37,7 +37,7 @@ public class NovaSeed extends SpecialSubcommandData {
             return;
         }
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
@@ -46,7 +46,7 @@ public class NovaSeed extends SpecialSubcommandData {
         //Remove all other players units from the tile in question
         OptionMapping destroyOption = event.getOption(Constants.DESTROY_OTHER_UNITS);
         if (destroyOption == null || destroyOption.getAsBoolean()) {
-            for (Player player_ : activeMap.getPlayers().values()) {
+            for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ != player) {
                     tile.removeAllUnits(player_.getColor());
                 }
@@ -54,11 +54,11 @@ public class NovaSeed extends SpecialSubcommandData {
         }
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.removeAllTokens();
-        activeMap.removeTile(tile.getPosition());
+        activeGame.removeTile(tile.getPosition());
 
         //Add the muaat supernova to the map and copy over the space unitholder
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
-        activeMap.setTile(novaTile);
+        activeGame.setTile(novaTile);
     }
 
 }

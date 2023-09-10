@@ -14,7 +14,7 @@ public class LeaderAdd extends LeaderAddRemove {
     
     @Override
     public void doAction(Player player, List<String> leaderIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" added leaders:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" added leaders:\n");
         for (String leaderID : leaderIDs ){
             if (player.hasLeader(leaderID)) {
                 sb.append("> ").append(leaderID).append(" (player had this leader)");

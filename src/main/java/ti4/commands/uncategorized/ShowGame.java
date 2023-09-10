@@ -1,4 +1,4 @@
-package ti4.commands.map;
+package ti4.commands.uncategorized;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,8 +12,8 @@ import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.map.Map;
-import ti4.map.MapManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -35,13 +35,13 @@ public class ShowGame implements Command {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return false;
             }
         } else {
-            Map userActiveMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-            if (userActiveMap == null){
+            Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+            if (userActiveGame == null){
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return false;
             }
@@ -52,14 +52,14 @@ public class ShowGame implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Map activeMap;
+        Game activeGame;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        MapManager mapManager = MapManager.getInstance();
+        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            activeMap = mapManager.getMap(mapName);
+            activeGame = gameManager.getGame(mapName);
         } else {
-            activeMap = mapManager.getUserActiveMap(event.getUser().getId());
+            activeGame = gameManager.getUserActiveGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
@@ -73,7 +73,7 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                File stats_file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+                File stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
                 MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
 
                 displayType = DisplayType.stats;
@@ -81,14 +81,14 @@ public class ShowGame implements Command {
                 displayType = DisplayType.system;
             }
         }
-        simpleShowGame(activeMap, event, displayType);
+        simpleShowGame(activeGame, event, displayType);
     }
-    public void simpleShowGame(Map activeMap, GenericInteractionCreateEvent event, DisplayType displayType){
-        File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+    public void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType){
+        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
        
-            List<Button> buttonsWeb = new ArrayList<Button>();
-            if(!activeMap.isFoWMode()){
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+            List<Button> buttonsWeb = new ArrayList<>();
+            if(!activeGame.isFoWMode()){
+                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+ activeGame.getName(),"Website View");
                 buttonsWeb.add(linkToWebsite);
             }
             buttonsWeb.add(Button.success("cardsInfo","Cards Info"));

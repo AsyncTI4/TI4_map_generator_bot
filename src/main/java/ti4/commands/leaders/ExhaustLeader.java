@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Game;
 import ti4.map.Leader;
-import ti4.map.Map;
 import ti4.map.Player;
 
 public class ExhaustLeader extends LeaderAction {
@@ -18,7 +18,7 @@ public class ExhaustLeader extends LeaderAction {
 	}
 
 	@Override
-	void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+	void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
 		Leader playerLeader = player.unsafeGetLeader(leaderID);
 		if (playerLeader == null) {
 			sendMessage("Leader '" + leaderID + "'' not found");
@@ -32,7 +32,7 @@ public class ExhaustLeader extends LeaderAction {
 
 		playerLeader.setExhausted(true);
 		sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-		StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
+		StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame))
 				.append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
@@ -40,7 +40,7 @@ public class ExhaustLeader extends LeaderAction {
 			messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
 					.append(" was placed on top of the leader");
 			if (playerLeader.getTgCount() != optionTG.getAsInt()) {
-				messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg)
+				messageText.append(" _(").append(playerLeader.getTgCount()).append(Emojis.tg)
 						.append(" total)_\n");
 			}
 		}

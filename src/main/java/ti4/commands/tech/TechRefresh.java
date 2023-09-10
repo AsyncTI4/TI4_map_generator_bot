@@ -13,6 +13,6 @@ public class TechRefresh extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         player.refreshTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(player, getActiveMap()) + " readied tech: " + Helper.getTechRepresentation(techID));
+        sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " readied tech: " + Helper.getTechRepresentation(techID));
     }
 }

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -52,7 +52,7 @@ public class SetupGameChannels extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         // Set main channel where SC's get played
         OptionMapping channel = event.getOption(Constants.MAIN_GAME_CHANNEL);
@@ -65,21 +65,21 @@ public class SetupGameChannels extends GameSubcommandData {
             return;
         }
 
-        activeMap.setMainGameChannelID(channel.getAsChannel().asTextChannel().getId());
+        activeGame.setMainGameChannelID(channel.getAsChannel().asTextChannel().getId());
 
-        if (activeMap.isCommunityMode() || activeMap.isFoWMode()) {
-            setRoleAndChannel(event, activeMap, Constants.PLAYER1, Constants.ROLE1, Constants.CHANNEL1);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER2, Constants.ROLE2, Constants.CHANNEL2);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER3, Constants.ROLE3, Constants.CHANNEL3);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER4, Constants.ROLE4, Constants.CHANNEL4);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER5, Constants.ROLE5, Constants.CHANNEL5);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER6, Constants.ROLE6, Constants.CHANNEL6);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
-            setRoleAndChannel(event, activeMap, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
+        if (activeGame.isCommunityMode() || activeGame.isFoWMode()) {
+            setRoleAndChannel(event, activeGame, Constants.PLAYER1, Constants.ROLE1, Constants.CHANNEL1);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER2, Constants.ROLE2, Constants.CHANNEL2);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER3, Constants.ROLE3, Constants.CHANNEL3);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER4, Constants.ROLE4, Constants.CHANNEL4);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER5, Constants.ROLE5, Constants.CHANNEL5);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER6, Constants.ROLE6, Constants.CHANNEL6);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
+            setRoleAndChannel(event, activeGame, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
         }
     }
 
-    private void setRoleAndChannel(SlashCommandInteractionEvent event, Map activeMap, String playerConstant, String roleConstant, String channelConstant) {
+    private void setRoleAndChannel(SlashCommandInteractionEvent event, Game activeGame, String playerConstant, String roleConstant, String channelConstant) {
         OptionMapping player = event.getOption(playerConstant);
         OptionMapping role = event.getOption(roleConstant);
         OptionMapping channel = event.getOption(channelConstant);
@@ -89,14 +89,14 @@ public class SetupGameChannels extends GameSubcommandData {
         }
         if (player != null && channel != null) {
             User asUser = player.getAsUser();
-            Player player_ = activeMap.getPlayer(asUser.getId());
+            Player player_ = activeGame.getPlayer(asUser.getId());
             if (player_ == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
                 return;
             }
 
             //set community mode data
-            if (activeMap.isCommunityMode()) {
+            if (activeGame.isCommunityMode()) {
                 if (role == null) {
                     //MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify role for community mode: " + roleConstant + " is missing");
                     //return;
@@ -113,7 +113,6 @@ public class SetupGameChannels extends GameSubcommandData {
             player_.setPrivateChannelID(channel.getAsChannel().getId());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify player and channel");
-            return;
         }
     }
 }

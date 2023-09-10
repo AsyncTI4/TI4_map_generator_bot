@@ -34,15 +34,15 @@ can setup up to 8 at once
 /game setup game_custom_name @custom text <- can add custom text to game
 
 For easy of setup suggest first command after map creation use
-/add_tile setup 0
+/map add_tile setup 0
 This adds a template with positions
 
 Now additional commands:
-/add_tile tileName positionOnMap
+/map add_tile tileName positionOnMap
 (We using somno template positions on map. from setup template and you see positions.
 Also we support TopLeft, TopRight, BottomLeft and BottomRight positions coresponding to TL, TR, BL, BR
 Mecatol position is MR)
-/add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
+/map add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
 You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /remove_tile tileName or position
 /delete_game <-deletes your game, only can delete the map you created

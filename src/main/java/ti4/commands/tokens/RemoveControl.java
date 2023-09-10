@@ -1,12 +1,13 @@
 package ti4.commands.tokens;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -17,7 +18,7 @@ import java.util.StringTokenizer;
 
 public class RemoveControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();
@@ -25,7 +26,7 @@ public class RemoveControl extends AddRemoveToken {
         } else {
             Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
             if (unitHolderIDs.size() == 2) {
-                HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
+                Set<String> unitHolder = new HashSet<>(unitHolderIDs);
                 unitHolder.remove(Constants.SPACE);
                 removeControlToken(event, colors, tile, unitHolder.iterator().next());
             } else {
@@ -34,7 +35,7 @@ public class RemoveControl extends AddRemoveToken {
         }
     }
 
-    private void removeControlToken(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, String planetInfo) {
+    private void removeControlToken(SlashCommandInteractionEvent event, List<String> colors, Tile tile, String planetInfo) {
         planetInfo = planetInfo.replace(" ", "");
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {

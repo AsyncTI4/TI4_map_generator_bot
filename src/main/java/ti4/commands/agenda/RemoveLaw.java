@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class RemoveLaw extends AgendaSubcommandData {
@@ -16,13 +16,13 @@ public class RemoveLaw extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        boolean success = activeMap.removeLaw(option.getAsInt());
+        boolean success = activeGame.removeLaw(option.getAsInt());
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law removed");
         } else {

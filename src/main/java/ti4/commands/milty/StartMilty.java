@@ -16,7 +16,6 @@ import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -41,7 +40,7 @@ public class StartMilty extends MiltySubcommandData {
 
     public static final int SLICE_GENERATION_CYCLES = 100;
 
-    private boolean anomalies_can_touch = false;
+    private boolean anomalies_can_touch;
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
@@ -52,17 +51,17 @@ public class StartMilty extends MiltySubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
-        int sliceCount = activeMap.getPlayerCountForMap() + 2;
+        int sliceCount = activeGame.getPlayerCountForMap() + 2;
         if (sliceOption != null) {
             sliceCount = sliceOption.getAsInt();
         }
         if (sliceCount > 9) {
             sliceCount = 9;
         }
-        int factionCount = activeMap.getPlayerCountForMap() + 2;
+        int factionCount = activeGame.getPlayerCountForMap() + 2;
         OptionMapping factionOption = event.getOption(Constants.FACTION_COUNT);
         if (factionOption != null) {
             factionCount = factionOption.getAsInt();
@@ -79,11 +78,11 @@ public class StartMilty extends MiltySubcommandData {
             anomalies_can_touch = anomaliesCanTouchOption.getAsBoolean();
         }
 
-        MiltyDraftManager draftManager = activeMap.getMiltyDraftManager();
+        MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
         draftManager.setFactionDraft(factionDraft);
         draftManager.clear();
         initDraftTiles(draftManager);
-        initDraftOrder(draftManager, activeMap);
+        initDraftOrder(draftManager, activeGame);
 
 
         boolean slicesCreated = generateSlices(sliceCount, draftManager);
@@ -96,24 +95,24 @@ public class StartMilty extends MiltySubcommandData {
             String message = "Slices:\n\n";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             List<ActionRow> actionRow = null;
-            List<Button> sliceButtons = new ArrayList<>(getMiltySliceButtons(activeMap));
+            List<Button> sliceButtons = new ArrayList<>(getMiltySliceButtons(activeGame));
             if (!sliceButtons.isEmpty()) actionRow = makeActionRows(sliceButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
             MessageChannel eventChannel = event.getChannel();
-            MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
+            MessageChannel mainGameChannel = activeGame.getMainGameChannel() == null ? eventChannel : activeGame.getMainGameChannel();
             mainGameChannel.sendMessage(baseMessageObject.build()).queue();
 
             message = "Factions:\n\n";
             baseMessageObject = new MessageCreateBuilder().addContent(message);
-            List<Button> factionButtons = new ArrayList<>(getMiltyFactionButtons(activeMap));
+            List<Button> factionButtons = new ArrayList<>(getMiltyFactionButtons(activeGame));
             if (!factionButtons.isEmpty()) actionRow = makeActionRows(factionButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
             mainGameChannel.sendMessage(baseMessageObject.build()).queue();
 
             message = "Order:\n\n";
             baseMessageObject = new MessageCreateBuilder().addContent(message);
-            List<Button> orderButtons = new ArrayList<>(getMiltyOrderButtons(activeMap));
+            List<Button> orderButtons = new ArrayList<>(getMiltyOrderButtons(activeGame));
             if (!orderButtons.isEmpty()) actionRow = makeActionRows(orderButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
             mainGameChannel.sendMessage(baseMessageObject.build()).queue();
@@ -139,8 +138,8 @@ public class StartMilty extends MiltySubcommandData {
         }
     }
 
-    private void initDraftOrder(MiltyDraftManager draftManager, Map activeMap) {
-        List<Player> players = activeMap.getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    private void initDraftOrder(MiltyDraftManager draftManager, Game activeGame) {
+        List<Player> players = activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
         Collections.shuffle(players);
         Collections.shuffle(players);
 
@@ -173,8 +172,8 @@ public class StartMilty extends MiltySubcommandData {
     }
 
 
-    private List<Button> getMiltySliceButtons(Map activeMap) {
-        MiltyDraftManager miltyDraftManager = activeMap.getMiltyDraftManager();
+    private List<Button> getMiltySliceButtons(Game activeGame) {
+        MiltyDraftManager miltyDraftManager = activeGame.getMiltyDraftManager();
         List<Button> sliceButtons = new ArrayList<>();
         for (MiltyDraftSlice slice : miltyDraftManager.getSlices()) {
             Button sliceButton = Button.success("milty_slice_" + slice.getName(), "Slice No.: " + slice.getName());
@@ -183,9 +182,9 @@ public class StartMilty extends MiltySubcommandData {
         return sliceButtons;
     }
 
-    private List<Button> getMiltyOrderButtons(Map activeMap) {
+    private List<Button> getMiltyOrderButtons(Game activeGame) {
         List<Button> orderButtons = new ArrayList<>();
-        for (int i = 0; i < activeMap.getPlayerCountForMap(); i++) {
+        for (int i = 0; i < activeGame.getPlayerCountForMap(); i++) {
             int order = i + 1;
             Button sliceButton = Button.success("milty_order_" + order, "Order No.: " + order);
             orderButtons.add(sliceButton);
@@ -193,9 +192,9 @@ public class StartMilty extends MiltySubcommandData {
         return orderButtons;
     }
 
-    private List<net.dv8tion.jda.api.interactions.components.buttons.Button> getMiltyFactionButtons(Map activeMap) {
+    private List<net.dv8tion.jda.api.interactions.components.buttons.Button> getMiltyFactionButtons(Game activeGame) {
         List<net.dv8tion.jda.api.interactions.components.buttons.Button> factionChoose = new ArrayList<>();
-        for (String faction : activeMap.getMiltyDraftManager().getFactionDraft()) {
+        for (String faction : activeGame.getMiltyDraftManager().getFactionDraft()) {
             if (faction != null && Mapper.isFaction(faction)) {
                 net.dv8tion.jda.api.interactions.components.buttons.Button button = Button.secondary("milty_faction_" + faction, " ");
                 String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
@@ -307,18 +306,18 @@ public class StartMilty extends MiltySubcommandData {
         } catch (IOException e) {
             BotLogger.log("Could not save generated slice image", e);
         }
-        Map activeMap = getActiveMap();
-        String absolutePath = file.getParent() + "/" + activeMap.getName() + "_slices.jpg";
+        Game activeGame = getActiveGame();
+        String absolutePath = file.getParent() + "/" + activeGame.getName() + "_slices.jpg";
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
-            final BufferedImage image = ImageIO.read(fileInputStream);
+            BufferedImage image = ImageIO.read(fileInputStream);
             fileInputStream.close();
 
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
 
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
@@ -404,7 +403,7 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private void initDraftTiles(MiltyDraftManager draftManager) {
-        java.util.Map<String, TileModel> allTiles = TileHelper.getAllTiles();
+        Map<String, TileModel> allTiles = TileHelper.getAllTiles();
         for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
             String tileID = tileModel.getId();
             if (isValid(tileModel, tileID)) {
@@ -414,9 +413,9 @@ public class StartMilty extends MiltySubcommandData {
             MiltyDraftTile draftTile = new MiltyDraftTile();
             if (wormholes != null) {
                 for (WormholeModel.Wormhole wormhole : wormholes) {
-                    if (WormholeModel.Wormhole.ALPHA.equals(wormhole)) {
+                    if (WormholeModel.Wormhole.ALPHA == wormhole) {
                         draftTile.setHasAlphaWH(true);
-                    } else if (WormholeModel.Wormhole.BETA.equals(wormhole)) {
+                    } else if (WormholeModel.Wormhole.BETA == wormhole) {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);

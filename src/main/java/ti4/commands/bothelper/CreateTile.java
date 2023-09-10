@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -52,21 +53,21 @@ public class CreateTile extends BothelperSubcommandData {
             );
         } catch (Exception e) {
             BotLogger.log("Something went wrong creating the tile! "
-                    + e.getMessage() + "\n" + e.getStackTrace());
+                    + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
         }
         if(Optional.ofNullable(tile).isPresent()) {
             try {
                 exportTileModelToJson(tile);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong exporting the tile to json! "
-                        + e.getMessage() + "\n" +e.getStackTrace());
+                        + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             try {
                 TileHelper.addNewTileToList(tile);
                 AliasHandler.addNewTileAliases(tile);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the tile to the active tiles list! " +
-                        e.getMessage() + "\n" + e.getStackTrace());
+                        e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
         }
         sendMessage("Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
@@ -90,7 +91,7 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
         tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
-        if(!wormholes.equals(""))
+        if(!"".equals(wormholes))
             tile.setWormholes(getWormholesFromString(wormholes));
 
         return tile;

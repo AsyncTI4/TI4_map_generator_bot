@@ -265,7 +265,7 @@ public class Emojis {
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
 
     // LIST OF SEM-LORES
-    public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
+    public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
 
     // ANOMOLIES
     public static final String Supernova = "<:supernova:1137029705946640445>";
@@ -300,7 +300,7 @@ public class Emojis {
     public static final String Scout = "<:scout_face_2:1071965098639360081>";
 
     // LIST OF GOOD DOGS
-    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
+    public static final List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
 
     // TOES
     public static final String NoToes = "<:NoToes:1082312430706774016>";
@@ -338,7 +338,7 @@ public class Emojis {
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
 
     // LIST OF SYMBOLS FOR FOG STUFF
-    public static List<String> symbols =
+    public static final List<String> symbols =
         Arrays.asList(
             warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
             CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,

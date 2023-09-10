@@ -8,7 +8,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -24,23 +23,22 @@ public class ChangeColor extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
-        @SuppressWarnings("ConstantConditions")
         String newColour = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(newColour)) {
             sendMessage("Color not valid");
             return;
         }
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
 
-        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+        LinkedHashMap<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newColour.equals(playerInfo.getColor())) {
@@ -64,7 +62,7 @@ public class ChangeColor extends PlayerSubcommandData {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
             
             LinkedHashMap<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+            for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 String key = pn.getKey();
                 Integer value = pn.getValue();
                 String newKey = key;
@@ -95,7 +93,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
             }
 
-            java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
+            Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
             for (String colour : debtTokens.keySet()) {
                 if (colour.equals(oldColor)) {
                     Integer count = debtTokens.get(colour);
@@ -117,11 +115,11 @@ public class ChangeColor extends PlayerSubcommandData {
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
 
-        for (Tile tile : activeMap.getTileMap().values()) {
+        for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 
-                HashMap<String, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
-                for (java.util.Map.Entry<String, Integer> unitDmg : unitDamage.entrySet()) {
+                Map<String, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
+                for (Map.Entry<String, Integer> unitDmg : unitDamage.entrySet()) {
                     String key = unitDmg.getKey();
                     if (!key.startsWith(oldColorID)) continue;
                     Integer value = unitDmg.getValue();
@@ -130,8 +128,8 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addUnitDamage(replacedKey, value);
                 }
 
-                HashMap<String, Integer> units = new HashMap<>(unitHolder.getUnits());
-                for (java.util.Map.Entry<String, Integer> unit : units.entrySet()) {
+                Map<String, Integer> units = new HashMap<>(unitHolder.getUnits());
+                for (Map.Entry<String, Integer> unit : units.entrySet()) {
                     String key = unit.getKey();
                     if (!key.startsWith(oldColorID)) continue;
                     Integer value = unit.getValue();
@@ -140,7 +138,7 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addUnit(replacedKey, value);
                 }
 
-                HashSet<String> controlList = new HashSet<>(unitHolder.getControlList());
+                Set<String> controlList = new HashSet<>(unitHolder.getControlList());
                 for (String control : controlList) {
                     if (!control.contains(oldColorID)) continue;
                     unitHolder.removeControl(control);
@@ -149,7 +147,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
 
                 
-                HashSet<String> ccList = new HashSet<>(unitHolder.getCCList());
+                Set<String> ccList = new HashSet<>(unitHolder.getCCList());
                 for (String cc : ccList) {
                     unitHolder.removeCC(cc);
                     cc = cc.replace(oldColorSuffix, newColorSuffix);
@@ -162,11 +160,11 @@ public class ChangeColor extends PlayerSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        File file = GenerateMap.getInstance().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, file);
     }
 }

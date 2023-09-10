@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -22,18 +22,18 @@ public class ReviseLaw extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
 
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
 
-        String optionText = null;
+        String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected) {
@@ -43,11 +43,11 @@ public class ReviseLaw extends AgendaSubcommandData {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
     
-        Player electedPlayer = Helper.getPlayerFromColorOrFaction(activeMap, optionText);
+        Player electedPlayer = Helper.getPlayerFromColorOrFaction(activeGame, optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();
         }
-        boolean success = activeMap.reviseLaw(option.getAsInt(), optionText);
+        boolean success = activeGame.reviseLaw(option.getAsInt(), optionText);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {

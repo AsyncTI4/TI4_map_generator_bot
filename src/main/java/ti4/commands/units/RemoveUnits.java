@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -16,13 +16,13 @@ import java.util.Objects;
 public class RemoveUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
         removeStuff(event, tile, count, planetName, unitID, color, true);
     }
 
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Map activeMap) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
         OptionMapping option = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         boolean priorityDmg = true;
         if (option != null) {
@@ -106,10 +106,10 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
-        super.actionAfterAll(event, tile, color, activeMap);
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
+        super.actionAfterAll(event, tile, color, activeGame);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
     }
 

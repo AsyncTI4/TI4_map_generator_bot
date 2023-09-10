@@ -7,11 +7,11 @@ import ti4.helpers.Constants;
 
 public class Leader {
     private final String id;
-    private String type = null;
-    private int tgCount = 0;
-    private boolean exhausted = false;
+    private String type;
+    private int tgCount;
+    private boolean exhausted;
     private boolean locked = true;
-    private boolean active = false;
+    private boolean active;
 
     @JsonCreator
     public Leader(@JsonProperty("id") String id,
