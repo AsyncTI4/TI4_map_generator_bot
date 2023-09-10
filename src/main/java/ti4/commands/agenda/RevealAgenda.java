@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -93,6 +94,8 @@ public class RevealAgenda extends AgendaSubcommandData {
                         sb.append("-----------\n");
                         sb.append("Game: ").append(activeGame.getName()).append("\n");
                         sb.append(event.getUser().getAsMention()).append("\n");
+                        sb.append("Game: ").append(activeGame.getName()).append("\n");
+                        sb.append(ButtonHelper.getTrueIdentity(speaker, activeGame)).append("\n");
                         sb.append("Drawn Agendas:\n");
                         sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                         sb.append("\n");
