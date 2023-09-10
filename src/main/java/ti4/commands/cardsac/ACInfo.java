@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -72,7 +73,7 @@ public class ACInfo extends ACCardsSubcommandData {
             if (trapCards.isEmpty()) {
                 sb.append("> None");
             } else {
-                for (java.util.Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
+                for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
@@ -86,7 +87,7 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static String getTrapCardRepresentation(String trapID, LinkedHashMap<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
-        java.util.Map<String, String> dsHandcards = Mapper.getDSHandcards();
+        Map<String, String> dsHandcards = Mapper.getDSHandcards();
         String info = dsHandcards.get(trapID);
         if (info == null) {
             return "";
@@ -98,7 +99,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String planet = trapCardsPlanets.get(trapID);
         sb.append("__**").append(trapName).append("**__").append(" - ").append(trapText);
         if (planet != null) {
-            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             String representation = planetRepresentations.get(planet);
             if (representation == null) {
                 representation = planet;
@@ -126,7 +127,7 @@ public class ACInfo extends ACCardsSubcommandData {
         //BUTTONS
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
-        if (acButtons != null && !acButtons.isEmpty()) {
+        if (!acButtons.isEmpty()) {
             
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
@@ -152,7 +153,7 @@ public class ACInfo extends ACCardsSubcommandData {
             if (actionCards.isEmpty()) {
                 sb.append("> None");
             } else {
-                for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
                     ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
                     
@@ -175,7 +176,7 @@ public class ACInfo extends ACCardsSubcommandData {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -202,13 +203,13 @@ public class ACInfo extends ACCardsSubcommandData {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null && actionCardWindow.equalsIgnoreCase("Action")) {
+                if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
@@ -223,7 +224,7 @@ public class ACInfo extends ACCardsSubcommandData {
             stall = "stall";
         }
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -238,7 +239,7 @@ public class ACInfo extends ACCardsSubcommandData {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
@@ -253,7 +254,7 @@ public class ACInfo extends ACCardsSubcommandData {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);

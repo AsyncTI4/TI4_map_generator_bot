@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.User;
@@ -165,13 +166,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     UnitHolder planetUnitHolder = unitHolders.get(planetName);
                     UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                     if (planetUnitHolder != null && spaceUnitHolder != null){
-                        HashMap<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                        Map<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
                         for (Player player_ : activeGame.getPlayers().values()) {
                             String color = player_.getColor();
                             planetUnitHolder.removeAllUnits(color);
                         }
                         HashMap<String, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                        for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                        for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                             String key = unitEntry.getKey();
                             if (key.contains("ff") || key.contains("gf") || key.contains("mf")){
                                 Integer count = spaceUnits.get(key);
@@ -281,7 +282,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                if(  ( (activeGame.getActivePlayer() != null && !(activeGame.getActivePlayer().equalsIgnoreCase(""))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge") && event != null)
+                if(  ( (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge") && event != null)
                 {
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
@@ -289,7 +290,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                 }
                 for(String law : activeGame.getLaws().keySet()){
-                    if(law.equalsIgnoreCase("minister_exploration")){
+                    if("minister_exploration".equalsIgnoreCase(law)){
                         if(activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
                             String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
@@ -298,14 +299,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         }
                     }
                 }
-                    
-                
-                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" explored ");
-                exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
-                exploredMessage.append("Planet ").append(Helper.getPlanetRepresentationPlusEmoji(mirageID)).append(" *(tile ").append(tile.getPosition()).append(")*").append(":\n");
-                exploredMessage.append(displayExplore(exploreID));
+
+                String exploredMessage = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
+                    Helper.getEmojiFromDiscord(planetTrait) +
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) + " *(tile " + tile.getPosition() + ")*" + ":\n" +
+                    displayExplore(exploreID);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
-                resolveExplore(event, exploreID, tile, mirageID, exploredMessage.toString(), false, player, activeGame);
+                resolveExplore(event, exploreID, tile, mirageID, exploredMessage, false, player, activeGame);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
@@ -329,7 +329,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)+". This placement is optional though.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
-                break;
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";

@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -60,11 +61,11 @@ public class SystemInfo extends SpecialSubcommandData {
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
-            java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
-            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            java.util.Map<String, String> colorToId = Mapper.getColorToId();
+            Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+            Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            Map<String, String> colorToId = Mapper.getColorToId();
             Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-            for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 String representation = planetRepresentations.get(name);
                 if (representation == null){
@@ -101,13 +102,13 @@ public class SystemInfo extends SpecialSubcommandData {
                     sb.append("\n");
                 }
                 boolean hasToken = false;
-                java.util.Map<String, String> tokensToName = Mapper.getTokensToName();
+                Map<String, String> tokensToName = Mapper.getTokensToName();
                 for (String token : unitHolder.getTokenList()) {
                     if (!hasToken){
                         sb.append("Tokens: ");
                         hasToken = true;
                     }
-                    for (java.util.Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                    for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
                         String key = entry_.getKey();
                         String value = entry_.getValue();
                         if (token.contains(key)){
@@ -121,7 +122,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
 
                 HashMap<String, Integer> units = unitHolder.getUnits();
-                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
 
                     String key = unitEntry.getKey();
 
@@ -156,9 +157,9 @@ public class SystemInfo extends SpecialSubcommandData {
         }
     }
 
-    private static void addtFactionIcon(Game activeGame, StringBuilder sb, java.util.Map<String, String> colorToId, String key, Boolean privateGame) {
+    private static void addtFactionIcon(Game activeGame, StringBuilder sb, Map<String, String> colorToId, String key, Boolean privateGame) {
 
-        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
+        for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
             String colorKey = colorEntry.getKey();
             String color = colorEntry.getValue();
             if (key.contains(colorKey)){

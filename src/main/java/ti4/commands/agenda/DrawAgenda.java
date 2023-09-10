@@ -1,5 +1,6 @@
 package ti4.commands.agenda;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class DrawAgenda extends AgendaSubcommandData {
         int index = 1;
         List<Button> buttons = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            java.util.Map.Entry<String, Integer> entry = activeGame.drawAgenda();
+            Map.Entry<String, Integer> entry = activeGame.drawAgenda();
             if (entry != null) {
                 sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                 index++;
@@ -58,10 +59,10 @@ public class DrawAgenda extends AgendaSubcommandData {
                 if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
                    // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
 
-                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
                 } else {
                     //MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
-                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
                 }
             } else {
                 MessageHelper.sendMessageToUser(sb.toString(), event);
@@ -80,7 +81,7 @@ public class DrawAgenda extends AgendaSubcommandData {
         }
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
-        drawAgenda((GenericInteractionCreateEvent) event, count, activeGame, player);
+        drawAgenda(event, count, activeGame, player);
     }
 }
 

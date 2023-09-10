@@ -25,11 +25,11 @@ public class CombatHelper {
     public static HashMap<UnitModel, Integer> GetAllUnits(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().flatMap(
             entry -> player.getUnitsByAsyncID(entry.getKey()).stream().map(x -> new ImmutablePair<>(x, entry.getValue()))
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        HashMap<UnitModel, Integer> output = null;
+        HashMap<UnitModel, Integer> output;
        
         output = new HashMap<>(unitsInCombat.entrySet().stream()
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
@@ -38,7 +38,7 @@ public class CombatHelper {
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
             .map(UnitModel::getBaseType)
-            .collect(Collectors.toList());
+            .toList();
         for(int x = 1; x < dupes.size(); x++){
             String dupe = dupes.get(x);
             for(UnitModel mod : output.keySet()){
@@ -60,7 +60,7 @@ public class CombatHelper {
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
-        java.util.Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
                     player.getPriorityUnitByAsyncID(entry.getKey()),
@@ -68,8 +68,8 @@ public class CombatHelper {
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        HashMap<UnitModel, Integer> output = null;
-        if (unitHolder.getName() == Constants.SPACE) {
+        HashMap<UnitModel, Integer> output;
+        if (unitHolder.getName().equals(Constants.SPACE)) {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
@@ -122,7 +122,7 @@ public class CombatHelper {
         return opponent;
     }
 
-    public static String RollForUnits(java.util.Map<UnitModel, Integer> units,
+    public static String RollForUnits(Map<UnitModel, Integer> units,
             HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
             Game activeGame) {
         String result = "";
@@ -135,10 +135,10 @@ public class CombatHelper {
         // Display extra rolls info
         List<UnitModel> unitsWithExtraRolls = units.keySet().stream()
                 .filter(unit -> extraRolls.containsKey(unit.getAsyncId()))
-                .collect(Collectors.toList());
+                .toList();
         if (!extraRolls.isEmpty()) {
             result += "With ";
-            ArrayList<String> extraRollMessages = new ArrayList<>();
+            List<String> extraRollMessages = new ArrayList<>();
             for (UnitModel unit : unitsWithExtraRolls) {
                 String plusPrefix = "+";
                 Integer numExtraRolls = extraRolls.get(unit.getAsyncId());
@@ -153,7 +153,8 @@ public class CombatHelper {
 
         // Actually roll for each unit
         int totalHits = 0;
-        for (java.util.Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
+        StringBuilder resultBuilder = new StringBuilder(result);
+        for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
@@ -215,16 +216,15 @@ public class CombatHelper {
                 upgradedUnitName = String.format(" %s", unit.getName());
             }
             String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
-            result += String.format("%s %s%s %s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
-                    unitTypeHitsInfo,
-                    Arrays.toString(resultRolls), hitRolls.length, rollsSuffix);
+            resultBuilder.append(String.format("%s %s%s %s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
+                unitTypeHitsInfo,
+                Arrays.toString(resultRolls), hitRolls.length, rollsSuffix));
         }
+        result = resultBuilder.toString();
 
-        String hitEmojis = "";
-        for (int i = 0; i < totalHits; i++) {
-            hitEmojis += ":boom:";
-        }
+        StringBuilder hitEmojis = new StringBuilder();
+        hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
         result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
-        return result.toString();
+        return result;
     }
 }

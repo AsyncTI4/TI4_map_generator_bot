@@ -43,25 +43,24 @@ public class ServerLimitStats extends BothelperSubcommandData {
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
-        StringBuilder sb = new StringBuilder("## Server Limit Statistics:\n");
-        sb.append("### Server: ").append(guild.getName()).append("\n");
-        sb.append("- ").append(memberCount).append(" / ").append(memberMax).append(getPercentage(memberCount, memberMax)).append(" - members").append("\n");
-        sb.append("- ").append(boostCount).append(" - boosts").append("\n");
-        sb.append("- ").append(emojiCount).append(" / ").append(emojiMax).append(getPercentage(emojiCount, emojiMax)).append(" - emojis").append("\n");
-        sb.append("- ").append(roleCount).append(" / 250").append(getPercentage(roleCount, 250)).append(" - roles").append("\n");
-        sb.append("### Channels:\n");
-        sb.append("- ").append("**").append(channelCount).append(" / 500").append(getPercentage(channelCount, 500)).append(" - channels**").append("\n");
-        sb.append(" - ").append(categoryChannelCount).append("   ").append(getPercentage(categoryChannelCount, channelCount)).append("  categories").append("\n");
-        sb.append(" - ").append(pbdChannelCount).append("   ").append(getPercentage(pbdChannelCount, channelCount)).append("  'pbd' channels").append("\n");
-        sb.append("### Threads:\n");
-        sb.append("- ").append("**").append(threadCount).append(" / 1000").append(getPercentage(threadCount, 1000)).append(" - threads**").append("\n");
-        sb.append(" - ").append("   ").append(threadArchivedCount).append(" - loaded archived threads").append("\n");
-        sb.append("- ").append(privateThreadCount).append("   ").append(getPercentage(privateThreadCount, threadCount)).append("  private threads").append("\n");
-        sb.append(" - ").append(cardsInfoThreadCount).append("   ").append(getPercentage(cardsInfoThreadCount, threadCount)).append("  'Cards Info' threads (/cards_info)").append("\n");
-        sb.append("- ").append(publicThreadCount).append("   ").append(getPercentage(publicThreadCount, threadCount)).append("  public threads").append("\n");
-        sb.append(" - ").append(botThreadCount).append("   ").append(getPercentage(botThreadCount, threadCount)).append("  '-bot-map-updates' threads").append("\n");
-        sb.append(" - ").append(roundThreadCount).append("   ").append(getPercentage(roundThreadCount, threadCount)).append("  '-round-' threads (/sc play and combat)").append("\n");
-        sendMessage(sb.toString());
+      String sb = "## Server Limit Statistics:\n" + "### Server: " + guild.getName() + "\n" +
+          "- " + memberCount + " / " + memberMax + getPercentage(memberCount, memberMax) + " - members" + "\n" +
+          "- " + boostCount + " - boosts" + "\n" +
+          "- " + emojiCount + " / " + emojiMax + getPercentage(emojiCount, emojiMax) + " - emojis" + "\n" +
+          "- " + roleCount + " / 250" + getPercentage(roleCount, 250) + " - roles" + "\n" +
+          "### Channels:\n" +
+          "- " + "**" + channelCount + " / 500" + getPercentage(channelCount, 500) + " - channels**" + "\n" +
+          " - " + categoryChannelCount + "   " + getPercentage(categoryChannelCount, channelCount) + "  categories" + "\n" +
+          " - " + pbdChannelCount + "   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels" + "\n" +
+          "### Threads:\n" +
+          "- " + "**" + threadCount + " / 1000" + getPercentage(threadCount, 1000) + " - threads**" + "\n" +
+          " - " + "   " + threadArchivedCount + " - loaded archived threads" + "\n" +
+          "- " + privateThreadCount + "   " + getPercentage(privateThreadCount, threadCount) + "  private threads" + "\n" +
+          " - " + cardsInfoThreadCount + "   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/cards_info)" + "\n" +
+          "- " + publicThreadCount + "   " + getPercentage(publicThreadCount, threadCount) + "  public threads" + "\n" +
+          " - " + botThreadCount + "   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-updates' threads" + "\n" +
+          " - " + roundThreadCount + "   " + getPercentage(roundThreadCount, threadCount) + "  '-round-' threads (/sc play and combat)" + "\n";
+        sendMessage(sb);
     }
 
     private String getPercentage(double numerator, double denominator) {

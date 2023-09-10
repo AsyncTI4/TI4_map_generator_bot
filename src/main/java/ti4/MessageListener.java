@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -151,14 +150,9 @@ public class MessageListener extends ListenerAdapter {
 
     private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
         // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
-        if (event.getChannel().getName().equalsIgnoreCase("ttpg-exports")) {
+        if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
             List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (attachments.isEmpty()) {
-                return; // no attachments on the message!
-            } else if (!attachments.get(0).getFileExtension().equalsIgnoreCase("json")) {
-                // MessageHelper.sendMessageToChannel(event.getChannel(), "File is not a JSON file. Will not be saved.");
-                return;
-            } else { //write to file
+            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.get(0).getFileExtension())) { //write to file
                 String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
                 String fileName = "ttpgexport_" + currentDateTime + ".json";
                 String filePath =  Storage.getTTPGExportDirectory() + "/" + fileName;
@@ -186,12 +180,12 @@ public class MessageListener extends ListenerAdapter {
                 if (activeGame.getAutoPingStatus() && activeGame.getAutoPingSpacer() != 0) {
                     String playerID = activeGame.getActivePlayer();
                     
-                    if (playerID != null || activeGame.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
+                    if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                         Player player = null;
                         if(playerID != null){
                             player = activeGame.getPlayer(playerID);
                         }
-                        if (player != null || activeGame.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
+                        if (player != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                             long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60*60*multiplier* activeGame.getAutoPingSpacer())) {
                                 String realIdentity = null;
@@ -200,7 +194,7 @@ public class MessageListener extends ListenerAdapter {
                                     realIdentity = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
                                     ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
                                 }
-                                if (activeGame.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                                if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())){
                                     AgendaHelper.pingMissingPlayers(activeGame);
                                 } else {
                                      long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
@@ -254,7 +248,7 @@ public class MessageListener extends ListenerAdapter {
                     }else{
                         long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
                         if (milliSinceLastPing > (60*60*multiplier* activeGame.getAutoPingSpacer())) {
-                            if(activeGame.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                            if("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())){
                                 AgendaHelper.pingMissingPlayers(activeGame);
                             }
                             activeGame.setLastActivePlayerPing(new Date());
@@ -285,7 +279,7 @@ public class MessageListener extends ListenerAdapter {
             String message2 = msg.getContentRaw();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Game activeGame = GameManager.getInstance().getGame(gameName);
-            if(activeGame.isFoWMode() && ((!event.getAuthor().getId().equalsIgnoreCase("947763140517560331") && !event.getAuthor().isBot() && !event.getAuthor().getId().equalsIgnoreCase("1089270182171656292")) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
+            if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
                 
                 for(Player player : activeGame.getRealPlayers()){
                     MessageChannel pChannel = player.getPrivateChannel();
@@ -303,8 +297,8 @@ public class MessageListener extends ListenerAdapter {
                         String threadName = threadN[0]+"-"+threadN[1]+"-"+threadN[2]+"-"+threadN[3]+"-"+threadN[4];
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().contains(threadName) && (MessageChannel) threadChannel_ != (MessageChannel)event.getChannel()) {
-                                MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, newMessage);
+                            if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
+                                MessageHelper.sendMessageToChannel(threadChannel_, newMessage);
                             }
                         }
                     }
@@ -326,7 +320,7 @@ public class MessageListener extends ListenerAdapter {
                 Player player = activeGame.getPlayer(event.getAuthor().getId());
                 if (activeGame.isCommunityMode()) {
                     Collection<Player> players = activeGame.getPlayers().values();
-                    java.util.List<Role> roles = event.getMember().getRoles();
+                    List<Role> roles = event.getMember().getRoles();
                     for (Player player2 : players) {
                         if (roles.contains(player2.getRoleForCommunity())) {
                             player = player2;

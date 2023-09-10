@@ -113,7 +113,6 @@ public class SetupGameChannels extends GameSubcommandData {
             player_.setPrivateChannelID(channel.getAsChannel().getId());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify player and channel");
-            return;
         }
     }
 }

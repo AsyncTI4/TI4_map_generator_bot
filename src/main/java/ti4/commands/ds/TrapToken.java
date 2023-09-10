@@ -1,5 +1,6 @@
 package ti4.commands.ds;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -52,7 +53,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
@@ -67,8 +68,8 @@ public class TrapToken extends DiscordantStarsSubcommandData {
 
         if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG)){
             tile.removeToken(Constants.LIZHO_TRAP_PNG, unitHolder.getName());
-            LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>(player.getTrapCardsPlanets());
-            for (java.util.Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
+            Map<String, String> trapCardsPlanets = new LinkedHashMap<>(player.getTrapCardsPlanets());
+            for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
                 if (planetName.equals(entry.getValue())) {
                     player.setTrapCardPlanet(entry.getKey(), null);
                 }
@@ -89,7 +90,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
             LinkedHashMap<String, Integer> trapCards = player.getTrapCards();
             LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap = null;
-            for (java.util.Map.Entry<String, Integer> traps : trapCards.entrySet()) {
+            for (Map.Entry<String, Integer> traps : trapCards.entrySet()) {
                 if (traps.getValue() == trapID){
                     trap = traps.getKey();
                     String planetUnitHolderName = trapCardsPlanets.get(traps.getKey());

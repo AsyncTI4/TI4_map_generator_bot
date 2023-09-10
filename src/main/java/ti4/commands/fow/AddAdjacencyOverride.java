@@ -39,7 +39,7 @@ public class AddAdjacencyOverride extends FOWSubcommandData {
         }
 
         String primaryTile = primaryTileOption.getAsString().toLowerCase();
-        int direction = 0;
+        int direction;
         switch (directionOption.getAsString().toLowerCase()) {
             case "north" -> direction = 0;
             case "northeast" -> direction = 1;

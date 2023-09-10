@@ -45,14 +45,14 @@ public class SCPick extends PlayerSubcommandData {
 
         Collection<Player> activePlayers = activeGame.getPlayers().values().stream()
                 .filter(Player::isRealPlayer)
-                .collect(Collectors.toList());
+                .toList();
         if (activePlayers.size() == 0) {
             sendMessage("No active players found");
             return;
         }
 
         int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
-        if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
+        if (maxSCsPerPlayer == 0) maxSCsPerPlayer = 1;
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
@@ -92,11 +92,9 @@ public class SCPick extends PlayerSubcommandData {
         secondHalfOfSCPick(event, player, activeGame, scPicked);
     }
 
-    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked)
-    {
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
-        String msg = "";
+    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
+        String msg;
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
@@ -111,9 +109,8 @@ public class SCPick extends PlayerSubcommandData {
             maxSCsPerPlayer = 1;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true));
-        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(activeGame, scPicked));
+        String sb = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) +
+            " Picked: " + Helper.getSCFrontRepresentation(activeGame, scPicked);
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
@@ -189,7 +186,7 @@ public class SCPick extends PlayerSubcommandData {
                 activeGame.setCurrentPhase("action");
             }
         }
-        msg = sb.toString();
+        msg = sb;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         //SEND EXTRA MESSAGE

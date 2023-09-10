@@ -5,7 +5,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -34,23 +33,21 @@ public class ShowRemainingRelics extends GenericRelicAction {
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
         boolean over = false;
         if (override != null) {
-           over = override.getAsString().equalsIgnoreCase("TRUE");
+           over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
         StringBuilder text;
         if (allRelics.isEmpty()) {
             text = new StringBuilder("**RELIC DECK IS EMPTY**");
         } else {
-            text = new StringBuilder(Emojis.Relic).append(" **RELICS REMAINING IN DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            text = new StringBuilder(Emojis.Relic).append(" **RELICS REMAINING IN DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String[] relicData = Mapper.getRelic(relicId).split(";");
                 text.append("- ").append(relicData[0]).append("\n");
             }
         }
-        Player player2 = activeGame.getPlayer(getUser().getId());
-        player2 = Helper.getGamePlayer(activeGame, player2, event, null);
 
-        if (player != null && activeGame.getCurrentPhase().equalsIgnoreCase("action") && !over && activeGame.isFoWMode()) {
+        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
                 sendMessage(text.toString());

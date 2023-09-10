@@ -1,5 +1,6 @@
 package ti4.commands.ds;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -66,7 +67,7 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
             LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap1 = null;
             String trap2 = null;
-            for (java.util.Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
+            for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
                 String planet = entry.getValue();
                 String trap = entry.getKey();
                 if (planetName.equals(planet)) {
@@ -93,7 +94,7 @@ public class TrapSwap extends DiscordantStarsSubcommandData {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();

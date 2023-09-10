@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -91,10 +92,10 @@ public class Constants {
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
 
-    public static String ALPHA = "alpha";
-    public static String BETA = "beta";
+    public static final String ALPHA = "alpha";
+    public static final String BETA = "beta";
     public static String GAMMA = "gamma";
-    public static String DELTA = "delta";
+    public static final String DELTA = "delta";
     public static String EPSILON = "whepsilon";
     public static String NARROWS = "whnarrows";
     public static String PROBABILITY = "whprobability";
@@ -660,7 +661,7 @@ public class Constants {
     public static final String COMMANDER = "commander";
     public static final String HERO = "hero";
     public static final String ENVOY = "envoy";
-    public static final ArrayList<String> leaderList = new ArrayList<>();
+    public static final List<String> leaderList = new ArrayList<>();
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -772,7 +773,7 @@ public class Constants {
     public static final String VERBOSITY_VERBOSE = "verbose";
     public static final String VERBOSITY_AVERAGE = "average";
     public static final String VERBOSITY_MINIMAL = "minimal";
-    public static final ArrayList<String> VERBOSITY_OPTIONS = new ArrayList<>();
+    public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
     static {
         VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
         VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);

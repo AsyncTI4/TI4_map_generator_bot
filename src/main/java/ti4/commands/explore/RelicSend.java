@@ -98,10 +98,9 @@ public class RelicSend extends GenericRelicAction {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player1, activeGame));
-        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(player2, activeGame));
-        sb.append("\n").append(Helper.getRelicRepresentation(relicID));
-        sendMessage(sb.toString());
+      String sb = Helper.getPlayerRepresentation(player1, activeGame) +
+          " sent a relic to " + Helper.getPlayerRepresentation(player2, activeGame) +
+          "\n" + Helper.getRelicRepresentation(relicID);
+        sendMessage(sb);
     }
 }

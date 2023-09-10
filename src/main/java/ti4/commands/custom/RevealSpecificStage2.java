@@ -1,5 +1,6 @@
 package ti4.commands.custom;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,7 +26,7 @@ public class RevealSpecificStage2 extends CustomSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify PO");
             return;
         }
-        java.util.Map.Entry<String, Integer> objective = activeGame.revealSpecificStage2(soOption.getAsString());
+        Map.Entry<String, Integer> objective = activeGame.revealSpecificStage2(soOption.getAsString());
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         String s = Helper.getGamePing(event, activeGame) +
             " **Stage 2 Public Objective Revealed**" + "\n" +

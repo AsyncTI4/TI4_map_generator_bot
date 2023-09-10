@@ -2,7 +2,6 @@ package ti4.commands.explore;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardsso.SOInfo;
@@ -30,7 +29,7 @@ public class DrawRelic extends GenericRelicAction {
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame) {
         String relicID = activeGame.drawRelic();
         if (relicID.isEmpty()) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getMessageChannel(), "Relic deck is empty");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
             return;
         }
         relicID = relicID.replace("extra1","");
@@ -42,11 +41,9 @@ public class DrawRelic extends GenericRelicAction {
 
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> {
-                message.append("Run the following commands to use Nanoforge:\n")
-                       .append("     `/explore relic_purge relic: nanoforge`\n")
-                       .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
-            }
+            case "nanoforge" -> message.append("Run the following commands to use Nanoforge:\n")
+                   .append("     `/explore relic_purge relic: nanoforge`\n")
+                   .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
                 activeGame.drawSecretObjective(player.getUserID());
                 

@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -49,7 +50,7 @@ public class Cleanup extends StatusSubcommandData {
             }
         }
         HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
-        for (java.util.Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
+        for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
 
@@ -69,7 +70,7 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
-            List<Leader> leads = new ArrayList<Leader>(player.getLeaders());
+            List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()){
                     if (leader.isActive()){
@@ -90,7 +91,7 @@ public class Cleanup extends StatusSubcommandData {
     public void returnEndStatusPNs(Game activeGame) {
         LinkedHashMap<String, Player> players = activeGame.getPlayers();
          for (Player player : players.values()) {
-             List<String> pns = new ArrayList<String>(player.getPromissoryNotesInPlayArea());
+             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
                 Player pnOwner = activeGame.getPNOwner(pn);

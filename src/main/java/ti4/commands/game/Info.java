@@ -33,7 +33,7 @@ public class Info extends GameSubcommandData {
         }
 
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
-        if (gameNameOption != null && (activeGame == null || !activeGame.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase()))) {
+        if (gameNameOption != null && !activeGame.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase())) {
             activeGame = gameManager.getGame(gameNameOption.getAsString().toLowerCase());
         }
 

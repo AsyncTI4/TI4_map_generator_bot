@@ -38,7 +38,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {
-            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
+            longPNDisplay = "y".equalsIgnoreCase(longPNOption.getAsString()) || "yes".equalsIgnoreCase(longPNOption.getAsString());
         }
 
         showAll(player, targetPlayer, activeGame, longPNDisplay);

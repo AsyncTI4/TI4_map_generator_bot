@@ -76,6 +76,5 @@ public class PingSystem extends FOWSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

@@ -26,7 +26,7 @@ public class BorderAnomalyModel {
         BorderAnomalyType(String name, String fileName) {
             this.name = name;
             String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
-            this.imageFile = new File(filePath);
+            imageFile = new File(filePath);
         }
 
         @Override
@@ -35,7 +35,7 @@ public class BorderAnomalyModel {
         }
 
         public String toSearchString() {
-            return this.toString().toLowerCase().replace("_","");
+            return toString().toLowerCase().replace("_","");
         }
     }
 

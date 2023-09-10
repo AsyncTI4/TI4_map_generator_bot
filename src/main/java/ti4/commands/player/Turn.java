@@ -77,8 +77,7 @@ public class Turn extends PlayerSubcommandData {
         int naaluSC = 0;
         Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
 
-        Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
-        boolean isFowPrivateGame = privateGame != null && privateGame;
+        boolean isFowPrivateGame  = FoWHelper.isPrivateGame(activeGame, event);
 
         //MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : activeGame.getPlayers().values()) {
@@ -163,7 +162,7 @@ public class Turn extends PlayerSubcommandData {
                 if(!activeGame.isFoWMode())
                 {
                     try {
-                        if (activeGame.getLatestTransactionMsg() != null && activeGame.getLatestTransactionMsg() != "") {
+                        if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
                             activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
                             activeGame.setLatestTransactionMsg("");
                         }
@@ -191,7 +190,7 @@ public class Turn extends PlayerSubcommandData {
                     if(player.getStasisInfantry() > 0){
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Use buttons to revive infantry. You have "+player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
                     }
-                    if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
+                    if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
                     }
 
@@ -202,7 +201,7 @@ public class Turn extends PlayerSubcommandData {
                 } else {
                    MessageHelper.sendMessageToChannel(gameChannel, text);
                     MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
-                    if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
+                    if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
                     }
                 }
@@ -242,8 +241,8 @@ public class Turn extends PlayerSubcommandData {
         List<Button> poButtons1 = new ArrayList<>();
         List<Button> poButtons2 = new ArrayList<>();
         List<Button> poButtonsCustom = new ArrayList<>();
-        int poStatus = 0;
-        for (java.util.Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
+        int poStatus;
+        for (Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
             String key = objective.getKey();
             String po_name = publicObjectivesState1.get(key);
             poStatus = 0;
@@ -253,13 +252,10 @@ public class Turn extends PlayerSubcommandData {
             }
             if (po_name == null) {
                 Integer integer = customPublicVP.get(key);
-                if (integer != null) {
-                    if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
-                        //Don't add it for now
-                    } else {
-                        po_name = key;
-                        poStatus = 2;
-                    }
+                if (integer != null && !key.toLowerCase().contains("custodian") && !key.toLowerCase().contains("imperial")
+                    && !key.contains("Shard of the Throne")) {
+                    po_name = key;
+                    poStatus = 2;
                 }
             }
             if (po_name != null) {
@@ -271,11 +267,9 @@ public class Turn extends PlayerSubcommandData {
                 } else if (poStatus == 1) { //Stage 2 Objectives
                     objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                     poButtons2.add(objectiveButton);
-                } else if (poStatus == 2) { //Other Objectives
+                } else { //Other Objectives
                     objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                     poButtonsCustom.add(objectiveButton);
-                } else {
-
                 }
             }
         }
@@ -313,7 +307,7 @@ public class Turn extends PlayerSubcommandData {
         // return beginning of status phase PNs
         LinkedHashMap<String, Player> players = activeGame.getPlayers();
          for (Player player : players.values()) {
-             List<String> pns = new ArrayList<String>(player.getPromissoryNotesInPlayArea());
+             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 Player pnOwner = activeGame.getPNOwner(pn);
                 if(!pnOwner.isRealPlayer()){
@@ -332,7 +326,7 @@ public class Turn extends PlayerSubcommandData {
     
         for(Player p2 : activeGame.getRealPlayers()){
             String ms2 = getMissedSCFollowsText(activeGame, p2);
-            if (ms2 != null && !ms2.equalsIgnoreCase("")) {
+            if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ms2);
             }
         }
@@ -340,7 +334,7 @@ public class Turn extends PlayerSubcommandData {
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) arborec.getCardsInfoThread(activeGame), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(activeGame), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
             
         }
         Player solPlayer =  Helper.getPlayerFromUnit(activeGame, "sol_flagship");

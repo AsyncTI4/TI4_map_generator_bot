@@ -79,7 +79,6 @@ public class Stats extends PlayerSubcommandData {
 		} else {
 			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
 			if (optionCC != null) {
-				@SuppressWarnings("ConstantConditions")
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
 				if (tokenizer.countTokens() != 3) {
@@ -190,7 +189,7 @@ public class Stats extends PlayerSubcommandData {
 							continue;
 						}
 						String faction = player_.getFaction();
-						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+						if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
 						player_.addFollowedSC(sc);
 					}
 					message.append("> flipped ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" to ").append(Helper.getSCEmojiFromInteger(sc)).append(" (unplayed)");
@@ -204,10 +203,9 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionDummy = event.getOption(Constants.DUMMY);
 		if (optionDummy != null) {
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionDummy));
 			boolean value = optionDummy.getAsBoolean();
 			player.setDummy(value);
-			sendMessage(message.toString());
+			sendMessage(getGeneralMessage(event, player, optionDummy));
 		}
 
 	}
@@ -338,7 +336,7 @@ public class Stats extends PlayerSubcommandData {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
 			String explanation = "";
 			if(value.contains("?")){	
-				explanation = value.substring(value.indexOf("?")+1, value.length());
+				explanation = value.substring(value.indexOf("?")+1);
 				value = value.substring(0, value.indexOf("?")).replace(" ", "");		
 			}
 			
@@ -367,13 +365,13 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-							+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
+		if(explanation == null || "".equalsIgnoreCase(explanation)){
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+							+ existingNumber + ", a change of " + (setToNumber - existingNumber)
 							+ ")_";
 		}else{
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
 				+ ")_ for the reason of: "+explanation;
 		}
 		
@@ -387,12 +385,12 @@ public class Stats extends PlayerSubcommandData {
 		} else if (changeNumber < 0) {
 			changeDescription = "decreased";
 		}
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_";
+		if(explanation == null || "".equalsIgnoreCase(explanation)){
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_";
 		}else{
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_ for the reason of: "+explanation; 
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_ for the reason of: "+explanation;
 		}
 		
 	}

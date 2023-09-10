@@ -1,5 +1,6 @@
 package ti4.commands.agenda;
 
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -50,7 +51,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String agendaType = agendaDetails.getType();
         String agendaName = agendaDetails.getName();
 
-        if(agendaName.equalsIgnoreCase("Emergency Session"))
+        if("Emergency Session".equalsIgnoreCase(agendaName))
         {
             MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeGame.getGuild(), activeGame)+" Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
             revealAgenda(event, revealFromBottom, activeGame, channel);
@@ -62,13 +63,13 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
-        if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation")) {
+        if (agendaName!= null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
             activeGame.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
         } else {
             boolean notEmergency = false;
             while(!notEmergency)
             {
-                if(agendaName.equalsIgnoreCase("Emergency Session"))
+                if("Emergency Session".equalsIgnoreCase(agendaName))
                 {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame)+" Emergency Session revealed underneath Covert Legislation, discarding it.");
@@ -79,7 +80,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 agendaType = agendaDetails2.getType();
                 agendaName = agendaDetails.getName();
                 activeGame.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
-                notEmergency = !agendaName.equalsIgnoreCase("Emergency Session");
+                notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 if(notEmergency){
                     MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
                      Player speaker = null;
@@ -88,14 +89,14 @@ public class RevealAgenda extends AgendaSubcommandData {
                     } 
                     if(speaker != null){
                         StringBuilder sb = new StringBuilder();
-                        java.util.Map.Entry<String, Integer> entry = activeGame.drawAgenda();
+                        Map.Entry<String, Integer> entry = activeGame.drawAgenda();
                         sb.append("-----------\n");
                         sb.append("Game: ").append(activeGame.getName()).append("\n");
                         sb.append(event.getUser().getAsMention()).append("\n");
                         sb.append("Drawn Agendas:\n");
                         sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                         sb.append("\n");
-                        MessageHelper.sendMessageToChannel((MessageChannel) speaker.getCardsInfoThread(activeGame), sb.toString());
+                        MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(activeGame), sb.toString());
                     }
                 }
 

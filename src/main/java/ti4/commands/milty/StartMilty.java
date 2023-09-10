@@ -40,7 +40,7 @@ public class StartMilty extends MiltySubcommandData {
 
     public static final int SLICE_GENERATION_CYCLES = 100;
 
-    private boolean anomalies_can_touch = false;
+    private boolean anomalies_can_touch;
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
@@ -311,13 +311,13 @@ public class StartMilty extends MiltySubcommandData {
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
-            final BufferedImage image = ImageIO.read(fileInputStream);
+            BufferedImage image = ImageIO.read(fileInputStream);
             fileInputStream.close();
 
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
 
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
@@ -403,7 +403,7 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private void initDraftTiles(MiltyDraftManager draftManager) {
-        java.util.Map<String, TileModel> allTiles = TileHelper.getAllTiles();
+        Map<String, TileModel> allTiles = TileHelper.getAllTiles();
         for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
             String tileID = tileModel.getId();
             if (isValid(tileModel, tileID)) {
@@ -413,9 +413,9 @@ public class StartMilty extends MiltySubcommandData {
             MiltyDraftTile draftTile = new MiltyDraftTile();
             if (wormholes != null) {
                 for (WormholeModel.Wormhole wormhole : wormholes) {
-                    if (WormholeModel.Wormhole.ALPHA.equals(wormhole)) {
+                    if (WormholeModel.Wormhole.ALPHA == wormhole) {
                         draftTile.setHasAlphaWH(true);
-                    } else if (WormholeModel.Wormhole.BETA.equals(wormhole)) {
+                    } else if (WormholeModel.Wormhole.BETA == wormhole) {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);

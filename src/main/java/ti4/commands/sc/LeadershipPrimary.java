@@ -50,7 +50,6 @@ public class LeadershipPrimary extends SCSubcommandData {
 		} else {
 
 			if (optionCC != null) {
-				@SuppressWarnings("ConstantConditions")
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
 				if (tokenizer.countTokens() != 3) {

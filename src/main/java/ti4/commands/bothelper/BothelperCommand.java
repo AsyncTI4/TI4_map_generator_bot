@@ -1,5 +1,6 @@
 package ti4.commands.bothelper;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -33,7 +34,7 @@ public class BothelperCommand implements Command {
         if (event.getName().equals(getActionID())) {
             Member member = event.getMember();
             if (member != null) {
-                java.util.List<Role> roles = member.getRoles();
+                List<Role> roles = member.getRoles();
                 for (Role role : MapGenerator.bothelperRoles) {
                     if (roles.contains(role)) {
                         return true;
@@ -78,7 +79,6 @@ public class BothelperCommand implements Command {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                subCommandExecuted = subcommand;
                 break;
             }
         }

@@ -22,10 +22,10 @@ public class AddTile extends AddRemoveTile {
     }
 
     public static void addCustodianToken(Tile tile) {
-        if (tile.getTileID().equals("18")) {
+        if ("18".equals(tile.getTileID())) {
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
-                if (unitHolder instanceof Planet && unitHolder.getName().equals("mr")) {
+                if (unitHolder instanceof Planet && "mr".equals(unitHolder.getName())) {
                     unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                 }
             }

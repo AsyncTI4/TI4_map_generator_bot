@@ -45,7 +45,7 @@ public class AbilityInfo extends PlayerSubcommandData {
     private static String getAbilityInfoText(Player player) {
         List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
         StringBuilder sb = new StringBuilder("__**Ability Info**__\n");
-        if (playerAbilities == null || playerAbilities.isEmpty() || playerAbilities.get(0).isBlank()) {
+        if (playerAbilities.isEmpty() || playerAbilities.get(0).isBlank()) {
             sb.append("> No Abilities");
             return sb.toString();
         }

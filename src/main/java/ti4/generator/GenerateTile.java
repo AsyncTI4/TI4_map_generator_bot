@@ -34,11 +34,11 @@ public class GenerateTile {
     private final int tileWidth = 345;
     private final int tileExtraWidth = 260;
 
-    private int offsetX = 0;
-    private int offsetY = 0;
+    private int offsetX;
+    private int offsetY;
 
-    private Boolean isFoWPrivate = null;
-    private Player fowPlayer = null;
+    private Boolean isFoWPrivate;
+    private Player fowPlayer;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
 
     private static GenerateTile instance;
@@ -136,7 +136,7 @@ public class GenerateTile {
             Set<String> tiles = tileMap.keySet();
             Set<String> tilesWithExtra = new HashSet<>(activeGame.getAdjacentTileOverrides().values());
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Tile));
-            tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
+            tilesWithExtra.forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Units));
 
             graphics.setFont(Storage.getFont32());
@@ -150,9 +150,9 @@ public class GenerateTile {
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
             }
@@ -193,8 +193,7 @@ public class GenerateTile {
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
-        String output = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-        return output == null ? "" : output;
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {

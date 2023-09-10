@@ -1,6 +1,7 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -16,7 +17,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
 import ti4.commands.cardsac.ACInfo_Legacy;
-import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -61,15 +61,15 @@ public class MessageHelper {
 	}
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game activeGame, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
-			StringTokenizer players  = null;
-			if (whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when")) {
-				if (activeGame.getLatestWhenMsg() != null && activeGame.getLatestWhenMsg() != "") {
+			StringTokenizer players;
+			if ("when".equalsIgnoreCase(whenOrAfter)) {
+				if (activeGame.getLatestWhenMsg() != null && !"".equals(activeGame.getLatestWhenMsg())) {
 					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestWhenMsg()).queue();
 				}
 				activeGame.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoWhen(), "_");
 			} else {
-				if (activeGame.getLatestAfterMsg() != null && activeGame.getLatestAfterMsg() != "") {
+				if (activeGame.getLatestAfterMsg() != null && !"".equals(activeGame.getLatestAfterMsg())) {
 					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestAfterMsg()).queue();
 				}
 				activeGame.setLatestAfterMsg(msg.getId());
@@ -96,10 +96,10 @@ public class MessageHelper {
 	public static void sendFileToChannel(MessageChannel channel, File file) {
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
-			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
 			for (ThreadChannel threadChannel_ : threadChannels) {
 				if (threadChannel_.getName().equals(threadName)) {
-					channel = (MessageChannel) threadChannel_;
+					channel = threadChannel_;
 				}
 			}
 		}
@@ -113,10 +113,10 @@ public class MessageHelper {
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
-			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
 			for (ThreadChannel threadChannel_ : threadChannels) {
 				if (threadChannel_.getName().equals(threadName)) {
-					channel = (MessageChannel) threadChannel_;
+					channel = threadChannel_;
 				}
 			}
 		}
@@ -143,9 +143,6 @@ public class MessageHelper {
 				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
 				return;
 			}
-			String gameName = event.getChannel().getName();
-			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
-			gameName = gameName.substring(0, gameName.indexOf("-"));
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
@@ -159,10 +156,10 @@ public class MessageHelper {
 		
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
-			List<ThreadChannel> threadChannels = ((TextChannel) channel).getThreadChannels();
+			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
 			for (ThreadChannel threadChannel_ : threadChannels) {
 				if (threadChannel_.getName().equals(threadName)) {
-					channel = (MessageChannel) threadChannel_;
+					channel = threadChannel_;
 				}
 			}
 		}
@@ -221,9 +218,9 @@ public class MessageHelper {
 						gameName = gameName.substring(0, gameName.indexOf("-"));
 						Game activeGame = GameManager.getInstance().getGame(gameName);
 						if(!activeGame.isFoWMode()){
-							if(activeGame.getLatestUpNextMsg()!= null && !activeGame.getLatestUpNextMsg().equalsIgnoreCase("")){
+							if(activeGame.getLatestUpNextMsg()!= null && !"".equalsIgnoreCase(activeGame.getLatestUpNextMsg())){
 								String id = activeGame.getLatestUpNextMsg().split("_")[0];
-								String message = activeGame.getLatestUpNextMsg().substring(activeGame.getLatestUpNextMsg().indexOf("_")+1, activeGame.getLatestUpNextMsg().length()).replace("#", "");
+								String message = activeGame.getLatestUpNextMsg().substring(activeGame.getLatestUpNextMsg().indexOf("_")+1).replace("#", "");
 								message = message.replace("UP NEXT", "started their turn");
 								
 								activeGame.getActionsChannel().editMessageById(id, message).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
@@ -305,7 +302,7 @@ public class MessageHelper {
 	}
 
 	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, String message) {
-		return privatelyPingPlayerList(players, activeGame, (MessageChannel) null, message, null, null);
+		return privatelyPingPlayerList(players, activeGame, null, message, null, null);
 	}
 
 	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, MessageChannel feedbackChannel, String message, String failText, String successText) {
@@ -340,7 +337,8 @@ public class MessageHelper {
         }
 
         //SEND MESSAGES
-		if (messageText == null || messageText.isEmpty()) return;
+				if (messageText == null || messageText.isEmpty()) return;
+
         for (String text : splitLargeText(messageText, 2000)) {
             threadChannel.sendMessage(text).queue();
         }
@@ -352,7 +350,6 @@ public class MessageHelper {
 	 *
 	 * @param messageText any non-null, non-empty string
 	 * @param maxLength   maximum length, any positive integer
-	 * @return
 	 */
 	private static List<String> splitLargeText(String messageText, int maxLength) {
 		List<String> texts = new ArrayList<>();
@@ -363,7 +360,7 @@ public class MessageHelper {
 		while (index < messageLength) {
 			String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
 			int lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
-			String textToAdd = "";
+			String textToAdd;
 			if (lastNewLineIndex > 0) {
 				textToAdd = nextChars.substring(0, lastNewLineIndex);
 				index += lastNewLineIndex;
@@ -448,12 +445,12 @@ public class MessageHelper {
 	}
 
     public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
-		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
-        if (channel instanceof TextChannel) {
-			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
-            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
+			if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
+			if (channel instanceof TextChannel) {
+						Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
+            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
-            MessageHelper.sendMessageToChannel(channel, messageToSend);
+            sendMessageToChannel(channel, messageToSend);
         }
     }
 
@@ -470,21 +467,20 @@ public class MessageHelper {
         } else if (channel instanceof ThreadChannel) {
             for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
 					channel.sendMessageEmbeds(messageEmbeds_).queue();
-				};
-        }
+				}
+		}
 	}
 
 	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, List<MessageEmbed> embeds) {
-		ThreadChannel channel = player.getCardsInfoThread(activeGame);
-		if (channel == null || embeds == null || embeds.isEmpty()) return;
-        for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
-			channel.sendMessageEmbeds(messageEmbeds_).queue();
-		};
-        
+			ThreadChannel channel = player.getCardsInfoThread(activeGame);
+			if (channel == null || embeds == null || embeds.isEmpty()) return;
+			for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
+				channel.sendMessageEmbeds(messageEmbeds_).queue();
+			}
 	}
 
     public static void sendMessageToBotLogWebhook(String message) {
-        if (!MapGenerator.guildPrimary.getId().equals("943410040369479690")) return; //Only run in Prod
+        if (!"943410040369479690".equals(MapGenerator.guildPrimary.getId())) return; //Only run in Prod
         DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
 		webhook.setContent(message);
 		try {

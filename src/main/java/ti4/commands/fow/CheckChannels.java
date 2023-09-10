@@ -19,7 +19,7 @@ public class CheckChannels extends FOWSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        if (FoWHelper.isPrivateGame(event) != null && FoWHelper.isPrivateGame(event)) {
+        if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }
@@ -53,6 +53,5 @@ public class CheckChannels extends FOWSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 }

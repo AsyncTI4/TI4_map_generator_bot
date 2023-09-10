@@ -2,7 +2,6 @@ package ti4.commands.help;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -30,7 +29,7 @@ public class ListPublicObjectives extends HelpSubcommandData {
             .sorted().toList();
         
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Public Objective List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        String message = "**__Public Objective List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 5) {
             String threadName = "/help list_public_objectives" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

@@ -15,26 +15,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AliasHandler {
-    private static HashMap<String, String> tilemapAliasList = new HashMap<>();
-    private static HashMap<String, String> unitAliasList = new HashMap<>();
-    private static ArrayList<String> unitValuesList = new ArrayList<>();
-    private static Map<String, String> unitListForHelp = new HashMap<>();
-    private static HashMap<String, String> cctokenAliasList = new HashMap<>();
-    private static HashMap<String, String> attachmentAliasList = new HashMap<>();
-    private static HashMap<String, String> tokenAliasList = new HashMap<>();
-    private static HashMap<String, String> factionAliasList = new HashMap<>();
-    private static HashMap<String, String> colorAliasList = new HashMap<>();
-    private static HashMap<String, String> techAliasList = new HashMap<>();
-    private static HashMap<String, String> actionCardAliasList = new HashMap<>();
-    private static HashMap<String, String> agendaAliasList = new HashMap<>();
-    private static HashMap<String, String> explorationAliasList = new HashMap<>();
-    private static HashMap<String, String> relicAliasList = new HashMap<>();
-    private static HashMap<String, String> objectiveAliasList = new HashMap<>();
-    private static HashMap<String, String> promissoryAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgPositionAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
-    private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
+
+    private static final Map<String, String> tilemapAliasList = new HashMap<>();
+    private static final Map<String, String> unitAliasList = new HashMap<>();
+    private static final List<String> unitValuesList = new ArrayList<>();
+    private static final Map<String, String> unitListForHelp = new HashMap<>();
+    private static final Map<String, String> cctokenAliasList = new HashMap<>();
+    private static final Map<String, String> attachmentAliasList = new HashMap<>();
+    private static final Map<String, String> tokenAliasList = new HashMap<>();
+    private static final Map<String, String> factionAliasList = new HashMap<>();
+    private static final Map<String, String> colorAliasList = new HashMap<>();
+    private static final Map<String, String> techAliasList = new HashMap<>();
+    private static final Map<String, String> actionCardAliasList = new HashMap<>();
+    private static final Map<String, String> agendaAliasList = new HashMap<>();
+    private static final Map<String, String> explorationAliasList = new HashMap<>();
+    private static final Map<String, String> relicAliasList = new HashMap<>();
+    private static final Map<String, String> objectiveAliasList = new HashMap<>();
+    private static final Map<String, String> promissoryAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgPositionAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
+    private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
     private static final Map<String, String> allTileAliases = new HashMap<>();
     private static final Map<String, String> allPlanetAliases = new HashMap<>();
 
@@ -85,7 +86,7 @@ public class AliasHandler {
      * @param keys true ->  load [key] into the list
      * @param keys false -> load [value1,value2,value3] into the list
      */
-    private static void readAliasFile(String fileName, ArrayList<String> list, boolean keys) {
+    private static void readAliasFile(String fileName, List<String> list, boolean keys) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
@@ -115,7 +116,7 @@ public class AliasHandler {
      * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
      * @param errorMessage error message provided
      */
-    private static void readAliasFile(String fileName, HashMap<String, String> aliasList, String errorMessage) {
+    private static void readAliasFile(String fileName, Map<String, String> aliasList, String errorMessage) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
@@ -152,7 +153,7 @@ public class AliasHandler {
     }
 
     public static String resolveTile(String name) {
-        if(name.equalsIgnoreCase("mirage"))
+        if("mirage".equalsIgnoreCase(name))
         {
             return name;
         }
@@ -209,7 +210,7 @@ public class AliasHandler {
         }
     }
 
-    public static ArrayList<String> getUnitValuesList() {
+    public static List<String> getUnitValuesList() {
         return unitValuesList;
     }
 
@@ -225,7 +226,7 @@ public class AliasHandler {
 
     public static String resolvePlanet(String name) {
         if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
-        if(name != null && name.equalsIgnoreCase("gamma")){
+        if("gamma".equalsIgnoreCase(name)){
             return name;
         }
         String aliasID = allPlanetAliases.get(name.toLowerCase());
@@ -239,7 +240,7 @@ public class AliasHandler {
 
     public static String resolveAttachment(String name) {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
-        if(name != null && name.equalsIgnoreCase("gamma")){
+        if("gamma".equalsIgnoreCase(name)){
             return name;
         }
         if (aliasID != null) {
@@ -365,9 +366,8 @@ public class AliasHandler {
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */
     public static String resolveTTPGPosition(String position) {
-        String aliasID = ttpgPositionAliasList.get(position);
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
-        return aliasID;
+        return ttpgPositionAliasList.get(position);
     }
 
     public static Map<String, String> getPlanetAliasEntryList() {

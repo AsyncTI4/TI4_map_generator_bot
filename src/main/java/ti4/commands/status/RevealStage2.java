@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -22,15 +23,14 @@ public class RevealStage2 extends StatusSubcommandData {
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        java.util.Map.Entry<String, Integer> objective = activeGame.revealState2();
+        Map.Entry<String, Integer> objective = activeGame.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeGame));
-        sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
-        sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(po.getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannelAndPin(channel, sb.toString());
+      String sb = Helper.getGamePing(event, activeGame) +
+          " **Stage 2 Public Objective Revealed**" + "\n" +
+          "(" + objective.getValue() + ") " +
+          po.getRepresentation() + "\n";
+        MessageHelper.sendMessageToChannelAndPin(channel, sb);
     }
 
     @Override

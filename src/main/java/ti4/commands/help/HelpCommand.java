@@ -75,7 +75,6 @@ public class HelpCommand implements Command {
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
-        return;
     }
 
 

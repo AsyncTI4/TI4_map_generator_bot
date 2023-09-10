@@ -1,5 +1,6 @@
 package ti4.commands.tech;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -66,7 +67,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
             } else {
                 HashMap<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
-                        .map(java.util.Map.Entry::getKey).toList();
+                        .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()){
                     sendMessage("No matching Tech found");
                     return;

@@ -1,4 +1,5 @@
 package ti4.commands.cardspn;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -35,12 +36,12 @@ public class ShowPN extends PNCardsSubcommandData {
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {
-            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
+            longPNDisplay = "y".equalsIgnoreCase(longPNOption.getAsString()) || "yes".equalsIgnoreCase(longPNOption.getAsString());
         }
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -57,17 +58,16 @@ public class ShowPN extends PNCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("---------\n");
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Promissory Note:").append("\n");
-        sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
-        sb.append("---------\n");
+        String sb = "---------\n" +
+            "Game: " + activeGame.getName() + "\n" +
+            "Player: " + player.getUserName() + "\n" +
+            "Showed Promissory Note:" + "\n" +
+            Mapper.getPromissoryNote(acID, longPNDisplay) + "\n" +
+            "---------\n";
         player.setPromissoryNote(acID);
         
         sendMessage("PN shown");
         PNInfo.sendPromissoryNoteInfo(activeGame, player, longPNDisplay);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeGame, sb);
     }
 }

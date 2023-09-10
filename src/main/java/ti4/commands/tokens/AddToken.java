@@ -2,6 +2,7 @@ package ti4.commands.tokens;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -56,7 +57,7 @@ public class AddToken extends AddRemoveToken {
         if (needSpecifyPlanet) {
             OptionMapping option = null;
             if(event instanceof SlashCommandInteractionEvent){
-                option = ((SlashCommandInteractionEvent) event).getOption(Constants.PLANET);
+                option = ((CommandInteractionPayload) event).getOption(Constants.PLANET);
             }
             
             if (option != null) {
@@ -64,7 +65,7 @@ public class AddToken extends AddRemoveToken {
             } else {
                 Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
                 if (unitHolderIDs.size() == 2) {
-                    HashSet<String> unitHolders = new HashSet<>(unitHolderIDs);
+                    Set<String> unitHolders = new HashSet<>(unitHolderIDs);
                     unitHolders.remove(Constants.SPACE);
                     unitHolder = unitHolders.iterator().next();
                 } else {
@@ -92,13 +93,13 @@ public class AddToken extends AddRemoveToken {
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                 if (planetUnitHolder != null && spaceUnitHolder != null){
-                    HashMap<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                    Map<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
                     for (Player player_ : activeGame.getPlayers().values()) {
                         String color = player_.getColor();
                         planetUnitHolder.removeAllUnits(color);
                     }
                     HashMap<String, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                         String key = unitEntry.getKey();
                         if (key.contains("ff") || key.contains("gf") || key.contains("mf")){
                             Integer count = spaceUnits.get(key);

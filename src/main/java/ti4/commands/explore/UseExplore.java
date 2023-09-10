@@ -1,5 +1,6 @@
 package ti4.commands.explore;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,7 +25,6 @@ public class UseExplore extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        @SuppressWarnings("ConstantConditions")
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
         if (activeGame.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
@@ -38,7 +38,7 @@ public class UseExplore extends ExploreSubcommandData {
                     if (tile != null) {
                         break;
                     }
-                    for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                    for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                         if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                             tile = tile_;
                             break;

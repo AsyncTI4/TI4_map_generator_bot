@@ -43,10 +43,9 @@ public class AddCustomPO extends StatusSubcommandData {
         int vp = vpOption.getAsInt();
 
         Integer poIndex = activeGame.addCustomPO(poName, vp);
-        StringBuilder sb = new StringBuilder();
-        sb.append("**Public Objective added:**").append("\n");
-        sb.append("(").append(poIndex).append(") ").append("\n");
-        sb.append(poName).append("\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+      String sb = "**Public Objective added:**" + "\n" +
+          "(" + poIndex + ") " + "\n" +
+          poName + "\n";
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

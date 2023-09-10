@@ -1,5 +1,6 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -35,7 +36,7 @@ public class ShowACToAll extends ACCardsSubcommandData {
         int soIndex = option.getAsInt();
         String acID = null;
         boolean scored = false;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+        for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 acID = so.getKey();
                 break;
@@ -47,15 +48,13 @@ public class ShowACToAll extends ACCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Card:").append("\n");
-
-        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
+      String sb = "Game: " + activeGame.getName() + "\n" +
+          "Player: " + player.getUserName() + "\n" +
+          "Showed Action Card:" + "\n" +
+          Mapper.getActionCard(acID).getRepresentation() + "\n";
         if (!scored) {
             player.setActionCard(acID);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
     }
 }

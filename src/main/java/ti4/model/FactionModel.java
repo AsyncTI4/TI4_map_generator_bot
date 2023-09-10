@@ -17,9 +17,7 @@ public class FactionModel implements ModelInterface {
     private List<String> promissoryNotes;
     private List<String> units;
 
-    public FactionModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && factionName != null
             && homeSystem != null

@@ -15,22 +15,22 @@ public class Storage {
     public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
-    private static Font TI_FONT_8 = null;
-    private static Font TI_FONT_12 = null;
-    private static Font TI_FONT_14 = null;
-    private static Font TI_FONT_16 = null;
-    private static Font TI_FONT_18 = null;
-    private static Font TI_FONT_20 = null;
-    private static Font TI_FONT_21 = null;
-    private static Font TI_FONT_24 = null;
-    private static Font TI_FONT_26 = null;
-    private static Font TI_FONT_28 = null;
-    private static Font TI_FONT_30 = null;
-    private static Font TI_FONT_32 = null;
-    private static Font TI_FONT_35 = null;
-    private static Font TI_FONT_40 = null;
-    private static Font TI_FONT_50 = null;
-    private static Font TI_FONT_64 = null;
+    private static Font TI_FONT_8;
+    private static Font TI_FONT_12;
+    private static Font TI_FONT_14;
+    private static Font TI_FONT_16;
+    private static Font TI_FONT_18;
+    private static Font TI_FONT_20;
+    private static Font TI_FONT_21;
+    private static Font TI_FONT_24;
+    private static Font TI_FONT_26;
+    private static Font TI_FONT_28;
+    private static Font TI_FONT_30;
+    private static Font TI_FONT_32;
+    private static Font TI_FONT_35;
+    private static Font TI_FONT_40;
+    private static Font TI_FONT_50;
+    private static Font TI_FONT_64;
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
@@ -161,7 +161,7 @@ public class Storage {
     private static Font getFont(float size) {
         Font tiFont = null;
         String resource = getResourcePath();
-        if (resource == null) return tiFont;
+        if (resource == null) return null;
         File file = new File(resource + "/font/SLIDER.TTF");
         try (InputStream inputStream = new FileInputStream(file)) {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);

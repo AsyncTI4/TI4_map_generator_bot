@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -46,7 +47,7 @@ public class SOCardsCommand implements Command {
             }
             Member member = event.getMember();
             if (member != null) {
-                java.util.List<Role> roles = member.getRoles();
+                List<Role> roles = member.getRoles();
                 for (Role role : MapGenerator.adminRoles) {
                     if (roles.contains(role)) {
                         return true;
@@ -105,7 +106,6 @@ public class SOCardsCommand implements Command {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                subCommandExecuted = subcommand;
                 break;
             }
         }

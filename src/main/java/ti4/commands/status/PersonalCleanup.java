@@ -48,7 +48,7 @@ public class PersonalCleanup extends StatusSubcommandData {
             }
         }
         HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
-        for (java.util.Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
+        for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             if (player.getSCs().contains(sc.getKey()))
                 sc.setValue(false);
         }

@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -65,7 +66,7 @@ public class Eliminate extends AddRemovePlayer {
             HashMap<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
             if(player != null && player.getFaction() != null){
                 //send back all the PNs of others that the player was holding
-                Set<String> pns = new HashSet<String>(player.getPromissoryNotes().keySet());
+                Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
                 for(String pnID :pns){
 
                     PromissoryNoteModel pn = PNss.get(pnID);
@@ -79,7 +80,7 @@ public class Eliminate extends AddRemovePlayer {
                 
                 //Purge all the PNs of the eliminated player that other players were holding
                 for(Player p2 : activeGame.getPlayers().values()){
-                    pns = new HashSet<String>(p2.getPromissoryNotes().keySet());
+                    pns = new HashSet<>(p2.getPromissoryNotes().keySet());
                     for(String pnID : pns){
                         PromissoryNoteModel pn = PNss.get(pnID);
                         if(pn!= null &&(pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))){
@@ -96,28 +97,27 @@ public class Eliminate extends AddRemovePlayer {
                     }
                 }
                 //discard all of a players ACs
-                LinkedHashMap<String, Integer> acs = new LinkedHashMap<String, Integer>(player.getActionCards());
-                for(java.util.Map.Entry<String, Integer> ac : acs.entrySet()){
+                LinkedHashMap<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
+                for(Map.Entry<String, Integer> ac : acs.entrySet()){
                     boolean removed = activeGame.discardActionCard(player.getUserID(), ac.getValue());
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Player: ").append(player.getUserName()).append(" - ");
-                    sb.append("Discarded Action Card:").append("\n");
-                    sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation()).append("\n");
-                    MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+                    String sb = "Player: " + player.getUserName() + " - " +
+                        "Discarded Action Card:" + "\n" +
+                        Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
                 //unscore all of a players SOs
-                acs = new LinkedHashMap<String, Integer>(player.getSecretsScored());
+                acs = new LinkedHashMap<>(player.getSecretsScored());
                 for(int so : acs.values()){
                     boolean scored = activeGame.unscoreSecretObjective(extraUser.getId(), so);
                 }
                 //discard all of a players SOs
 
-                acs = new LinkedHashMap<String, Integer>(player.getSecrets());
+                acs = new LinkedHashMap<>(player.getSecrets());
                 for(int so : acs.values()){
                     boolean removed = activeGame.discardSecretObjective(player.getUserID(), so);
                 }
                  //return SCs
-                Set<Integer> scs = new HashSet<Integer>(player.getSCs());
+                Set<Integer> scs = new HashSet<>(player.getSCs());
                 for(int sc : scs){
                    player.removeSC(sc);
                 }
@@ -126,7 +126,7 @@ public class Eliminate extends AddRemovePlayer {
             Guild guild = event.getGuild();
             Member removedMember = guild.getMemberById(extraUser.getId());
             List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
-            if (removedMember != null && roles != null && roles.size() == 1) {
+            if (removedMember != null && roles.size() == 1) {
                 guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
             }
             sb.append("Eliminated player: ").append(extraUser.getName()).append(" from game: ").append(activeGame.getName()).append("\n");
