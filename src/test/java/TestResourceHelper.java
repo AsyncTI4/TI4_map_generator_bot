@@ -12,8 +12,6 @@ import ti4.model.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;

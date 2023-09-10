@@ -156,7 +156,7 @@ public class Game {
     @ExportableField
     private GameStatus gameStatus = GameStatus.open;
 
-    private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
+    private final HashMap<Integer, Boolean> scPlayed = new HashMap<>();
 
     private HashMap<String, String> currentAgendaVotes = new HashMap<>();
     @ExportableField
@@ -841,10 +841,6 @@ public class Game {
     public String getSpeaker() {
         return speaker;
     }
-
-    /**
-     * @param speaker - The player's userID: player.getID()
-     */
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
     }
@@ -860,7 +856,6 @@ public class Game {
     public boolean getHackElectionStatus() {
         return hasHackElectionBeenPlayed;
     }
-
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
         if (playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0) {
             playersWhoHitPersistentNoAfter = playersWhoHitPersistentNoAfter + "_" + faction;
@@ -868,7 +863,6 @@ public class Game {
             playersWhoHitPersistentNoAfter = faction;
         }
     }
-
     public void addPlayersWhoHitPersistentNoWhen(String faction) {
         if (playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0) {
             playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_" + faction;
@@ -876,33 +870,21 @@ public class Game {
             playersWhoHitPersistentNoWhen = faction;
         }
     }
-
     public void setPlayersWhoHitPersistentNoAfter(String persistent) {
-
         playersWhoHitPersistentNoAfter = persistent;
-
     }
-
     public void setPlayersWhoHitPersistentNoWhen(String persistent) {
-
         playersWhoHitPersistentNoWhen = persistent;
-
     }
-
     public void setHackElectionStatus(boolean hack) {
-
         hasHackElectionBeenPlayed = hack;
-
     }
-
     public String getActivePlayer() {
         return activePlayer;
     }
-
     public String getActiveSystem() {
         return activeSystem;
     }
-
     public void setActiveSystem(String system) {
         activeSystem = system;
     }
@@ -1072,26 +1054,6 @@ public class Game {
     public List<Integer> getSCList() {
         return (new ArrayList<>(getScTradeGoods().keySet()));
     }
-
-    /**
-     * Add an additonal Strategy Card to use
-     * 
-     * @param sc the integer value of the new strategy card
-     */
-    public void addSC(int sc) {
-        if (!getSCList().contains(sc)) {
-            setScTradeGood(sc, null);
-        }
-    }
-
-    public void purgeSC(int sc) {
-        scTradeGoods.remove(sc);
-    }
-
-    public void setScPlayed(HashMap<Integer, Boolean> scPlayed) {
-        this.scPlayed = scPlayed;
-    }
-
     public LinkedHashMap<String, Integer> getRevealedPublicObjectives() {
         return revealedPublicObjectives;
     }

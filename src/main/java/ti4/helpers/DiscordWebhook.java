@@ -116,31 +116,31 @@ public class DiscordWebhook {
                 if (footer != null) {
                     JSONObject jsonFooter = new JSONObject();
 
-                    jsonFooter.put("text", footer.getText());
-                    jsonFooter.put("icon_url", footer.getIconUrl());
+                    jsonFooter.put("text", footer.text());
+                    jsonFooter.put("icon_url", footer.iconUrl());
                     jsonEmbed.put("footer", jsonFooter);
                 }
 
                 if (image != null) {
                     JSONObject jsonImage = new JSONObject();
 
-                    jsonImage.put("url", image.getUrl());
+                    jsonImage.put("url", image.url());
                     jsonEmbed.put("image", jsonImage);
                 }
 
                 if (thumbnail != null) {
                     JSONObject jsonThumbnail = new JSONObject();
 
-                    jsonThumbnail.put("url", thumbnail.getUrl());
+                    jsonThumbnail.put("url", thumbnail.url());
                     jsonEmbed.put("thumbnail", jsonThumbnail);
                 }
 
                 if (author != null) {
                     JSONObject jsonAuthor = new JSONObject();
 
-                    jsonAuthor.put("name", author.getName());
-                    jsonAuthor.put("url", author.getUrl());
-                    jsonAuthor.put("icon_url", author.getIconUrl());
+                    jsonAuthor.put("name", author.name());
+                    jsonAuthor.put("url", author.url());
+                    jsonAuthor.put("icon_url", author.iconUrl());
                     jsonEmbed.put("author", jsonAuthor);
                 }
 
@@ -148,9 +148,9 @@ public class DiscordWebhook {
                 for (EmbedObject.Field field : fields) {
                     JSONObject jsonField = new JSONObject();
 
-                    jsonField.put("name", field.getName());
-                    jsonField.put("value", field.getValue());
-                    jsonField.put("inline", field.isInline());
+                    jsonField.put("name", field.name());
+                    jsonField.put("value", field.value());
+                    jsonField.put("inline", field.inline());
 
                     jsonFields.add(jsonField);
                 }
@@ -271,95 +271,15 @@ public class DiscordWebhook {
             return this;
         }
 
-        private static class Footer {
-            private final String text;
-            private final String iconUrl;
+        private record Footer(String text, String iconUrl) {}
 
-            private Footer(String text, String iconUrl) {
-                this.text = text;
-                this.iconUrl = iconUrl;
-            }
+        private record Thumbnail(String url) {}
 
-            private String getText() {
-                return text;
-            }
+        private record Image(String url) {}
 
-            private String getIconUrl() {
-                return iconUrl;
-            }
-        }
+        private record Author(String name, String url, String iconUrl) {}
 
-        private static class Thumbnail {
-            private final String url;
-
-            private Thumbnail(String url) {
-                this.url = url;
-            }
-
-            private String getUrl() {
-                return url;
-            }
-        }
-
-        private static class Image {
-            private final String url;
-
-            private Image(String url) {
-                this.url = url;
-            }
-
-            private String getUrl() {
-                return url;
-            }
-        }
-
-        private static class Author {
-            private final String name;
-            private final String url;
-            private final String iconUrl;
-
-            private Author(String name, String url, String iconUrl) {
-                this.name = name;
-                this.url = url;
-                this.iconUrl = iconUrl;
-            }
-
-            private String getName() {
-                return name;
-            }
-
-            private String getUrl() {
-                return url;
-            }
-
-            private String getIconUrl() {
-                return iconUrl;
-            }
-        }
-
-        private static class Field {
-            private final String name;
-            private final String value;
-            private final boolean inline;
-
-            private Field(String name, String value, boolean inline) {
-                this.name = name;
-                this.value = value;
-                this.inline = inline;
-            }
-
-            private String getName() {
-                return name;
-            }
-
-            private String getValue() {
-                return value;
-            }
-
-            private boolean isInline() {
-                return inline;
-            }
-        }
+        private record Field(String name, String value, boolean inline) {}
     }
 
     private static class JSONObject {

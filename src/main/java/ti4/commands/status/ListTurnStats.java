@@ -7,7 +7,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-
 public class ListTurnStats extends StatusSubcommandData {
     public ListTurnStats() {
         super(Constants.TURN_STATS, "List average amount of time players take on their turns");
@@ -16,7 +15,7 @@ public class ListTurnStats extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        if (FoWHelper.isPrivateGame(event) != null && FoWHelper.isPrivateGame(event)) {
+        if (FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }
