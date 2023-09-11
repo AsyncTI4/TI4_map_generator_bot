@@ -1869,6 +1869,10 @@ public class Game {
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
         relics_.remove(Constants.ENIGMATIC_DEVICE); //Legacy, deck no longer includes this - can be removed once all games before pbd682 are finished
+        relics_.remove("starcharthazardous");
+        relics_.remove("starchartcultural");
+        relics_.remove("starchartindustrial");
+        relics_.remove("starchartfrontier");
         if (relics_.isEmpty()) {
             return "";
         }

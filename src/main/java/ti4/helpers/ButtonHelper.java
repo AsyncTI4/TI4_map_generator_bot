@@ -1124,7 +1124,7 @@ public class ButtonHelper {
             UnitHolder planetUnit = activeGame.getPlanetsInfo().get(plan);
             Planet planetReal =  (Planet) planetUnit;    
             if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
-                List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal);
+                List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
                 buttons.addAll(planetButtons);
             }
         }
@@ -1836,14 +1836,14 @@ public class ButtonHelper {
             Planet planetReal =  (Planet) planetUnit;
             String planet = planetReal.getName();    
             if (planetReal.getOriginalPlanetType() != null && player.getPlanets(activeGame).contains(planet) && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
-                List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal);
+                List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
                 buttons.addAll(planetButtons);
             }
         }
         return buttons;
     }
 
-    public static List<Button> getPlanetExplorationButtons(Game activeGame, Planet planet) {
+    public static List<Button> getPlanetExplorationButtons(Game activeGame, Planet planet, Player player) {
         if (planet == null || activeGame == null) return null;
 
         String planetType = planet.getOriginalPlanetType();
@@ -1858,6 +1858,18 @@ public class ButtonHelper {
             explorationTraits.add("cultural");
             explorationTraits.add("industrial");
             explorationTraits.add("hazardous");
+        }
+        if(player.hasAbility("black_markets")){
+            String traits = ButtonHelperFactionSpecific.getAllOwnedPlanetTypes(player, activeGame);
+            if(traits.contains("industrial")){
+                explorationTraits.add("industrial");
+            }
+            if(traits.contains("cultural")){
+                explorationTraits.add("cultural");
+            }
+            if(traits.contains("hazardous")){
+                explorationTraits.add("hazardous");
+            }
         }
         if (planet.getTokenList().contains("attachment_industrialboom.png")) {
             explorationTraits.add("industrial");
