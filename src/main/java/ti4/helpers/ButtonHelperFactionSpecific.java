@@ -379,7 +379,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveFollowUpIndoctrinationQuestion(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
-        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        Tile tile = Helper.getTileFromPlanet(planet, activeGame);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 "+unit+" "+planet, activeGame);
         for(Player p2 : activeGame.getRealPlayers()){
             if(p2 == player){
@@ -892,6 +892,12 @@ public class ButtonHelperFactionSpecific {
     
     public static boolean isTileCreussIFFSuitable(Game activeGame, Player player, Tile tile){
         for(String planet : player.getPlanets(activeGame)){
+            if(planet.toLowerCase().contains("custodia")){
+                continue;
+            }
+            if(Helper.getTileFromPlanet(planet, activeGame) == null){
+                continue;
+            }
             if(Helper.getTileFromPlanet(planet, activeGame).getPosition().equalsIgnoreCase(tile.getPosition())){
                 return true;
             }

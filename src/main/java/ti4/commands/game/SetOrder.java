@@ -76,7 +76,7 @@ public class SetOrder extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
-    private void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
         if (option1 != null) {
             String id = option1.getAsUser().getId();
             Player player = players.get(id);
@@ -85,5 +85,12 @@ public class SetOrder extends GameSubcommandData {
                 players.remove(id);
             }
         }
+    }
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, Player player) {
+        if (player != null){
+            newPlayerOrder.put(player.getUserID(), player);
+            players.remove(player.getUserID());
+        }
+        
     }
 }
