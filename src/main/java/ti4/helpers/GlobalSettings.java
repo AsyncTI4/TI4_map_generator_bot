@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import ti4.message.BotLogger;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class GlobalSettings {
 
@@ -77,8 +78,17 @@ public class GlobalSettings {
         }
     }
 
-    public static Map<String, Object> getSettings() {
+    private static Map<String, Object> getSettings() {
         return settings;
+    }
+
+    public static String getSettingsRepresentation() {
+        StringBuilder sb = new StringBuilder("### Global Settings:\n```");
+        for (Entry<String, Object> entries : GlobalSettings.getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
+            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+        }
+        sb.append("```");
+        return sb.toString();
     }
 
 }
