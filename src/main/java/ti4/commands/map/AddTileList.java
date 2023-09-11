@@ -63,7 +63,7 @@ public class AddTileList extends MapSubcommandData {
             }
             if (!TileHelper.getAllTiles().containsKey(tileID)) {
                 badTiles.add(tileID);
-                tileID = "0r";
+                tileID = "0gray";
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
