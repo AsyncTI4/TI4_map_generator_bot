@@ -1,5 +1,7 @@
 package ti4.commands.admin;
 
+import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,7 +13,7 @@ public class SetGlobalSetting extends AdminSubcommandData {
 
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");
-        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_NAME, "Setting to set").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SETTING_NAME, "Setting to set").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_VALUE, "Value to set").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SETTING_TYPE, "Type of setting").setRequired(true).setAutoComplete(true));
     }
@@ -27,12 +29,20 @@ public class SetGlobalSetting extends AdminSubcommandData {
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsString());
             if ("number".equals(type.getAsString()))
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
-            if ("bool".equals(type.getAsString()))  //TODO: Fix This, it doesn't work.
-                GlobalSettings.setSetting(setting.getAsString(), value.getAsBoolean());
+            if ("bool".equals(type.getAsString()))
+                GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
             GlobalSettings.saveSettings();
         } else {
             sendMessage("Bad Command!");
+            return;
         }
+        sendMessage("Setting `"  + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
+
+        StringBuilder sb = new StringBuilder("### Global Settings:\n```");
+        for (Entry<String, Object> entries : GlobalSettings.getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
+            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+        }
+        sendMessage(sb.append("```").toString());
     }
 
 }

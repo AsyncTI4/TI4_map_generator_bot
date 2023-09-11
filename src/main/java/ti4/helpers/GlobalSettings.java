@@ -13,6 +13,19 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import java.util.Map;
 
 public class GlobalSettings {
+
+    //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
+    public enum ImplementedSettings {
+        MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
+        THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
+        ;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+    }
+
     private static Map<String, Object> settings = new HashMap<>();
 
     private static File getFile() {
@@ -28,6 +41,7 @@ public class GlobalSettings {
             return def;
         return clazz.cast(settings.get(attr));
     }
+
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, val);
     }
@@ -57,6 +71,10 @@ public class GlobalSettings {
             // So this is intended to silently fail.
             e.printStackTrace();
         }
+    }
+
+    public static Map<String, Object> getSettings() {
+        return settings;
     }
 
 }
