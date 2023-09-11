@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -12,16 +13,20 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -134,6 +139,7 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
+        
 
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
 
@@ -157,6 +163,13 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        if(player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")){
+            activeGame.setComponentAction(true);
+            Button getTech = Button.success("acquireATech", "Get a tech");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(getTech);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+        }
     }
 
     private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {

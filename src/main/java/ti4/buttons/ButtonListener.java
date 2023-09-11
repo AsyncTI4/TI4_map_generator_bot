@@ -34,6 +34,7 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.uncategorized.ShowGame;
@@ -1125,6 +1126,10 @@ public class ButtonListener extends ListenerAdapter {
                             Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
                             buttons.add(winnuButton);
                         }
+                        if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                            Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                            buttons.add(hacanButton);
+                        }
                         Button DoneExhausting;
                         if (!buttonID.contains("deleteButtons")) {
                             DoneExhausting = Button.danger("deleteButtons_" + buttonID, "Done Exhausting Planets");
@@ -1873,12 +1878,18 @@ public class ButtonListener extends ListenerAdapter {
                         Button DoneGainingCC = Button.danger("deleteButtons_technology", "Done Gaining CCs");
                         String message = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player)
                             + ". Use buttons to gain CCs";
-                        List<Button> buttons = List.of(getTactic, getFleet, getStrat, exhaust, DoneGainingCC);
+                        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                        List<Button> buttons2 = List.of(exhaust);
                         if (!activeGame.isFoWMode()) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), message,
                                 buttons);
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), "Exhaust using this",
+                                buttons2);
                         } else {
+                           
                             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Exhaust using this",
+                                buttons2);
                         }
                     }
                     case "diploRefresh2" -> {
@@ -1926,6 +1937,7 @@ public class ButtonListener extends ListenerAdapter {
                         } else {
                             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                         }
+                        event.getMessage().delete().queue();
                     }
                     case "endOfTurnAbilities" -> MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to do an end of turn ability", ButtonHelper.getEndOfTurnAbilities(player, activeGame));
                     case "redistributeCCButtons" -> {
@@ -2845,6 +2857,22 @@ public class ButtonListener extends ListenerAdapter {
                         event.getMessage().delete().queue();
                         ButtonHelper.updateMap(activeGame, event);
                     }
+                    case "gameEnd" -> {
+                        GameEnd.secondHalfOfGameEnd(event, activeGame);
+                        event.getMessage().delete().queue();
+                    }
+                    case "purgeHacanHero" -> {
+                        Leader playerLeader = player.unsafeGetLeader("hacanhero");
+                        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                        boolean purged = player.removeLeader(playerLeader);
+                        if (purged) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "hacanhero" + " has been purged");
+                        } else {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Leader was not purged - something went wrong");
+                        }
+                        ButtonHelper.deleteTheOneButton(event);
+                        
+                    }
                     case "quash" -> {
                         int stratCC = player.getStrategicCC();
                         player.setStrategicCC(stratCC - 1);
@@ -2909,6 +2937,10 @@ public class ButtonListener extends ListenerAdapter {
                         event.getMessage().delete().queue();
 
                     }
+                     case "setOrder" -> {
+                        Helper.setOrder(activeGame);
+                        event.getMessage().delete().queue();
+                     }
                     case "gain_CC" -> {
                         String message = "";
                         String labelP = event.getButton().getLabel();

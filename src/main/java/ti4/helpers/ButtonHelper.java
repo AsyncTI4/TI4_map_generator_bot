@@ -1047,7 +1047,7 @@ public class ButtonHelper {
         String msg = ident+" removed CC from "+tileRep;
         if(whatIsItFor.contains("mahactAgent")){
             String faction = whatIsItFor.replace("mahactAgent", "");
-            player = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            player = Helper.getPlayerFromColorOrFaction(activeGame, player.getFaction());
             msg =  getTrueIdentity(player, activeGame) + " " +msg + " using Mahact agent";
             
             
@@ -1239,6 +1239,28 @@ public class ButtonHelper {
             }
         });
     }
+    public static void deleteTheOneButton(ButtonInteractionEvent event){
+        String exhaustedMessage = event.getMessage().getContentRaw();
+        if("".equalsIgnoreCase(exhaustedMessage)){
+            exhaustedMessage ="Updated";
+        }
+        List<ActionRow> actionRow2 = new ArrayList<>();
+        for (ActionRow row : event.getMessage().getActionRows()) {
+            List<ItemComponent> buttonRow = row.getComponents();
+            int buttonIndex = buttonRow.indexOf(event.getButton());
+            if (buttonIndex > -1 ) {
+                buttonRow.remove(buttonIndex);
+            }
+            if (buttonRow.size() > 0) {
+                actionRow2.add(ActionRow.of(buttonRow));
+            }
+        }
+        if (actionRow2.size() > 0 ) {
+                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+        } else {
+            event.getMessage().delete().queue();
+        }
+    }
     public static List<Button> getButtonsForPictureCombats(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace){
         Tile tile = activeGame.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
@@ -1325,7 +1347,12 @@ public class ButtonHelper {
                     buttons.add(Button.secondary(finChecker+"initialIndoctrination_"+unitH.getName(), "Indoctrinate on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
                 }
             }
-            buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Basic Combat ("+nameOfHolder+")"));
+            if(nameOfHolder.equalsIgnoreCase("space")){
+                buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
+            }else{
+                buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
+            }
+            
         }        
         return buttons;
     }
