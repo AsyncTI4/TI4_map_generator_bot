@@ -16,6 +16,7 @@ public class GlobalSettings {
 
     //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
     public enum ImplementedSettings {
+        UPLOAD_DATA_TO_WEB_SERVER, //Whether or not to send map and data to the web server
         MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
         THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
         ;

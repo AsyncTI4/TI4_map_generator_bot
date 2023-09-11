@@ -46,6 +46,9 @@ public class WebHelper {
     }
 
     public static void putData(String gameId, Game activeGame) {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
+
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
@@ -68,6 +71,9 @@ public class WebHelper {
     }
 
     public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
+
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
