@@ -113,9 +113,9 @@ public class WebHelper {
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
         } catch (SdkClientException e) {
-            // BotLogger.log("Could not add image to web server. Likely invalid credentials.", e);
+            BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
-            BotLogger.log("Could not add image to web server", e);
+            BotLogger.log("Could not add image for game `" + gameId + "` to web server", e);
         }
     }
 }
