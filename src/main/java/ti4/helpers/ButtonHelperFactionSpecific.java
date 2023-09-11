@@ -23,6 +23,7 @@ import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.player.SendDebt;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
@@ -38,6 +39,39 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
+
+     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")){
+                SendDebt.sendDebt(player, p2, 1);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" you sent 1 debt token to "+ButtonHelper.getIdentOrColor(p2, activeGame)+" due to their fine print ability");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+" you collected 1 debt token from "+ButtonHelper.getIdentOrColor(player, activeGame)+" due to your fine print ability. This is technically optional, done automatically for conveinance.");
+            }
+            break;
+        }
+    }
+
+    public static String getAllOwnedPlanetTypes(Player player, Game activeGame){
+
+        String types = "";
+        for(String planetName : player.getPlanets(activeGame)){
+            if(planetName.contains("custodia")){
+                continue;
+            }
+            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+            String planetType = planet.getOriginalPlanetType();
+            if (("industrial".equalsIgnoreCase(planetType) || "cultural".equalsIgnoreCase(planetType) || "hazardous".equalsIgnoreCase(planetType)) && !types.contains(planetType)) {
+                types = types + planetType;
+            }
+            if (planet.getTokenList().contains("attachment_titanspn.png")) {
+                types = types + "cultural";
+                types = types + "industrial";
+                types = types + "hazardous";
+            }
+        }
+
+        return types;
+    }
 
     public static void offerMahactInfButtons(Player player, Game activeGame){
         String message = ButtonHelper.getTrueIdentity(player, activeGame)+" Resolve Mahact infantry loss using the buttons";
