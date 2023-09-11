@@ -99,6 +99,9 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         // sendMessage("debug finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
         // pol3); (debug messagesender if more work is needed)
 
+        int negativePolicies = 0;
+        int positivePolicies = 0;
+
         // go through each option and set the policy accordingly
         if (pol1 != null) {
             if ("-".equals(pol1)) {
@@ -107,6 +110,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     sendMessage("removed Policy - The People: Connect (+).");
                 }
                 player.addAbility("policy_the_people_control");
+                negativePolicies++;
                 sendMessage("added Policy - The People: Control (-).");
             } else if ("+".equals(pol1)) {
                 if (player.hasAbility("policy_the_people_control")) {
@@ -114,6 +118,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     sendMessage("removed Policy - The People: Control (-).");
                 }
                 player.addAbility("policy_the_people_connect");
+                positivePolicies++;
                 sendMessage("added Policy - The People: Connect (+).");
             }
         }
@@ -124,6 +129,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     sendMessage("removed Policy - The Environment: Preserve (+).");
                 }
                 player.addAbility("policy_the_environment_plunder");
+                negativePolicies++;
                 sendMessage("added Policy - The Environment: Plunder (-).");
             } else if ("+".equals(pol2)) {
                 if (player.hasAbility("policy_the_environment_plunder")) {
@@ -131,6 +137,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     sendMessage("removed Policy - The Environment: Plunder (-).");
                 }
                 player.addAbility("policy_the_environment_preserve");
+                positivePolicies++;
                 sendMessage("added Policy - The Environment: Preserve (+).");
             }
         }
@@ -143,23 +150,33 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 if (!player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
-                    sendMessage(
-                            "added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!");
+                    sendMessage("added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!");
                 } else if (player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
-                    sendMessage(
-                            "added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
+                    sendMessage("added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
                 }
+                negativePolicies++;
             } else if ("+".equals(pol3)) {
                 if (player.hasAbility("policy_the_economy_exploit")) {
                     player.removeAbility("policy_the_economy_exploit");
                     player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
-                    sendMessage(
-                            "removed Policy - The Economy: Exploit (-). Increased Commodities total by 1 - double check the value is correct!.");
+                    sendMessage("removed Policy - The Economy: Exploit (-). Increased Commodities total by 1 - double check the value is correct!.");
                 }
                 player.addAbility("policy_the_economy_empower");
+                positivePolicies++;
                 sendMessage("added Policy - The Economy: Empower (+).");
             }
+        }
+
+        player.removeOwnedUnitByID("oldradin_mech");
+        player.removeOwnedUnitByID("oldradin_mech_positive");
+        player.removeOwnedUnitByID("oldradin_mech_negative");
+        if (positivePolicies >= 2) {
+            player.addOwnedUnitByID("oldradin_mech_positive");
+        } else if (negativePolicies >= 2) {
+            player.addOwnedUnitByID("oldradin_mech_negative");
+        } else {
+            player.addOwnedUnitByID("oldradin_mech");
         }
     }
 
