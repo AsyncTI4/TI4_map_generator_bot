@@ -1,7 +1,5 @@
 package ti4.commands.admin;
 
-import java.util.Map.Entry;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -37,12 +35,6 @@ public class SetGlobalSetting extends AdminSubcommandData {
             return;
         }
         sendMessage("Setting `"  + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
-
-        StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries : GlobalSettings.getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
-            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
-        }
-        sendMessage(sb.append("```").toString());
+        sendMessage(GlobalSettings.getSettingsRepresentation());
     }
-
 }
