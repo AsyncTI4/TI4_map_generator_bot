@@ -1483,15 +1483,11 @@ public class Helper {
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
-        int closeCount = GlobalSettings.getSetting("thread_close_count", Integer.class, 20);
+        int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 20);
+        int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
 
-        if (threadCount >= 975) {
-            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Server: **" + guild.getName() + "** thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
-            // if (false) { // Here to keep in case it's needed.
-            //     BotLogger.log(ListOldThreads.getOldThreadsMessage(guild, closeCount));
-            // } else {
-            BotLogger.log("> The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
-            //}
+        if (threadCount >= maxThreadCount) {
+            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Server: **" + guild.getName() + "** thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads. The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
     }
@@ -2000,6 +1996,34 @@ public class Helper {
         long hours = totalMinutes / 60; //total hours (truncates)
 
         return String.format("%02dh:%02dm:%02ds:%03d", hours, minutes, seconds, millis);
+    }
+
+    public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {
+        long totalMicroSeconds = totalNanoSeconds / 1000;
+        long totalMilliSeconds = totalMicroSeconds / 1000;
+        long totalSeconds = totalMilliSeconds / 1000;
+        long totalMinutes = totalSeconds / 60;
+        long totalHours = totalMinutes / 60;
+        long totalDays = totalHours /24;
+
+        long nanoSeconds = totalNanoSeconds % 1000;
+        long microSeconds = totalMicroSeconds % 1000;
+        long milleSeconds = totalMilliSeconds % 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = totalMinutes % 60;
+        long hours = totalHours % 24;
+        long days = totalDays;
+
+        StringBuilder sb = new StringBuilder();
+        // sb.append(String.format("%d:", days));
+        // sb.append(String.format("%02dh:", hours));
+        // sb.append(String.format("%02dm:", minutes));
+        sb.append(String.format("%02ds:", seconds));
+        sb.append(String.format("%03d:", milleSeconds));
+        sb.append(String.format("%03d:", microSeconds));
+        sb.append(String.format("%03d", nanoSeconds));
+
+        return sb.toString();
     }
 
     public static long median(List<Long> turnTimes) {

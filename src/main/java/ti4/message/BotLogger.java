@@ -117,7 +117,7 @@ public class BotLogger {
 
     /** Retreives either the event's guild's #bot-log channel, or, if that is null, the Primary server's #bot-log channel.
      */
-    private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
+    public static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
         TextChannel botLogChannel = null;
         if (event != null) {
             for (TextChannel textChannel : event.getGuild().getTextChannels()) {
