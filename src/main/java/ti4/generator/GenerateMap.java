@@ -2,6 +2,8 @@ package ti4.generator;
 
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
@@ -85,7 +87,7 @@ public class GenerateMap {
     private Player fowPlayer;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
 
-    private final boolean debug = true;
+    private final boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
     private long debugStartTime;
     private long debugTime;
     private long debugFowTime;
@@ -316,10 +318,13 @@ public class GenerateMap {
 
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
-            System.out.println("Total time to generate: " + total);
-            System.out.println("Frog time: " + debugFowTime + String.format("(%2.2f%%)", (double) debugFowTime / (double) total * 100.0));
-            System.out.println("Tile time: " + debugTileTime + String.format("(%2.2f%%)", (double) debugTileTime / (double) total * 100.0));
-            System.out.println("Info time: " + debugGameInfoTime + String.format("(%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0));
+            StringBuilder sb = new StringBuilder();
+            sb.append(" Total time to generate map " + activeGame.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
+            sb.append("   Frog time: " + Helper.getTimeRepresentationNanoSeconds(debugFowTime) + String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
+            sb.append("   Tile time: " + Helper.getTimeRepresentationNanoSeconds(debugTileTime) + String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
+            sb.append("   Info time: " + Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime) + String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            System.out.println(sb.toString());
+            MessageHelper.sendMessageToChannel((MessageChannelUnion) BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb.toString() + "\n```");
         }
 
         return jpgFile;
