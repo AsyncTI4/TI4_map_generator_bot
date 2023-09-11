@@ -1,6 +1,6 @@
 [
   {
-    "alias": "franken_1",
+    "alias": "franken1",
     "factionName": "Franken 1",
     "homeSystem": "",
     "startingFleet": "",
@@ -14,7 +14,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_2",
+    "alias": "franken2",
     "factionName": "Franken 2",
     "homeSystem": "",
     "startingFleet": "",
@@ -28,7 +28,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_3",
+    "alias": "franken3",
     "factionName": "Franken 3",
     "homeSystem": "",
     "startingFleet": "",
@@ -42,7 +42,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_4",
+    "alias": "franken4",
     "factionName": "Franken 4",
     "homeSystem": "",
     "startingFleet": "",
@@ -56,7 +56,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_5",
+    "alias": "franken5",
     "factionName": "Franken 5",
     "homeSystem": "",
     "startingFleet": "",
@@ -70,7 +70,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_6",
+    "alias": "franken6",
     "factionName": "Franken 6",
     "homeSystem": "",
     "startingFleet": "",
@@ -84,7 +84,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_7",
+    "alias": "franken7",
     "factionName": "Franken 7",
     "homeSystem": "",
     "startingFleet": "",
@@ -98,7 +98,7 @@
     "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
   },
   {
-    "alias": "franken_8",
+    "alias": "franken8",
     "factionName": "Franken 8",
     "homeSystem": "",
     "startingFleet": "",
