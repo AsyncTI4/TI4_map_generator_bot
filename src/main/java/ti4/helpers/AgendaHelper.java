@@ -1619,6 +1619,9 @@ public class AgendaHelper {
                 String votes = specificVote.substring(13, specificVote.indexOf("."));
                 if (Integer.parseInt(votes) >= currentHighest) {
                     if (Integer.parseInt(votes) == currentHighest) {
+                        if(winner == null){
+                            winner = new StringBuilder(outcome);
+                        }
                         winner.append("*").append(outcome);
                     } else {
                         currentHighest = Integer.parseInt(votes);
@@ -1631,6 +1634,9 @@ public class AgendaHelper {
         }
         if (currentHighest == 0) {
             return null;
+        }
+        if(winner == null){
+             winner = new StringBuilder(outcome);
         }
         return winner.toString();
     }

@@ -35,10 +35,12 @@ import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
+import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -284,11 +286,11 @@ public class Helper {
     }
 
     public static String getRoleMentionByName(Guild guild,  String roleName) {
-        if(roleName == null || guild.getRolesByName(roleName, true).isEmpty()){
+        if(roleName == null){
             return "@Oopsidoops no name";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
-        if (!roles.isEmpty()){
+        if (roles != null && !roles.isEmpty()){
             return roles.get(0).getAsMention();
         }
         return "[@" + roleName + "]";
@@ -1773,6 +1775,57 @@ public class Helper {
             return event.getGuild().getRolesByName(roleName, true).get(0);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+     public static void setOrder(Game activeGame){
+        
+        List<Integer> hsLocations = new ArrayList<Integer>();
+        LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
+        for(Player player : activeGame.getRealPlayers()){
+            Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+            if (tile == null) {
+                tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
+            }
+            if(player.getFaction().contains("ghost") && activeGame.getTile("17") != null){
+                tile = activeGame.getTile("17");
+            }
+            hsLocations.add(Integer.parseInt(tile.getPosition()));
+            unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
+        }
+        Collections.sort(hsLocations);
+        List<Player> sortedPlayers = new ArrayList<Player>();
+        for(Integer location : hsLocations){
+            sortedPlayers.add(unsortedPlayers.get(location));
+        }
+        LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
+        String msg = Helper.getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
+        try {
+            for(Player player : sortedPlayers){
+                new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
+                msg = msg + ButtonHelper.getTrueIdentity(player, activeGame) + " \n";
+            }
+            if (!players.isEmpty()) {
+                newPlayerOrder.putAll(players);
+            }
+            activeGame.setPlayers(newPlayerOrder);
+        } catch (Exception e){
+            activeGame.setPlayers(playersBackup);
+        }
+        msg = msg + "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+        
+    }
+    
+
+    public static void checkEndGame(Game activeGame, Player player){
+        if(player.getTotalVictoryPoints(activeGame) >= activeGame.getVp()){
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.add(Button.success("gameEnd", "End Game"));
+            buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
         }
     }
     public static Tile getTileFromPlanet(String planetName, Game activeGame) {

@@ -77,5 +77,6 @@ public class ScoreSO extends SOCardsSubcommandData {
         if(player.getLeaderIDs().contains("nomadcommander") && !player.hasLeaderUnlocked("nomadcommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "nomad", event);
         }
+        Helper.checkEndGame(activeGame, player);
     }
 }
