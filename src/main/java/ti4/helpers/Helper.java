@@ -493,14 +493,14 @@ public class Helper {
 
             case "admins" -> Emojis.AdminsFaction;
 
-            case "franken_1" -> Emojis.OneToe;
-            case "franken_2" -> Emojis.TwoToes;
-            case "franken_3" -> Emojis.ThreeToes;
-            case "franken_4" -> Emojis.FourToes;
-            case "franken_5" -> Emojis.FiveToes;
-            case "franken_6" -> Emojis.SixToes;
-            case "franken_7" -> Emojis.SevenToes;
-            case "franken_8" -> Emojis.EightToes;
+            case "franken1" -> Emojis.OneToe;
+            case "franken2" -> Emojis.TwoToes;
+            case "franken3" -> Emojis.ThreeToes;
+            case "franken4" -> Emojis.FourToes;
+            case "franken5" -> Emojis.FiveToes;
+            case "franken6" -> Emojis.SixToes;
+            case "franken7" -> Emojis.SevenToes;
+            case "franken8" -> Emojis.EightToes;
             
             default -> getRandomizedEmoji(0, null);
         };

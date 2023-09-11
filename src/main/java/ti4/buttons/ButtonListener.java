@@ -424,6 +424,9 @@ public class ButtonListener extends ListenerAdapter {
                     setstatus = false;
                 }
                 if (setstatus) {
+                    if(!player.getFollowedSCs().contains(scnum)){
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, activeGame);
+                    }
                     player.addFollowedSC(scnum);
                 }
                 MessageChannel channel = ButtonHelper.getSCFollowChannel(activeGame, player, scnum);
@@ -476,6 +479,9 @@ public class ButtonListener extends ListenerAdapter {
                         setstatus = false;
                     }
                     if (setstatus) {
+                        if(!player.getFollowedSCs().contains(scnum)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, activeGame);
+                        }
                         player.addFollowedSC(scnum);
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -1200,6 +1206,9 @@ public class ButtonListener extends ListenerAdapter {
             } else if (buttonID.startsWith("rider_")) {
                 AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
             } else if (buttonID.startsWith("construction_")) {
+                if(!player.getFollowedSCs().contains(4)){
+                    ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 4, activeGame);
+                }
                 player.addFollowedSC(4);
                 ButtonHelper.addReaction(event, false, false, "", "");
                 String unit = buttonID.replace("construction_", "");
@@ -1893,6 +1902,9 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     case "diploRefresh2" -> {
+                        if(!player.getFollowedSCs().contains(2)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 2, activeGame);
+                        }
                         player.addFollowedSC(2);
                         ButtonHelper.addReaction(event, false, false, "", "");
                         String message = trueIdentity + " Click the names of the planets you wish to ready";
@@ -1974,6 +1986,9 @@ public class ButtonListener extends ListenerAdapter {
                     }
 
                     case "leadershipGenerateCCButtons" -> {
+                        if(!player.getFollowedSCs().contains(1)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame);
+                        }
                         player.addFollowedSC(1);
                         ButtonHelper.addReaction(event, false, false, "", "");
                         String message = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player)
@@ -2046,6 +2061,9 @@ public class ButtonListener extends ListenerAdapter {
                             activeGame.drawSecretObjective(player.getUserID());
                             message = message + ". Drew a second SO due to plausible deniability";
                         }
+                        if(!player.getFollowedSCs().contains(8)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 8, activeGame);
+                        }
                         player.addFollowedSC(8);
                         SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -2056,6 +2074,9 @@ public class ButtonListener extends ListenerAdapter {
                             break;
                         }
                         String message = deductCC(player, event);
+                        if(!player.getFollowedSCs().contains(5)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
+                        }
                         player.addFollowedSC(5);
                         player.setCommodities(player.getCommoditiesTotal());
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -2087,6 +2108,9 @@ public class ButtonListener extends ListenerAdapter {
                             break;
                         }
                         String message = deductCC(player, event);
+                        if(!player.getFollowedSCs().contains(5)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
+                        }
                         player.addFollowedSC(5);
                         player.setCommodities(player.getCommoditiesTotal());
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -2094,11 +2118,17 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     case "sc_follow_leadership" -> {
                         String message = Helper.getPlayerPing(player) + " following.";
+                        if(!player.getFollowedSCs().contains(1)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame);
+                        }
                         player.addFollowedSC(1);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
                     case "sc_leadership_follow" -> {
                         String message = Helper.getPlayerPing(player) + " following.";
+                        if(!player.getFollowedSCs().contains(1)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame);
+                        }
                         player.addFollowedSC(1);
                         ButtonHelper.addReaction(event, false, false, message, "");
                     }
@@ -2108,6 +2138,9 @@ public class ButtonListener extends ListenerAdapter {
                             break;
                         }
                         player.setCommodities(player.getCommoditiesTotal());
+                        if(!player.getFollowedSCs().contains(5)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
+                        }
                         player.addFollowedSC(5);
                         ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                         ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
@@ -2123,6 +2156,9 @@ public class ButtonListener extends ListenerAdapter {
                         player.setTg(tg + commoditiesTotal);
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                         player.setCommodities(0);
+                        if(!player.getFollowedSCs().contains(5)){
+                            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
+                        }
                         player.addFollowedSC(5);
                         ButtonHelper.addReaction(event, false, false, "Replenishing and washing", "");
                         ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
@@ -2144,6 +2180,9 @@ public class ButtonListener extends ListenerAdapter {
                             setstatus = false;
                         }
                         if (setstatus) {
+                            if(!player.getFollowedSCs().contains(scnum)){
+                                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, activeGame);
+                            }
                             player.addFollowedSC(scnum);
                         }
                         ButtonHelper.addReaction(event, false, false, message, "");
