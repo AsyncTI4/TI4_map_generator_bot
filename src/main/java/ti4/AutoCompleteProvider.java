@@ -150,9 +150,10 @@ public class AutoCompleteProvider {
                 List<String> relicDeck = activeGame.getAllRelics();
                 tableRelics.addAll(relicDeck);
                 
+                Collections.shuffle(tableRelics);
+                
                 List<Command.Choice> options = tableRelics.stream()
                     .filter(value -> value.toLowerCase().contains(enteredValue))
-                    .sorted()
                     .limit(25)
                     .map(value -> new Command.Choice(value, value))
                     .collect(Collectors.toList());
@@ -165,7 +166,6 @@ public class AutoCompleteProvider {
 
                 List<Command.Choice> options = relics.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .sorted()
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                         .collect(Collectors.toList());
