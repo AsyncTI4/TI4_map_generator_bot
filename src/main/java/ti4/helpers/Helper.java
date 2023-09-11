@@ -1998,6 +1998,34 @@ public class Helper {
         return String.format("%02dh:%02dm:%02ds:%03d", hours, minutes, seconds, millis);
     }
 
+    public static String getTimeRepresentationNanoSeconds(long totalNanoSeconds) {
+        long totalMicroSeconds = totalNanoSeconds / 1000;
+        long totalMilliSeconds = totalMicroSeconds / 1000;
+        long totalSeconds = totalMilliSeconds / 1000;
+        long totalMinutes = totalSeconds / 60;
+        long totalHours = totalMinutes / 60;
+        long totalDays = totalHours /24;
+
+        long nanoSeconds = totalNanoSeconds % 1000;
+        long microSeconds = totalMicroSeconds % 1000;
+        long milleSeconds = totalMilliSeconds % 1000;
+        long seconds = totalSeconds % 60;
+        long minutes = totalMinutes % 60;
+        long hours = totalHours % 24;
+        long days = totalDays;
+
+        StringBuilder sb = new StringBuilder();
+        // sb.append(String.format("%d:", days));
+        // sb.append(String.format("%02dh:", hours));
+        // sb.append(String.format("%02dm:", minutes));
+        sb.append(String.format("%02ds:", seconds));
+        sb.append(String.format("%03d:", milleSeconds));
+        sb.append(String.format("%03d:", microSeconds));
+        sb.append(String.format("%03d", nanoSeconds));
+
+        return sb.toString();
+    }
+
     public static long median(List<Long> turnTimes) {
         List<Long> turnTimesSorted = new ArrayList<>(turnTimes);
         Collections.sort(turnTimesSorted);
