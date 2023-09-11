@@ -2443,7 +2443,7 @@
         "ability": "When you move this ship, apply +1 to the move value of each of your other ships during this tactical action."
     },
     {
-        "id": "olradin_mech_a",
+        "id": "olradin_mech",
         "baseType": "mech",
         "asyncId": "mf",
         "imageFileSuffix": "_mf.png",
@@ -2456,14 +2456,14 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If you have at least 2 “-” policies, flip this card. If this planet contains no more than 1 of your mechs, apply +1 to its resource value. "
+        "ability": "You have not selected your policies yet. This mech's ability depends on your policies.\nIf you have at least 2 “+” policies, and if this planet contains no more than 1 of your mechs, apply +1 to its influence value.\nIf you have at least 2 “-” policies, and if this planet contains no more than 1 of your mechs, apply +1 to its resource value."
     },
     {
-        "id": "olradin_mech_b",
+        "id": "olradin_mech_negative",
         "baseType": "mech",
         "asyncId": "mf",
         "imageFileSuffix": "_mf.png",
-        "name": "Exemplar",
+        "name": "Exemplar Malus (-)",
         "source": "ds",
         "faction": "Olradin",
         "capacityUsed": 1,
@@ -2472,7 +2472,23 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If you have at least 2 “+” policies, flip this card. If this planet contains no more than 1 of your mechs, apply +1 to its influence value."
+        "ability": "If this planet contains no more than 1 of your mechs, apply +1 to its resource value."
+    },
+    {
+        "id": "olradin_mech_positive",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "imageFileSuffix": "_mf.png",
+        "name": "Exemplar Bonum (+)",
+        "source": "ds",
+        "faction": "Olradin",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "If this planet contains no more than 1 of your mechs, apply +1 to its influence value."
     },
     {
         "id": "rohdhna_warsun",
