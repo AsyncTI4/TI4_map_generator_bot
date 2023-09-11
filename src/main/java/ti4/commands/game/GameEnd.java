@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -53,11 +54,16 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
 
+        secondHalfOfGameEnd(event, userActiveGame);
+    }
+    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame){
+        Game userActiveGame = activeGame;
+        String gameName = userActiveGame.getName();
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
         if (gameRoles.size() > 1) {
             MessageHelper.replyToMessage(event, "There are multiple roles that match this game name (" + gameName + "): " + gameRoles);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please call a @Bothelper to fix this before using `/game end`");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please call a @Bothelper to fix this before using `/game end`");
             return;
         } else if (gameRoles.size() == 0) {
             MessageHelper.replyToMessage(event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
@@ -65,23 +71,23 @@ public class GameEnd extends GameSubcommandData {
         }
 
         //ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), getActiveGame());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "This game's channels' permissions have been updated.");
+        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game's channels' permissions have been updated.");
 
         //DELETE THE ROLE
         if (deleteRole) {
             Role gameRole = gameRoles.get(0);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
             gameRole.delete().queue();
         }
 
         //POST GAME INFO
-        MessageHelper.sendMessageToChannel(event.getChannel(), "**Game: `" + gameName + "` has ended!**");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         userActiveGame.setHasEnded(true);
         userActiveGame.setEndedDate(new Date().getTime());
         GameSaveLoadManager.saveMap(userActiveGame, event);
         String gameEndText = getGameEndText(userActiveGame, event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), gameEndText);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         userActiveGame.setAutoPing(false);
         userActiveGame.setAutoPingSpacer(0);
         //SEND THE MAP IMAGE
@@ -115,7 +121,7 @@ public class GameEnd extends GameSubcommandData {
                 }
                 m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
                 String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             });
         }
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
@@ -143,7 +149,7 @@ public class GameEnd extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel, inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " is almost full. " + holytispoonMention + " - please make room soon!");
             }
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
-                MessageHelper.sendMessageToChannel(event.getChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
             } else {
                 String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
                 if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
@@ -168,15 +174,9 @@ public class GameEnd extends GameSubcommandData {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-
-        //DOWNLOAD CHANNEL BACKUP VIA CLI
-
-        //POST FILE TO BACKUP CHANNEL
-
-        //DELETE CHANNELS
     }
 
-    public static String getGameEndText(Game activeGame, SlashCommandInteractionEvent event) {
+    public static String getGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("__**").append(activeGame.getName()).append("**__ - ").append(activeGame.getCustomName()).append("\n");
         sb.append(activeGame.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate()));

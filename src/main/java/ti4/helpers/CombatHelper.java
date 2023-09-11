@@ -75,7 +75,7 @@ public class CombatHelper {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
+                .filter(entry -> entry.getKey() != null && entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
         Set<String> duplicates = new HashSet<>();

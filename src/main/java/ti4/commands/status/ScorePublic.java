@@ -74,6 +74,7 @@ public class ScorePublic extends StatusSubcommandData {
 		} else {
 			informAboutScoring(event, channel, activeGame, player, poID);
 		}
+		Helper.checkEndGame(activeGame, player);
 	}
 
 	public static String getNameNEMoji(Game activeGame, int poID){
