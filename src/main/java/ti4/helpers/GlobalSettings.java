@@ -10,12 +10,16 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import ti4.message.BotLogger;
+
 import java.util.Map;
 
 public class GlobalSettings {
 
     //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
     public enum ImplementedSettings {
+        DEBUG, //When true, additional show additional debug messages
         UPLOAD_DATA_TO_WEB_SERVER, //Whether or not to send map and data to the web server
         MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
         THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
@@ -53,7 +57,7 @@ public class GlobalSettings {
         try {
             writer.writeValue(getFile(), settings);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            BotLogger.log("Error saving Global Settings", e);
             e.printStackTrace();
         }
     }
@@ -67,10 +71,9 @@ public class GlobalSettings {
         try {
             settings = reader.readValue(Files.readString(getFile().toPath()), HashMap.class);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
