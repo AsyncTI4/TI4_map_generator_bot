@@ -2472,7 +2472,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If you have at least 2 “+” policies, flip this card. If this planet contains no more than 1 of your mechs, apply +1 to its resource value."
+        "ability": "If this planet contains no more than 1 of your mechs, apply +1 to its resource value."
     },
     {
         "id": "olradin_mech_positive",
@@ -2488,7 +2488,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "If you have at least 2 “-” policies, flip this card. If this planet contains no more than 1 of your mechs, apply +1 to its influence value."
+        "ability": "If this planet contains no more than 1 of your mechs, apply +1 to its influence value."
     },
     {
         "id": "rohdhna_warsun",

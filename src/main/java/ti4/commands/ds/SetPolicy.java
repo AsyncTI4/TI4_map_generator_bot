@@ -5,10 +5,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.AbilityInfo;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 public class SetPolicy extends DiscordantStarsSubcommandData {
 
@@ -26,7 +30,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
-        List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
+        // List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
         OptionMapping policy1 = event.getOption(Constants.SET_PEOPLE);
         OptionMapping policy2 = event.getOption(Constants.SET_ENVIRONMENT);
         OptionMapping policy3 = event.getOption(Constants.SET_ECONOMY);
@@ -168,19 +172,25 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             }
         }
 
-        player.removeOwnedUnitByID("oldradin_mech");
-        player.removeOwnedUnitByID("oldradin_mech_positive");
-        player.removeOwnedUnitByID("oldradin_mech_negative");
+        player.removeOwnedUnitByID("olradin_mech");
+        player.removeOwnedUnitByID("olradin_mech_positive");
+        player.removeOwnedUnitByID("olradin_mech_negative");
+        String unitModelID = null;
         if (positivePolicies >= 2) {
-            player.addOwnedUnitByID("oldradin_mech_positive");
-        } else if (negativePolicies >= 2) {
-            player.addOwnedUnitByID("oldradin_mech_negative");
+            unitModelID = "olradin_mech_positive";
+        } else if (negativePolicies > 2) {
+            unitModelID = "olradin_mech_negative";
         } else {
-            player.addOwnedUnitByID("oldradin_mech");
+            unitModelID = "olradin_mech";
         }
+        player.addOwnedUnitByID(unitModelID);
+        UnitModel unitModel = Mapper.getUnit(unitModelID);
+
+        AbilityInfo.sendAbilityInfo(activeGame, player, event);
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, List.of(unitModel.getUnitRepresentationEmbed(false)));
     }
 
-    public String convertChoice(String inputChoice) {
+    public static String convertChoice(String inputChoice) {
         if (inputChoice == null) {
             return null;
         }
