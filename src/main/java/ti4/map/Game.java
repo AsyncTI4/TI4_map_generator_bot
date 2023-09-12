@@ -2163,7 +2163,7 @@ public class Game {
         return relics;
     }
 
-    public void setRelics(ArrayList<String> deck) {
+    public void setRelics(List<String> deck) {
         deck = new ArrayList<>(deck);
         relics = deck;
     }

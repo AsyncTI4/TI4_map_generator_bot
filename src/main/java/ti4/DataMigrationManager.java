@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -50,6 +51,7 @@ public class DataMigrationManager {
             runMigration("migrateNullSCDeckToPoK_210823", DataMigrationManager::migrateNullSCDeckToPoK_210823);
             runMigration("migrateAbsolDeckIDs_210823", DataMigrationManager::migrateAbsolDeckIDs_210823);
             runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
+            runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -61,10 +63,39 @@ public class DataMigrationManager {
     /// <Description of how data is changing, and optionally what code fix it
     /// relates to>
     public static Boolean migrateExampleMigration_241223(Game game) {
+        boolean mapNeededMigrating = false;
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
-        return false;
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Example Migration method
+    /// Remove Enigmatic and DS Star Charts from Relic Decks - no longer required since Decks were implemented
+    public static Boolean migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923(Game game) {
+        boolean mapNeededMigrating = false;
+
+        // Legacy fake relics that no longer need to be included in the deck of cards to be added
+        List<String> relicDeck = new ArrayList<>(game.getAllRelics());
+        if (relicDeck.remove(Constants.ENIGMATIC_DEVICE)) mapNeededMigrating = true;
+        if (relicDeck.remove("starcharthazardous")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartcultural")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartindustrial")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartfrontier")) mapNeededMigrating = true;
+        game.setRelics(relicDeck);
+
+        // Underscores in explore ID
+        List<String> exploreDeck = new ArrayList<>(game.getAllExplores());
+        for (String exploreCard : exploreDeck) {
+            if (exploreCard.contains("_")) {
+                exploreDeck.remove(exploreCard);
+                exploreDeck.add(exploreCard.replaceAll("_", ""));
+                mapNeededMigrating = true;
+            }
+        }
+        game.setExploreDeck(exploreDeck);
+
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Player stats anchors implemented, but blown away all existing games.
