@@ -76,16 +76,15 @@ public class DataMigrationManager {
         boolean mapNeededMigrating = false;
 
         // Legacy fake relics that no longer need to be included in the deck of cards to be added
-        List<String> relicDeck = new ArrayList<>(game.getAllRelics());
+        List<String> relicDeck = game.getAllRelics();
         if (relicDeck.remove(Constants.ENIGMATIC_DEVICE)) mapNeededMigrating = true;
         if (relicDeck.remove("starcharthazardous")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartcultural")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartindustrial")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartfrontier")) mapNeededMigrating = true;
-        game.setRelics(relicDeck);
 
         // Underscores in explore ID
-        List<String> exploreDeck = new ArrayList<>(game.getAllExplores());
+        List<String> exploreDeck = game.getAllExplores();
         for (String exploreCard : exploreDeck) {
             if (exploreCard.contains("_")) {
                 exploreDeck.remove(exploreCard);
@@ -93,7 +92,6 @@ public class DataMigrationManager {
                 mapNeededMigrating = true;
             }
         }
-        game.setExploreDeck(exploreDeck);
 
         return mapNeededMigrating;
     }
