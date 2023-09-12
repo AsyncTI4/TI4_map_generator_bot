@@ -19,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -450,8 +451,7 @@ public class DataMigrationManager {
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
-            boolean endVPReachedButNotEnded = game.getPlayers().values().stream()
-                    .anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) {
                 continue;
             }
@@ -462,13 +462,13 @@ public class DataMigrationManager {
 
                 if (changesMade) {
                     migrationsAppliedThisTime.add(game.getName());
+                    GameSaveLoadManager.saveMap(game);
                 }
             }
         }
         if (migrationsAppliedThisTime.size() > 0) {
             String mapNames = String.join(", ", migrationsAppliedThisTime);
-            BotLogger.log(
-                    String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
+            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
         }
     }
 }
