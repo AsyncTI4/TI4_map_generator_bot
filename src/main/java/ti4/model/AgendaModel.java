@@ -11,6 +11,7 @@ public class AgendaModel implements ModelInterface {
     private String target;
     private String text1;
     private String text2;
+    private String mapText;
     private String source;
 
     public boolean isValid() {
@@ -47,14 +48,18 @@ public class AgendaModel implements ModelInterface {
         return text2;
     }
 
+    public String getMapText() {
+        return mapText;
+    }
+
     public String getSource() {
         return source;
     }
 
     public String getSourceEmoji() {
-      return switch (source) {
+      return switch (source.toLowerCase()) {
         case "absol" -> Emojis.Absol;
-        case "PoK" -> Emojis.Agenda;
+        case "pok" -> Emojis.Agenda;
         default -> Emojis.AsyncTI4Logo;
       };
     }
@@ -91,5 +96,9 @@ public class AgendaModel implements ModelInterface {
         if (footnote() != null) sb.append(footnote());
 
         return sb.toString();
+    }
+
+    public boolean displayElectedFaction() {
+        return "Elect Player".equalsIgnoreCase(target);
     }
 }
