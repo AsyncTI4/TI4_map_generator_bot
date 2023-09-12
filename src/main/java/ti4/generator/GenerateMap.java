@@ -379,14 +379,33 @@ public class GenerateMap {
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
+        int deltaX = 0;
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
         int deltaY = 35;
         int yDelta = 0;
 
+        // GAME MODES
+        deltaY = -150;
+        if (activeGame.isCompetitiveTIGLGame()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_TIGL.png");
+            deltaX += 100;
+        }
+        if (activeGame.isAbsolMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_Absol.png");
+            deltaX += 100;
+        }
+        if (activeGame.isDiscordantStarsMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
+            deltaX += 100;
+        }
+
+        // GAME FUN NAME
+        deltaY = 35;
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(activeGame.getCustomName(), 0, y);
 
+        // STRATEGY CARDS
         y = strategyCards(activeGame, y);
 
         int tempY = y;
@@ -1625,6 +1644,16 @@ public class GenerateMap {
 
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
+    private void drawGeneralImage(int x, int y, String resourceName) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            // BotLogger.log("Could not display play area: " + resourceName, e);
         }
     }
 
