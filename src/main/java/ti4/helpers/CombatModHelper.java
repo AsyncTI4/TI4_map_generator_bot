@@ -231,7 +231,20 @@ public class CombatModHelper {
         }
         if (StringUtils.isNotBlank(mod.getValueScalingType())) {
             switch (mod.getValueScalingType()) {
-                case Constants.FRAGMENT -> scalingCount = (long) player.getFragments().size();
+                case Constants.FRAGMENT -> {
+                    if(player.hasFoundCulFrag()){
+                        scalingCount += 1;
+                    }
+                    if(player.hasFoundHazFrag()){
+                        scalingCount += 1;
+                    }
+                    if(player.hasFoundIndFrag()){
+                        scalingCount += 1;
+                    }
+                    if(player.hasFoundUnkFrag()){
+                        scalingCount += 1;
+                    }
+                }
                 case Constants.LAW -> scalingCount = (long) activeGame.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
