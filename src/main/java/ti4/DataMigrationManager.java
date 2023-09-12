@@ -87,14 +87,16 @@ public class DataMigrationManager {
 
         // Underscores in explore ID
         List<String> exploreDeck = new ArrayList<>(game.getAllExplores());
+        List<String> badCards = new ArrayList<>();
         List<String> fixedCards = new ArrayList<>();
         for (String exploreCard : exploreDeck) {
             if (exploreCard.contains("_")) {
-                exploreDeck.remove(exploreCard);
+                badCards.add(exploreCard);
                 fixedCards.add(exploreCard.replaceAll("_", ""));
                 mapNeededMigrating = true;
             }
         }
+        exploreDeck.removeAll(badCards);
         exploreDeck.addAll(fixedCards);
         Collections.shuffle(exploreDeck);
         game.setExploreDeck(exploreDeck);
