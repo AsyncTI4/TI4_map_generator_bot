@@ -1815,7 +1815,7 @@ public class GenerateMap {
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);
             for (Player player : allPlayers) {
-                if (player.isPassed()) continue;
+                if (player.isPassed() || player.getSCs().size() == 0) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
                     String factionPath = getFactionPath(faction);
