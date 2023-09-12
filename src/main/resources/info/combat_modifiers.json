@@ -16,8 +16,7 @@
         "persistanceType": "ALWAYS",
         "scope": "",
         "related":[
-            {"type": "ability", "alias": "unrelenting"}, 
-            {"type":"relic", "alias":"starfall_array"},
+            {"type": "ability", "alias": "unrelenting"},
             {"type":"relic", "alias":"absol_thalnos"}
         ]
     },
