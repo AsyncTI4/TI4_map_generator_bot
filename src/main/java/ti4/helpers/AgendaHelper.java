@@ -1713,6 +1713,22 @@ public class AgendaHelper {
             voteCount += readyPlanetCount;
         }
 
+        // Olradin "Control" - +2 votes per cultural planet
+        if (player.hasAbility("policy_the_people_control")) {
+            List<String> cultPlanets = new ArrayList<>();
+            PlanetModel planetModel;
+            String planetType;
+            for (String cplanet : planets) {
+                planetModel = Mapper.getPlanet(cplanet);
+                if (planetModel == null) continue;
+                planetType = planetModel.getPlanetType().toString();
+                if (planetModel.getPlanetType().toString().equals(Constants.CULTURAL)) {
+                    cultPlanets.add(cplanet);
+                }
+            }
+            voteCount += (cultPlanets.size() * 2);
+        }
+
         return voteCount;
     }
 
