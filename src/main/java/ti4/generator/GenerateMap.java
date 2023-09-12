@@ -1796,7 +1796,7 @@ public class GenerateMap {
 
         //TURN ORDER
         String activePlayerUserID = activeGame.getActivePlayer();
-        if (activePlayerUserID != null && "action".equals(activeGame.getCurrentPhase())) {
+        if (!convertToGenericSC && activePlayerUserID != null && "action".equals(activeGame.getCurrentPhase())) {
             x += 450;
 
             graphics.setFont(Storage.getFont20());
