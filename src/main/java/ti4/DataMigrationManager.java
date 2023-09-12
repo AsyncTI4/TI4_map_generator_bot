@@ -54,6 +54,7 @@ public class DataMigrationManager {
             runMigration("migrateAbsolDeckIDs_210823", DataMigrationManager::migrateAbsolDeckIDs_210823);
             runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
             runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
+            runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -69,6 +70,13 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Shuffle the damn relic decks
+    public static Boolean migrateForceShuffleAllRelicsDecks_241223(Game game) {
+        boolean mapNeededMigrating = false;
+        Collections.shuffle(game.getAllRelics());
         return mapNeededMigrating;
     }
 
