@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -76,22 +77,27 @@ public class DataMigrationManager {
         boolean mapNeededMigrating = false;
 
         // Legacy fake relics that no longer need to be included in the deck of cards to be added
-        List<String> relicDeck = game.getAllRelics();
+        List<String> relicDeck = new ArrayList<>(game.getAllRelics());
         if (relicDeck.remove(Constants.ENIGMATIC_DEVICE)) mapNeededMigrating = true;
         if (relicDeck.remove("starcharthazardous")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartcultural")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartindustrial")) mapNeededMigrating = true;
         if (relicDeck.remove("starchartfrontier")) mapNeededMigrating = true;
+        game.setRelics(relicDeck);
 
         // Underscores in explore ID
-        List<String> exploreDeck = game.getAllExplores();
+        List<String> exploreDeck = new ArrayList<>(game.getAllExplores());
+        List<String> fixedCards = new ArrayList<>();
         for (String exploreCard : exploreDeck) {
             if (exploreCard.contains("_")) {
                 exploreDeck.remove(exploreCard);
-                exploreDeck.add(exploreCard.replaceAll("_", ""));
+                fixedCards.add(exploreCard.replaceAll("_", ""));
                 mapNeededMigrating = true;
             }
         }
+        exploreDeck.addAll(fixedCards);
+        Collections.shuffle(exploreDeck);
+        game.setExploreDeck(exploreDeck);
 
         return mapNeededMigrating;
     }
