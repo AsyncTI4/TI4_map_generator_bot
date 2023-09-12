@@ -914,7 +914,12 @@ public class GenerateMap {
             String abilityFileName = null;
             switch (abilityID) {
                 case "grace" -> abilityFileName = "pa_ds_edyn_grace";
-                // add additional displayed abilities here
+                case "policy_the_people_connect" -> abilityFileName = "pa_ds_olra_policy_cpos";
+                case "policy_the_people_control" -> abilityFileName = "pa_ds_olra_policy_cneg";
+                case "policy_the_environment_preserve" -> abilityFileName = "pa_ds_olra_policy_hpos";
+                case "policy_the_environment_plunder" -> abilityFileName = "pa_ds_olra_policy_hneg";
+                case "policy_the_economy_empower" -> abilityFileName = "pa_ds_olra_policy_ipos";
+                case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
             if (abilityFileName == null)
                 continue;
