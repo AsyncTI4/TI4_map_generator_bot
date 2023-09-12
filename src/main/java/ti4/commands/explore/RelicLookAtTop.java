@@ -17,11 +17,6 @@ public class RelicLookAtTop extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
         List<String> relicDeck = activeGame.getAllRelics();
-        relicDeck.remove(Constants.ENIGMATIC_DEVICE);
-        relicDeck.remove("starcharthazardous");
-        relicDeck.remove("starchartcultural");
-        relicDeck.remove("starchartindustrial");
-        relicDeck.remove("starchartfrontier");
         if (relicDeck.isEmpty()) {
             sendMessage("Relic deck is empty");
             return;
