@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1806,7 +1807,11 @@ public class GenerateMap {
             graphics.drawString("NEXT UP", x + 112, y + 34);
 
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
-            List<Player> allPlayers = activeGame.getRealPlayers();
+            List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
+            
+            Comparator<Player> comparator = Comparator.comparing(Player::getLowestSC);
+            allPlayers.sort(comparator);
+
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);
             for (Player player : allPlayers) {
