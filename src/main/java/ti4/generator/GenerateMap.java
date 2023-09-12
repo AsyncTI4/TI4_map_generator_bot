@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1786,10 +1787,51 @@ public class GenerateMap {
             }
             x += horizontalSpacingIncrement;
         }
+
+        //ROUND
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont64());
-        graphics.drawString("ROUND: " + activeGame.getRound(), x + 100, y);
+        x += 100;
+        graphics.drawString("ROUND: " + activeGame.getRound(), x, y);
 
+        //TURN ORDER
+        String activePlayerUserID = activeGame.getActivePlayer();
+        if (!convertToGenericSC && activePlayerUserID != null && "action".equals(activeGame.getCurrentPhase())) {
+            x += 450;
+
+            graphics.setFont(Storage.getFont20());
+            graphics.setColor(new Color(50, 230, 80));
+            graphics.drawString("ACTIVE", x + 10, y + 35);
+            graphics.setFont(Storage.getFont16());
+            graphics.setColor(Color.LIGHT_GRAY);
+            graphics.drawString("NEXT UP", x + 112, y + 34);
+
+            Player activePlayer = activeGame.getPlayer(activePlayerUserID);
+            List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
+            
+            Comparator<Player> comparator = Comparator.comparing(Player::getLowestSC);
+            allPlayers.sort(comparator);
+
+            int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
+            Collections.rotate(allPlayers, rotationDistance);
+            for (Player player : allPlayers) {
+                if (player.isPassed() || player.getSCs().size() == 0) continue;
+                String faction = player.getFaction();
+                if (faction != null) {
+                    String factionPath = getFactionPath(faction);
+                    if (factionPath != null) {
+                        BufferedImage bufferedImage;
+                        try {
+                            bufferedImage = ImageIO.read(new File(factionPath));
+                            graphics.drawImage(bufferedImage, x, y - 70, null);
+                            x += 100;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }            
+        }
         return y + 40;
     }
 
