@@ -101,9 +101,9 @@ public class GameSaveLoadManager {
         }
         
         if (activeGame.isDiscordantStarsMode()) {
-//            DiscordantStarsHelper.checkOlradinMech(activeMap);
             DiscordantStarsHelper.checkGardenWorlds(activeGame);
             DiscordantStarsHelper.checkSigil(activeGame);
+            DiscordantStarsHelper.checkOlradinMech(activeGame);
         }
 
         ObjectMapper mapper = new ObjectMapper();
