@@ -883,4 +883,7 @@ public class Constants {
     public static final String MEDIAN_TURN_TIME = "median_turn_time";
     public static final String SHOW_MEDIAN = "show_median";
     public static final String SHOW_AVERAGE_TURN_TIME = "show_average_turn_time";
+
+    public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
+    public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
 }
