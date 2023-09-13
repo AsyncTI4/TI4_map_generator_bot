@@ -134,18 +134,17 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
-
-        autoPingGames();
-
-        if (msg.getContentRaw().startsWith("[DELETE]")) {
-            msg.delete().queue();
+        try {      
+            if (msg.getContentRaw().startsWith("[DELETE]")) {
+                msg.delete().queue();
+            }
+            autoPingGames();
+            handleFoWWhispers(event, msg);
+            mapLog(event, msg);
+            saveJSONInTTPGExportsChannel(event);
+        } catch (Exception e) {
+            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-
-        handleFoWWhispers(event, msg);
-
-        mapLog(event, msg);
-
-        saveJSONInTTPGExportsChannel(event);
     }
 
     private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
