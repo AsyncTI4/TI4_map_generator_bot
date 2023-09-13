@@ -589,15 +589,51 @@ public class GenerateMap {
 
                 int soCount = objectivesSO(activeGame, yPlayArea + 150, player);
 
-                nombox(player, width - 450, yPlayArea);
+                int xDeltaFirstRowFromRightSide = 450;
+                int xDeltaSecondRowFromRightSide = 450;
+
+                nombox(player, width - xDeltaFirstRowFromRightSide, yPlayArea);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
                 if (!player.getPlanets().isEmpty()) {
                     xDeltaSecondRow = planetInfo(player, activeGame, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
+                
+                // REINFORCEMENTS
+                reinforcements(player, activeGame, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
 
+                // SLEEPER TOKENS
+                if (player.hasAbility("awaken")) {
+                    xDeltaSecondRowFromRightSide += 200;
+                    // paintNumber(unitID, x, y, remainingReinforcements, playerColor);
+
+                    String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
+                    BufferedImage bufferedImage = null;
+
+                    try {
+                        bufferedImage = ImageIO.read(new File(sleeperFile));
+                        if (bufferedImage != null) {
+                            List<Point> points = new ArrayList<>(){{
+                                add(new Point(0, 15));
+                                add(new Point(50, 0));
+                                add(new Point(100, 25));
+                                add(new Point(50, 50));
+                                add(new Point(10, 40));
+                            }};
+                            for (int i = 0; i < 5 - activeGame.getSleeperTokensPlacedCount(); i++) {
+                                Point point = points.get(i);
+                                graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide + point.x, yPlayAreaSecondRow + point.y, null);
+                            }
+                        }
+                    } catch (IOException e) {
+                        BotLogger.log("Could not read sleeper token file", e);
+                    }
+                }
+
+                // SPEAKER TOKEN
                 if (player.getUserID().equals(activeGame.getSpeaker())) {
+                    xDeltaSecondRowFromRightSide += 200;
                     String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
                     if (speakerFile != null) {
                         BufferedImage bufferedImage = null;
@@ -606,11 +642,9 @@ public class GenerateMap {
                         } catch (IOException e) {
                             BotLogger.log("Could not read speaker file", e);
                         }
-                        graphics.drawImage(bufferedImage, width - 650, yPlayAreaSecondRow + 25, null);
+                        graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 25, null);
                     }
                 }
-
-                reinforcements(player, activeGame, width - 450, yPlayAreaSecondRow, unitCount);
 
                 if (player.hasAbility("ancient_blueprints")) {
                     xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, activeGame);
