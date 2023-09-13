@@ -114,12 +114,9 @@ public class GameEnd extends GameSubcommandData {
         
         if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
+            FileUpload fileUpload = FileUpload.fromData(file);
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                try (FileUpload fileUpload = FileUpload.fromData(file)) {
-                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-                } catch (IOException e) {
-                    BotLogger.log(event, "Error from fileUpload: " + e.getMessage());
-                }
+                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
                 m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
                 String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
