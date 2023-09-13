@@ -327,4 +327,16 @@ public class Tile {
             return getTileID();
         }
     }
+
+    public List<String> getPlanetsWithPlayersSleeperTokens(Player player, Game activeGame) {
+        List<String> planetsWithSleepers = new ArrayList<>();
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet) {
+                if (planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)) {
+                    planetsWithSleepers.add(planet.getName());
+                }
+            }
+        }
+        return planetsWithSleepers;
+    }
 }
