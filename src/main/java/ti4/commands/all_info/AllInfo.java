@@ -16,6 +16,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.RelicInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.player.AbilityInfo;
+import ti4.commands.player.UnitInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -100,6 +101,7 @@ public class AllInfo implements Command {
         String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         AbilityInfo.sendAbilityInfo(activeGame, player);
+        UnitInfo.sendUnitInfo(activeGame, player);
         LeaderInfo.sendLeadersInfo(activeGame, player);
         TechInfo.sendTechInfo(activeGame, player);
         RelicInfo.sendRelicInfo(activeGame, player);
