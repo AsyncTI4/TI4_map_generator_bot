@@ -597,6 +597,19 @@ public class GenerateMap {
                     xDeltaSecondRow = planetInfo(player, activeGame, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
 
+                if (player.getUserID().equals(activeGame.getSpeaker())) {
+                    String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
+                    if (speakerFile != null) {
+                        BufferedImage bufferedImage = null;
+                        try {
+                            bufferedImage = ImageIO.read(new File(speakerFile));
+                        } catch (IOException e) {
+                            BotLogger.log("Could not read speaker file", e);
+                        }
+                        graphics.drawImage(bufferedImage, width - 650, yPlayAreaSecondRow + 25, null);
+                    }
+                }
+
                 reinforcements(player, activeGame, width - 450, yPlayAreaSecondRow, unitCount);
 
                 if (player.hasAbility("ancient_blueprints")) {
