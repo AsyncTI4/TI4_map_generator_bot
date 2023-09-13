@@ -17,6 +17,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -220,6 +221,11 @@ public class PlayAC extends ACCardsSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "Played action card: " + actionCardTitle);
 		}
+
+        var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.AC, acID);
+        if(posssibleCombatMod != null){
+            player.addNewTempCombatMod(posssibleCombatMod);
+        }
 
         ACInfo.sendActionCardInfo(activeMap, player);
         return null;

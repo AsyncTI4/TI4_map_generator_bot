@@ -1622,4 +1622,8 @@ public class Player {
     public void setTempCombatModifiers(List<TemporaryCombatModifierModel> tempMods){
         tempCombatModifiers = new ArrayList<TemporaryCombatModifierModel>(tempMods);
     }
+
+    public void addNewTempCombatMod(TemporaryCombatModifierModel newTempMod) {
+        newTempCombatModifiers.add(newTempMod);
+    }
 }

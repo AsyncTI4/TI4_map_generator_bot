@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -112,6 +113,13 @@ public class PlayPN extends PNCardsSubcommandData {
             // Add extra message for visibility
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
 		}
+        
+        //TODO: We dont currently have a constant or get a display name for PN 
+        //modifiers.
+        var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PN, acID);
+        if(posssibleCombatMod != null){
+            player.addNewTempCombatMod(posssibleCombatMod);
+        }
 
         sendMessage(sb.toString());
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false);

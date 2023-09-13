@@ -124,14 +124,16 @@ public class CombatHelper {
     }
 
     public static String RollForUnits(java.util.Map<UnitModel, Integer> units,
-            HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
+            HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player, Player opponent,
             Map activeMap) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
         mods.addAll(autoMods);
+        mods.addAll(tempMods);
         result += CombatModHelper.GetModifiersText("With automatic modifiers: \n", units, autoMods);
         result += CombatModHelper.GetModifiersText("With custom modifiers: \n", units, customMods);
+        result += CombatModHelper.GetModifiersText("With temprary modifiers: \n", units, tempMods);
 
         // Display extra rolls info
         List<UnitModel> unitsWithExtraRolls = units.keySet().stream()

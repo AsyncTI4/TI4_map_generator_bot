@@ -133,6 +133,21 @@ public class CombatModHelper {
         return currentRoundResults;
     }
 
+    public static TemporaryCombatModifierModel GetPossibleTempModifier(String relatedType, String relatedID){
+        TemporaryCombatModifierModel result = null;
+        var combatModifiers = Mapper.getCombatModifiers();
+        Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
+                    .filter(modifier -> modifier.isRelevantTo(relatedType, relatedID) 
+                        && (modifier.getPersistanceType().equals(Constants.MOD_TEMP_ONE_ROUND)
+                            || modifier.getPersistanceType().equals(Constants.MOD_TEMP_ONE_COMBAT)
+                            || modifier.getPersistanceType().equals(Constants.MOD_TEMP_ONE_TACTILE_ACTION)))
+                    .findFirst();
+        if(relevantMod.isPresent()){
+            result = new TemporaryCombatModifierModel(relatedType, relatedID, relevantMod.get());
+        }
+        return result;
+    }
+
     public static String GetModfierRelatedDisplayName(Player player, String relatedID, String relatedType){
         String displayName = "";
         switch (relatedType) {

@@ -136,6 +136,10 @@ public class CombatRoll extends SpecialSubcommandData {
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
         
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeMap);
+        
+        //Check for temp mods
+        CombatModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel, combatOnHolder);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
@@ -144,7 +148,7 @@ public class CombatRoll extends SpecialSubcommandData {
         String message = String.format("%s combat rolls for %s on %s %s:  \n",
                 StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
                 tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeMap);
+        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, tempMods, player, opponent, activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         message = StringUtils.removeEnd(message, ";\n");
