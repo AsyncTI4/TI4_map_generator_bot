@@ -2759,4 +2759,23 @@ public class Game {
     public int getFrontierExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.FRONTIER);
     }
+
+    public int getPlayersTurnSCInitiative(Player player) {
+        if (player.hasAbility("telepathic") && player.ownsPromissoryNote("gift") && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { //Naalu with gift in their hand
+            return 0;
+        } else if (player.getPromissoryNotesInPlayArea().contains("gift")) { //Someone with gift in their play area
+            return 0;
+        }
+
+        return player.getLowestSC();
+    }
+
+    private boolean otherPlayerInGameHasGiftInPlayArea(Player player) {
+        if (player.ownsPromissoryNote("gift") && player.getPromissoryNotes().containsKey("gift")) return false; //can't be in another play area if it's your card and in your hand
+        for (Player otherPlayer : getRealPlayers()) {
+            if (player.equals(otherPlayer)) continue; //don't check yourself
+            if (otherPlayer.getPromissoryNotesInPlayArea().contains("gift")) return true;
+        }
+        return false;
+    }
 }

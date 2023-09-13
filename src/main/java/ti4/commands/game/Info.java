@@ -82,7 +82,10 @@ public class Info extends GameSubcommandData {
         sb.append("Auto-Ping Time Interval (hrs): ").append(activeGame.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Text Size: ").append(activeGame.getLargeText()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(activeGame.getOutputVerbosity()).append(NEW_LINE);
-        sb.append("CC/Plastic warnings: ").append(activeGame.getCCNPlasticLimit()).append(NEW_LINE);
+        if (activeGame.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(activeGame.getTableTalkChannel().getAsMention()).append(NEW_LINE);
+        if (activeGame.getActionsChannel() != null) sb.append("Actions Channel: ").append(activeGame.getActionsChannel().getAsMention()).append(NEW_LINE);
+        if (activeGame.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(activeGame.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
+
         if (!privateGame) {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;

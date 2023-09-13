@@ -1838,7 +1838,7 @@ public class GenerateMap {
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
             
-            Comparator<Player> comparator = Comparator.comparing(Player::getLowestSC);
+            Comparator<Player> comparator = Comparator.comparing(p -> activeGame.getPlayersTurnSCInitiative(p));
             allPlayers.sort(comparator);
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
