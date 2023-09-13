@@ -110,6 +110,8 @@ public class GameEnd extends GameSubcommandData {
         message.append("\nPlease provide a summary of the game below:");
         String bothelperMention = Helper.getRoleMentionByName(MapGenerator.guildPrimary, "bothelper");
 
+        Helper.checkThreadLimitAndArchive(MapGenerator.guildPrimary);
+        
         if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
