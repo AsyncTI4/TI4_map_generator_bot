@@ -2778,4 +2778,16 @@ public class Game {
         }
         return false;
     }
+
+    public List<String> getAllPlanetsWithPlayersSleeperTokens(Player player) {
+        List<String> planetsWithSleepers = new ArrayList<>();
+        for(Tile tile : getTileMap().values()){
+            planetsWithSleepers.addAll(tile.getPlanetsWithPlayersSleeperTokens(player, this));
+        }
+        return planetsWithSleepers;
+    }
+
+    public int getPlayersSleeperTokensPlacedCount(Player player) {
+        return getAllPlanetsWithPlayersSleeperTokens(player).size();
+    }
 }
