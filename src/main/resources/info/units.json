@@ -3035,7 +3035,7 @@
         "moveValue": 2,
         "capacityValue": 1,
         "capacityUsed": 1,
-        "cost": 1,
+        "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
