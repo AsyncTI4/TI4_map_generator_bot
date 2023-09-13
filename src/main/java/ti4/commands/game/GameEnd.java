@@ -108,7 +108,7 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
-        String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
+        String bothelperMention = Helper.getRoleMentionByName(MapGenerator.guildPrimary, "bothelper");
 
         if(!activeGame.isFoWMode())
         {
