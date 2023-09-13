@@ -110,8 +110,7 @@ public class GameEnd extends GameSubcommandData {
         message.append("\nPlease provide a summary of the game below:");
         String bothelperMention = Helper.getRoleMentionByName(MapGenerator.guildPrimary, "bothelper");
 
-        if(!activeGame.isFoWMode())
-        {
+        if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                 try (FileUpload fileUpload = FileUpload.fromData(file)) {
@@ -124,19 +123,12 @@ public class GameEnd extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             });
         }
+
+        // GET BOTHELPER LOUNGE
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-        //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels == null){
-             return;
-        }
-        String threadName = "game-starts-and-ends";
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
-                MessageHelper.sendMessageToChannel(threadChannel_,
-                        "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-            }
+        if (bothelperLoungeChannel == null) {
+            BotLogger.log(event, "`#bothelper-lounge` channel not found - `/game end` cannot continue");
+            return;
         }
 
         //MOVE CHANNELS TO IN-LIMBO
@@ -171,6 +163,20 @@ public class GameEnd extends GameSubcommandData {
         if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
                 threadChannel.getManager().setArchived(true).queue();
+            }
+        }
+
+        // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
+        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+        if (threadChannels == null) {
+            BotLogger.log(event, "`#bothelper-lounge` did not have any threads open - `/game end` cannot continue");
+            return;
+        }
+        String threadName = "game-starts-and-ends";
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                MessageHelper.sendMessageToChannel(threadChannel_,
+                "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
             }
         }
     }
