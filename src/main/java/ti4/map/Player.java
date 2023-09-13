@@ -442,6 +442,7 @@ public class Player {
     public UnitModel getUnitByType(String unitType) {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
                 .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
                 .findFirst()
                 .orElse(null);
@@ -450,6 +451,7 @@ public class Player {
     public List<UnitModel> getUnitsByAsyncID(String asyncID) {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
+                .filter(Objects::nonNull)
                 .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
                 .toList();
     }
