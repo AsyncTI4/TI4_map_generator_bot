@@ -17,10 +17,8 @@ public class DiscordantStarsHelper {
                             if (player.getPlanets().contains(planet.getName())) {
                                 if (planet.hasGroundForces() && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                     planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                                } else {
-                                    if(!planet.hasGroundForces()){
-                                         planet.addToken(Constants.GARDEN_WORLDS_PNG);
-                                    }
+                                } else if (!planet.hasGroundForces()) {
+                                    planet.addToken(Constants.GARDEN_WORLDS_PNG);
                                 }
                             }
                         }
@@ -74,6 +72,7 @@ public class DiscordantStarsHelper {
 
     private static boolean oneMechCheck(String planetName, Game activeMap, Player player) {
         Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+        if (tile == null) return false;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         int numMechs = 0;
 
