@@ -2779,15 +2779,15 @@ public class Game {
         return false;
     }
 
-    public List<String> getAllPlanetsWithPlayersSleeperTokens(Player player) {
+    public List<String> getAllPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
         for(Tile tile : getTileMap().values()){
-            planetsWithSleepers.addAll(tile.getPlanetsWithPlayersSleeperTokens(player, this));
+            planetsWithSleepers.addAll(tile.getPlanetsWithSleeperTokens());
         }
         return planetsWithSleepers;
     }
 
-    public int getPlayersSleeperTokensPlacedCount(Player player) {
-        return getAllPlanetsWithPlayersSleeperTokens(player).size();
+    public int getSleeperTokensPlacedCount() {
+        return getAllPlanetsWithSleeperTokens().size();
     }
 }
