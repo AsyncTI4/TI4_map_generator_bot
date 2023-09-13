@@ -951,7 +951,7 @@ public class ButtonHelper {
     public static void doButtonsForSleepers(Player player, Game activeGame, Tile tile, ButtonInteractionEvent event) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
        
-        for(String planet : tile.getPlanetsWithPlayersSleeperTokens(player, activeGame)){
+        for(String planet : tile.getPlanetsWithSleeperTokens()){
             List<Button> planetsWithSleepers = new ArrayList<>();
             planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_pds_"+planet, "Replace sleeper on "+planet+ " with a pds."));
             if(getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4){
@@ -975,7 +975,7 @@ public class ButtonHelper {
     public static List<Button> getButtonsForRemovingASleeper(Player player, Game activeGame) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> planetsWithSleepers = new ArrayList<>();
-        for(String planet : activeGame.getAllPlanetsWithPlayersSleeperTokens(player)) {
+        for(String planet : activeGame.getAllPlanetsWithSleeperTokens()) {
             planetsWithSleepers.add(Button.success(finChecker+"removeSleeperFromPlanet_"+planet, "Remove the sleeper on "+planet+ "."));
         }
         planetsWithSleepers.add(Button.danger("deleteButtons", "Delete these buttons"));

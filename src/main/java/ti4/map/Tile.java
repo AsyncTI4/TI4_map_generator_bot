@@ -328,7 +328,7 @@ public class Tile {
         }
     }
 
-    public List<String> getPlanetsWithPlayersSleeperTokens(Player player, Game activeGame) {
+    public List<String> getPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             if (unitHolder instanceof Planet planet) {
