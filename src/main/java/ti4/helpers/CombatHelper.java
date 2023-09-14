@@ -58,18 +58,19 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, CombatRollType roleType){
-        switch(roleType){
-            case combatround: 
-                return GetUnitsInCombat(unitHolder,player, event);
-            case afb:
-                return GetUnitsInAFB(unitHolder, player, event);
+        return GetUnitsInCombatRound(unitHolder,player, event);
+        // switch(roleType){
+        //     case combatround: 
+        //         return GetUnitsInCombat(unitHolder,player, event);
+        //     case afb:
+        //         return GetUnitsInAFB(unitHolder, player, event);
 
-            default: 
-                return GetUnitsInCombat(unitHolder,player, event);
-        }
+        //     default: 
+        //         return GetUnitsInCombat(unitHolder,player, event);
+        // } TODO: Fix infiinte loop? 
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+    public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
