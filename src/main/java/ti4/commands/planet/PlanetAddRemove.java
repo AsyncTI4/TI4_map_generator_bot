@@ -57,7 +57,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        sendMessage(getActionHeaderMessage(activeGame, player) + resolveSpendAs(event, planetIDs) + ":");
+        sendMessage(getActionHeaderMessage(activeGame, player) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeGame);
@@ -97,12 +97,12 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     private String getActionHeaderMessage(Game activeGame, Player player) {
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" ");
         return switch (getActionID()) {
-            case Constants.PLANET_ADD -> message.append(" added planet(s)").toString();
-            case Constants.PLANET_REMOVE -> message.append(" removed planet(s)").toString();
-            case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s)").toString();
-            case Constants.PLANET_REFRESH -> message.append(" readied planet(s)").toString();
-            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability").toString();
-            case Constants.PLANET_REFRESH_ABILITY -> message.append(" readied the legendary ability").toString();
+            case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();
+            case Constants.PLANET_REMOVE -> message.append(" removed planet(s):").toString();
+            case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s):").toString();
+            case Constants.PLANET_REFRESH -> message.append(" readied planet(s):").toString();
+            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability:").toString();
+            case Constants.PLANET_REFRESH_ABILITY -> message.append(" readied the legendary ability:").toString();
             default -> "";
         };
     }
@@ -131,43 +131,5 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         } else {
             return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveGame());
         }
-    }
-
-    /** Customize the message to add what planets were exhausted for
-     * @param event - if "spend_as" option is used for "planet_exhaust"
-     * @return message describing what the planets were exhausted for
-     */
-    private String resolveSpendAs(SlashCommandInteractionEvent event, Set<String> planetIDs) {
-        OptionMapping option = event.getOption(Constants.SPEND_AS);
-        if (option != null) {
-            StringBuilder message = new StringBuilder(", spent as ");
-            String spendAs = option.getAsString();
-            int sum = 0;
-            switch (spendAs.toLowerCase()) {
-                case "r", "resources" -> {
-                    for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetResources(planetID, getActiveGame());
-                    }
-                    message.append(Helper.getResourceEmoji(sum)).append(" resources").toString();
-                }
-                case "i", "influence" -> {
-                    for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetInfluence(planetID, getActiveGame());
-                    }
-                    message.append(Helper.getInfluenceEmoji(sum)).append(" influence").toString();
-                }
-                case "v", "votes" -> message.append(" votes").toString();
-                case "t", "techskip" -> message.append(" a tech skip").toString();
-                case "toes" -> { //For HolyT
-                    for (String planetID : planetIDs) {
-                        sum += Helper.getPlanetInfluence(planetID, getActiveGame());
-                    }
-                    message.append(Helper.getToesEmoji(sum)).append(" toes").toString();
-                }
-                default -> message.append(spendAs).toString();
-            }
-            return message.toString();
-        }
-        return "";
     }
 }
