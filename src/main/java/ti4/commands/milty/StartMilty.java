@@ -53,6 +53,11 @@ public class StartMilty extends MiltySubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
+        if (!activeGame.isTestBetaFeaturesMode()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Milty Draft in this bot is incomplete.\nEnable access by running `/game setup beta_test_mode: true`\nMost folks use [this website](https://milty.shenanigans.be/) to do the Milty Draft and import the TTPG string with `/map add_tile_list`");
+            return;
+        }
+
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
         int sliceCount = activeGame.getPlayerCountForMap() + 2;
         if (sliceOption != null) {

@@ -78,6 +78,7 @@ public class Info extends GameSubcommandData {
         sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(activeGame.getFrontierExploreDeckSize()).append("/").append(activeGame.getFrontierExploreFullDeckSize()).append(NEW_LINE);
         
         sb.append("### Settings: ").append(NEW_LINE);
+        sb.append("Beta Test Mode: ").append(activeGame.isTestBetaFeaturesMode()).append(NEW_LINE);
         sb.append("Auto-Ping Time Interval (hrs): ").append(activeGame.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Text Size: ").append(activeGame.getLargeText()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(activeGame.getOutputVerbosity()).append(NEW_LINE);
