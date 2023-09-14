@@ -834,6 +834,21 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_PUBLIC_OBJECTIVES -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>(Mapper.getPublicObjectives());
+                        List<Command.Choice> options = publicObjectives.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
