@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
@@ -30,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
-        List<OptionMapping> options2 = event.getOptions();
+        // List<OptionMapping> allOptions = event.getOptions();
         String fullCommandName = event.getFullCommandName();
         String commandName = event.getName();
         String subCommandGroupName = event.getSubcommandGroup();
@@ -51,8 +52,9 @@ public class AutoCompleteProvider {
         }
 
         switch (commandName) {
-            case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, optionName, subCommandName);
+            case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
+            case Constants.HELP -> resolveHelpCommandAutoComplete(event, subCommandName, optionName);
         }
 
         switch (optionName) {
@@ -673,6 +675,25 @@ public class AutoCompleteProvider {
                                 .filter(value -> value.contains(enteredValue))
                                 .limit(25)
                                 .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void resolveHelpCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+        switch (subCommandName) {
+            case Constants.LIST_PLANETS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        List<PlanetModel> planets = new ArrayList<>(TileHelper.getAllPlanets().values());
+                        List<Command.Choice> options = planets.stream()
+                                .filter(value -> value.getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getName(), value.getId()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
