@@ -30,12 +30,12 @@ import org.apache.commons.lang3.StringUtils;
 public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
-        String optionName = event.getFocusedOption().getName();
         List<OptionMapping> options2 = event.getOptions();
         String fullCommandName = event.getFullCommandName();
         String commandName = event.getName();
         String subCommandGroupName = event.getSubcommandGroup();
         String subCommandName = event.getSubcommandName();
+        String optionName = event.getFocusedOption().getName();
 
         boolean showAllChoicesInGame = false;
         OptionMapping factionOrColourOption = event.getOption(Constants.FACTION_COLOR);
@@ -51,26 +51,7 @@ public class AutoCompleteProvider {
         }
 
         switch (commandName) {
-            case Constants.ADMIN -> {
-                switch (subCommandName) {
-                    case Constants.SET_SETTING -> {
-                        switch (optionName) {
-                            case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
-                            case Constants.SETTING_NAME -> {
-                                String enteredValue = event.getFocusedOption().getValue();
-                                List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(List.of(GlobalSettings.ImplementedSettings.values()));
-                                List<Command.Choice> options = settings.stream()
-                                        .map(setting -> setting.toString())
-                                        .filter(setting -> setting.contains(enteredValue))
-                                        .limit(25)
-                                        .map(setting -> new Command.Choice(setting, setting))
-                                        .collect(Collectors.toList());
-                                event.replyChoices(options).queue();
-                            }
-                        }
-                    }
-                }
-            }
+            case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, optionName, subCommandName);
         }
 
         switch (optionName) {
@@ -153,15 +134,6 @@ public class AutoCompleteProvider {
                         .filter(token -> token.contains(enteredValue))
                         .limit(25)
                         .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-            }
-            case Constants.GAME_STATUS -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("open", "locked")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
@@ -694,6 +666,27 @@ public class AutoCompleteProvider {
                         .map(token -> new Command.Choice(token, token))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+        }
+    }
+
+    private static void resolveAdminCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+        switch (subCommandName) {
+            case Constants.SET_SETTING -> {
+                switch (optionName) {
+                    case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
+                    case Constants.SETTING_NAME -> {
+                        String enteredValue = event.getFocusedOption().getValue();
+                        List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(List.of(GlobalSettings.ImplementedSettings.values()));
+                        List<Command.Choice> options = settings.stream()
+                                .map(setting -> setting.toString())
+                                .filter(setting -> setting.contains(enteredValue))
+                                .limit(25)
+                                .map(setting -> new Command.Choice(setting, setting))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
             }
         }
     }
