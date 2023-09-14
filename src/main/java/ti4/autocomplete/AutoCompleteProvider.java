@@ -727,6 +727,20 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_UNITS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, UnitModel> units = new HashMap<>(Mapper.getUnits());
+                        List<Command.Choice> options = units.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
