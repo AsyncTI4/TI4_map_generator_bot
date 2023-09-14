@@ -348,15 +348,6 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.SERVER -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("Primary", "Secondary")
-                        .filter(value -> value.toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-            }
             case Constants.CATEGORY -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Category> categories = new ArrayList<>();
