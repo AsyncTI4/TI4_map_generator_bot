@@ -804,6 +804,21 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_ACTION_CARDS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, ActionCardModel> actionCards = new HashMap<>(Mapper.getActionCards());
+                        List<Command.Choice> options = actionCards.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
