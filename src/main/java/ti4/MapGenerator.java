@@ -153,7 +153,6 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
         commandManager.addCommand(new MoveUnits());
-        commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
