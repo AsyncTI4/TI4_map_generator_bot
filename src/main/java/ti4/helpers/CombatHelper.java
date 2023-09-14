@@ -58,16 +58,16 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, CombatRollType roleType){
-        return GetUnitsInCombatRound(unitHolder,player, event);
-        // switch(roleType){
-        //     case combatround: 
-        //         return GetUnitsInCombat(unitHolder,player, event);
-        //     case afb:
-        //         return GetUnitsInAFB(unitHolder, player, event);
+        //return GetUnitsInCombatRound(unitHolder,player, event);
+        switch(roleType){
+            case combatround: 
+                return GetUnitsInCombatRound(unitHolder,player, event);
+            case afb:
+                return GetUnitsInAFB(unitHolder, player, event);
 
-        //     default: 
-        //         return GetUnitsInCombat(unitHolder,player, event);
-        // } TODO: Fix infiinte loop? 
+            default: 
+                return GetUnitsInCombatRound(unitHolder,player, event);
+        } 
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
