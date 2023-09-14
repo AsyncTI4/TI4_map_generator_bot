@@ -699,6 +699,20 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_TILES -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        List<TileModel> tiles = new ArrayList<>(TileHelper.getAllTiles().values());
+                        List<Command.Choice> options = tiles.stream()
+                                .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getName(), value.getName()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
