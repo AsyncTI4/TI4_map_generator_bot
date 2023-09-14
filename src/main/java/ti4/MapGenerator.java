@@ -265,7 +265,7 @@ public class MapGenerator {
             public void run() {
                 try {
                     MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
-                    readyToReceiveCommands = false;
+                    MapGenerator.readyToReceiveCommands = false;
                     MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
                     TimeUnit.SECONDS.sleep(2);
                     GameSaveLoadManager.saveMaps();
