@@ -1461,8 +1461,8 @@
     "alias": "ancient_data_archive",
     "name": "Ancient Data Archive",
     "phase": "Action",
-    "window": "Before a player draws a card from an exploration deck",
-    "text": "Look at the top 3 cards of that exploration deck; place 1 of those cards back on top of the deck and discard the rest.",
+    "window": "Before a player draws a card from an exploration deck or the relic deck",
+    "text": "Look at the top 3 cards of that deck; place 1 of those cards back on top of the deck and discard the rest.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -1551,8 +1551,8 @@
     "alias": "artifact_research",
     "name": "Artifact Research",
     "phase": "Action",
-    "window": "Action",
-    "text": "Purge 1 of your relic fragments and exhaust 1 of your planets that has a technology specialty. Then, research a technology of a type that matches that technology specialty.",
+    "window": "When you spend resources to research",
+    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may purge 1 relic fragment to research a technology.",
     "flavorText": "The observation team had protested with one voice, threatening to report to their respective governments and return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
   },
@@ -1560,8 +1560,8 @@
     "alias": "artifact_research2",
     "name": "Artifact Research",
     "phase": "Action",
-    "window": "Action",
-    "text": "Purge 1 of your relic fragments and exhaust 1 of your planets that has a technology specialty. Then, research a technology of a type that matches that technology specialty.",
+    "window": "When you spend resources to research",
+    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may purge 1 relic fragment to research a technology.",
     "flavorText": "The observation team had protested with one voice, threatening to report to their respective governments and return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
   },
@@ -1579,7 +1579,7 @@
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Purge any 2 of your relic fragments and spend 3 resources to gain 1 relic.",
+    "text": "Purge any 2 of your relic fragments to gain 1 relic.",
     "flavorText": "Carth breathed in the familiar air of Silver Sands. Home. Were it that he never had to leave. Were it that he was not here on such dark business.",
     "source": "action_deck_2"
   },
@@ -1588,7 +1588,7 @@
     "name": "Brilliant Tactician",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "You may redistribute any number of your command tokens on your command sheet; otherwise, draw 1 action card.",
+    "text": "You may redistribute any number of your command tokens on your command sheet; otherwise, draw 2 action cards.",
     "flavorText": "Sometimes the sum of foresight, fortune, and continuous effort coalesce into something greater. In this case, a rare opportunity that may very well change the tides of war.",
     "source": "action_deck_2"
   },
@@ -1597,7 +1597,7 @@
     "name": "Brutal Occupation",
     "phase": "Action",
     "window": "After you gain control of a planet",
-    "text": "Ready that planet or gain 2 commodities.",
+    "text": "Ready that planet and gain 2 commodities.",
     "flavorText": "Cabal cultists were known to quell threats of rebellion with stories of their penal colonies on the other side of the rift.",
     "source": "action_deck_2"
   },
@@ -1759,7 +1759,7 @@
     "name": "Defectors",
     "phase": "Action",
     "window": "Action",
-    "text": "Remove 1 of your neighbor's ships that does not have a capacity value from the game board. Then, place a matching unit from your reinforcements in any system containing your ships.",
+    "text": "Remove up to 2 of your neighbor's ships that do not have a capacity value from the game board. Then, place matching units from your reinforcements in any system containing your ships.",
     "flavorText": "“Then she was… assimilated… by the Letani after all.  Now, you… want me to… to… terminate her.” The operative's words struggled to come out, as she refused to process what she was being ordered to do. “What’s left of her,” said the Hacan, not unkindly.",
     "source": "action_deck_2"
   },
@@ -2199,8 +2199,8 @@
     "alias": "rigged_explosives",
     "name": "Rigged Explosives",
     "phase": "Action",
-    "window": "At the start of a combat round on a planet that contains your PDS",
-    "text": "For each of those PDS, you may destroy that unit to choose and destroy 1 of your opponent's units.",
+    "window": "At the start of a combat round on a planet that contains 1 of your structures",
+    "text": "You may destroy that structure to choose and destroy up to 2 of your opponent's units.",
     "flavorText": "In the distance, a huge explosion illuminated the sky. Brother Milor gripped the rails of his balcony as he watched. “These power plants were once bringers of life and light on this world. But now the light will be that of a thousand suns.”",
     "source": "action_deck_2"
   },
@@ -2245,7 +2245,7 @@
     "name": "Short-lived Clone",
     "phase": "Any",
     "window": "",
-    "text": "This card has the text ability of each player's agent, even if that agent is exhausted.",
+    "text": "This card has the text ability of each player's agent, even if that agent is exhausted. Before you discard this card, ready it.",
     "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
     "source": "action_deck_2"
   },
@@ -2317,7 +2317,7 @@
     "name": "Smuggler Routes",
     "phase": "Status",
     "window": "At the start of the status phase",
-    "text": "Choose 1 revealed public objective. During this status phase, when a player scores that objective, gain 1 trade good and you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
+    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, gain 1 trade good and you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
     "flavorText": "\"From Dirzuga to massive Letani, the whole symphony in every spore. You want infantry? I've got plenty. But who cares? No big deal. I want more... I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
@@ -2326,7 +2326,7 @@
     "name": "Space Mines",
     "phase": "Action",
     "window": "After another player activates a system",
-    "text": "Choose 1 system that contains your command token. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
+    "text": "Choose 1 system that contains your command token. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-4, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "Remnants of an age past, this forbidden means of warfare once brought galactic travel to a standstill.",
     "source": "action_deck_2"
   },
