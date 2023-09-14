@@ -789,6 +789,21 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_AGENDAS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, AgendaModel> agendas = new HashMap<>(Mapper.getAgendas());
+                        List<Command.Choice> options = agendas.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
