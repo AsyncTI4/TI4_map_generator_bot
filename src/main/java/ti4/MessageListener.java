@@ -289,7 +289,7 @@ public class MessageListener extends ListenerAdapter {
                         String newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone said: " + message2;
                         if(event.getAuthor().isBot() && message2.contains("Total hits ")){
                             String hits = StringUtils.substringAfter(message2, "Total hits ");
-                            String location = StringUtils.substringBefore(message2, "combat")+"**";
+                            String location = StringUtils.substringBefore(message2, "rolls for");
                             newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
                         }
                         newMessage = newMessage.replace("Total hits", "");
