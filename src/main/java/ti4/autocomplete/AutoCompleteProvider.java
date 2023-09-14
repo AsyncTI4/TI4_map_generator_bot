@@ -52,6 +52,7 @@ public class AutoCompleteProvider {
 
         switch (commandName) {
             case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, optionName, subCommandName);
+            case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
         }
 
         switch (optionName) {
@@ -397,36 +398,6 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-           case Constants.SET_PEOPLE -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("Connect", "Control","+","-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-
-            }
-            case Constants.SET_ENVIRONMENT -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("Preserve", "Plunder","+","-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-
-            }
-            case Constants.SET_ECONOMY -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("Empower", "Exploit","+","-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-
-            }
             case Constants.ABILITY, Constants.ABILITY_1, Constants.ABILITY_2, Constants.ABILITY_3, Constants.ABILITY_4, Constants.ABILITY_5 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
@@ -659,12 +630,49 @@ public class AutoCompleteProvider {
                     case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
                     case Constants.SETTING_NAME -> {
                         String enteredValue = event.getFocusedOption().getValue();
-                        List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(List.of(GlobalSettings.ImplementedSettings.values()));
+                        List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(
+                                List.of(GlobalSettings.ImplementedSettings.values()));
                         List<Command.Choice> options = settings.stream()
                                 .map(setting -> setting.toString())
                                 .filter(setting -> setting.contains(enteredValue))
                                 .limit(25)
                                 .map(setting -> new Command.Choice(setting, setting))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void resolveDiscordantStarsCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+        switch (subCommandName) {
+            case Constants.SET_POLICY -> {
+                switch (optionName) {
+                    case Constants.SET_PEOPLE -> {
+                        String enteredValue = event.getFocusedOption().getValue();
+                        List<Command.Choice> options = Stream.of("Connect", "Control", "+", "-")
+                                .filter(value -> value.contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                    case Constants.SET_ENVIRONMENT -> {
+                        String enteredValue = event.getFocusedOption().getValue();
+                        List<Command.Choice> options = Stream.of("Preserve", "Plunder", "+", "-")
+                                .filter(value -> value.contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                    case Constants.SET_ECONOMY -> {
+                        String enteredValue = event.getFocusedOption().getValue();
+                        List<Command.Choice> options = Stream.of("Empower", "Exploit", "+", "-")
+                                .filter(value -> value.contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
