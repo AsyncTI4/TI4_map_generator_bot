@@ -273,6 +273,7 @@ public class MapGenerator {
                     MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
                     mainThread.join();
                 } catch (Exception e) {
+                    MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
