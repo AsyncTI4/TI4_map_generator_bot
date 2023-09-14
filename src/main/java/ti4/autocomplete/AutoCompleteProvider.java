@@ -707,7 +707,8 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = tiles.stream()
                                 .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getName(), value.getName()))
+                                .map(value -> value.getName())
+                                .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -721,7 +722,8 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = leaders.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getKey(), value.getKey()))
+                                .map(value -> value.getKey())
+                                .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -735,7 +737,38 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = units.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+            case Constants.LIST_TECHS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
+                        List<Command.Choice> options = techs.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+            case Constants.LIST_ABILITIES -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, String> abilities = new HashMap<>(Mapper.getFactionAbilities());
+                        List<Command.Choice> options = abilities.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getKey())
+                                .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
