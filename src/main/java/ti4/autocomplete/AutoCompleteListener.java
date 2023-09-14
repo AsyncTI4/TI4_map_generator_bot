@@ -2,12 +2,11 @@ package ti4.autocomplete;
 
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.AutoCompleteProvider;
 import ti4.MapGenerator;
 import ti4.message.BotLogger;
 
 public class AutoCompleteListener extends ListenerAdapter {
-    
+
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
         if (!MapGenerator.readyToReceiveCommands) {
