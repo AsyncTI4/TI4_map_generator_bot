@@ -229,10 +229,6 @@ public class GameSaveLoadManager {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
-        writer.write(activeGame.getGameStatus());
-        writer.write(System.lineSeparator());
-
-
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
