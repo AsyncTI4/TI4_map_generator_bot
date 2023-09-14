@@ -338,6 +338,7 @@ public class Emojis {
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
+    public static final String BLT = "<:BLT:1080954650339065866>";
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols =
