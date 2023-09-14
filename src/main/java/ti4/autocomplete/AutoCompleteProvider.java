@@ -30,6 +30,16 @@ public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
+        List<OptionMapping> options2 = event.getOptions();
+        String fullCommandName = event.getFullCommandName();
+        String commandName = event.getName();
+        String subCommandGroupName = event.getSubcommandGroup();
+        String subCommandName = event.getSubcommandName();
+
+        boolean showAllChoicesInGame = false;
+        OptionMapping factionOrColourOption = event.getOption(Constants.FACTION_COLOR);
+        if (factionOrColourOption != null) showAllChoicesInGame = true;
+
         String userID = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
