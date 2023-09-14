@@ -85,7 +85,7 @@ public class ShowGame implements Command {
     }
 
     public static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event) {
-        simpleShowGame(activeGame, event, DisplayType.map);
+        simpleShowGame(activeGame, event, DisplayType.all);
     }
 
     private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
