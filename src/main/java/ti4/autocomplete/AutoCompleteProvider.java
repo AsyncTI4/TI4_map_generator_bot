@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.generator.Mapper;
@@ -49,19 +50,30 @@ public class AutoCompleteProvider {
             player = Helper.getGamePlayer(activeGame, player, event, null);
         }
 
-        switch (optionName) {
-            case Constants.SETTING_TYPE -> event.replyChoiceStrings("string","number","bool").queue();
-            case Constants.SETTING_NAME -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(List.of(GlobalSettings.ImplementedSettings.values()));
-                List<Command.Choice> options = settings.stream()
-                        .map(setting -> setting.toString())
-                        .filter(setting -> setting.startsWith(enteredValue))
-                        .limit(25)
-                        .map(setting -> new Command.Choice(setting, setting))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+        switch (commandName) {
+            case Constants.ADMIN -> {
+                switch (subCommandName) {
+                    case Constants.SET_SETTING -> {
+                        switch (optionName) {
+                            case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
+                            case Constants.SETTING_NAME -> {
+                                String enteredValue = event.getFocusedOption().getValue();
+                                List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(List.of(GlobalSettings.ImplementedSettings.values()));
+                                List<Command.Choice> options = settings.stream()
+                                        .map(setting -> setting.toString())
+                                        .filter(setting -> setting.contains(enteredValue))
+                                        .limit(25)
+                                        .map(setting -> new Command.Choice(setting, setting))
+                                        .collect(Collectors.toList());
+                                event.replyChoices(options).queue();
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        switch (optionName) {
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
