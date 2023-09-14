@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.player.AbilityInfo;
+import ti4.commands.special.CombatRoll;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -75,9 +77,13 @@ public class CombatModHelper {
     public static List<NamedCombatModifierModel> CalculateAutomaticMods(Player player, Player opponent,
             Map<UnitModel, Integer> unitsByQuantity,
             TileModel tile,
-            Game activeGame) {
+            Game activeGame,
+            CombatRollType rollType) {
         List<NamedCombatModifierModel> alwaysOnMods = new ArrayList<>();
-        HashMap<String, CombatModifierModel> combatModifiers = Mapper.getCombatModifiers();
+        HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
+        combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
+                            .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString())) 
+                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (String ability : player.getAbilities()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()

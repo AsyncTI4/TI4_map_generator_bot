@@ -57,7 +57,20 @@ public class CombatHelper {
         return output;
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, CombatRollType roleType){
+        return GetUnitsInCombatRound(unitHolder,player, event);
+        // switch(roleType){
+        //     case combatround: 
+        //         return GetUnitsInCombat(unitHolder,player, event);
+        //     case afb:
+        //         return GetUnitsInAFB(unitHolder, player, event);
+
+        //     default: 
+        //         return GetUnitsInCombat(unitHolder,player, event);
+        // } TODO: Fix infiinte loop? 
+    }
+
+    public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
@@ -71,12 +84,59 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
+                .filter(entry -> entry.getKey() != null &&  entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getIsGroundForce() != null && entry.getKey().getIsGroundForce())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        }
+        Set<String> duplicates = new HashSet<>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
+        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
+
+        // Gracefully fail when units don't exist
+        StringBuilder error = new StringBuilder();
+        if (missing.size() > 0) {
+            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
+            error.append(" Ping bothelper if this seems to be in error.\n");
+            error.append("> Unowned units: ").append(missing).append("\n");
+        }
+        if (dupes.size() > 0) {
+            error.append("You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+            error.append("> Duplicate units: ").append(dupes);
+        }   
+        if (missing.size() > 0 || dupes.size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        }
+
+        return output;
+    }
+
+    public static HashMap<UnitModel, Integer> GetUnitsInAFB(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+        String colorID = Mapper.getColorID(player.getColor());
+        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
+            entry -> new ImmutablePair<>
+                (
+                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    entry.getValue()
+                )
+        ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output;
+        if (unitHolder.getName().equals(Constants.SPACE)) {
+            output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
+                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        } else {
+            output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
         }
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
@@ -124,7 +184,7 @@ public class CombatHelper {
 
     public static String RollForUnits(Map<UnitModel, Integer> units,
             HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
-            Game activeGame) {
+            Game activeGame, CombatRollType rollType) {
         String result = "";
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
@@ -158,13 +218,13 @@ public class CombatHelper {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
-            int toHit = unit.getCombatHitsOn();
+            int toHit = unit.getCombatDieHitsOnForAbility(rollType);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeGame);
             int extraRollsForUnit = 0;
             if (extraRolls.containsKey(unit.getAsyncId())) {
                 extraRollsForUnit = extraRolls.get(unit.getAsyncId());
             }
-            int numRollsPerUnit = unit.getCombatDieCount();
+            int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             int[] resultRolls = new int[numRolls];
             for (int index = 0; index < numRolls; index++) {
@@ -185,8 +245,8 @@ public class CombatHelper {
             }
 
             String unitTypeHitsInfo = String.format("hits on %s", toHit);
-            if (unit.getCombatDieCount() > 1) {
-                unitTypeHitsInfo = String.format("%s rolls, hits on %s", unit.getCombatDieCount(), toHit);
+            if (unit.getCombatDieCountForAbility(rollType) > 1) {
+                unitTypeHitsInfo = String.format("%s rolls, hits on %s", unit.getCombatDieCountForAbility(rollType), toHit);
             }
             if (modifierToHit != 0) {
                 String modifierToHitString = Integer.toString(modifierToHit);
@@ -197,15 +257,15 @@ public class CombatHelper {
                 if ((toHit - modifierToHit) <= 1) {
                     unitTypeHitsInfo = String.format("always hits (%s mods)",
                             modifierToHitString);
-                    if (unit.getCombatDieCount() > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, always hits (%s mods)", unit.getCombatDieCount(),
+                    if (unit.getCombatDieCountForAbility(rollType) > 1) {
+                        unitTypeHitsInfo = String.format("%s rolls, always hits (%s mods)", unit.getCombatDieCountForAbility(rollType),
                                 modifierToHitString);
                     }
                 } else {
                     unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifierToHit),
                             modifierToHitString);
-                    if (unit.getCombatDieCount() > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, hits on %s (%s mods)", unit.getCombatDieCount(),
+                    if (unit.getCombatDieCountForAbility(rollType) > 1) {
+                        unitTypeHitsInfo = String.format("%s rolls, hits on %s (%s mods)", unit.getCombatDieCountForAbility(rollType),
                                 (toHit - modifierToHit), modifierToHitString);
                     }
                 }

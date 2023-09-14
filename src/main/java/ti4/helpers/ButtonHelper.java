@@ -920,17 +920,7 @@ public class ButtonHelper {
             new UnlockLeader().unlockLeader(event, faction + "commander", activeGame, player);
         }
     }
-    public static List<String> getPlanetsWithSleeperTokens(Player player, Game activeGame, Tile tile) {
-        List<String> planetsWithSleepers = new ArrayList<>();
-        for(UnitHolder unitHolder :tile.getUnitHolders().values()){
-            if(unitHolder instanceof Planet planet){
-                if(planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)){
-                    planetsWithSleepers.add(planet.getName());
-                }
-            }
-        }
-        return planetsWithSleepers;
-    }
+
     public static int getAmountOfSpecificUnitsOnPlanets(Player player, Game activeGame, String unit) {
         int num = 0;
         for(Tile tile : activeGame.getTileMap().values()){
@@ -946,7 +936,6 @@ public class ButtonHelper {
         return num;
     }
     
-    
     public static List<String> getPlanetsWithSpecificUnit(Player player, Game activeGame, Tile tile,String unit) {
         List<String> planetsWithUnit = new ArrayList<>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
@@ -958,17 +947,11 @@ public class ButtonHelper {
         }
         return planetsWithUnit;
     }
-    public static List<String> getAllPlanetsWithSleeperTokens(Player player, Game activeGame) {
-        List<String> planetsWithSleepers = new ArrayList<>();
-        for(Tile tile : activeGame.getTileMap().values()){
-            planetsWithSleepers.addAll(getPlanetsWithSleeperTokens(player, activeGame, tile));
-        }
-        return planetsWithSleepers;
-    }
+
     public static void doButtonsForSleepers(Player player, Game activeGame, Tile tile, ButtonInteractionEvent event) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
        
-        for(String planet : getPlanetsWithSleeperTokens(player, activeGame, tile)){
+        for(String planet : tile.getPlanetsWithSleeperTokens()){
             List<Button> planetsWithSleepers = new ArrayList<>();
             planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_pds_"+planet, "Replace sleeper on "+planet+ " with a pds."));
             if(getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4){
@@ -992,7 +975,7 @@ public class ButtonHelper {
     public static List<Button> getButtonsForRemovingASleeper(Player player, Game activeGame) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> planetsWithSleepers = new ArrayList<>();
-        for(String planet : getAllPlanetsWithSleeperTokens(player, activeGame)){
+        for(String planet : activeGame.getAllPlanetsWithSleeperTokens()) {
             planetsWithSleepers.add(Button.success(finChecker+"removeSleeperFromPlanet_"+planet, "Remove the sleeper on "+planet+ "."));
         }
         planetsWithSleepers.add(Button.danger("deleteButtons", "Delete these buttons"));
@@ -1349,6 +1332,7 @@ public class ButtonHelper {
             }
             if(nameOfHolder.equalsIgnoreCase("space")){
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
+                //buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName()+"_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
             }else{
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
             }
@@ -1938,7 +1922,18 @@ public class ButtonHelper {
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
         String unitHolderName = idInfo[2];
-        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>());
+        CombatRollType rollType = CombatRollType.combatround;
+        if(idInfo.length > 3){
+            String rollTypeString = idInfo[3];
+            switch (rollTypeString) {
+                case "afb":
+                    rollType = CombatRollType.afb;
+                    break;
+                default:
+                    break;
+            }
+        }
+        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>(), rollType);
     }
     public static MessageChannel getCorrectChannel(Player player, Game activeGame){
         if(activeGame.isFoWMode()){

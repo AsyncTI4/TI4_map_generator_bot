@@ -7,7 +7,8 @@
         "scope": "",
         "related":[
             {"type": "ability", "alias": "fragile"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_always_all",
@@ -18,7 +19,8 @@
         "related":[
             {"type": "ability", "alias": "unrelenting"},
             {"type":"relic", "alias":"absol_thalnos"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus2_2_matching_non_ff",
@@ -29,7 +31,8 @@
         "scope": "",
         "related":[
             {"type": "ability", "alias": "rule_of_two"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_always_fighter",
@@ -39,7 +42,8 @@
         "persistanceType": "ALWAYS",
         "related":[
             {"type": "agenda", "alias":"prophecy"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_frag_always_flagship",
@@ -50,7 +54,8 @@
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "bentor_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_law_always_flagship",
@@ -61,7 +66,8 @@
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "edyn_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_po_others_scored_always_mech",
@@ -72,7 +78,8 @@
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "kyro_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_half_unit_tech_always_mech",
@@ -84,7 +91,8 @@
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "mirveda_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2x_destroyers_always_flagship",
@@ -96,7 +104,8 @@
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "nokar_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_1_always_other_units_with_flagship",
@@ -107,7 +116,8 @@
         "scopeExcept":"fs",
         "related":[
             {"type": "unit", "alias": "sardakk_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_opponent_unit_tech_always_flagship",
@@ -118,7 +128,8 @@
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "zealots_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_cc_not_in_fleet_flagship",
@@ -129,7 +140,8 @@
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "mahact_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_opponent_faction_tech_always_mech",
@@ -140,7 +152,8 @@
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "zealots_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_frag_conditional_mech",
@@ -151,7 +164,8 @@
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "naalu_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_1_inf_with_mech",
@@ -162,7 +176,8 @@
         "scope": "gf",
         "related":[
             {"type": "unit", "alias": "jolnar_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
@@ -173,7 +188,8 @@
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "nekro_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_mr_legendary_home_conditional",
@@ -184,6 +200,31 @@
         "scope": "",
         "related":[
             {"type": "leader", "alias": "winnucommander"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
+    }, 
+    {
+        "alias": "plus_1_always_afb",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "leader", "alias": "kolumecommander"},
+            {"type": "relic", "alias": "starfall_array"}
+        ], 
+        "forCombatAbility": "afb"
+    }, 
+    {
+        "alias": "plus_x_frag_always_flagship_afb",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistanceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "bentor_flagship"}
+        ], 
+        "forCombatAbility": "afb"
     }
 ]

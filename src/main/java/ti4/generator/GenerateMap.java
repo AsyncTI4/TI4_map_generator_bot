@@ -587,17 +587,23 @@ public class GenerateMap {
                 y += 85;
                 y += 200;
 
-                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);
-
-                nombox(player, width - 450, yPlayArea);
-
+                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);             
+                
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
                 if (!player.getPlanets().isEmpty()) {
                     xDeltaSecondRow = planetInfo(player, activeGame, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
-
-                reinforcements(player, activeGame, width - 450, yPlayAreaSecondRow, unitCount);
+                
+                int xDeltaFirstRowFromRightSide = 0;
+                int xDeltaSecondRowFromRightSide = 0;
+                // FIRST ROW RIGHT SIDE
+                xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
+                
+                // SECOND ROW RIGHT SIDE
+                xDeltaSecondRowFromRightSide = reinforcements(player, activeGame, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
+                xDeltaSecondRowFromRightSide = sleeperTokens(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
+                xDeltaSecondRowFromRightSide = speakerToken(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
 
                 if (player.hasAbility("ancient_blueprints")) {
                     xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, activeGame);
@@ -636,6 +642,53 @@ public class GenerateMap {
 
             }
         }
+    }
+
+    private int speakerToken(Game activeGame, Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
+        if (player.getUserID().equals(activeGame.getSpeaker())) {
+            xDeltaSecondRowFromRightSide += 200;
+            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
+            if (speakerFile != null) {
+                BufferedImage bufferedImage = null;
+                try {
+                    bufferedImage = ImageIO.read(new File(speakerFile));
+                } catch (IOException e) {
+                    BotLogger.log("Could not read speaker file", e);
+                }
+                graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 25, null);
+            }
+        }
+        return xDeltaSecondRowFromRightSide;
+    }
+
+    private int sleeperTokens(Game activeGame, Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
+        if (player.hasAbility("awaken")) {
+            xDeltaSecondRowFromRightSide += 200;
+            // paintNumber(unitID, x, y, remainingReinforcements, playerColor);
+
+            String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
+            BufferedImage bufferedImage = null;
+
+            try {
+                bufferedImage = ImageIO.read(new File(sleeperFile));
+                if (bufferedImage != null) {
+                    List<Point> points = new ArrayList<>(){{
+                        add(new Point(0, 15));
+                        add(new Point(50, 0));
+                        add(new Point(100, 25));
+                        add(new Point(50, 50));
+                        add(new Point(10, 40));
+                    }};
+                    for (int i = 0; i < 5 - activeGame.getSleeperTokensPlacedCount(); i++) {
+                        Point point = points.get(i);
+                        graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide + point.x, yPlayAreaSecondRow + point.y, null);
+                    }
+                }
+            } catch (IOException e) {
+                BotLogger.log("Could not read sleeper token file", e);
+            }
+        }
+        return xDeltaSecondRowFromRightSide;
     }
 
     private int bentorBluePrintInfo(Player player, int x, int y, Game activeGame) {
@@ -961,8 +1014,9 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private void reinforcements(Player player, Game activeGame, int x, int y, HashMap<String, Integer> unitCount) {
+    private int reinforcements(Player player, Game activeGame, int xDeltaFromRightSide, int y, HashMap<String, Integer> unitCount) {
         HashMap<String, Tile> tileMap = activeGame.getTileMap();
+        int x = width - 450 - xDeltaFromRightSide;
         drawPAImage(x, y, "pa_reinforcements.png");
         if (unitCount.isEmpty()) {
             for (Tile tile : tileMap.values()) {
@@ -1044,11 +1098,8 @@ public class GenerateMap {
 
         int ccCount = Helper.getCCCount(activeGame, playerColor);
         String CC_TAG = "cc";
-        if (playerColor == null) {
-            return;
-        }
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
-        if (reinforcementsPosition != null) {
+        if (reinforcementsPosition != null && playerColor != null) {
             int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
@@ -1067,7 +1118,7 @@ public class GenerateMap {
             if (-5 <= remainingReinforcements)
                 paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
         }
-
+        return xDeltaFromRightSide + 450;
     }
 
     private static void fillUnits(HashMap<String, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
@@ -1090,11 +1141,11 @@ public class GenerateMap {
         }
     }
 
-    private void nombox(Player player, int x, int y) {
-
+    private int nombox(Player player, int xDeltaFromRightSide, int y) {
+        int x = width - 450 - xDeltaFromRightSide;
         UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
         if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
-            return;
+            return 0;
         }
 
         Point infPoint = new Point(50, 75);
@@ -1231,6 +1282,7 @@ public class GenerateMap {
                 }
             }
         }
+        return xDeltaFromRightSide + 450;
     }
 
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
@@ -1838,7 +1890,7 @@ public class GenerateMap {
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
             
-            Comparator<Player> comparator = Comparator.comparing(Player::getLowestSC);
+            Comparator<Player> comparator = Comparator.comparing(p -> activeGame.getPlayersTurnSCInitiative(p));
             allPlayers.sort(comparator);
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
