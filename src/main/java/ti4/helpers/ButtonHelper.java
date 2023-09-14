@@ -1332,6 +1332,7 @@ public class ButtonHelper {
             }
             if(nameOfHolder.equalsIgnoreCase("space")){
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
+                buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName()+"_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
             }else{
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
             }
@@ -1921,7 +1922,18 @@ public class ButtonHelper {
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
         String unitHolderName = idInfo[2];
-        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>());
+        CombatRollType rollType = CombatRollType.combatround;
+        if(idInfo.length > 3){
+            String rollTypeString = idInfo[3];
+            switch (rollTypeString) {
+                case "afb":
+                    rollType = CombatRollType.afb;
+                    break;
+                default:
+                    break;
+            }
+        }
+        new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>(), rollType);
     }
     public static MessageChannel getCorrectChannel(Player player, Game activeGame){
         if(activeGame.isFoWMode()){
