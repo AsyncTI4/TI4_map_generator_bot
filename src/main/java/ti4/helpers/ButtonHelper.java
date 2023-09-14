@@ -1162,6 +1162,11 @@ public class ButtonHelper {
                             MessageHelper.sendMessageToChannel(threadChannel_, "In fog, it is the players responsibility to check for pds2");
                         }
                     }
+                    if("space".equalsIgnoreCase(spaceOrGround)){
+                        List<Button> buttons2 = new ArrayList<Button>();
+                        buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use this button to roll AFB", buttons2);
+                    }
                     break;
                 }
                 
@@ -1214,6 +1219,11 @@ public class ButtonHelper {
                                 if(activeGame.isFoWMode()){
                                     MessageHelper.sendMessageToChannel(threadChannel_, "In fog, it is the players responsibility to check for pds2");
                                 }
+                            }//buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName()+"_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
+                            if("space".equalsIgnoreCase(spaceOrGround)){
+                                List<Button> buttons2 = new ArrayList<Button>();
+                                buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
+                                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use this button to roll AFB", buttons2);
                             }
                         }
                     }
@@ -1332,7 +1342,6 @@ public class ButtonHelper {
             }
             if(nameOfHolder.equalsIgnoreCase("space")){
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
-                //buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName()+"_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
             }else{
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
             }

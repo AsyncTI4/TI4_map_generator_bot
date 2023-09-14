@@ -482,9 +482,13 @@ public class ButtonListener extends ListenerAdapter {
                 int scnum = 1;
                 boolean setstatus = true;
                 try {
-                    scnum = Integer.parseInt(lastcharMod);
+                    scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
                 } catch (NumberFormatException e) {
-                    setstatus = false;
+                    try{
+                        scnum = Integer.parseInt(lastchar);
+                    }catch (NumberFormatException e2) {
+                        setstatus = false;
+                    }
                 }
                 if (setstatus) {
                     if(!player.getFollowedSCs().contains(scnum)){
@@ -498,9 +502,13 @@ public class ButtonListener extends ListenerAdapter {
             int scnum2 = 1;
             boolean setstatus = true;
             try {
-                scnum2 = Integer.parseInt(lastcharMod);
+                scnum2 = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
             } catch (NumberFormatException e) {
-                setstatus = false;
+                try{
+                    scnum2 = Integer.parseInt(lastchar);
+                }catch (NumberFormatException e2) {
+                    setstatus = false;
+                }
             }
             if (setstatus) {
                 player.addFollowedSC(scnum2);
