@@ -36,7 +36,6 @@ public class Constants {
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
-    public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String DOMINUS_ORB = "dominus_orb";
@@ -73,7 +72,6 @@ public class Constants {
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
     public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
     public static final String INIT_TSPMAP = "init_tspmap";
-    public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";

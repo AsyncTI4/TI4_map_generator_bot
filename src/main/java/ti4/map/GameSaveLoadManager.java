@@ -916,8 +916,6 @@ public class GameSaveLoadManager {
                     if (ENDMAPINFO.equals(data)) {
                         break;
                     }
-                   // activeMap.setMapStatus(MapStatus.valueOf(data));
-                    activeGame.setGameStatus(GameStatus.open);
 
                     while (myReader.hasNextLine()) {
                         data = myReader.nextLine();
