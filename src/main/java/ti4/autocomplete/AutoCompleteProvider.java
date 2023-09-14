@@ -1,9 +1,11 @@
-package ti4;
+package ti4.autocomplete;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import ti4.MapGenerator;
+import ti4.MessageListener;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
