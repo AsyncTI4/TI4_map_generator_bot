@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import ti4.autocomplete.AutoCompleteListener;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
@@ -82,7 +83,12 @@ public class MapGenerator {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
 
-        jda.addEventListener(new MessageListener(), new ButtonListener(), new UserJoinServerListener());
+        jda.addEventListener(
+            new MessageListener(), 
+            new ButtonListener(), 
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
+            
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
@@ -260,7 +266,7 @@ public class MapGenerator {
                 MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(10);
                 GameSaveLoadManager.saveMaps();
                 MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
                 MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");

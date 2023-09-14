@@ -44,10 +44,6 @@ public class Setup extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        if (!activeGame.isMapOpen()) {
-            sendMessage("Can do faction setup only when map is open and not locked. Use `/game set_status open`");
-            return;
-        }
 
         String factionOption = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (factionOption != null) factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");

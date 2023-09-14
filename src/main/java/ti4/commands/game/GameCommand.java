@@ -85,7 +85,6 @@ public class GameCommand implements Command {
     private Collection<GameSubcommandData> getSubcommands() {
         Collection<GameSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Info());
-        //subcommands.add(new SetStatus());
         subcommands.add(new Join());
         subcommands.add(new Leave());
         subcommands.add(new Add());
