@@ -713,6 +713,20 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.LIST_LEADERS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, String> leaders = new HashMap<>(Mapper.getLeaderRepresentations());
+                        List<Command.Choice> options = leaders.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getKey(), value.getKey()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 }
