@@ -290,11 +290,12 @@ public class MessageListener extends ListenerAdapter {
                         String newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone said: " + message2;
                         if(event.getAuthor().isBot() && message2.contains("Total hits ")){
                             String hits = StringUtils.substringAfter(message2, "Total hits ");
-                            String location = StringUtils.substringBefore(message2, "combat rolls for");
+                            String location = StringUtils.substringBefore(message2, "combat")+"**";
                             newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
                         }
+                        newMessage = newMessage.replace("Total hits", "");
                         String[] threadN = event.getChannel().getName().split("-");
-                        String threadName = threadN[0]+"-"+threadN[1]+"-"+threadN[2]+"-"+threadN[3]+"-"+threadN[4];
+                        String threadName = event.getChannel().getName();
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
                             if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
