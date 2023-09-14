@@ -101,9 +101,9 @@ public class MessageListener extends ListenerAdapter {
         if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
             return false;
         }
-        if (anyMatchGameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isMapOpen() || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+        if (anyMatchGameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             if (gameManager.getUserActiveGame(userID) != null && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
-//                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+                // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
             }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
