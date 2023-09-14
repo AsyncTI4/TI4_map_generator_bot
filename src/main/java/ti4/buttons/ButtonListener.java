@@ -2800,7 +2800,7 @@ public class ButtonListener extends ListenerAdapter {
                     ACInfo.sendActionCardInfo(activeGame, player);
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
                 }
-                case "showGameAgain" -> new ShowGame().simpleShowGame(activeGame, event, null);
+                case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperFactionSpecific.resolveMitosisInf(buttonID, event, activeGame, player, ident);
                 case "doneLanding" -> {
                     if (!event.getMessage().getContentRaw().contains("Moved all units to the space area.")) {

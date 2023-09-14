@@ -50,7 +50,6 @@ public class Info extends GameSubcommandData {
         sb.append("Owner: ").append(activeGame.getOwnerName()).append(NEW_LINE);
         sb.append("Created: ").append(activeGame.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate())).append(NEW_LINE);
-        sb.append("Status: `").append(activeGame.getGameStatus()).append("`").append(NEW_LINE);
         sb.append("Ended: `").append(activeGame.isHasEnded()).append("`").append(NEW_LINE);
         if (activeGame.isHasEnded()) sb.append("> Date Ended: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(NEW_LINE);
         

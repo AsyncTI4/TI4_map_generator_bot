@@ -269,9 +269,6 @@ public class Stats extends PlayerSubcommandData {
 		if (optionSC == null) {
 			return false;
 		}
-		if (activeGame.isMapOpen() && !activeGame.isCommunityMode()) {
-			activeGame.setGameStatus(GameStatus.open);
-		}
 		int scNumber = optionSC.getAsInt();
 		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}

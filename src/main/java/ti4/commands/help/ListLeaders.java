@@ -16,7 +16,7 @@ public class ListLeaders extends HelpSubcommandData {
 
     public ListLeaders() {
         super(Constants.LIST_LEADERS, "List all leaders the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override

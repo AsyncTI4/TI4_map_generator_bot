@@ -291,6 +291,8 @@ public class Emojis {
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
     public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
+    public static final String UnitTechSkip = "<:UnitTechSkip:1151926553488412702>";
+    public static final String NonUnitTechSkip = "<:NonUnitTechSkip:1151926572278874162>";
 
     // GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
