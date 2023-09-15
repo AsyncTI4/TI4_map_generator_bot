@@ -2,7 +2,6 @@ package ti4.generator;
 
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -1463,12 +1462,20 @@ public class GenerateMap {
                     String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                     drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planet);
                 }
+
+                boolean hasBentorEncryptionKey = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("encryptionkey"));
+                // BENTOR ENCRYPTION KEY
+                if (hasBentorEncryptionKey) {
+                    String imageFileName = "pc_tech_bentor_encryptionkey.png";
+                    drawPlanetImage(x + deltaX + 26, y + 82, imageFileName, planet);
+                }
+
                 String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
-                if (!originalTechSpeciality.isEmpty()) {
+                if (!originalTechSpeciality.isEmpty() && !hasBentorEncryptionKey) {
                     String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                     drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planet);
-                } else {
-                    ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
+                } else if (!hasBentorEncryptionKey) {
+                    List<String> techSpeciality = planetHolder.getTechSpeciality();
                     for (String techSpec : techSpeciality) {
                         if (techSpec.isEmpty()) {
                             continue;
