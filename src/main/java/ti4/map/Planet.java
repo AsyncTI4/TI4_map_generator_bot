@@ -195,11 +195,11 @@ public class Planet extends UnitHolder {
         return originalTechSpeciality;
     }
 
-    public ArrayList<String> getPlanetType() {
+    public List<String> getPlanetType() {
         return planetType;
     }
 
-    public ArrayList<String> getTechSpeciality() {
+    public List<String> getTechSpeciality() {
         return techSpeciality;
     }
 
