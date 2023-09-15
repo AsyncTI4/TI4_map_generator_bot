@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -14,7 +14,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 
 public class RemoveAllCC implements Command {
@@ -40,8 +39,7 @@ public class RemoveAllCC implements Command {
             Game activeGame = gameManager.getUserActiveGame(userID);
             parsingForTile(event, activeGame);
             GameSaveLoadManager.saveMap(activeGame, event);
-            File file = GenerateMap.getInstance().saveImage(activeGame, event);
-            MessageHelper.replyToMessage(event, file);
+            ShowGame.simpleShowGame(activeGame, event);
         }
     }
 
