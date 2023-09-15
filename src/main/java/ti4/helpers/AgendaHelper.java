@@ -64,7 +64,7 @@ public class AgendaHelper {
                     activeGame.addLaw(aID, winner);
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "#Added Law with " + winner + " as the elected!");
+                    "# Added Law with " + winner + " as the elected!");
                 if ("warrant".equalsIgnoreCase(agID)) {
                     player2.setSearchWarrant();
                     activeGame.drawSecretObjective(player2.getUserID());
@@ -277,6 +277,7 @@ public class AgendaHelper {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player playerB : activeGame.getRealPlayers()) {
                         playerB.setTg(5);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(playerB, activeGame, 5);
                         ButtonHelperFactionSpecific.pillageCheck(playerB, activeGame);
                     }
                     tg = 5;
@@ -311,6 +312,7 @@ public class AgendaHelper {
                         + "You have a rider to resolve or you voted for the correct outcome. Either way a tg has been added to your total due to your future sight ability. ("
                         + rid.getTg() + "-->" + (rid.getTg() + 1) + ")";
                     rid.setTg(rid.getTg() + 1);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(rid, activeGame, 1);
                     ButtonHelperFactionSpecific.pillageCheck(rid, activeGame);
                 } else {
                     message = rep + "You have a rider to resolve";
@@ -1137,6 +1139,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(channel,
                                 identity + " due to having a winning Keleres Rider, you have been given an AC and 2 tg (" + cTG + "->" + winningR.getTg() + ")");
                             ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
+                            ButtonHelperFactionSpecific.resolveArtunoCheck(winningR, activeGame, 2);
                         }
                         if (specificVote.contains("Politics Rider")) {
                             int amount = 3;
@@ -1151,7 +1154,6 @@ public class AgendaHelper {
                             ACInfo.sendActionCardInfo(activeGame, winningR, event);
                             activeGame.setSpeaker(winningR.getUserID());
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning Politics Rider, you have been given " + amount + " AC and the speaker token");
-                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
                         }
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity + " You have a diplo rider to resolve. Click the name of the planet who's system you wish to diplo";
@@ -1173,6 +1175,7 @@ public class AgendaHelper {
                             winningR.setTg(cTG + 5);
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning Trade Rider, you have been given 5 tg (" + cTG + "->" + winningR.getTg() + ")");
                             ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
+                            ButtonHelperFactionSpecific.resolveArtunoCheck(winningR, activeGame, 5);
                         }
                         if (specificVote.contains("Imperial Rider")) {
                             String msg = identity + " due to having a winning Imperial Rider, you have scored a pt\n";

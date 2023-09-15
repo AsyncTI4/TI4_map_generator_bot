@@ -83,7 +83,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 activeGame.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
                 if(notEmergency){
-                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
+                    MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
                      Player speaker = null;
                     if (activeGame.getPlayer(activeGame.getSpeaker()) != null) {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
@@ -92,8 +92,6 @@ public class RevealAgenda extends AgendaSubcommandData {
                         StringBuilder sb = new StringBuilder();
                         Map.Entry<String, Integer> entry = activeGame.drawAgenda();
                         sb.append("-----------\n");
-                        sb.append("Game: ").append(activeGame.getName()).append("\n");
-                        sb.append(event.getUser().getAsMention()).append("\n");
                         sb.append("Game: ").append(activeGame.getName()).append("\n");
                         sb.append(ButtonHelper.getTrueIdentity(speaker, activeGame)).append("\n");
                         sb.append("Drawn Agendas:\n");
