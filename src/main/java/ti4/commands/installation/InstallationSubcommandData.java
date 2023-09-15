@@ -4,15 +4,13 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
-import java.io.File;
-
 import org.jetbrains.annotations.NotNull;
 
-import ti4.generator.GenerateMap;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
+
 
 public abstract class InstallationSubcommandData extends SubcommandData {
 
@@ -46,8 +44,6 @@ public abstract class InstallationSubcommandData extends SubcommandData {
         String userID = event.getUser().getId();
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
-
-        File file = GenerateMap.getInstance().saveImage(activeGame, event);
-        MessageHelper.replyToMessage(event, file);
+        ShowGame.simpleShowGame(activeGame, event);
     }
 }
