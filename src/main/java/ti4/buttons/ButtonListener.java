@@ -427,9 +427,13 @@ public class ButtonListener extends ListenerAdapter {
             boolean setstatus = true;
             int scnum = 1;
             try {
-                scnum = Integer.parseInt(lastcharMod);
+                scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
             } catch (NumberFormatException e) {
-                setstatus = false;
+                try{
+                    scnum = Integer.parseInt(lastchar);
+                }catch (NumberFormatException e2) {
+                    setstatus = false;
+                }
             }
             if (setstatus) {
                 if(!player.getFollowedSCs().contains(scnum)){
@@ -1251,6 +1255,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ident + " tgs increased by 1 (" + player.getTg() + "->" + (player.getTg() + 1) + ")");
                 player.setTg(player.getTg() + 1);
                 ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("winnuStructure_")) {
@@ -2089,6 +2094,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    if (player.getStrategicCC() > 0) {
+                        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+                    }
                     String message = deductCC(player, event);
                     if(!player.getFollowedSCs().contains(5)){
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
@@ -2191,9 +2199,13 @@ public class ButtonListener extends ListenerAdapter {
                     int scnum = 1;
                     boolean setstatus = true;
                     try {
-                        scnum = Integer.parseInt(lastchar);
+                        scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
                     } catch (NumberFormatException e) {
-                        setstatus = false;
+                        try{
+                            scnum = Integer.parseInt(lastchar);
+                        }catch (NumberFormatException e2) {
+                            setstatus = false;
+                        }
                     }
                     if (setstatus) {
                         if(!player.getFollowedSCs().contains(scnum)){
@@ -2214,6 +2226,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     int tg = player.getTg();
                     player.setTg(tg + 3);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 3);
                     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
                     }
@@ -2588,6 +2601,7 @@ public class ButtonListener extends ListenerAdapter {
                         + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
                     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
                     }
@@ -2892,9 +2906,13 @@ public class ButtonListener extends ListenerAdapter {
                     int scnum2 = 1;
                     boolean setstatus = true;
                     try {
-                        scnum2 = Integer.parseInt(lastchar);
+                        scnum2 = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
                     } catch (NumberFormatException e) {
-                        setstatus = false;
+                        try{
+                            scnum2 = Integer.parseInt(lastchar);
+                        }catch (NumberFormatException e2) {
+                            setstatus = false;
+                        }
                     }
                     if (setstatus) {
                         player.addFollowedSC(scnum2);
