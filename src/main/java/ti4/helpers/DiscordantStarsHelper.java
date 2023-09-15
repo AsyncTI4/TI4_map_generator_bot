@@ -1,11 +1,13 @@
 package ti4.helpers;
 
+import ti4.commands.ds.SetPolicy;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.model.PlanetModel;
 
 public class DiscordantStarsHelper {
     public static void checkGardenWorlds(Game activeGame) {
@@ -85,5 +87,57 @@ public class DiscordantStarsHelper {
             }
         }
         return numMechs == 1;
+    }
+
+    public static void handleOlradinPoliciesWhenExhaustingPlanets(Game activeGame, Player player, String planet) {
+        if (activeGame == null || !activeGame.isDiscordantStarsMode() || player == null || !player.hasOlradinPolicies()) return;
+        PlanetModel planetModel = Mapper.getPlanet(planet);
+        if (planetModel == null) return;
+        StringBuilder sb = new StringBuilder();
+
+        if (planetModel.isLegendary()) {
+            sb.append("You exhausted ").append(Emojis.LegendaryPlanet).append(planetModel.getName()).append(" and triggered the following abilities:\n");
+            if (player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
+                player.setHasUsedEnvironmentPreserveAbility(true);
+                sb.append("");
+            }
+            if (player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
+                player.setHasUsedEconomyEmpowerAbility(true);
+                sb.append("");
+            }
+            if (player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect")) {
+                player.setHasUsedPeopleConnectAbility(true);
+                sb.append("");
+            }
+            return;
+        }
+
+        switch (planetModel.getPlanetType()) {
+            case HAZARDOUS -> {
+                if (player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
+                    player.setHasUsedEnvironmentPreserveAbility(true);
+                    sb.append("");
+                }
+            }
+            case INDUSTRIAL -> {
+                if (player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
+                    player.setHasUsedEconomyEmpowerAbility(true);
+                    sb.append("");
+                }
+                if (player.getHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
+                    player.setHasUsedEconomyExploitAbility(true);
+                }
+            }
+            case CULTURAL -> {
+                if (player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect")) {
+                    player.setHasUsedPeopleConnectAbility(true);
+                    sb.append("");
+                }
+            }
+            default -> {
+                //do nothing
+            }
+        }
+
     }
 }
