@@ -1255,6 +1255,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ident + " tgs increased by 1 (" + player.getTg() + "->" + (player.getTg() + 1) + ")");
                 player.setTg(player.getTg() + 1);
                 ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("winnuStructure_")) {
@@ -2225,6 +2226,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     int tg = player.getTg();
                     player.setTg(tg + 3);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 3);
                     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
                     }
@@ -2599,6 +2601,7 @@ public class ButtonListener extends ListenerAdapter {
                         + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
                     if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
                     }
