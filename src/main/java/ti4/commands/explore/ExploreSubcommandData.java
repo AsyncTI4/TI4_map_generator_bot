@@ -290,6 +290,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                 }
                 
@@ -300,6 +301,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                         player.setTg(player.getTg() + 1);
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
                     }
                 }
 
@@ -348,16 +350,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         player.setTg(player.getTg() + 1);
                         message = "Gained 1" + Emojis.tg + " (" + (player.getTg() - 1) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg() + 2);
                         message = "Gained 2" + Emojis.tg + " (" + (player.getTg() - 2) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg() + 3);
                         message = "Gained 3" + Emojis.tg + " (" + (player.getTg() - 3) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 3);
                     }
                     default -> message = "";
                 }
