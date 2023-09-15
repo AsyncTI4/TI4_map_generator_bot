@@ -46,8 +46,9 @@ public class ButtonHelperFactionSpecific {
                 SendDebt.sendDebt(player, p2, 1);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" you sent 1 debt token to "+ButtonHelper.getIdentOrColor(p2, activeGame)+" due to their fine print ability");
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+" you collected 1 debt token from "+ButtonHelper.getIdentOrColor(player, activeGame)+" due to your fine print ability. This is technically optional, done automatically for conveinance.");
+                break;
             }
-            break;
+            
         }
     }
 
@@ -220,6 +221,14 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
     }
 
+     public static void resolveArtunoCheck(Player player, Game activeGame, int tg){
+        if(player.hasUnexhaustedLeader("nomadagentartuno", activeGame)){
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.add(Button.success("exhaustAgent_nomadagentartuno_"+tg, "Exhaust Artuno with "+tg+" tg"));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to exhaust your agent Artuno and place "+tg+" on her.", buttons);
+        }
+     }
     
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String trueIdentity){
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
@@ -322,6 +331,7 @@ public class ButtonHelperFactionSpecific {
             String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             pillageCheck(player, activeGame);
+            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
         }
      }
      public static List<Button> getEmpyHeroButtons(Player player, Game activeGame){
@@ -496,7 +506,9 @@ public class ButtonHelperFactionSpecific {
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
                     pillageCheck(sender, activeGame);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(sender, activeGame, 1);
                     pillageCheck(receiver, activeGame);
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(receiver, activeGame, 1);
                 }
             }
         }
@@ -515,6 +527,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             }
             pillageCheck(player, activeGame);
+            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
         }
     }
 
@@ -1077,9 +1090,15 @@ public class ButtonHelperFactionSpecific {
             channel2 = player.getPrivateChannel();
         }
         playerLeader.setExhausted(true);
+       
+       
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
         String messageText = Helper.getPlayerRepresentation(player, activeGame) +
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
+        if("nomadagentartuno".equalsIgnoreCase(agent)){
+            playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
+			messageText = messageText + "\n" + rest.split("_")[1] +" "+ Emojis.tg + " was placed on top of the leader";
+        }
         MessageHelper.sendMessageToChannel(channel2, messageText);
         if ("naazagent".equalsIgnoreCase(agent)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
@@ -1100,6 +1119,7 @@ public class ButtonHelperFactionSpecific {
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg()+2);
             pillageCheck(player, activeGame);
+            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
             String message = trueIdentity+" increased your tgs by 2 ("+(player.getTg()-2)+"->"+player.getTg()+"). Use buttons in your cards info thread to discard an AC";
             MessageHelper.sendMessageToChannel(channel2, message);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
@@ -1474,6 +1494,7 @@ public class ButtonHelperFactionSpecific {
                 String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " due to your council patronage ability, 1tg has been added to your total and your commodities have been refreshed";
                 MessageHelper.sendMessageToChannel(channel, message);
                 pillageCheck(player, activeGame);
+                ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 cabalAgentInitiation(activeGame, player);
 
