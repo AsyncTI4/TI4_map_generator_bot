@@ -97,17 +97,19 @@ public class MessageListener extends ListenerAdapter {
         MapFileDeleter.deleteFiles();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
-        boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
+        boolean gameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
+        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN);
+        boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName));
+        if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (anyMatchGameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+        if (gameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             if (gameManager.getUserActiveGame(userID) != null && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
                 // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
             }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
-            if (anyMatchGameExists && !channelName.startsWith(userActiveGame.getName())) {
+            if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
                 MessageHelper.sendMessageToChannel(channel, "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 gameManager.resetMapForUser(userID);
             }
