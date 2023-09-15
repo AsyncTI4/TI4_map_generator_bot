@@ -142,7 +142,7 @@ public class ButtonHelper {
                 Map<String, Integer> tileUnits = new HashMap<>(units);
                 for (Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
                     String key = unitEntry.getKey();
-                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || ((!player.hasFF2Tech() && key.endsWith("ff.png"))   || (cabal != null && key.endsWith("ff.png"))  )) {
+                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || ((!player.hasFF2Tech() && key.endsWith("ff.png"))   || (cabal != null && (key.endsWith("ff.png") ||key.endsWith("sd.png") ))  )) {
                         continue;
                     }
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
@@ -519,6 +519,7 @@ public class ButtonHelper {
                     int numOfNeighbors = Helper.getNeighbourCount(activeGame,player);
                     String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" Minister of Commerce triggered, your tgs have increased due to your "+numOfNeighbors+" neighbors ("+player.getTg()+"->"+(player.getTg()+numOfNeighbors)+")";
                     player.setTg(numOfNeighbors+player.getTg());
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, numOfNeighbors);
                     MessageHelper.sendMessageToChannel(channel, message);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                     
@@ -585,6 +586,7 @@ public class ButtonHelper {
                     int cTG = nonActivePlayer.getTg();
                     nonActivePlayer.setTg(cTG+4);
                     MessageHelper.sendMessageToChannel(channel, ident + " gained 4 tg ("+cTG+"->"+nonActivePlayer.getTg()+")");
+                    ButtonHelperFactionSpecific.resolveArtunoCheck(nonActivePlayer, activeGame, 4);
                     ButtonHelperFactionSpecific.pillageCheck(nonActivePlayer, activeGame);
                 }
             }
@@ -1852,7 +1854,10 @@ public class ButtonHelper {
             explorationTraits.add("industrial");
             explorationTraits.add("hazardous");
         }
-        if(player.hasAbility("black_markets")){
+        if (planet.getTokenList().contains("attachment_industrialboom.png")) {
+            explorationTraits.add("industrial");
+        }
+        if(player.hasAbility("black_markets") && explorationTraits.size() > 0){
             String traits = ButtonHelperFactionSpecific.getAllOwnedPlanetTypes(player, activeGame);
             if(traits.contains("industrial")){
                 explorationTraits.add("industrial");
@@ -1864,9 +1869,7 @@ public class ButtonHelper {
                 explorationTraits.add("hazardous");
             }
         }
-        if (planet.getTokenList().contains("attachment_industrialboom.png")) {
-            explorationTraits.add("industrial");
-        }
+        
         
         for (String trait : explorationTraits) {
             String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
@@ -2732,6 +2735,12 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                     }
                 }
             }
+        }
+    }
+
+    public static void fixAllianceMembers(Game activeGame) {
+        for(Player player : activeGame.getRealPlayers()){
+            player.setAllianceMembers("");
         }
     }
     //playerHasUnitsInSystem(player, tile);
@@ -3802,6 +3811,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                         }
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Your tgs increased from "+oldTg+" -> "+ p1.getTg());
                         ButtonHelperFactionSpecific.pillageCheck(p1, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(p1, activeGame, p1.getTg() - oldTg);
                     }
                     
                 } else {

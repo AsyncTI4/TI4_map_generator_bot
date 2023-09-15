@@ -427,9 +427,13 @@ public class ButtonListener extends ListenerAdapter {
             boolean setstatus = true;
             int scnum = 1;
             try {
-                scnum = Integer.parseInt(lastcharMod);
+                scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
             } catch (NumberFormatException e) {
-                setstatus = false;
+                try{
+                    scnum = Integer.parseInt(lastchar);
+                }catch (NumberFormatException e2) {
+                    setstatus = false;
+                }
             }
             if (setstatus) {
                 if(!player.getFollowedSCs().contains(scnum)){
@@ -2089,6 +2093,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
+                    if (player.getStrategicCC() > 0) {
+                        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+                    }
                     String message = deductCC(player, event);
                     if(!player.getFollowedSCs().contains(5)){
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
@@ -2191,9 +2198,13 @@ public class ButtonListener extends ListenerAdapter {
                     int scnum = 1;
                     boolean setstatus = true;
                     try {
-                        scnum = Integer.parseInt(lastchar);
+                        scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
                     } catch (NumberFormatException e) {
-                        setstatus = false;
+                        try{
+                            scnum = Integer.parseInt(lastchar);
+                        }catch (NumberFormatException e2) {
+                            setstatus = false;
+                        }
                     }
                     if (setstatus) {
                         if(!player.getFollowedSCs().contains(scnum)){
@@ -2892,9 +2903,13 @@ public class ButtonListener extends ListenerAdapter {
                     int scnum2 = 1;
                     boolean setstatus = true;
                     try {
-                        scnum2 = Integer.parseInt(lastchar);
+                        scnum2 = Integer.parseInt(StringUtils.substringAfterLast(buttonID,"_"));
                     } catch (NumberFormatException e) {
-                        setstatus = false;
+                        try{
+                            scnum2 = Integer.parseInt(lastchar);
+                        }catch (NumberFormatException e2) {
+                            setstatus = false;
+                        }
                     }
                     if (setstatus) {
                         player.addFollowedSC(scnum2);
