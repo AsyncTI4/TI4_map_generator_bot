@@ -1035,192 +1035,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deleteButtons")) {
-            buttonID = buttonID.replace("deleteButtons_", "");
-            String editedMessage = event.getMessage().getContentRaw();
-            if (("Done Gaining CCs".equalsIgnoreCase(buttonLabel)
-                || "Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) && editedMessage.contains("CCs have gone from")) {
-
-                String playerRep = Helper.getPlayerRepresentation(player, activeGame);
-                String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-                String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "));
-                shortCCs = shortCCs.replace("CCs have gone from ", "");
-                shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
-                if (event.getMessage().getContentRaw().contains("Net gain")) {
-
-                    int netGain = ButtonHelper.checkNetGain(player, shortCCs);
-                    finalCCs = finalCCs + ". Net CC gain was " + netGain;
-                }
-                if (!activeGame.isFoWMode()) {
-                    if ("Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) {
-                        MessageHelper.sendMessageToChannel(actionsChannel,
-                            playerRep + " Initial CCs were " + shortCCs + ". Final CC Allocation Is " + finalCCs);
-                    } else {
-                        if ("leadership".equalsIgnoreCase(buttonID)) {
-                            String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-leadership";
-                            List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                            for (ThreadChannel threadChannel_ : threadChannels) {
-                                if (threadChannel_.getName().equals(threadName)) {
-                                    MessageHelper.sendMessageToChannel(threadChannel_,
-                                        playerRep + " Initial CCs were " + shortCCs + ". Final CC Allocation Is " + finalCCs);
-                                }
-                            }
-
-                        } else {
-                            MessageHelper.sendMessageToChannel(actionsChannel,
-                                playerRep + " Final CC Allocation Is " + finalCCs);
-                        }
-
-                    }
-
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        playerRep + " Final CC Allocation Is " + finalCCs);
-                }
-
-            }
-            if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
-                || "Done Producing Units".equalsIgnoreCase(buttonLabel))
-                && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
-
-                if (activeGame.isFoWMode()) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
-                } else {
-                    if ("warfare".equalsIgnoreCase(buttonID)) {
-                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-warfare";
-                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
-                            }
-                        }
-                    } else if ("leadership".equalsIgnoreCase(buttonID)) {
-                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-leadership";
-                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
-                            }
-                        }
-
-                    } else if ("construction".equalsIgnoreCase(buttonID)) {
-                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-construction";
-                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
-                            }
-                        }
-                    } else if ("technology".equalsIgnoreCase(buttonID)) {
-                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-technology";
-                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-
-                        if (!activeGame.getComponentAction()) {
-                            for (ThreadChannel threadChannel_ : threadChannels) {
-                                if (threadChannel_.getName().equals(threadName)) {
-                                    MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
-                                }
-                            }
-                        } else {
-                            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), editedMessage);
-
-                        }
-                    } else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
-                    }
-                }
-                if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
-                    String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
-
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
-                    if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
-                        buttons.add(sar);
-                    }
-                    if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
-                        buttons.add(sar2);
-                    }
-                    if (player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
-                        buttons.add(aiDEVButton);
-                    }
-                    if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
-                        buttons.add(sarweenButton);
-                    }
-                    if (player.hasUnexhaustedLeader("winnuagent", activeGame) && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
-                        buttons.add(winnuButton);
-                    }
-                    if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)) {
-                        Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
-                        buttons.add(hacanButton);
-                    }
-                    Button DoneExhausting;
-                    if (!buttonID.contains("deleteButtons")) {
-                        DoneExhausting = Button.danger("deleteButtons_" + buttonID, "Done Exhausting Planets");
-                    } else {
-                        DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
-                    }
-                    ButtonHelper.updateMap(activeGame, event);
-                    buttons.add(DoneExhausting);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-
-                }
-            }
-            if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
-                if (buttonID.contains("tacticalAction")) {
-                    ButtonHelper.exploreDET(player, activeGame, event);
-                    List<Button> systemButtons2 = new ArrayList<>();
-                    if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
-                        String message = trueIdentity + " You can use the button to explore using crown of emphidia";
-                        systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                    }
-                    systemButtons2 = new ArrayList<>();
-                    if (player.hasUnexhaustedLeader("sardakkagent", activeGame)) {
-                        String message = trueIdentity + " You can use the button to do sardakk agent";
-                        systemButtons2.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeGame, player));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                    }
-                    if (player.hasUnexhaustedLeader("nomadagentmercer", activeGame)) {
-                        String message = trueIdentity + " You can use the button to do General Mercer";
-                        systemButtons2.addAll(ButtonHelperFactionSpecific.getMercerAgentInitialButtons(activeGame, player));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                    }
-
-                    if (activeGame.getNaaluAgent()) {
-                        player = Helper.getPlayerFromUnlockedLeader(activeGame, "naaluagent");
-                        activeGame.setNaaluAgent(false);
-                    }
-
-                    String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Use buttons to end turn or do another action.";
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                    MessageChannel channel = event.getMessageChannel();
-                    if (activeGame.isFoWMode()) {
-                        channel = player.getPrivateChannel();
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
-
-                }
-            }
-            if ("diplomacy".equalsIgnoreCase(buttonID)) {
-                if (!activeGame.isFoWMode()) {
-                    String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-diplomacy";
-                    List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                    for (ThreadChannel threadChannel_ : threadChannels) {
-                        if (threadChannel_.getName().equals(threadName)) {
-                            MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
-                        }
-                    }
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
-                }
-            }
-            if ("spitItOut".equalsIgnoreCase(buttonID)) {
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), editedMessage);
-            }
-            event.getMessage().delete().queue();
+            deleteButtons(event, buttonID, buttonLabel, activeGame, player, actionsChannel, trueIdentity);
         } else if (buttonID.startsWith("reverse_")) {
             AgendaHelper.reverseRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("rider_")) {
@@ -3067,6 +2882,195 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         GameSaveLoadManager.saveMap(activeGame, event);
+    }
+
+    private void deleteButtons(ButtonInteractionEvent event, String buttonID, String buttonLabel, Game activeGame, Player player, MessageChannel actionsChannel, String trueIdentity) {
+        buttonID = buttonID.replace("deleteButtons_", "");
+        String editedMessage = event.getMessage().getContentRaw();
+        if (("Done Gaining CCs".equalsIgnoreCase(buttonLabel)
+            || "Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) && editedMessage.contains("CCs have gone from")) {
+
+            String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+            String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+            String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "));
+            shortCCs = shortCCs.replace("CCs have gone from ", "");
+            shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
+            if (event.getMessage().getContentRaw().contains("Net gain")) {
+
+                int netGain = ButtonHelper.checkNetGain(player, shortCCs);
+                finalCCs = finalCCs + ". Net CC gain was " + netGain;
+            }
+            if (!activeGame.isFoWMode()) {
+                if ("Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) {
+                    MessageHelper.sendMessageToChannel(actionsChannel,
+                        playerRep + " Initial CCs were " + shortCCs + ". Final CC Allocation Is " + finalCCs);
+                } else {
+                    if ("leadership".equalsIgnoreCase(buttonID)) {
+                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-leadership";
+                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) {
+                                MessageHelper.sendMessageToChannel(threadChannel_,
+                                    playerRep + " Initial CCs were " + shortCCs + ". Final CC Allocation Is " + finalCCs);
+                            }
+                        }
+
+                    } else {
+                        MessageHelper.sendMessageToChannel(actionsChannel,
+                            playerRep + " Final CC Allocation Is " + finalCCs);
+                    }
+
+                }
+
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                    playerRep + " Final CC Allocation Is " + finalCCs);
+            }
+
+        }
+        if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
+            || "Done Producing Units".equalsIgnoreCase(buttonLabel))
+            && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
+
+            if (activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
+            } else {
+                if ("warfare".equalsIgnoreCase(buttonID)) {
+                    String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-warfare";
+                    List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                    for (ThreadChannel threadChannel_ : threadChannels) {
+                        if (threadChannel_.getName().equals(threadName)) {
+                            MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
+                        }
+                    }
+                } else if ("leadership".equalsIgnoreCase(buttonID)) {
+                    String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-leadership";
+                    List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                    for (ThreadChannel threadChannel_ : threadChannels) {
+                        if (threadChannel_.getName().equals(threadName)) {
+                            MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
+                        }
+                    }
+
+                } else if ("construction".equalsIgnoreCase(buttonID)) {
+                    String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-construction";
+                    List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                    for (ThreadChannel threadChannel_ : threadChannels) {
+                        if (threadChannel_.getName().equals(threadName)) {
+                            MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
+                        }
+                    }
+                } else if ("technology".equalsIgnoreCase(buttonID)) {
+                    String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-technology";
+                    List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+
+                    if (!activeGame.getComponentAction()) {
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) {
+                                MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
+                            }
+                        }
+                    } else {
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), editedMessage);
+
+                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
+                }
+            }
+            if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+                String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
+
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
+                    buttons.add(sar);
+                }
+                if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
+                    buttons.add(sar2);
+                }
+                if (player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                    buttons.add(aiDEVButton);
+                }
+                if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
+                    buttons.add(sarweenButton);
+                }
+                if (player.hasUnexhaustedLeader("winnuagent", activeGame) && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
+                    buttons.add(winnuButton);
+                }
+                if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                    Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                    buttons.add(hacanButton);
+                }
+                Button DoneExhausting;
+                if (!buttonID.contains("deleteButtons")) {
+                    DoneExhausting = Button.danger("deleteButtons_" + buttonID, "Done Exhausting Planets");
+                } else {
+                    DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+                }
+                ButtonHelper.updateMap(activeGame, event);
+                buttons.add(DoneExhausting);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+
+            }
+        }
+        if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            if (buttonID.contains("tacticalAction")) {
+                ButtonHelper.exploreDET(player, activeGame, event);
+                List<Button> systemButtons2 = new ArrayList<>();
+                if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
+                    String message = trueIdentity + " You can use the button to explore using crown of emphidia";
+                    systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+                }
+                systemButtons2 = new ArrayList<>();
+                if (player.hasUnexhaustedLeader("sardakkagent", activeGame)) {
+                    String message = trueIdentity + " You can use the button to do sardakk agent";
+                    systemButtons2.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeGame, player));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+                }
+                if (player.hasUnexhaustedLeader("nomadagentmercer", activeGame)) {
+                    String message = trueIdentity + " You can use the button to do General Mercer";
+                    systemButtons2.addAll(ButtonHelperFactionSpecific.getMercerAgentInitialButtons(activeGame, player));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+                }
+
+                if (activeGame.getNaaluAgent()) {
+                    player = Helper.getPlayerFromUnlockedLeader(activeGame, "naaluagent");
+                    activeGame.setNaaluAgent(false);
+                }
+
+                String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Use buttons to end turn or do another action.";
+                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                MessageChannel channel = event.getMessageChannel();
+                if (activeGame.isFoWMode()) {
+                    channel = player.getPrivateChannel();
+                }
+                MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
+
+            }
+        }
+        if ("diplomacy".equalsIgnoreCase(buttonID)) {
+            if (!activeGame.isFoWMode()) {
+                String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-diplomacy";
+                List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        MessageHelper.sendMessageToChannel(threadChannel_, editedMessage);
+                    }
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
+            }
+        }
+        if ("spitItOut".equalsIgnoreCase(buttonID)) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), editedMessage);
+        }
+        event.getMessage().delete().queue();
     }
 
     public boolean addUsedSCPlayer(String messageID, Game activeGame, Player player,

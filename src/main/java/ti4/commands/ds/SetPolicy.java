@@ -70,19 +70,11 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             }
         }
 
-        // sendMessage("debug postset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
-        // pol3); (debug messagesender if more work is needed)
-
-        if (       (!player.hasAbility("policies"))
-                && (!player.hasAbility("policy_the_people_connect"))
-                && (!player.hasAbility("policy_the_people_control"))
-                && (!player.hasAbility("policy_the_environment_preserve"))
-                && (!player.hasAbility("policy_the_environment_plunder"))
-                && (!player.hasAbility("policy_the_economy_empower"))
-                && (!player.hasAbility("policy_the_economy_exploit"))) {
+        if (!player.hasOlradinPolicies()) {
             sendMessage("Player does not have Policy (Olradin Faction Ability)");
             return;
         }
+
         // extra returns for the first time policies are set
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
