@@ -3051,7 +3051,7 @@ public class ButtonListener extends ListenerAdapter {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
-
+                player.resetOlradinPolicyFlags();
             }
         }
         if ("diplomacy".equalsIgnoreCase(buttonID)) {
