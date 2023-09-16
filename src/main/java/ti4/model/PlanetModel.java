@@ -148,4 +148,8 @@ public class PlanetModel {
         }
         return sb.toString();
     }
+
+    public boolean isLegendary() {
+        return getLegendaryAbilityName() != null;
+    }
 }
