@@ -1574,9 +1574,9 @@ public class AgendaHelper {
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
          String agendaDetails = activeGame.getCurrentAgendaInfo();
          String agendaName = "";
-         if(StringUtils.countMatches(agendaDetails, "_") > 3)
-            if(agendaDetails.contains("absol")){
-                agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
+         if(StringUtils.countMatches(agendaDetails, "_") > 2)
+            if(StringUtils.countMatches(agendaDetails, "_") > 3){
+                agendaName = Mapper.getAgendaTitleNoCap(StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[3]+"_"));
             }else{
                 agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
             }
