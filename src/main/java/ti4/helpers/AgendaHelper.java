@@ -1574,13 +1574,13 @@ public class AgendaHelper {
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
          String agendaDetails = activeGame.getCurrentAgendaInfo();
          String agendaName = "";
-         if(agendaDetails.split("_").length >2){
+         try{
             if(agendaDetails.contains("absol")){
                 agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
             }else{
                 agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
             }
-         }else{
+        }catch (ArrayIndexOutOfBoundsException e){
             agendaName = "Not Currently Tracked";
          }
 
