@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -112,6 +113,16 @@ public class Player {
     private boolean hasFoundHazFrag;
     private boolean hasFoundIndFrag;
     private boolean hasFoundUnkFrag;
+
+    //OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
+    @Setter
+    private boolean hasUsedEconomyEmpowerAbility;
+    @Setter
+    private boolean hasUsedEconomyExploitAbility;
+    @Setter
+    private boolean hasUsedEnvironmentPreserveAbility;
+    @Setter
+    private boolean hasUsedPeopleConnectAbility;
 
     // Statistics
     private int numberOfTurns;
@@ -421,6 +432,9 @@ public class Player {
 
     public HashSet<String> getUnitsOwned() {
         return unitsOwned;
+    }
+    public boolean hasUnit(String unit) {
+        return unitsOwned.contains(unit);
     }
 
     public void setUnitsOwned(HashSet<String> unitsOwned) {
@@ -1661,5 +1675,46 @@ public class Player {
     public String getPlayerStatsAnchorPosition() {
         if ("null".equals(playerStatsAnchorPosition)) return null;
         return playerStatsAnchorPosition;
+    }
+
+    public boolean hasOlradinPolicies() {
+        return (hasAbility("policies"))
+            || (hasAbility("policy_the_people_connect"))
+            || (hasAbility("policy_the_environment_preserve"))
+            || (hasAbility("policy_the_economy_empower"))
+            || (hasAbility("policy_the_people_control"))
+            || (hasAbility("policy_the_environment_plunder"))
+            || (hasAbility("policy_the_economy_exploit"));
+    }
+
+    public void resetOlradinPolicyFlags() {
+        setHasUsedEconomyEmpowerAbility(false);
+        setHasUsedEconomyExploitAbility(false);
+        setHasUsedEnvironmentPreserveAbility(false);
+        setHasUsedPeopleConnectAbility(false);
+    }
+
+    public boolean getHasUsedEconomyEmpowerAbility() {
+        return hasUsedEconomyEmpowerAbility;
+    }
+
+    public boolean getHasUsedEconomyExploitAbility() {
+        return hasUsedEconomyExploitAbility;
+    }
+
+    public boolean getHasUsedEnvironmentPreserveAbility() {
+        return hasUsedEnvironmentPreserveAbility;
+    }
+
+    public boolean getHasUsedPeopleConnectAbility() {
+        return hasUsedPeopleConnectAbility;
+    }
+
+    public boolean hasPlanet(String planetID) {
+        return planets.contains(planetID);
+    }
+
+    public boolean hasPlanetReady(String planetID) {
+        return hasPlanet(planetID) && !exhaustedPlanets.contains(planetID);
     }
 }

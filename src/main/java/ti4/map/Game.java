@@ -60,6 +60,7 @@ public class Game {
     private int mapImageGenerationCount;
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
+    private boolean botFactionReacts;
     @JsonIgnore
     private final HashMap<String, UnitHolder> planets = new HashMap<>();
     @Nullable
@@ -153,6 +154,8 @@ public class Game {
     @ExportableField
     private int round = 1;
     @ExportableField
+    private int buttonPress;
+    @ExportableField
     private int pingSystemCounter;
     @ExportableField
     private String playersWhoHitPersistentNoAfter = "";
@@ -176,6 +179,7 @@ public class Game {
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private String phaseOfGame = "";
     private String currentAgendaInfo;
+    private String currentACDrawStatusInfo = "";
     private boolean hasHackElectionBeenPlayed;
     private List<String> agendas;
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
@@ -406,6 +410,15 @@ public class Game {
 
     public int getRound() {
         return round;
+    }
+    public int getButtonPressCount() {
+        return buttonPress;
+    }
+    public void increaseButtonPressCount() {
+       buttonPress = buttonPress +1;
+    }
+    public void setButtonPressCount(int count) {
+       buttonPress = count;
     }
 
     public void setRound(int round) {
@@ -906,6 +919,14 @@ public class Game {
 
     public void setCurrentAgendaInfo(String agendaInfo) {
         currentAgendaInfo = agendaInfo;
+    }
+
+    public String getACDrawStatusInfo() {
+        return currentACDrawStatusInfo;
+    }
+
+    public void setACDrawStatusInfo(String agendaInfo) {
+        currentACDrawStatusInfo = agendaInfo;
     }
 
     public String getCurrentAgendaInfo() {
@@ -1569,6 +1590,14 @@ public class Game {
         }
         return false;
     }
+    public boolean putBackIntoDeckOnTop(String id) {
+        if (!id.isEmpty()) {
+            discardAgendas.remove(id);
+            agendas.add(0, id);
+            return true;
+        }
+        return false;
+    }
 
     public boolean removeLaw(Integer idNumber) {
         String id = "";
@@ -1587,9 +1616,18 @@ public class Game {
         return false;
     }
 
+    public boolean removeLaw(String id) {
+        if (!id.isEmpty()) {
+            laws.remove(id);
+            lawsInfo.remove(id);
+            addDiscardAgenda(id);
+            return true;
+        }
+        return false;
+    }
+
     public boolean putAgendaTop(Integer idNumber) {
         if (sentAgendas.containsValue(idNumber)) {
-
             String id = "";
             for (Map.Entry<String, Integer> ac : sentAgendas.entrySet()) {
                 if (ac.getValue().equals(idNumber)) {
@@ -2276,9 +2314,15 @@ public class Game {
     public void setCCNPlasticLimit(boolean limit) {
         ccNPlasticLimit = limit;
     }
+    public void setBotFactionReactions(boolean limit) {
+        botFactionReacts = limit;
+    }
 
     public boolean getCCNPlasticLimit() {
         return ccNPlasticLimit;
+    }
+    public boolean getBotFactionReacts() {
+        return botFactionReacts;
     }
 
     public void setPlayer(String playerID, Player player) {

@@ -22,6 +22,8 @@ abstract public class JoinLeave extends GameSubcommandData {
         Game activeGame = getActiveGame();
         User user = event.getUser();
         action(activeGame, user);
+
+       // Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
         GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.replyToMessage(event, getResponseMessage(activeGame, user));
     }
