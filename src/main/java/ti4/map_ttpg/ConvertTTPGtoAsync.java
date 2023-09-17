@@ -457,7 +457,7 @@ public class ConvertTTPGtoAsync {
 
         // RELIC DECK
         List<String> ttpgRelicCards = ttpgMap.getDecks().getCardRelic().getDeck();
-        ArrayList<String> relicCards = new ArrayList<>() {{
+        List<String> relicCards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
             replaceAll(AliasHandler::resolveRelic);
         }};

@@ -257,26 +257,24 @@ public class MapGenerator {
         readyToReceiveCommands = true;
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT HAS FINISHED LOADING MAPS");
 
-
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                try {
-                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
-                    MapGenerator.readyToReceiveCommands = false;
-                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
-                    TimeUnit.SECONDS.sleep(10);
-                    GameSaveLoadManager.saveMaps();
-                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
-                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
-                    mainThread.join();
-                } catch (Exception e) {
-                    MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
-                    e.printStackTrace();
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                readyToReceiveCommands = false;
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
+                TimeUnit.SECONDS.sleep(10);
+                //TODO: add last command time/last save time to cut down on saves in this loop
+                //Also, make multithreaded
+                GameSaveLoadManager.saveMaps();
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                mainThread.join();
+            } catch (Exception e) {
+                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
+                e.printStackTrace();
             }
-        });
+        }));
     }
 }

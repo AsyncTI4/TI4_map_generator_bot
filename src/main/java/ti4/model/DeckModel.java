@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class DeckModel implements ModelInterface {
-    private String alias;
-    private String name;
-    private String type;
-    private String description;
-    private List<String> cardIDs;
+
+  private String alias;
+  private String name;
+  private String type;
+  private String description;
+  private List<String> cardIDs;
 
   public boolean isValid() {
         return alias != null
@@ -35,11 +36,11 @@ public class DeckModel implements ModelInterface {
         return description;
     }
 
-    public List<String> getCardIDs() {
-        return cardIDs;
+    public List<String> getNewDeck() {
+        return new ArrayList<>(cardIDs);
     }
 
-    public List<String> getShuffledCardList() {
+    public List<String> getNewShuffledDeck() {
         List<String> cardList = new ArrayList<>(cardIDs);
         Collections.shuffle(cardList);
         return cardList;
@@ -47,5 +48,9 @@ public class DeckModel implements ModelInterface {
 
     public int getCardCount() {
         return cardIDs.size();
+    }
+
+    private void setCardIDs(List<String> cardIDs) { // This method is for Jackson
+      this.cardIDs = Collections.unmodifiableList(cardIDs);
     }
 }

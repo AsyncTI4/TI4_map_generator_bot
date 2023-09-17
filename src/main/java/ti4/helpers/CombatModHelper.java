@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.player.AbilityInfo;
-import ti4.commands.special.CombatRoll;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -91,7 +90,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), AbilityInfo.getAbilityRepresentation(ability)));
             }
         }
@@ -102,7 +101,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getTechRepresentationLong(tech)));
             }
         }
@@ -113,7 +112,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getRelicRepresentation(relic)));
             }
         }
@@ -128,7 +127,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
             }
         }
@@ -140,7 +139,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(
                                 new NamedCombatModifierModel(relevantMod.get(),
                                         Helper.getEmojiFromDiscord(unit.getBaseType()) + " "
@@ -157,7 +156,7 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-            && checkModPassesCondition(relevantMod.get(), tile, player, opponent, activeGame, unitsByQuantity)) {
+            && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
             }
         }
@@ -178,7 +177,7 @@ public class CombatModHelper {
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-            Player opponent, Game activeGame, Map<UnitModel, Integer> unitsByQuantity) {
+            Player opponent, Map<UnitModel, Integer> unitsByQuantity) {
         boolean meetsCondition = false;
         String condition = "";
         if(modifier != null && modifier.getCondition() != null){
@@ -230,10 +229,10 @@ public class CombatModHelper {
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent, Game activeGame) {
         double value = mod.getValue().doubleValue();
-        double multipler = 1.0;
+        double multiplier = 1.0;
         Long scalingCount = (long) 0;
-        if (mod.getValueScalingMultipler() != null) {
-            multipler = mod.getValueScalingMultipler();
+        if (mod.getValueScalingMultiplier() != null) {
+            multiplier = mod.getValueScalingMultiplier();
         }
         if (StringUtils.isNotBlank(mod.getValueScalingType())) {
             switch (mod.getValueScalingType()) {
@@ -307,7 +306,7 @@ public class CombatModHelper {
                 default -> {
                 }
             }
-            value = value * multipler * scalingCount.doubleValue();
+            value = value * multiplier * scalingCount.doubleValue();
         }
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesnt return 2.5 etc
         return (int) value;

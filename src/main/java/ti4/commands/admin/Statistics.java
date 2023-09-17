@@ -23,7 +23,6 @@ public class Statistics extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> winnerFactionCount = new HashMap<>();
         Map<String, Integer> colorCount = new HashMap<>();
