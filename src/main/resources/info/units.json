@@ -2889,7 +2889,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported."
     },
     {
         "id": "titans_pds2",
@@ -2911,7 +2911,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. "
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
     },
     {
         "id": "tnelis_destroyer",
