@@ -59,16 +59,12 @@ public class CombatHelper {
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, CombatRollType roleType){
         //return GetUnitsInCombatRound(unitHolder,player, event);
-        switch(roleType){
-            case combatround: 
-                return GetUnitsInCombatRound(unitHolder,player, event);
-            case afb:
-                return GetUnitsInAFB(unitHolder, player, event);
-            case bombardment:
-                return GetUnitsInBombardment(unitHolder, player, event);
-            default: 
-                return GetUnitsInCombatRound(unitHolder,player, event);
-        } 
+        return switch (roleType) {
+            case combatround -> GetUnitsInCombatRound(unitHolder, player, event);
+            case afb -> GetUnitsInAFB(unitHolder, player, event);
+            case bombardment -> GetUnitsInBombardment(unitHolder, player, event);
+            default -> GetUnitsInCombatRound(unitHolder, player, event);
+        };
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
@@ -134,7 +130,7 @@ public class CombatHelper {
         if (unitHolder.getName().equals(Constants.SPACE)) {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
-                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+                .filter(entry -> entry.getKey().getAfbDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
@@ -181,7 +177,7 @@ public class CombatHelper {
         if (unitHolder.getName().equals(Constants.SPACE)) {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
-                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+                .filter(entry -> entry.getKey().getBombardDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
@@ -330,9 +326,7 @@ public class CombatHelper {
         }
         result = resultBuilder.toString();
 
-        StringBuilder hitEmojis = new StringBuilder();
-        hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
-        result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
+        result += String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
         return result;
     }
 }

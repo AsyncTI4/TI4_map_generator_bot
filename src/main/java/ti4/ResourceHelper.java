@@ -149,9 +149,6 @@ public class ResourceHelper {
         File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
         if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
-        } else {
-            // System.out.println("Could not find resource file " + name + " in folder " + folder);
-            // System.out.println(errorDescription);
         }
         return null;
     }

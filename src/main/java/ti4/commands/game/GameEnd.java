@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,13 +114,14 @@ public class GameEnd extends GameSubcommandData {
         
         if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
-            FileUpload fileUpload = FileUpload.fromData(file);
-            pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-                m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
-                String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            });
+            try (FileUpload fileUpload = FileUpload.fromData(file)) {
+                pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
+                    String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                });
+            } catch (IOException ignored) {}
         }
 
         // GET BOTHELPER LOUNGE

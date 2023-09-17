@@ -295,7 +295,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 
                 final String ministerOfExploration = "minister_exploration";
-                if (activeGame.getLaws().keySet().contains(ministerOfExploration)) {
+                if (activeGame.getLaws().containsKey(ministerOfExploration)) {
                     if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction()) && event != null) {
                         String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");

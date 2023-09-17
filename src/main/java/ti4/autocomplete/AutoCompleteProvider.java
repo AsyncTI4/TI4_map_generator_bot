@@ -635,7 +635,7 @@ public class AutoCompleteProvider {
                         List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(
                                 List.of(GlobalSettings.ImplementedSettings.values()));
                         List<Command.Choice> options = settings.stream()
-                                .map(setting -> setting.toString())
+                                .map(GlobalSettings.ImplementedSettings::toString)
                                 .filter(setting -> setting.contains(enteredValue))
                                 .limit(25)
                                 .map(setting -> new Command.Choice(setting, setting))
@@ -707,7 +707,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = tiles.stream()
                                 .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getName())
+                                .map(TileModel::getName)
                                 .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
@@ -722,7 +722,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = leaders.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
+                                .map(Map.Entry::getKey)
                                 .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
@@ -767,7 +767,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = abilities.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
+                                .map(Map.Entry::getKey)
                                 .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
@@ -782,7 +782,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = relics.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
+                                .map(Map.Entry::getKey)
                                 .map(value -> new Command.Choice(value, value))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();

@@ -58,7 +58,7 @@ public class Game {
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
     private int mapImageGenerationCount;
-    private final MiltyDraftManager miltyDraftManager;
+    private MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
     private boolean botFactionReacts;
     @JsonIgnore
@@ -209,26 +209,28 @@ public class Game {
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
 
-    public Game() {
-        creationDate = Helper.getDateRepresentation(new Date().getTime());
-        lastModifiedDate = new Date().getTime();
+    public static Game setupNewGame() {
+        Game game = new Game();
+        game.creationDate = Helper.getDateRepresentation(new Date().getTime());
+        game.lastModifiedDate = new Date().getTime();
 
-        miltyDraftManager = new MiltyDraftManager();
+        game.miltyDraftManager = new MiltyDraftManager();
 
-        secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
-        actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
-        explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
-        publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getNewShuffledDeck();
-        publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
-        agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
-        relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
+        game.secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
+        game.actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
+        game.explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
+        game.publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getNewShuffledDeck();
+        game.publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
+        game.agendas = Mapper.getDecks().get("agendas_pok").getNewShuffledDeck();
+        game.relics = Mapper.getDecks().get("relics_pok").getNewShuffledDeck();
 
-        addCustomPO(Constants.CUSTODIAN, 1);
+        game.addCustomPO(Constants.CUSTODIAN, 1);
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
-            scTradeGoods.put(i + 1, 0);
+            game.scTradeGoods.put(i + 1, 0);
         }
+        return game;
     }
 
     public void fixScrewedSOs() {
@@ -468,7 +470,6 @@ public class Game {
         listOfTilePinged[count] = tileName;
     }
 
-    //GAME MODES
     public boolean isCompetitiveTIGLGame() {
         return competitiveTIGLGame;
     }

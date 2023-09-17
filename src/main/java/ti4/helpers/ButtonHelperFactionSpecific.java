@@ -106,7 +106,7 @@ public class ButtonHelperFactionSpecific {
             if(p1 == player){
                 continue;
             }
-            List<Button> stuffToTransButtons = new ArrayList<Button>();
+            List<Button> stuffToTransButtons = new ArrayList<>();
             String message =  Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)+" The Naalu Hero has been played and you must send a PN. Please select the PN you would like to send";
             for(String pnShortHand : p1.getPromissoryNotes().keySet())
             {
@@ -311,7 +311,7 @@ public class ButtonHelperFactionSpecific {
 
      public static void resolveArtunoCheck(Player player, Game activeGame, int tg){
         if(player.hasUnexhaustedLeader("nomadagentartuno", activeGame)){
-            List<Button> buttons = new ArrayList<Button>();
+            List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_"+tg, "Exhaust Artuno with "+tg+" tg"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to exhaust your agent Artuno and place "+tg+" tg on her.", buttons);

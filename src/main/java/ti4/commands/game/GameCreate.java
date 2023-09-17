@@ -47,7 +47,7 @@ public class GameCreate extends GameSubcommandData {
     }
 
     public static Game createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
-        Game newGame = new Game();
+        Game newGame = Game.setupNewGame();
         String ownerID = gameOwner.getId();
         newGame.setOwnerID(ownerID);
         newGame.setOwnerName(gameOwner.getEffectiveName());

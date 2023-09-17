@@ -57,7 +57,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -310,7 +309,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("get_so_score_buttons")) {
             String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(activeGame, player);
-            if (soButtons != null && !soButtons.isEmpty()) {
+            if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
@@ -384,7 +383,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("get_so_discard_buttons")) {
             String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(activeGame, player);
-            if (soButtons != null && !soButtons.isEmpty()) {
+            if (!soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
@@ -407,7 +406,7 @@ public class ButtonListener extends ListenerAdapter {
                     "Only the player who played Politics can assign Speaker");
                 return;
             }
-            if (activeGame != null && !activeGame.isFoWMode()) {
+            if (!activeGame.isFoWMode()) {
                 for (Player player_ : activeGame.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
@@ -1244,7 +1243,7 @@ public class ButtonListener extends ListenerAdapter {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if (exhaustedMessage == null || "".equalsIgnoreCase(exhaustedMessage)) {
+            if ("".equalsIgnoreCase(exhaustedMessage)) {
                 exhaustedMessage = "Explore";
             }
             if (actionRow2.size() > 0) {
@@ -2132,9 +2131,6 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
                 }
                 case "score_imperial" -> {
-                    if (player == null || activeGame == null) {
-                        break;
-                    }
                     if (!player.getSCs().contains(8)) {
                         MessageHelper.sendMessageToChannel(privateChannel, "Only the player who has "
                             + Helper.getSCBackRepresentation(activeGame, 8) + " can score the Imperial point");
@@ -2776,9 +2772,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "vote" -> {
                     String pfaction2 = null;
-                    if (player != null) {
-                        pfaction2 = player.getFaction();
-                    }
+                    pfaction2 = player.getFaction();
                     if (pfaction2 != null) {
                         String voteMessage = "Chose to Vote. Click buttons for which outcome to vote for.";
                         String agendaDetails = activeGame.getCurrentAgendaInfo().split("_")[1];

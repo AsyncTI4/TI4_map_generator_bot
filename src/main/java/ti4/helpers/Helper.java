@@ -289,7 +289,7 @@ public class Helper {
             return "@Oopsidoops no name";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
-        if (roles != null && !roles.isEmpty()){
+        if (!roles.isEmpty()){
             return roles.get(0).getAsMention();
         }
         return "[@" + roleName + "]";
@@ -1708,7 +1708,7 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
             String faction = tech.getFaction();
-            if (tech.getType().toString().equalsIgnoreCase("unitupgrade")) {
+            if ("unitupgrade".equalsIgnoreCase(tech.getType().toString())) {
                 if (player.hasTech(tech.getAlias())) {
                     if (faction.isEmpty()) {
                          techs.add(tech);
@@ -1794,7 +1794,7 @@ public class Helper {
 
      public static void setOrder(Game activeGame){
         
-        List<Integer> hsLocations = new ArrayList<Integer>();
+        List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
         for(Player player : activeGame.getRealPlayers()){
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
@@ -1808,7 +1808,7 @@ public class Helper {
             unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
         }
         Collections.sort(hsLocations);
-        List<Player> sortedPlayers = new ArrayList<Player>();
+        List<Player> sortedPlayers = new ArrayList<>();
         for(Integer location : hsLocations){
             sortedPlayers.add(unsortedPlayers.get(location));
         }
@@ -1836,7 +1836,7 @@ public class Helper {
 
     public static void checkEndGame(Game activeGame, Player player){
         if(player.getTotalVictoryPoints(activeGame) >= activeGame.getVp()){
-            List<Button> buttons = new ArrayList<Button>();
+            List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
@@ -2081,16 +2081,15 @@ public class Helper {
         long hours = totalHours % 24;
         long days = totalDays;
 
-        StringBuilder sb = new StringBuilder();
         // sb.append(String.format("%d:", days));
         // sb.append(String.format("%02dh:", hours));
         // sb.append(String.format("%02dm:", minutes));
-        sb.append(String.format("%02ds:", seconds));
-        sb.append(String.format("%03d:", milleSeconds));
-        sb.append(String.format("%03d:", microSeconds));
-        sb.append(String.format("%03d", nanoSeconds));
+        String sb = String.format("%02ds:", seconds) +
+            String.format("%03d:", milleSeconds) +
+            String.format("%03d:", microSeconds) +
+            String.format("%03d", nanoSeconds);
 
-        return sb.toString();
+        return sb;
     }
 
     public static long median(List<Long> turnTimes) {

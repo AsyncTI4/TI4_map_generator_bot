@@ -599,7 +599,7 @@ public class AgendaHelper {
                 }
             } else {
                 winner = getWinner(activeGame);
-                if (!winner.equalsIgnoreCase("") && !winner.contains("*")) {
+                if (!"".equalsIgnoreCase(winner) && !winner.contains("*")) {
                     resolveTime = true;
                 } else {
                     Player speaker;
@@ -609,7 +609,7 @@ public class AgendaHelper {
                         speaker = activeGame.getRealPlayers().get(0);
                     }
                     List<Button> tiedWinners = new ArrayList<>();
-                    if (!winner.equalsIgnoreCase("")) {
+                    if (!"".equalsIgnoreCase(winner)) {
                         StringTokenizer winnerInfo = new StringTokenizer(winner, "*");
                         while (winnerInfo.hasMoreTokens()) {
                             String tiedWinner = winnerInfo.nextToken();
@@ -1085,7 +1085,7 @@ public class AgendaHelper {
         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) {
-            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
@@ -1590,7 +1590,7 @@ public class AgendaHelper {
         } else {
             StringBuilder summaryBuilder = new StringBuilder("# Agenda Name: "+agendaName+"\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
-               
+
                  agendaDetails = agendaDetails.split("_")[1];
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");

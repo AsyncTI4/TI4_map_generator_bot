@@ -71,7 +71,7 @@ public class DeleteGame implements Command {
             return;
         }
 
-        if (GameSaveLoadManager.deleteMap(mapName)) {
+        if (GameSaveLoadManager.deleteGame(mapName)) {
             GameManager.getInstance().deleteGame(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");
         } else {

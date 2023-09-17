@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -84,8 +85,8 @@ public class GlobalSettings {
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
-            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted(Comparator.comparing(Entry::getKey)).toList()) {
+            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");
         return sb.toString();

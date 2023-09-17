@@ -147,29 +147,21 @@ public class UnitModel implements ModelInterface {
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType){
-        switch (rollType) {
-            case combatround:
-                return getCombatDieCount();
-            case afb:
-                return getAfbDieCount();
-            case bombardment:
-                return getBombardDieCount();
-            default:
-                return getCombatDieCount();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatDieCount();
+            case afb -> getAfbDieCount();
+            case bombardment -> getBombardDieCount();
+            default -> getCombatDieCount();
+        };
     }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType){
-        switch (rollType) {
-            case combatround:
-                return getCombatHitsOn();
-            case afb:
-                return getAfbHitsOn();
-            case bombardment:
-                return getBombardHitsOn();
-            default:
-                return getCombatHitsOn();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatHitsOn();
+            case afb -> getAfbHitsOn();
+            case bombardment -> getBombardHitsOn();
+            default -> getCombatHitsOn();
+        };
     }
 
     private String getAsyncIDAliases() {

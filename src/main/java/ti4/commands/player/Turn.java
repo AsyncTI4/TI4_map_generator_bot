@@ -189,7 +189,7 @@ public class Turn extends PlayerSubcommandData {
                     MessageHelper.sendPrivateMessageToPlayer(player, activeGame, event, text, fail, success);
                     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
                     
-                    if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
+                    if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
                     }
                     if(player.getStasisInfantry() > 0){

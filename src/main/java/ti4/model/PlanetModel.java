@@ -67,7 +67,7 @@ public class PlanetModel {
         TileModel tile = TileHelper.getTile(getTileId());
         StringBuilder sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
-        if (tile != null) sb.append("\nSystem: " + tile.getName());
+        if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
 
         /*

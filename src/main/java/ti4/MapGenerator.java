@@ -248,7 +248,7 @@ public class MapGenerator {
         }
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
-        GameSaveLoadManager.loadMaps();
+        GameSaveLoadManager.loadGames();
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations(); 

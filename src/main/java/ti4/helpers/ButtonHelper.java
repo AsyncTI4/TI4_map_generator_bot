@@ -1166,7 +1166,7 @@ public class ButtonHelper {
                         }
                     }
                     if("space".equalsIgnoreCase(spaceOrGround)){
-                        List<Button> buttons2 = new ArrayList<Button>();
+                        List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
                         MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use this button to roll AFB", buttons2);
                     }
@@ -1224,7 +1224,7 @@ public class ButtonHelper {
                                 }
                             }//buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName()+"_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
                             if("space".equalsIgnoreCase(spaceOrGround)){
-                                List<Button> buttons2 = new ArrayList<Button>();
+                                List<Button> buttons2 = new ArrayList<>();
                                 buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
                                 MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use this button to roll AFB", buttons2);
                             }
@@ -1343,7 +1343,7 @@ public class ButtonHelper {
                     buttons.add(Button.secondary(finChecker+"initialIndoctrination_"+unitH.getName(), "Indoctrinate on "+nameOfHolder).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
                 }
             }
-            if(nameOfHolder.equalsIgnoreCase("space")){
+            if("space".equalsIgnoreCase(nameOfHolder)){
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
             }else{
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
@@ -1939,14 +1939,10 @@ public class ButtonHelper {
         if(idInfo.length > 3){
             String rollTypeString = idInfo[3];
             switch (rollTypeString) {
-                case "afb":
-                    rollType = CombatRollType.afb;
-                    break;
-                case "bombardment":
-                    rollType = CombatRollType.bombardment;
-                    break;
-                default:
-                    break;
+                case "afb" -> rollType = CombatRollType.afb;
+                case "bombardment" -> rollType = CombatRollType.bombardment;
+                default -> {
+                }
             }
         }
         new CombatRoll().secondHalfOfCombatRoll(player, activeGame, event, activeGame.getTileByPosition(pos), unitHolderName, new HashMap<>(), new ArrayList<>(), rollType);
@@ -2906,7 +2902,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
 
             if (player2.hasLeader("naaluhero") && player2.getLeaderByID("naaluhero").isPresent()
                     && player2.getLeaderByID("naaluhero").map(Leader::isLocked).orElse(true)) {
-                    List<Button> buttons = new ArrayList<Button>();
+                    List<Button> buttons = new ArrayList<>();
                     buttons.add(Button.success("naaluHeroInitiation", "Play Naalu Hero"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(activeGame),

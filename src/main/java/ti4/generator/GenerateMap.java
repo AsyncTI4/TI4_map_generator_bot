@@ -319,12 +319,12 @@ public class GenerateMap {
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
             StringBuilder sb = new StringBuilder();
-            sb.append(" Total time to generate map " + activeGame.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
-            sb.append("   Frog time: " + Helper.getTimeRepresentationNanoSeconds(debugFowTime) + String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
-            sb.append("   Tile time: " + Helper.getTimeRepresentationNanoSeconds(debugTileTime) + String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
-            sb.append("   Info time: " + Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime) + String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append(" Total time to generate map ").append(activeGame.getName()).append(": ").append(Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
+            sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
+            sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
+            sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
-            MessageHelper.sendMessageToChannel((MessageChannelUnion) BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
+            MessageHelper.sendMessageToChannel(BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
 
         return jpgFile;
@@ -1897,7 +1897,7 @@ public class GenerateMap {
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
             
-            Comparator<Player> comparator = Comparator.comparing(p -> activeGame.getPlayersTurnSCInitiative(p));
+            Comparator<Player> comparator = Comparator.comparing(activeGame::getPlayersTurnSCInitiative);
             allPlayers.sort(comparator);
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
