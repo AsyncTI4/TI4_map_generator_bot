@@ -231,7 +231,7 @@
     "mapText": "Discard this card after performing an action to return 1 of your command counters from the game board to your reinforcements. then you may perform 1 additional action.",
     "source": "base"
   },
-  {
+  { 
     "alias": "miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
@@ -867,7 +867,7 @@
     "text2": "Against: Attach this card to the Mecatol Rex planet card. The player that controls Mecatol Rex gains 1 victory point, and loses 1 victory point if they lose control of Mecatol Rex.",
     "source": "absol"
   },
-  {
+  { 
     "alias": "absol_abolishment",
     "name": "Judicial Abolishment",
     "type": "Directive",
@@ -956,7 +956,7 @@
     "mapText": "Follow Warfare without spending a command token. Action: Exhaust this card and spend 1 strat CC to perform Warfare Primary.",
     "source": "absol"
   },
-  {
+  { 
     "alias": "absol_miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",

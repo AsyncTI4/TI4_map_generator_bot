@@ -1705,6 +1705,21 @@ public class Helper {
         return techs;
     }
 
+     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        for (TechnologyModel tech : Mapper.getTechs().values()) {
+            String faction = tech.getFaction();
+            if (tech.getType().toString().equalsIgnoreCase("unitupgrade")) {
+                if (player.hasTech(tech.getAlias())) {
+                    if (faction.isEmpty()) {
+                         techs.add(tech);
+                    } 
+                }
+            }
+        }
+        return techs;
+    }
+
     public static String getTechRepresentationLong(String techID) {
         TechnologyModel tech = Mapper.getTechs().get(techID);
 
