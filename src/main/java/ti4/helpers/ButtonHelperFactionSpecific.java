@@ -419,7 +419,7 @@ public class ButtonHelperFactionSpecific {
             String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             pillageCheck(player, activeGame);
-            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+            resolveArtunoCheck(player, activeGame, 1);
         }
      }
      public static List<Button> getEmpyHeroButtons(Player player, Game activeGame){
@@ -593,9 +593,9 @@ public class ButtonHelperFactionSpecific {
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
                     pillageCheck(sender, activeGame);
-                    ButtonHelperFactionSpecific.resolveArtunoCheck(sender, activeGame, 1);
+                    resolveArtunoCheck(sender, activeGame, 1);
                     pillageCheck(receiver, activeGame);
-                    ButtonHelperFactionSpecific.resolveArtunoCheck(receiver, activeGame, 1);
+                    resolveArtunoCheck(receiver, activeGame, 1);
                 }
             }
         }
@@ -614,7 +614,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             }
             pillageCheck(player, activeGame);
-            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+            resolveArtunoCheck(player, activeGame, 1);
         }
     }
 
@@ -1300,7 +1300,7 @@ public class ButtonHelperFactionSpecific {
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg()+2);
             pillageCheck(player, activeGame);
-            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
+            resolveArtunoCheck(player, activeGame, 2);
             String message = trueIdentity+" increased your tgs by 2 ("+(player.getTg()-2)+"->"+player.getTg()+"). Use buttons in your cards info thread to discard an AC";
             MessageHelper.sendMessageToChannel(channel2, message);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
@@ -1675,7 +1675,7 @@ public class ButtonHelperFactionSpecific {
                 String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " due to your council patronage ability, 1tg has been added to your total and your commodities have been refreshed";
                 MessageHelper.sendMessageToChannel(channel, message);
                 pillageCheck(player, activeGame);
-                ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+                resolveArtunoCheck(player, activeGame, 1);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 cabalAgentInitiation(activeGame, player);
 

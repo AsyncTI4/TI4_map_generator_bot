@@ -51,34 +51,25 @@ public class Game {
     private String ownerID;
     private String ownerName = "";
     private String name;
-
     private String latestCommand = "";
-
     private String latestOutcomeVotedFor = "";
-
     private String latestAfterMsg = "";
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
-
     private int mapImageGenerationCount;
-
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
-    private boolean botFactionReacts = false;
-
+    private boolean botFactionReacts;
     @JsonIgnore
     private final HashMap<String, UnitHolder> planets = new HashMap<>();
-
     @Nullable
     private DisplayType displayTypeForced;
     @ExportableField
     private int playerCountForMap = 6;
-
     @Getter
     @Setter
     private boolean reverseSpeakerOrder;
-
     @ExportableField
     private int activationCount;
     @ExportableField
@@ -109,7 +100,6 @@ public class Game {
     private String largeText = "small";
     @ExportableField
     private boolean absolMode;
-
     @Getter
     @Setter
     private String acDeckID = "action_cards_pok";
@@ -135,7 +125,6 @@ public class Game {
     @Setter
     @ExportableField
     private String scSetID = "pok";
-
     @ExportableField
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -151,12 +140,8 @@ public class Game {
     private String mainChannelID;
     @Nullable
     private String botMapUpdatesThreadID;
-
-    //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
-
     private final HashMap<Integer, Boolean> scPlayed = new HashMap<>();
-
     private HashMap<String, String> currentAgendaVotes = new HashMap<>();
     @ExportableField
     private String speaker = "";
@@ -168,18 +153,15 @@ public class Game {
     private long lastModifiedDate;
     @ExportableField
     private int round = 1;
-     @ExportableField
-    private int buttonPress = 0;
-
+    @ExportableField
+    private int buttonPress;
     @ExportableField
     private int pingSystemCounter;
-
     @ExportableField
     private String playersWhoHitPersistentNoAfter = "";
     private String playersWhoHitPersistentNoWhen = "";
     @ExportableField
     private final String[] listOfTilePinged = new String[10];
-
     @ExportableField
     private String activePlayer;
     @ExportableField
@@ -193,7 +175,6 @@ public class Game {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
-    private final LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private String phaseOfGame = "";
@@ -211,34 +192,21 @@ public class Game {
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
-
     @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
-    // @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
-
     private List<String> publicObjectives1;
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
-
     @JsonIgnore
     private ArrayList<String> purgedPN = new ArrayList<>();
-
     private List<String> explore;
     private ArrayList<String> discardExplore = new ArrayList<>();
-    private List<String> relics = new ArrayList<>();
-
+    private List<String> relics;
     @JsonIgnore
-    private static HashMap<Player, Integer> playerVPs = new HashMap<>();
-
-    //AUTOCOMPLETE CACHE
-    @JsonIgnore
-    List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    @JsonIgnore
-    List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache;
-
+    private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
 
     public Game() {
@@ -247,24 +215,13 @@ public class Game {
 
         miltyDraftManager = new MiltyDraftManager();
 
-        //Card Decks
-        secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
-        Collections.shuffle(secretObjectives);
-
-        actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
-        Collections.shuffle(actionCards);
-
-        explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
-        Collections.shuffle(explore);
-
-        publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getShuffledCardList();
-        Collections.shuffle(publicObjectives1);
-
-        publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getShuffledCardList();
-        Collections.shuffle(publicObjectives2);
-
-        resetAgendas();
-        resetRelics();
+        secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
+        actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
+        explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
+        publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getNewShuffledDeck();
+        publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
+        agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
+        relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
 
         addCustomPO(Constants.CUSTODIAN, 1);
 
@@ -278,7 +235,7 @@ public class Game {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
             "The number of SOs in the deck before this operation is " + getNumberOfSOsInTheDeck() + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
 
-        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(secretObjectives);
         for (Player player : getPlayers().values()) {
             if (player == null) {
@@ -1242,7 +1199,6 @@ public class Game {
     }
 
     public boolean isCustodiansScored() {
-
         boolean custodiansTaken = false;
         String idC = "";
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -1293,11 +1249,7 @@ public class Game {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (scoredPlayerList.contains(userID)) {
-                scoredPlayerList.remove(userID);
-                scoredPublicObjectives.put(id, scoredPlayerList);
-                return true;
-            }
+            return scoredPlayerList.remove(userID);
         }
         return false;
     }
@@ -1309,7 +1261,6 @@ public class Game {
     }
 
     public boolean removeCustomPO(Integer idNumber) {
-
         String id = "";
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
@@ -1496,8 +1447,7 @@ public class Game {
     }
 
     public void resetAgendas() {
-        agendas = Mapper.getDecks().get(getAgendaDeckID()).getShuffledCardList();
-        Collections.shuffle(agendas);
+        agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
         discardAgendas = new LinkedHashMap<>();
     }
 
@@ -1756,7 +1706,6 @@ public class Game {
     }
 
     public boolean putSpecificAgendaOnTop(String agendaID) {
-
         boolean succeeded = agendas.remove(agendaID);
         addDiscardAgenda(agendaID);
         return succeeded;
@@ -1867,49 +1816,37 @@ public class Game {
     }
 
     public void triplicateExplores() {
-        explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
-        Collections.shuffle(explore);
-        for (String relic : Mapper.getDecks().get("explores_pok").getShuffledCardList()) {
-            String copy1 = relic + "extra1";
-            String copy2 = relic + "extra2";
-            explore.add(copy1);
-            explore.add(copy2);
+        explore = Mapper.getDecks().get("explores_pok").getNewDeck();
+        for (String card : explore) {
+            explore.add(card + "extra1");
+            explore.add(card + "extra2");
         }
         Collections.shuffle(explore);
     }
 
     public void triplicateACs() {
-        actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
-        Collections.shuffle(actionCards);
-        for (String relic : Mapper.getDecks().get("action_cards_pok").getShuffledCardList()) {
-            String copy1 = relic + "extra1";
-            String copy2 = relic + "extra2";
-            actionCards.add(copy1);
-            actionCards.add(copy2);
+        actionCards = Mapper.getDecks().get("action_cards_pok").getNewDeck();
+        for (String card : actionCards) {
+            actionCards.add(card + "extra1");
+            actionCards.add(card + "extra2");
         }
         Collections.shuffle(actionCards);
     }
 
     public void triplicateSOs() {
-        secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
-        Collections.shuffle(secretObjectives);
-        for (String relic : Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList()) {
-            String copy1 = relic + "extra1";
-            String copy2 = relic + "extra2";
-            secretObjectives.add(copy1);
-            secretObjectives.add(copy2);
+        secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewDeck();
+        for (String card : secretObjectives) {
+            secretObjectives.add(card + "extra1");
+            secretObjectives.add(card + "extra2");
         }
         Collections.shuffle(secretObjectives);
     }
 
     public String drawRelic() {
-        ArrayList<String> relics_ = new ArrayList<>(relics);
-        if (relics_.isEmpty()) {
+        if (relics.isEmpty()) {
             return "";
         }
-        String remove = relics_.remove(0);
-        relics.remove(remove);
-        return remove;
+        return relics.remove(0);
     }
 
     public boolean shuffleRelicBack(String relicID) {
@@ -1936,18 +1873,15 @@ public class Game {
         }
     }
 
-    @Nullable
-    public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
+    public void drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
             String id = secretObjectives.get(0);
             Player player = getPlayer(userID);
             if (player != null) {
                 secretObjectives.remove(id);
                 player.setSecret(id);
-                return player.getSecrets();
             }
         }
-        return null;
     }
 
     @Nullable
@@ -1969,30 +1903,28 @@ public class Game {
         return secretObjectives.remove(soID);
     }
 
-    @Nullable
-    public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
-        if (!actionCards.isEmpty()) {
-            int tries = 0;
-            while (tries < 3) {
-                if (actionCards.contains(acID)) {
-                    Player player = getPlayer(userID);
-                    if (player != null) {
-                        actionCards.remove(acID);
-                        player.setActionCard(acID);
-                        return player.getActionCards();
-                    }
-                    tries = 12;
-                }
-                tries++;
-                if (acID.contains("extra1")) {
-                    acID = acID.replace("extra1", "extra2");
-                } else {
-                    acID = acID + "extra1";
-                }
-            }
-
+    public void drawSpecificActionCard(String acID, String userID) {
+        if (actionCards.isEmpty()) {
+            return;
         }
-        return null;
+        int tries = 0;
+        while (tries < 3) {
+            if (actionCards.contains(acID)) {
+                Player player = getPlayer(userID);
+                if (player != null) {
+                    actionCards.remove(acID);
+                    player.setActionCard(acID);
+                    return;
+                }
+                tries = 12;
+            }
+            tries++;
+            if (acID.contains("extra1")) {
+                acID = acID.replace("extra1", "extra2");
+            } else {
+                acID = acID + "extra1";
+            }
+        }
     }
 
     public void setDiscardActionCard(String id) {
@@ -2065,7 +1997,6 @@ public class Game {
             actionCards.add(acID);
             Collections.shuffle(actionCards);
             return true;
-
         }
         return false;
     }
@@ -2195,34 +2126,31 @@ public class Game {
     }
 
     public void setRelics(List<String> deck) {
-        deck = new ArrayList<>(deck);
-        relics = deck;
+        relics = new ArrayList<>(deck);
     }
 
     public void resetRelics() {
-        relics = Mapper.getDecks().get(getRelicDeckID()).getShuffledCardList();
-        Collections.shuffle(relics);
+        relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
     }
 
     public void triplicateRelics() {
         if (absolMode) {
-            relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
-            for (String relic : Mapper.getDecks().get("relics_absol").getShuffledCardList()) {
+            relics = Mapper.getDecks().get("relics_absol").getNewShuffledDeck();
+            for (String relic : Mapper.getDecks().get("relics_absol").getNewShuffledDeck()) {
                 String copy1 = relic + "extra1";
                 String copy2 = relic + "extra2";
                 relics.add(copy1);
                 relics.add(copy2);
             }
         } else {
-            relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
-            for (String relic : Mapper.getDecks().get("relics_pok").getShuffledCardList()) {
+            relics = Mapper.getDecks().get("relics_pok").getNewShuffledDeck();
+            for (String relic : Mapper.getDecks().get("relics_pok").getNewShuffledDeck()) {
                 String copy1 = relic + "extra1";
                 String copy2 = relic + "extra2";
                 relics.add(copy1);
                 relics.add(copy2);
             }
         }
-
         Collections.shuffle(relics);
     }
 
@@ -2246,7 +2174,7 @@ public class Game {
             }
         }
         setAcDeckID(deck.getAlias());
-        setActionCards(deck.getShuffledCardList());
+        setActionCards(deck.getNewShuffledDeck());
         return true;
     }
 
@@ -2258,7 +2186,7 @@ public class Game {
             }
         }
         setRelicDeckID(deck.getAlias());
-        setRelics(new ArrayList<>(deck.getShuffledCardList()));
+        setRelics(deck.getNewShuffledDeck());
         return true;
     }
 
@@ -2270,7 +2198,7 @@ public class Game {
             }
         }
         setSoDeckID(deck.getAlias());
-        setSecretObjectives(deck.getShuffledCardList());
+        setSecretObjectives(deck.getNewShuffledDeck());
         return true;
     }
 
@@ -2280,7 +2208,7 @@ public class Game {
             return false;
         }
         setAgendaDeckID(deck.getAlias());
-        setAgendas(deck.getShuffledCardList());
+        setAgendas(deck.getNewShuffledDeck());
         return true;
     }
 
@@ -2488,20 +2416,6 @@ public class Game {
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
         }
         return planets.keySet();
-    }
-
-    private void calculatePlayerVPs() {
-        playerVPs = new HashMap<>();
-        for (Player player : getPlayers().values()) {
-            playerVPs.put(player, player.getTotalVictoryPoints(this));
-        }
-    }
-
-    public int getPlayerVPs(Player player) {
-        calculatePlayerVPs();
-        Integer playerVPCount = playerVPs.get(player);
-        if (playerVPCount == null) playerVPCount = 0;
-        return playerVPCount;
     }
 
     public void endGameIfOld() {
@@ -2744,7 +2658,7 @@ public class Game {
         DeckModel exploreDeckModel = Mapper.getDeck(getExplorationDeckID());
         if (exploreDeckModel == null) return -1;
         List<String> exploreDeck = new ArrayList<>();
-        for (String exploreCardID : exploreDeckModel.getCardIDs()) {
+        for (String exploreCardID : exploreDeckModel.getNewDeck()) {
             String exploreCard = Mapper.getExplore(exploreCardID);
             if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
                 exploreDeck.add(exploreCard);

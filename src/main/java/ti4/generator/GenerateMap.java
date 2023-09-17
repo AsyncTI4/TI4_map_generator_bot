@@ -323,8 +323,8 @@ public class GenerateMap {
             sb.append("   Frog time: " + Helper.getTimeRepresentationNanoSeconds(debugFowTime) + String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
             sb.append("   Tile time: " + Helper.getTimeRepresentationNanoSeconds(debugTileTime) + String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
             sb.append("   Info time: " + Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime) + String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
-            System.out.println(sb.toString());
-            MessageHelper.sendMessageToChannel((MessageChannelUnion) BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb.toString() + "\n```");
+            System.out.println(sb);
+            MessageHelper.sendMessageToChannel((MessageChannelUnion) BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
 
         return jpgFile;

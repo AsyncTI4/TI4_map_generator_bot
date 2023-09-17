@@ -4,32 +4,27 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 
 @Data
 public class CombatModifierModel implements ModelInterface {
+
     private String type;
     private Integer value;
     private String valueScalingType;
-    private Double valueScalingMultipler = 1.0;
-
-    private String persistanceType;
-
-    @JsonProperty("related")
+    private Double valueScalingMultiplier = 1.0;
+    private String persistenceType;
     private List<CombatModifierRelatedModel> related;
     private String alias;
     private String scope;
     private String scopeExcept;
     private String condition;
-
     private String forCombatAbility;
 
     public boolean isValid() {
         return type != null
                 && value != null
-                && persistanceType != null
+                && persistenceType != null
                 && related != null;
     }
 
@@ -40,14 +35,14 @@ public class CombatModifierModel implements ModelInterface {
 
     public Boolean isInScopeForUnit(UnitModel unit) {
         boolean isInScope = false;
-        if (getScopeExcept() != null) {
-            if (!getScopeExcept().equals(unit.getAsyncId())) {
+        if (scopeExcept != null) {
+            if (!scopeExcept.equals(unit.getAsyncId())) {
                 isInScope = true;
             }
         } else {
-            if (StringUtils.isBlank(getScope())
-                    || "all".equals(getScope())
-                    || getScope().equals(unit.getAsyncId())) {
+            if (StringUtils.isBlank(scope)
+                    || "all".equals(scope)
+                    || scope.equals(unit.getAsyncId())) {
                 isInScope = true;
             }
         }

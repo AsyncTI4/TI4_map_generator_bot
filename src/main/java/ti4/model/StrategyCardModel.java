@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 
 @Data
-public class StrategyCardModel implements ModelInterface{
+public class StrategyCardModel implements ModelInterface {
     private String name;
     private String alias;
     private Map<Integer, String> cardValues;
