@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
@@ -29,20 +31,20 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
+import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
 
     public static void resolveAgenda(Game activeGame, String buttonID, ButtonInteractionEvent event, MessageChannel actionsChannel) {
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
-        String agendaid = activeGame.getCurrentAgendaInfo().substring(
-            activeGame.getCurrentAgendaInfo().lastIndexOf("_") + 1);
+        String agendaid = activeGame.getCurrentAgendaInfo().split("_")[2];
         int aID;
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = activeGame.revealAgenda(false);
             LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "#The hidden agenda was " + agendaName
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# The hidden agenda was " + agendaName
                 + "! You can find it added as a law or in the discard.");
             aID = discardAgendas.get(id2);
         } else {
@@ -196,6 +198,16 @@ public class AgendaHelper {
                         Helper.getPlayerRepresentation(player2, activeGame) + " Use the button to get a tech", buttons);
                 }
 
+            }//"abolishment" || "absol_abolishment", "miscount" || "absol_miscount"
+            if ("abolishment".equalsIgnoreCase(agID) || "absol_abolishment".equalsIgnoreCase(agID)) {
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Abolished the "+Mapper.getAgendaTitleNoCap(winner)+" law");
+                activeGame.removeLaw(winner);
+            }
+            if ("miscount".equalsIgnoreCase(agID) || "absol_miscount".equalsIgnoreCase(agID)) {
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Repealed the "+Mapper.getAgendaTitleNoCap(winner)+" law and will now reveal it for the purposes of revoting. It is technically still in effect");
+                activeGame.removeLaw(winner);
+                activeGame.putBackIntoDeckOnTop(winner);
+                new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
             }
             if ("mutiny".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;
@@ -293,8 +305,7 @@ public class AgendaHelper {
                 // Figure out law
             }
         }
-        String summary = getSummaryOfVotes(activeGame, false);
-        List<Player> riders = getWinningRiders(summary, winner, activeGame, event);
+        List<Player> riders = getWinningRiders(winner, activeGame, event);
          List<Player> voters = getWinningVoters(winner, activeGame);
         voters.addAll(riders);
         for (Player player : voters) {
@@ -340,7 +351,9 @@ public class AgendaHelper {
         Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
             "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
         List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+         }
 
         event.getMessage().delete().queue();
     }
@@ -412,14 +425,13 @@ public class AgendaHelper {
 
     public static void exhaustPlanetsForVoting(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel, String finsFactionCheckerPrefix) {
         String votes = buttonID.substring(buttonID.indexOf("_") + 1);
-        String voteMessage = "Chose to vote  " + votes + " votes for "
-            + StringUtils.capitalize(activeGame.getLatestOutcomeVotedFor())
-            + ". Click buttons to choose which planets to exhaust for votes";
+        String voteMessage = ButtonHelper.getIdent(player)+" Chose to vote " + votes + " votes for "
+            + StringUtils.capitalize(activeGame.getLatestOutcomeVotedFor());
         List<Button> voteActionRow = getPlanetButtons(event, player, activeGame);
         int allVotes = getVoteTotal(event, player, activeGame)[0];
         Button exhausteverything = Button.danger("exhaust_everything_" + allVotes,
             "Exhaust everything (" + allVotes + ")");
-        Button concludeExhausting = Button.danger(finsFactionCheckerPrefix + "delete_buttons_" + votes,
+        Button concludeExhausting = Button.danger(finsFactionCheckerPrefix + "resolveAgendaVote_" + votes,
             "Done exhausting planets.");
         Button OopsMistake = Button.success("refreshVotes_" + votes,
             "Ready planets");
@@ -532,24 +544,16 @@ public class AgendaHelper {
                 HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
                 String existingData = outcomes.getOrDefault(outcome, "empty");
                 if ("empty".equalsIgnoreCase(existingData)) {
-
                     existingData = identifier + "_" + votes;
                 } else {
                     existingData = existingData + ";" + identifier + "_" + votes;
                 }
                 activeGame.setCurrentAgendaVote(outcome, existingData);
                 ButtonHelper.addReaction(event, true, true,
-                    "Voted " + votes + " votes for " + StringUtils.capitalize(outcome) + "!", "");
+                ButtonHelper.getIdent(player)+" Voted " + votes + " votes for " + StringUtils.capitalize(outcome) + "!", "");
             }
 
-            String pFaction1 = StringUtils.capitalize(player.getFaction());
-            Button EraseVote = Button.danger("FFCC_" + pFaction1 + "_eraseMyVote",
-                pFaction1 + " Erase Any Of Your Previous Votes");
-            List<Button> EraseButton = List.of(EraseVote);
-            String mErase = "Use this button if you want to erase your previous votes and vote again";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mErase, EraseButton);
             String message = " up to vote! Resolve using buttons.";
-
             Player nextInLine = getNextInLine(player, getVotingOrder(activeGame),
                 activeGame);
             String realIdentity2 = Helper.getPlayerRepresentation(nextInLine, activeGame, event.getGuild(), true);
@@ -577,7 +581,7 @@ public class AgendaHelper {
                 String pFaction = StringUtils.capitalize(nextInLine.getFaction());
                 String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
                 Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-                Button Abstain = Button.danger(finChecker + "delete_buttons_0", pFaction + " Choose To Abstain");
+                Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
                 Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                     "(For Others) Abstain for this player");
                 activeGame.updateActivePlayer(nextInLine);
@@ -594,41 +598,29 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                 }
             } else {
-                String summary = getSummaryOfVotes(activeGame, false);
-                winner = getWinner(summary);
-                if (winner != null && !winner.contains("*")) {
+                winner = getWinner(activeGame);
+                if (!winner.equalsIgnoreCase("") && !winner.contains("*")) {
                     resolveTime = true;
                 } else {
                     Player speaker;
                     if (activeGame.getPlayer(activeGame.getSpeaker()) != null) {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
                     } else {
-                        speaker = null;
+                        speaker = activeGame.getRealPlayers().get(0);
                     }
-
                     List<Button> tiedWinners = new ArrayList<>();
-                    if (winner != null) {
+                    if (!winner.equalsIgnoreCase("")) {
                         StringTokenizer winnerInfo = new StringTokenizer(winner, "*");
                         while (winnerInfo.hasMoreTokens()) {
                             String tiedWinner = winnerInfo.nextToken();
-                            Button button = Button.primary("delete_buttons_outcomeTie* " + tiedWinner, tiedWinner);
+                            Button button = Button.primary("resolveAgendaVote_outcomeTie* " + tiedWinner, tiedWinner);
                             tiedWinners.add(button);
                         }
                     } else {
-
-                        tiedWinners = getAgendaButtons(null, activeGame, "delete_buttons_outcomeTie*");
+                        tiedWinners = getAgendaButtons(null, activeGame, "resolveAgendaVote_outcomeTie*");
                     }
                     if (!tiedWinners.isEmpty()) {
-                        MessageChannel channel;
-                        if (activeGame.isFoWMode()) {
-                            channel = speaker == null ? null : speaker.getPrivateChannel();
-                            if (channel == null) {
-                                MessageHelper.sendMessageToChannel(event.getChannel(),
-                                    "Speaker is not assigned for some reason. Please decide the winner.");
-                            }
-                        } else {
-                            channel = event.getChannel();
-                        }
+                        MessageChannel channel = ButtonHelper.getCorrectChannel(speaker, activeGame);
                         MessageHelper.sendMessageToChannelWithButtons(channel,
                             Helper.getPlayerRepresentation(speaker, activeGame, event.getGuild(), true)
                                 + " please decide the winner.",
@@ -652,20 +644,19 @@ public class AgendaHelper {
 
     public static void resolveTime(GenericInteractionCreateEvent event, Game activeGame, String winner) {
         if (winner == null) {
-            String summary = getSummaryOfVotes(activeGame, false);
-            winner = getWinner(summary);
+            winner = getWinner(activeGame);
         }
         List<Player> losers = getLosers(winner, activeGame);
         String summary2 = getSummaryOfVotes(activeGame, true);
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), summary2 + "\n \n");
         activeGame.setCurrentPhase("agendaEnd");
         activeGame.setActivePlayer(null);
-        String resMessage = "Please hold while people resolve shenanigans. " + losers.size()
+        String resMessage = "You can hold while people resolve shenanigans. If it not an important agenda, you are encouraged to move on and float the shenanigans " + losers.size()
             + " players have the opportunity to play deadly plot.";
         if ((!activeGame.isACInDiscard("Bribery") || !activeGame.isACInDiscard("Deadly Plot"))
             && (losers.size() > 0 || activeGame.isAbsolMode())) {
-            Button noDeadly = Button.primary("genericReact1", "No Deadly Plot");
-            Button noBribery = Button.primary("genericReact2", "No Bribery");
+            Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
+            Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
 
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage,
@@ -697,7 +688,7 @@ public class AgendaHelper {
             && (!activeGame.isACInDiscard("Confounding") || !activeGame.isACInDiscard("Confusing"))) {
             String resMessage2 = Helper.getGamePing(activeGame.getGuild(), activeGame)
                 + " please react to no confusing/confounding";
-            Button noConfounding = Button.primary("genericReact3", "Refuse Confounding Legal Text");
+            Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
             Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
             List<Button> buttons = List.of(noConfounding, noConfusing);
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage2, buttons);
@@ -753,7 +744,7 @@ public class AgendaHelper {
         }
 
         event.getChannel().sendMessage(voteMessage).queue();
-        event.getMessage().delete().queue();
+        //event.getMessage().delete().queue();
     }
 
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
@@ -762,8 +753,7 @@ public class AgendaHelper {
         String choice = choiceParams[1];
 
         String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
-        String agendaDetails = activeGame.getCurrentAgendaInfo();
-        agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_") + 1);
+        String agendaDetails = activeGame.getCurrentAgendaInfo().split("_")[1];
         // if(activeMap)
         String cleanedChoice = choice;
         if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
@@ -788,16 +778,11 @@ public class AgendaHelper {
         }
         activeGame.setCurrentAgendaVote(choice, existingData);
 
-        if (!"Non-AC Rider".equalsIgnoreCase(rider) && !"Keleres Rider".equalsIgnoreCase(rider)
-            && !"Keleres Xxcha Hero".equalsIgnoreCase(rider)
-            && !"Galactic Threat Rider".equalsIgnoreCase(rider)) {
-            List<Button> voteActionRow = new ArrayList<>();
-            Button concludeExhausting = Button.danger("reverse_" + rider, "Click this if the " + rider + " is sabod");
-            voteActionRow.add(concludeExhausting);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
-        }
+       
+        MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
+        String summary2 = getSummaryOfVotes(activeGame, true);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), summary2 + "\n \n");
+        
         event.getMessage().delete().queue();
     }
 
@@ -859,7 +844,9 @@ public class AgendaHelper {
 
     public static List<Button> getVoteButtons(int minVote, int voteTotal) {
         List<Button> voteButtons = new ArrayList<>();
-
+        if(minVote < 0){
+            minVote = 0;
+        }
         if (voteTotal - minVote > 20) {
             for (int x = 10; x < voteTotal + 10; x += 10) {
                 int y = x - 9;
@@ -876,7 +863,7 @@ public class AgendaHelper {
                 Button button = Button.secondary("votes_" + x, "" + x);
                 voteButtons.add(button);
             }
-            Button button = Button.danger("distinguished_" + voteTotal, "Press Me For +5 Vote Options");
+            Button button = Button.danger("distinguished_" + voteTotal, "Increase Votes");
             voteButtons.add(button);
         }
         return voteButtons;
@@ -932,7 +919,7 @@ public class AgendaHelper {
             message = realIdentity + message;
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-            Button Abstain = Button.danger(finChecker + "delete_buttons_0", pFaction + " Choose To Abstain");
+            Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
             Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                 "(For Others) Abstain for this player");
             try {
@@ -958,11 +945,12 @@ public class AgendaHelper {
     public static List<Button> getLawOutcomeButtons(Game activeGame, String rider, String prefix) {
         List<Button> lawButtons = new ArrayList<>();
         for (Map.Entry<String, Integer> law : activeGame.getLaws().entrySet()) {
+            String lawName = Mapper.getAgendaTitleNoCap(law.getKey());
             Button button;
             if (rider == null) {
-                button = Button.secondary(prefix + "_" + law.getKey(), law.getKey());
+                button = Button.secondary(prefix + "_" + law.getKey(), lawName);
             } else {
-                button = Button.secondary(prefix + "rider_law;" + law.getKey() + "_" + rider, law.getKey());
+                button = Button.secondary(prefix + "rider_law;" + law.getKey() + "_" + rider, lawName);
             }
             lawButtons.add(button);
         }
@@ -980,6 +968,24 @@ public class AgendaHelper {
                     button = Button.secondary(prefix + "_" + so.getKey(), soName);
                 } else {
                     button = Button.secondary(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
+                }
+                secretButtons.add(button);
+            }
+        }
+        return secretButtons;
+    }
+
+    public static List<Button> getUnitUpgradeOutcomeButtons(Game activeGame, String rider, String prefix) {
+        List<Button> secretButtons = new ArrayList<>();
+        for (Player player : activeGame.getPlayers().values()) {
+            for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(player)) {
+                Button button;
+                String techName = tech.getName();
+                if (rider == null) {
+
+                    button = Button.secondary(prefix + "_" + tech.getAlias(), techName);
+                } else {
+                    button = Button.secondary(prefix + "rider_so;" + tech.getAlias() + "_" + rider, techName);
                 }
                 secretButtons.add(button);
             }
@@ -1062,8 +1068,7 @@ public class AgendaHelper {
     }
 
     public static List<Button> getAgendaButtons(String ridername, Game activeGame, String prefix) {
-        String agendaDetails = activeGame.getCurrentAgendaInfo();
-        agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_") + 1);
+        String agendaDetails = activeGame.getCurrentAgendaInfo().split("_")[1];
         List<Button> outcomeActionRow;
         if (agendaDetails.contains("For")) {
             outcomeActionRow = getForAgainstOutcomeButtons(ridername, prefix);
@@ -1079,6 +1084,8 @@ public class AgendaHelper {
             outcomeActionRow = getSecretOutcomeButtons(activeGame, ridername, prefix);
         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
+        } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) {
+            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
@@ -1087,7 +1094,7 @@ public class AgendaHelper {
 
     }
 
-    public static List<Player> getWinningRiders(String summary, String winner, Game activeGame, GenericInteractionCreateEvent event) {
+    public static List<Player> getWinningRiders(String winner, Game activeGame, GenericInteractionCreateEvent event) {
         List<Player> winningRs = new ArrayList<>();
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
 
@@ -1535,20 +1542,60 @@ public class AgendaHelper {
             }
         }
     }
+    public static String getWinner(Game activeGame){
+        String winner = "";
+        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        int currentHighest = -1;
+        for (String outcome : outcomes.keySet()) {
+            int totalVotes = 0;
+            StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+            while (vote_info.hasMoreTokens()) {
+                String specificVote = vote_info.nextToken();
+                String vote = specificVote.split("_")[1];
+                if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
+                    totalVotes += Integer.parseInt(vote);    
+                } 
+            }
+            int votes = totalVotes;
+            if (votes >= currentHighest) {
+                if (votes == currentHighest) {
+                    winner = winner+"*"+outcome;
+                } else {
+                    currentHighest = votes;
+                    winner = outcome;
+                }
+            }
+        }
+        return winner;
+    }
 
     public static String getSummaryOfVotes(Game activeGame, boolean capitalize) {
         String summary;
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
-
+         String agendaDetails = activeGame.getCurrentAgendaInfo();
+         String agendaName = "";
+        if(agendaDetails.contains("absol")){
+            agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
+        }else{
+           agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
+        }
         if (outcomes.keySet().size() == 0) {
-            summary = "No current riders or votes have been cast yet.";
+            summary = "# Agenda Name: "+agendaName+"\nNo current riders or votes have been cast yet.";
         } else {
-            StringBuilder summaryBuilder = new StringBuilder("Current status of votes and outcomes is: \n");
+            StringBuilder summaryBuilder = new StringBuilder("# Agenda Name: "+agendaName+"\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
+               
+                 agendaDetails = agendaDetails.split("_")[1];
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
-                if (capitalize) {
+                if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
+                    outcome =  Mapper.getSecretObjectivesJustNames().get(outcome);
+                } else if (agendaDetails.contains("Elect Law") || agendaDetails.contains("elect law")) {
+                    outcome = Mapper.getAgendaTitleNoCap(outcome);
+                }else if (agendaDetails.toLowerCase().contains("unit upgrade")) {
+                    outcome = Mapper.getTech(outcome).getName();
+                }else if (capitalize) {
                     outcome = StringUtils.capitalize(outcome);
                 }
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
@@ -1604,45 +1651,7 @@ public class AgendaHelper {
         return summary;
     }
 
-    public static String getWinner(String summary) {
-        StringBuilder winner = null;
-        StringTokenizer vote_info = new StringTokenizer(summary, ":");
-        int currentHighest = 0;
-        String outcome = "";
-
-        while (vote_info.hasMoreTokens()) {
-            String specificVote = vote_info.nextToken();
-            if (specificVote.contains("Current status")) {
-            } else {
-                if (!specificVote.contains("Total")) {
-                    outcome = specificVote.substring(2);
-                    continue;
-                }
-
-                String votes = specificVote.substring(13, specificVote.indexOf("."));
-                if (Integer.parseInt(votes) >= currentHighest) {
-                    if (Integer.parseInt(votes) == currentHighest) {
-                        if(winner == null){
-                            winner = new StringBuilder(outcome);
-                        }
-                        winner.append("*").append(outcome);
-                    } else {
-                        currentHighest = Integer.parseInt(votes);
-                        winner = new StringBuilder(outcome);
-                    }
-
-                }
-                outcome = specificVote.substring(specificVote.lastIndexOf(".") + 3);
-            }
-        }
-        if (currentHighest == 0) {
-            return null;
-        }
-        if(winner == null){
-             winner = new StringBuilder(outcome);
-        }
-        return winner.toString();
-    }
+   
 
     public static String getPlayerVoteText(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();

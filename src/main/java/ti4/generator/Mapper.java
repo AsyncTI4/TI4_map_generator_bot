@@ -475,6 +475,13 @@ public class Mapper {
         }
         return agendaModel.getName().toUpperCase();
     }
+    public static String getAgendaTitleNoCap(String id) {
+        AgendaModel agendaModel = agendas.get(id);
+        if (agendaModel == null) {
+            return null;
+        }
+        return agendaModel.getName();
+    }
 
     public static String getAgendaType(String id) {
         AgendaModel agendaModel = agendas.get(id);
