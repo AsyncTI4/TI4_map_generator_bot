@@ -29,8 +29,16 @@ public class TileHelper {
         return allPlanets;
     }
 
+    public static PlanetModel getPlanet(String planetId) {
+        return allPlanets.get(planetId);
+    }
+
     public static Map<String, TileModel> getAllTiles() {
         return allTiles;
+    }
+
+    public static TileModel getTile(String tileId) {
+        return allTiles.get(tileId);
     }
 
     public static void initPlanetsFromJson() {

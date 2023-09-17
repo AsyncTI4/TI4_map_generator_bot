@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import ti4.autocomplete.AutoCompleteListener;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
@@ -82,7 +83,12 @@ public class MapGenerator {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
 
-        jda.addEventListener(new MessageListener(), new ButtonListener(), new UserJoinServerListener());
+        jda.addEventListener(
+            new MessageListener(), 
+            new ButtonListener(), 
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
+            
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
@@ -147,7 +153,6 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
         commandManager.addCommand(new MoveUnits());
-        commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
@@ -255,20 +260,23 @@ public class MapGenerator {
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
-                readyToReceiveCommands = false;
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
-                TimeUnit.SECONDS.sleep(5);
-                GameSaveLoadManager.saveMaps();
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
-                mainThread.join();
-                //
-            } catch (Exception e) {
-                e.printStackTrace();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                    MapGenerator.readyToReceiveCommands = false;
+                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
+                    TimeUnit.SECONDS.sleep(10);
+                    GameSaveLoadManager.saveMaps();
+                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
+                    MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                    mainThread.join();
+                } catch (Exception e) {
+                    MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
-        }));
+        });
     }
 }

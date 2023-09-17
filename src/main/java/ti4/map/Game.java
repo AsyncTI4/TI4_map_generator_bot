@@ -154,8 +154,6 @@ public class Game {
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
-    @ExportableField
-    private GameStatus gameStatus = GameStatus.open;
 
     private final HashMap<Integer, Boolean> scPlayed = new HashMap<>();
 
@@ -2352,10 +2350,8 @@ public class Game {
     }
 
     public void addPlayer(String id, String name) {
-        if (GameStatus.open == gameStatus) {
-            Player player = new Player(id, name);
-            players.put(id, player);
-        }
+        Player player = new Player(id, name);
+        players.put(id, player);
     }
 
     public Player addPlayerLoad(String id, String name) {
@@ -2415,22 +2411,7 @@ public class Game {
     }
 
     public void removePlayer(String playerID) {
-        if (GameStatus.open == gameStatus) {
-            players.remove(playerID);
-        }
-    }
-
-    public void setGameStatus(GameStatus status) {
-        gameStatus = status;
-    }
-
-    @JsonIgnore
-    public boolean isMapOpen() {
-        return gameStatus == GameStatus.open;
-    }
-
-    public String getGameStatus() {
-        return gameStatus.value;
+        players.remove(playerID);
     }
 
     public void setOwnerID(String ownerID) {

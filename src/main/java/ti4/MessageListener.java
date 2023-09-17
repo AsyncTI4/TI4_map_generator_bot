@@ -50,21 +50,6 @@ import ti4.message.MessageHelper;
 public class MessageListener extends ListenerAdapter {
 
     @Override
-    public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        if (!MapGenerator.readyToReceiveCommands) {
-            event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
-            return;
-        }
-
-        try {
-            AutoCompleteProvider.autoCompleteListener(event);
-        } catch (Exception e) {
-            String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
-            BotLogger.log(message, e);
-        }
-    }
-
-    @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (!MapGenerator.readyToReceiveCommands) {
             event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
@@ -117,17 +102,19 @@ public class MessageListener extends ListenerAdapter {
         MapFileDeleter.deleteFiles();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
-        boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
+        boolean gameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
+        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN);
+        boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName));
+        if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (anyMatchGameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isMapOpen() || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+        if (gameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             if (gameManager.getUserActiveGame(userID) != null && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
-//                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+                // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
             }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
-            if (anyMatchGameExists && !channelName.startsWith(userActiveGame.getName())) {
+            if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
                 MessageHelper.sendMessageToChannel(channel, "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 gameManager.resetMapForUser(userID);
             }

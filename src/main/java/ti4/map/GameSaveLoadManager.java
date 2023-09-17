@@ -229,10 +229,6 @@ public class GameSaveLoadManager {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
-        writer.write(activeGame.getGameStatus());
-        writer.write(System.lineSeparator());
-
-
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
@@ -923,8 +919,6 @@ public class GameSaveLoadManager {
                     if (ENDMAPINFO.equals(data)) {
                         break;
                     }
-                   // activeMap.setMapStatus(MapStatus.valueOf(data));
-                    activeGame.setGameStatus(GameStatus.open);
 
                     while (myReader.hasNextLine()) {
                         data = myReader.nextLine();

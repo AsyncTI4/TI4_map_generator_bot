@@ -291,6 +291,8 @@ public class Emojis {
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
     public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
+    public static final String UnitTechSkip = "<:UnitTechSkip:1151926553488412702>";
+    public static final String NonUnitTechSkip = "<:NonUnitTechSkip:1151926572278874162>";
 
     // GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
@@ -336,6 +338,7 @@ public class Emojis {
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
+    public static final String BLT = "<:BLT:1080954650339065866>";
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols =
