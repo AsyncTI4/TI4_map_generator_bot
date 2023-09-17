@@ -1084,8 +1084,8 @@ public class AgendaHelper {
             outcomeActionRow = getSecretOutcomeButtons(activeGame, ridername, prefix);
         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
-        } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) {
-            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+        } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) { // TODO: same booleans?
+            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }
