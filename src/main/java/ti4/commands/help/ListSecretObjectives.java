@@ -17,7 +17,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
 
     public ListSecretObjectives() {
         super(Constants.LIST_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
         Map<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         List<String> searchedList = soList.keySet().stream()
             .map(secretObjectiveModel -> secretObjectiveModel + " = " + SOInfo.getSecretObjectiveRepresentation(secretObjectiveModel))
-            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

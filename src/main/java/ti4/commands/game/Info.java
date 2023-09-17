@@ -50,7 +50,6 @@ public class Info extends GameSubcommandData {
         sb.append("Owner: ").append(activeGame.getOwnerName()).append(NEW_LINE);
         sb.append("Created: ").append(activeGame.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: ").append(Helper.getDateRepresentation(activeGame.getLastModifiedDate())).append(NEW_LINE);
-        sb.append("Status: `").append(activeGame.getGameStatus()).append("`").append(NEW_LINE);
         sb.append("Ended: `").append(activeGame.isHasEnded()).append("`").append(NEW_LINE);
         if (activeGame.isHasEnded()) sb.append("> Date Ended: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(NEW_LINE);
         
@@ -79,6 +78,7 @@ public class Info extends GameSubcommandData {
         sb.append(" - ").append(Emojis.FrontierCard).append("Frontier Deck: ").append(activeGame.getFrontierExploreDeckSize()).append("/").append(activeGame.getFrontierExploreFullDeckSize()).append(NEW_LINE);
         
         sb.append("### Settings: ").append(NEW_LINE);
+        sb.append("Beta Test Mode: ").append(activeGame.isTestBetaFeaturesMode()).append(NEW_LINE);
         sb.append("Auto-Ping Time Interval (hrs): ").append(activeGame.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Text Size: ").append(activeGame.getLargeText()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(activeGame.getOutputVerbosity()).append(NEW_LINE);

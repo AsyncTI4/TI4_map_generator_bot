@@ -9,10 +9,12 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.planet.PlanetAdd;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
 import ti4.map.*;
@@ -67,24 +69,12 @@ abstract public class AddRemoveUnits implements Command {
 
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
-        if (optionMapGen == null) {
-            File file = GenerateMap.getInstance().saveImage(activeGame, event);
-           // MessageHelper.replyToMessage(event, file);
-            
-                List<Button> buttonsWeb = new ArrayList<>();
-                if(!activeGame.isFoWMode()){
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+ activeGame.getName(),"Website View");
-                    buttonsWeb.add(linkToWebsite);
-                }
-                buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
-                buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
-                MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
-             
+        boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
+        if (generateMap) {
+            ShowGame.simpleShowGame(activeGame, event);
         } else {
             MessageHelper.replyToMessage(event, "Map update completed");
         }
-
     }
 
     public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Game activeGame) {
@@ -517,7 +507,7 @@ abstract public class AddRemoveUnits implements Command {
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'True' to not generate a map update with this command").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"))
         );
     }
 
