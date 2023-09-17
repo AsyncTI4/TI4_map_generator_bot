@@ -1115,7 +1115,7 @@ public class GameSaveLoadManager {
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
-                        activeGame.setAdjacentTileOverride(getParsedAdjacencyOverrides(info, activeGame));
+                        activeGame.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
@@ -1551,8 +1551,7 @@ public class GameSaveLoadManager {
         return scoredPOs;
     }
 
-    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer, Game activeGame) {
-
+    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
         StringTokenizer override = new StringTokenizer(tokenizer, ";");
         LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
         while (override.hasMoreTokens()) {

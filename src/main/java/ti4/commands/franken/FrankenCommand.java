@@ -97,7 +97,6 @@ public class FrankenCommand implements Command {
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
-
     protected String getActionDescription() {
         return "Franken";
     }
@@ -112,8 +111,6 @@ public class FrankenCommand implements Command {
         subcommands.add(new PNRemove());
         subcommands.add(new UnitAdd());
         subcommands.add(new UnitRemove());
-
-
         return subcommands;
     }
 

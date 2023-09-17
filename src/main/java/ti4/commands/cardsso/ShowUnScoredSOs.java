@@ -23,7 +23,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
         }
-        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(defaultSecrets);
         for(Player player : activeGame.getPlayers().values()){
             if(player == null){

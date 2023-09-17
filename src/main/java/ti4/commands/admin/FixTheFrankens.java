@@ -19,7 +19,6 @@ public class FixTheFrankens extends AdminSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
