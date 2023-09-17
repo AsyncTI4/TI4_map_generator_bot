@@ -117,6 +117,7 @@ public class Info extends GameSubcommandData {
         sb.append("Laws: `").append(activeGame.getLaws()).append("`").append(NEW_LINE);
         sb.append("Laws Info: `").append(activeGame.getLawsInfo()).append("`").append(NEW_LINE);
         sb.append("Migrations Run: `").append(activeGame.getRunMigrations()).append("`").append(NEW_LINE);
+        sb.append("Buttons pressed: `").append(activeGame.getButtonPressCount()).append("`").append(NEW_LINE);
 
         return sb;
     }

@@ -16,14 +16,18 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.fow.Whisper;
@@ -39,6 +43,7 @@ import ti4.map.MapFileDeleter;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -246,6 +251,35 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
+        if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot()){
+            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
+        }
+
+        if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
+            String gameName = event.getChannel().getName();
+            String message2 = msg.getContentRaw();
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			Game activeGame = GameManager.getInstance().getGame(gameName);
+            if(activeGame != null && activeGame.getBotFactionReacts()){
+                Player player = activeGame.getPlayer(event.getAuthor().getId());
+                try{
+                    MessageHistory mHistory = event.getChannel().getHistory();
+                    RestAction<List<Message>> lis = mHistory.retrievePast(2);
+                    if(!event.getMessage().getAuthor().getId().equalsIgnoreCase(lis.complete().get(1).getAuthor().getId())){
+                        if(player != null && player.isRealPlayer() ){
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))).queue();
+                        }
+                    }
+                }catch (Exception e){
+                    BotLogger.log("Reading previous message", e);
+                }
+                
+                
+                
+                
+            }
+        }
+
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
@@ -259,25 +293,44 @@ public class MessageListener extends ListenerAdapter {
                 break;
             }
         }
+        
         if (event.getChannel() instanceof ThreadChannel &&  event.getChannel().getName().contains("vs") &&  event.getChannel().getName().contains("private")) {
             String gameName = event.getChannel().getName();
             String message2 = msg.getContentRaw();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
+            String systemPos = event.getChannel().getName().split("_")[4];
+
 			Game activeGame = GameManager.getInstance().getGame(gameName);
-            if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
+            Player player3 = activeGame.getPlayer(event.getAuthor().getId());
+            if (activeGame.isCommunityMode()) {
+                Collection<Player> players = activeGame.getPlayers().values();
+                List<Role> roles = event.getMember().getRoles();
+                for (Player player2 : players) {
+                    if (roles.contains(player2.getRoleForCommunity())) {
+                        player3 = player2;
+                    }
+                }
+            }
+            Tile tile = activeGame.getTileByPosition(systemPos);
+            if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
                 
                 for(Player player : activeGame.getRealPlayers()){
+                    if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
+                        continue;
+                    }
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if(pChan != null){
-                        
-                        
                         String newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone said: " + message2;
                         if(event.getAuthor().isBot() && message2.contains("Total hits ")){
                             String hits = StringUtils.substringAfter(message2, "Total hits ");
                             String location = StringUtils.substringBefore(message2, "rolls for");
                             newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
                         }
+                        if(!event.getAuthor().isBot() && player3.isRealPlayer()){
+                            newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" " +" said: " + message2;
+                        }
+                        
                         newMessage = newMessage.replace("Total hits", "");
                         String[] threadN = event.getChannel().getName().split("-");
                         String threadName = event.getChannel().getName();

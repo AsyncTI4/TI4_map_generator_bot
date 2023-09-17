@@ -433,6 +433,9 @@ public class Player {
     public HashSet<String> getUnitsOwned() {
         return unitsOwned;
     }
+    public boolean hasUnit(String unit) {
+        return unitsOwned.contains(unit);
+    }
 
     public void setUnitsOwned(HashSet<String> unitsOwned) {
         this.unitsOwned = unitsOwned;

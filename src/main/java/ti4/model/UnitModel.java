@@ -152,6 +152,8 @@ public class UnitModel implements ModelInterface {
                 return getCombatDieCount();
             case afb:
                 return getAfbDieCount();
+            case bombardment:
+                return getBombardDieCount();
             default:
                 return getCombatDieCount();
         }
@@ -163,6 +165,8 @@ public class UnitModel implements ModelInterface {
                 return getCombatHitsOn();
             case afb:
                 return getAfbHitsOn();
+            case bombardment:
+                return getBombardHitsOn();
             default:
                 return getCombatHitsOn();
         }
