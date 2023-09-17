@@ -178,7 +178,7 @@ public class Game {
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private String phaseOfGame = "";
-    private String currentAgendaInfo;
+    private String currentAgendaInfo = "";
     private String currentACDrawStatusInfo = "";
     private boolean hasHackElectionBeenPlayed;
     private List<String> agendas;
