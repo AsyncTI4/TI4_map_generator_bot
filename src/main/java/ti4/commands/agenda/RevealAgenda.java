@@ -65,7 +65,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, activeGame, channel);
             return;
         }
-        if (agendaName!= null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
+        if (agendaName != null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
             activeGame.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID+"_"+id);
         } else {
             boolean notEmergency = false;
