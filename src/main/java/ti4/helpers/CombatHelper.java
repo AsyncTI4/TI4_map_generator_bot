@@ -64,7 +64,8 @@ public class CombatHelper {
                 return GetUnitsInCombatRound(unitHolder,player, event);
             case afb:
                 return GetUnitsInAFB(unitHolder, player, event);
-
+            case bombardment:
+                return GetUnitsInBombardment(unitHolder, player, event);
             default: 
                 return GetUnitsInCombatRound(unitHolder,player, event);
         } 
@@ -134,6 +135,53 @@ public class CombatHelper {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
                 .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        } else {
+            output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
+        }
+        Set<String> duplicates = new HashSet<>();
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
+        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
+
+        // Gracefully fail when units don't exist
+        StringBuilder error = new StringBuilder();
+        if (missing.size() > 0) {
+            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
+            error.append(" Ping bothelper if this seems to be in error.\n");
+            error.append("> Unowned units: ").append(missing).append("\n");
+        }
+        if (dupes.size() > 0) {
+            error.append("You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+            error.append("> Duplicate units: ").append(dupes);
+        }   
+        if (missing.size() > 0 || dupes.size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        }
+
+        return output;
+    }
+
+    public static HashMap<UnitModel, Integer> GetUnitsInBombardment(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+        String colorID = Mapper.getColorID(player.getColor());
+        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
+            entry -> new ImmutablePair<>
+                (
+                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    entry.getValue()
+                )
+        ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output;
+        if (unitHolder.getName().equals(Constants.SPACE)) {
+            output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
+                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.

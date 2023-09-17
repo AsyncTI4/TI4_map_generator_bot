@@ -1,10 +1,14 @@
 package ti4.commands.special;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
@@ -37,6 +41,9 @@ public class StellarConverter extends SpecialSubcommandData {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
+        secondHalfOfStellar(activeGame, planetName, event);
+    }
+    public void secondHalfOfStellar(Game activeGame, String planetName, GenericInteractionCreateEvent event){
         Tile tile = null;
         UnitHolder unitHolder = null;
         for (Tile tile_ : activeGame.getTileMap().values()) {
@@ -55,10 +62,16 @@ public class StellarConverter extends SpecialSubcommandData {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }
-
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2.getPlanets().contains(planetName)){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+ " we regret to inform you but "+ Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+            }
+        }
         activeGame.removePlanet(unitHolder);
         tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
-        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "You feel a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+
     }
 
     @Override

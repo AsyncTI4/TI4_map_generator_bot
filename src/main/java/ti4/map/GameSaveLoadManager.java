@@ -293,6 +293,9 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.CURRENT_AGENDA_INFO + " " + activeGame.getCurrentAgendaInfo());
         writer.write(System.lineSeparator());
+         writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + activeGame.getACDrawStatusInfo());
+        writer.write(System.lineSeparator());
+
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + activeGame.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
@@ -420,6 +423,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ROUND + " " + activeGame.getRound());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BUTTON_PRESS_COUNT + " " + activeGame.getButtonPressCount());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + activeGame.getCustomName());
         writer.write(System.lineSeparator());
 
@@ -466,6 +471,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.HACK_ELECTION_STATUS + " " + activeGame.getHackElectionStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + activeGame.getCCNPlasticLimit());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.BOT_FACTION_REACTS + " " + activeGame.getBotFactionReacts());
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
@@ -1187,6 +1194,13 @@ public class GameSaveLoadManager {
                         // do nothing
                     }
                 }
+                case Constants.CURRENT_ACDRAWSTATUS_INFO-> {
+                    try {
+                        activeGame.setACDrawStatusInfo(info);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     try {
@@ -1316,6 +1330,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setCCNPlasticLimit(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BOT_FACTION_REACTS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setBotFactionReactions(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1452,6 +1474,13 @@ public class GameSaveLoadManager {
                         activeGame.setRound(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse round number", exception);
+                    }
+                }
+                case Constants.BUTTON_PRESS_COUNT -> {
+                    try {
+                        activeGame.setButtonPressCount(Integer.parseInt(info));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse button press count", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
