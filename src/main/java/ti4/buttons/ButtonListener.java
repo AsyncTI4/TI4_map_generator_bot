@@ -124,7 +124,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
-        buttonID = buttonID.replace("delete_buttons_", "resolveAgendaVote_")
+        buttonID = buttonID.replace("delete_buttons_", "resolveAgendaVote_");
         activeGame.increaseButtonPressCount();
 
         MessageChannel privateChannel = event.getChannel();
