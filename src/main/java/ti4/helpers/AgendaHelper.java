@@ -1574,15 +1574,17 @@ public class AgendaHelper {
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
          String agendaDetails = activeGame.getCurrentAgendaInfo();
          String agendaName = "";
-         try{
+         if(StringUtils.countMatches(agendaDetails, "_") > 3)
             if(agendaDetails.contains("absol")){
                 agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
             }else{
                 agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
             }
-        }catch (ArrayIndexOutOfBoundsException e){
-            agendaName = "Not Currently Tracked";
-         }
+       else{
+        agendaName = "Not Currently Tracked";
+       }
+            
+         
 
         
         if (outcomes.keySet().size() == 0) {
@@ -1590,8 +1592,13 @@ public class AgendaHelper {
         } else {
             StringBuilder summaryBuilder = new StringBuilder("# Agenda Name: "+agendaName+"\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
-               
-                 agendaDetails = agendaDetails.split("_")[1];
+               if(StringUtils.countMatches(activeGame.getCurrentAgendaInfo(), "_") > 1){
+                    agendaDetails =activeGame.getCurrentAgendaInfo().split("_")[1];
+               }
+               else{
+                    agendaDetails = activeGame.getCurrentAgendaInfo();
+               }
+                 
                 int totalVotes = 0;
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 String outcomeSummary;
