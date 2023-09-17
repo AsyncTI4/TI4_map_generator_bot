@@ -1574,11 +1574,17 @@ public class AgendaHelper {
         HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
          String agendaDetails = activeGame.getCurrentAgendaInfo();
          String agendaName = "";
-        if(agendaDetails.contains("absol")){
-            agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
-        }else{
-           agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
-        }
+         if(agendaDetails.split("_").length >2){
+            if(agendaDetails.contains("absol")){
+                agendaName = Mapper.getAgendaTitleNoCap("absol_"+agendaDetails.split("_")[4]);
+            }else{
+                agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
+            }
+         }else{
+            agendaName = "Not Currently Tracked";
+         }
+
+        
         if (outcomes.keySet().size() == 0) {
             summary = "# Agenda Name: "+agendaName+"\nNo current riders or votes have been cast yet.";
         } else {
