@@ -298,7 +298,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName();
             String message2 = msg.getContentRaw();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-            String systemPos = event.getChannel().getName().split("_")[4];
+            String systemPos = event.getChannel().getName().split("-")[4];
 
 			Game activeGame = GameManager.getInstance().getGame(gameName);
             Player player3 = activeGame.getPlayer(event.getAuthor().getId());
