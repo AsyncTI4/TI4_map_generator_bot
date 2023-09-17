@@ -185,7 +185,7 @@ public class CombatRoll extends SpecialSubcommandData {
             CombatModifierModel combatModifier = new CombatModifierModel();
             combatModifier.setValue(count);
             combatModifier.setScope(unit);
-            combatModifier.setPersistanceType("CUSTOM");
+            combatModifier.setPersistenceType("CUSTOM");
             resultList.add(new NamedCombatModifierModel(combatModifier, ""));
         }
         return resultList;

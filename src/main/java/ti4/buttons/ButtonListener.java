@@ -1602,7 +1602,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.removeFragment(fragid);
             }
             String message = Helper.getPlayerRepresentation(player, activeGame) + " purged fragments: "
-                + fragmentsToPurge.toString();
+                + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperModifyUnits.movingUnitsInTacticalAction(buttonID, event, activeGame, player, ident, buttonLabel);
@@ -1690,7 +1690,7 @@ public class ButtonListener extends ListenerAdapter {
                     message.append(Helper.getLeaderFullRepresentation(playerLeader));
                     boolean purged = player.removeLeader(playerLeader);
                     if (purged) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString() + " - Leader Oodlynn has been purged");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader Oodlynn has been purged");
                     } else {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
                     }

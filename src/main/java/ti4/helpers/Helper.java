@@ -40,7 +40,6 @@ import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1801,7 +1800,7 @@ public class Helper {
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
         LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
-        String msg = Helper.getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
+        String msg = getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
         try {
             for(Player player : sortedPlayers){
                 new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
@@ -1825,7 +1824,7 @@ public class Helper {
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
         }
     }
     public static Tile getTileFromPlanet(String planetName, Game activeGame) {

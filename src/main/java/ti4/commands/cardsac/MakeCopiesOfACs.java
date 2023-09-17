@@ -41,7 +41,6 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
             activeGame.triplicateExplores();
             activeGame.triplicateACs();
             activeGame.triplicateSOs();
-
         }
     }
 }

@@ -47,9 +47,9 @@ public class Setup extends GameSubcommandData {
         OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
         if (vpOption != null) {
             int count = vpOption.getAsInt();
-            if (count < 1){
+            if (count < 1) {
                 count = 1;
-            } else if (count > 20){
+            } else if (count > 20) {
                 count = 20;
             }
             activeGame.setVp(count);
@@ -83,10 +83,10 @@ public class Setup extends GameSubcommandData {
 
         OptionMapping allianceOption = event.getOption(Constants.ALLIANCE_MODE);
         if (allianceOption != null){
-            String alliaceMode = allianceOption.getAsString();
-            if ("YES".equals(alliaceMode)){
+            String allianceMode = allianceOption.getAsString();
+            if ("YES".equals(allianceMode)){
                 activeGame.setAllianceMode(true);
-            } else if ("FALSE".equals(alliaceMode)){
+            } else if ("FALSE".equals(allianceMode)){
                 activeGame.setAllianceMode(false);
             }
         }
