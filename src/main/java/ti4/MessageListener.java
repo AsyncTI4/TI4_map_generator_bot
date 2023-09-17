@@ -251,8 +251,8 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
-        if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot()){
-            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
+        if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
+           // event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
         }
 
         if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
