@@ -305,7 +305,7 @@
     "abilities": ["telepathic", "foresight"],
     "leaders": ["naaluagent", "naalucommander", "naaluhero"],
     "promissoryNotes": ["gift"],
-    "units": ["naalu_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naalu_flagship", "infantry", "naalu_mech", "pds", "spacedock"]
+    "units": ["naalu_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naalu_flagship", "infantry", "naalu_mech_omega", "pds", "spacedock"]
   },
   {
     "alias": "nekro",
