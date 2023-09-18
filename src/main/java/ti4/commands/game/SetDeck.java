@@ -80,12 +80,12 @@ public class SetDeck extends GameSubcommandData {
                     return activeGame.validateAndSetSecretObjectiveDeck(event, deckModel);
                 }
                 case Constants.STAGE_1_PUBLIC_DECK -> {
-                    activeGame.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
+                    activeGame.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
                     activeGame.setStage1PublicDeckID(deckModel.getAlias());
                     return true;
                 }
                 case Constants.STAGE_2_PUBLIC_DECK -> {
-                    activeGame.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
+                    activeGame.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
                     activeGame.setStage2PublicDeckID(deckModel.getAlias());
                     return true;
                 }
@@ -96,7 +96,7 @@ public class SetDeck extends GameSubcommandData {
                     return activeGame.validateAndSetAgendaDeck(event, deckModel);
                 }
                 case Constants.EXPLORATION_DECKS -> {
-                    activeGame.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
+                    activeGame.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
                     activeGame.setExplorationDeckID(deckModel.getAlias());
                     return true;
                 }

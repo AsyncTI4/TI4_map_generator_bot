@@ -16,7 +16,7 @@ public class ListActionCards extends HelpSubcommandData {
 
     public ListActionCards() {
         super(Constants.LIST_ACTION_CARDS, "List all action cards the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ListActionCards extends HelpSubcommandData {
         HashMap<String, ActionCardModel> acList = Mapper.getActionCards();
         List<String> searchedList = acList.entrySet().stream()
             .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
-            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();          
             
         String searchDescription = searchString == null ? "" : " search: " + searchString;

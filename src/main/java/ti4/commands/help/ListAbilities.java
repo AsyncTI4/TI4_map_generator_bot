@@ -16,7 +16,7 @@ public class ListAbilities extends HelpSubcommandData {
 
     public ListAbilities() {
         super(Constants.LIST_ABILITIES, "List all abilities");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
@@ -29,7 +29,7 @@ public class ListAbilities extends HelpSubcommandData {
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Ability List__**\n" + String.join("\n", searchedList);
+        String message = "**__Ability List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
             String threadName = "/help list_abilities" + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);

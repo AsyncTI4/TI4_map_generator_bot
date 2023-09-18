@@ -78,13 +78,12 @@ public class SleeperToken extends SpecialSubcommandData {
             return;
         }
 
-        if (unitHolder.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)){
+        if (unitHolder.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)) {
             tile.removeToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
         } else {
             tile.addToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
-            List<String> planetsWithSleepers = ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeGame);
             String ident = Helper.getFactionIconFromDiscord(player.getFaction());
-            if(planetsWithSleepers.size() > 5){
+            if (activeGame.getSleeperTokensPlacedCount() > 5) {
                 String message2 = ident + " has more than 5 sleepers out. Use buttons to remove a sleeper token";
                 List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, activeGame);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);

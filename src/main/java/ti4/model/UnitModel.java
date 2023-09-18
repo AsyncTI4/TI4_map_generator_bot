@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
@@ -143,6 +144,32 @@ public class UnitModel implements ModelInterface {
         // eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
 
         return eb.build();
+    }
+
+    public int getCombatDieCountForAbility(CombatRollType rollType){
+        switch (rollType) {
+            case combatround:
+                return getCombatDieCount();
+            case afb:
+                return getAfbDieCount();
+            case bombardment:
+                return getBombardDieCount();
+            default:
+                return getCombatDieCount();
+        }
+    }
+
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType){
+        switch (rollType) {
+            case combatround:
+                return getCombatHitsOn();
+            case afb:
+                return getAfbHitsOn();
+            case bombardment:
+                return getBombardHitsOn();
+            default:
+                return getCombatHitsOn();
+        }
     }
 
     private String getAsyncIDAliases() {

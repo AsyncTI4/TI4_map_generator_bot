@@ -666,7 +666,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less."
+        "ability": "After this unit moves into a system, produce up to 2 units that have a combined cost of 4 or less, regardless of other players' ships."
     },
     {
         "id": "dihmohn_mech",
@@ -2889,7 +2889,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported."
     },
     {
         "id": "titans_pds2",
@@ -2911,7 +2911,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. "
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
     },
     {
         "id": "tnelis_destroyer",
@@ -3035,7 +3035,7 @@
         "moveValue": 2,
         "capacityValue": 1,
         "capacityUsed": 1,
-        "cost": 1,
+        "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,

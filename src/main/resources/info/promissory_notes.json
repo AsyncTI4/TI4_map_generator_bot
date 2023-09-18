@@ -1937,7 +1937,7 @@
         "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "At the start of a space combat:Choose 1 of your opponent's ships in the active system, you may produce 1 unit of that type in that system, spending influence instead of resources.Then, return this card to the Mortheus player."
+        "text": "At the start of a space combat while you are the defender:You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system. Then, return this card to the Mortheus player."
     },
     {
         "alias": "dspnmyko",

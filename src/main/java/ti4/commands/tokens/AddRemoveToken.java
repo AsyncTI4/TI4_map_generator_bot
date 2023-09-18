@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -16,9 +16,7 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 abstract public class AddRemoveToken implements Command {
@@ -76,19 +74,7 @@ abstract public class AddRemoveToken implements Command {
 
                 parsingForTile(event, colors, tile, activeGame);
                 GameSaveLoadManager.saveMap(activeGame, event);
-
-                File file = GenerateMap.getInstance().saveImage(activeGame, event);
-                //MessageHelper.replyToMessage(event, file);
-                
-                    List<Button> buttonsWeb = new ArrayList<>();
-                    if(!activeGame.isFoWMode()){
-                        Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+ activeGame.getName(),"Website View");
-                        buttonsWeb.add(linkToWebsite);
-                    }
-                    buttonsWeb.add(Button.success("cardsInfo","Cards Info"));
-                    buttonsWeb.add(Button.secondary("showGameAgain","Show Game"));
-                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
-                
+                ShowGame.simpleShowGame(activeGame, event);
             } else {
                 MessageHelper.replyToMessage(event, "Tile needs to be specified.");
             }

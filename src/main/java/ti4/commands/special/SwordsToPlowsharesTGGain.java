@@ -38,6 +38,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
         List<String> planets = player.getPlanets();
         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
         StringBuilder message = new StringBuilder();
+        int oldTg = player.getTg();
         for (Tile tile : activeGame.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())){
@@ -72,6 +73,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                 channel = player.getPrivateChannel();
             }
             MessageHelper.sendMessageToChannel(channel, message.toString());
+        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, player.getTg() - oldTg);
         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
 
     }

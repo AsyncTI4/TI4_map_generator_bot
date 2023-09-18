@@ -3,188 +3,228 @@
         "alias": "minus1_always_all",
         "type": "DIE_MOD",
         "value": "-1",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "",
         "related":[
             {"type": "ability", "alias": "fragile"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_always_all",
         "type": "DIE_MOD",
         "value": "+1",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "",
         "related":[
-            {"type": "ability", "alias": "unrelenting"}, 
-            {"type":"relic", "alias":"starfall_array"},
+            {"type": "ability", "alias": "unrelenting"},
             {"type":"relic", "alias":"absol_thalnos"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus2_2_matching_non_ff",
         "type": "DIE_MOD",
         "value": "+2",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition":"units_two_matching_not_ff",
         "scope": "",
         "related":[
             {"type": "ability", "alias": "rule_of_two"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_always_fighter",
         "type": "DIE_MOD",
         "value": "+1",
         "scope": "ff",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "related":[
             {"type": "agenda", "alias":"prophecy"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_frag_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "fragment",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "bentor_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_law_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "law",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "edyn_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_po_others_scored_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "po_opponent_exclusively_scored",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "kyro_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_half_unit_tech_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "unit_tech",
-        "valueScalingMultipler": 0.5,
-        "persistanceType": "ALWAYS",
+        "valueScalingMultiplier": 0.5,
+        "persistenceType": "ALWAYS",
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "mirveda_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2x_destroyers_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "destroyers",
-        "valueScalingMultipler": 0.5,
-        "persistanceType": "ALWAYS",
+        "valueScalingMultiplier": 0.5,
+        "persistenceType": "ALWAYS",
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "nokar_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_1_always_other_units_with_flagship",
         "type": "DIE_MOD",
         "value": "+1",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "",
         "scopeExcept":"fs",
         "related":[
             {"type": "unit", "alias": "sardakk_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_opponent_unit_tech_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "opponent_unit_tech",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "zealots_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_cc_not_in_fleet_flagship",
         "type": "DIE_MOD",
         "value": "+2",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition": "opponent_no_cc_fleet",
         "scope": "fs",
         "related":[
             {"type": "unit", "alias": "mahact_flagship"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_x_opponent_faction_tech_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "opponent_faction_tech",
-        "persistanceType": "ALWAYS",
+        "persistenceType": "ALWAYS",
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "zealots_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_frag_conditional_mech",
         "type": "DIE_MOD",
         "value": "+2",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition": "opponent_frag",
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "naalu_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_1_inf_with_mech",
         "type": "DIE_MOD",
         "value": "+1",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition": "has_ability_fragile",
         "scope": "gf",
         "related":[
             {"type": "unit", "alias": "jolnar_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
         "type": "DIE_MOD",
         "value": "+2",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition":"opponent_stolen_faction_tech",
         "scope": "mf",
         "related":[
             {"type": "unit", "alias": "nekro_mech"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus_2_mr_legendary_home_conditional",
         "type": "DIE_MOD",
         "value": "+2",
-        "persistanceType": "CONDITIONAL",
+        "persistenceType": "CONDITIONAL",
         "condition": "planet_mr_legendary_home",
         "scope": "",
         "related":[
             {"type": "leader", "alias": "winnucommander"}
-        ]
+        ], 
+        "forCombatAbility": "combatround"
+    }, 
+    {
+        "alias": "plus_1_always_afb",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "leader", "alias": "kolumecommander"},
+            {"type": "relic", "alias": "starfall_array"}
+        ], 
+        "forCombatAbility": "afb"
+    }, 
+    {
+        "alias": "plus_x_frag_always_flagship_afb",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related":[
+            {"type": "unit", "alias": "bentor_flagship"}
+        ], 
+        "forCombatAbility": "afb"
     }
 ]

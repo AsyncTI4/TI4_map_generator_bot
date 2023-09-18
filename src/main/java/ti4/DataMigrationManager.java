@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -50,6 +53,8 @@ public class DataMigrationManager {
             runMigration("migrateNullSCDeckToPoK_210823", DataMigrationManager::migrateNullSCDeckToPoK_210823);
             runMigration("migrateAbsolDeckIDs_210823", DataMigrationManager::migrateAbsolDeckIDs_210823);
             runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
+            runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
+            runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -61,10 +66,51 @@ public class DataMigrationManager {
     /// <Description of how data is changing, and optionally what code fix it
     /// relates to>
     public static Boolean migrateExampleMigration_241223(Game game) {
+        boolean mapNeededMigrating = false;
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
-        return false;
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Shuffle the damn relic decks
+    public static Boolean migrateForceShuffleAllRelicsDecks_241223(Game game) {
+        boolean mapNeededMigrating = false;
+        Collections.shuffle(game.getAllRelics());
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Example Migration method
+    /// Remove Enigmatic and DS Star Charts from Relic Decks - no longer required since Decks were implemented
+    public static Boolean migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923(Game game) {
+        boolean mapNeededMigrating = false;
+
+        // Legacy fake relics that no longer need to be included in the deck of cards to be added
+        List<String> relicDeck = new ArrayList<>(game.getAllRelics());
+        if (relicDeck.remove(Constants.ENIGMATIC_DEVICE)) mapNeededMigrating = true;
+        if (relicDeck.remove("starcharthazardous")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartcultural")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartindustrial")) mapNeededMigrating = true;
+        if (relicDeck.remove("starchartfrontier")) mapNeededMigrating = true;
+        game.setRelics(relicDeck);
+
+        // Underscores in explore ID
+        List<String> exploreDeck = new ArrayList<>(game.getAllExplores());
+        List<String> badCards = new ArrayList<>();
+        List<String> fixedCards = new ArrayList<>();
+        for (String exploreCard : exploreDeck) {
+            if (exploreCard.contains("_")) {
+                badCards.add(exploreCard);
+                fixedCards.add(exploreCard.replaceAll("_", ""));
+                mapNeededMigrating = true;
+            }
+        }
+        exploreDeck.removeAll(badCards);
+        exploreDeck.addAll(fixedCards);
+        Collections.shuffle(exploreDeck);
+        game.setExploreDeck(exploreDeck);
+
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Player stats anchors implemented, but blown away all existing games.
@@ -413,8 +459,7 @@ public class DataMigrationManager {
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
-            boolean endVPReachedButNotEnded = game.getPlayers().values().stream()
-                    .anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) {
                 continue;
             }
@@ -425,13 +470,13 @@ public class DataMigrationManager {
 
                 if (changesMade) {
                     migrationsAppliedThisTime.add(game.getName());
+                    GameSaveLoadManager.saveMap(game);
                 }
             }
         }
         if (migrationsAppliedThisTime.size() > 0) {
             String mapNames = String.join(", ", migrationsAppliedThisTime);
-            BotLogger.log(
-                    String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
+            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
         }
     }
 }

@@ -17,7 +17,7 @@ public class ListTechs extends HelpSubcommandData {
 
     public ListTechs() {
         super(Constants.LIST_TECHS, "List all techs the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override

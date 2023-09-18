@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import ti4.autocomplete.AutoCompleteListener;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
@@ -51,6 +52,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -81,16 +83,21 @@ public class MapGenerator {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
 
-        jda.addEventListener(new MessageListener(), new ButtonListener(), new UserJoinServerListener());
+        jda.addEventListener(
+            new MessageListener(), 
+            new ButtonListener(), 
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
+            
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            BotLogger.log("Error waiting for bot to get ready", e);
+            MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
-        MessageHelper.sendMessageToBotLogWebhook("BOT IS STARTING UP");
+        MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         TileHelper.init();
         PositionMapper.init();
@@ -146,7 +153,6 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
         commandManager.addCommand(new MoveUnits());
-        commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
@@ -201,7 +207,7 @@ public class MapGenerator {
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
             if (guildCommunityPlays != null) {
-                BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildCommunityPlays.getName());
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
@@ -212,7 +218,7 @@ public class MapGenerator {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             if (guildFogOfWar != null) {
-                BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildFogOfWar.getName());
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
@@ -223,7 +229,7 @@ public class MapGenerator {
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
             if (guildSecondary != null) {
-                BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildSecondary.getName());
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
@@ -234,38 +240,39 @@ public class MapGenerator {
         if (args.length >= 7) {
             guild3rd = jda.getGuildById(args[6]);
             if (guild3rd != null) {
-                BotLogger.log("BOT STARTED UP: " + guild3rd.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guild3rd.getName());
                 CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
             }
         }
 
-        BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
         GameSaveLoadManager.loadMaps();
 
-        BotLogger.log("BOT CHECKING FOR DATA MIGRATIONS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations(); 
-        BotLogger.log("BOT FINISHED CHECKING FOR DATA MIGRATIONS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;
-        BotLogger.log("BOT HAS FINISHED LOADING MAPS");
-
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT HAS FINISHED LOADING MAPS");
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
-                TimeUnit.SECONDS.sleep(5);
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
+                TimeUnit.SECONDS.sleep(10);
+                //TODO: add last command time/last save time to cut down on saves in this loop
+                //Also, make multithreaded
                 GameSaveLoadManager.saveMaps();
-                MessageHelper.sendMessageToBotLogWebhook("MAPS HAVE BEEN SAVED");
-                MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS COMPLETE");
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
+                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
                 mainThread.join();
-                //
             } catch (Exception e) {
+                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
                 e.printStackTrace();
             }
         }));

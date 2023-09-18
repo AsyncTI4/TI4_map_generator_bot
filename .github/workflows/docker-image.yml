@@ -22,17 +22,21 @@ jobs:
         script_stop: true
         envs: AWS_KEY, AWS_SECRET
         script: |
+          echo "Backing up games..."
           cd /root/ti4bot
           ./scheduled_upload.sh
+          echo "Pulling changes from GitHub..."
           cd /root/ti4bot/TI4_map_generator_bot
           git pull
           echo "Building docker image..."
           docker version
           docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
-          echo "Restarting TIBot... giving 30 seconds to shutdown"
-          docker stop $(docker ps -q) --time 30
+          echo "Restarting TIBot... giving 60 seconds to shutdown"
+          docker stop $(docker ps -q) --time 60
+          echo "Backing up games again..."
           cd /root/ti4bot
           ./scheduled_upload.sh
+          echo "Starting Container..."
           cd /root
           ./docker_run.sh
           echo "Cleaning up docker stuff..."

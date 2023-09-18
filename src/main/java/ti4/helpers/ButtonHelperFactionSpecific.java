@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
+import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.ExpPlanet;
@@ -37,8 +38,106 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelperFactionSpecific {
+
+    public static void checkForGeneticRecombination(Player voter, Game activeGame){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == voter){
+                continue;
+            }
+            if(p2.hasTechReady("gr")){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getTrueIdentity(voter, activeGame) + " you technically may want to wait for a genetic recomination decision here. Use your discretion.");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you may use genetic recomination decision here on "+StringUtils.capitalize(voter.getColor())+". This is not automated/tracked by the bot");
+            }
+        }
+    }
+     public static void resolveNaaluHeroSend(Player p1, Game activeGame, String buttonID, ButtonInteractionEvent event){
+
+        buttonID = buttonID.replace("naaluHeroSend_", "");
+        String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
+        String amountToTrans = buttonID.substring(buttonID.indexOf("_")+1);
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionToTrans);
+        String message2 = "";
+        String ident = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), false);
+        String ident2 = Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), false);
+        String id = null;
+        int pnIndex;
+        pnIndex = Integer.parseInt(amountToTrans);
+        for (Map.Entry<String, Integer> so : p1.getPromissoryNotes().entrySet()) {
+            if (so.getValue().equals(pnIndex)) {
+                id = so.getKey();
+            }
+        }
+        p1.removePromissoryNote(id);
+        p2.setPromissoryNote(id);
+        boolean sendSftT = false;
+        boolean sendAlliance = false;
+        String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+        if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
+                && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(Helper.getPlayerFromColorOrFaction(activeGame,promissoryNoteOwner))) {
+            p2.setPromissoryNotesInPlayArea(id);
+            if (id.endsWith("_sftt")) {
+                sendSftT = true;
+            } else {
+                sendAlliance = true;
+            }
+        }
+        PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
+        PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
+        String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
+        message2 = Helper.getPlayerRepresentation(p1, activeGame) + " sent " + Emojis.PN + text + "PN to " + ident2;
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message2);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message2);
+        }
+        event.getMessage().delete().queue();
+
+    }
+    public static void resolveGhostCommanderPlacement(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " placed 1 fighter in "+tile.getRepresentation()+" using Ghost Commander");
+    }
+
+
+
+    public static void resolveNaaluHeroInitiation(Player player, Game activeGame, ButtonInteractionEvent event){
+        Leader playerLeader = player.unsafeGetLeader("naaluhero");
+        StringBuilder message2 = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2 + " - Leader " + "naaluhero" + " has been purged. \n\n Sent buttons to resolve to everyone's channels");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Leader was not purged - something went wrong");
+        }
+        for(Player p1 : activeGame.getRealPlayers()){
+            if(p1 == player){
+                continue;
+            }
+            List<Button> stuffToTransButtons = new ArrayList<Button>();
+            String message =  Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)+" The Naalu Hero has been played and you must send a PN. Please select the PN you would like to send";
+            for(String pnShortHand : p1.getPromissoryNotes().keySet())
+            {
+                if(p1.getPromissoryNotesInPlayArea().contains(pnShortHand)){
+                    continue;
+                }
+                PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+                Player owner = activeGame.getPNOwner(pnShortHand);
+                Button transact;
+                if(activeGame.isFoWMode()){
+                    transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() +" "+ promissoryNote.getName());
+                }else{
+                    transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                }
+                stuffToTransButtons.add(transact);
+            }
+            MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeGame), message, stuffToTransButtons);
+        }
+        event.getMessage().delete().queue();
+    }
 
      public static void resolveVadenSCDebt(Player player, int sc, Game activeGame){
         for(Player p2 : activeGame.getRealPlayers()){
@@ -46,8 +145,9 @@ public class ButtonHelperFactionSpecific {
                 SendDebt.sendDebt(player, p2, 1);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" you sent 1 debt token to "+ButtonHelper.getIdentOrColor(p2, activeGame)+" due to their fine print ability");
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+" you collected 1 debt token from "+ButtonHelper.getIdentOrColor(player, activeGame)+" due to your fine print ability. This is technically optional, done automatically for conveinance.");
+                break;
             }
-            break;
+            
         }
     }
 
@@ -220,6 +320,14 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
     }
 
+     public static void resolveArtunoCheck(Player player, Game activeGame, int tg){
+        if(player.hasUnexhaustedLeader("nomadagentartuno", activeGame)){
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.add(Button.success("exhaustAgent_nomadagentartuno_"+tg, "Exhaust Artuno with "+tg+" tg"));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to exhaust your agent Artuno and place "+tg+" tg on her.", buttons);
+        }
+     }
     
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String trueIdentity){
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
@@ -322,6 +430,7 @@ public class ButtonHelperFactionSpecific {
             String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             pillageCheck(player, activeGame);
+            resolveArtunoCheck(player, activeGame, 1);
         }
      }
      public static List<Button> getEmpyHeroButtons(Player player, Game activeGame){
@@ -363,8 +472,7 @@ public class ButtonHelperFactionSpecific {
             msg = msg.replace("Infantrys","infantry");
             if (unitP.contains("sd") || unitP.contains("pd") || cabal.getAllianceMembers().contains(player.getFaction())) {
                 return;
-            }
-            
+            }  
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount +" " +unit, activeGame);
         }
         if(activeGame.isFoWMode()){
@@ -496,7 +604,9 @@ public class ButtonHelperFactionSpecific {
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
                     pillageCheck(sender, activeGame);
+                    resolveArtunoCheck(sender, activeGame, 1);
                     pillageCheck(receiver, activeGame);
+                    resolveArtunoCheck(receiver, activeGame, 1);
                 }
             }
         }
@@ -515,6 +625,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             }
             pillageCheck(player, activeGame);
+            resolveArtunoCheck(player, activeGame, 1);
         }
     }
 
@@ -561,7 +672,6 @@ public class ButtonHelperFactionSpecific {
         int maxComms = p2.getCommoditiesTotal();
         String unit2;
         Button unitButton2;
-
         unit2 = "destroyer";
         if(maxComms> 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 8){
             unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
@@ -591,9 +701,104 @@ public class ButtonHelperFactionSpecific {
             unitButton2 = Button.danger("cabalAgentCapture_"+unit2+"_"+p2.getFaction(), "Capture "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
-
         return buttons;
-
+    }
+    public static List<Button> getUnitButtonsForVortex(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        Player p2 = null;
+        String unit2;
+        Button unitButton2;
+        unit2 = "destroyer";
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "csd");
+        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "sd"));
+        if(tiles.size() == 0){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldnt find any docks");
+            return buttons;
+        }
+        Set<String> adjTiles = FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tiles.get(0).getPosition(), player, false);
+        for(Tile tile : tiles){
+            adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        }
+        List<String> unitsCollectedAlready = new ArrayList<>();
+        for(String pos : adjTiles){
+            
+            Tile tile = activeGame.getTileByPosition(pos);
+            for(Player p3 : activeGame.getRealPlayers()){
+                if(p3 == player){
+                    continue;
+                }
+                if(FoWHelper.playerHasUnitsInSystem(p3, tile)){
+                    for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                        for(String unit : unitHolder.getUnits().keySet()){
+                            
+                            
+                            if(!unitsCollectedAlready.contains(unit) && !unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit("sd"), p3.getColor())) && !unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit("pds"), p3.getColor()))  && !unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit("csd"), p3.getColor()))){
+                                unit2 = "mech";
+                                System.out.println("BOOO "+Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor()));
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(unit2, p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 4){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "destroyer";
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 8){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "cruiser";
+                                
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 8){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "carrier";
+                                
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 4){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "dreadnought";
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 5){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "warsun";
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 2){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "infantry";
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor()))){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                                unit2 = "fighter";
+                                if(unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor()))){
+                                    unitButton2 = Button.danger("cabalVortextCapture_"+unit2+"_"+p3.getFaction(), "Capture "+StringUtils.capitalize(p3.getColor()) + " "+unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+                                    buttons.add(unitButton2);
+                                    unitsCollectedAlready.add(unit);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return buttons;
+    }
+    public static void resolveVortexCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event){
+        String unit = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+" a "+unit+" of yours has been captured by vortex.");
+        cabalEatsUnit(p2, activeGame, player, 1, unit, event);
+        event.getMessage().delete().queue();
     }
     public static void resolveCabalAgentCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event){
         String unit = buttonID.split("_")[1];
@@ -1077,9 +1282,15 @@ public class ButtonHelperFactionSpecific {
             channel2 = player.getPrivateChannel();
         }
         playerLeader.setExhausted(true);
+       
+       
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
         String messageText = Helper.getPlayerRepresentation(player, activeGame) +
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
+        if("nomadagentartuno".equalsIgnoreCase(agent)){
+            playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
+			messageText = messageText + "\n" + rest.split("_")[1] +" "+ Emojis.tg + " was placed on top of the leader";
+        }
         MessageHelper.sendMessageToChannel(channel2, messageText);
         if ("naazagent".equalsIgnoreCase(agent)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
@@ -1100,6 +1311,7 @@ public class ButtonHelperFactionSpecific {
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg()+2);
             pillageCheck(player, activeGame);
+            resolveArtunoCheck(player, activeGame, 2);
             String message = trueIdentity+" increased your tgs by 2 ("+(player.getTg()-2)+"->"+player.getTg()+"). Use buttons in your cards info thread to discard an AC";
             MessageHelper.sendMessageToChannel(channel2, message);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
@@ -1474,6 +1686,7 @@ public class ButtonHelperFactionSpecific {
                 String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " due to your council patronage ability, 1tg has been added to your total and your commodities have been refreshed";
                 MessageHelper.sendMessageToChannel(channel, message);
                 pillageCheck(player, activeGame);
+                resolveArtunoCheck(player, activeGame, 1);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 cabalAgentInitiation(activeGame, player);
 
