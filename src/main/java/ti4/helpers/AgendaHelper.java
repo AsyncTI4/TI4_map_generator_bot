@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -157,14 +158,14 @@ public class AgendaHelper {
 
                 }
             }
-            if(activeGame.getLaws().size() > 0){
-                for(Player player : activeGame.getRealPlayers()){
-                    if(player.getLeaderIDs().contains("edyncommander") && !player.hasLeaderUnlocked("edyncommander")){
+            if (activeGame.getLaws().size() > 0) {
+                for (Player player : activeGame.getRealPlayers()) {
+                    if (player.getLeaderIDs().contains("edyncommander") && !player.hasLeaderUnlocked("edyncommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "edyn", event);
                     }
                 }
             }
-            
+
         } else {
 
             if (activeGame.getCurrentAgendaInfo().contains("Player")) {
@@ -294,10 +295,10 @@ public class AgendaHelper {
         }
         String summary = getSummaryOfVotes(activeGame, false);
         List<Player> riders = getWinningRiders(summary, winner, activeGame, event);
-         List<Player> voters = getWinningVoters(winner, activeGame);
+        List<Player> voters = getWinningVoters(winner, activeGame);
         voters.addAll(riders);
         for (Player player : voters) {
-            if(player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")){
+            if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
             }
         }
@@ -802,10 +803,10 @@ public class AgendaHelper {
     public static List<Button> getWhenButtons(Game activeGame) {
         Button playWhen = Button.danger("play_when", "Play When");
         Button noWhen = Button.primary("no_when", "No Whens (for now)")
-            .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+            .withEmoji(Emoji.fromFormatted(Emojis.nowhens));
         Button noWhenPersistent = Button
             .primary("no_when_persistent", "No Whens (for this agenda)")
-            .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+            .withEmoji(Emoji.fromFormatted(Emojis.nowhens));
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         Player quasher = Helper.getPlayerFromAbility(activeGame, "quash");
         if (quasher != null && quasher.getStrategicCC() > 0) {
@@ -1348,7 +1349,7 @@ public class AgendaHelper {
             }
         }
 
-        return new int[]{ voteCount, hasXxchaHero, hasXxchaAlliance };
+        return new int[] { voteCount, hasXxchaHero, hasXxchaAlliance };
     }
 
     public static List<Player> getVotingOrder(Game activeGame) {
@@ -1583,10 +1584,12 @@ public class AgendaHelper {
                     }
 
                     if (!activeGame.isFoWMode() && activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
-                        summaryBuilder.append(Helper.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary).append(")\n");
+                        summaryBuilder.append(Helper.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                            .append(")\n");
 
                     } else if (!activeGame.isHomeBrewSCMode() && activeGame.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                        summaryBuilder.append(Helper.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary).append(")\n");
+                        summaryBuilder.append(Helper.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                            .append(")\n");
                     } else {
                         summaryBuilder.append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary).append(")\n");
 
@@ -1774,24 +1777,19 @@ public class AgendaHelper {
             additionalVotesAndSources.put(Emojis.BioticTech + "Exhaust Networked Command", fleetCC);
         }
 
-        // //Edyn Mandate Sigil - Planets in Sigil systems gain +1 vote //INCOMPLETE, POSSIBLY CHANGING ON DS END
-        // Player edynMechPlayer = Helper.getPlayerFromColorOrFaction(activeMap, "edyn");
-        // if (edynMechPlayer != null) {
-        //     int count = 0;
-        //     List<Tile> edynMechTiles = activeMap.getTileMap().values().stream().filter(t -> Helper.playerHasMechInSystem(t, activeMap, edynMechPlayer)).toList();
-        //     for (Tile tile : edynMechTiles) {
-        //         for (String planet : tile.getUnitHolders().keySet()) {
-        //             if (player.getPlanets().contains(planet) && !player.getExhaustedPlanets().contains(planet)) {
-        //                 count++;
-        //             }
-        //         }
-        //     }
-        //     if (count != 0) {
-        //         sb.append(" (+" + count + " for (" + count + "x) Planets in " + Emojis.edyn + "Sigil Systems)");
-        //         additionalVotes += count;
-        //     }
-        // }
-
         return additionalVotesAndSources;
+    }
+
+    public static EmbedBuilder buildAgendaEmbed(AgendaModel agenda) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(agenda.getSourceEmoji() + " " + agenda.getName());
+
+        StringBuilder desc = new StringBuilder("**").append(agenda.getType()).append(":** *").append(agenda.getTarget()).append("*\n");
+        desc.append("> ").append(agenda.getText1().replace("For:", "**For:**")).append("\n");
+        desc.append("> ").append(agenda.getText2().replace("Against:", "**Against:**"));
+        eb.setDescription(desc.toString());
+        eb.setFooter(agenda.footnote());
+
+        return eb;
     }
 }
