@@ -1,5 +1,8 @@
 package ti4.model;
 
+import lombok.Data;
+
+@Data
 public class TechnologyModel implements ModelInterface {
     private String alias;
     private String name;
@@ -19,7 +22,7 @@ public class TechnologyModel implements ModelInterface {
         }
     }
 
-  public boolean isValid() {
+    public boolean isValid() {
         return alias != null
             && name != null
             && text != null
@@ -28,38 +31,6 @@ public class TechnologyModel implements ModelInterface {
             && faction != null
             && requirements != null
             && type != null;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TechnologyType getType() {
-        return type;
-    }
-
-    public String getRequirements() {
-        return requirements;
-    }
-
-    public String getFaction() {
-        return faction;
-    }
-
-    public String getBaseUpgrade() {
-        return baseUpgrade;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public String getText() {
-        return text;
     }
 
     public static int sortTechsByRequirements(TechnologyModel t1, TechnologyModel t2) {
