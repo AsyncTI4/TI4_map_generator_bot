@@ -55,6 +55,7 @@ public class AutoCompleteProvider {
             case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
             case Constants.HELP -> resolveHelpCommandAutoComplete(event, subCommandName, optionName);
+            case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
         }
 
         switch (optionName) {
@@ -621,6 +622,28 @@ public class AutoCompleteProvider {
                         .map(token -> new Command.Choice(token, token))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+        }
+    }
+
+    private static void resolveActionCardAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game activeGame) {
+        switch (subCommandName) {
+            case Constants.PICK_AC_FROM_DISCARD -> {
+                switch (optionName) {
+                    case Constants.ACTION_CARD_ID -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, Integer> discardActionCardIDs = activeGame.getDiscardActionCards();
+                        List<Command.Choice> options = discardActionCardIDs.entrySet().stream()
+                                .map(entry -> Map.entry(Mapper.getActionCard(entry.getKey()), entry.getValue()))
+                                .filter(entry -> entry.getKey().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(entry -> new Command.Choice(
+                                        entry.getKey().getName() + " (" + entry.getValue() + ")",
+                                        entry.getValue()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
             }
         }
     }
