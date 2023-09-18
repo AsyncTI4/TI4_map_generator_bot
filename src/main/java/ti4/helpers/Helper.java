@@ -756,17 +756,27 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac) {
+    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
-        for (String planet : planets) {
-            if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
-                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, getPlanetRepresentation(planet, activeGame) + " System");
-                planetButtons.add(button);
+        if(mahact == null){
+            for (String planet : planets) {
+                if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet+"_"+"diploP", getPlanetRepresentation(planet, activeGame) + " System");
+                    planetButtons.add(button);
+                }
             }
-
+        }else{
+            for(Tile tile : activeGame.getTileMap().values()){
+                if(FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile, activeGame)){
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+tile.getPosition()+"_"+"mahact"+mahact.getColor(), tile.getRepresentation() + " System");
+                    planetButtons.add(button);
+                }
+            }
+            
         }
+        
         return planetButtons;
     }
 
@@ -1920,11 +1930,13 @@ public class Helper {
             if (unitHolder.getUnits().get(mechKey) != null) {
                 return true;
             }
-            if("arborec".equalsIgnoreCase(player.getFaction())){
+            if(player.hasUnit("arborec_mech")){
                 mechKey = colorID + "_mf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
                 }
+            }
+            if(player.hasUnit("arborec_infantry") || player.hasTech("lw2")){
                 mechKey = colorID + "_gf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
@@ -1933,6 +1945,7 @@ public class Helper {
         }
         return false;
     }
+    
 
     public static Set<Player> getNeighbouringPlayers(Game activeGame, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();
