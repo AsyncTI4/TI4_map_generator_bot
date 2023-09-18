@@ -298,7 +298,6 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName();
             String message2 = msg.getContentRaw();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-            String systemPos = event.getChannel().getName().split("-")[4];
 
 			Game activeGame = GameManager.getInstance().getGame(gameName);
             Player player3 = activeGame.getPlayer(event.getAuthor().getId());
@@ -311,9 +310,16 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
             }
-            Tile tile = activeGame.getTileByPosition(systemPos);
+           
             if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
                 
+                String systemPos = "";
+                if(StringUtils.countMatches(event.getChannel().getName(), "-") > 4){
+                    systemPos=event.getChannel().getName().split("-")[4];
+                }else{
+                    return;
+                }
+                 Tile tile = activeGame.getTileByPosition(systemPos);
                 for(Player player : activeGame.getRealPlayers()){
                     if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
                         continue;
