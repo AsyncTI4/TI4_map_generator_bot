@@ -2761,7 +2761,7 @@ public class ButtonListener extends ListenerAdapter {
                                     if(player3 == player2 || player3 == player){
                                         continue;
                                     }
-                                    if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
+                                    if(!tile.getRepresentationForButtons(activeGame, player3).contains("(")){
                                         continue;
                                     }
                                     ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");
