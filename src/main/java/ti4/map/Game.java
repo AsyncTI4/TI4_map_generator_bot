@@ -177,6 +177,7 @@ public class Game {
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
+    @ExportableField
     private String phaseOfGame = "";
     private String currentAgendaInfo = "";
     private String currentACDrawStatusInfo = "";
