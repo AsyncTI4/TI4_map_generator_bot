@@ -73,6 +73,18 @@ public class PNInfo extends PNCardsSubcommandData {
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")){
+            Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naalu")));
+            buttons.add(naalu);
+        }
+        if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            buttons.add(hacanButton);
+        }
+        if(player.hasRelicReady("e6-g0_network")){
+            buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
+        }
+        
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 

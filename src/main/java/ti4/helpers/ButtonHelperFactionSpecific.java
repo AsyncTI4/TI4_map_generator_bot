@@ -42,6 +42,17 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void checkForGeneticRecombination(Player voter, Game activeGame){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == voter){
+                continue;
+            }
+            if(p2.hasTechReady("gr")){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getTrueIdentity(voter, activeGame) + " you technically may want to wait for a genetic recomination decision here. Use your discretion.");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you may use genetic recomination decision here on "+StringUtils.capitalize(voter.getColor())+". This is not automated/tracked by the bot");
+            }
+        }
+    }
      public static void resolveNaaluHeroSend(Player p1, Game activeGame, String buttonID, ButtonInteractionEvent event){
 
         buttonID = buttonID.replace("naaluHeroSend_", "");

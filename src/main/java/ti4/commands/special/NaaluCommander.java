@@ -2,6 +2,7 @@ package ti4.commands.special;
 
 import java.util.Set;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
@@ -27,6 +28,9 @@ public class NaaluCommander extends SpecialSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        secondHalfOfNaaluCommander(event, activeGame, player);
+    }
+    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player){
 
         if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) { //TODO: switch logic from isNaalu to hasNaaluCommander
             sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
@@ -35,7 +39,6 @@ public class NaaluCommander extends SpecialSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
         sb.append("__**Top Agenda:**__\n");
         String agendaID = activeGame.lookAtTopAgenda(0);
         sb.append("1: ");
