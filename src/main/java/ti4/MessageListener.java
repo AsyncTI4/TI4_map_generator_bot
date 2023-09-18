@@ -108,7 +108,7 @@ public class MessageListener extends ListenerAdapter {
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (gameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+        if (gameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isCommunityMode() || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             if (gameManager.getUserActiveGame(userID) != null && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
                 // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
             }
