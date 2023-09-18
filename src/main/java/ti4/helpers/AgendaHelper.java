@@ -597,6 +597,7 @@ public class AgendaHelper {
                     message = getSummaryOfVotes(activeGame, true) + "\n \n " + realIdentity + message;
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                 }
+                ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, activeGame);
             } else {
                 winner = getWinner(activeGame);
                 if (!winner.equalsIgnoreCase("") && !winner.contains("*")) {
@@ -937,6 +938,7 @@ public class AgendaHelper {
             } else {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
+            ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, activeGame);
         } else {
             event.getMessageChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically").queue();
         }
@@ -1164,7 +1166,7 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity + " You have a diplo rider to resolve. Click the name of the planet who's system you wish to diplo";
-                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, winningR, activeGame, true);
+                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, winningR, activeGame, true, null);
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Construction Rider")) {
@@ -1576,7 +1578,7 @@ public class AgendaHelper {
          String agendaName = "";
          if(StringUtils.countMatches(agendaDetails, "_") > 2)
             if(StringUtils.countMatches(agendaDetails, "_") > 3){
-                agendaName = Mapper.getAgendaTitleNoCap(StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[3]+"_"));
+                agendaName = Mapper.getAgendaTitleNoCap(StringUtils.substringAfter(agendaDetails, agendaDetails.split("_")[2]+"_"));
             }else{
                 agendaName = Mapper.getAgendaTitleNoCap(agendaDetails.split("_")[3]);
             }
