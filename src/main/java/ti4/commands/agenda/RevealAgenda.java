@@ -76,6 +76,10 @@ public class RevealAgenda extends AgendaSubcommandData {
                     activeGame.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame)+" Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
+                if(agendaTarget.toLowerCase().contains("elect law") && activeGame.getLaws().size() < 1){
+                    activeGame.revealAgenda(revealFromBottom);
+                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame)+" an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
+                }
                 String id2 = activeGame.getNextAgenda(revealFromBottom);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
                 agendaTarget = agendaDetails2.getTarget();
@@ -83,6 +87,9 @@ public class RevealAgenda extends AgendaSubcommandData {
                 agendaName = agendaDetails.getName();
                 activeGame.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL_covert");
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
+                if(agendaTarget.toLowerCase().contains("elect law") && activeGame.getLaws().size() < 1){
+                    notEmergency = false;
+                }
                 if(notEmergency){
                     cov = true;
 
