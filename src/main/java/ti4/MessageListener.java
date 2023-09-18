@@ -256,12 +256,21 @@ public class MessageListener extends ListenerAdapter {
         }
 
         if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
-            String gameName = event.getChannel().getName();
+            String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
             String message2 = msg.getContentRaw();
-			gameName = gameName.substring(0, gameName.indexOf("-"));
+			
 			Game activeGame = GameManager.getInstance().getGame(gameName);
-            if(activeGame != null && activeGame.getBotFactionReacts()){
+            if(activeGame != null && activeGame.getBotFactionReacts() && !activeGame.isFoWMode()){
                 Player player = activeGame.getPlayer(event.getAuthor().getId());
+                if (activeGame.isCommunityMode()) {
+                    Collection<Player> players = activeGame.getPlayers().values();
+                    List<Role> roles = event.getMember().getRoles();
+                    for (Player player2 : players) {
+                        if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                    }
+                }
                 try{
                     MessageHistory mHistory = event.getChannel().getHistory();
                     RestAction<List<Message>> lis = mHistory.retrievePast(2);
@@ -295,11 +304,10 @@ public class MessageListener extends ListenerAdapter {
         }
         
         if (event.getChannel() instanceof ThreadChannel &&  event.getChannel().getName().contains("vs") &&  event.getChannel().getName().contains("private")) {
-            String gameName = event.getChannel().getName();
+            String gameName2 = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
             String message2 = msg.getContentRaw();
-			gameName = gameName.substring(0, gameName.indexOf("-"));
 
-			Game activeGame = GameManager.getInstance().getGame(gameName);
+			Game activeGame = GameManager.getInstance().getGame(gameName2);
             Player player3 = activeGame.getPlayer(event.getAuthor().getId());
             if (activeGame.isCommunityMode()) {
                 Collection<Player> players = activeGame.getPlayers().values();
@@ -311,7 +319,11 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
            
-            if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
+            if(activeGame.isFoWMode() && 
+                (
+                    (player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot()) 
+                    || (event.getAuthor().isBot() && message2.contains("Total hits "))
+                )){
                 
                 String systemPos = "";
                 if(StringUtils.countMatches(event.getChannel().getName(), "-") > 4){
@@ -321,6 +333,9 @@ public class MessageListener extends ListenerAdapter {
                 }
                  Tile tile = activeGame.getTileByPosition(systemPos);
                 for(Player player : activeGame.getRealPlayers()){
+                    if(player3 != null && player == player3){
+                        continue;
+                    }
                     if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
                         continue;
                     }
@@ -333,12 +348,11 @@ public class MessageListener extends ListenerAdapter {
                             String location = StringUtils.substringBefore(message2, "rolls for");
                             newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
                         }
-                        if(!event.getAuthor().isBot() && player3.isRealPlayer()){
-                            newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" " +" said: " + message2;
+                        if(!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()){
+                            newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" "+StringUtils.capitalize(player3.getColor()) +" said: " + message2;
                         }
                         
                         newMessage = newMessage.replace("Total hits", "");
-                        String[] threadN = event.getChannel().getName().split("-");
                         String threadName = event.getChannel().getName();
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
