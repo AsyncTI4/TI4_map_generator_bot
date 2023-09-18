@@ -40,7 +40,6 @@ import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -682,7 +681,7 @@ public class Helper {
         Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_fighter_"+tp, "Produce 1 Fighter" );
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
-        if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)&& !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
+        if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)&& !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
             Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Produce 2 Fighters" );
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
             unitButtons.add(ff2Button);
@@ -724,7 +723,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+ getPlanetRepresentation(pp, activeGame));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
+                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+ getPlanetRepresentation(pp, activeGame) );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
@@ -739,7 +738,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space"+tile.getPosition(), "Produce 1 Infantry in space");
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
+                if(!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_space"+tile.getPosition(), "Produce 2 Infantry in space" );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
@@ -757,17 +756,27 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac) {
+    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
-        for (String planet : planets) {
-            if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
-                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, getPlanetRepresentation(planet, activeGame) + " System");
-                planetButtons.add(button);
+        if(mahact == null){
+            for (String planet : planets) {
+                if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet+"_"+"diploP", getPlanetRepresentation(planet, activeGame) + " System");
+                    planetButtons.add(button);
+                }
             }
-
+        }else{
+            for(Tile tile : activeGame.getTileMap().values()){
+                if(FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile, activeGame)){
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+tile.getPosition()+"_"+"mahact"+mahact.getColor(), tile.getRepresentation() + " System");
+                    planetButtons.add(button);
+                }
+            }
+            
         }
+        
         return planetButtons;
     }
 
@@ -1705,6 +1714,21 @@ public class Helper {
         return techs;
     }
 
+     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        for (TechnologyModel tech : Mapper.getTechs().values()) {
+            String faction = tech.getFaction();
+            if (tech.getType().toString().equalsIgnoreCase("unitupgrade")) {
+                if (player.hasTech(tech.getAlias())) {
+                    if (faction.isEmpty()) {
+                         techs.add(tech);
+                    } 
+                }
+            }
+        }
+        return techs;
+    }
+
     public static String getTechRepresentationLong(String techID) {
         TechnologyModel tech = Mapper.getTechs().get(techID);
 
@@ -1801,7 +1825,7 @@ public class Helper {
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
         LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
-        String msg = Helper.getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
+        String msg = getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
         try {
             for(Player player : sortedPlayers){
                 new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
@@ -1825,7 +1849,7 @@ public class Helper {
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), getGamePing(activeGame.getGuild(), activeGame) + " it seems like "+ButtonHelper.getIdentOrColor(player, activeGame) + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.", buttons);
         }
     }
     public static Tile getTileFromPlanet(String planetName, Game activeGame) {
@@ -1906,11 +1930,13 @@ public class Helper {
             if (unitHolder.getUnits().get(mechKey) != null) {
                 return true;
             }
-            if("arborec".equalsIgnoreCase(player.getFaction())){
+            if(player.hasUnit("arborec_mech")){
                 mechKey = colorID + "_mf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
                 }
+            }
+            if(player.hasUnit("arborec_infantry") || player.hasTech("lw2")){
                 mechKey = colorID + "_gf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
@@ -1919,6 +1945,7 @@ public class Helper {
         }
         return false;
     }
+    
 
     public static Set<Player> getNeighbouringPlayers(Game activeGame, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();

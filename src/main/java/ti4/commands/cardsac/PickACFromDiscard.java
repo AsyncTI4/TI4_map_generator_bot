@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class PickACFromDiscard extends ACCardsSubcommandData {
     public PickACFromDiscard() {
         super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true).setAutoComplete(true));
     }
 
     @Override

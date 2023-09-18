@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.player.AbilityInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -69,19 +70,11 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
             }
         }
 
-        // sendMessage("debug postset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
-        // pol3); (debug messagesender if more work is needed)
-
-        if (       (!player.hasAbility("policies"))
-                && (!player.hasAbility("policy_the_people_connect"))
-                && (!player.hasAbility("policy_the_people_control"))
-                && (!player.hasAbility("policy_the_environment_preserve"))
-                && (!player.hasAbility("policy_the_environment_plunder"))
-                && (!player.hasAbility("policy_the_economy_empower"))
-                && (!player.hasAbility("policy_the_economy_exploit"))) {
+        if (!player.hasOlradinPolicies()) {
             sendMessage("Player does not have Policy (Olradin Faction Ability)");
             return;
         }
+
         // extra returns for the first time policies are set
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
@@ -185,6 +178,8 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         }
         player.addOwnedUnitByID(unitModelID);
         UnitModel unitModel = Mapper.getUnit(unitModelID);
+
+        DiscordantStarsHelper.checkOlradinMech(activeGame);
 
         AbilityInfo.sendAbilityInfo(activeGame, player, event);
         MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, List.of(unitModel.getUnitRepresentationEmbed(false)));

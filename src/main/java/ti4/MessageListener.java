@@ -16,15 +16,18 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.fow.Whisper;
@@ -40,25 +43,11 @@ import ti4.map.MapFileDeleter;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class MessageListener extends ListenerAdapter {
-
-    @Override
-    public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        if (!MapGenerator.readyToReceiveCommands) {
-            event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
-            return;
-        }
-
-        try {
-            AutoCompleteProvider.autoCompleteListener(event);
-        } catch (Exception e) {
-            String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
-            BotLogger.log(message, e);
-        }
-    }
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -113,17 +102,19 @@ public class MessageListener extends ListenerAdapter {
         MapFileDeleter.deleteFiles();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
-        boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
+        boolean gameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
+        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN);
+        boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName));
+        if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (anyMatchGameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isMapOpen() || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+        if (gameExists && (gameManager.getUserActiveGame(userID) == null || !gameManager.getUserActiveGame(userID).getName().equals(gameID) && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isCommunityMode() || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             if (gameManager.getUserActiveGame(userID) != null && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
-//                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+                // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
             }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
-            if (anyMatchGameExists && !channelName.startsWith(userActiveGame.getName())) {
+            if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
                 MessageHelper.sendMessageToChannel(channel, "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 gameManager.resetMapForUser(userID);
             }
@@ -134,18 +125,17 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
-
-        autoPingGames();
-
-        if (msg.getContentRaw().startsWith("[DELETE]")) {
-            msg.delete().queue();
+        try {      
+            if (msg.getContentRaw().startsWith("[DELETE]")) {
+                msg.delete().queue();
+            }
+            autoPingGames();
+            handleFoWWhispers(event, msg);
+            mapLog(event, msg);
+            saveJSONInTTPGExportsChannel(event);
+        } catch (Exception e) {
+            BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-
-        handleFoWWhispers(event, msg);
-
-        mapLog(event, msg);
-
-        saveJSONInTTPGExportsChannel(event);
     }
 
     private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
@@ -261,6 +251,44 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
+        if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
+           // event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
+        }
+
+        if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
+            String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
+            String message2 = msg.getContentRaw();
+			
+			Game activeGame = GameManager.getInstance().getGame(gameName);
+            if(activeGame != null && activeGame.getBotFactionReacts() && !activeGame.isFoWMode()){
+                Player player = activeGame.getPlayer(event.getAuthor().getId());
+                if (activeGame.isCommunityMode()) {
+                    Collection<Player> players = activeGame.getPlayers().values();
+                    List<Role> roles = event.getMember().getRoles();
+                    for (Player player2 : players) {
+                        if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                    }
+                }
+                try{
+                    MessageHistory mHistory = event.getChannel().getHistory();
+                    RestAction<List<Message>> lis = mHistory.retrievePast(2);
+                    if(!event.getMessage().getAuthor().getId().equalsIgnoreCase(lis.complete().get(1).getAuthor().getId())){
+                        if(player != null && player.isRealPlayer() ){
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))).queue();
+                        }
+                    }
+                }catch (Exception e){
+                    BotLogger.log("Reading previous message", e);
+                }
+                
+                
+                
+                
+            }
+        }
+
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
@@ -274,27 +302,58 @@ public class MessageListener extends ListenerAdapter {
                 break;
             }
         }
+        
         if (event.getChannel() instanceof ThreadChannel &&  event.getChannel().getName().contains("vs") &&  event.getChannel().getName().contains("private")) {
-            String gameName = event.getChannel().getName();
+            String gameName2 = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
             String message2 = msg.getContentRaw();
-			gameName = gameName.substring(0, gameName.indexOf("-"));
-			Game activeGame = GameManager.getInstance().getGame(gameName);
-            if(activeGame.isFoWMode() && ((!"947763140517560331".equalsIgnoreCase(event.getAuthor().getId()) && !event.getAuthor().isBot() && !"1089270182171656292".equalsIgnoreCase(event.getAuthor().getId())) || (event.getAuthor().isBot() && message2.contains("Total hits ")))           ){
+
+			Game activeGame = GameManager.getInstance().getGame(gameName2);
+            Player player3 = activeGame.getPlayer(event.getAuthor().getId());
+            if (activeGame.isCommunityMode()) {
+                Collection<Player> players = activeGame.getPlayers().values();
+                List<Role> roles = event.getMember().getRoles();
+                for (Player player2 : players) {
+                    if (roles.contains(player2.getRoleForCommunity())) {
+                        player3 = player2;
+                    }
+                }
+            }
+           
+            if(activeGame.isFoWMode() && 
+                (
+                    (player3 != null && player3.isRealPlayer() && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot()) 
+                    || (event.getAuthor().isBot() && message2.contains("Total hits "))
+                )){
                 
+                String systemPos = "";
+                if(StringUtils.countMatches(event.getChannel().getName(), "-") > 4){
+                    systemPos=event.getChannel().getName().split("-")[4];
+                }else{
+                    return;
+                }
+                 Tile tile = activeGame.getTileByPosition(systemPos);
                 for(Player player : activeGame.getRealPlayers()){
+                    if(player3 != null && player == player3){
+                        continue;
+                    }
+                    if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
+                        continue;
+                    }
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if(pChan != null){
-                        
-                        
                         String newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone said: " + message2;
                         if(event.getAuthor().isBot() && message2.contains("Total hits ")){
                             String hits = StringUtils.substringAfter(message2, "Total hits ");
-                            String location = StringUtils.substringBefore(message2, "combat rolls for");
+                            String location = StringUtils.substringBefore(message2, "rolls for");
                             newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" Someone rolled dice for "+location+" and got a total of **" + hits + " hits";
                         }
-                        String[] threadN = event.getChannel().getName().split("-");
-                        String threadName = threadN[0]+"-"+threadN[1]+"-"+threadN[2]+"-"+threadN[3]+"-"+threadN[4];
+                        if(!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()){
+                            newMessage = ButtonHelper.getTrueIdentity(player, activeGame)+" "+StringUtils.capitalize(player3.getColor()) +" said: " + message2;
+                        }
+                        
+                        newMessage = newMessage.replace("Total hits", "");
+                        String threadName = event.getChannel().getName();
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
                             if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {

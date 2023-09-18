@@ -30,13 +30,13 @@ public class Constants {
     public static final String BASE_GAME_MODE = "base_game_mode";
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
+    public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
-    public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String DOMINUS_ORB = "dominus_orb";
@@ -73,7 +73,6 @@ public class Constants {
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
     public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
     public static final String INIT_TSPMAP = "init_tspmap";
-    public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
@@ -182,7 +181,6 @@ public class Constants {
     public static final String ADD_UNITS = "add_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
-    public static final String MOVE_UNITS2 = "move_units2";
     public static final String NO_MAPGEN = "no_mapgen";
     public static final String REMOVE_UNITS = "remove_units";
     public static final String REMOVE_UNIT_DAMAGE = "remove_sustain_damage";
@@ -303,6 +301,7 @@ public class Constants {
     public static final String SO_ID = "so_id";
     public static final String AGENDA_ID = "agenda_id";
     public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
+    public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
@@ -686,7 +685,6 @@ public class Constants {
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
-    public static final String SPEND_AS = "spend_as";
     public static final String CATEGORY = "category";
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String GAME_END = "end";
@@ -714,7 +712,6 @@ public class Constants {
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
-    public static final String SERVER = "server";
     public static final String LIST_COMMANDS = "list_commands";
     public static final String INCLUDE_SUBCOMMANDS = "include_subcommands";
     public static final String INCLUDE_OPTIONS = "include_options";
@@ -744,6 +741,7 @@ public class Constants {
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
+    public static final String BOT_FACTION_REACTS= "bot_faction_reacts";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
@@ -883,4 +881,9 @@ public class Constants {
     public static final String MEDIAN_TURN_TIME = "median_turn_time";
     public static final String SHOW_MEDIAN = "show_median";
     public static final String SHOW_AVERAGE_TURN_TIME = "show_average_turn_time";
+
+    public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
+    public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
+    public static final String EXAMPLES_ONLY = "examples_only";
+    public static final String HOW_TO_MOVE_UNITS = "how_to_move_units";
 }

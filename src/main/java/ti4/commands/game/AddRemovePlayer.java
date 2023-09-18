@@ -49,10 +49,6 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         }
         GameManager gameManager = GameManager.getInstance();
         Game activeGame = gameManager.getGame(mapName);
-        if (!activeGame.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can only add/remove players when game status is 'open'.");
-            return;
-        }
 
         User user = event.getUser();
         action(event, activeGame, user);

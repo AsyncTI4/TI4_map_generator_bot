@@ -17,7 +17,7 @@ public class ListAgendas extends HelpSubcommandData {
 
     public ListAgendas() {
         super(Constants.LIST_AGENDAS, "List all agendas the bot can use");
-        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ListAgendas extends HelpSubcommandData {
         HashMap<String, AgendaModel> agendaList = Mapper.getAgendas();
         List<String> searchedList = agendaList.keySet().stream()
             .map(agendaKey -> agendaKey + " = " + Helper.getAgendaRepresentation(agendaKey))
-            .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

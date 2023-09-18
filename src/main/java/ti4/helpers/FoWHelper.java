@@ -246,8 +246,6 @@ public class FoWHelper {
 		}
 		if (!toShow) {
 			for (String primaryTile : activeGame.getCustomAdjacentTiles().keySet()) {
-				System.out.println("Primary tile" + primaryTile);
-				System.out.println("Position" + position);
 				if (activeGame.getCustomAdjacentTiles().get(primaryTile).contains(position)) {
 					adjacentPositions.add(primaryTile);
 				}
@@ -257,6 +255,37 @@ public class FoWHelper {
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeGame, position, player);
 		adjacentPositions.addAll(wormholeAdjacencies);
 
+		return adjacentPositions;
+	}
+	public static Set<String> getAdjacentTilesAndNotThisTile(Game activeGame, String position, Player player, boolean toShow) {
+		Set<String> adjacentPositions = traverseAdjacencies(activeGame, false, position);
+		
+		List<String> adjacentCustomTiles = activeGame.getCustomAdjacentTiles().get(position);
+		
+		List<String> adjacentCustomTiles2 = new ArrayList<>();
+		if (adjacentCustomTiles != null) {
+			if (!toShow) {
+				for (String t : adjacentCustomTiles) {
+					if (activeGame.getCustomAdjacentTiles().get(t) != null && activeGame.getCustomAdjacentTiles().get(t).contains(position)) {
+						adjacentCustomTiles2.add(t);
+					}
+				}
+				adjacentPositions.addAll(adjacentCustomTiles2);
+			} else {
+				adjacentPositions.addAll(adjacentCustomTiles);
+			}
+		}
+		if (!toShow) {
+			for (String primaryTile : activeGame.getCustomAdjacentTiles().keySet()) {
+				if (activeGame.getCustomAdjacentTiles().get(primaryTile).contains(position)) {
+					adjacentPositions.add(primaryTile);
+				}
+			}
+		}
+		
+		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeGame, position, player);
+		adjacentPositions.addAll(wormholeAdjacencies);
+		adjacentPositions.remove(position);
 		return adjacentPositions;
 	}
 

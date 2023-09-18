@@ -55,6 +55,7 @@ public class Turn extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeGame)+ " ended turn");
         }
         pingNextPlayer(event, activeGame, mainPlayer);
+        mainPlayer.resetOlradinPolicyFlags();
         //if (!nextMessage.isEmpty()) sendMessage(nextMessage); Sending message in ping next Player
     }
 

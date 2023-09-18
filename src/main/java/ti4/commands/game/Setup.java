@@ -17,17 +17,18 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "Mark the game as TIGL"));
-        addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want to allow Alliance Mode for map, FALSE to disable it").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want Community Mode for map, FALSE to disable it").setRequired(false));
+       // addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want Alliance Mode for map, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "YES if want FoW Mode for map, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want to allow strategy card follow reminders, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
     }
 
     @Override
@@ -47,9 +48,9 @@ public class Setup extends GameSubcommandData {
         OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
         if (vpOption != null) {
             int count = vpOption.getAsInt();
-            if (count < 1){
+            if (count < 1) {
                 count = 1;
-            } else if (count > 20){
+            } else if (count > 20) {
                 count = 20;
             }
             activeGame.setVp(count);
@@ -81,16 +82,6 @@ public class Setup extends GameSubcommandData {
             }
         }
 
-        OptionMapping allianceOption = event.getOption(Constants.ALLIANCE_MODE);
-        if (allianceOption != null){
-            String alliaceMode = allianceOption.getAsString();
-            if ("YES".equals(alliaceMode)){
-                activeGame.setAllianceMode(true);
-            } else if ("FALSE".equals(alliaceMode)){
-                activeGame.setAllianceMode(false);
-            }
-        }
-
         OptionMapping fowOption = event.getOption(Constants.FOW_MODE);
         if (fowOption != null){
             String fowMode = fowOption.getAsString();
@@ -118,6 +109,15 @@ public class Setup extends GameSubcommandData {
                 activeGame.setCCNPlasticLimit(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)){
                 activeGame.setCCNPlasticLimit(false);
+            }
+        }
+        OptionMapping factReacts = event.getOption(Constants.BOT_FACTION_REACTS);
+        if (factReacts != null){
+            String ccNP = factReacts.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP)){
+                activeGame.setBotFactionReactions(true);
+            } else if ("OFF".equalsIgnoreCase(ccNP)){
+                activeGame.setBotFactionReactions(false);
             }
         }
 

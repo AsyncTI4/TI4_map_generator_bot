@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
@@ -21,13 +20,10 @@ abstract public class JoinLeave extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        if (!activeGame.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
-            return;
-        }
         User user = event.getUser();
         action(activeGame, user);
-        Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
+
+       // Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
         GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.replyToMessage(event, getResponseMessage(activeGame, user));
     }

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.map.Game;
@@ -119,6 +120,7 @@ public class ButtonHelperModifyUnits {
         String pos2 = both.split("_")[1];
         Tile tile1 = activeGame.getTileByPosition(pos1);
         Tile tile2 = activeGame.getTileByPosition(pos2);
+        tile2 = MoveUnits.flipMallice(event, tile2, activeGame);
         AddCC.addCC(event, player.getColor(), tile2, true);
         Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
@@ -988,7 +990,9 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
-        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeGame, event);
+        for(int x=0; x < amount; x++){
+            ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeGame, event);
+        }
     }
 
 }

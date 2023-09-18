@@ -20,6 +20,7 @@ import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatHelper;
 import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatRollType;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -99,11 +100,11 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
 
-        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods);
+        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, CombatRollType.combatround);
     }
 
     public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName,
-            HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
+            HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods, CombatRollType rollType){
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if(combatOnHolder == null){
@@ -111,7 +112,7 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
         
-        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event, rollType);
         if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
@@ -132,16 +133,20 @@ public class CombatRoll extends SpecialSubcommandData {
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeGame);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
-        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeGame);
+        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeGame, rollType);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
         autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat);
 
-        String message = String.format("%s combat rolls for %s on %s %s:  \n",
-                StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
+        String combatTypeName = StringUtils.capitalize(combatOnHolder.getName()) + " combat";
+        if(rollType != CombatRollType.combatround){
+            combatTypeName = rollType.getValue();
+        }
+        String message = String.format("**%s** rolls for %s on %s %s:  \n",
+                combatTypeName, Helper.getFactionIconFromDiscord(player.getFaction()),
                 tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeGame);
+        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeGame, rollType);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
@@ -180,7 +185,7 @@ public class CombatRoll extends SpecialSubcommandData {
             CombatModifierModel combatModifier = new CombatModifierModel();
             combatModifier.setValue(count);
             combatModifier.setScope(unit);
-            combatModifier.setPersistanceType("CUSTOM");
+            combatModifier.setPersistenceType("CUSTOM");
             resultList.add(new NamedCombatModifierModel(combatModifier, ""));
         }
         return resultList;
