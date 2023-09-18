@@ -1838,7 +1838,7 @@ public class GenerateMap {
 
     private int strategyCards(Game activeGame, int y) {
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
-        y += 80;
+        int deltaY = y + 80;
         LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
         Collection<Player> players = activeGame.getPlayers().values();
         Set<Integer> scPicked = new HashSet<>();
@@ -1860,27 +1860,33 @@ public class GenerateMap {
             if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc));
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, y);
+                graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont26());
                     graphics.setColor(Color.WHITE);
-                    graphics.drawString("TG:" + tg, x, y + 30);
+                    graphics.drawString("TG:" + tg, x, deltaY + 30);
                 }
             }
             if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
                 graphics.setColor(Color.GRAY);
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, y);
+                graphics.drawString(Integer.toString(sc), x, deltaY);
             }
             x += horizontalSpacingIncrement;
+        }
+
+        //NEXTLINE IF LOTS OF SC CARDS
+        if (activeGame.getScTradeGoods().size() > 32) {
+            x = 20;
+            deltaY += 100;
         }
 
         //ROUND
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont64());
         x += 100;
-        graphics.drawString("ROUND: " + activeGame.getRound(), x, y);
+        graphics.drawString("ROUND: " + activeGame.getRound(), x, deltaY);
 
         //TURN ORDER
         String activePlayerUserID = activeGame.getActivePlayer();
@@ -1889,10 +1895,10 @@ public class GenerateMap {
 
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
-            graphics.drawString("ACTIVE", x + 10, y + 35);
+            graphics.drawString("ACTIVE", x + 10, deltaY + 35);
             graphics.setFont(Storage.getFont16());
             graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("NEXT UP", x + 112, y + 34);
+            graphics.drawString("NEXT UP", x + 112, deltaY + 34);
 
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
@@ -1911,7 +1917,7 @@ public class GenerateMap {
                         BufferedImage bufferedImage;
                         try {
                             bufferedImage = ImageIO.read(new File(factionPath));
-                            graphics.drawImage(bufferedImage, x, y - 70, null);
+                            graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                             x += 100;
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -1920,7 +1926,7 @@ public class GenerateMap {
                 }
             }            
         }
-        return y + 40;
+        return deltaY + 40;
     }
 
     private void playerInfo(Game activeGame) {
