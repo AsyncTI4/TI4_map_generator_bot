@@ -2700,7 +2700,7 @@ public class Game {
     }
 
     public int getPlayersTurnSCInitiative(Player player) {
-        if (player.hasAbility("telepathic") && player.ownsPromissoryNote("gift") && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { //Naalu with gift in their hand
+        if ((player.hasAbility("telepathic") || player.ownsPromissoryNote("gift")) && (player.getPromissoryNotes().containsKey("gift") || !otherPlayerInGameHasGiftInPlayArea(player))) { //Naalu with gift in their hand
             return 0;
         } else if (player.getPromissoryNotesInPlayArea().contains("gift")) { //Someone with gift in their play area
             return 0;
