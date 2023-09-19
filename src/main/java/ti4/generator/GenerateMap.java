@@ -1667,7 +1667,7 @@ public class GenerateMap {
                 if (getFactionIconOffset)
                     return new Coord(204, 21);
                 return new Coord(191, 4);
-            case "sd":
+            case "sd", "vsd":
                 if (getFactionIconOffset)
                     return new Coord(52, 65);
                 return new Coord(46, 49);
