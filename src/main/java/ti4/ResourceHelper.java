@@ -1,5 +1,6 @@
 package ti4;
 
+import java.util.concurrent.ThreadLocalRandom;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 
@@ -76,7 +77,7 @@ public class ResourceHelper {
     @Nullable
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
-            if (AsyncTI4DiscordBot.RANDOM.nextInt(Constants.EYE_CHANCE) == 0) {
+            if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
                 return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
             }
         }

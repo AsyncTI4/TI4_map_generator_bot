@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -972,18 +973,18 @@ public class Game {
 
     public void setSentAgenda(String id) {
         Collection<Integer> values = sentAgendas.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         sentAgendas.put(id, identifier);
     }
 
     public int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         discardAgendas.put(id, identifier);
         return identifier;
@@ -1465,9 +1466,9 @@ public class Game {
         LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
         for (String card : discardAgendasList) {
             Collection<Integer> values = discardAgendas.values();
-            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+                identifier = ThreadLocalRandom.current().nextInt(1000);
             }
             discardAgendas.put(card, identifier);
         }
@@ -1509,9 +1510,9 @@ public class Game {
         if (!id.isEmpty()) {
 
             Collection<Integer> values = laws.values();
-            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+                identifier = ThreadLocalRandom.current().nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -1545,9 +1546,9 @@ public class Game {
         }
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
-            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+                identifier = ThreadLocalRandom.current().nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -1930,9 +1931,9 @@ public class Game {
 
     public void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         discardActionCards.put(id, identifier);
     }
@@ -2222,9 +2223,9 @@ public class Game {
         LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
         for (String card : discardActionCardList) {
             Collection<Integer> values = discardActionCards.values();
-            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+                identifier = ThreadLocalRandom.current().nextInt(1000);
             }
             discardActionCards.put(card, identifier);
         }

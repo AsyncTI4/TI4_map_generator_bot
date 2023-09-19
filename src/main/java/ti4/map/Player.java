@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -535,18 +536,18 @@ public class Player {
 
     public void setActionCard(String id) {
         Collection<Integer> values = actionCards.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier);
     }
 
     public void setTrapCard(String id) {
         Collection<Integer> values = trapCards.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         trapCards.put(id, identifier);
     }
@@ -557,9 +558,9 @@ public class Player {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(100);
+        int identifier = ThreadLocalRandom.current().nextInt(100);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(100);
+            identifier = ThreadLocalRandom.current().nextInt(100);
         }
         promissoryNotes.put(id, identifier);
     }
@@ -633,9 +634,9 @@ public class Player {
     public void setSecret(String id) {
 
         Collection<Integer> values = secrets.values();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         secrets.put(id, identifier);
     }
@@ -662,9 +663,9 @@ public class Player {
     public void setSecretScored(String id, Game activeGame) {
         Collection<Integer> values = secretsScored.values();
         List<Integer> allIDs = activeGame.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
-        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
-            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
+            identifier = ThreadLocalRandom.current().nextInt(1000);
         }
         secretsScored.put(id, identifier);
     }

@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -288,7 +289,7 @@ public class CombatHelper {
             for (int index = 0; index < numRolls; index++) {
                 int min = 1;
                 int max = 10;
-                resultRolls[index] = AsyncTI4DiscordBot.RANDOM.nextInt(max - min + 1) + min;
+                resultRolls[index] = ThreadLocalRandom.current().nextInt(max - min + 1) + min;
             }
 
             int[] hitRolls = Arrays.stream(resultRolls)

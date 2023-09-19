@@ -5,6 +5,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -401,7 +402,7 @@ public class Helper {
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
         //symbols = new ArrayList<>(testingEmoji);
-        Random seed = messageID == null ? AsyncTI4DiscordBot.RANDOM : new Random(messageID.hashCode());
+        Random seed = messageID == null ? ThreadLocalRandom.current() : new Random(messageID.hashCode());
         Collections.shuffle(symbols, seed);
         value = value % symbols.size();
         return symbols.get(value);
@@ -409,14 +410,14 @@ public class Helper {
 
     public static String getRandomSemLore() {
         List<String> semLores = new ArrayList<>(Emojis.SemLores);
-        Random seed = AsyncTI4DiscordBot.RANDOM;
+        Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
         return semLores.get(0);
     }
 
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
-        Random seed = AsyncTI4DiscordBot.RANDOM;
+        Random seed = ThreadLocalRandom.current();
         Collections.shuffle(goodDogs, seed);
         return goodDogs.get(0);
     }
