@@ -33,7 +33,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
                 allRelics.remove(relicId);
             }
             player.addRelic(relicId);
-            RelicModel relicData = Mapper.getRelicObject(relicId);
+            RelicModel relicData = Mapper.getRelic(relicId);
             String relicString = "Relic: " + relicData.getName() + " - " + relicData.getText();
             sendMessage(relicString);
         } else {

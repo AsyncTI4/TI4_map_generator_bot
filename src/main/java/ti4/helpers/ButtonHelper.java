@@ -3558,7 +3558,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         // Relics
         boolean dontEnigTwice = true;
         for (String relic : p1.getRelics()) {
-            RelicModel relicData = Mapper.getRelicObject(relic);
+            RelicModel relicData = Mapper.getRelic(relic);
 
             if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE) || (relicData != null && relicData.getText().contains("Action:"))) {
                 Button rButton;
@@ -3996,7 +3996,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                         p1.removeExhaustedRelic(buttonID);
                     }
                    
-                    RelicModel relicModel = Mapper.getRelicObject(buttonID);
+                    RelicModel relicModel = Mapper.getRelic(buttonID);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),purgeOrExhaust + Emojis.Relic + " relic: " + relicModel.getName() + "\n> " + relicModel.getText());
                     if(relicModel.getName().contains("Enigmatic")){
                         activeGame.setComponentAction(true);

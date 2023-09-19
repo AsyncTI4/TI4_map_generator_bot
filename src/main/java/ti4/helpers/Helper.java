@@ -1755,7 +1755,7 @@ public class Helper {
     }
 
     public static String getRelicRepresentation(String relicID) {
-        RelicModel relicModel = Mapper.getRelicObject(relicID);
+        RelicModel relicModel = Mapper.getRelic(relicID);
         if (relicModel == null) {
             BotLogger.log("`Helper.getRelicRepresentation` failed to find `relicID = " + relicID + "`");
             return "RelicID not found: `" + relicID + "`\n";

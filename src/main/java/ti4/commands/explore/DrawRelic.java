@@ -36,7 +36,7 @@ public class DrawRelic extends GenericRelicAction {
         relicID = relicID.replace("extra1","");
         relicID = relicID.replace("extra2","");
         player.addRelic(relicID);
-        RelicModel relicData = Mapper.getRelicObject(relicID);
+        RelicModel relicData = Mapper.getRelic(relicID);
         StringBuilder message = new StringBuilder();
         message.append(Helper.getPlayerRepresentation(player, activeGame)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText()).append("\n");
 
