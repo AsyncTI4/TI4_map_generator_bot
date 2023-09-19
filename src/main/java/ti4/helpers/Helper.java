@@ -146,6 +146,7 @@ public class Helper {
     public static boolean isAllianceModeAndPreviouslyOwnedCheck(Game activeGame, String planet) {
         return (activeGame.isAllianceMode() && doesAnyoneOwnPlanet(activeGame, planet));
     }
+
      public static boolean isSaboAllowed(Game activeGame, Player player) {
        
         if("pbd100".equalsIgnoreCase(activeGame.getName())){
@@ -290,7 +291,7 @@ public class Helper {
             return "@Oopsidoops no name";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
-        if (roles != null && !roles.isEmpty()){
+        if (!roles.isEmpty()){
             return roles.get(0).getAsMention();
         }
         return "[@" + roleName + "]";
@@ -2022,7 +2023,6 @@ public class Helper {
             // Set.add() returns false if the element was already present in the set.
             // Hence filter such elements
             .filter(n -> !items.add(n))
-  
             // Collect duplicate elements in the set
             .collect(Collectors.toSet());
     }
