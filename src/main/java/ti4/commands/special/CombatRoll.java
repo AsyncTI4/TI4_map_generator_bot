@@ -112,7 +112,7 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
         
-        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event, rollType);
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event, rollType);
         if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
