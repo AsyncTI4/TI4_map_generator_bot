@@ -1,1 +1,37 @@
-{"id":"er91","name":"Dognui","aliases":["dognui"],"imagePath":"er91_dognui.png","planetIds":["dognui"],"shipPositionsType":"TYPE10","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":[null],"planets":["dognui"]}
+{
+    "id": "er91",
+    "name": "Dognui",
+    "aliases": [
+        "dognui"
+    ],
+    "imagePath": "er91_dognui.png",
+    "planetIds": [
+        "dognui"
+    ],
+    "shipPositionsType": "TYPE10",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": [
+        null
+    ],
+    "planets": [
+        "dognui"
+    ],
+    "isGravityRift": true
+}

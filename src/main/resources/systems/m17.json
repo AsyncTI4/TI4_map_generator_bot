@@ -1,1 +1,36 @@
-{"id":"m17","name":"Origin","aliases":["origin","lazax"],"imagePath":"m17_origin.png","planetIds":["origin"],"shipPositionsType":"TYPE01","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":null,"planets":["origin"]}
+{
+    "id": "m17",
+    "name": "Origin",
+    "aliases": [
+        "origin",
+        "lazax"
+    ],
+    "imagePath": "m17_origin.png",
+    "planetIds": [
+        "origin"
+    ],
+    "shipPositionsType": "TYPE01",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "planets": [
+        "origin"
+    ],
+    "isAsteroidField": true
+}

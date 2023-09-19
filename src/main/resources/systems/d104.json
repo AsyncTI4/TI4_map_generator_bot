@@ -1,1 +1,37 @@
-{"id":"d104","name":"Domna","aliases":["domna","dom","4253"],"imagePath":"d104.png","planetIds":["domna"],"shipPositionsType":"TYPE01","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":null,"planets":["domna"]}
+{
+    "id": "d104",
+    "name": "Domna",
+    "aliases": [
+        "domna",
+        "dom",
+        "4253"
+    ],
+    "imagePath": "d104.png",
+    "planetIds": [
+        "domna"
+    ],
+    "shipPositionsType": "TYPE01",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "planets": [
+        "domna"
+    ],
+    "isNebula": true
+}
