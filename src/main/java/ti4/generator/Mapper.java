@@ -34,7 +34,6 @@ public class Mapper {
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
     private static final Properties explore = new Properties();
-    private static final Properties relics = new Properties();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
     private static final Properties leader_representation = new Properties();
@@ -52,6 +51,7 @@ public class Mapper {
     private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+    private static final HashMap<String, RelicModel> relics = new HashMap<>();
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
     private static final HashMap<String, UnitModel> units = new HashMap<>();
     @Getter
@@ -74,7 +74,7 @@ public class Mapper {
         importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
         importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
-        readData("relics.properties", relics, "Could not read relic file");
+        importJsonObjects("relics.json", relics, RelicModel.class, "Could not read relic file");
         importJsonObjects("technology.json", technologies, TechnologyModel.class, "Could not read technology file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
@@ -421,17 +421,11 @@ public class Mapper {
     public static String getRelic(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
-        return (String) relics.get(id);
+        return (String) relics.get(id).getSimpleRepresentation();
     }
 
     public static RelicModel getRelicObject(String id) {
-        String relicString = getRelic(id);
-
-        StringTokenizer tokenizer = new StringTokenizer(relicString, ";");
-        String name = tokenizer.nextToken();
-        String effect = tokenizer.nextToken();
-        String shortName = tokenizer.hasMoreTokens() ? tokenizer.nextToken() : null;
-        return new RelicModel(id, name, effect, shortName);
+        return relics.get(id);
     }
 
     public static PlanetModel getPlanet(String id) {
@@ -665,22 +659,25 @@ public class Mapper {
         }
         return expList;
     }
+    
     public static HashMap<String, String> getRelics(String extra) {
         HashMap<String, String> relicList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : relics.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            relicList.put(entry.getKey() +extra, tokenizer.nextToken());
+        for (Map.Entry<String, RelicModel> entry : relics.entrySet()) {
+            relicList.put(entry.getKey() + extra, entry.getValue().getName());
         }
         return relicList;
     }
 
     public static HashMap<String, String> getRelics() {
         HashMap<String, String> relicList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : relics.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            relicList.put((String) entry.getKey(), tokenizer.nextToken());
+        for (Map.Entry<String, RelicModel> entry : relics.entrySet()) {
+            relicList.put(entry.getKey(), entry.getValue().getName());
         }
         return relicList;
+    }
+
+    public static Map<String, RelicModel> getRelicModels() {
+        return new HashMap<>(relics);
     }
 
     public static HashMap<String, AgendaModel> getAgendas() {
