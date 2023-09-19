@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.model.RelicModel;
 
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class DrawSpecificRelic extends GenericRelicAction {
                 allRelics.remove(relicId);
             }
             player.addRelic(relicId);
-            String[] relicData = Mapper.getRelic(relicId).split(";");
-            String relicString = "Relic: " + relicData[0] + " - " + relicData[1];
+            RelicModel relicData = Mapper.getRelicObject(relicId);
+            String relicString = "Relic: " + relicData.getName() + " - " + relicData.getText();
             sendMessage(relicString);
         } else {
             sendMessage("Invalid relic or relic not present in deck");

@@ -3,6 +3,7 @@ package ti4.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
+import ti4.helpers.Emojis;
 
 @Data
 public class RelicModel implements ModelInterface {
@@ -14,11 +15,23 @@ public class RelicModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return true;
+        return alias != null 
+            && name != null 
+            && text != null 
+            && source != null;
     }
 
     @JsonIgnore
     public String getSimpleRepresentation() {
-        return String.format("**%s**: %s *(%s)*", getName(), getText(), getSource());
+        return getSourceEmoji() + String.format("**%s**: %s *(%s)*", getName(), getText(), getSource());
+    }
+
+    @JsonIgnore
+    public String getSourceEmoji() {
+        return switch (source) {
+            case "absol" -> Emojis.Absol;
+            case "ds" -> Emojis.DiscordantStars;
+            default -> "";
+        };
     }
 }

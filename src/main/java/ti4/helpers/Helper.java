@@ -50,6 +50,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -1754,22 +1755,12 @@ public class Helper {
     }
 
     public static String getRelicRepresentation(String relicID) {
-        String relicText = Mapper.getRelic(relicID);
-        if (relicText == null) {
+        RelicModel relicModel = Mapper.getRelicObject(relicID);
+        if (relicModel == null) {
             BotLogger.log("`Helper.getRelicRepresentation` failed to find `relicID = " + relicID + "`");
             return "RelicID not found: `" + relicID + "`\n";
         }
-        String[] relicData = relicText.split(";");
-        StringBuilder message = new StringBuilder();
-        message.append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
-
-        //Append helpful commands after relic draws and resolve effects:
-        switch (relicID) {
-            case "nanoforge" -> message.append("Run the following commands to use Nanoforge:\n")
-                   .append("     `/explore relic_purge relic: nanoforge`\n")
-                   .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
-        }
-        return message.toString();
+        return relicModel.getSimpleRepresentation();
     }
 
     public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Game activeGame, Player player) {

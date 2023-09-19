@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
 
 public class DrawRelic extends GenericRelicAction {
 
@@ -35,9 +36,9 @@ public class DrawRelic extends GenericRelicAction {
         relicID = relicID.replace("extra1","");
         relicID = relicID.replace("extra2","");
         player.addRelic(relicID);
-        String[] relicData = Mapper.getRelic(relicID).split(";");
+        RelicModel relicData = Mapper.getRelicObject(relicID);
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getPlayerRepresentation(player, activeGame)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
+        message.append(Helper.getPlayerRepresentation(player, activeGame)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText()).append("\n");
 
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {

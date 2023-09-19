@@ -2890,7 +2890,7 @@ public class ButtonListener extends ListenerAdapter {
                     String relicId = "dominusorb";
                     player.removeRelic(relicId);
                     player.removeExhaustedRelic(relicId);
-                    String relicName = Mapper.getRelic(relicId).split(";")[0];
+                    String relicName = Mapper.getRelicObject(relicId).getName();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), purgeOrExhaust + Emojis.Relic + " relic: " + relicName);
                     event.getMessage().delete().queue();
                     String message = "Choose a system to move from.";
