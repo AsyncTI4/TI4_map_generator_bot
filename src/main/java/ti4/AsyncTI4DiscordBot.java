@@ -1,5 +1,8 @@
 package ti4;
 
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -58,7 +61,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class MapGenerator {
+public class AsyncTI4DiscordBot {
+
+    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(
+        Math.max(2, Runtime.getRuntime().availableProcessors()));
+    public static final Random RANDOM = new Random();
+    public static final List<Role> adminRoles = new ArrayList<>();
+    public static final List<Role> developerRoles = new ArrayList<>();
+    public static final List<Role> bothelperRoles = new ArrayList<>();
 
     public static JDA jda;
     public static String userID;
@@ -67,10 +77,6 @@ public class MapGenerator {
     public static Guild guild3rd;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static final List<Role> adminRoles = new ArrayList<>();
-    public static final List<Role> developerRoles = new ArrayList<>();
-    public static final List<Role> bothelperRoles = new ArrayList<>();
-
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {

@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -355,7 +355,7 @@ public class AutoCompleteProvider {
             case Constants.CATEGORY -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Category> categories = new ArrayList<>();
-                for (Guild guild : MapGenerator.jda.getGuilds()) {
+                for (Guild guild : AsyncTI4DiscordBot.jda.getGuilds()) {
                     categories.addAll(guild.getCategories());
                 }
                 List<Command.Choice> options = categories.stream()

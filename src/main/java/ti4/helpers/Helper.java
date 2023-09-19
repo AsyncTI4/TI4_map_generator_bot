@@ -31,7 +31,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
@@ -50,7 +50,6 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
-import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -402,7 +401,7 @@ public class Helper {
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
         //symbols = new ArrayList<>(testingEmoji);
-        Random seed = messageID == null ? new Random() : new Random(messageID.hashCode());
+        Random seed = messageID == null ? AsyncTI4DiscordBot.RANDOM : new Random(messageID.hashCode());
         Collections.shuffle(symbols, seed);
         value = value % symbols.size();
         return symbols.get(value);
@@ -410,14 +409,14 @@ public class Helper {
 
     public static String getRandomSemLore() {
         List<String> semLores = new ArrayList<>(Emojis.SemLores);
-        Random seed = new Random();
+        Random seed = AsyncTI4DiscordBot.RANDOM;
         Collections.shuffle(semLores, seed);
         return semLores.get(0);
     }
 
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
-        Random seed = new Random();
+        Random seed = AsyncTI4DiscordBot.RANDOM;
         Collections.shuffle(goodDogs, seed);
         return goodDogs.get(0);
     }
@@ -1047,7 +1046,7 @@ public class Helper {
     }
 
     public static String getPlayerPing(Player player) {
-        User userById = MapGenerator.jda.getUserById(player.getUserID());
+        User userById = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         if (userById == null) {
             return "";
         }

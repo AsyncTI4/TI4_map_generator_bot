@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -95,7 +95,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.replyToMessage(event, file);
 
         //CREATE POST IN #THE-PBD-CHRONICLES
-        TextChannel pbdChroniclesChannel = MapGenerator.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
+        TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
         String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
         if (pbdChroniclesChannel == null) {
             BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
@@ -107,9 +107,9 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
-        String bothelperMention = Helper.getRoleMentionByName(MapGenerator.guildPrimary, "bothelper");
+        String bothelperMention = Helper.getRoleMentionByName(AsyncTI4DiscordBot.guildPrimary, "bothelper");
 
-        Helper.checkThreadLimitAndArchive(MapGenerator.guildPrimary);
+        Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
         
         if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
@@ -123,7 +123,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         // GET BOTHELPER LOUNGE
-        TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
         if (bothelperLoungeChannel == null) {
             BotLogger.log(event, "`#bothelper-lounge` channel not found - `/game end` cannot continue");
             return;
@@ -194,7 +194,7 @@ public class GameEnd extends GameSubcommandData {
             int playerVP = player.getTotalVictoryPoints(activeGame);
             sb.append("> `").append(index).append(".` ");
             sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-            sb.append(Helper.getColourAsMention(MapGenerator.guildPrimary, player.getColor()));
+            sb.append(Helper.getColourAsMention(AsyncTI4DiscordBot.guildPrimary, player.getColor()));
             sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
             sb.append(" - *").append(playerVP).append("VP* ");
             if (playerVP >= activeGame.getVp()) sb.append(" - **WINNER**");

@@ -3,16 +3,14 @@ package ti4.generator;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.*;
 import ti4.map.*;
@@ -290,13 +288,13 @@ public class GenerateMap {
 
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
-                new Thread(() -> {
+                AsyncTI4DiscordBot.THREAD_POOL.execute(() -> {
                     WebHelper.putMap(activeGame.getName(), mainImage);
                     WebHelper.putData(activeGame.getName(), activeGame);
-                }).start();
-            } else if (!(isFoWPrivate == null) && isFoWPrivate) {
+                });
+            } else if (isFoWPrivate != null && isFoWPrivate) {
                 Player player = getFowPlayer(activeGame, event);
-                new Thread(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player)).start();
+                AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
             }
         } catch (IOException e) {
             BotLogger.log(activeGame.getName() + ": Could not save generated map");
@@ -360,7 +358,7 @@ public class GenerateMap {
 
     private Image getPlayerDiscordAvatar(Player player) {
         String userID = player.getUserID();
-        Member member = MapGenerator.guildPrimary.getMemberById(userID);
+        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
         if (member == null)
             return null;
         BufferedImage resourceBufferedImage;

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -27,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -173,7 +172,7 @@ public class Player {
     @JsonIgnore
     public Role getRoleForCommunity() {
         try {
-            return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
+            return AsyncTI4DiscordBot.jda.getRoleById(getRoleIDForCommunity());
         } catch (Exception e) {
             // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
         }
@@ -192,7 +191,7 @@ public class Player {
     @JsonIgnore
     public MessageChannel getPrivateChannel() {
         try {
-            return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
+            return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
             // BotLogger.log("Could not retrieve privateChannel for " + getName(), e);
         }
@@ -245,7 +244,7 @@ public class Player {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
 
-                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD
@@ -275,7 +274,7 @@ public class Player {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
 
-                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
 
                 // SEARCH FOR EXISTING OPEN THREAD
@@ -536,18 +535,18 @@ public class Player {
 
     public void setActionCard(String id) {
         Collection<Integer> values = actionCards.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         actionCards.put(id, identifier);
     }
 
     public void setTrapCard(String id) {
         Collection<Integer> values = trapCards.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         trapCards.put(id, identifier);
     }
@@ -558,9 +557,9 @@ public class Player {
 
     public void setPromissoryNote(String id) {
         Collection<Integer> values = promissoryNotes.values();
-        int identifier = new Random().nextInt(100);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(100);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(100);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(100);
         }
         promissoryNotes.put(id, identifier);
     }
@@ -634,9 +633,9 @@ public class Player {
     public void setSecret(String id) {
 
         Collection<Integer> values = secrets.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         secrets.put(id, identifier);
     }
@@ -663,9 +662,9 @@ public class Player {
     public void setSecretScored(String id, Game activeGame) {
         Collection<Integer> values = secretsScored.values();
         List<Integer> allIDs = activeGame.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         secretsScored.put(id, identifier);
     }
@@ -811,10 +810,10 @@ public class Player {
     }
 
     public String getUserName() {
-        User userById = MapGenerator.jda.getUserById(userID);
+        User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
         if (userById != null) {
             userName = userById.getName();
-            Member member = MapGenerator.guildPrimary.getMemberById(userID);
+            Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
             if (member != null) userName = member.getEffectiveName();
         }
         return userName;

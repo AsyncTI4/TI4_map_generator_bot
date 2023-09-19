@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -50,7 +50,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
 
         Player player = Helper.getGamePlayer(activeGame, null, event, user.getId());
         if (player != null) {
-            user = MapGenerator.jda.getUserById(player.getUserID());
+            user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         }
     }
 }

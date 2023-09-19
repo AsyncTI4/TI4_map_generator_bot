@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.generator.Mapper;
@@ -600,10 +600,10 @@ public class Game {
     @JsonIgnore
     public TextChannel getTableTalkChannel() {
         try {
-            return MapGenerator.jda.getTextChannelById(getTableTalkChannelID());
+            return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
         } catch (Exception e) {
             TextChannel tableTalkChannel;
-            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
+            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannels().stream()
                 .filter(c -> c.getName().startsWith(getName()))
                 .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
                 .toList();
@@ -628,9 +628,9 @@ public class Game {
     @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
-            return MapGenerator.jda.getTextChannelById(getMainGameChannelID());
+            return AsyncTI4DiscordBot.jda.getTextChannelById(getMainGameChannelID());
         } catch (Exception e) {
-            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+            List<TextChannel> gameChannels = AsyncTI4DiscordBot.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
             if (gameChannels.size() == 1) {
                 TextChannel mainGameChannel = gameChannels.get(0);
                 setMainGameChannelID(mainGameChannel.getId());
@@ -657,10 +657,10 @@ public class Game {
     @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
         try {
-            return MapGenerator.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+            return AsyncTI4DiscordBot.jda.getThreadChannelById(getBotMapUpdatesThreadID());
         } catch (Exception e) {
             ThreadChannel threadChannel; //exists and is not locked
-            List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+            List<ThreadChannel> botChannels = AsyncTI4DiscordBot.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
             if (botChannels.size() == 1) { //found a matching thread
             } else { //can't find it, might be archived
                 for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
@@ -972,18 +972,18 @@ public class Game {
 
     public void setSentAgenda(String id) {
         Collection<Integer> values = sentAgendas.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         sentAgendas.put(id, identifier);
     }
 
     public int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         discardAgendas.put(id, identifier);
         return identifier;
@@ -1465,9 +1465,9 @@ public class Game {
         LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
         for (String card : discardAgendasList) {
             Collection<Integer> values = discardAgendas.values();
-            int identifier = new Random().nextInt(1000);
+            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = new Random().nextInt(1000);
+                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             }
             discardAgendas.put(card, identifier);
         }
@@ -1509,9 +1509,9 @@ public class Game {
         if (!id.isEmpty()) {
 
             Collection<Integer> values = laws.values();
-            int identifier = new Random().nextInt(1000);
+            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = new Random().nextInt(1000);
+                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -1545,9 +1545,9 @@ public class Game {
         }
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
-            int identifier = new Random().nextInt(1000);
+            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = new Random().nextInt(1000);
+                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
@@ -1930,9 +1930,9 @@ public class Game {
 
     public void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
         }
         discardActionCards.put(id, identifier);
     }
@@ -2222,9 +2222,9 @@ public class Game {
         LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
         for (String card : discardActionCardList) {
             Collection<Integer> values = discardActionCards.values();
-            int identifier = new Random().nextInt(1000);
+            int identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             while (values.contains(identifier)) {
-                identifier = new Random().nextInt(1000);
+                identifier = AsyncTI4DiscordBot.RANDOM.nextInt(1000);
             }
             discardActionCards.put(card, identifier);
         }
