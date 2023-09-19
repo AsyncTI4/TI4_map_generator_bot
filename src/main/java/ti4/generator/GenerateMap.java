@@ -3,6 +3,7 @@ package ti4.generator;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
@@ -1694,7 +1695,7 @@ public class GenerateMap {
                 System.out.println("error:" + u);
             } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
                 Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                //drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction() + ".png", 0.38f, 1.0f);
+                drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction().toLowerCase() + ".png", 0.38f, 1.0f);
                 //String factionIcon = "pa_tech_baseunit_" + unit.getFaction() + ".png";
                 //drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
             }
