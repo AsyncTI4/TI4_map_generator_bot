@@ -204,9 +204,6 @@
         "source": "absol"
     },
     {
-        "alias": "#PBD100"
-    },
-    {
         "alias": "ring_king_poon",
         "name": "The Ring of King Poon",
         "text": "Action: Exhaust this card to peek at a face down objective. Action: You may flip a face down public objective. Score a revealed public objective. Purge this card.",
@@ -217,9 +214,6 @@
         "name": "King Tis's Golden Tooth",
         "text": "Attach this card to a planet you control that is the farthest away from your home system. Gain 1 VP. If you lose control of the planet, lose 1 VP and give this card to the player who took the planet from you.",
         "source": "pbd100"
-    },
-    {
-        "alias": "#Discordant Stars"
     },
     {
         "alias": "boon_of_the_cerulean_god",

@@ -19,6 +19,6 @@ public class RelicModel implements ModelInterface {
 
     @JsonIgnore
     public String getSimpleRepresentation() {
-        return String.format("**%s** *(%s)*: %s", getName(), getSource(), getText());
+        return String.format("**%s**: %s *(%s)*", getName(), getText(), getSource());
     }
 }
