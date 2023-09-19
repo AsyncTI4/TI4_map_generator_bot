@@ -174,12 +174,12 @@ public class AutoCompleteProvider {
             }
             case Constants.RELIC_ALL -> { 
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> relics = Mapper.getRelics();           
+                Map<String, RelicModel> relics = Mapper.getRelics();           
 
                 List<Command.Choice> options = relics.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }          
@@ -801,12 +801,11 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> relics = new HashMap<>(Mapper.getRelics());
+                        Map<String, RelicModel> relics = Mapper.getRelics();
                         List<Command.Choice> options = relics.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getText().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
