@@ -3,6 +3,7 @@ package ti4.generator;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
@@ -21,6 +22,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 import javax.imageio.ImageIO;
 
@@ -586,19 +588,19 @@ public class GenerateMap {
                 y += 85;
                 y += 200;
 
-                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);             
-                
+                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);
+
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
                 if (!player.getPlanets().isEmpty()) {
                     xDeltaSecondRow = planetInfo(player, activeGame, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
-                
+
                 int xDeltaFirstRowFromRightSide = 0;
                 int xDeltaSecondRowFromRightSide = 0;
                 // FIRST ROW RIGHT SIDE
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
-                
+
                 // SECOND ROW RIGHT SIDE
                 xDeltaSecondRowFromRightSide = reinforcements(player, activeGame, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
@@ -671,13 +673,15 @@ public class GenerateMap {
             try {
                 bufferedImage = ImageIO.read(new File(sleeperFile));
                 if (bufferedImage != null) {
-                    List<Point> points = new ArrayList<>(){{
-                        add(new Point(0, 15));
-                        add(new Point(50, 0));
-                        add(new Point(100, 25));
-                        add(new Point(50, 50));
-                        add(new Point(10, 40));
-                    }};
+                    List<Point> points = new ArrayList<>() {
+                        {
+                            add(new Point(0, 15));
+                            add(new Point(50, 0));
+                            add(new Point(100, 25));
+                            add(new Point(50, 50));
+                            add(new Point(10, 40));
+                        }
+                    };
                     for (int i = 0; i < 5 - activeGame.getSleeperTokensPlacedCount(); i++) {
                         Point point = points.get(i);
                         graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide + point.x, yPlayAreaSecondRow + point.y, null);
@@ -1619,52 +1623,109 @@ public class GenerateMap {
         return false;
     }
 
+    private static class Coord {
+        public int x;
+        public int y;
+
+        Coord(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
+        switch (asyncId) {
+            case "gf":
+                if (getFactionIconOffset)
+                    return new Coord(3, 17);
+                return new Coord(3, 2);
+            case "fs":
+                if (getFactionIconOffset)
+                    return new Coord(185, 101);
+                return new Coord(151, 67);
+            case "ff":
+                if (getFactionIconOffset)
+                    return new Coord(5, 72);
+                return new Coord(7, 59);
+            case "dn":
+                if (getFactionIconOffset)
+                    return new Coord(116, 99);
+                return new Coord(93, 72);
+            case "dd":
+                if (getFactionIconOffset)
+                    return new Coord(62, 106);
+                return new Coord(52, 99);
+            case "cv":
+                if (getFactionIconOffset)
+                    return new Coord(105, 38);
+                return new Coord(82, 11);
+            case "ca":
+                if (getFactionIconOffset)
+                    return new Coord(149, 24);
+                return new Coord(126, 1);
+            case "ws":
+                if (getFactionIconOffset)
+                    return new Coord(204, 21);
+                return new Coord(191, 4);
+            case "sd", "vsd":
+                if (getFactionIconOffset)
+                    return new Coord(52, 65);
+                return new Coord(46, 49);
+            case "pd":
+                if (getFactionIconOffset)
+                    return new Coord(51, 15);
+                return new Coord(47, 2);
+            case "mf":
+                if (getFactionIconOffset)
+                    return new Coord(5, 110);
+                return new Coord(3, 102);
+            default:
+                return new Coord(0, 0);
+        }
+    }
+
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX, Player player, Game activeGame) {
-        String outline = "pa_tech_unitsnew_outlines_generic.png";
-
-        // Custom UnitTech Outline for Nomad
-        if (player.ownsUnit("nomad_flagship") || player.ownsUnit("nomad_flagship2")) {
-            outline = "pa_tech_unitsnew_outlines_nomad.png";
-        }
-
-        // Use Nomad Outline for Nekro abilties if Nomad is in game
-        if (player.hasAbility("technological_singularity") || player.hasAbility("galactic_threat")) {
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if (player_.ownsUnit("nomad_flagship") || player_.ownsUnit("nomad_flagship2")) {
-                    outline = "pa_tech_unitsnew_outlines_nomad.png";
-                    break;
-                }
-            }
-        }
+        String outline = "pa_tech_unitupgrade_outlines.png";
 
         drawPAImage(x + deltaX, y, outline);
-        if (techs == null) {
-            graphics.setColor(Color.WHITE);
-            graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
-            deltaX += 228;
-            return deltaX;
-        }
-        for (String tech : techs) {
-            TechnologyModel techInformation = techInfo.get(tech);
-
-            String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) + "_";
-            if (techInformation.getBaseUpgrade().isEmpty()) {
-                if ("dt2".equals(tech)) {
-                    unit += "sd2.png";
-                } else {
-                    unit += tech + ".png";
-                }
-            } else {
-                unit += techInformation.getBaseUpgrade() + ".png";
+        // Add faction icons for base units
+        for (String u : player.getUnitsOwned()) {
+            UnitModel unit = Mapper.getUnit(u);
+            if (unit == null) {
+                System.out.println("error:" + u);
+            } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
+                Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+                drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction().toLowerCase() + ".png", 0.38f, 1.0f);
+                //String factionIcon = "pa_tech_baseunit_" + unit.getFaction() + ".png";
+                //drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
             }
-            drawPAImage(x + deltaX, y, unit);
-            if (!techInformation.getFaction().isEmpty()) {
-                String factionIcon = "pa_tech_unitsnew_" + techInformation.getFaction() + "_" + tech + ".png";
-                drawPAImage(x + deltaX, y, factionIcon);
+        }
+        if (techs != null) {
+            for (String tech : techs) {
+                TechnologyModel techInformation = techInfo.get(tech);
+                if (!techInformation.getType().equals(TechnologyModel.TechnologyType.UNITUPGRADE)) {
+                    continue;
+                }
+
+                UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
+
+                if (unit == null) {
+                    BotLogger.log("Could not load unit associated with tech: " + techInformation.getAlias());
+                    continue;
+                }
+                Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                String new_unitImage = Mapper.getColorID(player.getColor()) + "_" + unit.getAsyncId() + ".png";
+                drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, new_unitImage);
+
+                if (!techInformation.getFaction().isEmpty()) {
+                    Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+                    String factionIcon = "pa_tech_unitupgrade_" + techInformation.getFaction() + ".png";
+                    drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
+                }
             }
         }
         graphics.setColor(Color.WHITE);
-        graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
+        graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
         deltaX += 228;
         return deltaX;
     }
@@ -1723,6 +1784,16 @@ public class GenerateMap {
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             // BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAUnitUpgrade(int x, int y, String resourceName) {
+        try {
+            String path = Tile.getUnitPath(resourceName);
+            BufferedImage img = ImageIO.read(new File(path));
+            graphics.drawImage(img, x, y, null);
+        } catch (Exception e) {
+            // Do Nothing
         }
     }
 
@@ -1838,7 +1909,7 @@ public class GenerateMap {
 
     private int strategyCards(Game activeGame, int y) {
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
-        y += 80;
+        int deltaY = y + 80;
         LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
         Collection<Player> players = activeGame.getPlayers().values();
         Set<Integer> scPicked = new HashSet<>();
@@ -1860,27 +1931,33 @@ public class GenerateMap {
             if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc));
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, y);
+                graphics.drawString(Integer.toString(sc), x, deltaY);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont26());
                     graphics.setColor(Color.WHITE);
-                    graphics.drawString("TG:" + tg, x, y + 30);
+                    graphics.drawString("TG:" + tg, x, deltaY + 30);
                 }
             }
             if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
                 graphics.setColor(Color.GRAY);
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(Integer.toString(sc), x, y);
+                graphics.drawString(Integer.toString(sc), x, deltaY);
             }
             x += horizontalSpacingIncrement;
+        }
+
+        //NEXTLINE IF LOTS OF SC CARDS
+        if (activeGame.getScTradeGoods().size() > 32) {
+            x = 20;
+            deltaY += 100;
         }
 
         //ROUND
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont64());
         x += 100;
-        graphics.drawString("ROUND: " + activeGame.getRound(), x, y);
+        graphics.drawString("ROUND: " + activeGame.getRound(), x, deltaY);
 
         //TURN ORDER
         String activePlayerUserID = activeGame.getActivePlayer();
@@ -1889,16 +1966,14 @@ public class GenerateMap {
 
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
-            graphics.drawString("ACTIVE", x + 10, y + 35);
+            graphics.drawString("ACTIVE", x + 10, deltaY + 35);
             graphics.setFont(Storage.getFont16());
             graphics.setColor(Color.LIGHT_GRAY);
-            graphics.drawString("NEXT UP", x + 112, y + 34);
+            graphics.drawString("NEXT UP", x + 112, deltaY + 34);
 
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
-            
-            Comparator<Player> comparator = Comparator.comparing(activeGame::getPlayersTurnSCInitiative);
-            allPlayers.sort(comparator);
+            allPlayers.sort(Comparator.comparing(activeGame::getPlayersTurnSCInitiative));
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);
@@ -1911,16 +1986,16 @@ public class GenerateMap {
                         BufferedImage bufferedImage;
                         try {
                             bufferedImage = ImageIO.read(new File(factionPath));
-                            graphics.drawImage(bufferedImage, x, y - 70, null);
+                            graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                             x += 100;
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                 }
-            }            
+            }
         }
-        return y + 40;
+        return deltaY + 40;
     }
 
     private void playerInfo(Game activeGame) {
@@ -2745,24 +2820,9 @@ public class GenerateMap {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
-                for (UnitHolder unitHolder : unitHolders) {
-                    boolean drawAnomaly = false;
-                    Set<String> tokenList = unitHolder.getTokenList();
-                    if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
-                        drawAnomaly = true;
-                    }
-                    Set<String> unitList = unitHolder.getUnits().keySet();
-                    for (String unit : unitList) {
-                        if (unit.contains("csd.png")) {
-                            drawAnomaly = true;
-                            break;
-                        }
-                    }
-                    if (drawAnomaly) {
-                        BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
-                        tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
-                    }
+                if (tile.isAnomaly()) {
+                    BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                    tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                 }
 
                 int textOffset;

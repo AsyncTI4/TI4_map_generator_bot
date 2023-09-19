@@ -133,7 +133,7 @@ public class Player {
     }
 
     public Player(@JsonProperty("userID") String userID,
-                  @JsonProperty("userName") String userName) {
+        @JsonProperty("userName") String userName) {
         this.userID = userID;
         this.userName = userName;
     }
@@ -157,7 +157,7 @@ public class Player {
     }
 
     public void removeMahactCC(String cc) {
-         mahactCC.remove(cc);
+        mahactCC.remove(cc);
     }
 
     public String getRoleIDForCommunity() {
@@ -168,7 +168,8 @@ public class Player {
         this.roleIDForCommunity = roleIDForCommunity;
     }
 
-    @Nullable @JsonIgnore
+    @Nullable
+    @JsonIgnore
     public Role getRoleForCommunity() {
         try {
             return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
@@ -186,7 +187,8 @@ public class Player {
         this.privateChannelID = privateChannelID;
     }
 
-    @Nullable @JsonIgnore
+    @Nullable
+    @JsonIgnore
     public MessageChannel getPrivateChannel() {
         try {
             return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
@@ -203,12 +205,16 @@ public class Player {
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2") || getTechs().contains("pds2") || getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds");
     }
+
     public boolean hasInf2Tech() {//"dszeliinf"
-        return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2") || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("dszeliinf");
+        return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2") || getTechs().contains("lw2") || getTechs().contains("dscymiinf")
+            || getTechs().contains("dszeliinf");
     }
+
     public boolean hasWarsunTech() {
         return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws") || "muaat".equalsIgnoreCase(getFaction());
     }
+
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff") || getTechs().contains("dslizhff");
     }
@@ -228,7 +234,7 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeGame.getName() + "-" + getUserName().replaceAll("/", "");
         if (activeGame.isFoWMode()) {
-            threadName = activeGame.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+            threadName = activeGame.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
         //ATTEMPT TO FIND BY ID
@@ -295,7 +301,7 @@ public class Player {
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeGame.isCommunityMode() && !activeGame.isFoWMode());
-        if(activeGame.getName().contains("pbd100") || activeGame.getName().contains("pbd500")){
+        if (activeGame.getName().contains("pbd100") || activeGame.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
@@ -323,12 +329,13 @@ public class Player {
     public void setPassed(boolean passed) {
         this.passed = passed;
     }
-     public boolean isReadyToPassBag() {
+
+    public boolean isReadyToPassBag() {
         return readyToPassBag;
     }
 
     public void setReadyToPassBag(boolean passed) {
-        readyToPassBag= passed;
+        readyToPassBag = passed;
     }
 
     public HashSet<String> getAbilities() {
@@ -432,6 +439,7 @@ public class Player {
     public HashSet<String> getUnitsOwned() {
         return unitsOwned;
     }
+
     public boolean hasUnit(String unit) {
         return unitsOwned.contains(unit);
     }
@@ -454,45 +462,50 @@ public class Player {
 
     public UnitModel getUnitByType(String unitType) {
         return getUnitsOwned().stream()
-                .map(Mapper::getUnit)
-                .filter(Objects::nonNull)
-                .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
-                .findFirst()
-                .orElse(null);
+            .map(Mapper::getUnit)
+            .filter(Objects::nonNull)
+            .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
+            .findFirst()
+            .orElse(null);
     }
 
     public List<UnitModel> getUnitsByAsyncID(String asyncID) {
         return getUnitsOwned().stream()
-                .map(Mapper::getUnit)
-                .filter(Objects::nonNull)
-                .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
-                .toList();
+            .map(Mapper::getUnit)
+            .filter(Objects::nonNull)
+            .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+            .toList();
     }
 
-    public UnitModel getPriorityUnitByAsyncID(String asyncID){
+    public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
         List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
 
-        
-        if(allUnits.isEmpty()){
+        if (allUnits.isEmpty()) {
             return null;
         }
-        if(allUnits.size() == 1){
+        if (allUnits.size() == 1) {
             return allUnits.get(0);
         }
-        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2) - GetUnitModelPriority(d1));
-
+        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2, unitHolder) - GetUnitModelPriority(d1, unitHolder));
 
         return allUnits.get(0);
     }
-    private Integer GetUnitModelPriority(UnitModel unit){
-        if(StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
-            return 4;
-        else if(StringUtils.isNotBlank(unit.getFaction()))
-            return 3;
-        else if(StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
-            return 2;
-        else 
-            return 1;
+
+    private Integer GetUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+        int score = 0;
+
+        if (StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            score += 4;
+        if (StringUtils.isNotBlank(unit.getFaction()))
+            score += 3;
+        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            score += 2;
+        if (unitHolder != null
+                && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
+                        || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
+            score++;
+
+        return score;
     }
 
     public UnitModel getUnitByID(String unitID) {
@@ -502,7 +515,8 @@ public class Player {
     public String checkUnitsOwned() {
         for (int count : getUnitsOwnedByBaseType().values()) {
             if (count > 1) {
-                String message = "> Warning - Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `" + getUnitsOwned() + "`";
+                String message = "> Warning - Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `"
+                    + getUnitsOwned() + "`";
                 BotLogger.log(message);
                 return message;
             }
@@ -670,7 +684,6 @@ public class Player {
         secretsScored.remove(idToRemove);
     }
 
-
     public int getCrf() {
         return crf;
     }
@@ -691,37 +704,34 @@ public class Player {
         return fragments;
     }
 
-    public boolean enoughFragsForRelic(){
+    public boolean enoughFragsForRelic() {
         boolean enough = false;
         int haz = 0;
         int ind = 0;
         int cult = 0;
         int frontier = 0;
-		for (String id : fragments) {
-			String[] cardInfo = Mapper.getExplore(id).split(";");
-			if ("hazardous".equalsIgnoreCase(cardInfo[1])) {
-				haz = haz + 1;
-			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
-				frontier = frontier+1;
-			}else if ("industrial".equalsIgnoreCase(cardInfo[1])) {
-				ind = ind+1;
-			}else if ("cultural".equalsIgnoreCase(cardInfo[1])) {
-				cult = cult+1;
-			}
-		}
-        int targetToHit = 3 - frontier;
-        if(hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf"))
-        {
-            targetToHit = targetToHit-1;
+        for (String id : fragments) {
+            String[] cardInfo = Mapper.getExplore(id).split(";");
+            if ("hazardous".equalsIgnoreCase(cardInfo[1])) {
+                haz = haz + 1;
+            } else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
+                frontier = frontier + 1;
+            } else if ("industrial".equalsIgnoreCase(cardInfo[1])) {
+                ind = ind + 1;
+            } else if ("cultural".equalsIgnoreCase(cardInfo[1])) {
+                cult = cult + 1;
+            }
         }
-        if(haz >= targetToHit || cult >= targetToHit || ind >= targetToHit)
-        {
+        int targetToHit = 3 - frontier;
+        if (hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf")) {
+            targetToHit = targetToHit - 1;
+        }
+        if (haz >= targetToHit || cult >= targetToHit || ind >= targetToHit) {
             enough = true;
         }
 
         return enough;
     }
-
 
     public void setFragments(ArrayList<String> fragmentList) {
         fragments = fragmentList;
@@ -765,7 +775,7 @@ public class Player {
 
     public void addRelic(String relicID) {
         if (!relics.contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
-            if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)){
+            if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
                 setCommoditiesTotal(getCommoditiesTotal() + 2);
             }
             relics.add(relicID);
@@ -777,7 +787,7 @@ public class Player {
     }
 
     public void removeRelic(String relicID) {
-        if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)){
+        if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
             setCommoditiesTotal(getCommoditiesTotal() - 2);
         }
         relics.remove(relicID);
@@ -822,17 +832,17 @@ public class Player {
     private void initAbilities() {
         HashSet<String> abilities = new HashSet<>();
         for (String ability : getFactionStartingAbilities()) {
-            if (ability.isEmpty() || ability.isBlank()){
+            if (ability.isEmpty() || ability.isBlank()) {
             } else {
                 abilities.add(ability);
             }
         }
         setAbilities(abilities);
-        if (faction.equals(Constants.LIZHO)){
+        if (faction.equals(Constants.LIZHO)) {
             Map<String, String> dsHandcards = Mapper.getDSHandcards();
             for (Entry<String, String> entry : dsHandcards.entrySet()) {
                 String key = entry.getKey();
-                if (key.endsWith(Constants.LIZHO)){
+                if (key.endsWith(Constants.LIZHO)) {
                     setTrapCard(key);
                 }
             }
@@ -858,7 +868,7 @@ public class Player {
 
     private List<String> getFactionStartingLeaders() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
-        if(factionSetupInfo == null) return new ArrayList<>();
+        if (factionSetupInfo == null) return new ArrayList<>();
         return new ArrayList<>(factionSetupInfo.getLeaders());
     }
 
@@ -908,7 +918,7 @@ public class Player {
                 return Optional.of(leader);
             }
         }
-        if (leaderID.contains("agent")){
+        if (leaderID.contains("agent")) {
             leaderID = "yssarilagent";
             for (Leader leader : leaders) {
                 if (leader.getId().equals(leaderID)) {
@@ -932,7 +942,7 @@ public class Player {
     }
 
     public boolean hasLeader(String leaderID, Game activeGame) {
-        if(!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeGame)){
+        if (!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeGame)) {
             return getLeaderIDs().contains("yssarilagent");
         }
         return getLeaderIDs().contains(leaderID);
@@ -954,7 +964,7 @@ public class Player {
                 break;
             }
         }
-        if (leaderToPurge == null){
+        if (leaderToPurge == null) {
             return false;
         }
         return leaders.remove(leaderToPurge);
@@ -963,7 +973,7 @@ public class Player {
     public boolean removeLeader(Leader leader) {
         return leaders.remove(leader);
     }
-    
+
     public void addLeader(String leaderID) {
         if (!getLeaderIDs().contains(leaderID)) {
             Leader leader = new Leader(leaderID);
@@ -986,19 +996,23 @@ public class Player {
             this.color = AliasHandler.resolveColor(color);
         }
     }
+
     public void addAllianceMember(String color) {
         if (!"null".equals(color)) {
-            allianceMembers = allianceMembers+color;
+            allianceMembers = allianceMembers + color;
         }
     }
+
     public void setAllianceMembers(String color) {
         if (!"null".equals(color)) {
             allianceMembers = color;
         }
     }
+
     public String getAllianceMembers() {
         return allianceMembers;
     }
+
     public void removeAllianceMember(String color) {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers.replace(color, "");
@@ -1196,9 +1210,11 @@ public class Player {
     public List<String> getTechs() {
         return techs;
     }
+
     public List<String> getFrankenBagPersonal() {
         return frankenBagPersonal;
     }
+
     public List<String> getFrankenBagToPass() {
         return frankenBagToPass;
     }
@@ -1210,18 +1226,20 @@ public class Player {
     public boolean hasTechReady(String techID) {
         return hasTech(techID) && !exhaustedTechs.contains(techID);
     }
+
     public List<String> getPlanets() {
         return planets;
     }
+
     public boolean isPlayerMemberOfAlliance(Player player2) {
         return allianceMembers.contains(player2.getFaction());
     }
 
     public List<String> getPlanets(Game activeGame) {
         List<String> newPlanets = new ArrayList<>(planets);
-        if(!"".equalsIgnoreCase(allianceMembers)){
-            for(Player player2 : activeGame.getRealPlayers()){
-                if(getAllianceMembers().contains(player2.getFaction())){
+        if (!"".equalsIgnoreCase(allianceMembers)) {
+            for (Player player2 : activeGame.getRealPlayers()) {
+                if (getAllianceMembers().contains(player2.getFaction())) {
                     newPlanets.addAll(player2.getPlanets());
                 }
             }
@@ -1232,9 +1250,11 @@ public class Player {
     public void setPlanets(List<String> planets) {
         this.planets = planets;
     }
+
     public void setFrankenBagPersonal(List<String> planets) {
         frankenBagPersonal = planets;
     }
+
     public void setFrankenBagToPass(List<String> planets) {
         frankenBagToPass = planets;
     }
@@ -1329,7 +1349,7 @@ public class Player {
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)){
+        if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
         }
@@ -1348,7 +1368,7 @@ public class Player {
                 for (UnitModel u : unitsToRemove) {
                     removeOwnedUnitByID(u.getId());
                 }
-                
+
                 addOwnedUnitByID(unitModel.getId());
             }
         }
@@ -1357,7 +1377,7 @@ public class Player {
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)){
+        if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
         }
 
@@ -1379,8 +1399,7 @@ public class Player {
                     .map(UnitModel::getId)
                     .filter(id -> id.equals(unitModel.getBaseType())).findFirst()
                     .orElse(replacementUnit);
-            }
-            else if (relevantTechs.size() > 0) {
+            } else if (relevantTechs.size() > 0) {
                 // Ignore the case where there's multiple faction techs and also
                 replacementUnit = relevantTechs.stream().min(TechnologyModel::sortFactionTechsFirst)
                     .map(TechnologyModel::getAlias)
@@ -1407,6 +1426,7 @@ public class Player {
         techs.remove(tech);
         doAdditionalThingsWhenRemovingTech(tech);
     }
+
     public void removeElementFromBagToPass(String tech) {
         frankenBagToPass.remove(tech);
     }
@@ -1505,11 +1525,11 @@ public class Player {
         return new Tile(tileID, position, player, true, label);
     }
 
-    public HashMap<String,String> getFogTiles() {
+    public HashMap<String, String> getFogTiles() {
         return fow_seenTiles;
     }
 
-    public HashMap<String,String> getFogLabels() {
+    public HashMap<String, String> getFogLabels() {
         return fow_customLabels;
     }
 

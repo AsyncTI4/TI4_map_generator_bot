@@ -13,6 +13,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
@@ -49,20 +50,14 @@ public class CombatHelper {
             }
 
         }
-
-        
-        
-
-
         return output;
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInCombat(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, CombatRollType roleType){
-        //return GetUnitsInCombatRound(unitHolder,player, event);
+    public static HashMap<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
+            GenericInteractionCreateEvent event, CombatRollType roleType) {
         return switch (roleType) {
-            case combatround -> GetUnitsInCombatRound(unitHolder, player, event);
-            case afb -> GetUnitsInAFB(unitHolder, player, event);
-            case bombardment -> GetUnitsInBombardment(unitHolder, player, event);
+            case afb -> GetUnitsInAFB(tile, player, event);
+            case bombardment -> GetUnitsInBombardment(tile, player, event);
             default -> GetUnitsInCombatRound(unitHolder, player, event);
         };
     }
@@ -73,7 +68,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
@@ -115,32 +110,39 @@ public class CombatHelper {
         return output;
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInAFB(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+    public static HashMap<UnitModel, Integer> GetUnitsInAFB(Tile tile, Player player,
+            GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
-        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+
+        HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            HashMap<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+                Integer existingCount = 0;
+                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
+                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
+                }
+                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+            }
+        }
+
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        HashMap<UnitModel, Integer> output;
-        if (unitHolder.getName().equals(Constants.SPACE)) {
-            output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
-                .filter(entry -> entry.getKey().getAfbDieCount() > 0)
+        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-        } else {
-            output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
-        }
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
             .map(UnitModel::getBaseType)
             .collect(Collectors.toList());
-        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+        List<String> missing = unitsByAsyncId.keySet().stream()
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
             .collect(Collectors.toList());
 
@@ -162,32 +164,37 @@ public class CombatHelper {
         return output;
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInBombardment(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+    public static HashMap<UnitModel, Integer> GetUnitsInBombardment(Tile tile, Player player,
+            GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
-        HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            HashMap<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+                Integer existingCount = 0;
+                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
+                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
+                }
+                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+            }
+        }
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        HashMap<UnitModel, Integer> output;
-        if (unitHolder.getName().equals(Constants.SPACE)) {
-            output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
-                .filter(entry -> entry.getKey().getBombardDieCount() > 0)
+        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-        } else {
-            output = new HashMap<>(); // Theres no antifighter barrage when the unit holder is on a planet.
-        }
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
             .map(UnitModel::getBaseType)
             .collect(Collectors.toList());
-        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+        List<String> missing = unitsByAsyncId.keySet().stream()
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
             .collect(Collectors.toList());
 

@@ -756,17 +756,27 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac) {
+    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
-        for (String planet : planets) {
-            if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
-                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, getPlanetRepresentation(planet, activeGame) + " System");
-                planetButtons.add(button);
+        if(mahact == null){
+            for (String planet : planets) {
+                if (!getPlanetRepresentation(planet, activeGame).toLowerCase().contains("mecatol") || ac) {
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet+"_"+"diploP", getPlanetRepresentation(planet, activeGame) + " System");
+                    planetButtons.add(button);
+                }
             }
-
+        }else{
+            for(Tile tile : activeGame.getTileMap().values()){
+                if(FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile, activeGame)){
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+tile.getPosition()+"_"+"mahact"+mahact.getColor(), tile.getRepresentation() + " System");
+                    planetButtons.add(button);
+                }
+            }
+            
         }
+        
         return planetButtons;
     }
 
@@ -1269,9 +1279,9 @@ public class Helper {
         return sb.toString().trim();
     }
 
-    public static Integer getPlayerResourcesAvailable(Player player, Game activeGame) {
+    public static int getPlayerResourcesAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
@@ -1290,9 +1300,9 @@ public class Helper {
         return resourcesCount;
     }
 
-    public static Integer getPlayerResourcesTotal(Player player, Game activeGame) {
+    public static int getPlayerResourcesTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
@@ -1310,9 +1320,9 @@ public class Helper {
         return resourcesCount;
     }
 
-    public static Integer getPlayerOptimalResourcesAvailable(Player player, Game activeGame) {
+    public static int getPlayerOptimalResourcesAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
@@ -1342,9 +1352,9 @@ public class Helper {
                 .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalResources).sum();
     }
 
-    public static Integer getPlayerInfluenceAvailable(Player player, Game activeGame) {
+    public static int getPlayerInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
@@ -1363,9 +1373,9 @@ public class Helper {
         return influenceCount;
     }
 
-    public static Integer getPlayerInfluenceTotal(Player player, Game activeGame) {
+    public static int getPlayerInfluenceTotal(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
 
@@ -1384,9 +1394,9 @@ public class Helper {
         return influenceCount;
     }
 
-    public static Integer getPlayerOptimalInfluenceAvailable(Player player, Game activeGame) {
+    public static int getPlayerOptimalInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
@@ -1415,9 +1425,9 @@ public class Helper {
                 .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
     }
 
-    public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game activeGame) {
+    public static int getPlayerFlexResourcesInfluenceAvailable(Player player, Game activeGame) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
+            return -1;
         }
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
@@ -1920,11 +1930,13 @@ public class Helper {
             if (unitHolder.getUnits().get(mechKey) != null) {
                 return true;
             }
-            if("arborec".equalsIgnoreCase(player.getFaction())){
+            if(player.hasUnit("arborec_mech")){
                 mechKey = colorID + "_mf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
                 }
+            }
+            if(player.hasUnit("arborec_infantry") || player.hasTech("lw2")){
                 mechKey = colorID + "_gf.png";
                 if (unitHolder.getUnits().get(mechKey) != null) {
                     return true;
@@ -1933,6 +1945,7 @@ public class Helper {
         }
         return false;
     }
+    
 
     public static Set<Player> getNeighbouringPlayers(Game activeGame, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();

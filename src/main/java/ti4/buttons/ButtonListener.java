@@ -51,6 +51,7 @@ import ti4.commands.player.Stats;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
+import ti4.commands.special.NaaluCommander;
 import ti4.helpers.Constants;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -360,6 +361,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.hacanAgentRefresh(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("retreatGroundUnits_")) {
             ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, activeGame, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("naaluCommander")) {
+            new NaaluCommander().secondHalfOfNaaluCommander(event, activeGame, player);
+        } else if (buttonID.startsWith("mahactMechHit_")) {
+            String pos = buttonID.split("_")[1];
+            String color = buttonID.split("_")[2];
+            Tile tile = activeGame.getTileByPosition(pos);
+            Player attacker = Helper.getPlayerFromColorOrFaction(activeGame, color);
+            ButtonHelper.resolveMahactMechAbilityUse(player, attacker, activeGame, tile, event);
         } else if (buttonID.startsWith("retreatUnitsFrom_")) {
             ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, activeGame, player);
             String both = buttonID.replace("retreatUnitsFrom_", "");
@@ -885,29 +894,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("exhaust_")) {
             AgendaHelper.exhaustStuffForVoting(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("diplo_")) {
-            String planet = buttonID.replace("diplo_", "");
-            String tileID = AliasHandler.resolveTile(planet.toLowerCase());
-            Tile tile = activeGame.getTile(tileID);
-            if (tile == null) {
-                tile = activeGame.getTileByPosition(tileID);
-            }
-            if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-                return;
-            }
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if (player_ != player) {
-                    String color = player_.getColor();
-                    if (Mapper.isColorValid(color)) {
-                        AddCC.addCC(event, color, tile);
-                        Helper.isCCCountCorrect(event, activeGame, color);
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannel(event.getChannel(), ident + " chose to diplo the system containing "
-                + Helper.getPlanetRepresentation(planet, activeGame));
-            event.getMessage().delete().queue();
+            ButtonHelper.resolveDiploPrimary(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("doneWithOneSystem_")) {
             String pos = buttonID.replace("doneWithOneSystem_", "");
             Tile tile = activeGame.getTileByPosition(pos);
@@ -1928,7 +1915,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "diploSystem" -> {
                     String message = trueIdentity + " Click the name of the planet who's system you wish to diplo";
 
-                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeGame, false);
+                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, null);
                     if (!activeGame.isFoWMode()) {
                         List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
                         if (threadChannels == null)
@@ -2757,7 +2744,7 @@ public class ButtonListener extends ListenerAdapter {
                                     if(player3 == player2 || player3 == player){
                                         continue;
                                     }
-                                    if(!tile.getRepresentationForButtons(activeGame, player).contains("(")){
+                                    if(!tile.getRepresentationForButtons(activeGame, player3).contains("(")){
                                         continue;
                                     }
                                     ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");

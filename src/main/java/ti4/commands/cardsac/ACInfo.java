@@ -189,13 +189,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
                 acButtons.add(nekroButton);
             }
-            if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
-                Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
-                acButtons.add(hacanButton);
-            }
-            if(player.hasRelicReady("e6-g0_network")){
-                acButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
-            }
+            
         }
         return acButtons;
     }
