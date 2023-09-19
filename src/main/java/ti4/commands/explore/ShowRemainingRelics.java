@@ -41,7 +41,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
             text = new StringBuilder(Emojis.Relic).append(" **RELICS REMAINING IN DECK** (").append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
-                String relicName = Mapper.getRelicObject(relicId).getName();
+                String relicName = Mapper.getRelic(relicId).getName();
                 text.append("- ").append(relicName).append("\n");
             }
         }

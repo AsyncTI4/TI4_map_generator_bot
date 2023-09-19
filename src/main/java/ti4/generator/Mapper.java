@@ -418,13 +418,9 @@ public class Mapper {
         return (String) explore.get(id);
     }
 
-    // public static String getRelic(String id) {
-    //     id = id.replace("extra1", "");
-    //     id = id.replace("extra2", "");
-    //     return (String) relics.get(id).getSimpleRepresentation();
-    // }
-
-    public static RelicModel getRelicObject(String id) {
+    public static RelicModel getRelic(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return relics.get(id);
     }
 
