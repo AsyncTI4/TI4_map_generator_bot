@@ -1,1 +1,37 @@
-{"id":"er40","name":"Theta Nebula","aliases":["thetanebula"],"imagePath":"er40_theta_nebula.png","planetIds":[],"shipPositionsType":"TYPE08","spaceTokenLocations":[{"x":190.0,"y":30.0},{"x":215.0,"y":110.0},{"x":185.0,"y":205.0},{"x":100.0,"y":90.0},{"x":60.0,"y":130.0}],"wormholes":["THETA"],"planets":[]}
+{
+    "id": "er40",
+    "name": "Theta Nebula",
+    "aliases": [
+        "thetanebula"
+    ],
+    "imagePath": "er40_theta_nebula.png",
+    "planetIds": [],
+    "shipPositionsType": "TYPE08",
+    "spaceTokenLocations": [
+        {
+            "x": 190.0,
+            "y": 30.0
+        },
+        {
+            "x": 215.0,
+            "y": 110.0
+        },
+        {
+            "x": 185.0,
+            "y": 205.0
+        },
+        {
+            "x": 100.0,
+            "y": 90.0
+        },
+        {
+            "x": 60.0,
+            "y": 130.0
+        }
+    ],
+    "wormholes": [
+        "THETA"
+    ],
+    "planets": [],
+    "isNebula": true
+}

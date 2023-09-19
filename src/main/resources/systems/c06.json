@@ -1,1 +1,18 @@
-{"id":"c06","name":"Eko","aliases":["c06","eko"],"imagePath":"C06_Eko.png","shipPositionsType":"TYPE13","spaceTokenLocations":[],"wormholes":["ALPHA"],"planets":["eko"]}
+{
+    "id": "c06",
+    "name": "Eko",
+    "aliases": [
+        "c06",
+        "eko"
+    ],
+    "imagePath": "C06_Eko.png",
+    "shipPositionsType": "TYPE13",
+    "spaceTokenLocations": [],
+    "wormholes": [
+        "ALPHA"
+    ],
+    "planets": [
+        "eko"
+    ],
+    "isGravityRift": true
+}

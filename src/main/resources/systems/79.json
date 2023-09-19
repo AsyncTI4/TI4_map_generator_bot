@@ -1,1 +1,43 @@
-{"id":"79","name":"Asteroids Alpha Wormhole","aliases":["79","asteroidsalphawh","asteroidsawh","asteroidsalpha","asteroidalphawormhole","asteroidsawormhole","asawh","awhas"],"imagePath":"79_AsteroidsAlphaWH.png","shipPositionsType":"TYPE08","spaceTokenLocations":[{"x":190.0,"y":30.0},{"x":215.0,"y":110.0},{"x":185.0,"y":205.0},{"x":100.0,"y":190.0},{"x":60.0,"y":130.0}],"wormholes":["ALPHA"],"planets":[]}
+{
+    "id": "79",
+    "name": "Asteroids Alpha Wormhole",
+    "aliases": [
+        "79",
+        "asteroidsalphawh",
+        "asteroidsawh",
+        "asteroidsalpha",
+        "asteroidalphawormhole",
+        "asteroidsawormhole",
+        "asawh",
+        "awhas"
+    ],
+    "imagePath": "79_AsteroidsAlphaWH.png",
+    "shipPositionsType": "TYPE08",
+    "spaceTokenLocations": [
+        {
+            "x": 190.0,
+            "y": 30.0
+        },
+        {
+            "x": 215.0,
+            "y": 110.0
+        },
+        {
+            "x": 185.0,
+            "y": 205.0
+        },
+        {
+            "x": 100.0,
+            "y": 190.0
+        },
+        {
+            "x": 60.0,
+            "y": 130.0
+        }
+    ],
+    "wormholes": [
+        "ALPHA"
+    ],
+    "planets": [],
+    "isAsteroidField": true
+}

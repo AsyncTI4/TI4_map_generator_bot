@@ -1,1 +1,41 @@
-{"id":"67","name":"Cormund","aliases":["67","cormund","cormundgr","cormundgravrift","cormundrift","cormnd","cormond","crmnd","cmnd","cd"],"imagePath":"67_Cormund.png","shipPositionsType":"TYPE10","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":[],"planets":["cormund"]}
+{
+    "id": "67",
+    "name": "Cormund",
+    "aliases": [
+        "67",
+        "cormund",
+        "cormundgr",
+        "cormundgravrift",
+        "cormundrift",
+        "cormnd",
+        "cormond",
+        "crmnd",
+        "cmnd",
+        "cd"
+    ],
+    "imagePath": "67_Cormund.png",
+    "shipPositionsType": "TYPE10",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "cormund"
+    ],
+    "isGravityRift": true
+}
