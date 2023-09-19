@@ -47,6 +47,7 @@ public class DataMigrationManager {
     ///
     public static void runMigrations() {
         try {
+            runMigration("migrateGheminaAddCarrier_190923", DataMigrationManager::migrateGheminaAddCarrier_190923);
             runMigration("migrateNaaluMechsToOmega_180923", DataMigrationManager::migrateNaaluMechsToOmega_180923);
             runMigration("migrateFixkeleresUnits_010823", DataMigrationManager::migrateFixkeleresUnits_010823);
             runMigration("migrateOwnedUnits_010823", DataMigrationManager::migrateOwnedUnits_010823);
@@ -439,6 +440,23 @@ public class DataMigrationManager {
             if (player.hasUnit("naalu_mech")) {
                 player.removeOwnedUnitByID("naalu_mech");
                 player.addOwnedUnitByID("naalu_mech_omega");
+                mapNeededMigrating = true;
+            }
+        }
+        return mapNeededMigrating;
+    }
+
+    private static Boolean migrateGheminaAddCarrier_190923(Game game) {
+        boolean mapNeededMigrating = false;
+        for (Player player : game.getPlayers().values()) {
+            if (player.getFaction().equalsIgnoreCase("ghemina") && player.hasUnit("carrier")) {
+                player.removeOwnedUnitByID("carrier");
+                player.addOwnedUnitByID("ghemina_carrier");
+                mapNeededMigrating = true;
+            }
+            if (player.getFaction().equalsIgnoreCase("ghemina") && player.hasUnit("carrier2")) {
+                player.removeOwnedUnitByID("carrier2");
+                player.addOwnedUnitByID("ghemina_carrier2");
                 mapNeededMigrating = true;
             }
         }
