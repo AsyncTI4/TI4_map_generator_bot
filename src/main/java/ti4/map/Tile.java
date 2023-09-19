@@ -375,4 +375,16 @@ public class Tile {
         }
         return false;
     }
+
+    public boolean isAnomaly() {
+        if (isAsteroidBelt() || isSupernova() || isNebula() || isGravityRift()) {
+            return true;
+        }
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
