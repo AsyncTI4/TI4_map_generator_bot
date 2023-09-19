@@ -347,8 +347,8 @@ public class Tile {
         return TileHelper.getTile(getTileID());
     }
 
-    public boolean isAsteroidBelt() {
-        return getTileModel().isAsteroidBelt();
+    public boolean isAsteroidField() {
+        return getTileModel().isAsteroidField();
     }
 
     public boolean isSupernova() {
@@ -377,7 +377,7 @@ public class Tile {
     }
 
     public boolean isAnomaly() {
-        if (isAsteroidBelt() || isSupernova() || isNebula() || isGravityRift()) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
             return true;
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {
