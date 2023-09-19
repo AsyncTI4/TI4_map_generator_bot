@@ -478,7 +478,7 @@ public class Player {
             .toList();
     }
 
-    public UnitModel getPriorityUnitByAsyncID(String asyncID) {
+    public UnitModel getPriorityUnitByAsyncID(String asyncID, UnitHolder unitHolder) {
         List<UnitModel> allUnits = new ArrayList<>(getUnitsByAsyncID(asyncID));
 
         if (allUnits.isEmpty()) {
@@ -487,20 +487,25 @@ public class Player {
         if (allUnits.size() == 1) {
             return allUnits.get(0);
         }
-        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2) - GetUnitModelPriority(d1));
+        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2, unitHolder) - GetUnitModelPriority(d1, unitHolder));
 
         return allUnits.get(0);
     }
 
-    private Integer GetUnitModelPriority(UnitModel unit) {
+    private Integer GetUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+        int score = 0;
+
         if (StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
-            return 4;
-        else if (StringUtils.isNotBlank(unit.getFaction()))
-            return 3;
-        else if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
-            return 2;
-        else
-            return 1;
+            score += 4;
+        if (StringUtils.isNotBlank(unit.getFaction()))
+            score += 3;
+        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+            score += 2;
+        if ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
+                || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip())))
+            score++;
+
+        return score;
     }
 
     public UnitModel getUnitByID(String unitID) {
