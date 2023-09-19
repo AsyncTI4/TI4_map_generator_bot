@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Player;
+import ti4.model.RelicModel;
 
 public class PurgeRelic extends GenericRelicAction {
 
@@ -27,8 +28,8 @@ public class PurgeRelic extends GenericRelicAction {
         }
         player.removeRelic(relicId);
         player.removeExhaustedRelic(relicId);
-        String[] relicData = Mapper.getRelic(relicId).split(";");
-      sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData[0] + "**__\n> " + relicData[1] + "\n");
+        RelicModel relicData = Mapper.getRelic(relicId);
+        sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
         RelicInfo.sendRelicInfo(getActiveGame(), player, event);
     }
 }

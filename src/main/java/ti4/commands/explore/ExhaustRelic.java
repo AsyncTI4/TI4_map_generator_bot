@@ -38,7 +38,7 @@ public class ExhaustRelic extends GenericRelicAction {
 
 	protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
 		player.addExhaustedRelic(relicId);
-		String relicName = Mapper.getRelic(relicId).split(";")[0];
+		String relicName = Mapper.getRelic(relicId).getName();
 		sendMessage("Exhausted " + Emojis.Relic + " relic: " + relicName);
 	}
 }

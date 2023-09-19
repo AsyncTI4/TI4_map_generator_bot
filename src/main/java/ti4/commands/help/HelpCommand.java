@@ -100,6 +100,8 @@ public class HelpCommand implements Command {
         subcommands.add(new ListActionCards());
         subcommands.add(new ListTechs());
         subcommands.add(new ListLeaders());
+        subcommands.add(new ListPromissoryNotes());
+        subcommands.add(new ListExplores());
         subcommands.add(new HowToMoveUnits());
 
         return subcommands;
