@@ -1754,15 +1754,6 @@ public class Helper {
         return agendaDetails.getRepresentation(uniqueID);
     }
 
-    public static String getRelicRepresentation(String relicID) {
-        RelicModel relicModel = Mapper.getRelic(relicID);
-        if (relicModel == null) {
-            BotLogger.log("`Helper.getRelicRepresentation` failed to find `relicID = " + relicID + "`");
-            return "RelicID not found: `" + relicID + "`\n";
-        }
-        return relicModel.getSimpleRepresentation();
-    }
-
     public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Game activeGame, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
         if (playerLeader != null && playerLeader.isLocked()) {

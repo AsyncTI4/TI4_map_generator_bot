@@ -9,12 +9,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
 
 public class RelicSend extends GenericRelicAction {
     public RelicSend() {
@@ -97,10 +99,10 @@ public class RelicSend extends GenericRelicAction {
             sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }
-
-      String sb = Helper.getPlayerRepresentation(player1, activeGame) +
-          " sent a relic to " + Helper.getPlayerRepresentation(player2, activeGame) +
-          "\n" + Helper.getRelicRepresentation(relicID);
+        RelicModel relicModel = Mapper.getRelic(relicID);
+        String sb = Helper.getPlayerRepresentation(player1, activeGame) +
+                " sent a relic to " + Helper.getPlayerRepresentation(player2, activeGame) +
+                "\n" + relicModel.getSimpleRepresentation();
         sendMessage(sb);
     }
 }
