@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -344,5 +345,34 @@ public class Tile {
 
     public TileModel getTileModel() {
         return TileHelper.getTile(getTileID());
+    }
+
+    public boolean isAsteroidBelt() {
+        return getTileModel().isAsteroidBelt();
+    }
+
+    public boolean isSupernova() {
+        return getTileModel().isSupernova();
+    }
+
+    public boolean isNebula() {
+        return getTileModel().isNebula();
+    }
+
+    public boolean isGravityRift() {
+        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
+    }
+
+    public boolean hasCabalSpaceDockOrGravRiftToken() {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            Set<String> tokenList = unitHolder.getTokenList();
+            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
+                return true;
+            }
+            if (unitHolder.getUnits().containsKey("csd.png")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
