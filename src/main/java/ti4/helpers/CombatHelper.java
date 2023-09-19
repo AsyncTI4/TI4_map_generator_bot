@@ -77,7 +77,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
@@ -125,7 +125,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
@@ -172,7 +172,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                    player.getPriorityUnitByAsyncID(entry.getKey()),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
