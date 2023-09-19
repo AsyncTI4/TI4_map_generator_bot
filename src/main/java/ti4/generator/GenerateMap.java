@@ -2822,24 +2822,9 @@ public class GenerateMap {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
-                for (UnitHolder unitHolder : unitHolders) {
-                    boolean drawAnomaly = false;
-                    Set<String> tokenList = unitHolder.getTokenList();
-                    if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
-                        drawAnomaly = true;
-                    }
-                    Set<String> unitList = unitHolder.getUnits().keySet();
-                    for (String unit : unitList) {
-                        if (unit.contains("csd.png")) {
-                            drawAnomaly = true;
-                            break;
-                        }
-                    }
-                    if (drawAnomaly) {
-                        BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
-                        tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
-                    }
+                if (tile.isAnomaly()) {
+                    BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                    tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                 }
 
                 int textOffset;

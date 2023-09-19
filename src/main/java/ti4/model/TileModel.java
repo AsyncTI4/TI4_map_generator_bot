@@ -24,12 +24,17 @@ public class TileModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
+    private Boolean isAsteroidField;
+    private Boolean isSupernova;
+    private Boolean isNebula;
+    private Boolean isGravityRift;
 
     @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
     }
 
+    @JsonIgnore
     public List<String> getPlanets() {
         return planetIds;
     }
@@ -55,5 +60,40 @@ public class TileModel {
             BotLogger.log("Could not find tile image: " + getId());
         }
         return tilePath;
+    }
+
+    @JsonIgnore
+    public boolean hasWormhole() {
+        return getWormholes() != null && !getWormholes().isEmpty();
+    }
+
+    @JsonIgnore
+    public boolean hasPlanets() {
+        return getPlanets() != null && !getPlanets().isEmpty();
+    }
+
+    @JsonIgnore
+    public boolean isEmpty() {
+        return !hasPlanets();
+    }
+
+    @JsonIgnore
+    public boolean isAsteroidField() {
+        return Optional.ofNullable(isAsteroidField).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isSupernova() {
+        return Optional.ofNullable(isSupernova).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isNebula() {
+        return Optional.ofNullable(isNebula).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isGravityRift() {
+        return Optional.ofNullable(isGravityRift).orElse(false);
     }
 }

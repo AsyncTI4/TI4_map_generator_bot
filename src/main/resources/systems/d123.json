@@ -1,17 +1,12 @@
 {
-    "id": "44",
-    "name": "Asteroids",
+    "id": "d123",
+    "name": "Alpha Beta Nova",
     "aliases": [
-        "44",
-        "asteroids1",
-        "asteroidsfield1",
-        "af1",
-        "asteroids",
-        "asteroid",
-        "asteroidfield",
-        "asteroidsfield"
+        "alphabetanova",
+        "4260"
     ],
-    "imagePath": "44_Asteroids.png",
+    "imagePath": "d123.png",
+    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -28,14 +23,17 @@
         },
         {
             "x": 100.0,
-            "y": 190.0
+            "y": 90.0
         },
         {
             "x": 60.0,
             "y": 130.0
         }
     ],
-    "wormholes": [],
+    "wormholes": [
+        "ALPHA",
+        "BETA"
+    ],
     "planets": [],
-    "isAsteroidField": true
+    "isSupernova": true
 }

@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,9 +10,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
+import ti4.model.TileModel;
 
 import java.awt.*;
 import java.util.*;
@@ -338,5 +341,50 @@ public class Tile {
             }
         }
         return planetsWithSleepers;
+    }
+
+    public TileModel getTileModel() {
+        return TileHelper.getTile(getTileID());
+    }
+
+    public boolean isAsteroidField() {
+        return getTileModel().isAsteroidField();
+    }
+
+    public boolean isSupernova() {
+        return getTileModel().isSupernova();
+    }
+
+    public boolean isNebula() {
+        return getTileModel().isNebula();
+    }
+
+    public boolean isGravityRift() {
+        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
+    }
+
+    public boolean hasCabalSpaceDockOrGravRiftToken() {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            Set<String> tokenList = unitHolder.getTokenList();
+            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
+                return true;
+            }
+            if (unitHolder.getUnits().containsKey("csd.png")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnomaly() {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
+            return true;
+        }
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
