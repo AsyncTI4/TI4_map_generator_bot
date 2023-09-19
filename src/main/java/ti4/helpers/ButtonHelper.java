@@ -67,6 +67,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -3554,45 +3555,31 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 }
             }
         }
-        //Relics
+        // Relics
         boolean dontEnigTwice = true;
-        for(String relic : p1.getRelics())
-        {
-            
-            String relicText = Mapper.getRelic(relic);
-            String[] relicData =  null;
-            if(relicText != null)
-            {
-                relicData = relicText.split(";");
-            }
-            if(relicData != null && relicData[0].contains("<"))
-            {
-                relicData[0] =relicData[0].substring(0, relicData[0].indexOf("<"));
-            }
-            
-            if(relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE) || (relicData != null && relicData[1].contains("Action:")))
-            {
+        for (String relic : p1.getRelics()) {
+            RelicModel relicData = Mapper.getRelic(relic);
+
+            if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE) || (relicData != null && relicData.getText().contains("Action:"))) {
                 Button rButton;
-                if(relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE))
-                {
-                    if(!dontEnigTwice){
-                       continue;
+                if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
+                    if (!dontEnigTwice) {
+                        continue;
                     }
-                    rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge Enigmatic Device");
+                    rButton = Button.danger(finChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
                     dontEnigTwice = false;
                 } else {
-                    if("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic) )
-                    {
-                        if(!p1.getExhaustedRelics().contains(relic)){
-                            rButton = Button.primary(finChecker+prefix+"relic_"+relic, "Exhaust " + relicData[0]);
-                        }else{
+                    if ("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic)) {
+                        if (!p1.getExhaustedRelics().contains(relic)) {
+                            rButton = Button.primary(finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
+                        } else {
                             continue;
                         }
-                        
-                    }else {
-                        rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge " + relicData[0]);
+
+                    } else {
+                        rButton = Button.danger(finChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
-                        
+
                 }
                 compButtons.add(rButton);
             }
@@ -4009,16 +3996,16 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                         p1.removeExhaustedRelic(buttonID);
                     }
                    
-                    String relicName = Mapper.getRelic(buttonID).split(";")[0];
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),purgeOrExhaust + Emojis.Relic + " relic: " + relicName);
-                    if(relicName.contains("Enigmatic")){
+                    RelicModel relicModel = Mapper.getRelic(buttonID);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),purgeOrExhaust + Emojis.Relic + " relic: " + relicModel.getName() + "\n> " + relicModel.getText());
+                    if(relicModel.getName().contains("Enigmatic")){
                         activeGame.setComponentAction(true);
                         Button getTech = Button.success("acquireATech", "Get a tech");
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(getTech);
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(p1, activeGame) +" Use Button to get a tech", buttons);
                     }
-                    if(relicName.contains("Nanoforge")){      
+                    if(relicModel.getName().contains("Nanoforge")){      
                         offerNanoforgeButtons(p1, activeGame, event);
                     }
                     if ("dynamiscore".equals(buttonID) || "absol_dynamiscore".equals(buttonID)){
