@@ -20,6 +20,7 @@ import ti4.map.UnitHolder;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
@@ -111,9 +112,9 @@ public class CombatModHelper {
                     .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
                     .findFirst();
             
-            if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
-                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getRelicRepresentation(relic)));
+            if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+                RelicModel relicModel = Mapper.getRelic(relic);
+                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
             }
         }
 

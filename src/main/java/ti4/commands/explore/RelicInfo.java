@@ -6,11 +6,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
 
 public class RelicInfo extends ExploreSubcommandData {
     public RelicInfo() {
@@ -60,7 +63,8 @@ public class RelicInfo extends ExploreSubcommandData {
             return sb.toString();
         }
         for (String relicID : playerRelics) {
-            sb.append(Helper.getRelicRepresentation(relicID));
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            if (relicModel != null) sb.append(Emojis.Relic).append(relicModel.getSimpleRepresentation()).append("\n");
         }
         return sb.toString();
     }
