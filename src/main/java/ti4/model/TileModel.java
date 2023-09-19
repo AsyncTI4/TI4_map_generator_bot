@@ -24,7 +24,7 @@ public class TileModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    private Boolean isAsteroidBelt;
+    private Boolean isAsteroidField;
     private Boolean isSupernova;
     private Boolean isNebula;
     private Boolean isGravityRift;
@@ -73,8 +73,8 @@ public class TileModel {
         return !hasPlanets();
     }
 
-    public boolean isAsteroidBelt() {
-        return Optional.ofNullable(isAsteroidBelt).orElse(false);
+    public boolean isAsteroidField() {
+        return Optional.ofNullable(isAsteroidField).orElse(false);
     }
 
     public boolean isSupernova() {
