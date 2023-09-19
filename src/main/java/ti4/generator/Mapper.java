@@ -655,24 +655,8 @@ public class Mapper {
         }
         return expList;
     }
-    
-    public static HashMap<String, String> getRelics(String extra) {
-        HashMap<String, String> relicList = new HashMap<>();
-        for (Map.Entry<String, RelicModel> entry : relics.entrySet()) {
-            relicList.put(entry.getKey() + extra, entry.getValue().getName());
-        }
-        return relicList;
-    }
 
-    public static HashMap<String, String> getRelics() {
-        HashMap<String, String> relicList = new HashMap<>();
-        for (Map.Entry<String, RelicModel> entry : relics.entrySet()) {
-            relicList.put(entry.getKey(), entry.getValue().getName());
-        }
-        return relicList;
-    }
-
-    public static Map<String, RelicModel> getRelicModels() {
+    public static Map<String, RelicModel> getRelics() {
         return new HashMap<>(relics);
     }
 

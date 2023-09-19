@@ -22,7 +22,7 @@ public class ListRelics extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        Map<String, RelicModel> relicModelList = Mapper.getRelicModels();
+        Map<String, RelicModel> relicModelList = Mapper.getRelics();
         List<String> searchedList = relicModelList.entrySet().stream()
             .map(entry -> entry.getKey() + "\n> " + entry.getValue().getSimpleRepresentation())
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
