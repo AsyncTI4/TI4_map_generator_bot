@@ -6,8 +6,6 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
-import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
-import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -589,19 +587,19 @@ public class GenerateMap {
                 y += 85;
                 y += 200;
 
-                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);             
-                
+                int soCount = objectivesSO(activeGame, yPlayArea + 150, player);
+
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
                 if (!player.getPlanets().isEmpty()) {
                     xDeltaSecondRow = planetInfo(player, activeGame, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
-                
+
                 int xDeltaFirstRowFromRightSide = 0;
                 int xDeltaSecondRowFromRightSide = 0;
                 // FIRST ROW RIGHT SIDE
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
-                
+
                 // SECOND ROW RIGHT SIDE
                 xDeltaSecondRowFromRightSide = reinforcements(player, activeGame, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
@@ -674,13 +672,15 @@ public class GenerateMap {
             try {
                 bufferedImage = ImageIO.read(new File(sleeperFile));
                 if (bufferedImage != null) {
-                    List<Point> points = new ArrayList<>(){{
-                        add(new Point(0, 15));
-                        add(new Point(50, 0));
-                        add(new Point(100, 25));
-                        add(new Point(50, 50));
-                        add(new Point(10, 40));
-                    }};
+                    List<Point> points = new ArrayList<>() {
+                        {
+                            add(new Point(0, 15));
+                            add(new Point(50, 0));
+                            add(new Point(100, 25));
+                            add(new Point(50, 50));
+                            add(new Point(10, 40));
+                        }
+                    };
                     for (int i = 0; i < 5 - activeGame.getSleeperTokensPlacedCount(); i++) {
                         Point point = points.get(i);
                         graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide + point.x, yPlayAreaSecondRow + point.y, null);
@@ -1694,8 +1694,9 @@ public class GenerateMap {
                 System.out.println("error:" + u);
             } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
                 Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                String factionIcon = "pa_tech_unitupgrade_" + unit.getFaction() + ".png";
-                drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
+                drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction() + ".png", 0.38f, 1.0f);
+                //String factionIcon = "pa_tech_baseunit_" + unit.getFaction() + ".png";
+                //drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
             }
         }
         if (techs != null) {
@@ -1712,8 +1713,6 @@ public class GenerateMap {
                     continue;
                 }
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
-                if (debug) System.out.println(String.format("%s coords: %d %d", unit.getAlias(), unitOffset.x, unitOffset.y));
-
                 String new_unitImage = Mapper.getColorID(player.getColor()) + "_" + unit.getAsyncId() + ".png";
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, new_unitImage);
 
@@ -1973,7 +1972,7 @@ public class GenerateMap {
 
             Player activePlayer = activeGame.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(activeGame.getRealPlayers());
-            
+
             Comparator<Player> comparator = Comparator.comparing(p -> activeGame.getPlayersTurnSCInitiative(p));
             allPlayers.sort(comparator);
 
@@ -1995,7 +1994,7 @@ public class GenerateMap {
                         }
                     }
                 }
-            }            
+            }
         }
         return deltaY + 40;
     }
