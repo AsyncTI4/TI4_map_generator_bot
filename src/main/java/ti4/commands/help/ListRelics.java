@@ -1,6 +1,5 @@
 package ti4.commands.help;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
@@ -26,7 +24,7 @@ public class ListRelics extends HelpSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         Map<String, RelicModel> relicModelList = Mapper.getRelicModels();
         List<String> searchedList = relicModelList.entrySet().stream()
-            .map(entry -> entry.getKey() + " = " + entry.getSimpleRepresentation())
+            .map(entry -> entry.getKey() + "\n> " + entry.getValue().getSimpleRepresentation())
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
             .sorted().toList();
         
