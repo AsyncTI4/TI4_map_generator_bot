@@ -34,7 +34,6 @@ public class TileModel {
         return Optional.ofNullable(name).orElse("");
     }
 
-    @JsonIgnore
     public List<String> getPlanets() {
         return planetIds;
     }
