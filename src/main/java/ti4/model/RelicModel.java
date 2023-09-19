@@ -1,19 +1,24 @@
 package ti4.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RelicModel {
-    private String id;
+public class RelicModel implements ModelInterface {
+    private String alias;
     private String name;
-    private String effect;
     private String shortName;
+    private String text;
+    private String source;
 
-    public String getName() {
-        return name.replace("<:Absol:1079473959248068701>", "");
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
+    @JsonIgnore
+    public String getSimpleRepresentation() {
+        return String.format("**%s** *(%s)*: %s", getName(), getSource(), getText());
     }
 }
