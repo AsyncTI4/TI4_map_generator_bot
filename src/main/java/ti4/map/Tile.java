@@ -369,8 +369,10 @@ public class Tile {
             if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
                 return true;
             }
-            if (unitHolder.getUnits().containsKey("csd.png")) {
-                return true;
+            for (String unit : unitHolder.getUnits().keySet()) {
+                if (unit.contains("csd.png")) {
+                    return true;
+                }
             }
         }
         return false;
