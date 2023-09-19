@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.experimental.var;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -18,7 +17,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatHelper {
@@ -52,11 +50,6 @@ public class CombatHelper {
             }
 
         }
-
-        
-        
-
-
         return output;
     }
 
@@ -142,7 +135,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
@@ -194,7 +187,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                    player.getPriorityUnitByAsyncID(entry.getKey(), null),
                     entry.getValue()
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
