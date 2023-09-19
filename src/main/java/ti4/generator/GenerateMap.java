@@ -1694,7 +1694,7 @@ public class GenerateMap {
                 System.out.println("error:" + u);
             } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
                 Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction() + ".png", 0.38f, 1.0f);
+                //drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction() + ".png", 0.38f, 1.0f);
                 //String factionIcon = "pa_tech_baseunit_" + unit.getFaction() + ".png";
                 //drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
             }
