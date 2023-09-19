@@ -841,7 +841,7 @@ public class GameSaveLoadManager {
     private static Map<String, Game> loadGamesJson() {
         File[] jsonFiles = readAllMapJSONFiles();
         if (jsonFiles == null) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
         return Arrays.stream(jsonFiles).parallel().map(GameSaveLoadManager::loadGameJson).filter(Objects::nonNull)
             .collect(Collectors.toMap(Game::getName, Function.identity()));
@@ -865,7 +865,7 @@ public class GameSaveLoadManager {
     private static Map<String, Game> loadGamesTxt() {
         File[] files = readAllMapFiles();
         if (files == null) {
-            return Collections.emptyMap();
+            return new HashMap<>();
         }
         return Arrays.stream(files).parallel().map(GameSaveLoadManager::loadGameTxt).filter(Objects::nonNull)
             .collect(Collectors.toMap(Game::getName, Function.identity()));
