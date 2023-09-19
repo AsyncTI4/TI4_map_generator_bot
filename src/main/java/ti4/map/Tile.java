@@ -9,9 +9,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
+import ti4.model.TileModel;
 
 import java.awt.*;
 import java.util.*;
@@ -338,5 +340,9 @@ public class Tile {
             }
         }
         return planetsWithSleepers;
+    }
+
+    public TileModel getTileModel() {
+        return TileHelper.getTile(getTileID());
     }
 }
