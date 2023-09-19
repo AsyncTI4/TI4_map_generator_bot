@@ -1,1 +1,13 @@
-{"id":"d35b","name":"Supernova","aliases":["d35b"],"imagePath":"D35b_Supernova.png","shipPositionsType":"TYPE08","spaceTokenLocations":[],"wormholes":[],"planets":[]}
+{
+    "id": "d35b",
+    "name": "Supernova",
+    "aliases": [
+        "d35b"
+    ],
+    "imagePath": "D35b_Supernova.png",
+    "shipPositionsType": "TYPE08",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [],
+    "isSupernova": true
+}
