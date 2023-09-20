@@ -124,6 +124,9 @@ public class Game {
     private String explorationDeckID = "explores_pok";
     @Getter
     @Setter
+    private String technologyDeckID = "techs_pok";
+    @Getter
+    @Setter
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
@@ -1758,6 +1761,10 @@ public class Game {
 
     public ArrayList<String> getExploreDiscard(String reqType) {
         return getExplores(reqType, discardExplore);
+    }
+
+    public List<String> getTechnologyDeck() {
+        return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
 
     public String drawExplore(String reqType) {

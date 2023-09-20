@@ -268,23 +268,16 @@ public class AutoCompleteProvider {
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, TechnologyModel> techs = Mapper.getTechs();
-                if (activeGame != null && activeGame.isDiscordantStarsMode()) {
-                    List<Command.Choice> options = techs.entrySet().stream()
+                Map<String, TechnologyModel> techs = Mapper.getTechs().entrySet().stream()
+                        .filter(entry -> activeGame.getTechnologyDeck().contains(entry.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                
+                List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                         .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                } else {
-                    List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !"ds".equals(value.getKey())))
-                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
+                event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
@@ -556,6 +549,17 @@ public class AutoCompleteProvider {
                 HashMap<String, DeckModel> decks = Mapper.getDecks();
                 List<Command.Choice> options = decks.values().stream()
                         .filter(deckModel -> deckModel.getType().equals(Constants.EXPLORE))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.TECHNOLOGY_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Map<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.TECHNOLOGY))
                         .filter(value -> value.getAlias().contains(enteredValue))
                         .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
                         .limit(25)
