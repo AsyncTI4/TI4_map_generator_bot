@@ -1,5 +1,24 @@
 package ti4.commands.milty;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,31 +29,22 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.MapFileDeleter;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class StartMilty extends MiltySubcommandData {
 
@@ -286,7 +296,7 @@ public class StartMilty extends MiltySubcommandData {
                 graphics.drawString(resources + "/" + influence, hs.x + 130, hs.y + 130);
                 graphics.drawString("(" + resourcesMilty + "/" + influenceMilty + ")", hs.x + 70, hs.y + 190);
 
-                BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, scale);
+                BufferedImage resizedSlice = ImageHelper.scale(sliceImage, scale);
                 graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
                 index++;
 
