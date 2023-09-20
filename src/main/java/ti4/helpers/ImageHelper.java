@@ -45,6 +45,7 @@ public class ImageHelper {
 
   @Nullable
   public static BufferedImage readScaled(String filePath, float percent) {
+    if (filePath == null) return null;
     return getOrLoad(percent + filePath, () -> {
       BufferedImage image = readImage(filePath);
       if (image == null) {
