@@ -894,4 +894,5 @@ public class Constants {
     public static final String IS_GRAVITY_RIFT = "is_gravity_rift";
     public static final String TECHNOLOGY_DECK = "technology_deck";
     public static final Object TECHNOLOGY = "technology";
+    public static final String TECH_DECK_ID = "tech_deck_id";
 }
