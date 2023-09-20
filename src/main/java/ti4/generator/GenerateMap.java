@@ -375,7 +375,7 @@ public class GenerateMap {
         try {
             ImageProxy avatarProxy = member.getEffectiveAvatar();
             InputStream inputStream = avatarProxy.download().get();
-            image = ImageHelper.readScaled(member.getEffectiveName(), inputStream, 32, 32);
+            image = ImageHelper.readScaled(member.getUser().getName(), inputStream, 32, 32);
         } catch (Exception e) {
             BotLogger.log("Could not get Avatar", e);
         }
@@ -2783,18 +2783,13 @@ public class GenerateMap {
 
     public static BufferedImage partialTileImage(Tile tile, Game activeGame, TileStep step, Player frogPlayer, Boolean isFrogPrivate) throws IOException {
         BufferedImage tileOutput = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
-
-        String position = tile.getPosition();
-        boolean tileIsFroggy = isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer);
-        BufferedImage image = ImageHelper.read(tile.getTilePath());
-        BufferedImage frogOfWar = null;
-        if (tileIsFroggy) frogOfWar = ImageHelper.read(tile.getFowTilePath(frogPlayer));
-
         Graphics tileGraphics = tileOutput.createGraphics();
+
         switch (step) {
             case Setup -> {
             } // do nothing
             case Tile -> {
+                BufferedImage image = ImageHelper.read(tile.getTilePath());
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
@@ -2815,17 +2810,18 @@ public class GenerateMap {
                     textOffset = 20;
                 }
                 tileGraphics.setColor(Color.WHITE);
-                if (tileIsFroggy) {
+                if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer)) {
+                    BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(frogPlayer));
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
                     tileGraphics.drawString(tile.getFogLabel(frogPlayer), TILE_PADDING + labelPositionPoint.x, TILE_PADDING + labelPositionPoint.y);
                 }
-                tileGraphics.drawString(position, TILE_PADDING + tilePositionPoint.x - textOffset, TILE_PADDING + tilePositionPoint.y);
+                tileGraphics.drawString(tile.getPosition(), TILE_PADDING + tilePositionPoint.x - textOffset, TILE_PADDING + tilePositionPoint.y);
             }
             case Extras -> {
-                if (tileIsFroggy)
+                if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer))
                     return tileOutput;
 
-                List<String> adj = activeGame.getAdjacentTileOverrides(position);
+                List<String> adj = activeGame.getAdjacentTileOverrides(tile.getPosition());
                 int direction = 0;
                 for (String secondaryTile : adj) {
                     if (secondaryTile != null) {
@@ -2839,7 +2835,7 @@ public class GenerateMap {
                 });
             }
             case Units -> {
-                if (tileIsFroggy)
+                if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer))
                     return tileOutput;
 
                 List<Rectangle> rectangles = new ArrayList<>();
@@ -2902,7 +2898,6 @@ public class GenerateMap {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
         BufferedImage borderDecorationImage;
-
         try {
             borderDecorationImage = ImageHelper.read(decorationType.getImageFilePath());
         } catch (Exception e) {
@@ -2943,15 +2938,14 @@ public class GenerateMap {
     }
 
     private static void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game activeGame, Player frogPlayer, Boolean isFrogPrivate) {
-        BufferedImage image = null;
-        HashSet<String> ccList = unitHolder.getCCList();
         int deltaX = 0;
         int deltaY = 0;
-        for (String ccID : ccList) {
+        for (String ccID : unitHolder.getCCList()) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 continue;
             }
+            BufferedImage image = null;
             try {
                 image = ImageHelper.read(ccPath);
 
