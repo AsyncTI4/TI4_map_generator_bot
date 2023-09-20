@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -41,7 +41,7 @@ public class Replace extends GameSubcommandData {
         boolean isAdmin = false;
         if (member != null) {
             List<Role> roles = member.getRoles();
-            for (Role role : MapGenerator.bothelperRoles) {
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
                     break;

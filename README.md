@@ -17,7 +17,7 @@ Ensure your launch.json file includes a configuration like this:
     "type": "java",
     "name": "Launch MapGenerator",
     "request": "launch",
-    "mainClass": "ti4.MapGenerator",
+    "mainClass": "ti4.AsyncTI4DiscordBot",
     "projectName": "TI4_map_generator_discord_bot",
     "args": [
         "{DISCORD_BOT_TOKEN}", // Discord Developer Portal -> Applications -> Bot -> Token

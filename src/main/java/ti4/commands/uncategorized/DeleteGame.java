@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -59,7 +59,7 @@ public class DeleteGame implements Command {
         boolean isAdmin = false;
         if (member_ != null) {
             List<Role> roles = member_.getRoles();
-            for (Role role : MapGenerator.adminRoles) {
+            for (Role role : AsyncTI4DiscordBot.adminRoles) {
                 if (roles.contains(role)) {
                     isAdmin = true;
                     break;

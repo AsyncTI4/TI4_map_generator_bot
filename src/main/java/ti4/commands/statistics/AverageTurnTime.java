@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -84,7 +84,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
         for (Entry<String, Entry<Integer, Long>> userTurnCountTotalTime : playerTurnTimes.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow).sorted(comparator).limit(topLimit).toList()) {
-            User user = MapGenerator.jda.getUserById(userTurnCountTotalTime.getKey());
+            User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
             int turnCount = userTurnCountTotalTime.getValue().getKey();
             long totalMillis = userTurnCountTotalTime.getValue().getValue();
 

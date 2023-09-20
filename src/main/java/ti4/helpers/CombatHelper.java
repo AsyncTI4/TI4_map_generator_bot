@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
+import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -285,10 +287,9 @@ public class CombatHelper {
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             int[] resultRolls = new int[numRolls];
             for (int index = 0; index < numRolls; index++) {
-                Random random = new Random();
                 int min = 1;
                 int max = 10;
-                resultRolls[index] = random.nextInt(max - min + 1) + min;
+                resultRolls[index] = ThreadLocalRandom.current().nextInt(max - min + 1) + min;
             }
 
             int[] hitRolls = Arrays.stream(resultRolls)
