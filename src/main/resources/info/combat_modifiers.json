@@ -1,7 +1,18 @@
 [
     {
+        "alias": "plus1_roll_plasmascoring",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related":[
+            {"type": "tech", "alias": "ps"}
+        ], 
+        "forCombatAbility": "bombardment"
+    },
+    {
         "alias": "minus1_always_all",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "-1",
         "persistenceType": "ALWAYS",
         "scope": "",
@@ -12,7 +23,7 @@
     },
     {
         "alias": "plus1_always_all",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
@@ -24,7 +35,7 @@
     },
     {
         "alias": "plus2_2_matching_non_ff",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition":"units_two_matching_not_ff",
@@ -36,7 +47,7 @@
     },
     {
         "alias": "plus1_always_fighter",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "scope": "ff",
         "persistenceType": "ALWAYS",
@@ -47,7 +58,7 @@
     },
     {
         "alias": "plus_x_frag_always_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "fragment",
         "persistenceType": "ALWAYS",
@@ -59,7 +70,7 @@
     },
     {
         "alias": "plus_x_law_always_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "law",
         "persistenceType": "ALWAYS",
@@ -71,7 +82,7 @@
     },
     {
         "alias": "plus_x_po_others_scored_always_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "po_opponent_exclusively_scored",
         "persistenceType": "ALWAYS",
@@ -83,7 +94,7 @@
     },
     {
         "alias": "plus_half_unit_tech_always_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "unit_tech",
         "valueScalingMultiplier": 0.5,
@@ -96,7 +107,7 @@
     },
     {
         "alias": "plus_2x_destroyers_always_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "destroyers",
         "valueScalingMultiplier": 0.5,
@@ -109,7 +120,7 @@
     },
     {
         "alias": "plus_1_always_other_units_with_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
@@ -121,7 +132,7 @@
     },
     {
         "alias": "plus_x_opponent_unit_tech_always_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "opponent_unit_tech",
         "persistenceType": "ALWAYS",
@@ -133,7 +144,7 @@
     },
     {
         "alias": "plus_2_opponent_cc_not_in_fleet_flagship",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_no_cc_fleet",
@@ -145,7 +156,7 @@
     },
     {
         "alias": "plus_x_opponent_faction_tech_always_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "opponent_faction_tech",
         "persistenceType": "ALWAYS",
@@ -157,7 +168,7 @@
     },
     {
         "alias": "plus_2_opponent_frag_conditional_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_frag",
@@ -169,7 +180,7 @@
     },
     {
         "alias": "plus_1_inf_with_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "has_ability_fragile",
@@ -181,7 +192,7 @@
     },
     {
         "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition":"opponent_stolen_faction_tech",
@@ -193,7 +204,7 @@
     },
     {
         "alias": "plus_2_mr_legendary_home_conditional",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
         "condition": "planet_mr_legendary_home",
@@ -205,7 +216,7 @@
     }, 
     {
         "alias": "plus_1_always_afb",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
@@ -217,7 +228,7 @@
     }, 
     {
         "alias": "plus_x_frag_always_flagship_afb",
-        "type": "DIE_MOD",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "fragment",
         "persistenceType": "ALWAYS",
