@@ -1,12 +1,17 @@
 package ti4.model;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
+import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
 public class AgendaModel implements ModelInterface {
     private String alias;
     private String name;
+    private String category;
+    private String categoryDescription;
     private String type;
     private String target;
     private String text1;
@@ -17,11 +22,26 @@ public class AgendaModel implements ModelInterface {
     public boolean isValid() {
         return alias != null
             && name != null
+            && validateCategory()
             && type != null
             && target != null
             && text1 != null
-            && text2 != null
             && source != null;
+    }
+
+    private boolean validateCategory() {
+        if (category == null) return true;
+        switch (category) {
+            case "faction" -> {
+                return Mapper.isFaction(categoryDescription);
+            }
+            case "event" -> {
+                return List.of("immediate", "permanent", "temporary").stream().anyMatch(s -> s.equalsIgnoreCase(categoryDescription));
+            }
+            default -> {
+                return true;
+            }
+        }
     }
 
     public String getAlias() {
@@ -30,6 +50,14 @@ public class AgendaModel implements ModelInterface {
 
     public String getName() {
         return name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getCategoryDescription() {
+        return categoryDescription;
     }
 
     public String getType() {

@@ -231,7 +231,7 @@
     "mapText": "Discard this card after performing an action to return 1 of your command counters from the game board to your reinforcements. then you may perform 1 additional action.",
     "source": "base"
   },
-  { 
+  {
     "alias": "miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
@@ -359,7 +359,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. Then, destroy 1 infantry on the planet. The resource value of this planet is increased by 2.",
-    "text2":"",
+    "text2": "",
     "source": "base"
   },
   {
@@ -368,7 +368,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. Then, destroy all units on that planet. Player's units cannot land, be produced, or be placed on this planet.",
-    "text2":"",
+    "text2": "",
     "source": "base"
   },
   {
@@ -377,7 +377,7 @@
     "type": "Law",
     "target": "Elect Planet",
     "text1": "Attach this card to the elected planet's card. The planet's owner gains 1 victory point. Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",
-    "text2":"",
+    "text2": "",
     "source": "base"
   },
   {
@@ -867,7 +867,7 @@
     "text2": "Against: Attach this card to the Mecatol Rex planet card. The player that controls Mecatol Rex gains 1 victory point, and loses 1 victory point if they lose control of Mecatol Rex.",
     "source": "absol"
   },
-  { 
+  {
     "alias": "absol_abolishment",
     "name": "Judicial Abolishment",
     "type": "Directive",
@@ -956,7 +956,7 @@
     "mapText": "Follow Warfare without spending a command token. Action: Exhaust this card and spend 1 strat CC to perform Warfare Primary.",
     "source": "absol"
   },
-  { 
+  {
     "alias": "absol_miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
@@ -1165,5 +1165,1008 @@
     "text1": "For: Players may research 1 technology for each type of wormhole in systems that contain their ships. The player who cast the most votes \"For\" may ignore 1 prerequisite on each technology they research as a result.",
     "text2": "Against: Each player who voted \"For\" destroys 1 ship for each alpha or beta wormhole in systems that contain their ships. Each player who voted \"Against\" or abstained removes 1 command token from their command sheet and returns it to their reinforcements.",
     "source": "absol"
+  },
+  {
+    "alias": "baldrick_anti-intellectual_revolution",
+    "name": "Anti-Intellectual Revolution",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may exhaust 1 planet for each 2 technologies they own (round up). If they do not, they return 1 technology to their reinforcements.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_battle_royale",
+    "name": "Battle Royale",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player secretly chooses a number of their units on the gameboard from 0 to 10. Then, each player rolls 1 die for each selected unit. If the result equals the unit's combat value or higher, it is removed. If at least 5 total units are removed, the player who removes the most units in this way gains 1 victory point.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_cabinet_shuffle",
+    "name": "Cabinet Shuffle",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The speaker may choose 1 public objective that has been scored by 0 players. Discard it and draw a new public objective from the same stage to replace it. If no valid target exists, each player may draw 1 action card.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_cavalcade",
+    "name": "Cavalcade",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player randomly discards 3 action cards from their hand. Then, each player draws 2 action cards.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_acceleration_5000",
+    "name": "Acceleration 5000",
+    "category": "event",
+    "categoryDescription": "temporary",
+    "text1": "Apply +1 to the move value of all ships for the remainder of this action phase. At the start of the status phase, discard this card.",
+    "mapText": "Apply +1 to the move value of all ships for the remainder of this action phase. At the start of the status phase, discard this card.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_ansible_relays",
+    "name": "Ansible Relays",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "At the start of their turn, the active player may return 1 trade good to the supply. If they do, they may negotiate transactions with players who are not their neighbors during this turn.",
+    "mapText": "At the start of your turn, you may spend 1 trade good to negotiate transactions with players who are not your neighbors during this turn.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_apotheosis",
+    "name": "Apotheosis",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "During the status phase, if 1 player reaches 10 (14) points, the game does not end. Instead, complete the entire status phase. The player with the most points at the end of the status phase wins the game. If more than 1 player is tied with the most points, the winner is determined by speaker order.",
+    "mapText": "Once you begin the status phase, complete the entire phase. Then, the player with the most points wins (ties broken by speaker order).",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_bolide_flares",
+    "name": "Bolide Flares",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "When a player moves units into or through an asteroid field, the player must apply 1 hit to the moving ships.",
+    "mapText": "When a player moves units into or through an asteroid field, the player must apply 1 hit to the moving ships.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_cloak_and_dagger",
+    "name": "Cloak and Dagger",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "Each player draws 1 secret objective.\nEach player can have 1 additional scored or unscored secret objective.  ",
+    "mapText": "Each player can have 1 additional scored or unscored secret objective.  ",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_construction_initiative",
+    "name": "Construction Initiative",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "The production capacity of each space dock is increased by 1.",
+    "mapText": "The production capacity of each space dock is increased by 1.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_dimensional_gateway",
+    "name": "Dimensional Gateway",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Randomly draw 1 blue-backed tile. Place the system off the edge of the gameboard. Place an alpha, beta, and gamma wormhole token on the system.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_entrenchment",
+    "name": "Entrenchment",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "At the start of a ground combat, the defender may produce 1 hit and assign it to the attacker's ground forces.",
+    "mapText": "At the start of a ground combat, the defender may produce 1 hit and assign it to the attacker's ground forces.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_galactic_conference",
+    "name": "Galactic Conference",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may perform the secondary of a readied or unchosen strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements instead.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_good_tidings",
+    "name": "Good Tidings",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may choose one of the following:\n- gain 1 command token\n- gain 2 trade goods\n- produce up to 3 resources worth of units at one of their space docks in a system that does not contain a command token",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_halsefar_doctrine",
+    "name": "Halsefar Doctrine",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may perform the secondary of 1 readied or unchosen strategy card. Then, return all strategy cards to their readied state.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_hester's_belt",
+    "name": "Hester's Belt",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "The player with the highest combined resources/influence gains Hester's Belt. If multiple player are tied, roll for possession (highest roll wins).",
+    "mapText": "DEAL WITH MANUALLY OR NEEDS SPECIAL IMPLEMENTATION",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_intraspatial_fluxuation",
+    "name": "Intraspatial Fluxuation",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The speaker rolls 1 die. If the result is 1-5, shift the position of each tile adjacent to Mecatol Rex one space clockwise. If the result is 6-10, shift the position of each tile adjacent to Mecatol Rex one space counter-clockwise.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_ixthian_artifact",
+    "name": "Ixthian Artifact",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_ixthian_diadem",
+    "name": "Ixthian Diadem",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, remove all units from Mecatol Rex and any planet in a system that is adjacent to the Mecatol Rex system. Return each of the affected planets to neutral status.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_ixthian_urn",
+    "name": "Ixthian Urn",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The speaker rolls 1 die. If the result is 6-10, each player may research 1 technology.  If the result is 1-5, each player that controls a planet in a system adjacent to the Mecatol Rex system may explore that planet.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_mercenary_guilds",
+    "name": "Mercenary Guilds",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "- Draw a number of agents from unused factions equivalent to player count -1 and place 5 trade goods on each.\n- On their turn in the action phase, a player may purchase rights to the agent by spending resources equivalent to the number of trade goods on the agent. Remove the trade goods from the agent. \n- Once purchased, the agent ability is available to use at any time. Mercenary agents do not ready. Once used, they are discarded permanently.  \n- At the start of the turn of the player holding the Antiquities card, remove 1 trade good from each mercenary agent with 2 or more trade goods on it. ",
+    "mapText": "DEAL WITH MANUALLY OR NEEDS SPECIAL IMPLEMENTATION",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_mission_reset",
+    "name": "Mission Reset",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Return all strategy cards. Starting with the player to the right of the speaker and moving in counter-clockwise order, players select new strategy cards.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_new_challenger",
+    "name": "New Challenger",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Randomly draw 1 unused faction. Place the faction's starting fleet in the Mecatol Rex system and its starting ground forces on Mecatol Rex. Resolve any resulting combats. \n- If the Custodians point has not been scored, return the Custodians token to the supply. This point may no longer be scored.\n- If the faction's units remain in the system after combat, it will defend on future activations. \n- The faction does not use any faction abilities, and its units cannot leave the Mecatol Rex system.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_overproduction",
+    "name": "Overproduction",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player's commodity value is reduced by 1. Then, each player refreshes their commodities.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_pirate_strike",
+    "name": "Pirate Strike",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "- In each system that contains exactly 1 non-fighter ship, destroy all ships in that system. \n- Each player must return 1 TG to the supply for each 4 TGs on their faction sheet (round up).",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_race_for_the_prize",
+    "name": "Race for the Prize",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "At the start of their turn, a player may perform 1 component action. Component actions do not constitute an action; if a player does not take a tactical or strategic action on their turn, they must pass.",
+    "mapText": "At the start of your turn, you may perform 1 component action. This does not count as an action. If you don't take a tactical or strategic action, you must pass.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_recharge",
+    "name": "Recharge",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may remove 1 of their command tokens from the board.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_research_networks",
+    "name": "Research Networks",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "The player with the fewest technologies may research 1 technology. The player with the most technologies may gain 3 trade goods.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_research_spinoffs",
+    "name": "Research Spinoffs",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may return one technology to their reinforcements. If they do, they may research a technology with the same number of prerequisites or fewer.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_revolt",
+    "name": "Revolt",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Roll 1 die for each non-home planet that contains 3+ ground forces. On a result of 1-7, the owner must either spend 1 resource or destroy half the ground forces on the planet (round up). On a result of 8-10, destroy all ground forces on the planet and return it to a neutral status.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_rising_empire",
+    "name": "Rising Empire",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "- If no player has more than 4 points, each player gains 1 victory point. \n- If at least 1 player has more than 4 points, each player may place a ship with a cost of 4 or less from their reinforcements in a system that contains 1 or more of their ships.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_shared_research",
+    "name": "Shared Research",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "Each player's units can move through nebulae.",
+    "mapText": "Each player's units can move through nebulae.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_tangled_wires",
+    "name": "Tangled Wires",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may place a command token from their reinforcements on their home system. If they do not, they must remove two of their non-fighter ships from the gameboard.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_theodolite_surveillance",
+    "name": "Theodolite Surveillance",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player may explore 1 planet they control.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_total_war",
+    "name": "Total War",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "At the start of the status phase, if a player controls all the planets in their home system and at least one planet in 2 other different players' home systems, they win the game.",
+    "mapText": "At the start of the status phase, if you control all the planets in you home system and at least one planet in 2 other different players' home systems, you win.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_twilight_of_the_idols",
+    "name": "Twilight of the Idols",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player must remove 1 of their non-fighter ships from the gameboard for each objective they have scored.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_weapon_schematics_leak",
+    "name": "Weapon Schematics Leak",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "All players may ignore all prerequisites on war sun technologies.",
+    "mapText": "All players may ignore all prerequisites on war sun technologies.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_wormhole_instability",
+    "name": "Wormhole Instability",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Each player that has at least 1 non-fighter ship in a wormhole must destroy 1 of their non-fighter ships in each system that contains a wormhole. For each ship that was destroyed, its owner gains one command token",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_wormhole_reconstruction",
+    "name": "Wormhole Reconstruction",
+    "category": "event",
+    "categoryDescription": "permanent",
+    "text1": "All systems that contain either an alpha or beta wormhole are adjacent to each other.",
+    "mapText": "All systems that contain either an alpha or beta wormhole are adjacent to each other.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_wormhole_research",
+    "name": "Wormhole Research",
+    "category": "event",
+    "categoryDescription": "immediate",
+    "text1": "Destroy all ships in systems that contain an alpha or beta wormhole. Then, players who destroyed ships may:\n- Research 1 technology if they destroyed 1-3 non-fighter ships.\n- Research 2 technologies if they destroyed 4-7 non-fighter ships.\n- Research 3 technologies if they destroyed 8+ non-fighter ships.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_agency_reorganization",
+    "name": "Agency Reorganization",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "- If the elected player's commander is locked, unlock their commander.\n- If the elected player's commander is unlocked, purge their commander and alliance promissory note. Then, that players gains 2 command tokens.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_archived_secret",
+    "name": "Archived Secret",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player draws 1 secret objective.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_armed_forces_standardization",
+    "name": "Armed Forces Standardization",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player places command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_articles_of_war",
+    "name": "Articles of War",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "All mechs lose their printed abilities except for Sustain Damage.",
+    "text2": "Each player must place a command token in a system that contains one of their units with sustain damage, if possible.",
+    "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_checks_and_balances",
+    "name": "Checks and Balances",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "During the strategy phase, begin with the player to the right of the speaker and proceed in counter-clockwise order",
+    "text2": "For each Support for the Throne promissory note in a player's play area, they lose 1 victory point. Then purge all Support for the Throne promissory notes.",
+    "mapText": "During the strategy phase, begin with the player to the right of the speaker and proceed in counter-clockwise order",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_clandestine_operations",
+    "name": "Clandestine Operations",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Each player removes 2 command tokens from their command sheet and return those tokens to their reinforcements.",
+    "text2": "Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_classified_document_leaks",
+    "name": "Classified Document Leaks",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Scored Secret Objective\n (When this agenda is revealed, if there are no scored secret objectives, discard this card and reveal another agenda from the top of the deck.)",
+    "text1": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
+    "mapText": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_committee_formation",
+    "name": "Committee Formation",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nBefore players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose a player to be elected. Players do not vote on that agenda.",
+    "mapText": "Before players vote on an elect player agenda, you may discard this card to choose a player to be elected. Players do not vote on the agenda.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_compensated_disarmament",
+    "name": "Compensated Disarmament",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Planet",
+    "text1": "Destroy each ground force on the elected planet; for each unit that was destroyed, the player who control that planet gains 1 trade good.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_covert_legislation",
+    "name": "Covert Legislation",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other Elect Players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.); the other Elect Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_dedevelopment",
+    "name": "Dedevelopment",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player who owns at least 2 technologies",
+    "text1": "The elected player returns 2 technologies to their reinforcements. Then, they may research 1 technology.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_economic_equality",
+    "name": "Economic Equality",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
+    "text2": "Each player returns all of their trade goods to the supply.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_galactic_crisis_pact",
+    "name": "Galactic Crisis Pact",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Strategy Card",
+    "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements instead.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_homeland_defense_act",
+    "name": "Homeland Defense Act",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "Players may not decline to fire space cannon or anti-fighter barrage.",
+    "text2": "Each player that voted For may place 1 PDS from their reinforcements on a planet they control.",
+    "mapText": "Players may not decline to fire space cannon or anti-fighter barrage.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_imperial_arbiter",
+    "name": "Imperial Arbiter",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nAt the end of the strategy phase, the owner of this card may discard this card to swap 1 of their strategy cards with 1 of another player's strategy cards.",
+    "mapText": "At the end of the strategy phase, you may discard this card to swap 1 of your strategy cards with 1 of another player's strategy cards.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_incentive_program",
+    "name": "Incentive Program",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
+    "text2": "Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_intergalactic_peacekeepers",
+    "name": "Intergalactic Peacekeepers",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+    "text2": "Each player that voted Against or abstained must remove 4 units from the gameboard, if possible.",
+    "mapText": "At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_judicial_abolishment",
+    "name": "Judicial Abolishment",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Law\n(When this agenda is revealed, if there are 2 or fewer laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "text1": "Discard the elected law from play.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_antiquities",
+    "name": "Minister of Antiquities",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player gains 1 relic.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_commerce",
+    "name": "Minister of Commerce",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nAfter the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor.",
+    "mapText": "After you replenish commodities, gain 1 trade good for each player that is your neighbor.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_defense",
+    "name": "Minister of Defense",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nThe maximum number of non-fighter ships the owner of this card can have in each system is increased by 1.",
+    "mapText": "The maximum number of non-fighter ships you can have in each system is increased by 1.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_development",
+    "name": "Minister of Development",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nThe owner of this card's commodity value is increased by 1.\nAt any time, the owner of this card may replenish their commodities and convert their commodities into trade goods; if they do, purge this card.",
+    "mapText": "Your commodity value is increased by 1. At any time, you may purge this card to replenish your commodities and convert their commodities into trade goods.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_industry",
+    "name": "Minister of Industry",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nAt the start of the strategy phase, the owner of this card gains 1 command token.\nThe owner of this card may purge this card to gain a command token.",
+    "mapText": "At the start of the strategy phase, gain 1 command token. You may purge this card to gain a command token.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_infrastructure",
+    "name": "Minister of Infrastructure",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nWhen the owner of this card places a space dock in a system, their units in that system may use their Production abilities.\nWhen the owner of this card uses the Production ability of 1 or more of their units, they apply +2 to the total production value.",
+    "mapText": "When you place a space dock in a system, your units in that system may use their Production abilities. When you use Production apply +2 to the total production value.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_peace",
+    "name": "Minister of Peace",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nAfter a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card; immediately end the active player's turn.",
+    "mapText": "After a player activates a system that contains 1 or more of a different player's units, discard this card to immediately end the active player's turn.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_policy",
+    "name": "Minister of Policy",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card and draws 3 action cards.\nThe maximum number of action cards the owner of this card can have in their hand is increased by 3. ",
+    "mapText": "The maximum number of action cards you can have in your hand is increased by 3. ",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_sciences",
+    "name": "Minister of Sciences",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nWhen the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology.",
+    "mapText": "When you resolve the primary or secondary ability of the \"Technology\" strategy card, you do not need to spend resources.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_minister_of_war",
+    "name": "Minister of War",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card.\nThe owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and return it to their reinforcements; then they may perform 1 additional action.",
+    "mapText": "Discard this card after performing an action to return 1 of your command tokens from the game board to your reinforcements; you may perform 1 additional action.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_miscount_disclosed",
+    "name": "Miscount Disclosed",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Law\n(When this agenda is revealed, if there are 2 or fewer laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_mutiny",
+    "name": "Mutiny",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Each player that voted \"For\" gains 1 victory point.",
+    "text2": "Each player that voted \"For\" loses 1 victory point.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_nexus_sovereignty",
+    "name": "Nexus Sovereignty",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "A player must return a command token from their strategy pool to reinforcements in order to activate the wormhole nexus.",
+    "text2": "Place a gamma wormhole token in the Mecatol Rex system.",
+    "mapText": "A player must return a command token from their strategy pool to reinforcements in order to activate the wormhole nexus.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_political_censure",
+    "name": "Political Censure",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card and 1 victory point.\nThe elected player cannot play action cards.\nIf the owner of this card loses this card, they lose 1 victory point.",
+    "mapText": "You cannot play action cards. If you lose this card, lose 1 victory point.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_public_execution",
+    "name": "Public Execution",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player discards all of their action cards. The elected player cannot vote on any agendas during this agenda phase. If they have the speaker token, roll 1 die. On a result of 1-4, pass the token 1 place to the left. On a result of 5-10, pass the token 1 space to the right.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_regulated_conscription",
+    "name": "Regulated Conscription",
+    "category": "agenda",
+    "type": "Law",
+    "target": "For/Against",
+    "text1": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
+    "text2": "Each player that voted Against or abstained removes a command token from their player sheet. Each player that voted For gains a command token.",
+    "mapText": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_research_grant_reallocation",
+    "name": "Research Grant Reallocation",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "Elect Player",
+    "text1": "The elected player gains any 1 technology of their choice. Then, for each prerequisite on that technology, they remove 1 token from their fleet pool and return it to their reinforcements.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_search_warrant",
+    "name": "Search Warrant",
+    "category": "agenda",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card and draws 2 secret objectives.\nThe owner of this card plays with their secret objectives revealed.",
+    "mapText": "You play with your secret objectives revealed",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_seed_of_an_empire",
+    "name": "Seed of an Empire",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "The player with the most victory points gains 1 victory point.",
+    "text2": "The player with the fewest victory points gains 1 victory point.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_stately_quadrille",
+    "name": "Stately Quadrille",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their right.",
+    "text2": "Return all alliance promissory notes to their owners. Then, each player gives their alliance to the player sitting to their left.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_swords_to_plowshares",
+    "name": "Swords to Plowshares",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Each player destroys half of their infantry on each planet they control, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed.",
+    "text2": "Each player places 1 infantry from their reinforcements on each planet they control.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_unconventional_measures",
+    "name": "Unconventional Measures",
+    "category": "agenda",
+    "type": "Directive",
+    "target": "For/Against",
+    "text1": "Each player that voted \"For\" draws 2 action cards.",
+    "text2": "Each player that voted \"For\" discards all of their action cards.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_administrative_order",
+    "name": "Administrative Order (Federation of Sol)",
+    "category": "faction",
+    "categoryDescription": "sol",
+    "type": "Law",
+    "text1": "When the Sol player uses their Orbital Drop ability, they gain 1 trade good.",
+    "text2": "The Sol player may place up to 4 fighters on the board in systems that contain their units.",
+    "mapText": "When the Sol player uses their Orbital Drop ability, they gain 1 trade good.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_armament_retrofit",
+    "name": "Armament Retrofit (Embers of Muaat)",
+    "category": "faction",
+    "categoryDescription": "muaat",
+    "type": "Law",
+    "text1": "The Muaat flagship gains combat, capacity, and move values equivalent to the Muaat player's war suns.",
+    "text2": "Each player that voted For gains 1 command token in their strategy pool.",
+    "mapText": "The Muaat flagship gains combat, capacity, and move values equivalent to the Muaat player's war suns.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_astral_echoes",
+    "name": "Astral Echoes (Seers of Quilane)",
+    "category": "faction",
+    "categoryDescription": "quilane",
+    "type": "Directive",
+    "text1": "The Quilane player may look at the top 4 cards of the relic deck, then return them to the top of the deck in any order",
+    "text2": "Each player that voted For gains 1 unknown relic fragment.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_astrolane_corridors",
+    "name": "Astrolane Corridors (Naalu Collective)",
+    "category": "faction",
+    "categoryDescription": "naalu",
+    "type": "Directive",
+    "text1": "For each 5 fighters (round down) the Naalu player has on the board, they gain 1 trade good.",
+    "text2": "Each player that voted against or abstained must reveal 1 secret objective from their hand to the Naalu player, if possible.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_cognitive_spire",
+    "name": "Cognitive Spire (L1Z1X Mindnet)",
+    "category": "faction",
+    "categoryDescription": "l1z1x",
+    "type": "Directive",
+    "text1": "At the start of the strategy phase, the L1Z1X player may spend 4 resources to research 1 technology or 10 resources to research 2 technologies.",
+    "text2": "Each player that voted against must replace 1 technology on their player sheet with a technology of the same color that has fewer prerequisites. If they cannot do this, they cannot vote against.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_communication_transfer_node",
+    "name": "Communication Transfer Node (Nomad)",
+    "category": "faction",
+    "categoryDescription": "nomad",
+    "type": "Directive",
+    "text1": "The Nomad player gains 4 trade goods.",
+    "text2": "Each player that voted For gains 2 trade goods.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_cosmic_armory",
+    "name": "Cosmic Armory (Vuil'raith Cabal)",
+    "category": "faction",
+    "categoryDescription": "cabal",
+    "type": "Law",
+    "text1": "At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
+    "text2": "The Cabal player may capture one unit costing 2 resources or less from the reinforcements of each player that abstained or voted Against.",
+    "mapText": "At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_excavation_crew",
+    "name": "Excavation Crew (Naaz-Rokha Alliance)",
+    "category": "faction",
+    "categoryDescription": "naaz",
+    "type": "Directive",
+    "text1": "The Naaz-Rokha player may explore 2 planets they control.",
+    "text2": "Each player that voted For may explore 1 planet they control.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_flare_trellis",
+    "name": "Flare Trellis (Argent Flight)",
+    "category": "faction",
+    "categoryDescription": "argent",
+    "type": "Law",
+    "text1": "The Argent player gains this card\nAfter activating a system, the Argent player may purge this card to transport their PDS units as if they were ground forces.",
+    "text2": "The Argent player may place 1 PDS unit from their reinforcements on any planet they control.",
+    "mapText": "After activating a system, the Argent player may purge this card to transport their PDS units as if they were ground forces.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_galactic_tribute",
+    "name": "Galactic Tribute (Barony of Letnev)",
+    "category": "faction",
+    "categoryDescription": "letnev",
+    "type": "Law",
+    "text1": "A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
+    "text2": "At the start of the strategy phase, each ship with sustain damage that belongs to a player that voted against or abstained becomes damaged.",
+    "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with bombardment",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_mainframe_incursino",
+    "name": "Mainframe Incursion (Nekro Virus)",
+    "category": "faction",
+    "categoryDescription": "nekro",
+    "type": "Directive",
+    "text1": "The Nekro player may gain 1 technology owned by a player who voted For this agenda, or from a player who abstained.",
+    "text2": "Each player that voted against must return 1 command token to their reinforcements.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_matter_expropriation",
+    "name": "Matter Expropriation (Clan of Saar)",
+    "category": "faction",
+    "categoryDescription": "saar",
+    "type": "Law",
+    "text1": "After the Saar player loses control of a planet, they gain 1 trade good.",
+    "text2": "At the start of the strategy phase, each player that voted For may produce units worth up to 3 resources and place them in systems that contain 1 of their space docks.",
+    "mapText": "After the Saar player loses control of a planet, they gain 1 trade good.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_meij_restoration",
+    "name": "M'eij Restoration (Sardakk N'orr)",
+    "category": "faction",
+    "categoryDescription": "sardakk",
+    "type": "Directive",
+    "text1": "The Sardakk player may research a technology.",
+    "text2": "At the start of the strategy phase, each player that voted against or abstained must exhaust 1 planet for each technology that they own.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_network_patrols",
+    "name": "Network Patrols (Council Keleres)",
+    "category": "faction",
+    "categoryDescription": "keleres",
+    "type": "Law",
+    "text1": "Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
+    "text2": "The Keleres player gains 2 trade goods.",
+    "mapText": "Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_privateer_fleet",
+    "name": "Privateer Fleet (Mentak Coalition)",
+    "category": "faction",
+    "categoryDescription": "mentak",
+    "type": "Law",
+    "text1": "At the end of a combat in a system adjacent to 1 or more of Mentak's ships, the Mentak player gains a trade good.",
+    "text2": "The Mentak player may place up to 2 cruisers from their reinforcements in any system that contains their ships.",
+    "mapText": "At the end of a combat in a system adjacent to 1 or more of Mentak's ships, the Mentak player gains a trade good.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_rhizomatic_inflation",
+    "name": "Rhizomatic Inflation (Arborec)",
+    "category": "faction",
+    "categoryDescription": "arborec",
+    "type": "Law",
+    "text1": "When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
+    "text2": "For each player that voted Against, the Arborec player may may place 1 command token from that player's reinforcements in any non-home system.",
+    "mapText": "When the Arborec player uses Production, reduce the combined cost of the produced units by 1.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_secret_provisions",
+    "name": "Secret Provisions (Yssaril Tribes)",
+    "category": "faction",
+    "categoryDescription": "yssaril",
+    "type": "Law",
+    "text1": "When using their stall tactics ability, if the Yssaril player does not deploy a mech they may instead place 2 infantry from their reinforcements on a planet they control.",
+    "text2": "Each player that voted For may draw 1 action card.",
+    "mapText": "When using their stall tactics ability, if Yssaril does not deploy a mech they can place 2 infantry from their reinforcements on a planet they control.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_shadow_walkers",
+    "name": "Shadow Walkers (Mahact Gene-Sorcerers)",
+    "category": "faction",
+    "categoryDescription": "mahact",
+    "type": "Directive",
+    "text1": "The Mahact player may add 1 command token to their player sheet from a faction whose token is not already on the sheet.",
+    "text2": "Each player that voted Against or abstained must give the Mahact player a random action card.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_special_session",
+    "name": "Special Session (Xxcha Kingdom)",
+    "category": "faction",
+    "categoryDescription": "xxcha",
+    "type": "Law",
+    "text1": "The Xxcha player gains this card\nAt the end of the agenda phase, the Xxcha player may purge this card to begin another agenda phase.",
+    "text2": "The Xxcha player gains one trade good for each player that voted Against.",
+    "mapText": "At the end of the agenda phase, the Xxcha player may purge this card to begin another agenda phase.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_trade_harmonization",
+    "name": "Trade Harmonization (Emirates of Hacan)",
+    "category": "faction",
+    "categoryDescription": "hacan",
+    "type": "Law",
+    "text1": "- At any time, the Hacan player may discard 1 action to gain 1 trade good. \n- At any time, the Hacan player may discard 2 trade goods to gain 1 action card.",
+    "text2": "At the start of the strategy phase, the Hacan player may produce 1 ship at one of their space docks.",
+    "mapText": "At any time, the Hacan player may: discard 1 action to gain 1 trade good; discard 2 trade goods to gain 1 action card.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_transitive_development",
+    "name": "Transitive Development (Titans of Ul)",
+    "category": "faction",
+    "categoryDescription": "titans",
+    "type": "Directive",
+    "text1": "The Titans player may place up to 3 sleeper tokens on planets that are in or adjacent to systems that contain a planet they control.",
+    "text2": "Each player that voted For gains 2 trade goods.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_turnbuckle_drop",
+    "name": "Turnbuckle Drop (Yin Brotherhood)",
+    "category": "faction",
+    "categoryDescription": "yin",
+    "type": "Law",
+    "text1": "When the Yin player uses a faction ability, they gain 1 trade good.",
+    "text2": "- Each player that voted For gains 1 trade good\n- The Yin player gains a trade good for each player that voted Against.",
+    "mapText": "When the Yin player uses a faction ability, they gain 1 trade good.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_twilight_watch",
+    "name": "Twilight Watch (Empyrean)",
+    "category": "faction",
+    "categoryDescription": "empyrean",
+    "type": "Directive",
+    "text1": "The Empyrean player may place up to 2 destroyers or cruisers from their reinforcement in systems that do not contain another player's units.",
+    "text2": "The Empyrean player may place a frontier token in a system that does not contain a planet and does not already have a frontier token.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_voyager_returns",
+    "name": "Voyager Returns (Winnu)",
+    "category": "faction",
+    "categoryDescription": "winnu",
+    "type": "Law",
+    "text1": "When the Winnu player activates the Mecatol Rex system, they may apply +1 to the move value of their ships during this tactical action.",
+    "text2": "The Winnu player may draw 2 action cards.\nEach player that voted for may draw 1 action card.",
+    "mapText": "When the Winnu player activates the Mecatol Rex system, they may apply +1 to the move value of their ships during this tactical action.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_weapons_endowment",
+    "name": "Weapons Endowment (Universities of Jol-Nar)",
+    "category": "faction",
+    "categoryDescription": "jolnar",
+    "type": "Law",
+    "text1": "Ignore Jol-Nar's fragile faction ability in systems that contain a planet with a technology specialty.",
+    "text2": "Each player that voted against must exhaust 1 technology on their player sheet. If they cannot do this, they cannot vote against.",
+    "mapText": "Ignore Jol-Nar's fragile faction ability in systems that contain a planet with a technology specialty.",
+    "source": "ignis_aurora"
+  },
+  {
+    "alias": "baldrick_wormhole_checkpoints",
+    "name": "Wormhole Checkpoints (Ghosts of Creuss)",
+    "category": "faction",
+    "categoryDescription": "creuss",
+    "type": "Law",
+    "text1": "After a non-Creuss player moves ships through a wormhole, they must destroy 1 of the non-fighter ships that moved through a wormhole, if able.",
+    "text2": "The Creuss player may place up to 2 of their IFF tokens in non-home systems.",
+    "mapText": "After a non-Creuss player moves ships through a wormhole, they must destroy 1 of the non-fighter ships that moved through a wormhole, if able.",
+    "source": "ignis_aurora"
   }
 ]
