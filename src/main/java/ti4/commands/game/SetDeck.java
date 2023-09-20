@@ -29,6 +29,7 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.AGENDA_DECK, "Agenda");
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
+        addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
     }
 
     @Override

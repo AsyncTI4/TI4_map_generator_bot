@@ -892,4 +892,5 @@ public class Constants {
     public static final String IS_SUPERNOVA = "is_supernova";
     public static final String IS_NEBULA = "is_nebula";
     public static final String IS_GRAVITY_RIFT = "is_gravity_rift";
+    public static final String TECHNOLOGY_DECK = "technology_deck";
 }

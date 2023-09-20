@@ -198,6 +198,34 @@
         "weapons_research_facility","freighter_conversion1","freighter_conversion2","bootstrapping1","bootstrapping2","wormhole_generator1","wormhole_generator2","ahrf1","ahrf2","ahrf3","ahrf4",
         "construction_yard1","construction_yard2","construction_yard3","construction_yard4","abandoned_keel1","abandoned_keel2","abandoned_keel3","lazax_manufactorum","airf1","airf2","airf3","airf4","airf5"
     ]
-}
+    },
+    {
+        "alias": "techs_base",
+        "name": "Base Techs",
+        "type": "technology",
+        "description": "All base techs",
+        "cardIDs": []
+    },
+    {
+        "alias": "techs_pok",
+        "name": "PoK Techs",
+        "type": "technology",
+        "description": "All base techs + PoK techs",
+        "cardIDs": []
+    },
+    {
+        "alias": "techs_absol",
+        "name": "Absol's Techs",
+        "type": "technology",
+        "description": "All techs for Absol mode",
+        "cardIDs": []
+    },
+    {
+        "alias": "techs_baldrick",
+        "name": "Baldricks Ignis Aurora Techs",
+        "type": "technology",
+        "description": "All techs for Ignis Aurora",
+        "cardIDs": []
+    }
 ]
 

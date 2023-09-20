@@ -124,6 +124,9 @@ public class Game {
     private String explorationDeckID = "explores_pok";
     @Getter
     @Setter
+    private String technologyDeckID = "techs_pok";
+    @Getter
+    @Setter
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
@@ -207,6 +210,8 @@ public class Game {
     private List<String> explore;
     private ArrayList<String> discardExplore = new ArrayList<>();
     private List<String> relics;
+    @Getter @Setter
+    private List<String> technologies;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
@@ -224,6 +229,7 @@ public class Game {
         publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
         agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
+        technologies = Mapper.getDecks().get(getTechnologyDeckID()).getNewShuffledDeck();
 
         addCustomPO(Constants.CUSTODIAN, 1);
 
