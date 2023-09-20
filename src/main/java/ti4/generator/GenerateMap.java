@@ -174,7 +174,7 @@ public class GenerateMap {
     }
 
     public File saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
-        if (true || debug) {
+        if (debug) {
             debugStartTime = System.nanoTime();
             System.out.printf("Map gen started for map %s%n", activeGame.getName());
         }
@@ -326,7 +326,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
 
-        if (true || debug) {
+        if (debug) {
             long total = System.nanoTime() - debugStartTime;
             StringBuilder sb = new StringBuilder();
             sb.append(" Total time to generate map " + activeGame.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
