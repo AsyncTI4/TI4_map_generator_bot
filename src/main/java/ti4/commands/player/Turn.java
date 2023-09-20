@@ -162,8 +162,11 @@ public class Turn extends PlayerSubcommandData {
             return "";
         }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
-        return "Next Player not found";
+        if(nextPlayer == null){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
+        }
+       // MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
+        return "";
     }
 
     private String getMissedSCFollowsText(Game activeGame, Player player) {
