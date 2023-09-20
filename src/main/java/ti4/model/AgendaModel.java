@@ -24,7 +24,6 @@ public class AgendaModel implements ModelInterface {
             && name != null
             && validateCategory()
             && type != null
-            && target != null
             && text1 != null
             && source != null;
     }
