@@ -101,6 +101,10 @@ public class SetDeck extends GameSubcommandData {
                     activeGame.setExplorationDeckID(deckModel.getAlias());
                     return true;
                 }
+                case Constants.TECHNOLOGY_DECK -> {
+                    activeGame.setTechnologyDeckID(deckModel.getAlias());
+                    return true;
+                }
             }
         }
         return false;

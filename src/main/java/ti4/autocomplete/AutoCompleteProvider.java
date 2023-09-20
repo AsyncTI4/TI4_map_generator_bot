@@ -562,6 +562,17 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.TECHNOLOGY_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Map<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.TECHNOLOGY))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.STRATEGY_CARD_SET -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
