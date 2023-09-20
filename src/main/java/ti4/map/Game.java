@@ -210,8 +210,6 @@ public class Game {
     private List<String> explore;
     private ArrayList<String> discardExplore = new ArrayList<>();
     private List<String> relics;
-    @Getter @Setter
-    private List<String> technologies;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
@@ -229,7 +227,6 @@ public class Game {
         publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
         agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
-        technologies = Mapper.getDecks().get(getTechnologyDeckID()).getNewShuffledDeck();
 
         addCustomPO(Constants.CUSTODIAN, 1);
 
@@ -1764,6 +1761,10 @@ public class Game {
 
     public ArrayList<String> getExploreDiscard(String reqType) {
         return getExplores(reqType, discardExplore);
+    }
+
+    public List<String> getTechnologyDeck() {
+        return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
 
     public String drawExplore(String reqType) {
