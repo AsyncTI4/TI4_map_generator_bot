@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BorderAnomalyModel {
+
     public enum BorderAnomalyType {
         ASTEROID("Asteroid Field", "asteroid_border.png"),
         GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"),
@@ -21,12 +22,11 @@ public class BorderAnomalyModel {
         private final String name;
 
         @Getter
-        private final File imageFile;
+        private final String imageFilePath;
 
         BorderAnomalyType(String name, String fileName) {
             this.name = name;
-            String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
-            imageFile = new File(filePath);
+            imageFilePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
         }
 
         @Override
@@ -43,7 +43,6 @@ public class BorderAnomalyModel {
         if (type == null) {
             return null;
         }
-        BorderAnomalyType.values();
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
                 .collect(
                         Collectors.toMap(
