@@ -763,7 +763,7 @@
     "alias": "htp",
     "name": "Hegemonic Trade Policy",
     "type": "CYBERNETIC",
-    "requirements": "Y",
+    "requirements": "YY",
     "faction": "winnu",
     "baseUpgrade": "",
     "source": "base",
@@ -1548,5 +1548,75 @@
     "baseUpgrade": "inf2",
     "source": "ds",
     "text": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system. Cost 1(x2), Combat 7; BOMBARDMENT 8"
+  },
+  {
+    "alias": "ciqineqreceptors",
+    "name": "Ciqineq Receptors",
+    "type": "BIOTIC",
+    "requirements": "GG",
+    "faction": "qulane",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Action: Exhaust this card to draw 2 event cards. Place 1 into your hand and shuffle the other back into the deck."
+  },
+  {
+    "alias": "gjenspecterii",
+    "name": "Gjen Specter II",
+    "type": "UNITUPGRADE",
+    "requirements": "G",
+    "faction": "qulane",
+    "baseUpgrade": "inf2",
+    "source": "ignis_aurora",
+    "text": "Cost 1 (x2) Combat: 7 This unit does not count against capacity. Up to 4 of this unit can be transported on each non-fighter ship. At the start of a space combat, you may remove up to 3 infantry from the space area of the active system. For each 1 that you remove, your opponent must assign 1 hit to their ships."
+  },
+  {
+    "alias": "stellarcorridors",
+    "name": "Stellar Corridors",
+    "type": "PROPULSION",
+    "requirements": "BB",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the start of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
+  },
+  {
+    "alias": "fabrilerealignment",
+    "name": "Fibrile Realignment",
+    "type": "BIOTIC",
+    "requirements": "GG",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "ACTION: Exhaust this card to discard either one secret objective or one action card. Then, draw a new card of the same type."
+  },
+  {
+    "alias": "precisiontargeting",
+    "name": "Precision Targeting",
+    "type": "WARFARE",
+    "requirements": "R",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the start of a round of combat you may exhaust this card to cause your opponents' units participating in that combat that have Sustain Damage to become damaged."
+  },
+  {
+    "alias": "syntheticreclamation",
+    "name": "Synthetic Reclamation",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "arborec",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "When 1 or more of your units produces units, you may remove infantry from that system. For each infantry that you remove, reduce the combined cost of the produced units by 1."
+  },
+  {
+    "alias": "leviathaneruptor",
+    "name": "Leviathan Eruptor",
+    "type": "WARFARE",
+    "requirements": "RR",
+    "faction": "cabal",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the end of a combat round, you may exhaust this card to return 1 captured unit and place a unit of the same type from your reinforcements in the active system."
   }
 ]

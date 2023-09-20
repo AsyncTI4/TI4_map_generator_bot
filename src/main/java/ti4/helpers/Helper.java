@@ -493,6 +493,7 @@ public class Helper {
             case "zelian" -> Emojis.zelian;
 
             case "admins" -> Emojis.AdminsFaction;
+            case "qulane" -> Emojis.Qulane;
 
             case "franken1" -> Emojis.OneToe;
             case "franken2" -> Emojis.TwoToes;
@@ -1114,7 +1115,7 @@ public class Helper {
         //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
         String[] leaderRepSplit = leaderRep.split(";");
         if (leaderRepSplit.length != 6) {
-            BotLogger.log("Invalid `leaderRepSplit.length=" + leaderRepSplit.length + "` caught within `Helper.getLeaderRepresentation`");
+            BotLogger.log("Invalid `leaderID=" + leaderID + "` `leaderRepSplit.length=" + leaderRepSplit.length + "` caught within `Helper.getLeaderRepresentation`");
             return leaderRep;
         }
         String leaderName = leaderRepSplit[0];

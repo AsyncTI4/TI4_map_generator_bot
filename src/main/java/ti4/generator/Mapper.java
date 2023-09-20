@@ -117,14 +117,16 @@ public class Mapper {
                 BotLogger.log(e.getMessage());
             }
         }
-
+        
+        List<String> badObjects = new ArrayList<>();
         allObjects.forEach(obj -> {
             if (obj.isValid()) {
                 objectMap.put(obj.getAlias(), obj);
             } else {
-                BotLogger.log(obj.getAlias() + " is improperly formatted.");
+                badObjects.add(obj.getAlias());
             }
         });
+        if (!badObjects.isEmpty()) BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> " + String.join("\n> ", badObjects));
     }
 
     public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {

@@ -29,6 +29,7 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.AGENDA_DECK, "Agenda");
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
+        addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
     }
 
     @Override
@@ -98,6 +99,10 @@ public class SetDeck extends GameSubcommandData {
                 case Constants.EXPLORATION_DECKS -> {
                     activeGame.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
                     activeGame.setExplorationDeckID(deckModel.getAlias());
+                    return true;
+                }
+                case Constants.TECHNOLOGY_DECK -> {
+                    activeGame.setTechnologyDeckID(deckModel.getAlias());
                     return true;
                 }
             }

@@ -1,6 +1,10 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 @Data
 public class TechnologyModel implements ModelInterface {
@@ -51,5 +55,17 @@ public class TechnologyModel implements ModelInterface {
 
     public static int sortFactionTechsLast(TechnologyModel t1, TechnologyModel t2) {
         return sortFactionTechsFirst(t1, t2) * -1;
+    }
+
+    @JsonIgnore
+    public MessageEmbed getRepresentationEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+        String name = getName() == null ? "" : getName();
+        eb.setTitle("__" + name + "__", null);
+        // eb.setColor(Color.yellow);
+        eb.setDescription("Type: " + getType() + "  Requires: " + getRequirements());
+        eb.addField("", getText(), true);
+        eb.setFooter("ID: " + getAlias());
+        return eb.build();
     }
 }
