@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -69,7 +69,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         String categoryChannelName = event.getOption(Constants.CATEGORY, null, OptionMapping::getAsString);
         Category categoryChannel = null;
         if (categoryChannelName != null && !categoryChannelName.isEmpty()) {
-            List<Category> categoriesWithName = MapGenerator.jda.getCategoriesByName(categoryChannelName, false);
+            List<Category> categoriesWithName = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false);
             if (categoriesWithName.size() > 1) {
                 sendMessage("Too many categories with this name!!");
                 return;
@@ -77,7 +77,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 sendMessage("Category not found");
                 return;
             } else {
-                categoryChannel = MapGenerator.jda.getCategoriesByName(categoryChannelName, false).get(0);
+                categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).get(0);
             }
         } else { //CATEGORY WAS NOT PROVIDED, FIND ONE
             categoryChannelName = getCategoryNameForGame(gameName);
@@ -120,7 +120,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return;
         } else if (category.getChannels().size() > 45) {
             String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.";
-            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+            TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             if (bothelperLoungeChannel != null) {
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
             } else {
@@ -259,7 +259,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         List<String> gameAndRoleNames = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -279,7 +279,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         List<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -314,7 +314,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -347,10 +347,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static Guild getNextAvailableServer() {
-        if (serverCanHostNewGame(MapGenerator.guildPrimary)) {
-            return MapGenerator.guildPrimary;
-        } else if (serverCanHostNewGame(MapGenerator.guildSecondary)) {
-            return MapGenerator.guildSecondary;
+        if (serverCanHostNewGame(AsyncTI4DiscordBot.guildPrimary)) {
+            return AsyncTI4DiscordBot.guildPrimary;
+        } else if (serverCanHostNewGame(AsyncTI4DiscordBot.guildSecondary)) {
+            return AsyncTI4DiscordBot.guildSecondary;
         } else {
             return null;
         }
@@ -397,7 +397,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     public static List<Category> getAllAvailablePBDCategories() {
 
-        return MapGenerator.jda.getCategories().stream()
+        return AsyncTI4DiscordBot.jda.getCategories().stream()
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();
     }

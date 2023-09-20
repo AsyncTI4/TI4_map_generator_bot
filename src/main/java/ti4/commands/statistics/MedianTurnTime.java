@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -72,7 +72,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         for (Entry<String, Long> userMedianTurnTime : playerMedianTurnTimes.entrySet().stream()
             .filter(o -> o.getValue() != 0 && playerTurnCount.get(o.getKey()) >= minimumTurnsToShow)
             .sorted(Entry.comparingByValue()).limit(topLimit).toList()) {
-            User user = MapGenerator.jda.getUserById(userMedianTurnTime.getKey());
+            User user = AsyncTI4DiscordBot.jda.getUserById(userMedianTurnTime.getKey());
             long totalMillis = userMedianTurnTime.getValue();
             int turnCount = playerTurnCount.get(userMedianTurnTime.getKey());
 

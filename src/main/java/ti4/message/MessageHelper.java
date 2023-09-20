@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
@@ -285,7 +285,7 @@ public class MessageHelper {
 	 */
 	public static boolean sendPrivateMessageToPlayer(Player player, Game activeGame, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         if (messageText == null || messageText.length() == 0) return true; // blank message counts as a success
-		User user = MapGenerator.jda.getUserById(player.getUserID());
+		User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
 		if (user == null) {
 			sendMessageToChannel(feedbackChannel, failText);
 			return false;
@@ -480,7 +480,7 @@ public class MessageHelper {
 	}
 
     public static void sendMessageToBotLogWebhook(String message) {
-			if (!"943410040369479690".equals(MapGenerator.guildPrimary.getId())) return; //Only run in Prod
+			if (!"943410040369479690".equals(AsyncTI4DiscordBot.guildPrimary.getId())) return; //Only run in Prod
 			DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
 			webhook.setContent(message);
 			try {

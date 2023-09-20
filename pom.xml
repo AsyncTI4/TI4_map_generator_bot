@@ -112,7 +112,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ti4.MapGenerator</mainClass>
+                            <mainClass>ti4.AsyncTI4DiscordBot</mainClass>
                         </manifest>
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
@@ -126,7 +126,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ti4.MapGenerator</mainClass>
+                            <mainClass>ti4.AsyncTI4DiscordBot</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

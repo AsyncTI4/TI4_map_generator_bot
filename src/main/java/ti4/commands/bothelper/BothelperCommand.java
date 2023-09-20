@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -35,7 +35,7 @@ public class BothelperCommand implements Command {
             Member member = event.getMember();
             if (member != null) {
                 List<Role> roles = member.getRoles();
-                for (Role role : MapGenerator.bothelperRoles) {
+                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
                     if (roles.contains(role)) {
                         return true;
                     }

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -62,8 +62,8 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
         GameSaveLoadManager.saveMap(newGame, event);
-        if(MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).size() > 0){
-            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).size() > 0){
+            TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
             List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
             if (threadChannels == null){

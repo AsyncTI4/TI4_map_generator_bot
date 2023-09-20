@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
@@ -44,7 +44,7 @@ public class CardsInfo implements Command {
             Member member = event.getMember();
             if (member != null) {
                 List<Role> roles = member.getRoles();
-                for (Role role : MapGenerator.adminRoles) {
+                for (Role role : AsyncTI4DiscordBot.adminRoles) {
                     if (roles.contains(role)) {
                         return true;
                     }
@@ -53,11 +53,11 @@ public class CardsInfo implements Command {
             Game userActiveGame = gameManager.getUserActiveGame(userID);
             if (userActiveGame.isCommunityMode()){
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
-                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
+                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;
                 }
-            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }

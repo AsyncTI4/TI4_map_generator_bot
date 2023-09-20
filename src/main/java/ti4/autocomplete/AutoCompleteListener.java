@@ -2,14 +2,14 @@ package ti4.autocomplete;
 
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.message.BotLogger;
 
 public class AutoCompleteListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        if (!MapGenerator.readyToReceiveCommands) {
+        if (!AsyncTI4DiscordBot.readyToReceiveCommands) {
             event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
             return;
         }

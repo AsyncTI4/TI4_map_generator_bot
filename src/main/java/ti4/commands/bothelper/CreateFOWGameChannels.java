@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -199,7 +199,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     }
 
     private static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         List<String> gameAndRoleNames = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -221,7 +221,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
 
    
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
@@ -284,7 +284,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     
     public static List<Category> getAllAvailablePBDCategories() {
 
-        return MapGenerator.jda.getCategories().stream()
+        return AsyncTI4DiscordBot.jda.getCategories().stream()
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();
     }
