@@ -1698,9 +1698,9 @@ public class Helper {
         return techButtons;
     }
 
-    public static List<TechnologyModel> getAllTechOfAType(String techType, String playerfaction, Player player) {
+    public static List<TechnologyModel> getAllTechOfAType(Game activeGame, String techType, String playerfaction, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyModel tech : Mapper.getTechs().values()) {
+        for (TechnologyModel tech : Mapper.getTechs().values().stream().filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias())).toList()) {
             String faction = tech.getFaction();
             if (tech.getType().toString().equalsIgnoreCase(techType)) {
                 if (!player.hasTech(tech.getAlias())) {

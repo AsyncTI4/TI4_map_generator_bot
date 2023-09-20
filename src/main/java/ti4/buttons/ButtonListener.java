@@ -674,7 +674,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
-            List<TechnologyModel> techs = Helper.getAllTechOfAType(techType, player.getFaction(), player);
+            List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player.getFaction(), player);
             List<Button> buttons = Helper.getTechButtons(techs, techType, player);
             buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
             String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to get the tech you want";
