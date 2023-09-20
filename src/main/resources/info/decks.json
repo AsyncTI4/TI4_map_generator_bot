@@ -188,29 +188,29 @@
         ]
     },
     {
-    "alias": "explores_asteroid",
-    "name": "Asteroid's Exploration Decks",
-    "type": "explore",
-    "description": "(NOT READY FOR USE) All explore cards in a 'vanilla' PoK game, plus some additions",
-    "cardIDs": [
-        "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
-        "imperial_research_institute", "trade_office", "spy_agency", "galactic_heritage_site", "distinguished_councilor","talented_officer1","talented_officer2","acrf1", "acrf2", "acrf3", "acrf4", "acrf5", "acrf6",
-        "weapons_research_facility","freighter_conversion1","freighter_conversion2","bootstrapping1","bootstrapping2","wormhole_generator1","wormhole_generator2","ahrf1","ahrf2","ahrf3","ahrf4",
-        "construction_yard1","construction_yard2","construction_yard3","construction_yard4","abandoned_keel1","abandoned_keel2","abandoned_keel3","lazax_manufactorum","airf1","airf2","airf3","airf4","airf5"
-    ]
+        "alias": "explores_asteroid",
+        "name": "Asteroid's Exploration Decks",
+        "type": "explore",
+        "description": "(NOT READY FOR USE) All explore cards in a 'vanilla' PoK game, plus some additions",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
+            "imperial_research_institute", "trade_office", "spy_agency", "galactic_heritage_site", "distinguished_councilor","talented_officer1","talented_officer2","acrf1", "acrf2", "acrf3", "acrf4", "acrf5", "acrf6",
+            "weapons_research_facility","freighter_conversion1","freighter_conversion2","bootstrapping1","bootstrapping2","wormhole_generator1","wormhole_generator2","ahrf1","ahrf2","ahrf3","ahrf4",
+            "construction_yard1","construction_yard2","construction_yard3","construction_yard4","abandoned_keel1","abandoned_keel2","abandoned_keel3","lazax_manufactorum","airf1","airf2","airf3","airf4","airf5"
+        ]
     },
     {
         "alias": "techs_base",
         "name": "Base Techs",
         "type": "technology",
-        "description": "All base techs",
+        "description": "All techs available in Base Game",
         "cardIDs": []
     },
     {
         "alias": "techs_pok",
         "name": "PoK Techs",
         "type": "technology",
-        "description": "All base techs + PoK techs",
+        "description": "All techs available in PoK + Codexes. This is the default deck.",
         "cardIDs": []
     },
     {
