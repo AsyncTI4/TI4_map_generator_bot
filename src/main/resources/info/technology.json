@@ -763,7 +763,7 @@
     "alias": "htp",
     "name": "Hegemonic Trade Policy",
     "type": "CYBERNETIC",
-    "requirements": "Y",
+    "requirements": "YY",
     "faction": "winnu",
     "baseUpgrade": "",
     "source": "base",
