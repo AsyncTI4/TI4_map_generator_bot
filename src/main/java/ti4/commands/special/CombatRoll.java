@@ -133,11 +133,17 @@ public class CombatRoll extends SpecialSubcommandData {
         Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeGame);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
-        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeGame, rollType);
+        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent,
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_MODIFIERS);
+
+        List<NamedCombatModifierModel> autoExtraRolls = CombatModHelper.CalculateAutomaticMods(player, opponent,
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_EXTRA_ROLLS);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
-        customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
-        autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat);
+        customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat, rollType);
+        autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat, rollType);
+
+        autoExtraRolls = CombatModHelper.FilterRelevantMods(autoExtraRolls, unitsInCombat, rollType);
 
         String combatTypeName = StringUtils.capitalize(combatOnHolder.getName()) + " combat";
         if(rollType != CombatRollType.combatround){
@@ -146,7 +152,8 @@ public class CombatRoll extends SpecialSubcommandData {
         String message = String.format("**%s** rolls for %s on %s %s:  \n",
                 combatTypeName, Helper.getFactionIconFromDiscord(player.getFaction()),
                 tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, player, opponent, activeGame, rollType);
+        message += CombatHelper.RollForUnits(unitsByQuantity, autoExtraRolls, customMods, autoMods, player, opponent,
+                activeGame, rollType);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");

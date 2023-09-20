@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.player.AbilityInfo;
+import ti4.commands.special.CombatRoll;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -63,9 +64,11 @@ public class CombatModHelper {
         }
         return result;
     }
-    public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier) {
+
+    public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier,
+            CombatRollType rollType) {
         for (UnitModel unit : units) {
-            if (modifier.isInScopeForUnit(unit)) {
+            if (modifier.isInScopeForUnit(unit, units, rollType)) {
                 return true;
             }
         }
@@ -78,12 +81,14 @@ public class CombatModHelper {
             Map<UnitModel, Integer> unitsByQuantity,
             TileModel tile,
             Game activeGame,
-            CombatRollType rollType) {
+            CombatRollType rollType,
+            String modifierType) {
         List<NamedCombatModifierModel> alwaysOnMods = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
-                            .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString())) 
-                            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString()))
+                .filter(entry -> entry.getValue().getType().equals(modifierType))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (String ability : player.getAbilities()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
@@ -166,11 +171,11 @@ public class CombatModHelper {
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, List<NamedCombatModifierModel> modifiers, Player player,
-            Player opponent, Game activeGame) {
+            Player opponent, Game activeGame, List<UnitModel> allUnits, CombatRollType rollType) {
         int modValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
-            if (modifier.isInScopeForUnit(unit)) {
+            if (modifier.isInScopeForUnit(unit, allUnits, rollType)) {
                 modValue += GetVariableModValue(modifier, player, opponent, activeGame);
             }
         }
@@ -312,9 +317,11 @@ public class CombatModHelper {
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesnt return 2.5 etc
         return (int) value;
     }
-    public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods, List<UnitModel> units){
+
+    public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods,
+            List<UnitModel> units, CombatRollType rollType) {
         return mods.stream()
-                .filter(model -> IsModInScopeForUnits(units, model.getModifier()))
+                .filter(model -> IsModInScopeForUnits(units, model.getModifier(), rollType))
                 .toList();
     }
 }
