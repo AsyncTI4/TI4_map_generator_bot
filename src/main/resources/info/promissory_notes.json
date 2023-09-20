@@ -2418,5 +2418,15 @@
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the ethereal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the ethereal player."
+    },
+    {
+        "alias": "qulaneafterssight",
+        "name": "After Sight",
+        "faction": "qulane",
+        "colour": "",
+        "playArea": "false",
+        "attachment": "",
+        "source": "ignis_aurora",
+        "text": "When you declare a retreat: Choose one ship in the active system. That ship does not participate in the combat round and cannot be assigned hits. At the end of the combat round, return this card to the Qulane player."
     }
 ]
