@@ -242,7 +242,8 @@ public class CombatHelper {
     }
 
     public static String RollForUnits(Map<UnitModel, Integer> units,
-            HashMap<String, Integer> extraRolls, List<NamedCombatModifierModel> customMods, List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
+            List<NamedCombatModifierModel> extraRolls, List<NamedCombatModifierModel> customMods,
+            List<NamedCombatModifierModel> autoMods, Player player, Player opponent,
             Game activeGame, CombatRollType rollType) {
         String result = "";
 
@@ -252,37 +253,21 @@ public class CombatHelper {
         result += CombatModHelper.GetModifiersText("With custom modifiers: \n", units, customMods);
 
         // Display extra rolls info
-        List<UnitModel> unitsWithExtraRolls = units.keySet().stream()
-                .filter(unit -> extraRolls.containsKey(unit.getAsyncId()))
-                .toList();
-        if (!extraRolls.isEmpty()) {
-            result += "With ";
-            List<String> extraRollMessages = new ArrayList<>();
-            for (UnitModel unit : unitsWithExtraRolls) {
-                String plusPrefix = "+";
-                Integer numExtraRolls = extraRolls.get(unit.getAsyncId());
-                String unitAsnycEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
-                if (numExtraRolls < 0) {
-                    plusPrefix = "";
-                }
-                extraRollMessages.add(String.format("%s%s rolls for %s", plusPrefix, numExtraRolls, unitAsnycEmoji));
-            }
-            result += String.join(", ", extraRollMessages) + "\n";
-        }
+        result += CombatModHelper.GetModifiersText("With automatic extra rolls: \n", units, extraRolls);
 
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
+        List<UnitModel> unitsList = new ArrayList<>(units.keySet());
         for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
             int toHit = unit.getCombatDieHitsOnForAbility(rollType);
-            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeGame);
-            int extraRollsForUnit = 0;
-            if (extraRolls.containsKey(unit.getAsyncId())) {
-                extraRollsForUnit = extraRolls.get(unit.getAsyncId());
-            }
+            int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, mods, player, opponent, activeGame,
+                    unitsList, rollType);
+            int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, extraRolls, player, opponent,
+                    activeGame, unitsList, rollType);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             int[] resultRolls = new int[numRolls];
@@ -302,10 +287,19 @@ public class CombatHelper {
                 rollsSuffix = "s";
             }
 
-            String unitTypeHitsInfo = String.format("hits on %s", toHit);
-            if (unit.getCombatDieCountForAbility(rollType) > 1) {
-                unitTypeHitsInfo = String.format("%s rolls, hits on %s", unit.getCombatDieCountForAbility(rollType), toHit);
+            // Rolls str fragment
+            String unitRollsTextInfo = "";
+            int totalRolls = unit.getCombatDieCountForAbility(rollType) + extraRollsForUnit;
+            if (totalRolls > 1) {
+                unitRollsTextInfo = String.format(" %s rolls, ", unit.getCombatDieCountForAbility(rollType), toHit);
+                if (extraRollsForUnit > 0) {
+                    unitRollsTextInfo = String.format(" %s rolls (+%s rolls), ",
+                            unit.getCombatDieCountForAbility(rollType),
+                            extraRollsForUnit);
+                }
             }
+
+            String unitTypeHitsInfo = String.format("hits on %s", toHit);
             if (modifierToHit != 0) {
                 String modifierToHitString = Integer.toString(modifierToHit);
                 if (modifierToHit > 0) {
@@ -315,27 +309,18 @@ public class CombatHelper {
                 if ((toHit - modifierToHit) <= 1) {
                     unitTypeHitsInfo = String.format("always hits (%s mods)",
                             modifierToHitString);
-                    if (unit.getCombatDieCountForAbility(rollType) > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, always hits (%s mods)", unit.getCombatDieCountForAbility(rollType),
-                                modifierToHitString);
-                    }
                 } else {
                     unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifierToHit),
                             modifierToHitString);
-                    if (unit.getCombatDieCountForAbility(rollType) > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, hits on %s (%s mods)", unit.getCombatDieCountForAbility(rollType),
-                                (toHit - modifierToHit), modifierToHitString);
-                    }
                 }
-
             }
             String upgradedUnitName = "";
             if (!StringUtils.isBlank(unit.getUpgradesFromUnitId()) || !StringUtils.isBlank(unit.getFaction())) {
                 upgradedUnitName = String.format(" %s", unit.getName());
             }
             String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
-            resultBuilder.append(String.format("%s %s%s %s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
-                unitTypeHitsInfo,
+            resultBuilder.append(String.format("%s %s%s%s%s %s - %s hit%s\n", numOfUnit, unitEmoji, upgradedUnitName,
+                    unitRollsTextInfo, unitTypeHitsInfo,
                 Arrays.toString(resultRolls), hitRolls.length, rollsSuffix));
         }
         result = resultBuilder.toString();

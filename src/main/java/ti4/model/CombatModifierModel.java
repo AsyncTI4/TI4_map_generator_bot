@@ -1,10 +1,12 @@
 package ti4.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
+import ti4.helpers.CombatRollType;
 
 @Data
 public class CombatModifierModel implements ModelInterface {
@@ -33,7 +35,7 @@ public class CombatModifierModel implements ModelInterface {
             && related.getType().equals(relatedType));
     }
 
-    public Boolean isInScopeForUnit(UnitModel unit) {
+    public Boolean isInScopeForUnit(UnitModel unit, List<UnitModel> allUnits, CombatRollType rollType) {
         boolean isInScope = false;
         if (scopeExcept != null) {
             if (!scopeExcept.equals(unit.getAsyncId())) {
@@ -44,6 +46,12 @@ public class CombatModifierModel implements ModelInterface {
                     || "all".equals(scope)
                     || scope.equals(unit.getAsyncId())) {
                 isInScope = true;
+            }
+            if ("_best_".equals(scope)) {
+                List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
+                sortedAllUnits.sort(
+                        (a, b) -> a.getCombatDieHitsOnForAbility(rollType) - b.getCombatDieHitsOnForAbility(rollType));
+                isInScope = sortedAllUnits.get(0).getAsyncId() == unit.getAsyncId();
             }
         }
         return isInScope;
