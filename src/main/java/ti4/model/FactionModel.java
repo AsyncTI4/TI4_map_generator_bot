@@ -16,6 +16,7 @@ public class FactionModel implements ModelInterface {
     private List<String> leaders;
     private List<String> promissoryNotes;
     private List<String> units;
+    private String source;
 
   public boolean isValid() {
         return alias != null
@@ -49,6 +50,10 @@ public class FactionModel implements ModelInterface {
 
     public int getCommodities() {
         return commodities;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public List<String> getFactionTech() {
