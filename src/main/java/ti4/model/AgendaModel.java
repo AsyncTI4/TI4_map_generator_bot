@@ -52,7 +52,7 @@ public class AgendaModel implements ModelInterface {
     }
 
     public String getCategory() {
-        return category;
+        return Optional.ofNullable(category).orElse("");
     }
 
     public String getCategoryDescription() {
