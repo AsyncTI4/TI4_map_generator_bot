@@ -31,7 +31,7 @@ public class ListTechs extends HelpSubcommandData {
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
-            String threadName = "/help list_techs" + (searchString == null ? "" : " search: " + searchString);
+            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
         } else if (messageEmbeds.size() > 0) {
             event.getChannel().sendMessageEmbeds(messageEmbeds).queue();

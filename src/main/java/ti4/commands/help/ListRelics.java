@@ -34,7 +34,7 @@ public class ListRelics extends HelpSubcommandData {
             }
         }
         if (messageEmbeds.size() > 3) {
-            String threadName = "/help list_relics" + (searchString == null ? "" : " search: " + searchString);
+            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
         } else if (messageEmbeds.size() > 0) {
             event.getChannel().sendMessageEmbeds(messageEmbeds).queue();

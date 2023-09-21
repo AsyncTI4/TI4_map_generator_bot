@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
@@ -34,6 +35,7 @@ public class ListTiles extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         if (!event.getChannel().getType().isThread()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please use this command in a thread.");
+            //TODO: Allow sending from channel by creating thread if requried
             return;
         }
 
@@ -46,9 +48,7 @@ public class ListTiles extends HelpSubcommandData {
 
         for (TileModel tile : tiles) {
             MessageEmbed tileEmbed = tile.getHelpMessageEmbed(includeAliases);
-            if (searchString == null || tileEmbed.getTitle().toLowerCase().contains(searchString.toLowerCase()) || (tile.getAliases() != null && tile.getAliases().toString().toLowerCase().contains(searchString.toLowerCase()))) {
-                tileEmbeds.add(Map.entry(tile, tileEmbed));
-            }
+            if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed)); 
         }
 
         List<MessageCreateAction> messageCreateActions = new ArrayList<>();

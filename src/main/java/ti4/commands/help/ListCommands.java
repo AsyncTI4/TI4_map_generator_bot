@@ -70,7 +70,7 @@ public class ListCommands extends HelpSubcommandData {
         }
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String threadName = "/help list_commands" + searchDescription;
+        String threadName = event.getFullCommandName() + searchDescription;
         MessageHelper.sendMessageToThread(event.getChannel(), threadName, sb.toString());
     }
 }
