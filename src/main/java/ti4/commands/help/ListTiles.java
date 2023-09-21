@@ -6,10 +6,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.ListUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,22 +40,26 @@ public class ListTiles extends HelpSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!event.getChannel().getType().isThread()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please use this command in a thread.");
-            //TODO: Allow sending from channel by creating thread if requried
-            return;
-        }
-
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);      
 
-        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().sorted(Comparator.comparing(TileModel::getId)).toList();
-
+        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> TileHelper.isValidTile(searchString) ? searchString.equals(tile.getId()) : true).sorted(Comparator.comparing(TileModel::getId)).toList();
+        MessageChannel channel = event.getMessageChannel();
+        
+        
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
-
+        
         for (TileModel tile : tiles) {
             MessageEmbed tileEmbed = tile.getHelpMessageEmbed(includeAliases);
             if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed)); 
+        }
+
+        CompletableFuture<ThreadChannel> futureThread = null;
+        if (tileEmbeds.size() > 3) {
+            if (event.getChannel() instanceof TextChannel) {
+                String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
+                futureThread = ((TextChannel) channel).createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).submitAfter(1, TimeUnit.SECONDS);
+            }
         }
 
         List<MessageCreateAction> messageCreateActions = new ArrayList<>();
@@ -61,13 +72,15 @@ public class ListTiles extends HelpSubcommandData {
                 messageEmbeds.add(entry.getValue());
                 try {
                     File file = new File(entry.getKey().getTilePath());
-                    fileUploads.add(FileUpload.fromData(file, entry.getKey().getImagePath()));
+                    if (file.exists()) fileUploads.add(FileUpload.fromData(file, entry.getKey().getImagePath()));
                 } catch (Exception e) {
                     BotLogger.log("Error finding image file for tile: " + entry.getKey().getImagePath(), e);
                 }
             }
 
-            messageCreateActions.add(event.getMessageChannel().sendMessageEmbeds(messageEmbeds).addFiles(fileUploads));
+            if (futureThread != null && !futureThread.isDone()) channel = futureThread.join();
+
+            messageCreateActions.add(channel.sendMessageEmbeds(messageEmbeds).addFiles(fileUploads));
         }
 
         for (MessageCreateAction messageCreateAction : messageCreateActions) {
