@@ -15,6 +15,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 
 public class TechInfo extends TechSubcommandData {
@@ -64,12 +65,10 @@ public class TechInfo extends TechSubcommandData {
     private static String getTechInfoText(Player player) {
         List<String> playerTechs = player.getTechs();
         StringBuilder sb = new StringBuilder("__**Tech Info**__\n");
-        if (playerTechs == null || playerTechs.isEmpty()) {
+        if (playerTechs.isEmpty()) {
             sb.append("> No Techs");
-            return sb.toString();
         }
 
-        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : playerTechs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
@@ -84,8 +83,8 @@ public class TechInfo extends TechSubcommandData {
         for (Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
             List<String> list = entry.getValue();
             list.sort((tech1, tech2) -> {
-                TechnologyModel tech1Info = techInfo.get(tech1);
-                TechnologyModel tech2Info = techInfo.get(tech2);
+                TechnologyModel tech1Info = Mapper.getTech(tech1);
+                TechnologyModel tech2Info = Mapper.getTech(tech2);
                 return TechnologyModel.sortTechsByRequirements(tech1Info, tech2Info);
             });
         }
@@ -93,6 +92,17 @@ public class TechInfo extends TechSubcommandData {
         for (List<String> techList : techsFiltered.values()) {
             for (String techID : techList) {
                 sb.append(Helper.getTechRepresentationLong(techID));
+            }
+        }
+
+        FactionModel factionModel = Mapper.getFactionSetup(player.getFaction());
+        if (factionModel != null) {
+            List<String> notResearchedFactionTechs = factionModel.getFactionTech().stream().filter(techID -> !playerTechs.contains(techID)).toList();
+            if (!notResearchedFactionTechs.isEmpty()) {
+                sb.append("\n__**Faction Tech (Not Yet Researched)**__\n");
+                for (String techID : notResearchedFactionTechs) {
+                    sb.append(Helper.getTechRepresentationLong(techID));
+                }
             }
         }
 
