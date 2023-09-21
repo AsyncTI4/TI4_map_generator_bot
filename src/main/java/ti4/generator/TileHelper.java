@@ -124,4 +124,12 @@ public class TileHelper {
             }
         });
     }
+
+    public static boolean isValidTile(String tileID) {
+        return allTiles.containsKey(tileID);
+    }
+
+    public static boolean isValidPlanet(String planetID) {
+        return allPlanets.containsKey(planetID);
+    }
 }

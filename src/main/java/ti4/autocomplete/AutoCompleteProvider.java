@@ -734,8 +734,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = tiles.stream()
                                 .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
