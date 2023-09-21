@@ -15,14 +15,12 @@ import ti4.message.MessageHelper;
 public class ListCommands extends HelpSubcommandData {
     public ListCommands() {
         super(Constants.LIST_COMMANDS, "List all of the bot's commands and subcommands");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SUBCOMMANDS, "True to include subcommands"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        boolean includeSubcommands = event.getOption(Constants.INCLUDE_SUBCOMMANDS, false, OptionMapping::getAsBoolean);
         boolean includeOptions = event.getOption(Constants.INCLUDE_OPTIONS, false, OptionMapping::getAsBoolean);
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
@@ -36,10 +34,9 @@ public class ListCommands extends HelpSubcommandData {
             List<Subcommand> subcommands = command.getSubcommands();
             int subcommandCount = subcommands.size();
             List<Option> options = command.getOptions();
-            int optionCount = options.size();
 
             String commandText = "`/" + command.getFullCommandName() + "` : **" + command.getDescription() + "**";
-            if (searchString == null || commandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(commandText).append(" (").append(subcommandCount).append("/25)\n");
+            if (searchString == null || subcommands.stream().anyMatch(s -> s.getFullCommandName().toLowerCase().contains(searchString) || s.getDescription().toLowerCase().contains(searchString))) sb.append(commandText).append(" (").append(subcommandCount).append("/25)\n");
             commandCount++;
 
             //COMMAND OPTIONS
@@ -51,19 +48,17 @@ public class ListCommands extends HelpSubcommandData {
             }
 
             //SUBCOMMANDS
-            if (includeSubcommands) {
-                for (Subcommand subcommand : subcommands) {
-                    String subcommandText = "> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription();
-                    if (searchString == null || subcommandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(subcommandText).append("\n");
-                    subcommandCount++;
+            for (Subcommand subcommand : subcommands) {
+                String subcommandText = "> `/" + subcommand.getFullCommandName() + "` : " + subcommand.getDescription();
+                if (searchString == null || subcommandText.toLowerCase().contains(searchString.toLowerCase())) sb.append(subcommandText).append("\n");
+                subcommandCount++;
 
-                    //SUBCOMMAND OPTIONS
-                    if (includeOptions) {
-                        List<Option> suboptions = subcommand.getOptions();
-                        for (Option option : suboptions) {
-                            String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
-                            if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) sb.append(optionText).append("\n");
-                        }
+                //SUBCOMMAND OPTIONS
+                if (includeOptions) {
+                    List<Option> suboptions = subcommand.getOptions();
+                    for (Option option : suboptions) {
+                        String optionText = "> `     " + option.getName() + "` : " + option.getDescription();
+                        if (searchString == null || optionText.toLowerCase().contains(searchString.toLowerCase())) sb.append(optionText).append("\n");
                     }
                 }
             }
