@@ -76,7 +76,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if(player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame)){
+                    if(player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_)){
                         String msg2 = Helper.getPlayerRepresentation(player_, activeGame) + " lost shard and lost a victory point. "+Helper.getPlayerRepresentation(player, activeGame) +" gained shard and a victory point.";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
                         player_.removeRelic("shard");
