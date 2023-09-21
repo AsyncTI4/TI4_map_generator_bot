@@ -426,6 +426,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("assignSpeaker_")) {
+            String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
+            if (activeGame != null && !activeGame.isFoWMode()) {
+                for (Player player_ : activeGame.getPlayers().values()) {
+                    if (player_.getFaction().equals(faction)) {
+                        activeGame.setSpeaker(player_.getUserID());
+                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player_, activeGame);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    }
+                }
+            }
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("reveal_stage_")) {
             String lastC = buttonID.replace("reveal_stage_", "");
             if ("2".equalsIgnoreCase(lastC)) {
@@ -2189,11 +2201,11 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     if (speaker == null) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button (command is /player stats speaker:y)");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button.");
+                        ButtonHelper.offerSpeakerButtons(activeGame, player);
                         return;
                     }
-                    new RevealStage1().revealS1(event, activeGame.getMainGameChannel());
-                    new RevealStage1().revealS1(event, activeGame.getMainGameChannel());
+                    RevealStage1.revealTwoStage1(event, activeGame.getMainGameChannel());
                     ButtonHelper.startStrategyPhase(event, activeGame);
                     event.getMessage().delete().queue();
                 }

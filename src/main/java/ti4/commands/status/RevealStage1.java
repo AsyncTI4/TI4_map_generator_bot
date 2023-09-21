@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +14,7 @@ import ti4.model.PublicObjectiveModel;
 
 public class RevealStage1 extends StatusSubcommandData {
     public RevealStage1() {
-        super(Constants.REVEAL_STATGE1, "Reveal Stage1 Public Objective");
+        super(Constants.REVEAL_STAGE1, "Reveal Stage1 Public Objective");
     }
 
     @Override
@@ -26,13 +27,21 @@ public class RevealStage1 extends StatusSubcommandData {
 
         Map.Entry<String, Integer> objective = activeGame.revealState1();
 
-
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-      String sb = Helper.getGamePing(event, activeGame) +
-          " **Stage 1 Public Objective Revealed**" + "\n" +
-          "(" + objective.getValue() + ") " +
-          po.getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannelAndPin(channel, sb);
+        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 1 Public Objective Revealed**");
+        channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
+    }
+
+    public static void revealTwoStage1(GenericInteractionCreateEvent event, MessageChannel channel) {
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+
+        Map.Entry<String, Integer> objective1 = activeGame.revealState1();
+        Map.Entry<String, Integer> objective2 = activeGame.revealState1();
+
+        PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
+        PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
+        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 1 Public Objectives Revealed**");
+        channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed())).queue(m -> m.pin().queue());
     }
 
     @Override

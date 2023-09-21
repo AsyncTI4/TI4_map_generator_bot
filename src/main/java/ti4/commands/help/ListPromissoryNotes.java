@@ -31,7 +31,7 @@ public class ListPromissoryNotes extends HelpSubcommandData {
         String searchDescription = searchString == null ? "" : " search: " + searchString;
         String message = "**__Promissory Note List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 5) {
-            String threadName = "/help list_promissory_notes" + searchDescription;
+            String threadName = event.getFullCommandName() + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
         } else if (searchedList.size() > 0) {
             event.getChannel().sendMessage(message).queue();

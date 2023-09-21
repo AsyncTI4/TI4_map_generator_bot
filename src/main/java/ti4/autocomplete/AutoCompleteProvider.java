@@ -734,8 +734,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = tiles.stream()
                                 .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -779,8 +778,7 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = techs.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -792,6 +790,21 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, String> abilities = new HashMap<>(Mapper.getFactionAbilities());
                         List<Command.Choice> options = abilities.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getKey())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+            case Constants.LIST_EXPLORES -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, String> explores = new HashMap<>(Mapper.getExplores());
+                        List<Command.Choice> options = explores.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
                                 .map(value -> value.getKey())
@@ -866,6 +879,21 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>(Mapper.getPublicObjectives());
                         List<Command.Choice> options = publicObjectives.entrySet().stream()
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> value.getValue().getName())
+                                .map(value -> new Command.Choice(value, value))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+            case Constants.LIST_PROMISSORY_NOTES -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>(Mapper.getPromissoryNotes());
+                        List<Command.Choice> options = promissoryNotes.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
                                 .map(value -> value.getValue().getName())

@@ -4308,4 +4308,26 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
     }
 
+    public static void offerSpeakerButtons(Game activeGame, Player player) {
+        String assignSpeakerMessage = "Please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+        List<Button> assignSpeakerActionRow = getAssignSpeakerButtons(activeGame);
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
+    }
+
+    private static List<Button> getAssignSpeakerButtons(Game activeGame) {
+        List<Button> assignSpeakerButtons = new ArrayList<>();
+        for (Player player : activeGame.getPlayers().values()) {
+            if (player.isRealPlayer() && !player.getUserID().equals(activeGame.getSpeaker())) {
+                String faction = player.getFaction();
+                if (faction != null && Mapper.isFaction(faction)) {
+                    Button button = Button.secondary("assignSpeaker_" + faction, " ");
+                    String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                    assignSpeakerButtons.add(button);
+                }
+            }
+        }
+        return assignSpeakerButtons;
+    }
+
 }
