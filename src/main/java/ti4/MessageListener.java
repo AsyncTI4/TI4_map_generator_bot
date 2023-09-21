@@ -251,12 +251,27 @@ public class MessageListener extends ListenerAdapter {
 
     private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
         if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
+            try{
+                    MessageHistory mHistory = event.getChannel().getHistory();
+                    RestAction<List<Message>> lis = mHistory.retrievePast(4);
+                    boolean allNonBots = true;
+                    for(Message m : lis.complete()){
+                        if(m.getAuthor().isBot() || m.getReactions().size() > 0){
+                            allNonBots = false;
+                            break;
+                        }
+                    }
+                    if(allNonBots){
+                        event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+                    }
+                }catch (Exception e){
+                    BotLogger.log("Reading previous message", e);
+                }
            // event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
         }
 
         if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
             String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
-            String message2 = msg.getContentRaw();
 			
 			Game activeGame = GameManager.getInstance().getGame(gameName);
             if(activeGame != null && activeGame.getBotFactionReacts() && !activeGame.isFoWMode()){
