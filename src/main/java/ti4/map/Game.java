@@ -58,6 +58,7 @@ public class Game {
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
+    @Getter @Setter
     private int mapImageGenerationCount;
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
@@ -119,6 +120,9 @@ public class Game {
     @Getter
     @Setter
     private String agendaDeckID = "agendas_pok";
+    @Getter
+    @Setter
+    private String eventDeckID = null;
     @Getter
     @Setter
     private String explorationDeckID = "explores_pok";
@@ -187,6 +191,10 @@ public class Game {
     private String currentACDrawStatusInfo = "";
     private boolean hasHackElectionBeenPlayed;
     private List<String> agendas;
+    @Getter
+    private List<String> events;
+    @Getter
+    private List<String> discardedEvents = new ArrayList<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
@@ -226,6 +234,7 @@ public class Game {
         publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getNewShuffledDeck();
         publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
         agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
+        events = new ArrayList<>();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
 
         addCustomPO(Constants.CUSTODIAN, 1);
@@ -993,6 +1002,10 @@ public class Game {
         return identifier;
     }
 
+    public void discardEvent(String eventID) {
+        discardedEvents.add(eventID);
+    }
+
     public void addRevealedPublicObjective(String id) {
         Collection<Integer> values = revealedPublicObjectives.values();
         int identifier = 0;
@@ -1447,13 +1460,31 @@ public class Game {
         this.agendas = agendas;
     }
 
+    public void setEvents(List<String> events) {
+        this.events = events;
+    }
+
     public void shuffleAgendas() {
         Collections.shuffle(agendas);
+    }
+
+    public void shuffleEvents() {
+        Collections.shuffle(events);
     }
 
     public void resetAgendas() {
         agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
         discardAgendas = new LinkedHashMap<>();
+    }
+
+    public void resetEvents() {
+        DeckModel eventDeckModel = Mapper.getDecks().get(getEventDeckID());
+        if (eventDeckModel == null) {
+            events = new ArrayList<>();
+        } else {
+            events = eventDeckModel.getNewShuffledDeck();
+        }
+        discardedEvents = new ArrayList<>();
     }
 
     public void resetDrawStateAgendas() {
@@ -1463,6 +1494,10 @@ public class Game {
     @JsonSetter
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
+    }
+
+    public void setDiscardedEvents(List<String> discardedEvents) {
+        this.discardedEvents = discardedEvents;
     }
 
     public void setDiscardAgendas(List<String> discardAgendasList) {
@@ -1563,7 +1598,7 @@ public class Game {
         return false;
     }
 
-    public boolean shuffleBackIntoDeck(Integer idNumber) {
+    public boolean shuffleAgendaBackIntoDeck(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
@@ -1580,7 +1615,7 @@ public class Game {
         return false;
     }
 
-    public boolean putBackIntoDeckOnTop(Integer idNumber) {
+    public boolean putAgendaBackIntoDeckOnTop(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
@@ -1595,7 +1630,7 @@ public class Game {
         }
         return false;
     }
-    public boolean putBackIntoDeckOnTop(String id) {
+    public boolean putAgendaBackIntoDeckOnTop(String id) {
         if (!id.isEmpty()) {
             discardAgendas.remove(id);
             agendas.add(0, id);
@@ -1702,7 +1737,6 @@ public class Game {
     }
 
     public boolean discardSpecificAgenda(String agendaID) {
-
         boolean succeeded = agendas.remove(agendaID);
         if (succeeded) {
             addDiscardAgenda(agendaID);
@@ -2221,6 +2255,16 @@ public class Game {
         return true;
     }
 
+    public boolean validateAndSetEventDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        if (getDiscardedEvents().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change event deck while there are events in the discard pile.");
+            return false;
+        }
+        setEventDeckID(deck.getAlias());
+        setEvents(deck.getNewShuffledDeck());
+        return true;
+    }
+
     @JsonSetter
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
         this.discardActionCards = discardActionCards;
@@ -2571,14 +2615,6 @@ public class Game {
         return leaders;
     }
 
-    public int getMapImageGenerationCount() {
-        return mapImageGenerationCount;
-    }
-
-    public int setMapImageGenerationCount(int mapImageGenerationCount) {
-        return this.mapImageGenerationCount = mapImageGenerationCount;
-    }
-
     public void incrementMapImageGenerationCount() {
         mapImageGenerationCount++;
     }
@@ -2616,6 +2652,16 @@ public class Game {
     public int getAgendaFullDeckSize() {
         DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
         if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
+        return -1;
+    }
+
+    public int getEventDeckSize() {
+        return getEvents().size();
+    }
+
+    public int getEventFullDeckSize() {
+        DeckModel eventDeckModel = Mapper.getDeck(getEventDeckID());
+        if (eventDeckModel != null) return eventDeckModel.getCardCount();
         return -1;
     }
 

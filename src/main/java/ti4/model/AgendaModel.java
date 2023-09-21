@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -29,13 +30,12 @@ public class AgendaModel implements ModelInterface {
     }
 
     private boolean validateCategory() {
-        if (category == null) return true;
-        switch (category) {
+        switch (getCategory()) {
             case "faction" -> {
-                return Mapper.isFaction(categoryDescription);
+                return Mapper.isFaction(getCategoryDescription());
             }
             case "event" -> {
-                return List.of("immediate", "permanent", "temporary").stream().anyMatch(s -> s.equalsIgnoreCase(categoryDescription));
+                return List.of("immediate", "permanent", "temporary").stream().anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -56,31 +56,31 @@ public class AgendaModel implements ModelInterface {
     }
 
     public String getCategoryDescription() {
-        return categoryDescription;
+        return Optional.ofNullable(categoryDescription).orElse("");
     }
 
     public String getType() {
-        return type;
+        return Optional.ofNullable(type).orElse("");
     }
 
     public String getTarget() {
-        return target;
+        return Optional.ofNullable(target).orElse("");
     }
 
     public String getText1() {
-        return text1;
+        return Optional.ofNullable(text1).orElse("");
     }
 
     public String getText2() {
-        return text2;
+        return Optional.ofNullable(text2).orElse("");
     }
 
     public String getMapText() {
-        return mapText;
+        return Optional.ofNullable(mapText).orElse("");
     }
 
     public String getSource() {
-        return source;
+        return Optional.ofNullable(source).orElse("");
     }
 
     public String getSourceEmoji() {
@@ -112,12 +112,12 @@ public class AgendaModel implements ModelInterface {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (text1.length() > 0) {
-            String arg = text1.replace("For:", "**For:**");
+        if (getText1().length() > 0) {
+            String arg = getText1().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }
-        if (text2.length() > 0) {
-            String arg = text2.replace("Against:", "**Against:**");
+        if (getText2().length() > 0) {
+            String arg = getText2().replace("Against:", "**Against:**");
             sb.append("> ").append(arg).append("\n");
         }
         if (footnote() != null) sb.append(footnote());
