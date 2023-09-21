@@ -13,7 +13,7 @@ import ti4.model.PublicObjectiveModel;
 
 public class RevealStage2 extends StatusSubcommandData {
     public RevealStage2() {
-        super(Constants.REVEAL_STATGE2, "Reveal Stage2 Public Objective");
+        super(Constants.REVEAL_STAGE2, "Reveal Stage2 Public Objective");
     }
 
     @Override
@@ -26,11 +26,8 @@ public class RevealStage2 extends StatusSubcommandData {
         Map.Entry<String, Integer> objective = activeGame.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-      String sb = Helper.getGamePing(event, activeGame) +
-          " **Stage 2 Public Objective Revealed**" + "\n" +
-          "(" + objective.getValue() + ") " +
-          po.getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannelAndPin(channel, sb);
+        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 2 Public Objective Revealed**");
+        channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 
     @Override

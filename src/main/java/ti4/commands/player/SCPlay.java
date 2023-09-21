@@ -285,7 +285,7 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, noFollowButton, draw_2_ac);
     }
 
-    private List<Button> getPoliticsAssignSpeakerButtons(Game activeGame) {
+    private static List<Button> getPoliticsAssignSpeakerButtons(Game activeGame) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : activeGame.getPlayers().values()) {
             if (player.isRealPlayer() && !player.getUserID().equals(activeGame.getSpeaker())) {

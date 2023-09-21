@@ -24,14 +24,19 @@ public class ListTechs extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
+        if (Mapper.isValidTech(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true)).queue();
+            return;
+        }
+
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
         for (TechnologyModel techModel : Mapper.getTechs().values().stream().sorted(TechnologyModel.sortByTechRequirements).toList()) {
             MessageEmbed representationEmbed = techModel.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
-            String threadName = "/help list_techs" + (searchString == null ? "" : " search: " + searchString);
+            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
         } else if (messageEmbeds.size() > 0) {
             event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
