@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -1622,22 +1623,13 @@ public class Helper {
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
         List<Button> techButtons = new ArrayList<>();
 
-        techs.sort((tech1, tech2) -> {
-            int req1 = tech1.getRequirements().length();
-            int req2 = tech2.getRequirements().length();
-            if (req1 < req2) {
-                return -1;
-            }
-            if (req2 < req1) {
-                return 1;
-            }
-            return tech1.getName().compareTo(tech2.getName());
-        });
+        techs.sort(TechnologyModel.sortByTechRequirements);
 
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
             String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
             Button techB;
+            String requirementsEmoji = tech.getRequirementsEmoji();
             switch (techType) {
                 case "propulsion" -> {
                     techB = Button.primary(buttonID, techName);
@@ -2098,5 +2090,21 @@ public class Helper {
         } else {
             return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
         }
+    }
+
+    public static boolean embedContainsSearchTerm(MessageEmbed messageEmbed, String searchString) {
+        if (messageEmbed == null) return false;
+        if (searchString == null) return true;
+        searchString = searchString.toLowerCase();
+
+        if (messageEmbed.getTitle() != null && messageEmbed.getTitle().toLowerCase().contains(searchString)) return true;
+        if (messageEmbed.getDescription() != null && messageEmbed.getDescription().toLowerCase().contains(searchString)) return true;
+        if (messageEmbed.getFooter() != null && messageEmbed.getFooter().getText() != null && messageEmbed.getFooter().getText().toLowerCase().contains(searchString)) return true;
+        for (MessageEmbed.Field field : messageEmbed.getFields()) {
+            if (field.getName() != null && field.getName().toLowerCase().contains(searchString)) return true;
+            if (field.getValue() != null && field.getValue().toLowerCase().contains(searchString)) return true;
+        }
+
+        return false;
     }
 }
