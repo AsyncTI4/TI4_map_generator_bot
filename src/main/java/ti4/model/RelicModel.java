@@ -40,13 +40,13 @@ public class RelicModel implements ModelInterface {
     }
 
     @JsonIgnore
-    public MessageEmbed getRepresentationEmbed() {
+    public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = getName() == null ? "" : getName();
         eb.setTitle(Emojis.Relic + "__" + name + "__" + getSourceEmoji(), null);
         eb.setColor(Color.yellow);
         eb.setDescription(getText());
-        eb.setFooter("ID: " + getAlias());
+        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
     }
 }
