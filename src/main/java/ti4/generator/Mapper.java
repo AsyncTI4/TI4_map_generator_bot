@@ -663,7 +663,7 @@ public class Mapper {
     }
 
     public static boolean isRelic(String relicID) {
-        return relics.containsKey(relicID.toLowerCase());
+        return relics.containsKey(relicID);
     }
 
     public static HashMap<String, AgendaModel> getAgendas() {
