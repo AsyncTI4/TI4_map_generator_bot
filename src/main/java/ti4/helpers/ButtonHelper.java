@@ -3900,9 +3900,16 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                     if(tiles.isEmpty()){
                         tiles = getTilesOfPlayersSpecificUnit(activeGame, p1, "cabalspacedock");
                     }
+                    if(p1.hasUnit("ghoti_flagship")){
+                        tiles.addAll(getTilesOfPlayersSpecificUnit(activeGame, p1, "flagship"));
+                    }
+                    List<String> pos2 = new ArrayList<String>();
                     for(Tile tile : tiles){
-                        Button tileButton = Button.success("produceOneUnitInTile_"+tile.getPosition()+"_sling", tile.getRepresentationForButtons(activeGame,p1));
-                        buttons.add(tileButton);
+                        if(!pos2.contains(tile.getPosition())){
+                            Button tileButton = Button.success("produceOneUnitInTile_"+tile.getPosition()+"_sling", tile.getRepresentationForButtons(activeGame,p1));
+                            buttons.add(tileButton);
+                            pos2.add(tile.getPosition());
+                        }
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to sling in.", buttons);
                 }
