@@ -2,7 +2,6 @@ package ti4.model;
 
 import java.awt.Color;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,12 +24,10 @@ public class RelicModel implements ModelInterface {
             && source != null;
     }
 
-    @JsonIgnore
     public String getSimpleRepresentation() {
         return getSourceEmoji() + String.format("**%s**: %s *(%s)*", getName(), getText(), getSource());
     }
 
-    @JsonIgnore
     public String getSourceEmoji() {
         return switch (source) {
             case "absol" -> Emojis.Absol;
@@ -39,7 +36,10 @@ public class RelicModel implements ModelInterface {
         };
     }
 
-    @JsonIgnore
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = getName() == null ? "" : getName();

@@ -5,7 +5,6 @@ import java.util.Comparator;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 public class PublicObjectiveModel implements ModelInterface {
@@ -60,6 +59,10 @@ public class PublicObjectiveModel implements ModelInterface {
             return po1.getPoints() < po2.getPoints() ? -1 : 1;
         }
     };
+
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
