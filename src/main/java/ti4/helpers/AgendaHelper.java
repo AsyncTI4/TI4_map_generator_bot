@@ -1505,7 +1505,7 @@ public class AgendaHelper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Button.success("refresh_" + planet,
+            Button button = Button.success("refresh_" + planet + "_"+player.getFaction(),
                 StringUtils.capitalize(planet) + "(" + Helper.getPlanetResources(planet, activeGame) + "/" + Helper.getPlanetInfluence(planet, activeGame) + ")");
             planetButtons.add(button);
         }

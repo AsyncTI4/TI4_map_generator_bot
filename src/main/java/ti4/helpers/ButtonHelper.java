@@ -711,7 +711,7 @@ public class ButtonHelper {
      public static  List<Button> getXxchaAgentReadyButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for(String planet : player.getExhaustedPlanets()){
-            buttons.add(Button.success("refresh_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeGame)));
+            buttons.add(Button.success("refresh_"+planet+ "_"+player.getFaction(), "Ready "+Helper.getPlanetRepresentation(planet, activeGame)));
         }
         buttons.add(Button.danger("deleteButtons_spitItOut", "Delete These Buttons"));
         return buttons;
@@ -1410,13 +1410,24 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static boolean isPlanetLegendaryOrHome(String planetName, Game activeGame){
+    public static boolean isPlanetLegendaryOrHome(String planetName, Game activeGame, boolean onlyIncludeYourHome, Player p1){
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, activeGame);
         Planet planetHolder = (Planet) unitHolder;
         boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary"));
         boolean oneOfThree = planetHolder.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType()) || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
         if(!planetHolder.getName().toLowerCase().contains("rex") && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree){
-            hasAbility = true;
+            if(onlyIncludeYourHome && p1 != null && p1.getPlayerStatsAnchorPosition() != null){
+
+                if(Helper.getTileFromPlanet(planetName, activeGame).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())){
+                    hasAbility = true;
+                }
+                if(p1.getFaction().equalsIgnoreCase("ghost") && planetName.equalsIgnoreCase("creuss")){
+                    hasAbility = true;
+                }
+            }else{
+                hasAbility = true;
+            }
+            
         }
         return hasAbility;
     }
@@ -2741,7 +2752,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             Tile tile = activeGame.getTileByPosition(pos);
             for(UnitHolder unitHolder : tile.getUnitHolders().values()){
                 if(unitHolder instanceof Planet planet){
-                    if(!player.getPlanets(activeGame).contains(planet.getName()) && !ButtonHelper.isPlanetLegendaryOrHome(unitHolder.getName(), activeGame) && !planet.getName().toLowerCase().contains("rex")){
+                    if(!player.getPlanets(activeGame).contains(planet.getName()) && !ButtonHelper.isPlanetLegendaryOrHome(unitHolder.getName(), activeGame, false, player) && !planet.getName().toLowerCase().contains("rex")){
                         buttons.add(Button.success(finChecker+"stellarConvert_"+planet.getName(), "Stellar Convert "+Helper.getPlanetRepresentation(planet.getName(), activeGame)));
                     }
                 }
