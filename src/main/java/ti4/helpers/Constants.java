@@ -507,9 +507,9 @@ public class Constants {
     public static final String SYSTEM = "system";
     public static final String CLEANUP = "cleanup";
     public static final String PERSONAL_CLEANUP = "personal_cleanup";
-    public static final String REVEAL_STATGE1 = "po_reveal_stage1";
-    public static final String REVEAL_SPECIFIC_STATGE1 = "reveal_specific_stage1";
-    public static final String REVEAL_SPECIFIC_STATGE2 = "reveal_specific_stage2";
+    public static final String REVEAL_STAGE1 = "po_reveal_stage1";
+    public static final String REVEAL_SPECIFIC_STAGE1 = "reveal_specific_stage1";
+    public static final String REVEAL_SPECIFIC_STAGE2 = "reveal_specific_stage2";
     public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peakable_objectives";
     public static final String NUMBER_OF_OBJECTIVES = "number_of_objectives";
     public static final String SWAP_STAGE2 = "swap_stage2";
@@ -524,7 +524,7 @@ public class Constants {
     public static final String SO_TO_PO = "so_to_po";
     public static final String REMOVE_CUSTOM = "po_remove_custom";
     public static final String DISCARD_SPECIFIC_AGENDA = "discard_specific_agenda";
-    public static final String REVEAL_STATGE2 = "po_reveal_stage2";
+    public static final String REVEAL_STAGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
     public static final String SHUFFLE_OBJECTIVE_BACK = "po_shuffle_back";
