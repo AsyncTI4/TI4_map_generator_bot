@@ -471,9 +471,10 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, List<MessageEmbed> embeds) {
+	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, String message, List<MessageEmbed> embeds) {
 			ThreadChannel channel = player.getCardsInfoThread(activeGame);
 			if (channel == null || embeds == null || embeds.isEmpty()) return;
+			splitAndSent(message, channel);
 			for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
 				channel.sendMessageEmbeds(messageEmbeds_).queue();
 			}
