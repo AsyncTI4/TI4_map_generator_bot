@@ -29,11 +29,11 @@ public class PutDiscardBackIntoDeckAgendas extends AgendaSubcommandData {
         if (option2 != null) {
             if("YES".equalsIgnoreCase(option2.getAsString()))
             {
-                success = activeGame.shuffleBackIntoDeck(option.getAsInt());
+                success = activeGame.shuffleAgendaBackIntoDeck(option.getAsInt());
             }
             else
             {
-                success = activeGame.putBackIntoDeckOnTop(option.getAsInt());
+                success = activeGame.putAgendaBackIntoDeckOnTop(option.getAsInt());
             }
         }
 

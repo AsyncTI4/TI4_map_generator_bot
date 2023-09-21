@@ -208,7 +208,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
                     "# Repealed the " + Mapper.getAgendaTitleNoCap(winner) + " law and will now reveal it for the purposes of revoting. It is technically still in effect");
                 activeGame.removeLaw(winner);
-                activeGame.putBackIntoDeckOnTop(winner);
+                activeGame.putAgendaBackIntoDeckOnTop(winner);
                 new RevealAgenda().revealAgenda(event, false, activeGame, activeGame.getMainGameChannel());
             }
             if ("mutiny".equalsIgnoreCase(agID)) {
