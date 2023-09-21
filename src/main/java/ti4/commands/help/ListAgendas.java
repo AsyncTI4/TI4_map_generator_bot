@@ -32,7 +32,7 @@ public class ListAgendas extends HelpSubcommandData {
         String searchDescription = searchString == null ? "" : " search: " + searchString;
         String message = "**__Agenda List__**" + searchDescription + "\n" + String.join("\n", searchedList);
         if (searchedList.size() > 3) {
-            String threadName = "/help list_agendas" + searchDescription;
+            String threadName = event.getFullCommandName() + searchDescription;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
         } else if (searchedList.size() > 0) {
             event.getChannel().sendMessage(message).queue();
