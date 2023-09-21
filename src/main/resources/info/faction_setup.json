@@ -1013,7 +1013,7 @@
     "homeSystem": "qulane",
     "startingFleet": "cv,2 dd,3 ff,4 inf m,sd k",
     "commodities": 2,
-    "factionTech": ["gsii", "cr"],
+    "factionTech": ["gjenspecterii", "ciqineqreceptors"],
     "startingTech": [],
     "homePlanets": ["kull", "minaluk"],
     "abilities": ["revelation", "redemption"],
