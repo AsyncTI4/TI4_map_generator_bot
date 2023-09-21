@@ -271,7 +271,7 @@ public class Emojis {
     // ANOMOLIES
     public static final String Supernova = "<:supernova:1137029705946640445>";
     public static final String Asteroid = "<:asteroidbelt:1137029604050210846>";
-    public static final String GRift = "<:grift:1136836649003782254>";
+    public static final String GravityRift = "<:grift:1136836649003782254>";
     public static final String Nebula = "<:nebula:1137029690004090900>";
 
     // TECHNOLOGY

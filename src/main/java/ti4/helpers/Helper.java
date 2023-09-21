@@ -1005,7 +1005,7 @@ public class Helper {
 
             //OTHER
             case "whalpha" -> Emojis.WHalpha;
-             case "grift" -> Emojis.GRift;
+             case "grift" -> Emojis.GravityRift;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
             case "creussalpha" -> Emojis.CreussAlpha;
