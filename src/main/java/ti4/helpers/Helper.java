@@ -2092,17 +2092,17 @@ public class Helper {
         }
     }
 
-    public static boolean embedContainsSearchTerm(MessageEmbed messageEmbed, String searchTerm) {
+    public static boolean embedContainsSearchTerm(MessageEmbed messageEmbed, String searchString) {
         if (messageEmbed == null) return false;
-        if (searchTerm == null) return true;
-        searchTerm = searchTerm.toLowerCase();
+        if (searchString == null) return true;
+        searchString = searchString.toLowerCase();
 
-        if (messageEmbed.getTitle() != null && messageEmbed.getTitle().toLowerCase().contains(searchTerm)) return true;
-        if (messageEmbed.getDescription() != null && messageEmbed.getDescription().toLowerCase().contains(searchTerm)) return true;
-        if (messageEmbed.getFooter() != null && messageEmbed.getFooter().getText() != null && messageEmbed.getFooter().getText().toLowerCase().contains(searchTerm)) return true;
+        if (messageEmbed.getTitle() != null && messageEmbed.getTitle().toLowerCase().contains(searchString)) return true;
+        if (messageEmbed.getDescription() != null && messageEmbed.getDescription().toLowerCase().contains(searchString)) return true;
+        if (messageEmbed.getFooter() != null && messageEmbed.getFooter().getText() != null && messageEmbed.getFooter().getText().toLowerCase().contains(searchString)) return true;
         for (MessageEmbed.Field field : messageEmbed.getFields()) {
-            if (field.getName() != null && field.getName().toLowerCase().contains(searchTerm)) return true;
-            if (field.getValue() != null && field.getValue().toLowerCase().contains(searchTerm)) return true;
+            if (field.getName() != null && field.getName().toLowerCase().contains(searchString)) return true;
+            if (field.getValue() != null && field.getValue().toLowerCase().contains(searchString)) return true;
         }
 
         return false;

@@ -1,8 +1,9 @@
 package ti4.commands.help;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,19 +24,17 @@ public class ListTechs extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, TechnologyModel> techList = Mapper.getTechs();
-        List<String> searchedList = techList.keySet().stream()
-            .map(technologyModel -> technologyModel + " = " + Helper.getTechRepresentationLong(technologyModel))
-            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
-            .sorted().toList();
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Tech List__**" + searchDescription + "\n" + String.join("\n", searchedList);
-        if (searchedList.size() > 3) {
-            String threadName = "/help list_techs" + searchDescription;
-            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
-        } else if (searchedList.size() > 0) {
-            event.getChannel().sendMessage(message).queue();
+        for (TechnologyModel techModel : Mapper.getTechs().values().stream().sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(true, true);
+            if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
+        }
+        if (messageEmbeds.size() > 3) {
+            String threadName = "/help list_techs" + (searchString == null ? "" : " search: " + searchString);
+            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
+        } else if (messageEmbeds.size() > 0) {
+            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
         }
     }
 }

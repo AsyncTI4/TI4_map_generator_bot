@@ -76,16 +76,17 @@ public class TechnologyModel implements ModelInterface {
         String techFaction = getFaction();
         if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
-        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji, null);
+        eb.setTitle(techEmoji  + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
 
         //DESCRIPTION
-        eb.setDescription(getText());
-
+        StringBuilder description = new StringBuilder();
+        if (includeRequirements) description.append("*Requirements: ").append(getRequirementsEmoji()).append("*\n");
+        description.append(getText());
+        eb.setDescription(description.toString());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeRequirements && !getRequirementsEmoji().isBlank()) footer.append("Requires: " + getRequirementsEmoji());
-        if (includeID) footer.append("     ID: " + getAlias());
+        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
         
         eb.setColor(getEmbedColour());
@@ -103,6 +104,14 @@ public class TechnologyModel implements ModelInterface {
         };
     }
 
+    private String getSourceEmoji() {
+        return switch (getSource()) {
+            case "absol" -> Emojis.Absol;
+            case "ds" -> Emojis.DiscordantStars;
+            default -> "";
+        };
+    }
+
     public String getRequirementsEmoji() {
         switch (getType()) {
             case PROPULSION -> {
@@ -110,7 +119,7 @@ public class TechnologyModel implements ModelInterface {
                     case "B" -> Emojis.PropulsionTech;
                     case "BB" -> Emojis.Propulsion2;
                     case "BBB" -> Emojis.Propulsion3;
-                    default -> "";
+                    default -> "None";
                 };
             }
             case CYBERNETIC -> {
@@ -118,7 +127,7 @@ public class TechnologyModel implements ModelInterface {
                     case "Y" -> Emojis.CyberneticTech;
                     case "YY" -> Emojis.Cybernetic2;
                     case "YYY" -> Emojis.Cybernetic3;
-                    default -> "";
+                    default -> "None";
                 };
             }
             case BIOTIC -> { 
@@ -126,7 +135,7 @@ public class TechnologyModel implements ModelInterface {
                     case "G" -> Emojis.BioticTech;
                     case "GG" -> Emojis.Biotic2;
                     case "GGG" -> Emojis.Biotic3;
-                    default -> "";
+                    default -> "None";
                 };
             }
             case WARFARE -> {
@@ -134,7 +143,7 @@ public class TechnologyModel implements ModelInterface {
                     case "R" -> Emojis.WarfareTech;
                     case "RR" -> Emojis.Warfare2;
                     case "RRR" -> Emojis.Warfare3;
-                    default -> "";
+                    default -> "None";
                 };
             }
             case UNITUPGRADE -> {
@@ -150,10 +159,10 @@ public class TechnologyModel implements ModelInterface {
                     case "dn2" -> Emojis.Propulsion2 + Emojis.CyberneticTech;
                     case "ws" -> Emojis.CyberneticTech + Emojis.Warfare3;
                     case "fs" -> Emojis.BioticTech + Emojis.PropulsionTech + Emojis.CyberneticTech;
-                    default -> "";
+                    default -> "None";
                 };
             }
         }
-        return "";
+        return "None";
     }
 }
