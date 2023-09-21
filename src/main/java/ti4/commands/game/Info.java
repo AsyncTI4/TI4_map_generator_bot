@@ -64,12 +64,12 @@ public class Info extends GameSubcommandData {
         }
         sb.append("Strategy Card Set: `").append(activeGame.getScSetID()).append("`").append(NEW_LINE);
         sb.append("Decks: ").append(NEW_LINE);
-        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ")
-            .append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(activeGame.getSoDeckID()).append("` ").append(activeGame.getSecretObjectiveDeckSize()).append("/").append(activeGame.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(activeGame.getStage1PublicDeckID()).append("` ").append(activeGame.getPublicObjectives1DeckSize()).append("/").append(activeGame.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(activeGame.getStage2PublicDeckID()).append("` ").append(activeGame.getPublicObjectives2DeckSize()).append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/").append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
+        if (activeGame.getEventDeckID() != null) sb.append("- ").append("").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/").append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
         sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/").append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
         sb.append("- Exploration Deck: `").append(activeGame.getExplorationDeckID()).append("`").append(NEW_LINE);
