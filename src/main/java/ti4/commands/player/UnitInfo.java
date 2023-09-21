@@ -45,13 +45,13 @@ public class UnitInfo extends PlayerSubcommandData {
     }
 
     public static void sendUnitInfo(Game activeGame, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, getUnitMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "__**Unit Info:**__", getUnitMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getUnitMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (UnitModel unitModel : player.getUnitsOwned().stream().sorted().map(Mapper::getUnit).toList()) { // Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
+        for (UnitModel unitModel : player.getUnitsOwned().stream().sorted().map(Mapper::getUnit).toList()) {
             MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(false);
             messageEmbeds.add(unitRepresentationEmbed);
         }
