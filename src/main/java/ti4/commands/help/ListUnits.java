@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
@@ -29,10 +30,8 @@ public class ListUnits extends HelpSubcommandData {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
-            MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
-            if (searchString == null || unitRepresentationEmbed.getTitle().toLowerCase().contains(searchString.toLowerCase())) {
-                messageEmbeds.add(unitRepresentationEmbed);
-            }
+            MessageEmbed representationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
+            if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
             String threadName = "/help list_units" + (searchString == null ? "" : " search: " + searchString);
