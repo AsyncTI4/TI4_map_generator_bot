@@ -14,24 +14,25 @@ import ti4.model.PublicObjectiveModel;
 
 public class RevealSpecificStage1 extends CustomSubcommandData {
     public RevealSpecificStage1() {
-        super(Constants.REVEAL_SPECIFIC_STATGE1, "PO to reveal");
+        super(Constants.REVEAL_SPECIFIC_STAGE1, "PO to reveal");
         addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public ID").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        OptionMapping soOption = event.getOption(Constants.PO_ID);
-        if (soOption == null) {
+        OptionMapping poOption = event.getOption(Constants.PO_ID);
+        if (poOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify PO");
             return;
         }
-        Map.Entry<String, Integer> objective = activeGame.revealSpecificStage1(soOption.getAsString());
+        Map.Entry<String, Integer> objective = activeGame.revealSpecificStage1(poOption.getAsString());
+        if (objective == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "PO not found");
+            return;
+        }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-      String sb = Helper.getGamePing(event, activeGame) +
-          " **Stage 1 Public Objective Revealed**" + "\n" +
-          "(" + objective.getValue() + ") " +
-          po.getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannelAndPin(activeGame.getMainGameChannel(), sb);
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getGamePing(event, activeGame) + " **Stage 1 Public Objective Revealed**");
+        event.getChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 }
