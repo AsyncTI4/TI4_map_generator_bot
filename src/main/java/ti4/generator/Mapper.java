@@ -662,6 +662,10 @@ public class Mapper {
         return new HashMap<>(relics);
     }
 
+    public static boolean isRelic(String relicID) {
+        return relics.containsKey(relicID.toLowerCase());
+    }
+
     public static HashMap<String, AgendaModel> getAgendas() {
         return new HashMap<>(agendas);
     }
