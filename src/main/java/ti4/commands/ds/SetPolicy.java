@@ -182,7 +182,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         DiscordantStarsHelper.checkOlradinMech(activeGame);
 
         AbilityInfo.sendAbilityInfo(activeGame, player, event);
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, List.of(unitModel.getUnitRepresentationEmbed(false)));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "", List.of(unitModel.getUnitRepresentationEmbed(false)));
     }
 
     public static String convertChoice(String inputChoice) {
