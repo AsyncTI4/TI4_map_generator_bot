@@ -572,8 +572,12 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("refresh_")) {
             String planetName = buttonID.split("_")[1];
-            String faction = buttonID.split("_")[2];
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = player;
+            if(StringUtils.countMatches(buttonID,"_") > 1){
+                String faction = buttonID.split("_")[2];
+                p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            }
+            
             new PlanetRefresh().doAction(p2, planetName, activeGame);
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
