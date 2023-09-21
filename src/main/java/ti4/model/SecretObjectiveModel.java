@@ -57,6 +57,10 @@ public class SecretObjectiveModel implements ModelInterface {
         }
     };
 
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 

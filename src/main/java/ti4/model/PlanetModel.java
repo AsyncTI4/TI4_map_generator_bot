@@ -38,7 +38,11 @@ public class PlanetModel {
         return Optional.ofNullable(name).orElse("");
     }
 
-    public MessageEmbed getPlanetRepresentationEmbed(boolean includeAliases) {
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         
         EmbedBuilder eb = new EmbedBuilder();
         /*

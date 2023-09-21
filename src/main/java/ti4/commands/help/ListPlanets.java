@@ -32,9 +32,9 @@ public class ListPlanets extends HelpSubcommandData {
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (PlanetModel planetModel : TileHelper.getAllPlanets().values().stream().sorted(Comparator.comparing(PlanetModel::getId)).toList()) {
-            MessageEmbed planetRepresentationEmbed = planetModel.getPlanetRepresentationEmbed(includeAliases);
-            if (Helper.embedContainsSearchTerm(planetRepresentationEmbed, searchString)) messageEmbeds.add(planetRepresentationEmbed); 
+        for (PlanetModel model : TileHelper.getAllPlanets().values().stream().sorted(Comparator.comparing(PlanetModel::getId)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(includeAliases);
+            if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed); 
         }
         if (messageEmbeds.size() > 3) {
             String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
