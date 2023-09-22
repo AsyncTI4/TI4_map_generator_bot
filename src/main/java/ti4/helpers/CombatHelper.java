@@ -19,6 +19,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatHelper {
@@ -56,7 +57,7 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
-            GenericInteractionCreateEvent event, CombatRollType roleType) {
+            GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
         //return GetUnitsInCombatRound(unitHolder,player, event);
         switch(roleType){
             case combatround: 
@@ -65,6 +66,8 @@ public class CombatHelper {
                 return GetUnitsInAFB(tile, player, event);
             case bombardment:
                 return GetUnitsInBombardment(tile, player, event);
+            case spacecannonoffence:
+                return getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
             default: 
                 return GetUnitsInCombatRound(unitHolder,player, event);
         } 
@@ -187,6 +190,85 @@ public class CombatHelper {
             }
         }
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
+                entry -> new ImmutablePair<>(
+                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                        entry.getValue()))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        Set<String> duplicates = new HashSet<>();
+        List<String> dupes = output.keySet().stream()
+                .filter(unit -> !duplicates.add(unit.getAsyncId()))
+                .map(UnitModel::getBaseType)
+                .collect(Collectors.toList());
+        List<String> missing = unitsByAsyncId.keySet().stream()
+                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+                .collect(Collectors.toList());
+
+        // Gracefully fail when units don't exist
+        StringBuilder error = new StringBuilder();
+        if (missing.size() > 0) {
+            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
+            error.append(" Ping bothelper if this seems to be in error.\n");
+            error.append("> Unowned units: ").append(missing).append("\n");
+        }
+        if (dupes.size() > 0) {
+            error.append(
+                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+            error.append("> Duplicate units: ").append(dupes);
+        }
+        if (missing.size() > 0 || dupes.size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        }
+
+        return output;
+    }
+
+    public static HashMap<UnitModel, Integer> getUnitsInSpaceCannonOffense(Tile tile, Player player,
+            GenericInteractionCreateEvent event, Game activeGame) {
+        String colorID = Mapper.getColorID(player.getColor());
+
+        HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
+
+        Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
+        for (UnitHolder unitHolder : unitHolders) {
+            HashMap<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+            for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+                Integer existingCount = 0;
+                if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
+                    existingCount = unitsByAsyncId.get(unitEntry.getKey());
+                }
+                unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+            }
+        }
+
+        HashMap<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false);
+        for (String adjacentTilePosition : adjTiles) {
+            if (adjacentTilePosition.equals(tile.getPosition())) {
+                continue;
+            }
+            Tile adjTile = activeGame.getTileByPosition(adjacentTilePosition);
+            for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
+                HashMap<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+                for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+                    Integer existingCount = 0;
+                    if (adjacentUnitsByAsyncId.containsKey(unitEntry.getKey())) {
+                        existingCount = adjacentUnitsByAsyncId.get(unitEntry.getKey());
+                    }
+                    adjacentUnitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+                }
+            }
+        }
+
+        Map<UnitModel, Integer> unitsOnTile = unitsByAsyncId.entrySet().stream().map(
+                entry -> new ImmutablePair<>(
+                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                        entry.getValue()))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        Map<UnitModel, Integer> unitsOnAdjacentTiles = adjacentUnitsByAsyncId.entrySet().stream().map(
             entry -> new ImmutablePair<>
                 (
                     player.getPriorityUnitByAsyncID(entry.getKey(), null),
@@ -194,9 +276,24 @@ public class CombatHelper {
                 )
         ).collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+        HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
+                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+
+        HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
+                .filter(entry -> entry.getKey() != null
+                        && entry.getKey().getSpaceCannonDieCount() > 0
+                        && entry.getKey().getDeepSpaceCannon() != null && entry.getKey().getDeepSpaceCannon())
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+
+        for (var entry : adjacentOutput.entrySet()) {
+            if (output.containsKey(entry.getKey())) {
+                output.put(entry.getKey(), entry.getValue() + output.get(entry.getKey()));
+            } else {
+                output.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
@@ -295,9 +392,13 @@ public class CombatHelper {
             int totalRolls = unit.getCombatDieCountForAbility(rollType) + extraRollsForUnit;
             if (totalRolls > 1) {
                 unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType), toHit);
-                if (extraRollsForUnit > 0) {
+                if (extraRollsForUnit > 0 && unit.getCombatDieCountForAbility(rollType) > 1) {
                     unitRollsTextInfo = String.format("%s rolls (+%s rolls),",
                             unit.getCombatDieCountForAbility(rollType),
+                            extraRollsForUnit);
+                }
+                else if (extraRollsForUnit > 0) {
+                    unitRollsTextInfo = String.format("(+%s rolls),",
                             extraRollsForUnit);
                 }
             }
