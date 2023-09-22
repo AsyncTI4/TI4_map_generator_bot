@@ -54,6 +54,7 @@ public class Game {
     private String ownerID;
     private String ownerName = "";
     private String name;
+    
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String latestAfterMsg = "";
@@ -64,7 +65,8 @@ public class Game {
     private int mapImageGenerationCount;
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
-    private boolean botFactionReacts;
+    private boolean botFactionReacts = false;
+    private boolean botShushing = true;
     @JsonIgnore
     private final HashMap<String, UnitHolder> planets = new HashMap<>();
     @Nullable
@@ -166,6 +168,8 @@ public class Game {
     @ExportableField
     private int buttonPress;
     @ExportableField
+    private int slashCommandsRun;
+    @ExportableField
     private int pingSystemCounter;
     @ExportableField
     private String playersWhoHitPersistentNoAfter = "";
@@ -186,6 +190,7 @@ public class Game {
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
+    private HashMap<String, Integer> slashCommandsUsed = new HashMap<>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     @ExportableField
     private String phaseOfGame = "";
@@ -435,6 +440,15 @@ public class Game {
     }
     public void setButtonPressCount(int count) {
        buttonPress = count;
+    }
+    public void setSlashCommandsRun(int count) {
+       slashCommandsRun = count;
+    }
+    public void increaseSlashCommandsRun() {
+       slashCommandsRun = slashCommandsRun +1;
+    }
+    public int getSlashCommandsRunCount(){
+        return slashCommandsRun;
     }
 
     public void setRound(int round) {
@@ -868,6 +882,9 @@ public class Game {
     public HashMap<String, Integer> getCurrentMovedUnitsFrom1System() {
         return displacedUnitsFrom1System;
     }
+    public HashMap<String, Integer> getAllSlashCommandsUsed() {
+        return slashCommandsUsed;
+    }
 
     public HashMap<String, Integer> getMovedUnitsFromCurrentActivation() {
         return displacedUnitsFromEntireTacticalAction;
@@ -876,9 +893,15 @@ public class Game {
     public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
         displacedUnitsFrom1System.put(unit, count);
     }
+    public void setSpecificSlashCommandCount(String command, int count) {
+        slashCommandsUsed.put(command, count);
+    }
 
     public void setCurrentMovedUnitsFrom1System(HashMap<String, Integer> displacedUnits) {
         displacedUnitsFrom1System = displacedUnits;
+    }
+     public void setSlashCommandsUsed(HashMap<String, Integer> commands) {
+        slashCommandsUsed = commands;
     }
 
     public void setSpecificCurrentMovedUnitsFrom1TacticalAction(String unit, int count) {
@@ -1079,18 +1102,20 @@ public class Game {
     }
 
     public void setUpPeakableObjectives(int num) {
-        for (int x = 0; x < num; x++) {
-            if (!publicObjectives1.isEmpty()) {
-                Collections.shuffle(publicObjectives1);
-                String id = publicObjectives1.get(0);
-                publicObjectives1.remove(id);
-                publicObjectives1Peakable.add(id);
-            }
-            if (!publicObjectives2.isEmpty()) {
-                Collections.shuffle(publicObjectives2);
-                String id = publicObjectives2.get(0);
-                publicObjectives2.remove(id);
-                publicObjectives2Peakable.add(id);
+        if(publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num-1 ){
+            for (int x = 0; x < num; x++) {
+                if (!publicObjectives1.isEmpty()) {
+                    Collections.shuffle(publicObjectives1);
+                    String id = publicObjectives1.get(0);
+                    publicObjectives1.remove(id);
+                    publicObjectives1Peakable.add(id);
+                }
+                if (!publicObjectives2.isEmpty()) {
+                    Collections.shuffle(publicObjectives2);
+                    String id = publicObjectives2.get(0);
+                    publicObjectives2.remove(id);
+                    publicObjectives2Peakable.add(id);
+                }
             }
         }
     }
@@ -2365,11 +2390,18 @@ public class Game {
         botFactionReacts = limit;
     }
 
+    public void setShushing(boolean limit) {
+        botShushing = limit;
+    }
+
     public boolean getCCNPlasticLimit() {
         return ccNPlasticLimit;
     }
     public boolean getBotFactionReacts() {
         return botFactionReacts;
+    }
+    public boolean getBotShushing() {
+        return botShushing;
     }
 
     public void setPlayer(String playerID, Player player) {

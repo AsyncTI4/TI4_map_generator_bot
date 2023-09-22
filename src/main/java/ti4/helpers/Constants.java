@@ -31,6 +31,8 @@ public class Constants {
     public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
+    public static final String SLASH_COMMAND_COUNT = "slash_command_count";
+    public static final String SLASH_COMMAND_STRING = "slash_command_string";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
@@ -407,6 +409,7 @@ public class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
+    public static final String CUSTOMIZATION = "customization";
     public static final String CHANGE_COLOR = "change_color";
     public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
@@ -737,11 +740,13 @@ public class Constants {
     public static final String LATEST_TRANSACTION_MSG = "latest_transaction_msg";
     public static final String LATEST_UPNEXT_MSG = "latest_upnext_msg";
     public static final String PHASE_OF_GAME = "phase_of_game";
+    public static final String ALL_SLASH_COMMANDS = "all_slash_commands";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String BOT_FACTION_REACTS= "bot_faction_reacts";
+    public static final String BOT_SHUSHING= "bot_shushing";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
