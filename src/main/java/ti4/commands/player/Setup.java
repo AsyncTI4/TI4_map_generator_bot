@@ -18,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -135,6 +136,8 @@ public class Setup extends PlayerSubcommandData {
             }
             player.addTech(tech);
         }
+
+        
         
 
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
@@ -165,6 +168,11 @@ public class Setup extends PlayerSubcommandData {
             List<Button> buttons = new ArrayList<>();
             buttons.add(getTech);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+        }
+        if(player.hasAbility("oracle_ai")){
+            activeGame.setUpPeakableObjectives(10);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player.");
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
     }
 

@@ -63,6 +63,20 @@ public class MessageListener extends ListenerAdapter {
             if (!isChannelOK) {
                 event.reply("Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123`").setEphemeral(true).queue();
                 return;
+            }else{
+                GameManager gameManager = GameManager.getInstance();
+                Game userActiveGame = gameManager.getUserActiveGame(userID);
+                if(userActiveGame != null){
+                    userActiveGame.increaseSlashCommandsRun();
+                    String command = event.getName()+" "+event.getSubcommandName();
+                    Integer count = userActiveGame.getAllSlashCommandsUsed().get(command);
+                    if(count == null){
+                        userActiveGame.setSpecificSlashCommandCount(command, 1);
+                    }else{
+                        userActiveGame.setSpecificSlashCommandCount(command, 1+count);
+                    }
+                }
+                
             }
         }
 
@@ -252,17 +266,21 @@ public class MessageListener extends ListenerAdapter {
     private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
         if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
             try{
-                    MessageHistory mHistory = event.getChannel().getHistory();
-                    RestAction<List<Message>> lis = mHistory.retrievePast(4);
-                    boolean allNonBots = true;
-                    for(Message m : lis.complete()){
-                        if(m.getAuthor().isBot() || m.getReactions().size() > 0){
-                            allNonBots = false;
-                            break;
+                    String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
+                    Game activeGame = GameManager.getInstance().getGame(gameName);
+                    if(activeGame != null && activeGame.getPublicObjectives1() != null && activeGame.getPublicObjectives1().size() > 1 && activeGame.getBotShushing()){
+                        MessageHistory mHistory = event.getChannel().getHistory();
+                        RestAction<List<Message>> lis = mHistory.retrievePast(4);
+                        boolean allNonBots = true;
+                        for(Message m : lis.complete()){
+                            if(m.getAuthor().isBot() || m.getReactions().size() > 0){
+                                allNonBots = false;
+                                break;
+                            }
                         }
-                    }
-                    if(allNonBots){
-                        event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+                        if(allNonBots){
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+                        }
                     }
                 }catch (Exception e){
                     BotLogger.log("Reading previous message", e);
@@ -296,10 +314,6 @@ public class MessageListener extends ListenerAdapter {
                 }catch (Exception e){
                     BotLogger.log("Reading previous message", e);
                 }
-                
-                
-                
-                
             }
         }
 

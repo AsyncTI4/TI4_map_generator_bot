@@ -1,5 +1,6 @@
 package ti4.commands.custom;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -28,12 +29,15 @@ public class PeakAtStage2 extends CustomSubcommandData {
             return;
         }
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
-        String obj = activeGame.peakAtStage2(loc1.getAsInt());
+        secondHalfOfPeak(event, activeGame, player, loc1.getAsInt());
+        
+    }
+    public void secondHalfOfPeak(GenericInteractionCreateEvent event, Game activeGame, Player player, int loc1){
+        String obj = activeGame.peakAtStage2(loc1);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
       String sb = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) +
-          " **Stage 2 Public Objective at location " + loc1.getAsInt() + "**" + "\n" +
+          " **Stage 2 Public Objective at location " + loc1 + "**" + "\n" +
           po.getRepresentation() + "\n";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), sb);
-        
     }
 }

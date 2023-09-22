@@ -322,6 +322,14 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
         writer.write(System.lineSeparator());
 
+        HashMap<String, Integer> slashCommands = activeGame.getAllSlashCommandsUsed();
+        StringBuilder sb10 = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : slashCommands.entrySet()) {
+            sb10.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+        }
+        writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
+        writer.write(System.lineSeparator());
+
         HashMap<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
         StringBuilder sb4 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
@@ -421,6 +429,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BUTTON_PRESS_COUNT + " " + activeGame.getButtonPressCount());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SLASH_COMMAND_COUNT + " " + activeGame.getSlashCommandsRunCount());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + activeGame.getCustomName());
         writer.write(System.lineSeparator());
 
@@ -469,6 +479,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + activeGame.getCCNPlasticLimit());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_FACTION_REACTS + " " + activeGame.getBotFactionReacts());
+        writer.write(System.lineSeparator());
+         writer.write(Constants.BOT_SHUSHING + " " + activeGame.getBotShushing());
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
@@ -1284,6 +1296,21 @@ public class GameSaveLoadManager {
                         }
                     }
                 }
+                case Constants.SLASH_COMMAND_STRING-> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeGame.setSpecificSlashCommandCount(outcome, Integer.parseInt(voteInfo));
+                        }
+                    }
+                }
                 case Constants.DISPLACED_UNITS_ACTIVATION -> {
                     StringTokenizer vote_info = new StringTokenizer(info, ":");
                     while (vote_info.hasMoreTokens()) {
@@ -1335,6 +1362,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setBotFactionReactions(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BOT_SHUSHING -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShushing(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1478,6 +1513,13 @@ public class GameSaveLoadManager {
                         activeGame.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse button press count", exception);
+                    }
+                }
+                case Constants.SLASH_COMMAND_COUNT -> {
+                    try {
+                        activeGame.setSlashCommandsRun(Integer.parseInt(info));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse slash command count", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {

@@ -1,12 +1,18 @@
 package ti4.commands.special;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.AsyncTI4DiscordBot;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -62,6 +68,11 @@ public class StellarConverter extends SpecialSubcommandData {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }
+        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()){
+            TextChannel watchPary= AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).get(0);
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, tile.getPosition(), event);
+            MessageHelper.sendMessageWithFile(watchPary, systemWithContext, "Moments before disaster in game "+activeGame.getName(), false);
+        }
         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
         for(Player p2 : activeGame.getRealPlayers()){
             if(p2.getPlanets().contains(planetName)){
@@ -70,7 +81,13 @@ public class StellarConverter extends SpecialSubcommandData {
         }
         activeGame.removePlanet(unitHolder);
         tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
+        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()){
+            TextChannel watchPary= AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).get(0);
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, tile.getPosition(), event);
+            MessageHelper.sendMessageWithFile(watchPary, systemWithContext, "After-shot "+activeGame.getName(), false);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+        
 
     }
 
