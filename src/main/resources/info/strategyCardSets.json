@@ -188,5 +188,21 @@
       "87": "Imperial Group 7"
     },
     "description": "Grouped SCs for PBD #1000"
+  },
+  {
+    "name": "Ignis Aurora Strategy Cards",
+    "alias": "ignis_aurora",
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Antiquities",
+      "9": "Imperial"
+    },
+    "description": "Strategy Cards for Baldrick's Ignis Aurora expansion"
   }
 ]
