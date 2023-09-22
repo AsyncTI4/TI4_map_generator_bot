@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.player.AbilityInfo;
-import ti4.commands.special.CombatRoll;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -170,16 +169,22 @@ public class CombatModHelper {
         return alwaysOnMods;
     }
 
-    public static Integer GetCombinedModifierForUnit(UnitModel unit, List<NamedCombatModifierModel> modifiers, Player player,
+    public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
+            List<NamedCombatModifierModel> modifiers, Player player,
             Player opponent, Game activeGame, List<UnitModel> allUnits, CombatRollType rollType) {
-        int modValue = 0;
+        int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, allUnits, rollType)) {
-                modValue += GetVariableModValue(modifier, player, opponent, activeGame);
+                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame);
+                Integer perUnitCount = 1;
+                if (modifier.getApplyEachForQuantity()) {
+                    perUnitCount = numOfUnit;
+                }
+                modsValue += (modValue * perUnitCount);
             }
         }
-        return modValue;
+        return modsValue;
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,

@@ -22,6 +22,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scopeExcept;
     private String condition;
     private String forCombatAbility;
+    private Boolean applyEachForQuantity = false;
 
     public boolean isValid() {
         return type != null
