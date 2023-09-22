@@ -1,5 +1,39 @@
 [
     {
+        "alias": "plus1_roll_argent_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related":[
+            {"type": "leader", "alias": "argentcommander"}
+        ], 
+        "forCombatAbility": "afb"
+    },
+    {
+        "alias": "plus1_roll_argent_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related":[
+            {"type": "leader", "alias": "argentcommander"}
+        ], 
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_roll_mechs_naaz_flagship",
+        "type": "extrarolls",
+        "value": "+1",
+        "applyEachForQuantity": true,
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "related":[
+            {"type": "unit", "alias": "naaz_flagship"}
+        ], 
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus1_roll_plasmascoring",
         "type": "extrarolls",
         "value": "+1",
