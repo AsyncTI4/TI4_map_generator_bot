@@ -31,6 +31,8 @@ import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
+import ti4.commands.custom.PeakAtStage1;
+import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
@@ -323,6 +325,23 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("arcExp_")) {
             ButtonHelper.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
+        } else if (buttonID.startsWith("augerHeroSwap_")) {
+            ButtonHelperFactionSpecific.augersHeroSwap(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("augersHeroStart_")) {
+            ButtonHelperFactionSpecific.augersHeroResolution(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("augersPeak_")) {
+            if(buttonID.split("_")[1].equalsIgnoreCase("1")){
+                new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, 1);
+            }else{
+                new PeakAtStage2().secondHalfOfPeak(event, activeGame, player, 1);
+            }
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("initialPeak")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("augersPeak_1", "Peek At Next Stage 1"));
+            buttons.add(Button.success("augersPeak_2", "Peek At Next Stage 2"));
+            String msg = trueIdentity + " the bot doesn't know if the next objective is a stage 1 or a stage 2. Please help it out and click the right button.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), msg, buttons);
         } else if (buttonID.startsWith("cabalHeroTile_")) {
             ButtonHelperFactionSpecific.executeCabalHero(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("creussIFFStart_")) {
@@ -1574,6 +1593,23 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if ("fin".equalsIgnoreCase(pnKey)) {
                     MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Keleres Rider");
+                    return;
+                }
+                ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
+            }
+            //"dspnedyn"
+            if(riderName.contains("Unity Algorithm")){
+                player.exhaustTech("dsedyng");
+            }
+            if ("Edyn Rider".equalsIgnoreCase(riderName)) {
+                String pnKey = "fin";
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    if (pn.contains("dspnedyn")) {
+                        pnKey = pn;
+                    }
+                }
+                if ("fin".equalsIgnoreCase(pnKey)) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
                     return;
                 }
                 ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
@@ -2935,7 +2971,6 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.",
                         buttons);
-                    event.getMessage().delete().queue();
 
                 }
                     case "setOrder" -> {

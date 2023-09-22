@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -9,12 +10,14 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
@@ -22,11 +25,14 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -229,6 +235,37 @@ public class AgendaHelper {
                     message.append(Helper.getPlayerRepresentation(playerWL, activeGame)).append(" scored 'Mutiny'\n");
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
+            }
+            if ("artifact".equalsIgnoreCase(agID)) {
+                TextChannel watchParty=null;
+                if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).size() > 0 && !activeGame.isFoWMode()){
+                    watchParty= AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).get(0);
+                    Tile tile = Helper.getTileFromPlanet("mr", activeGame);
+                    if(watchParty != null && tile != null){
+                        File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
+                        MessageHelper.sendMessageToChannel(watchParty, AgendaHelper.getSummaryOfVotes(activeGame, true));
+                        MessageHelper.sendMessageWithFile(watchParty, systemWithContext, "Surrounding Mecatol Rex In "+activeGame.getName(), false);
+                    }
+                    
+                }
+                if ("for".equalsIgnoreCase(winner)) {
+                    Die d1 = new Die(6);
+                    String msg =  "# Rolled a "+d1.getResult() +" for Ixthian!";
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+                    if(watchParty != null){
+                        MessageHelper.sendMessageToChannel(watchParty, msg);
+                    }
+                    if(d1.isSuccess()&& !activeGame.isFoWMode()){
+                        activeGame.setComponentAction(true);
+                        Button getTech = Button.success("acquireATech", "Get a tech");
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(getTech);
+                        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "You can use the button to get your tech", buttons);
+                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Against on Ixthian? Disgraceful");
+                }
+                
             }
             if ("seed_empire".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;
@@ -819,6 +856,10 @@ public class AgendaHelper {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));
             afterButtons.add(playKeleresAfter);
         }
+        if (Helper.getPlayerFromColorOrFaction(activeGame, "edyn") != null && !activeGame.isFoWMode()) {
+            Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+            afterButtons.add(playKeleresAfter);
+        }
         if (Helper.getPlayerFromAbility(activeGame, "galactic_threat") != null && !activeGame.isFoWMode()) {
             Player nekroProbably = Helper.getPlayerFromAbility(activeGame, "galactic_threat");
             String finChecker = "FFCC_" + nekroProbably.getFaction() + "_";
@@ -831,6 +872,21 @@ public class AgendaHelper {
             String finChecker = "FFCC_" + keleresX.getFaction() + "_";
             Button playKeleresHero = Button.secondary(finChecker + "play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));
             afterButtons.add(playKeleresHero);
+        }
+        if (Helper.getPlayerFromAbility(activeGame, "radiance") != null) {
+            Player edyn = Helper.getPlayerFromAbility(activeGame, "radiance");
+            String finChecker = "FFCC_" + edyn.getFaction() + "_";
+            Button playKeleresHero = Button.secondary(finChecker + "play_after_Edyn Radiance Ability", "Use Edyn Radiance Ability").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+            afterButtons.add(playKeleresHero);
+        }
+
+        for(Player p1 : activeGame.getRealPlayers()){
+            if(p1.hasTechReady("dsedyng")){
+                Player edyn = p1;
+                String finChecker = "FFCC_" + edyn.getFaction() + "_";
+                Button playKeleresHero = Button.secondary(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+                afterButtons.add(playKeleresHero);
+            }
         }
 
         Button noAfter = Button.primary("no_after", "No Afters (for now)")
@@ -1530,7 +1586,7 @@ public class AgendaHelper {
                 String specificVote = vote_info.nextToken();
                 String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
                 String vote = specificVote.substring(specificVote.indexOf("_") + 1);
-                if (vote.contains("Rider") || vote.contains("Sanction") || vote.contains("Hero")) {
+                if (vote.contains("Rider") || vote.contains("Sanction") || vote.contains("Radiance")  || vote.contains("Unity Algorithm") || vote.contains("Hero")) {
                     voteSummBuilder.append(";").append(specificVote);
                 } else if (faction2.equals(faction)) {
                 } else {
@@ -1556,7 +1612,7 @@ public class AgendaHelper {
             while (vote_info.hasMoreTokens()) {
                 String specificVote = vote_info.nextToken();
                 String vote = specificVote.split("_")[1];
-                if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
+                if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero") && !vote.contains("Radiance")  && !vote.contains("Unity Algorithm")) {
                     totalVotes += Integer.parseInt(vote);
                 }
             }
@@ -1623,13 +1679,13 @@ public class AgendaHelper {
                             faction = "Someone";
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
-                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
+                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")&& !vote.contains("Radiance")  && !vote.contains("Unity Algorithm")) {
                             totalVotes += Integer.parseInt(vote);
                         }
                         outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
-                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
+                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero") && !vote.contains("Radiance")  && !vote.contains("Unity Algorithm")) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
                         } else {
