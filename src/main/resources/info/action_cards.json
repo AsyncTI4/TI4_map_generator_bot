@@ -1516,7 +1516,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust and explore 1 planet you control. Each time you gain a relic fragment during this action, explore that planet again.",
+    "text": "Exhaust and explore 1 planet you control; if you draw a relic fragment, you may purge it to gain 1 relic.",
     "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -1525,7 +1525,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust and explore 1 planet you control. Each time you gain a relic fragment during this action, explore that planet again.",
+    "text": "Exhaust and explore 1 planet you control; if you draw a relic fragment, you may purge it to gain 1 relic.",
     "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -1534,7 +1534,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust and explore 1 planet you control. Each time you gain a relic fragment during this action, explore that planet again.",
+    "text": "Exhaust and explore 1 planet you control; if you draw a relic fragment, you may purge it to gain 1 relic.",
     "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -1543,7 +1543,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust and explore 1 planet you control. Each time you gain a relic fragment during this action, explore that planet again.",
+    "text": "Exhaust and explore 1 planet you control; if you draw a relic fragment, you may purge it to gain 1 relic.",
     "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -1584,11 +1584,29 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "boarding_torpedoes",
+    "name": "Boarding Torpedoes",
+    "phase": "Action",
+    "window": "After you destroy an opponent's non-fighter ship",
+    "text": "Place 1 ship of the same type from your reinforcements into the active system.",
+    "flavorText": "\"It ain't the ship's guard I'm worried about, sonny, it's what happens if we miss...\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "border_skirmish",
+    "name": "Border Skirmish",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Move all units in the space area of any system to an adjacent system that contains a different player's ships. Space combat is resolved in that system; neither player can retreat or resolve abilities that would move their ships. At the end of the first round of combat, move the attacking player's units to the system they originated in; the combat ends in a draw.",
+    "flavorText": "\"Our dominion knows no border.\"",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "brilliant_tactician",
     "name": "Brilliant Tactician",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "You may redistribute any number of your command tokens on your command sheet; otherwise, draw 2 action cards.",
+    "text": "You may redistribute any number of your command tokens on your command sheet; otherwise, draw 1 action card.",
     "flavorText": "Sometimes the sum of foresight, fortune, and continuous effort coalesce into something greater. In this case, a rare opportunity that may very well change the tides of war.",
     "source": "action_deck_2"
   },
@@ -1705,8 +1723,17 @@
     "name": "Cyberwarfare",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust 1 of another player's planets that has a technology specialty and gain trade goods equal to the resource value of that planet. Then, exhaust 1 technology that player owns.",
+    "text": "Exhaust 1 of another player's planets that has a technology specialty and gain trade goods equal to the resource or influence value of that planet.",
     "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE BELONGS TO US",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "spatial_collapse",
+    "name": "Spatial Collapse",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Swap the positions of 2 adjacent systems that do not contain an anomaly and are not on the edge of the game board.",
+    "flavorText": "The reports were so unbelievable that Rin had chosen to witness the event firsthand. Defying all she knew, the spatial dimension had twisted into an indecipherable mockery of itself, leaving the nearby galaxies nearly perfectly mirrored in position.",
     "source": "action_deck_2"
   },
   {
@@ -2151,11 +2178,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "recurrence_protocols",
-    "name": "Recurrence Protocols",
+    "alias": "efficient_protocols",
+    "name": "Efficient Protocols",
     "phase": "Action",
     "window": "Action",
-    "text": "Exhaust 1 of your planets that has a technology specialty and gain trade goods equal to its resource value. Then, ready 1 technology that you own.",
+    "text": "Exhaust 1 of your planets that has a technology specialty and gain trade goods equal to its resource or influence value. Then, ready 1 technology that you own.",
     "flavorText": "I48S surveyed the new installation, taking note on several routines he already planned to improve upon. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
