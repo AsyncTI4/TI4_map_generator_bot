@@ -2995,8 +2995,10 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 continue;
             }
 
+            Leader playerLeader = player2.getLeader("naaluhero").orElse(null);
+            
             if (player2.hasLeader("naaluhero") && player2.getLeaderByID("naaluhero").isPresent()
-                    && player2.getLeaderByID("naaluhero").map(Leader::isLocked).orElse(true)) {
+                    && playerLeader != null && !playerLeader.isLocked() ){
                     List<Button> buttons = new ArrayList<Button>();
                     buttons.add(Button.success("naaluHeroInitiation", "Play Naalu Hero"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -3968,6 +3970,13 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                             buttons.add(Button.primary(finChecker+"yinHeroStart", "Invade a planet with Yin Hero"));
                             buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)+" use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
+                        }
+                        if ("augershero".equals(playerLeader.getId())) {
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Button.primary(finChecker+"augersHeroStart_"+1, "Resolve Augers Hero on Stage 1 Deck"));
+                            buttons.add(Button.primary(finChecker+"augersHeroStart_"+2, "Resolve Augers Hero on Stage 2 Deck"));
+                            buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)+" use the button to choose which objective type you wanna hero on", buttons);
                         }
                         if ("empyreanhero".equals(playerLeader.getId())) {
                              new AddFrontierTokens().parsingForTile(event, activeGame);
