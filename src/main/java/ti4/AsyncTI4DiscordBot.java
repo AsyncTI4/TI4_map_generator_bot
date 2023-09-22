@@ -1,11 +1,11 @@
 package ti4;
 
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -27,6 +27,7 @@ import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
+import ti4.commands.developer.DeveloperCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
@@ -87,6 +88,7 @@ public class AsyncTI4DiscordBot {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
+                .setEnableShutdownHook(false)
                 .build();
 
         jda.addEventListener(
@@ -100,6 +102,8 @@ public class AsyncTI4DiscordBot {
         } catch (InterruptedException e) {
             MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
+
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Starting Up"));
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
@@ -171,6 +175,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new AdminCommand());
 
 
+        commandManager.addCommand(new DeveloperCommand());
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
@@ -254,6 +259,7 @@ public class AsyncTI4DiscordBot {
         }
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
+        jda.getPresence().setActivity(Activity.playing("Loading Maps"));
         GameSaveLoadManager.loadMaps();
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT CHECKING FOR DATA MIGRATIONS");
@@ -261,21 +267,26 @@ public class AsyncTI4DiscordBot {
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT HAS FINISHED LOADING MAPS");
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Restarting"));
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
                 TimeUnit.SECONDS.sleep(10);
                 //TODO: add last command time/last save time to cut down on saves in this loop
                 //Also, make multithreaded
                 GameSaveLoadManager.saveMaps();
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                TimeUnit.SECONDS.sleep(5);
+                jda.shutdown();
+                jda.awaitShutdown();
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());

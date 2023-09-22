@@ -1,4 +1,4 @@
-package ti4.commands.admin;
+package ti4.commands.developer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,12 +7,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.DataMigrationManager;
+import ti4.commands.admin.AdminSubcommandData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
-public class RunManualDataMigration extends AdminSubcommandData {
+public class RunManualDataMigration extends DeveloperSubcommandData {
     public RunManualDataMigration() {
         super(Constants.RUN_MANUAL_DATA_MIGRATION, "Run a manual data migration on a game.");
         addOptions(new OptionData(OptionType.STRING, Constants.MIGRATION_NAME, "migration name").setRequired(true));
@@ -26,7 +28,7 @@ public class RunManualDataMigration extends AdminSubcommandData {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         Game activeGame = GameManager.getInstance().getGame(gameName);
         if(activeGame == null){
-            sendMessage("Cant find map for game name" + gameName);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cant find map for game name" + gameName);
             return;
         }
         
@@ -35,9 +37,9 @@ public class RunManualDataMigration extends AdminSubcommandData {
             Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
             Boolean changesMade = (Boolean) method.invoke(null, activeGame);
             if(changesMade){
-                sendMessage("Successfully run migration " + migrationName + " for map " + activeGame.getName());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + activeGame.getName());
             }else{
-                sendMessage("Successfully run migration " + migrationName + " for map " + activeGame.getName() + " but no changes were required.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + activeGame.getName() + " but no changes were required.");
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             BotLogger.log("failed to run data migration", e);
