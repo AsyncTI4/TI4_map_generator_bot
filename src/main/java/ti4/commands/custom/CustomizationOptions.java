@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class CustomizationOptions extends CustomSubcommandData{
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
-        addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "Small/medium/large, default small").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
@@ -65,12 +65,10 @@ public class CustomizationOptions extends CustomSubcommandData{
             }
         }
 
-       
-
-        OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
+        OptionMapping largeText = event.getOption(Constants.TEXT_SIZE);
         if (largeText != null) {
             String large = largeText.getAsString();
-            getActiveGame().setLargeText(large);
+            getActiveGame().setTextSize(large);
         }
 
 
