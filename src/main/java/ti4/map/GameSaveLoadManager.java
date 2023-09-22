@@ -466,7 +466,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LARGE_TEXT + " " + activeGame.getLargeText());
+        writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
@@ -1454,9 +1454,16 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
-                case Constants.LARGE_TEXT -> {
+                case Constants.TEXT_SIZE -> {
                     try {
-                        activeGame.setLargeText(info);
+                        activeGame.setTextSize(info);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case "large_text" -> { //MIGRATION ONLY TO PRESERVE NAME CHANGE - CAN DELETE IF YOU SEE THIS
+                    try {
+                        activeGame.setTextSize(info);
                     } catch (Exception e) {
                         //Do nothing
                     }
