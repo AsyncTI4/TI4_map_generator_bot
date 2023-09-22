@@ -110,6 +110,7 @@ public class DiscordantStarsCommand implements Command {
         subcommands.add(new TrapSwap());
         subcommands.add(new FlipGrace());
         subcommands.add(new SetPolicy());
+        subcommands.add(new DrawBlueBackTile());
 
         return subcommands;
     }
