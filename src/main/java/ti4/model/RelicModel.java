@@ -14,6 +14,7 @@ public class RelicModel implements ModelInterface {
     private String name;
     private String shortName;
     private String text;
+    private String flavourText;
     private String source;
 
     @Override
