@@ -2587,6 +2587,22 @@
         "ability": "DEPLOY: After you activate a system, you may spend 4 resources to replace 1 of your non-fighter ships in that system with your flagship."
     },
     {
+        "id": "rohdhna_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "imageFileSuffix": "_mf.png",
+        "name": "Autofabricator",
+        "source": "ds",
+        "faction": "rohdhna",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: After you use your RECYCLED MATERIALS faction ability in a system, you may place 1 mech in that system's space area or on a planet you control in that system."
+    },
+    {
         "id": "saar_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
