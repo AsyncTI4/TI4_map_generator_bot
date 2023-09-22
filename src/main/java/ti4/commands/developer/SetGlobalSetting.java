@@ -1,13 +1,15 @@
-package ti4.commands.admin;
+package ti4.commands.developer;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.admin.AdminSubcommandData;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
+import ti4.message.MessageHelper;
 
-public class SetGlobalSetting extends AdminSubcommandData {
+public class SetGlobalSetting extends DeveloperSubcommandData {
 
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");
@@ -31,10 +33,10 @@ public class SetGlobalSetting extends AdminSubcommandData {
                 GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
             GlobalSettings.saveSettings();
         } else {
-            sendMessage("Bad Command!");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Bad Command!");
             return;
         }
-        sendMessage("Setting `"  + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
-        sendMessage(GlobalSettings.getSettingsRepresentation());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Setting `"  + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
+        MessageHelper.sendMessageToChannel(event.getChannel(), GlobalSettings.getSettingsRepresentation());
     }
 }
