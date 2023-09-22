@@ -54,6 +54,9 @@ public class CombatModifierModel implements ModelInterface {
                         (a, b) -> a.getCombatDieHitsOnForAbility(rollType) - b.getCombatDieHitsOnForAbility(rollType));
                 isInScope = sortedAllUnits.get(0).getAsyncId() == unit.getAsyncId();
             }
+            if ("_ship_".equals(scope)) {
+                isInScope = unit.getIsShip() != null && unit.getIsShip();
+            }
         }
         return isInScope;
     }
