@@ -895,4 +895,6 @@ public class Constants {
     public static final String TECHNOLOGY_DECK = "technology_deck";
     public static final Object TECHNOLOGY = "technology";
     public static final String TECH_DECK_ID = "tech_deck_id";
+    public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
+    public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
 }
