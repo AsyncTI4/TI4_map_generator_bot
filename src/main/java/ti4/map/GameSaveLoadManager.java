@@ -1461,13 +1461,6 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
-                case "large_text" -> { //MIGRATION ONLY TO PRESERVE NAME CHANGE - CAN DELETE IF YOU SEE THIS
-                    try {
-                        activeGame.setTextSize(info);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
                 case Constants.ABSOL_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
