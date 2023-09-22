@@ -1006,7 +1006,7 @@ public class GameSaveLoadManager {
                                 String data = tmpData != null ? tmpData : myReader.nextLine();
                                 tmpData = null;
                                 if (UNITS.equals(data)) {
-                                    spaceHolder = myReader.nextLine();
+                                    spaceHolder = myReader.nextLine().toLowerCase();
                                     if (tile != null) {
                                         if (Constants.MIRAGE.equals(spaceHolder)) {
                                             Helper.addMirageToTile(tile);
