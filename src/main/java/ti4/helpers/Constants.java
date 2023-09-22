@@ -898,4 +898,5 @@ public class Constants {
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
+    public static final String COMBAT_ROLL_TYPE = "rolltype";
 }
