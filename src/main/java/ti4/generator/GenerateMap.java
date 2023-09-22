@@ -34,6 +34,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
+
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -178,6 +181,8 @@ public class GenerateMap {
             debugStartTime = System.nanoTime();
             System.out.printf("Map gen started for map %s%n", activeGame.getName());
         }
+
+        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Generating Map: " + activeGame.getName()));
 
         activeGame.incrementMapImageGenerationCount();
         init(activeGame);
@@ -336,7 +341,7 @@ public class GenerateMap {
             System.out.println(sb);
             MessageHelper.sendMessageToChannel(BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
-
+        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         return jpgFile;
     }
 
