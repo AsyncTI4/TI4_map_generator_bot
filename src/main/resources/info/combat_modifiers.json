@@ -46,7 +46,7 @@
         "forCombatAbility": "combatround"
     },
     {
-        "alias": "plus1_roll_plasmascoring",
+        "alias": "plus1_roll_plasmascoring_spacecannon",
         "type": "extrarolls",
         "value": "+1",
         "persistenceType": "ALWAYS",
@@ -54,6 +54,20 @@
         "related":[
             {"type": "tech", "alias": "ps"}
         ], 
+        "forCombatAbility": "spacecannonoffence"
+    },
+    {
+        "alias": "plus1_roll_plasmascoring",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "ps"
+            }
+        ],
         "forCombatAbility": "bombardment"
     },
     {

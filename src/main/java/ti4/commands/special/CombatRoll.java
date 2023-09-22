@@ -50,6 +50,9 @@ public class CombatRoll extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
                 "comma list of <count> <unit> eg 2 fighter 1 dreadnought")
                 .setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE,
+                "switch to afb/bombardment/spacecannonoffence")
+                .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
                 .setAutoComplete(true).setRequired(false));
     }
@@ -62,6 +65,7 @@ public class CombatRoll extends SpecialSubcommandData {
         OptionMapping mods = event.getOption(Constants.COMBAT_MODIFIERS);
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
+        OptionMapping rollTypeOption = event.getOption(Constants.COMBAT_ROLL_TYPE);
 
         String userID = getUser().getId();
         Player player = activeGame.getPlayer(userID);
@@ -100,7 +104,20 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
 
-        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, CombatRollType.combatround);
+        CombatRollType rollType = CombatRollType.combatround;
+        if (rollTypeOption != null) {
+            if (rollTypeOption.getAsString().equals("afb")) {
+                rollType = CombatRollType.afb;
+            }
+            if (rollTypeOption.getAsString().equals("bombardment")) {
+                rollType = CombatRollType.bombardment;
+            }
+            if (rollTypeOption.getAsString().equals("spacecannonoffence")) {
+                rollType = CombatRollType.spacecannonoffence;
+            }
+        }
+
+        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, rollType);
     }
 
     public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName,
@@ -112,7 +129,8 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
         
-        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event, rollType);
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
+                rollType, activeGame);
         if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
