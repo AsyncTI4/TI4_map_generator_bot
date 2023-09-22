@@ -22,6 +22,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scopeExcept;
     private String condition;
     private String forCombatAbility;
+    private Boolean applyEachForQuantity = false;
 
     public boolean isValid() {
         return type != null
@@ -52,6 +53,9 @@ public class CombatModifierModel implements ModelInterface {
                 sortedAllUnits.sort(
                         (a, b) -> a.getCombatDieHitsOnForAbility(rollType) - b.getCombatDieHitsOnForAbility(rollType));
                 isInScope = sortedAllUnits.get(0).getAsyncId() == unit.getAsyncId();
+            }
+            if ("_ship_".equals(scope)) {
+                isInScope = unit.getIsShip() != null && unit.getIsShip();
             }
         }
         return isInScope;
