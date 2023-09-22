@@ -259,16 +259,17 @@ public class AsyncTI4DiscordBot {
         }
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING MAPS: " + guildPrimary.getName());
         jda.getPresence().setActivity(Activity.playing("Loading Maps"));
         GameSaveLoadManager.loadMaps();
 
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT CHECKING FOR DATA MIGRATIONS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations(); 
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT FINISHED CHECKING FOR DATA MIGRATIONS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT HAS FINISHED LOADING MAPS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING MAPS");
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
@@ -277,8 +278,9 @@ public class AsyncTI4DiscordBot {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Restarting"));
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10);
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING MAPS");
                 //TODO: add last command time/last save time to cut down on saves in this loop
                 //Also, make multithreaded
                 GameSaveLoadManager.saveMaps();
