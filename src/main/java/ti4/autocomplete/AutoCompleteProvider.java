@@ -52,7 +52,7 @@ public class AutoCompleteProvider {
         }
 
         switch (commandName) {
-            case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, subCommandName, optionName);
+            case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
             case Constants.HELP -> resolveHelpCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
@@ -367,9 +367,9 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.LARGE_TEXT -> {
+            case Constants.TEXT_SIZE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("small", "medium", "large")
+                List<Command.Choice> options = Stream.of("tiny", "small", "medium", "large")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
@@ -652,7 +652,7 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveAdminCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+    private static void resolveDeveloperCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         switch (subCommandName) {
             case Constants.SET_SETTING -> {
                 switch (optionName) {
