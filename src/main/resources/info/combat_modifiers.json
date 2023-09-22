@@ -1,5 +1,17 @@
 [
     {
+        "alias": "plus1_roll_in_nebula",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "nebula_defender",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround", 
+        "related":[
+            {"type":"custom", "alias":"custom","message": ":shield: Defenders get +1 to ship rolls in a nebula."}
+        ]
+    },
+    {
         "alias": "plus1_roll_argent_commander_afb",
         "type": "extrarolls",
         "value": "+1",

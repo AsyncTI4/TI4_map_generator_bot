@@ -95,7 +95,8 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                            activeGame)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), AbilityInfo.getAbilityRepresentation(ability)));
             }
         }
@@ -106,7 +107,8 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                            activeGame)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getTechRepresentationLong(tech)));
             }
         }
@@ -116,7 +118,8 @@ public class CombatModHelper {
                     .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
                     .findFirst();
             
-            if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+            if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent,
+                    unitsByQuantity, activeGame)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
             }
@@ -132,7 +135,8 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                            activeGame)) {
                 alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
             }
         }
@@ -144,7 +148,8 @@ public class CombatModHelper {
                     .findFirst();
             
             if (relevantMod.isPresent() 
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                            activeGame)) {
                 alwaysOnMods.add(
                                 new NamedCombatModifierModel(relevantMod.get(),
                                         Helper.getEmojiFromDiscord(unit.getBaseType()) + " "
@@ -159,10 +164,23 @@ public class CombatModHelper {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, leader.getId()))
                     .findFirst();
-            
-            if (relevantMod.isPresent() 
-            && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity)) {
-                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
+
+            if (relevantMod.isPresent()
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                            activeGame)) {
+                alwaysOnMods.add(
+                        new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
+            }
+        }
+
+        List<CombatModifierModel> customAlwaysRelveantMods = combatModifiers.values().stream()
+                .filter(modifier -> modifier.isRelevantTo(Constants.CUSTOM, Constants.CUSTOM))
+                .collect(Collectors.toList());
+        for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
+            if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
+                    activeGame)) {
+                alwaysOnMods.add(
+                        new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
             }
         }
         
@@ -188,7 +206,7 @@ public class CombatModHelper {
     }
 
     public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-            Player opponent, Map<UnitModel, Integer> unitsByQuantity) {
+            Player opponent, Map<UnitModel, Integer> unitsByQuantity, Game game) {
         boolean meetsCondition = false;
         String condition = "";
         if(modifier != null && modifier.getCondition() != null){
@@ -226,6 +244,11 @@ public class CombatModHelper {
                 if (unitsByQuantity.entrySet().size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     meetsCondition = unitByQuantity.getValue() == 2 && !"ff".equals(unitByQuantity.getKey().getAsyncId());
+                }
+            }
+            case Constants.MOD_NEBULA_DEFENDER -> {
+                if (onTile.isNebula() && !game.getActivePlayer().equals(player.getUserID())) {
+                    meetsCondition = true;
                 }
             }
             default -> meetsCondition = true;
