@@ -18,7 +18,7 @@ import ti4.message.BotLogger;
 public class ImageHelper {
 
   private static final Cache<String, BufferedImage> imageCache = CacheBuilder.newBuilder()
-      .maximumSize(1000)
+      .maximumSize(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 1000))
       .expireAfterAccess(24, TimeUnit.HOURS)
       .build();
 
