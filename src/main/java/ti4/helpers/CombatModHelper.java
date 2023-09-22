@@ -113,6 +113,21 @@ public class CombatModHelper {
             }
         }
 
+        if(opponent != null){
+            for (String tech : opponent.getTechs()) {
+                Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
+                        .filter(modifier -> modifier.isRelevantTo("opponent_tech", tech))
+                        .findFirst();
+                
+                if (relevantMod.isPresent() 
+                        && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                                activeGame)) {
+                    alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), Helper.getTechRepresentationLong(tech)));
+                }
+            }
+        }
+
+
         for (String relic : player.getRelics()) {
             Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
