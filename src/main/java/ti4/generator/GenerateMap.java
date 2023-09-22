@@ -182,7 +182,7 @@ public class GenerateMap {
             System.out.printf("Map gen started for map %s%n", activeGame.getName());
         }
 
-        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Generating Map: " + activeGame.getName()));
+        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing(activeGame.getName()));
 
         activeGame.incrementMapImageGenerationCount();
         init(activeGame);
