@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
@@ -150,6 +151,11 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")){
+            new PlanetRefresh().doAction(player, planetName, activeGame);
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+            ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
         }
     }
 }

@@ -22,6 +22,8 @@ import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
+import ti4.commands.custom.PeakAtStage1;
+import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
@@ -32,6 +34,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -39,20 +42,70 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.PublicObjectiveModel;
 
 public class ButtonHelperFactionSpecific {
 
+    
     public static void checkForGeneticRecombination(Player voter, Game activeGame){
         for(Player p2 : activeGame.getRealPlayers()){
             if(p2 == voter){
                 continue;
             }
             if(p2.hasTechReady("gr")){
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getTrueIdentity(voter, activeGame) + " you technically may want to wait for a genetic recomination decision here. Use your discretion.");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(voter, activeGame), ButtonHelper.getTrueIdentity(voter, activeGame) + " you technically may want to wait for a genetic recombination decision here. Use your discretion.");
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you may use genetic recomination decision here on "+StringUtils.capitalize(voter.getColor())+". This is not automated/tracked by the bot");
             }
         }
     }
+
+    public static void augersHeroResolution(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event ){
+        List<Button> buttons = new ArrayList<Button>();
+        if(buttonID.split("_")[1].equalsIgnoreCase("1")){
+            int size = activeGame.getPublicObjectives1Peakable().size()-2;
+            for(int x = size; x < size+3; x++){
+                new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, x);
+                String obj = activeGame.peakAtStage1(x);
+                PublicObjectiveModel po = Mapper.getPublicObjective(obj);
+                buttons.add(Button.success("augerHeroSwap_1_"+x, "Put "+po.getName() + " As The Next Objective"));
+            }
+        }else{
+            int size = activeGame.getPublicObjectives2Peakable().size()-2;
+            for(int x = size; x < size+3; x++){
+                new PeakAtStage2().secondHalfOfPeak(event, activeGame, player, x);
+                String obj = activeGame.peakAtStage2(x);
+                PublicObjectiveModel po = Mapper.getPublicObjective(obj);
+                buttons.add(Button.success("augerHeroSwap_2_"+x, "Put "+po.getName() + " As The Next Objective"));
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Decline to change the next objective"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+ " use buttons to resolve", buttons);
+    }
+    public static void augersHeroSwap(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event ){
+        int num = Integer.parseInt(buttonID.split("_")[2]);
+        if(buttonID.split("_")[1].equalsIgnoreCase("1")){
+            activeGame.swapStage1(1, num);
+        }else{
+            activeGame.swapStage2(1, num);
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+ " put the objective at location "+num+ " as next up. Feel free to peek at it to confirm it worked");
+        GameSaveLoadManager.saveMap(activeGame, event);
+        event.getMessage().delete().queue();
+    }
+
+
+    public static List<Button> resolveFlorzenCommander(Player player, Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : player.getExhaustedPlanets()){
+            Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets(activeGame).contains(planet)) {
+                List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+                buttons.addAll(planetButtons);
+            }
+        }
+        return buttons;
+    }
+
      public static void resolveNaaluHeroSend(Player p1, Game activeGame, String buttonID, ButtonInteractionEvent event){
 
         buttonID = buttonID.replace("naaluHeroSend_", "");

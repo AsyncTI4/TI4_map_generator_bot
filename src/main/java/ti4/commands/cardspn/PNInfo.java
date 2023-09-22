@@ -77,6 +77,10 @@ public class PNInfo extends PNCardsSubcommandData {
             Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naalu")));
             buttons.add(naalu);
         }
+        if(player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")){
+            Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("augers")));
+            buttons.add(augers);
+        }
         if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
             buttons.add(hacanButton);
