@@ -1,6 +1,6 @@
 [
     {
-        "alias": "plus1_roll_argent_commander",
+        "alias": "plus1_roll_argent_commander_afb",
         "type": "extrarolls",
         "value": "+1",
         "persistenceType": "ALWAYS",
@@ -11,7 +11,7 @@
         "forCombatAbility": "afb"
     },
     {
-        "alias": "plus1_roll_argent_commander",
+        "alias": "plus1_roll_argent_commander_bombard",
         "type": "extrarolls",
         "value": "+1",
         "persistenceType": "ALWAYS",
