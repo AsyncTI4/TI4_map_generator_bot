@@ -102,7 +102,7 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN);
+        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN) || eventName.contains(Constants.DEVELOPER);
         boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName));
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
