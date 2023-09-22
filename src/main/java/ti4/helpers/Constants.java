@@ -711,7 +711,7 @@ public class Constants {
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
-    public static final String LARGE_TEXT = "large_text";
+    public static final String TEXT_SIZE = "text_size";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
@@ -904,4 +904,5 @@ public class Constants {
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
+    public static final String DEVELOPER = "developer";
 }
