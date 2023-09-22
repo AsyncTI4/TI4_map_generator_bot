@@ -369,7 +369,7 @@ public class AutoCompleteProvider {
             }
             case Constants.TEXT_SIZE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("small", "medium", "large")
+                List<Command.Choice> options = Stream.of("tiny", "small", "medium", "large")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

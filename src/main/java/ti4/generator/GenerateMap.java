@@ -2798,14 +2798,16 @@ public class GenerateMap {
                     tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                 }
 
-                int textOffset;
+                int textOffset = 0;
                 if ("large".equals(activeGame.getTextSize())) {
                     tileGraphics.setFont(Storage.getFont50());
-                    textOffset = 160;
+                    textOffset = 90;
                 } else if ("medium".equals(activeGame.getTextSize())) {
                     tileGraphics.setFont(Storage.getFont35());
-                    textOffset = 40;
-                } else {
+                    textOffset = 50;
+                } else if ("tiny".equals(activeGame.getTextSize())) {
+                    tileGraphics.setFont(Storage.getFont12());
+                } else { //"small"
                     tileGraphics.setFont(Storage.getFont20());
                     textOffset = 20;
                 }
