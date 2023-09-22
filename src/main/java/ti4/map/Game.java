@@ -1,6 +1,8 @@
 package ti4.map;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -98,8 +100,8 @@ public class Game {
     private boolean homebrewSCMode;
     @ExportableField
     private boolean stratPings = true;
-    @ExportableField
-    private String largeText = "small";
+    @ExportableField @Getter @Setter
+    private String textSize = "medium";
     @ExportableField
     private boolean absolMode;
     @Getter
@@ -545,14 +547,6 @@ public class Game {
 
     public void setStratPings(boolean stratPings) {
         this.stratPings = stratPings;
-    }
-
-    public void setLargeText(String largeText) {
-        this.largeText = largeText;
-    }
-
-    public String getLargeText() {
-        return largeText;
     }
 
     public boolean isAbsolMode() {

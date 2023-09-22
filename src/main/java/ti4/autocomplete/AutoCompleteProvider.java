@@ -367,7 +367,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.LARGE_TEXT -> {
+            case Constants.TEXT_SIZE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("small", "medium", "large")
                         .filter(value -> value.contains(enteredValue))
