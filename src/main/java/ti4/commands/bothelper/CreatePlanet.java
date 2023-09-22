@@ -51,8 +51,8 @@ public class CreatePlanet extends BothelperSubcommandData {
         String shortName = Optional.ofNullable(event.getOption(Constants.PLANET_SHORT_NAME)).isPresent() ? event.getOption(Constants.PLANET_SHORT_NAME).getAsString() : null;
         PlanetModel planet = null;
         try {
-            planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString(),
-                    event.getOption(Constants.PLANET_TILE_ID).getAsString(),
+            planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString().toLowerCase(),
+                    event.getOption(Constants.PLANET_TILE_ID).getAsString().toLowerCase(),
                     event.getOption(Constants.PLANET_NAME).getAsString(),
                     event.getOption(Constants.PLANET_ALIASES).getAsString(),
                     event.getOption(Constants.PLANET_POSITION_X).getAsInt(),
