@@ -1618,5 +1618,355 @@
     "baseUpgrade": "",
     "source": "ignis_aurora",
     "text": "At the end of a combat round, you may exhaust this card to return 1 captured unit and place a unit of the same type from your reinforcements in the active system."
+  },
+  {
+    "alias": "baldrick_amd",
+    "name": "Antimass Deflectors",
+    "type": "PROPULSION",
+    "requirements": "",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Your ships can move into and through asteroid fields. When other players' units use SPACE CANNON against your units, apply -2 to the result of each die roll."
+  },
+  {
+    "alias": "baldrick_gd",
+    "name": "Gravity Drive",
+    "type": "PROPULSION",
+    "requirements": "B",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "After you activate a system, you may exhaust this card to apply +1 to the move value of your ships during this tactical action."
+  },
+  {
+    "alias": "baldrick_fl",
+    "name": "Fleet Logistics",
+    "type": "CYBERNETIC",
+    "requirements": "YY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1."
+  },
+  {
+    "alias": "baldrick_lwd",
+    "name": "Light/Wave Deflector",
+    "type": "PROPULSION",
+    "requirements": "BBB",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "After you activate a system, you may exhaust this card to allow your ships to move through systems that contain other players' ship during this tactical action."
+  },
+  {
+    "alias": "baldrick_nm",
+    "name": "Neural Motivator",
+    "type": "BIOTIC",
+    "requirements": "",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "ACTION: Exhaust this card to draw one action card."
+  },
+  {
+    "alias": "baldrick_dxa",
+    "name": "Dacxive Animators",
+    "type": "BIOTIC",
+    "requirements": "G",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the start of a round of ground combat, you may exhaust this card. If you do, for each infantry destroyed in that combat round place an infantry token on this card. At the end of the combat round, place 1 infantry from your reinforcements on the planet for each token on this card."
+  },
+  {
+    "alias": "baldrick_hm",
+    "name": "Hyper Metabolism",
+    "type": "BIOTIC",
+    "requirements": "G",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "You may exhaust this card at the end of your turn to gain one command token."
+  },
+  {
+    "alias": "baldrick_x89",
+    "name": "X-89 Bacterial Weapon",
+    "type": "BIOTIC",
+    "requirements": "GGG",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "After the space cannon defense step of a planetary invasion, you may exhaust this card to destroy all of your opponent's infantry on that planet. Then, roll 1 die for each of your infantry on that planet. For each result of 6 or greater, destroy 1 of those units."
+  },
+  {
+    "alias": "baldrick_bs",
+    "name": "Bio-Stims",
+    "type": "BIOTIC",
+    "requirements": "",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty or 1 of your other technologies."
+  },
+  {
+    "alias": "baldrick_ps",
+    "name": "Plasma Scoring",
+    "type": "WARFARE",
+    "requirements": "",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "When 1 or more of your units use Bombardment, Anti-Fighter Barrage, or Space Cannon, 1 of those units may roll 1 additional die."
+  },
+  {
+    "alias": "baldrick_td",
+    "name": "Transit Diodes",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control."
+  },
+  {
+    "alias": "baldrick_pi",
+    "name": "Predictive Intelligence",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you cast votes during the agenda phase, you may cast 3 additional votes."
+  },
+  {
+    "alias": "baldrick_ws",
+    "name": "War Sun",
+    "type": "UNITUPGRADE",
+    "requirements": "RRRY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Cost 10, Combat 3(x3), Move 2, Capacity 8, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
+  },
+  {
+    "alias": "baldrick_sd2",
+    "name": "Space Dock II",
+    "type": "UNITUPGRADE",
+    "requirements": "YY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "This unit's PRODUCTION value is equal to 5 more than the resource or influence value of this planet. Up to 6 fighters in this system do not count against your ships' capacity. PRODUCTION X"
+  },
+  {
+    "alias": "baldrick_l4",
+    "name": "L4 Disruptors",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "letnev",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the start of a space combat you may exhaust this card. If you do, the other player cannot retreat or resolve abilities that would move their ships during this combat."
+  },
+  {
+    "alias": "baldrick_pws2",
+    "name": "Prototype War Sun II",
+    "type": "UNITUPGRADE",
+    "requirements": "RRRY",
+    "faction": "muaat",
+    "baseUpgrade": "ws",
+    "source": "ignis_aurora",
+    "text": "Cost 10, Combat 3(x3), Move 2, Capacity 8, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability. This unit cannot be destroyed by Direct Hit action cards."
+  },
+  {
+    "alias": "baldrick_ac2",
+    "name": "Advanced Carrier II",
+    "type": "UNITUPGRADE",
+    "requirements": "GB",
+    "faction": "sol",
+    "baseUpgrade": "cv2",
+    "source": "ignis_aurora",
+    "text": "Cost 3, Combat 9, Move 2, Capacity 8, SUSTAIN DAMAGE"
+  },
+  {
+    "alias": "baldrick_sdn2",
+    "name": "Super Dreadnought II",
+    "type": "UNITUPGRADE",
+    "requirements": "RBY",
+    "faction": "l1z1x",
+    "baseUpgrade": "dn2",
+    "source": "ignis_aurora",
+    "text": "Cost 4, Combat 4, Move 2, Capacity 2, SUSTAIN DAMAGE, BOMBARDMENT 4."
+  },
+  {
+    "alias": "baldrick_cl2",
+    "name": "Crimson Legionnaire II",
+    "type": "UNITUPGRADE",
+    "requirements": "G",
+    "faction": "mahact",
+    "baseUpgrade": "inf2",
+    "source": "ignis_aurora",
+    "text": "Cost 1(x2), Combat 7. After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+  },
+  {
+    "alias": "baldrick_hcf2",
+    "name": "Hybrid Crystal Fighter II",
+    "type": "UNITUPGRADE",
+    "requirements": "BY",
+    "faction": "naalu",
+    "baseUpgrade": "ff2",
+    "source": "ignis_aurora",
+    "text": "Cost 1(x2), Combat 7, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool."
+  },
+  {
+    "alias": "baldrick_exo2",
+    "name": "Exotrireme II",
+    "type": "UNITUPGRADE",
+    "requirements": "RBY",
+    "faction": "sardakk",
+    "baseUpgrade": "dn2",
+    "source": "ignis_aurora",
+    "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 4(x2), After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system."
+  },
+  {
+    "alias": "baldrick_scc",
+    "name": "Spacial Conduit Cylinders",
+    "type": "PROPULSION",
+    "requirements": "BB",
+    "faction": "jolnar",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "You may treat all systems that contain your structures as adjacent."
+  },
+  {
+    "alias": "baldrick_lgf",
+    "name": "Lazax Gate Folding",
+    "type": "PROPULSION",
+    "requirements": "B",
+    "faction": "winnu",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "During your tactical actions, treat the Mecatol Rex system as if it contains each non-delta wormhole."
+  },
+  {
+    "alias": "baldrick_bio",
+    "name": "Bioplasmosis",
+    "type": "BIOTIC",
+    "requirements": "G",
+    "faction": "arborec",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "At the start of the status phase, you may choose 1 Bioplasmosis attachment and place it on a planet you control."
+  },
+  {
+    "alias": "baldrick_so2",
+    "name": "Spec Ops II",
+    "type": "UNITUPGRADE",
+    "requirements": "G",
+    "faction": "sol",
+    "baseUpgrade": "inf2",
+    "source": "ignis_aurora",
+    "text": "You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+  },
+  {
+    "alias": "baldrick_is",
+    "name": "Inheritance Systems",
+    "type": "CYBERNETIC",
+    "requirements": "YY",
+    "faction": "l1z1x",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "ACTION: Exhaust this card and spend 6 resources to research a technology."
+  },
+  {
+    "alias": "baldrick_ht2",
+    "name": "Hel-Titan II",
+    "type": "UNITUPGRADE",
+    "requirements": "YR",
+    "faction": "titans",
+    "baseUpgrade": "pds2",
+    "source": "ignis_aurora",
+    "text": "Combat 6. This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems. When your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able. PLANETARY SHIELD, SPACE CANNON 6, SUSTAIN DAMAGE, PRODUCTION 1"
+  },
+  {
+    "alias": "baldrick_ers",
+    "name": "E-Res Siphons",
+    "type": "CYBERNETIC",
+    "requirements": "YY",
+    "faction": "jolnar",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "After another player activates a system that contains 1 or more of your ships, gain 3 trade goods."
+  },
+  {
+    "alias": "baldrick_dn2",
+    "name": "Dreadnought II",
+    "type": "UNITUPGRADE",
+    "requirements": "RBY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 5."
+  },
+  {
+    "alias": "baldrick_pds2",
+    "name": "PDS II",
+    "type": "UNITUPGRADE",
+    "requirements": "RY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "PLANETARY SHIELD, DEEP SPACE CANNON 6 You may use this unit's Space Cannon against ships that are adjacent to this unit's system.\nWhen your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able."
+  },
+  {
+    "alias": "baldrick_cv2",
+    "name": "Carrier II",
+    "type": "UNITUPGRADE",
+    "requirements": "GB",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Cost 3, Combat 9, Move 2, Capacity 6"
+  },
+  {
+    "alias": "baldrick_ff2",
+    "name": "Fighter II",
+    "type": "UNITUPGRADE",
+    "requirements": "BY",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Cost 1(x2), Combat 8, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+  },
+  {
+    "alias": "baldrick_inf2",
+    "name": "Infantry II",
+    "type": "UNITUPGRADE",
+    "requirements": "G",
+    "faction": "",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Cost 1(x2), Combat 7. You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
+  },
+  {
+    "alias": "baldrick_htp",
+    "name": "Hegemonic Trade Policy",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "winnu",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn."
+  },
+  {
+    "alias": "baldrick_ic",
+    "name": "Impulse Core",
+    "type": "CYBERNETIC",
+    "requirements": "Y",
+    "faction": "yin",
+    "baseUpgrade": "",
+    "source": "ignis_aurora",
+    "text": "When you or your opponent resolve a retreat, you may produce a hit and assign it to one of your opponent's ships in the active system."
   }
 ]
