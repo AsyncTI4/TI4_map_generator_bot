@@ -52,7 +52,7 @@ public class AutoCompleteProvider {
         }
 
         switch (commandName) {
-            case Constants.ADMIN -> resolveAdminCommandAutoComplete(event, subCommandName, optionName);
+            case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
             case Constants.HELP -> resolveHelpCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
@@ -652,7 +652,7 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveAdminCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+    private static void resolveDeveloperCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         switch (subCommandName) {
             case Constants.SET_SETTING -> {
                 switch (optionName) {
