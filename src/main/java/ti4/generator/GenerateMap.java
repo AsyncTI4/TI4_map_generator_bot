@@ -2799,10 +2799,10 @@ public class GenerateMap {
                 }
 
                 int textOffset;
-                if ("large".equals(activeGame.getLargeText())) {
+                if ("large".equals(activeGame.getTextSize())) {
                     tileGraphics.setFont(Storage.getFont50());
                     textOffset = 160;
-                } else if ("medium".equals(activeGame.getLargeText())) {
+                } else if ("medium".equals(activeGame.getTextSize())) {
                     tileGraphics.setFont(Storage.getFont35());
                     textOffset = 40;
                 } else {

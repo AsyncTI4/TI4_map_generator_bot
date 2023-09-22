@@ -22,7 +22,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "YES if want FoW Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
-        addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "Small/medium/large, default medium").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
@@ -132,10 +132,10 @@ public class Setup extends GameSubcommandData {
             }
         }
 
-        OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
-        if (largeText != null) {
-            String large = largeText.getAsString();
-            getActiveGame().setLargeText(large);
+        OptionMapping textSizeOption = event.getOption(Constants.TEXT_SIZE);
+        if (textSizeOption != null) {
+            String textSize = textSizeOption.getAsString();
+            getActiveGame().setTextSize(textSize);
         }
 
 
