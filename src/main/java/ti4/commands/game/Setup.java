@@ -99,6 +99,7 @@ public class Setup extends GameSubcommandData {
             }
         }
 
+
         OptionMapping pingHours = event.getOption(Constants.AUTO_PING);
         if (pingHours != null) {
             int pinghrs = pingHours.getAsInt();
