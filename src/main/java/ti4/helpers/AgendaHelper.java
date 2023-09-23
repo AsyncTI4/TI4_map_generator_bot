@@ -430,7 +430,8 @@ public class AgendaHelper {
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian!";
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
         if (watchParty != null) {
-            MessageHelper.sendMessageToChannel(watchParty, msg + " " + watchPartyPing);
+            String watchMsg = watchPartyPing + " " + activeGame.getName() + " has finished rolling:\n" + msg;
+            MessageHelper.sendMessageToChannel(watchParty, watchMsg);
         }
         if (d1.isSuccess() && !activeGame.isFoWMode()) {
             activeGame.setComponentAction(true);
