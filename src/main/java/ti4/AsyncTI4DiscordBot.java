@@ -84,19 +84,19 @@ public class AsyncTI4DiscordBot {
         GlobalSettings.loadSettings();
 
         jda = JDABuilder.createDefault(args[0])
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                .setEnableShutdownHook(false)
-                .build();
+            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            .setMemberCachePolicy(MemberCachePolicy.ALL)
+            .setChunkingFilter(ChunkingFilter.ALL)
+            .setEnableShutdownHook(false)
+            .build();
 
         jda.addEventListener(
-            new MessageListener(), 
-            new ButtonListener(), 
+            new MessageListener(),
+            new ButtonListener(),
             new UserJoinServerListener(),
             new AutoCompleteListener());
-            
+
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
@@ -174,19 +174,16 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
 
-
         commandManager.addCommand(new DeveloperCommand());
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
-
 
         commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
-
 
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
@@ -202,14 +199,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new StatisticsCommand());
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
-        
-        // TODO: Delete these
-        // commandManager.addCommand(new AddTile());
-        // commandManager.addCommand(new RemoveTile());
-        // commandManager.addCommand(new AddTileList());
-        // commandManager.addCommand(new AddBorderAnomaly());
-        // commandManager.addCommand(new RemoveBorderAnomaly());
-        
+
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
@@ -218,7 +208,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
             if (guildCommunityPlays != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildCommunityPlays.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildCommunityPlays.getName());
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
@@ -229,7 +219,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             if (guildFogOfWar != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildFogOfWar.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
@@ -240,7 +230,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
             if (guildSecondary != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildSecondary.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildSecondary.getName());
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
@@ -251,7 +241,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 7) {
             guild3rd = jda.getGuildById(args[6]);
             if (guild3rd != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guild3rd.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guild3rd.getName());
                 CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
@@ -264,7 +254,7 @@ public class AsyncTI4DiscordBot {
         GameSaveLoadManager.loadMaps();
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
-        DataMigrationManager.runMigrations(); 
+        DataMigrationManager.runMigrations();
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;

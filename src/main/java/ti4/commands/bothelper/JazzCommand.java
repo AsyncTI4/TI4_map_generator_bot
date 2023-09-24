@@ -2,6 +2,7 @@ package ti4.commands.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.AgendaHelper;
 import ti4.message.MessageHelper;
 
 public class JazzCommand extends BothelperSubcommandData {
@@ -25,6 +26,6 @@ public class JazzCommand extends BothelperSubcommandData {
             }
         }
 
-        //AgendaHelper.rollIxthian(getActiveGame());
+        AgendaHelper.rollIxthian(getActiveGame());
     }
 }
