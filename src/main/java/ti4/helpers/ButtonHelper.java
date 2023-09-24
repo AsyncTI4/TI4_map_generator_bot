@@ -1212,10 +1212,13 @@ public class ButtonHelper {
                     List<Button> buttons = getButtonsForPictureCombats(activeGame,  tile.getPosition(), p1, player2, spaceOrGround);
                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                     if (playersWithPds2.size() > 0 && !activeGame.isFoWMode() && "space".equalsIgnoreCase(spaceOrGround)) {
-                        StringBuilder pdsMessage = new StringBuilder("The following players have pds2 cover in the region:");
+                        StringBuilder pdsMessage = new StringBuilder("The following players have pds2 cover in the region, and can use the button to fire it:");
                         for(Player playerWithPds : playersWithPds2){
                             pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                         }
+                        List<Button> buttons2 = new ArrayList<>();
+                        //buttons2.add(Button.success(spaceOrGround, "Fire Space Cannon Offence"));
+                        
                         MessageHelper.sendMessageToChannel(threadChannel_, pdsMessage.toString());
                     }else{
                         if(activeGame.isFoWMode()){
@@ -1225,7 +1228,8 @@ public class ButtonHelper {
                     if("space".equalsIgnoreCase(spaceOrGround)){
                         List<Button> buttons2 = new ArrayList<Button>();
                         buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.afb, "Roll " + CombatRollType.afb.getValue()));
-                        MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use this button to roll AFB", buttons2);
+                        buttons2.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.spacecannonoffence, "Roll Space Cannon Offence"));
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
                     }
                     break;
                 }
@@ -1379,6 +1383,13 @@ public class ButtonHelper {
         if ("space".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Button.danger("retreat_"+pos, "Retreat"));
         }
+        if(ButtonHelper.getTilesOfUnitsWithBombard(p1, activeGame).contains(tile) ||ButtonHelper.getTilesOfUnitsWithBombard(p2, activeGame).contains(tile)){
+            if(tile.getUnitHolders().size() > 2){
+                 buttons.add(Button.secondary("bombardConfirm_combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.bombardment, "Roll Bombardment"));
+            }else{
+                buttons.add(Button.secondary("combatRoll_"+tile.getPosition()+"_space_"+CombatRollType.bombardment, "Roll Bombardment"));
+            }
+        }
         for (UnitHolder unitH : tile.getUnitHolders().values()) {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
@@ -1403,7 +1414,7 @@ public class ButtonHelper {
             if(nameOfHolder.equalsIgnoreCase("space")){
                 buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Space Combat"));
             }else{
-                buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Combat for "+nameOfHolder+""));
+                buttons.add(Button.secondary("combatRoll_"+pos+"_"+unitH.getName(), "Roll Ground Combat for "+nameOfHolder+""));
             }
             
         }        
@@ -1431,7 +1442,7 @@ public class ButtonHelper {
         }
         return hasAbility;
     }
-    public static boolean isTileHomeSystem(Tile tile, Game activeGame){
+    public static boolean isTileHomeSystem(Tile tile){
         boolean isHome = false;
         for(UnitHolder unitHolder : tile.getUnitHolders().values()){
             if(unitHolder instanceof Planet planetHolder){
@@ -2035,6 +2046,9 @@ public class ButtonHelper {
                     break;
                 case "bombardment":
                     rollType = CombatRollType.bombardment;
+                    break;
+                case "spacecannonoffence":
+                    rollType = CombatRollType.spacecannonoffence;
                     break;
                 default:
                     break;

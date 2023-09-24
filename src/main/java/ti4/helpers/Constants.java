@@ -350,6 +350,7 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
@@ -745,6 +746,7 @@ public class Constants {
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
+    public static final String POWERED = "powered";
     public static final String BOT_FACTION_REACTS= "bot_faction_reacts";
     public static final String BOT_SHUSHING= "bot_shushing";
     public static final String LIST_MY_GAMES = "list_my_games";
