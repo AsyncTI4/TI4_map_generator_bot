@@ -73,7 +73,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.CombatRollType;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -2665,7 +2664,7 @@ public class ButtonListener extends ListenerAdapter {
                                     player2 = players.get(1);
                                 }
 
-                                String threadName = ButtonHelper.combatThreadName(activeGame, player2, player, tile);
+                                String threadName = ButtonHelper.combatThreadName(activeGame, player, player2, tile);
                                 if (!activeGame.isFoWMode()) {
                                     ButtonHelper.makeACombatThread(activeGame, actionsChannel, player, player2, threadName, tile, event, "space");
                                 } else {
@@ -2724,7 +2723,7 @@ public class ButtonListener extends ListenerAdapter {
                             if (player2 == player) {
                                 player2 = players.get(1);
                             }
-                            String threadName = ButtonHelper.combatThreadName(activeGame, player2, player, tile);
+                            String threadName = ButtonHelper.combatThreadName(activeGame, player, player2, tile);
                             if (!activeGame.isFoWMode()) {
                                 ButtonHelper.makeACombatThread(activeGame, actionsChannel, player, player2, threadName, tile, event, "ground");
                             } else {

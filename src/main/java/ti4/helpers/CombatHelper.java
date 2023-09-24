@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
-import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -19,7 +18,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatHelper {
