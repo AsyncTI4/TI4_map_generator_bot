@@ -36,12 +36,16 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
-	interface MessageFunction{
+	public interface MessageFunction{
 		void run(Message msg);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
 		splitAndSent(messageText, channel);
+	}
+
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
+		splitAndSent(messageText, channel, Collections.singletonList(buttons));
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
@@ -59,6 +63,7 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeGame, player, msg);
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
+
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game activeGame, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players;
@@ -183,7 +188,7 @@ public class MessageHelper {
 		splitAndSentWithAction(messageText, channel, null, buttons);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+	public static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
 		splitAndSentWithAction(messageText, channel, restAction, null);
 	}
 
