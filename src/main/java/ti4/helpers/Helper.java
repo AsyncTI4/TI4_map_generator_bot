@@ -771,10 +771,10 @@ public class Helper {
                     planetButtons.add(button);
                 }
             }
-        } else {
-            for (Tile tile : activeGame.getTileMap().values()) {
-                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile, activeGame)) {
-                    Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_" + "mahact" + mahact.getColor(), tile.getRepresentation() + " System");
+        }else{
+            for(Tile tile : activeGame.getTileMap().values()){
+                if(FoWHelper.playerHasUnitsInSystem(player, tile) && !ButtonHelper.isTileHomeSystem(tile)){
+                    Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+tile.getPosition()+"_"+"mahact"+mahact.getColor(), tile.getRepresentation() + " System");
                     planetButtons.add(button);
                 }
             }
