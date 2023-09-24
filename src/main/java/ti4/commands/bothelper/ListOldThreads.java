@@ -18,8 +18,8 @@ import ti4.helpers.Constants;
 public class ListOldThreads extends BothelperSubcommandData {
     final public static Predicate<ThreadChannel> filter = c -> c.getLatestMessageIdLong() != 0 && !c.isArchived();
 
-    public ListOldThreads(){
-        super(Constants.LIST_OLD_THREADS, "List the oldest 'active' threads. Use to help find threads that can be archived.");
+    public ListOldThreads() {
+        super(Constants.LIST_OLD_THREADS, "List the oldest threads");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of threads to list (1 to 1000)").setRequired(true));
     }
 
@@ -37,16 +37,17 @@ public class ListOldThreads extends BothelperSubcommandData {
         StringBuilder sb;
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                            .filter(filter)
-                            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                            .limit(channelCount)
-                            .toList();
+            .filter(filter)
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(channelCount)
+            .toList();
 
         sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **").append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
+            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **")
+                .append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }
@@ -54,16 +55,16 @@ public class ListOldThreads extends BothelperSubcommandData {
     public static String getHowOldOldestThreadIs(Guild guild) {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                            .filter(filter)
-                            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                            .limit(1)
-                            .toList();
+            .filter(filter)
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(1)
+            .toList();
 
         String durationText = "";
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            durationText =  duration.toHours() + " hours old";
+            durationText = duration.toHours() + " hours old";
         }
         return durationText;
     }

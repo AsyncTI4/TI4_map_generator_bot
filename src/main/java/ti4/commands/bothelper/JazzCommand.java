@@ -3,11 +3,10 @@ package ti4.commands.bothelper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
 import ti4.message.MessageHelper;
-import ti4.helpers.AgendaHelper;
 
 public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {
-        super("jazz_command", "Jazz's custom command");
+        super("jazz_command", "jazzxhands");
         // addOptions(new OptionData(OptionType.INTEGER, "num_dice", "description", true).setRequiredRange(0, 1000));
         // addOptions(new OptionData(OptionType.INTEGER, "threshold", "description", true).setRequiredRange(1, 10));
         // addOptions(new OptionData(OptionType.INTEGER, "num_dice_2", "description", true).setRequiredRange(0, 1000));
@@ -26,6 +25,6 @@ public class JazzCommand extends BothelperSubcommandData {
             }
         }
 
-        AgendaHelper.rollIxthian(getActiveGame());
+        //AgendaHelper.rollIxthian(getActiveGame());
     }
 }

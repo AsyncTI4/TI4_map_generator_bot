@@ -40,6 +40,10 @@ public class MessageHelper {
 		void run(Message msg);
 	}
 
+	public interface ThreadFunction{
+		void run(ThreadChannel msg);
+	}
+
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
 		splitAndSent(messageText, channel);
 	}

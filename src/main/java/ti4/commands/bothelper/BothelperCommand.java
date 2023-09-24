@@ -57,7 +57,7 @@ public class BothelperCommand implements Command {
             activeGame = "Active map: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -73,7 +73,7 @@ public class BothelperCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        BothelperSubcommandData subCommandExecuted;
+        //BothelperSubcommandData subCommandExecuted;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (BothelperSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
@@ -105,13 +105,14 @@ public class BothelperCommand implements Command {
         subcommands.add(new ReExportAllTiles());
         subcommands.add(new JazzCommand());
         subcommands.add(new Observer());
+        subcommands.add(new ListButtons());
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

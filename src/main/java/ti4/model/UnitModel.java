@@ -1,6 +1,5 @@
 package ti4.model;
 
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -64,44 +63,44 @@ public class UnitModel implements ModelInterface {
         String factionEmoji = Helper.getEmojiFromDiscord(faction);
         String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
 
-      return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
+        return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
-    
+
     public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
-        
+
         String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().toLowerCase());
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
         /*
-            Set the title:
-            1. Arg: title as string
-            2. Arg: URL as string or could also be null
-        */
+         * Set the title:
+         * 1. Arg: title as string
+         * 2. Arg: URL as string or could also be null
+         */
         String name = getName() == null ? "" : getName();
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
 
         /*
-            Set the color
-        */
+         * Set the color
+         */
         // eb.setColor(Color.red);
         // eb.setColor(new Color(0xF40C0C));
         // eb.setColor(new Color(255, 0, 54));
 
         /*
-            Set the text of the Embed:
-            Arg: text as string
-        */
+         * Set the text of the Embed:
+         * Arg: text as string
+         */
         // eb.setDescription(getId());
 
         // String afbText = unit.getAfbHitsOn() + 
 
         /*
-            Add fields to embed:
-            1. Arg: title as string
-            2. Arg: text as string
-            3. Arg: inline mode true / false
-        */
+         * Add fields to embed:
+         * 1. Arg: title as string
+         * 2. Arg: text as string
+         * 3. Arg: inline mode true / false
+         */
         // eb.addField("Title of field", "test of field", false);
         // eb.addField("Title of field", "test of field", false);
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
@@ -110,66 +109,66 @@ public class UnitModel implements ModelInterface {
         if (getAbility() != null) eb.addField("Ability:", getAbility(), false);
 
         /*
-            Add spacer like field
-            Arg: inline mode true / false
-        */
+         * Add spacer like field
+         * Arg: inline mode true / false
+         */
         // eb.addBlankField(false);
 
         /*
-            Add embed author:
-            1. Arg: name as string
-            2. Arg: url as string (can be null)
-            3. Arg: icon url as string (can be null)
-        */
+         * Add embed author:
+         * 1. Arg: name as string
+         * 2. Arg: url as string (can be null)
+         * 3. Arg: icon url as string (can be null)
+         */
         // eb.setAuthor("name", null, "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
 
         /*
-            Set footer:
-            1. Arg: text as string
-            2. icon url as string (can be null)
-        */
+         * Set footer:
+         * 1. Arg: text as string
+         * 2. icon url as string (can be null)
+         */
         // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
         /*
-            Set image:
-            Arg: image url as string
-        */
+         * Set image:
+         * Arg: image url as string
+         */
         // eb.setImage("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
 
         /*
-            Set thumbnail image:
-            Arg: image url as string
-        */
+         * Set thumbnail image:
+         * Arg: image url as string
+         */
         // eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
 
         return eb.build();
     }
 
-    public int getCombatDieCountForAbility(CombatRollType rollType){
+    public int getCombatDieCountForAbility(CombatRollType rollType) {
         switch (rollType) {
             case combatround:
                 return getCombatDieCount();
-            case afb:
+            case AFB:
                 return getAfbDieCount();
             case bombardment:
                 return getBombardDieCount();
-            case spacecannonoffence:
+            case SpaceCannonOffence:
                 return getSpaceCannonDieCount();
             default:
                 return getCombatDieCount();
         }
     }
 
-    public int getCombatDieHitsOnForAbility(CombatRollType rollType){
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
         switch (rollType) {
             case combatround:
                 return getCombatHitsOn();
-            case afb:
+            case AFB:
                 return getAfbHitsOn();
             case bombardment:
                 return getBombardHitsOn();
-            case spacecannonoffence:
+            case SpaceCannonOffence:
                 return getSpaceCannonHitsOn();
             default:
                 return getCombatHitsOn();
@@ -183,22 +182,22 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getValuesText() {
-      return getCostText() +
-          getMoveText() +
-          getProductionText() +
-          getCapacityText();
+        return getCostText() +
+            getMoveText() +
+            getProductionText() +
+            getCapacityText();
     }
 
     private String getDiceText() {
-      return getCombatText() +
-          getAFBText() +
-          getBombardText() +
-          getSpaceCannonText();
+        return getCombatText() +
+            getAFBText() +
+            getBombardText() +
+            getSpaceCannonText();
     }
-    
+
     private String getOtherText() {
-      return getPlanetaryShieldText() +
-          getSustainDamageText();
+        return getPlanetaryShieldText() +
+            getSustainDamageText();
     }
 
     private String getCostText() {
