@@ -30,7 +30,7 @@
         }
     ],
     "wormholes": [
-        null
+        "ALPHA", "BETA"
     ],
     "planets": [],
     "isGravityRift": true

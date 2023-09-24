@@ -1006,7 +1006,7 @@ public class GameSaveLoadManager {
                                 String data = tmpData != null ? tmpData : myReader.nextLine();
                                 tmpData = null;
                                 if (UNITS.equals(data)) {
-                                    spaceHolder = myReader.nextLine();
+                                    spaceHolder = myReader.nextLine().toLowerCase();
                                     if (tile != null) {
                                         if (Constants.MIRAGE.equals(spaceHolder)) {
                                             Helper.addMirageToTile(tile);
@@ -1455,13 +1455,6 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.TEXT_SIZE -> {
-                    try {
-                        activeGame.setTextSize(info);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
-                case "large_text" -> { //MIGRATION ONLY TO PRESERVE NAME CHANGE - CAN DELETE IF YOU SEE THIS
                     try {
                         activeGame.setTextSize(info);
                     } catch (Exception e) {
