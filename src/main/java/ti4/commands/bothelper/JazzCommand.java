@@ -1,15 +1,9 @@
 package ti4.commands.bothelper;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.Mapper;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.model.AgendaModel;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.Emojis;
 
 public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {
@@ -32,17 +26,6 @@ public class JazzCommand extends BothelperSubcommandData {
             }
         }
 
-        Game activeGame = getActiveGame();
-        String agendaID = activeGame.getNextAgenda(false);
-        AgendaModel agenda = Mapper.getAgenda(agendaID);
-        // Make an embed
-        EmbedBuilder eb = AgendaHelper.buildAgendaEmbed(agenda);
-        eb.addField(Emojis.nowhens + " __No Whens__", Emojis.Arborec + Emojis.Naaz + Emojis.Winnu + "\n", true);
-        eb.addField(Emojis.noafters + " __No Afters__", Emojis.Arborec + Emojis.Naaz, true);
-
-        MessageCreateBuilder mcb = new MessageCreateBuilder();
-        mcb.addEmbeds(eb.build());
-
-        event.getChannel().sendMessage(mcb.build()).queue();
+        AgendaHelper.rollIxthian(getActiveGame());
     }
 }

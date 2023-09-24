@@ -2810,4 +2810,10 @@ public class Game {
     public int getSleeperTokensPlacedCount() {
         return getAllPlanetsWithSleeperTokens().size();
     }
+
+    public Optional<Player> getPlayerByColorID(String color) {
+        return getRealPlayers().stream()
+                    .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
+                    .findFirst();
+    }
 }
