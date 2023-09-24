@@ -26,7 +26,7 @@ public class Replace extends GameSubcommandData {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
     }
@@ -53,7 +53,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
         
-        OptionMapping removeOption = event.getOption(Constants.PLAYER);
+        OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if (removeOption == null || addOption == null) {
             MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
@@ -62,7 +62,7 @@ public class Replace extends GameSubcommandData {
         
         Player removedPlayer = Helper.getPlayer(activeGame, null, event);
         if (removedPlayer == null){
-            MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
+            MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
         }
         User addedUser = addOption.getAsUser();
