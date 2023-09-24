@@ -1430,7 +1430,7 @@ public class ButtonListener extends ListenerAdapter {
             if (!activeGame.isFoWMode() && playersWithPds2.size() > 0) {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
                 List<Button> buttons2 = new ArrayList<Button>();
-                buttons2.add(Button.secondary("combatRoll_" + pos + "_space_" + CombatRollType.SpaceCannonOffence, "Roll Space Cannon Offence"));
+                buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                 }
