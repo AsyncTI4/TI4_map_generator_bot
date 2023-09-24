@@ -31,6 +31,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
@@ -417,7 +419,7 @@ public class StartMilty extends MiltySubcommandData {
         return slicesCreated;
     }
 
-    private void initDraftTiles(MiltyDraftManager draftManager) {
+    public void initDraftTiles(MiltyDraftManager draftManager) {
         Map<String, TileModel> allTiles = TileHelper.getAllTiles();
         for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
             String tileID = tileModel.getId();
@@ -434,17 +436,25 @@ public class StartMilty extends MiltySubcommandData {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);
+                        continue;
                     }
                 }
             }
             Tile tile = new Tile(tileID, "none");
+            if(tileID.length() > 2){
+                continue;
+            }
+           
+            if(ButtonHelper.isTileHomeSystem(tile) || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres") ){
+                continue;
+            }
             draftTile.setTile(tile);
-
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 if (unitHolder instanceof Planet planet) {
                     int resources = planet.getResources();
                     int influence = planet.getInfluence();
+                
                     draftTile.addResources(resources);
                     draftTile.addInfluence(influence);
                     if (resources > influence) {
@@ -466,7 +476,7 @@ public class StartMilty extends MiltySubcommandData {
             int resources = draftTile.getResources();
             int influence = draftTile.getInfluence();
             int combinedResources = resources + influence;
-            if (combinedResources == 0) {
+            if (combinedResources == 0 || tile.isAnomaly()) {
                 draftTile.setTierList(TierList.red);
             } else if (combinedResources < 4) {
                 draftTile.setTierList(TierList.low);

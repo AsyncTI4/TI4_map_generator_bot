@@ -74,9 +74,11 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CombatRollType;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -1427,12 +1429,13 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
             }
             if (!activeGame.isFoWMode() && playersWithPds2.size() > 0) {
-                StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of deep space cannon units owned by");
-
+                StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
+                 List<Button> buttons2 = new ArrayList<Button>();
+                buttons2.add(Button.secondary("combatRoll_"+pos+"_space_"+CombatRollType.spacecannonoffence, "Roll Space Cannon Offence"));
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                 }
-                MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage.toString());
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), pdsMessage.toString(), buttons2);
             }
             List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
             List<Button> button3 = ButtonHelperFactionSpecific.getL1Z1XAgentButtons(activeGame, player);
@@ -1657,6 +1660,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("putSleeperOnPlanet_")) {
             ButtonHelperFactionSpecific.putSleeperOn(buttonID, event, activeGame, player, ident);
+         } else if (buttonID.startsWith("frankenDraftAction_")) {
+            FrankenDraftHelper.resolveFrankenDraftAction(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
             ButtonHelperFactionSpecific.removeSleeper(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("replaceSleeperWith_")) {

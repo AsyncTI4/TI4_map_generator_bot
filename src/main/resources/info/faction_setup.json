@@ -141,7 +141,7 @@
   },
   {
     "alias": "argent",
-    "factionName": "The Argent flight",
+    "factionName": "The Argent Flight",
     "homeSystem": "58",
     "startingFleet": "cv,2 dd,2 ff,3 inf v,2 inf a, pds y,sd v",
     "commodities": 3,
