@@ -13,28 +13,28 @@ import ti4.helpers.Constants;
 
 public class Observer extends BothelperSubcommandData {
     public Observer() {
-        super(Constants.OBSERVER,"Add or remove observers to game channels");
+        super(Constants.OBSERVER, "Add or remove observers to game channels");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER,"Player @playername").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ADD_REMOVE,"add or remove player as observer").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ADD_REMOVE, "add or remove player as observer").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-       Guild guild = event.getGuild();
-       Member user = guild.getMemberById(event.getOption("player").getAsString());
-       
+        Guild guild = event.getGuild();
+        Member user = guild.getMemberById(event.getOption("player").getAsString());
+
         List<GuildChannel> channels = guild.getChannels();
-        
-        for(GuildChannel channel : channels) {
-            if(channel.getName().contains(event.getOption("game_name").getAsString())) {
-            
-                if("add".equals(event.getOption("add_remove").getAsString())) {
-                    channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL,Permission.MESSAGE_SEND).queue();
+
+        for (GuildChannel channel : channels) {
+            if (channel.getName().contains(event.getOption("game_name").getAsString())) {
+
+                if ("add".equals(event.getOption("add_remove").getAsString())) {
+                    channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
                     sendMessage("Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
                 }
 
-                if("remove".equals(event.getOption("add_remove").getAsString())) {
+                if ("remove".equals(event.getOption("add_remove").getAsString())) {
                     channel.getPermissionContainer().upsertPermissionOverride(user).deny(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
                     sendMessage("Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
                 }
@@ -42,4 +42,3 @@ public class Observer extends BothelperSubcommandData {
         }
     }
 }
-

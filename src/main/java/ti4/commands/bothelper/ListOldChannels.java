@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
 
 public class ListOldChannels extends BothelperSubcommandData {
-    public ListOldChannels(){
-        super(Constants.LIST_OLD_CHANNELS, "List the oldest 'active' channels. Use to help find dead games to free up channels.");
+    public ListOldChannels() {
+        super(Constants.LIST_OLD_CHANNELS, "List the oldest channels");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of channels to list (1 to 500)").setRequired(true));
     }
 
@@ -33,10 +33,10 @@ public class ListOldChannels extends BothelperSubcommandData {
     public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
         List<TextChannel> channels = guild.getTextChannels();
         channels = channels.stream()
-                            .filter(c -> c.getLatestMessageIdLong() != 0)
-                            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                            .limit(channelCount)
-                            .toList();
+            .filter(c -> c.getLatestMessageIdLong() != 0)
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(channelCount)
+            .toList();
 
         StringBuilder sb = new StringBuilder("Least Active Channels:\n");
         for (TextChannel channel : channels) {

@@ -2,7 +2,6 @@ package ti4.buttons;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1430,8 +1429,8 @@ public class ButtonListener extends ListenerAdapter {
             }
             if (!activeGame.isFoWMode() && playersWithPds2.size() > 0) {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
-                 List<Button> buttons2 = new ArrayList<Button>();
-                buttons2.add(Button.secondary("combatRoll_"+pos+"_space_"+CombatRollType.spacecannonoffence, "Roll Space Cannon Offence"));
+                List<Button> buttons2 = new ArrayList<Button>();
+                buttons2.add(Button.secondary("combatRoll_" + pos + "_space_" + CombatRollType.SpaceCannonOffence, "Roll Space Cannon Offence"));
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                 }
@@ -1660,7 +1659,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("putSleeperOnPlanet_")) {
             ButtonHelperFactionSpecific.putSleeperOn(buttonID, event, activeGame, player, ident);
-         } else if (buttonID.startsWith("frankenDraftAction_")) {
+        } else if (buttonID.startsWith("frankenDraftAction_")) {
             FrankenDraftHelper.resolveFrankenDraftAction(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
             ButtonHelperFactionSpecific.removeSleeper(buttonID, event, activeGame, player, ident);
@@ -2607,7 +2606,6 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
                 }
-
                 case "doneWithTacticalAction" -> {
                     ButtonHelper.exploreDET(player, activeGame, event);
                     if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
@@ -2666,14 +2664,11 @@ public class ButtonListener extends ListenerAdapter {
                                 if (player2 == player) {
                                     player2 = players.get(1);
                                 }
-                                String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-system-" + tile.getPosition() + "-" + player.getFaction() + "-vs-"
-                                    + player2.getFaction();
 
+                                String threadName = ButtonHelper.combatThreadName(activeGame, player2, player, tile);
                                 if (!activeGame.isFoWMode()) {
                                     ButtonHelper.makeACombatThread(activeGame, actionsChannel, player, player2, threadName, tile, event, "space");
                                 } else {
-                                    threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-system-" + tile.getPosition() + "-" + player.getColor() + "-vs-" + player2.getColor()
-                                        + "-private";
                                     ButtonHelper.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "space");
                                     ButtonHelper.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "space");
                                     for (Player player3 : activeGame.getRealPlayers()) {
@@ -2729,13 +2724,10 @@ public class ButtonListener extends ListenerAdapter {
                             if (player2 == player) {
                                 player2 = players.get(1);
                             }
-                            String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-system-" + tile.getPosition() + "-" + player.getFaction() + "-vs-"
-                                + player2.getFaction();
+                            String threadName = ButtonHelper.combatThreadName(activeGame, player2, player, tile);
                             if (!activeGame.isFoWMode()) {
                                 ButtonHelper.makeACombatThread(activeGame, actionsChannel, player, player2, threadName, tile, event, "ground");
                             } else {
-                                threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-system-" + tile.getPosition() + "-" + player.getColor() + "-vs-" + player2.getColor()
-                                    + "-private";
                                 ButtonHelper.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "ground");
                                 ButtonHelper.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "ground");
                                 for (Player player3 : activeGame.getRealPlayers()) {
