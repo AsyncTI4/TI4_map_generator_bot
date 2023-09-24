@@ -1303,8 +1303,8 @@ public class ButtonHelper {
         }
         if ("space".equalsIgnoreCase(spaceOrGround)) {
             List<Button> buttons2 = new ArrayList<Button>();
-            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.AFB, "Roll " + CombatRollType.AFB.getValue()));
-            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.SpaceCannonOffence, "Roll Space Cannon Offence"));
+            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
+            buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
         }
     }
