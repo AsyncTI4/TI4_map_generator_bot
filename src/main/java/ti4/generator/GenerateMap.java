@@ -1442,7 +1442,8 @@ public class GenerateMap {
                     drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planet);
                 }
 
-                boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary"));
+                boolean hasAbility = planetHolder.isHasAbility() ||
+                    planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary") || token.contains("consulate"));
                 if (hasAbility) {
                     String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                     String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
@@ -2987,7 +2988,8 @@ public class GenerateMap {
                         tileGraphics.drawImage(factionImage, imgX + DELTA_X, imgY + DELTA_Y, null);
                     }
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             if (image != null) {
                 deltaX += image.getWidth() / 5;
