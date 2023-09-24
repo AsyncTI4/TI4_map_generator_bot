@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -19,6 +22,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -243,9 +248,9 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
             if ("artifact".equalsIgnoreCase(agID)) {
-                if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).size() > 0 && !activeGame.isFoWMode()) {
-                    TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).get(0);
-                    String watchPartyPing = AsyncTI4DiscordBot.guildPrimary.getRoleById("1155175414025703466").getAsMention();
+                TextChannel watchParty = watchPartyChannel(activeGame);
+                String watchPartyPing = watchPartyPing(activeGame);
+                if (watchParty != null && !activeGame.isFoWMode()) {
                     Tile tile = Helper.getTileFromPlanet("mr", activeGame);
                     if (watchParty != null && tile != null) {
                         File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
@@ -386,6 +391,24 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
     }
 
+    @Nullable
+    private static String watchPartyPing(Game activeGame) {
+        List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName("Ixthian Watch Party", true);
+        if (!activeGame.isFoWMode() && roles.size() > 0) {
+            return roles.get(0).getAsMention();
+        }
+        return null;
+    }
+
+    @Nullable
+    private static TextChannel watchPartyChannel(Game activeGame) {
+        List<TextChannel> channels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
+        if (!activeGame.isFoWMode() && channels.size() > 0) {
+            return channels.get(0);
+        }
+        return null;
+    }
+
     private static void sleep() {
         try {
             TimeUnit.SECONDS.sleep(1);
@@ -393,38 +416,48 @@ public class AgendaHelper {
         }
     }
 
-    private static String drumroll(Game activeGame, int drums) {
-        StringBuilder sb = new StringBuilder(Helper.getGamePing(activeGame.getGuild(), activeGame));
-        sb.append("\n# Drumroll please.... ").append(Emojis.RollDice);
-        sb.append("\n# 🥁").append(" 🥁".repeat(drums));
+    private static String drumroll(String ping, int drums) {
+        StringBuilder sb = new StringBuilder();
+        if (ping != null) {
+            sb.append(ping).append("\n");
+        }
+        sb.append("# Drumroll please.... ").append(Emojis.RollDice).append("\n");
+        sb.append("# 🥁").append(" 🥁".repeat(drums));
         return sb.toString();
     }
 
     public static void rollIxthian(Game activeGame) {
+        TextChannel watchParty = watchPartyChannel(activeGame);
+        String watchPartyPing = watchPartyPing(activeGame);
+        String activeGamePing = Helper.getGamePing(activeGame.getGuild(), activeGame);
+        Message watchPartyMsg = watchParty == null ? null : watchParty.sendMessage(drumroll(watchPartyPing, 0)).complete();
+
         MessageHelper.MessageFunction resolveIxthian = (msg) -> {
-            int rand = 5 + ThreadLocalRandom.current().nextInt(5);
+            int rand = 10 + ThreadLocalRandom.current().nextInt(5);
             if (ThreadLocalRandom.current().nextInt(10) == 0) {
                 //random chance for a super long wait
-                rand += ThreadLocalRandom.current().nextInt(50);
+                rand += ThreadLocalRandom.current().nextInt(45);
             }
             sleep();
             for (int i = 1; i <= rand; i++) {
-                msg.editMessage(drumroll(activeGame, i)).queue();
+                msg.editMessage(drumroll(activeGamePing, i)).queue();
+                if (watchPartyMsg != null) {
+                    watchPartyMsg.editMessage(drumroll(watchPartyPing, i)).queue();
+                }
                 sleep();
             }
             msg.delete().queue();
+            if (watchPartyMsg != null) {
+                watchPartyMsg.delete().queue();
+            }
             resolveIxthianRoll(activeGame);
         };
-        MessageHelper.splitAndSentWithAction(drumroll(activeGame, 0), activeGame.getMainGameChannel(), resolveIxthian);
+        MessageHelper.splitAndSentWithAction(drumroll(activeGamePing, 0), activeGame.getMainGameChannel(), resolveIxthian);
     }
 
     private static void resolveIxthianRoll(Game activeGame) {
-        TextChannel watchParty = null;
-        String watchPartyPing = "";
-        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).size() > 0 && !activeGame.isFoWMode()) {
-            watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true).get(0);
-            watchPartyPing = AsyncTI4DiscordBot.guildPrimary.getRoleById("1155175414025703466").getAsMention();
-        }
+        TextChannel watchParty = watchPartyChannel(activeGame);
+        String watchPartyPing = watchPartyPing(activeGame);
 
         Die d1 = new Die(6);
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian!";
