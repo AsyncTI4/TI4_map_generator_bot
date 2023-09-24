@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Objects;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.ISnowflake;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,6 +20,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -247,6 +250,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
         sendMessage(message);
 
         GameSaveLoadManager.saveMap(newGame, event);
+
+        //AUTOCLOSE THREAD AFTER RUNNING COMMAND
+        if (event.getChannel() instanceof ThreadChannel) {
+            ThreadChannel thread = (ThreadChannel) event.getChannel();
+            thread.getManager().setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue();
+            thread.getManager().setArchived(true).queue();
+            thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
+        }
     }
 
     private static String getNextGameName() {
