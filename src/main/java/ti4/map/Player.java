@@ -1,6 +1,9 @@
 package ti4.map;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -13,6 +16,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
@@ -44,6 +48,7 @@ public class Player {
     private boolean isDummy;
 
     private String faction;
+    private String factionEmoji = null;
 
     @Setter
     private String playerStatsAnchorPosition;
@@ -828,6 +833,18 @@ public class Player {
         this.faction = faction;
         initLeaders();
         initAbilities();
+    }
+
+    @NotNull @Nonnull
+    public String getFactionEmoji() {
+        if (factionEmoji != null || !factionEmoji.isBlank() || !factionEmoji.isEmpty()) {
+            return factionEmoji;
+        }
+        return Helper.getFactionIconFromDiscord(getFaction());
+    }
+
+    public void setFactionEmoji(String factionEmoji) {
+        this.factionEmoji = factionEmoji;
     }
 
     private void initAbilities() {
