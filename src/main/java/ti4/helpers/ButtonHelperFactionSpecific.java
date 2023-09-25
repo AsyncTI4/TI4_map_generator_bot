@@ -190,7 +190,7 @@ public class ButtonHelperFactionSpecific {
                     transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() + " " + promissoryNote.getName());
                 } else {
                     transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                        .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                 }
                 stuffToTransButtons.add(transact);
             }
@@ -545,7 +545,7 @@ public class ButtonHelperFactionSpecific {
         String msg = Helper.getPlayerRepresentation(cabal, activeGame, activeGame.getGuild(), true) + " has failed to eat " + amount + " of the " + unit + "s owned by "
             + Helper.getPlayerRepresentation(player, activeGame) + " because they were blockaded. Wah-wah.";
         if (!isCabalBlockadedByPlayer(player, activeGame, cabal)) {
-            msg = Helper.getFactionIconFromDiscord(cabal.getFaction()) + " has devoured " + amount + " of the " + unit + "s owned by " + player.getColor() + ". Chomp chomp.";
+            msg = cabal.getFactionEmoji() + " has devoured " + amount + " of the " + unit + "s owned by " + player.getColor() + ". Chomp chomp.";
             String color = player.getColor();
             String unitP = AliasHandler.resolveUnit(unit);
             if (unitP.contains("ff") || unitP.contains("gf")) {
@@ -575,7 +575,7 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile) && !isCabalBlockadedByPlayer(p2, activeGame, player)) {
-                ButtonHelper.riftAllUnitsInASystem(pos, event, activeGame, p2, Helper.getFactionIconFromDiscord(p2.getFaction()), player);
+                ButtonHelper.riftAllUnitsInASystem(pos, event, activeGame, p2, p2.getFactionEmoji(), player);
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile) && isCabalBlockadedByPlayer(p2, activeGame, player)) {
                 String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " has failed to eat units owned by " + Helper.getPlayerRepresentation(player, activeGame)
@@ -1154,7 +1154,7 @@ public class ButtonHelperFactionSpecific {
             if (player.hasUnexhaustedLeader("mentakagent", activeGame)) {
                 List<Button> buttons = new ArrayList<>();
                 Button winnuButton = Button.success("exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mentak")));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use Mentak Agent?", buttons);
@@ -1704,11 +1704,11 @@ public class ButtonHelperFactionSpecific {
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, activeGame);
                     if (numInf > 0) {
                         buttons.add(Button.success("sardakkcommander_infantry_" + planetId + "_" + planetId2, "Commit 1 infantry from " + planetRepresentation2 + " to " + planetRepresentation)
-                            .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }
                     if (numMechs > 0) {
                         buttons.add(Button.primary("sardakkcommander_mech_" + planetId + "_" + planetId2, "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation)
-                            .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
                     }
                 }
             }
@@ -1733,7 +1733,7 @@ public class ButtonHelperFactionSpecific {
                     if (!player.getPlanets(activeGame).contains(planet2) && !planetRepresentation2.contains("Mecatol") && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
                         buttons.add(Button.success(finChecker + "peaceAccords_" + planet2, "Use peace accords to take control of " + planetRepresentation2)
-                            .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("xxcha"))));
+                            .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
                         planetsChecked.add(planet2);
                     }
                 }
@@ -1765,7 +1765,7 @@ public class ButtonHelperFactionSpecific {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId, "Use Sardakk Agent on " + planetRepresentation)
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sardakk"))));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
             }
         }
 
@@ -1786,7 +1786,7 @@ public class ButtonHelperFactionSpecific {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_nomadagentmercer_" + activeGame.getActiveSystem() + "_" + planetId, "Use Nomad Agent General Mercer on " + planetRepresentation)
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
             }
         }
 
@@ -1806,7 +1806,7 @@ public class ButtonHelperFactionSpecific {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_l1z1xagent_" + activeGame.getActiveSystem() + "_" + planetId, "Use L1Z1X Agent on " + planetRepresentation)
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("l1z1x"))));
+                    .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
             }
         }
 

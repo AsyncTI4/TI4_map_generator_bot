@@ -91,7 +91,7 @@ public class Info extends GameSubcommandData {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;
             for (Player player : activeGame.getRealPlayers()) {
-                sb.append("> `").append(index).append(".` ").append(Helper.getFactionIconFromDiscord(player.getFaction())).append(player.getUserName()).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                sb.append("> `").append(index).append(".` ").append(player.getFactionEmoji()).append(player.getUserName()).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
                 if (player.getRoleForCommunity() != null) sb.append(" - Community Role: ").append(player.getRoleForCommunity().getName());
                 sb.append(NEW_LINE);
                 index++;

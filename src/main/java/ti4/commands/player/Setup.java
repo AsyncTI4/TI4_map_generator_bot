@@ -81,6 +81,7 @@ public class Setup extends PlayerSubcommandData {
 
         player.setColor(color);
         player.setFaction(faction);
+        player.setFactionEmoji(null);
         player.getPlanets().clear();
         player.getTechs().clear();
 
