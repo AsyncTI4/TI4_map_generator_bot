@@ -971,7 +971,15 @@ public class GenerateMap {
             for (int i = 0; i < debtToken.getValue(); i++) {
                 graphics.drawImage(bufferedImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
                 if (!convertToGeneric) {
-                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                    int centreCustomTokenHorizontally = 0;
+                    int centreCustomTokenVertically = 0;
+                    if (getPlayerByControlMarker(activeGame.getPlayers().values(), controlID).hasCustomFactionEmoji()) {
+                        factionImage = getFactionImageScaled(getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), 35, 35);
+                        factionImage = ImageHelper.scale(factionImage, 0.60f);
+                        centreCustomTokenHorizontally = bufferedImage.getWidth()/2 - factionImage.getWidth()/2;
+                        centreCustomTokenVertically = bufferedImage.getHeight()/2 - factionImage.getHeight()/2;
+                    }
+                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX + centreCustomTokenHorizontally, y + deltaY + tokenDeltaY + centreCustomTokenVertically, null);
                 }
                 tokenDeltaX += 15;
             }
