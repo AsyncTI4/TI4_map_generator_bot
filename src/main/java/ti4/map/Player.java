@@ -847,6 +847,10 @@ public class Player {
         this.factionEmoji = factionEmoji;
     }
 
+    public boolean hasCustomFactionEmoji() {
+        return factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !factionEmoji.equals("null") && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
+    }
+
     private void initAbilities() {
         HashSet<String> abilities = new HashSet<>();
         for (String ability : getFactionStartingAbilities()) {
