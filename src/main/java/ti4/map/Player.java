@@ -1253,12 +1253,12 @@ public class Player {
         this.planets = planets;
     }
 
-    public void setFrankenBagPersonal(List<String> planets) {
-        frankenBagPersonal = planets;
+    public void setFrankenBagPersonal(List<String> frankenBagPersonal) {
+        this.frankenBagPersonal = frankenBagPersonal;
     }
 
-    public void setFrankenBagToPass(List<String> planets) {
-        frankenBagToPass = planets;
+    public void setFrankenBagToPass(List<String> frankenBagToPass) {
+        this.frankenBagToPass = frankenBagToPass;
     }
 
     public List<String> getReadiedPlanets() {
@@ -1429,8 +1429,8 @@ public class Player {
         doAdditionalThingsWhenRemovingTech(tech);
     }
 
-    public void removeElementFromBagToPass(String tech) {
-        frankenBagToPass.remove(tech);
+    public boolean removeElementFromBagToPass(String element) {
+        return frankenBagToPass.remove(element);
     }
 
     public void addPlanet(String planet) {
