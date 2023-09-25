@@ -1431,7 +1431,7 @@ public class ButtonHelper {
             if (nameOfHolder.equalsIgnoreCase("space")) {
                 buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
             } else {
-                buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Combat for " + nameOfHolder + ""));
+                buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + ""));
             }
 
         }

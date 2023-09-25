@@ -50,6 +50,7 @@ public class FrankenDraftHelper {
             newKeys.add("Ability: " +abilities.get(key));
         }
         newKeys.removeAll(alreadyHeld);
+        newKeys.removeIf(key -> key.toLowerCase().contains("mitosis") ||key.toLowerCase().contains("tribuni") || key.toLowerCase().contains("fragile") ||key.toLowerCase().contains("hubris") || key.toLowerCase().contains("devour") || key.toLowerCase().contains("fragile") || key.toLowerCase().contains("propagation"));
         for(int x = 0; x < count; x++){
             boolean foundOne = false;
             while(!foundOne){
@@ -109,13 +110,16 @@ public class FrankenDraftHelper {
             allDesiredThings.removeIf(token -> token.toUpperCase().endsWith("(DS)") || token.toLowerCase().contains("franken")|| token.toLowerCase().contains("lazax") || token.toLowerCase().contains("admins"));
         }
         if(!factionThing.equalsIgnoreCase("Hero")){
-            allDesiredThings.removeIf(token -> token.toLowerCase().contains("keleresa")|| token.toLowerCase().contains("keleresx"));
+            allDesiredThings.removeIf(token -> token.toLowerCase().contains("keleresa")|| token.toLowerCase().contains("keleres argent")|| token.toLowerCase().contains("keleres xxcha")|| token.toLowerCase().contains("keleresx"));
         }
+
 
         for(String thing : allDesiredThings){
             keys.add(factionThing+": "+thing + " "+factionThing);
         }
         keys.removeAll(alreadyHeld);
+        keys.removeIf(token -> token.toLowerCase().contains("sardakk norr starting tech") || token.toLowerCase().contains("nar mech"));
+
         for(int x = 0; x < count; x++){
             int randNum = ThreadLocalRandom.current().nextInt(0,keys.size());
             String ability = keys.get(randNum);
@@ -128,9 +132,21 @@ public class FrankenDraftHelper {
     public static List<Button> getFrankenBagButtons(Game activeGame, Player player){
         List<Button> buttons = new ArrayList<>();
         List<String> bagToPass = player.getFrankenBagToPass();
+        int numItem = 1;
         Collections.sort(bagToPass);
         for(String item : bagToPass){
-            buttons.add(Button.success("frankenDraftAction_"+item,item));
+            String itemLabel = numItem + ". "+item;
+            if(item.contains("Blue Tile") || item.contains("Mech:")){
+                 buttons.add(Button.primary("frankenDraftAction_"+item,itemLabel));
+            }else if(item.contains("Red Tile") || item.contains("Faction Tech")){
+                 buttons.add(Button.danger("frankenDraftAction_"+item,itemLabel));
+            }else if(item.contains("Agent") || item.contains("Commander") || item.contains("Hero") || item.contains("Speaker Position")){
+                buttons.add(Button.secondary("frankenDraftAction_"+item,itemLabel));
+            }else{
+                buttons.add(Button.success("frankenDraftAction_"+item,itemLabel));
+            }
+            numItem = numItem + 1;
+            
         }
         return buttons;
     }
@@ -139,7 +155,9 @@ public class FrankenDraftHelper {
         String item = buttonID.split("_")[1];
         player.addToFrankenPersonalBag(item);
         player.removeElementFromBagToPass(item);
-        player.setReadyToPassBag(true);
+        if(player.getFrankenBagToPass().size() % 2 == 0 && player.getFrankenBagPersonal().size() != 1){
+            player.setReadyToPassBag(true);
+        }
         boolean everyoneReady = true;
         for(Player p2 : activeGame.getRealPlayers()){
             if(!p2.isReadyToPassBag()){
@@ -149,7 +167,13 @@ public class FrankenDraftHelper {
          String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you picked "+item;
         
         if(!everyoneReady){
-           msg = msg + ". But not everyone has picked yet. Please wait and you will be pinged when the last person has picked.";
+            if(player.isReadyToPassBag()){
+                msg = msg + ". But not everyone has picked yet. Please wait and you will be pinged when the last person has picked.";
+            }else{
+                msg = msg + ". Please pick another item from this bag.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Use buttons to select something", getFrankenBagButtons(activeGame, player));
+            }
+           
            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
         }else{
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
@@ -185,8 +209,10 @@ public class FrankenDraftHelper {
         String representation = "";
         List<String> currentBag = player.getFrankenBagPersonal();
         Collections.sort(currentBag);
+        int itemNum = 1;
         for(String item : currentBag){
-            representation = representation + item + "\n";
+            representation = representation +itemNum + ". "+ item + "\n";
+            itemNum = itemNum + 1;
         }
 
         return representation;
@@ -195,8 +221,10 @@ public class FrankenDraftHelper {
         String representation = "";
         List<String> currentBag = player.getFrankenBagToPass();
         Collections.sort(currentBag);
+        int itemNum = 1;
         for(String item : currentBag){
-            representation = representation + item + "\n";
+            representation = representation + itemNum + ". "+ item + "\n";
+            itemNum = itemNum + 1;
         }
 
         return representation;
@@ -242,6 +270,9 @@ public class FrankenDraftHelper {
             alreadyHeld.addAll(bagToPass);
             player.setFrankenBagToPass(bagToPass);
             player.setReadyToPassBag(false);
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " draft started. As a reminder, for the first bag you pick 3 items, and for "+
+            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
+            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready. Please note the bot does not enforce limits on how many of something you can pick. Be mindful of this and dont take more of something that you should have (dont take 8 faction abilities, for instance)");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun, use buttons to select something", getFrankenBagButtons(activeGame, player));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Here is a text version of the bag so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, player));
         }
