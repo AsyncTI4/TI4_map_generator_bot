@@ -838,7 +838,7 @@ public class Player {
 
     @NotNull @Nonnull
     public String getFactionEmoji() {
-        if (factionEmoji != null || !factionEmoji.isBlank() || !factionEmoji.isEmpty()) {
+        if (factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !factionEmoji.equals("null")) {
             return factionEmoji;
         }
         return Helper.getFactionIconFromDiscord(getFaction());
@@ -849,7 +849,7 @@ public class Player {
     }
 
     public String getFactionImageURL() {
-        if (factionImageURL != null || !factionImageURL.isBlank() || !factionImageURL.isEmpty() || !factionImageURL.equals("null")) {
+        if (factionImageURL != null && !factionImageURL.isBlank() && !factionImageURL.isEmpty() && !factionImageURL.equals("null")) {
             return factionImageURL;
         }
         return null;
