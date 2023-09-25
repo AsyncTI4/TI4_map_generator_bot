@@ -108,7 +108,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && event != null)
         {
-            String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+            String fac = player.getFactionEmoji();
             
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
             player.setTg(player.getTg()+1);
@@ -118,7 +118,7 @@ public class PlanetAdd extends PlanetAddRemove {
         for(String law : activeGame.getLaws().keySet()){
             if("minister_exploration".equalsIgnoreCase(law)){
                 if(activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
-                    String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                    String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);

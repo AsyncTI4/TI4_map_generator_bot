@@ -193,7 +193,7 @@ public class GameEnd extends GameSubcommandData {
             
             int playerVP = player.getTotalVictoryPoints(activeGame);
             sb.append("> `").append(index).append(".` ");
-            sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+            sb.append(player.getFactionEmoji());
             sb.append(Helper.getColourAsMention(AsyncTI4DiscordBot.guildPrimary, player.getColor()));
             sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
             sb.append(" - *").append(playerVP).append("VP* ");

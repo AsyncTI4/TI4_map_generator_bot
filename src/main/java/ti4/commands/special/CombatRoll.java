@@ -135,7 +135,7 @@ public class CombatRoll extends SpecialSubcommandData {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Helper.getFactionIconFromDiscord("naaz") + " Z-Grav Eidolon due to Articles of War agenda.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
         }
         if (unitsByQuantity.size() == 0) {
@@ -145,7 +145,7 @@ public class CombatRoll extends SpecialSubcommandData {
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "There are no units in " + fightingOnUnitHolderName + " on tile " + tile.getPosition() + " for player " + player.getColor() + " "
-                    + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n"
+                    + player.getFactionEmoji() + "\n"
                     + "Ping bothelper if this seems to be in error.");
 
             return;
@@ -170,7 +170,7 @@ public class CombatRoll extends SpecialSubcommandData {
             combatTypeName = rollType.getValue();
         }
         String message = String.format("**%s** rolls for %s on %s %s:  \n",
-            combatTypeName, Helper.getFactionIconFromDiscord(player.getFaction()),
+            combatTypeName, player.getFactionEmoji(),
             tile.getPosition(), Emojis.RollDice);
         message += CombatHelper.RollForUnits(unitsByQuantity, autoExtraRolls, customMods, autoMods, player, opponent,
             activeGame, rollType);

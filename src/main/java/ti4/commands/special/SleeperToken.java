@@ -82,7 +82,7 @@ public class SleeperToken extends SpecialSubcommandData {
             tile.removeToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
         } else {
             tile.addToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
-            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            String ident = player.getFactionEmoji();
             if (activeGame.getSleeperTokensPlacedCount() > 5) {
                 String message2 = ident + " has more than 5 sleepers out. Use buttons to remove a sleeper token";
                 List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, activeGame);

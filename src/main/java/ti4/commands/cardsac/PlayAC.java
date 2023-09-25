@@ -132,7 +132,7 @@ public class PlayAC extends ACCardsSubcommandData {
         for (Player player2 : activeGame.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
                 Button instinctButton = Button.secondary("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training")
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Xxcha));
                 List<Button> xxchaButtons = new ArrayList<>();
                 xxchaButtons.add(instinctButton);
                 Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
