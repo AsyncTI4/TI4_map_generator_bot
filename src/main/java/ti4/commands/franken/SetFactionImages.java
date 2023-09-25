@@ -12,10 +12,9 @@ import ti4.map.Player;
 public class SetFactionImages extends FrankenSubcommandData {
 
     public SetFactionImages() {
-        super(Constants.SET_FACTION_IMAGES, "Set franken faction images to use");
+        super(Constants.SET_FACTION_ICON, "Set franken faction icon to use");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Emoji to use"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_IMAGE_URL, "Image to use"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RESET, "Reset images to default"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RESET, "Reset icon to default"));
     }
 
     @Override
@@ -37,12 +36,6 @@ public class SetFactionImages extends FrankenSubcommandData {
         if (factionEmoji != null) {
             player.setFactionEmoji(factionEmoji);
         }
-
-        String factionImage = event.getOption(Constants.FACTION_IMAGE_URL, null, OptionMapping::getAsString);
-        if (factionImage != null) {
-            // player.setFactionImage(factionImage);
-        }
-
     }
     
 }
