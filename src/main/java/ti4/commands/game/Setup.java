@@ -78,17 +78,7 @@ public class Setup extends GameSubcommandData {
             activeGame.setCustomName(customGameName);
         }
 
-        // GAME MODES
-        Boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, null, OptionMapping::getAsBoolean);
-        if (isTIGLGame != null && isTIGLGame) {
-            getActiveGame().setCompetitiveTIGLGame(true);
-        }
-
-        Boolean absolMode = event.getOption(Constants.ABSOL_MODE, null, OptionMapping::getAsBoolean);
-        Boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, null, OptionMapping::getAsBoolean);
-        Boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, null, OptionMapping::getAsBoolean);
-
-        if (!setGameMode(event, activeGame, baseGameMode, absolMode, discordantStarsMode, isTIGLGame)) {
+        if (!setGameMode(event, activeGame)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
         }
 
@@ -96,12 +86,33 @@ public class Setup extends GameSubcommandData {
         if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
     }
 
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, Boolean baseGameMode, Boolean absolMode, Boolean discordantStarsMode, Boolean tiglGame) {
-        
-        // TODO: Validate TIGL is not a homebrew game 
+    public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
+        boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, activeGame.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
+        boolean absolMode = event.getOption(Constants.ABSOL_MODE, activeGame.isAbsolMode(), OptionMapping::getAsBoolean);
+        boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, activeGame.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
+        boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, activeGame.isBaseGameMode(), OptionMapping::getAsBoolean);
+        return setGameMode(event, activeGame, baseGameMode, absolMode, discordantStarsMode, isTIGLGame);
+    }
 
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean discordantStarsMode, boolean isTIGLGame) {
+
+        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+            return false;
+        } else if (isTIGLGame) {
+            activeGame.setCompetitiveTIGLGame(isTIGLGame);
+            return true;
+        }
+
+        if (baseGameMode && (absolMode || discordantStarsMode)) {
+            
+        } else if (baseGameMode) {
+            // TODO: Do base game mode setup here instead of separate command
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "For Base Game Mode, please run /custom change_to_base_game. This mode is still Work in Progress");
+        }
+        
         // BOTH ABSOL & DS, and/or if either was set before the other
-        if (Optional.ofNullable(absolMode).orElse(activeGame.isAbsolMode()) && Optional.ofNullable(discordantStarsMode).orElse(activeGame.isDiscordantStarsMode())) {
+        if (absolMode && discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
@@ -113,29 +124,21 @@ public class Setup extends GameSubcommandData {
         }
     
         // JUST DS
-        if (discordantStarsMode != null) {
-            if (discordantStarsMode) {
-                if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-                if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
-                activeGame.setTechnologyDeckID("techs_ds");
-            }
-            activeGame.setDiscordantStarsMode(discordantStarsMode);
+        if (discordantStarsMode && !absolMode) {
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
+            activeGame.setTechnologyDeckID("techs_ds");
         }
+        activeGame.setDiscordantStarsMode(discordantStarsMode);
 
         // JUST ABSOL
-        if (absolMode != null) {
-            if (absolMode) {
-                if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
-                if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
-                activeGame.setTechnologyDeckID("techs_absol");
-                // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
-            }
-            activeGame.setAbsolMode(absolMode);
+        if (absolMode && !discordantStarsMode) {
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
+            activeGame.setTechnologyDeckID("techs_absol");
+            // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
         }
-
-        if (baseGameMode != null && baseGameMode) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "For Base Game Mode, please run /custom change_to_base_game. This mode is still Work in Progress");
-        }
+        activeGame.setAbsolMode(absolMode);
 
         return true;
     }
