@@ -2899,7 +2899,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     String buttonMsg = "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.";
                     List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), buttonMsg, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), buttonMsg, buttons);
                 }
                 case "setOrder" -> {
                     Helper.setOrder(activeGame);

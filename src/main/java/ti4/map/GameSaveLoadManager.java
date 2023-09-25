@@ -612,9 +612,10 @@ public class GameSaveLoadManager {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + String.join(",", player.getFrankenBagToPass()));
+            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + String.join(",", player.getFrankenBagToPass()).replace(" ", "|"));
             writer.write(System.lineSeparator());
-            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + String.join(",", player.getFrankenBagPersonal()));
+
+            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + String.join(",", player.getFrankenBagPersonal()).replace(" ", "|"));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
