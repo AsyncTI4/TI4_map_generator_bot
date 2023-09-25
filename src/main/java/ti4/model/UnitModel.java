@@ -68,7 +68,7 @@ public class UnitModel implements ModelInterface {
 
     public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
 
-        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().toLowerCase());
+        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction());
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();

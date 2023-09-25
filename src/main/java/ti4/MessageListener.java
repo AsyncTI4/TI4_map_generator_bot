@@ -308,7 +308,7 @@ public class MessageListener extends ListenerAdapter {
                     RestAction<List<Message>> lis = mHistory.retrievePast(2);
                     if(!event.getMessage().getAuthor().getId().equalsIgnoreCase(lis.complete().get(1).getAuthor().getId())){
                         if(player != null && player.isRealPlayer() ){
-                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))).queue();
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(player.getFactionEmoji())).queue();
                         }
                     }
                 }catch (Exception e){

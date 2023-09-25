@@ -38,6 +38,8 @@ import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
@@ -371,6 +373,26 @@ public class GenerateMap {
         return factionFile;
     }
 
+    private BufferedImage getFactionImage(Player player) {
+        return getFactionImageScaled(player, 95, 95);
+    }
+
+    private BufferedImage getFactionImageScaled(Player player, int width, int height) {
+        Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+        if (factionEmoji instanceof CustomEmoji) {
+            CustomEmoji factionCustomEmoji = (CustomEmoji) factionEmoji;
+            return ImageHelper.scale(ImageHelper.readImageURL(factionCustomEmoji.getImageUrl()), width, height);
+        }
+
+        String factionID = player.getFaction();
+        String factionPath = getFactionPath(factionID);
+        BufferedImage bufferedImage = null;
+        if (factionPath != null) {
+            bufferedImage = ImageHelper.read(factionPath);
+        }
+        return ImageHelper.scale(bufferedImage, width, height);
+    }
+
     private Image getPlayerDiscordAvatar(Player player) {
         String userID = player.getUserID();
         Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
@@ -457,9 +479,8 @@ public class GenerateMap {
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    String factionPath = getFactionPath(faction);
-                    if (factionPath != null) {
-                        BufferedImage bufferedImage = ImageHelper.read(factionPath);
+                    BufferedImage bufferedImage = getFactionImage(player);
+                    if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
                 }
@@ -1153,9 +1174,8 @@ public class GenerateMap {
 
         String faction = player.getFaction();
         if (faction != null) {
-            String factionPath = getFactionPath(faction);
-            if (factionPath != null) {
-                BufferedImage bufferedImage = ImageHelper.read(factionPath);
+            BufferedImage bufferedImage = getFactionImage(player);
+            if (bufferedImage != null) {
                 graphics.drawImage(bufferedImage, x + 178, y + 33, null);
             }
         }
@@ -1976,10 +1996,8 @@ public class GenerateMap {
                 if (player.isPassed() || player.getSCs().size() == 0) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    String factionPath = getFactionPath(faction);
-                    if (factionPath != null) {
-                        BufferedImage bufferedImage;
-                        bufferedImage = ImageHelper.read(factionPath);
+                    BufferedImage bufferedImage = getFactionImage(player);
+                    if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                         x += 100;
                     }

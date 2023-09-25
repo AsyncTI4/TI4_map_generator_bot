@@ -125,7 +125,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
-            String factionIcon = Helper.getFactionIconFromDiscord(player.getFaction());
+            String factionIcon = player.getFactionEmoji();
             if (planetName != null) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + cardInfo[0] + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
             } else {
@@ -287,7 +287,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge") && event != null) {
-                    String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                    String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
                     ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
@@ -297,7 +297,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 final String ministerOfExploration = "minister_exploration";
                 if (activeGame.getLaws().keySet().contains(ministerOfExploration)) {
                     if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction()) && event != null) {
-                        String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                        String fac = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                         player.setTg(player.getTg() + 1);
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);

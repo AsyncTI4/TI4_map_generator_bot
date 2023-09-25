@@ -133,7 +133,7 @@ public class SCPlay extends PlayerSubcommandData {
         ActionRow actionRow = null;
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeGame));
         if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
-            scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+            scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
         if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
         if (actionRow != null) baseMessageObject.addComponents(actionRow);
@@ -195,7 +195,7 @@ public class SCPlay extends PlayerSubcommandData {
             //"scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
             
             Button emelpar = Button.danger("scepterE_follow_"+scToPlay, "Exhaust Scepter of Emelpar");
-            Button mahactA = Button.danger("mahactA_follow_"+scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact")));
+            Button mahactA = Button.danger("mahactA_follow_"+scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
             for (Player player3 : activeGame.getPlayers().values()) {
                 if (player3 == player) {
                     continue;
@@ -292,7 +292,7 @@ public class SCPlay extends PlayerSubcommandData {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isFaction(faction)) {
                     Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
-                    String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                    String factionEmojiString = player.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     assignSpeakerButtons.add(button);
                 }
