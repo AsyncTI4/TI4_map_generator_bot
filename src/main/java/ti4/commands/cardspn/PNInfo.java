@@ -64,7 +64,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 if(activeGame.isFoWMode()){
                     transact = Button.success("resolvePNPlay_"  + pnShortHand, "Play " +owner.getColor() +" "+ promissoryNote.getName());
                 }else{
-                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                 }
                 buttons.add(transact);
             }
@@ -74,15 +74,15 @@ public class PNInfo extends PNCardsSubcommandData {
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
         if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")){
-            Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naalu")));
+            Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Emojis.Naalu));
             buttons.add(naalu);
         }
         if(player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")){
-            Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("augers")));
+            Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
         if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
-            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
         if(player.hasRelicReady("e6-g0_network")){
@@ -164,7 +164,7 @@ public class PNInfo extends PNCardsSubcommandData {
         String pnText = pnModel.getText();
         Player pnOwner = activeGame.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
-            if (!activeGame.isFoWMode()) sb.append(Helper.getFactionIconFromDiscord(pnOwner.getFaction()));
+            if (!activeGame.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
             sb.append(Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
             // if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));

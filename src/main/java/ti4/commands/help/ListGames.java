@@ -80,7 +80,7 @@ public class ListGames extends HelpSubcommandData {
         representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(gameToShow.getLastModifiedDate())).append("  ");
         for (Player player : gameToShow.getPlayers().values()) {
             if (!gameToShow.isFoWMode() && player.getFaction() != null) {
-                representationText.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+                representationText.append(player.getFactionEmoji());
             }
         }
         representationText.append(" [").append(gameToShow.getGameModesText()).append("] ");
