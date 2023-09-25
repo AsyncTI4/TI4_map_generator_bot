@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -2224,14 +2224,14 @@ public class Game {
         this.actionCards = actionCards;
     }
 
-    public boolean validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardActionCards().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **" + deck.getName() + "** while there are action cards in the discard pile.");
             return false;
         }
         for (Player player : getPlayers().values()) {
             if (player.getActionCards().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **" + deck.getName() + "** while there are action cards in player hands.");
                 return false;
             }
         }
@@ -2240,10 +2240,10 @@ public class Game {
         return true;
     }
 
-    public boolean validateAndSetRelicDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetRelicDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         for (Player player : getPlayers().values()) {
             if (player.getRelics().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change relic deck while there are relics in player hands.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **" + deck.getName() + "** while there are relics in player hands.");
                 return false;
             }
         }
@@ -2252,10 +2252,10 @@ public class Game {
         return true;
     }
 
-    public boolean validateAndSetSecretObjectiveDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetSecretObjectiveDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         for (Player player : getPlayers().values()) {
             if (player.getSecrets().size() > 0) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change secret objective deck while there are secret objectives in player hands.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change secret objective deck to **" + deck.getName() + "** while there are secret objectives in player hands.");
                 return false;
             }
         }
@@ -2264,9 +2264,9 @@ public class Game {
         return true;
     }
 
-    public boolean validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetAgendaDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardAgendas().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change agenda deck to **" + deck.getName() + "** while there are agendas in the discard pile.");
             return false;
         }
         setAgendaDeckID(deck.getAlias());
@@ -2274,9 +2274,9 @@ public class Game {
         return true;
     }
 
-    public boolean validateAndSetEventDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+    public boolean validateAndSetEventDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardedEvents().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change event deck while there are events in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change event deck to **" + deck.getName() + "** while there are events in the discard pile.");
             return false;
         }
         setEventDeckID(deck.getAlias());
