@@ -81,13 +81,13 @@ public class Game {
     @ExportableField
     private int vp = 10;
     @ExportableField
-    private boolean competitiveTIGLGame;
+    private boolean competitiveTIGLGame = false;
     @ExportableField
-    private boolean communityMode;
+    private boolean communityMode = false;
     @ExportableField
-    private boolean allianceMode;
+    private boolean allianceMode = false;
     @ExportableField
-    private boolean fowMode;
+    private boolean fowMode = false;
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
@@ -95,7 +95,7 @@ public class Game {
     @ExportableField
     private boolean componentAction;
     @ExportableField
-    private boolean baseGameMode;
+    private boolean baseGameMode = false;
     @ExportableField
     private boolean lightFogMode;
     @ExportableField
@@ -105,7 +105,7 @@ public class Game {
     @ExportableField @Getter @Setter
     private String textSize = "medium";
     @ExportableField
-    private boolean absolMode;
+    private boolean absolMode = false;
     @Getter
     @Setter
     private String acDeckID = "action_cards_pok";
@@ -138,9 +138,9 @@ public class Game {
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
-    private boolean discordantStarsMode;
+    private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
-    private boolean testBetaFeaturesMode;
+    private boolean testBetaFeaturesMode = false;
     private boolean hasEnded;
     private long endedDate;
     @Getter
