@@ -112,7 +112,7 @@ public class FrankenCommand implements Command {
         subcommands.add(new UnitAdd());
         subcommands.add(new UnitRemove());
         subcommands.add(new StartFrankenDraft());
-        subcommands.add(new SetFactionImages());
+        subcommands.add(new SetFactionIcon());
         return subcommands;
     }
 

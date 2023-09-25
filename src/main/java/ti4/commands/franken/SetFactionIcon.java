@@ -9,9 +9,9 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 
-public class SetFactionImages extends FrankenSubcommandData {
+public class SetFactionIcon extends FrankenSubcommandData {
 
-    public SetFactionImages() {
+    public SetFactionIcon() {
         super(Constants.SET_FACTION_ICON, "Set franken faction icon to use");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Emoji to use"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RESET, "Reset icon to default"));
