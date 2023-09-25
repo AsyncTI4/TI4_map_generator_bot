@@ -105,10 +105,12 @@ public class Setup extends GameSubcommandData {
         }
 
         if (baseGameMode && (absolMode || discordantStarsMode)) {
-            
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
+            return false;
         } else if (baseGameMode) {
             // TODO: Do base game mode setup here instead of separate command
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "For Base Game Mode, please run /custom change_to_base_game. This mode is still Work in Progress");
+            return true;
         }
         
         // BOTH ABSOL & DS, and/or if either was set before the other
@@ -125,6 +127,7 @@ public class Setup extends GameSubcommandData {
     
         // JUST DS
         if (discordantStarsMode && !absolMode) {
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
             activeGame.setTechnologyDeckID("techs_ds");
@@ -134,11 +137,20 @@ public class Setup extends GameSubcommandData {
         // JUST ABSOL
         if (absolMode && !discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
             activeGame.setTechnologyDeckID("techs_absol");
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
         }
         activeGame.setAbsolMode(absolMode);
+
+        // JUST PoK
+        if (!absolMode && !discordantStarsMode) {
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            activeGame.setTechnologyDeckID("techs_pok");
+        }
 
         return true;
     }
