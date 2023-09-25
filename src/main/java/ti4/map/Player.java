@@ -1254,11 +1254,19 @@ public class Player {
     }
 
     public void setFrankenBagPersonal(List<String> frankenBagPersonal) {
-        this.frankenBagPersonal = frankenBagPersonal;
+        List<String> newBag= new ArrayList<>();
+        for(String item : frankenBagPersonal){
+            newBag.add(item.replace("|"," "));
+        }
+        this.frankenBagPersonal = newBag;
     }
 
     public void setFrankenBagToPass(List<String> frankenBagToPass) {
-        this.frankenBagToPass = frankenBagToPass;
+        List<String> newBag= new ArrayList<>();
+        for(String item : frankenBagToPass){
+            newBag.add(item.replace("|"," "));
+        }
+        this.frankenBagToPass = newBag;
     }
 
     public List<String> getReadiedPlanets() {
