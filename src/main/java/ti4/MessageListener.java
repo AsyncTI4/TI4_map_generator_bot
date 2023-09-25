@@ -209,7 +209,7 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity + " this is a brusk missive stating that while you may sleep, the game never does.";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*4) ){
-                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absense.";
+                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absence.";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*5) ){
                                         ping = realIdentity + " this is a firm request that you do something to end this situation.";
