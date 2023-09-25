@@ -1126,6 +1126,7 @@ public class Player {
     public void setTg(int tg) {
         this.tg = tg;
     }
+    
 
     public void setFollowedSCs(Set<Integer> followedSCs) {
         this.followedSCs = followedSCs;
