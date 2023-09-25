@@ -50,7 +50,7 @@ public class FrankenDraftHelper {
             newKeys.add("Ability: " +abilities.get(key));
         }
         newKeys.removeAll(alreadyHeld);
-        newKeys.removeIf(key -> key.toLowerCase().contains("mitosis") ||key.toLowerCase().contains("tribuni") || key.toLowerCase().contains("fragile") ||key.toLowerCase().contains("hubris") || key.toLowerCase().contains("devour") || key.toLowerCase().contains("fragile") || key.toLowerCase().contains("propagation"));
+        newKeys.removeIf(key -> key.toLowerCase().contains("mitosis") || key.toLowerCase().contains("redemption") || key.toLowerCase().contains("revelation") ||key.toLowerCase().contains("tribuni") || key.toLowerCase().contains("fragile") ||key.toLowerCase().contains("hubris") || key.toLowerCase().contains("devour") || key.toLowerCase().contains("fragile") || key.toLowerCase().contains("propagation"));
         for(int x = 0; x < count; x++){
             boolean foundOne = false;
             while(!foundOne){
@@ -118,7 +118,7 @@ public class FrankenDraftHelper {
             keys.add(factionThing+": "+thing + " "+factionThing);
         }
         keys.removeAll(alreadyHeld);
-        keys.removeIf(token -> token.toLowerCase().contains("sardakk norr starting tech") || token.toLowerCase().contains("nar mech"));
+        keys.removeIf(token -> token.toLowerCase().contains("sardakk norr starting tech") || token.toLowerCase().contains("nar mech") || token.toLowerCase().contains("muaat mech") || token.toLowerCase().contains("mentak oalition pn"));
 
         for(int x = 0; x < count; x++){
             int randNum = ThreadLocalRandom.current().nextInt(0,keys.size());
@@ -169,6 +169,7 @@ public class FrankenDraftHelper {
         if(!everyoneReady){
             if(player.isReadyToPassBag()){
                 msg = msg + ". But not everyone has picked yet. Please wait and you will be pinged when the last person has picked.";
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), ButtonHelper.getIdent(player) + " is ready to pass their bag");
             }else{
                 msg = msg + ". Please pick another item from this bag.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Use buttons to select something", getFrankenBagButtons(activeGame, player));
@@ -270,12 +271,12 @@ public class FrankenDraftHelper {
             alreadyHeld.addAll(bagToPass);
             player.setFrankenBagToPass(bagToPass);
             player.setReadyToPassBag(false);
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " draft started. As a reminder, for the first bag you pick 3 items, and for "+
-            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
-            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready. Please note the bot does not enforce limits on how many of something you can pick. Be mindful of this and dont take more of something that you should have (dont take 8 faction abilities, for instance)");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun, use buttons to select something", getFrankenBagButtons(activeGame, player));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Here is a text version of the bag so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, player));
         }
+         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " draft started. As a reminder, for the first bag you pick 3 items, and for "+
+            "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
+            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready. Please note the bot does not enforce limits on how many of something you can pick. Be mindful of this and dont take more of something that you should have (dont take 8 faction abilities, for instance)");
     }
     public static List<String> getRandomTiles(int count, List<MiltyDraftTile> typeOfTile, List<String> alreadyHeld, String type){
         List<String> desiredThing = new ArrayList<>();
@@ -306,13 +307,16 @@ public class FrankenDraftHelper {
         
         List<String> keys = new ArrayList<>();
         keys.addAll(allDesiredThings.keySet());
-        keys.removeIf(key -> allDesiredThings.get(key).getFaction() == null || allDesiredThings.get(key).getFaction().equals("") || !allDesiredThings.get(key).getSource().equals("pok"));
+        keys.removeIf(key -> allDesiredThings.get(key).getFaction() == null || allDesiredThings.get(key).getFaction().equals("") || (!allDesiredThings.get(key).getSource().equals("pok") && !allDesiredThings.get(key).getSource().equals("base")));
         List<String> newKeys = new ArrayList<>();
+        int c = 1;
         for(String key : keys){
             newKeys.add("Faction Tech: " + allDesiredThings.get(key).getName());
+            c = c+1;
         }
         newKeys.removeAll(alreadyHeld);
         int size = newKeys.size();
+    
         for(int x = 0; x < count && size > 0; x++){
             int randNum = ThreadLocalRandom.current().nextInt(0,size);
             String ability = newKeys.get(randNum);
