@@ -13,6 +13,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -264,6 +265,26 @@ public class CombatHelper {
                 player.getPriorityUnitByAsyncID(entry.getKey(), null),
                 entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+
+        // TODO: This could be done better.
+        for (UnitHolder unitHolder : unitHolders) {
+            if (unitHolder instanceof Planet) {
+                Planet planet = (Planet) unitHolder;
+                String ccID = Mapper.getControlID(player.getColor());
+                if (planet.getControlList().contains(ccID)
+                        && planet.getTokenList().contains("attachment_titanshero.png")) {
+                    var titanHeroFakeUnit = new UnitModel();
+                    titanHeroFakeUnit.setSpaceCannonHitsOn(5);
+                    titanHeroFakeUnit.setSpaceCannonDieCount(3);
+                    titanHeroFakeUnit.setName(":Titans: Geoform attachment");
+                    titanHeroFakeUnit.setAsyncId("titanshero");
+                    titanHeroFakeUnit.setId("titanshero");
+                    titanHeroFakeUnit.setBaseType("pds");
+                    titanHeroFakeUnit.setFaction("Titans");
+                    unitsOnTile.put(titanHeroFakeUnit, 1);
+                }
+            }
+        }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
             .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
