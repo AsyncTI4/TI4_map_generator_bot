@@ -49,6 +49,7 @@ public class Player {
 
     private String faction;
     private String factionEmoji = null;
+    private String factionImageURL = null;
 
     @Setter
     private String playerStatsAnchorPosition;
@@ -845,6 +846,19 @@ public class Player {
 
     public void setFactionEmoji(String factionEmoji) {
         this.factionEmoji = factionEmoji;
+    }
+
+    public String getFactionImageURL() {
+        if (factionImageURL != null || !factionImageURL.isBlank() || !factionImageURL.isEmpty() || !factionImageURL.equals("null")) {
+            return factionImageURL;
+        }
+        return null;
+    }
+
+    public void setFactionImageURL(String factionImageURL) {
+        if (!"null".equalsIgnoreCase(factionImageURL)) {
+            this.factionImageURL = factionImageURL;
+        }
     }
 
     private void initAbilities() {
