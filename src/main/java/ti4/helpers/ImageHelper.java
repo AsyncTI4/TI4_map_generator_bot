@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -64,6 +65,13 @@ public class ImageHelper {
     return outputImage;
   }
 
+  public static BufferedImage scale(BufferedImage originalImage, int scaledWidth, int scaledHeight) {
+    Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_FAST);
+    BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
+    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+    return outputImage;
+  }
+
   private static BufferedImage getOrLoad(String key, Callable<BufferedImage> loader) {
     try {
       return imageCache.get(key, loader);
@@ -89,6 +97,17 @@ public class ImageHelper {
       return ImageIO.read(inputStream);
     } catch (IOException e) {
       BotLogger.log("Failed to read image: " + Arrays.toString(e.getStackTrace()));
+    }
+    return null;
+  }
+
+  public static BufferedImage readImageURL(String imageURL) {
+    try {
+      URL url = new URL(imageURL);
+      InputStream inputStream = url.openStream();
+      return readImage(inputStream);
+    } catch (IOException e) {
+      BotLogger.log("Failed to read image URL:" + Arrays.toString(e.getStackTrace()));
     }
     return null;
   }
