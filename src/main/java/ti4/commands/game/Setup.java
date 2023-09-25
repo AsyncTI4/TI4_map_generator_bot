@@ -98,11 +98,13 @@ public class Setup extends GameSubcommandData {
 
     public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, Boolean baseGameMode, Boolean absolMode, Boolean discordantStarsMode, Boolean tiglGame) {
         
+        // TODO: Validate TIGL is not a homebrew game 
+
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (Optional.ofNullable(absolMode).orElse(activeGame.isAbsolMode()) && Optional.ofNullable(discordantStarsMode).orElse(activeGame.isDiscordantStarsMode())) {
-            if (activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
-            if (activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-            if (activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
             activeGame.setTechnologyDeckID("techs_ds_absol");
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
             activeGame.setAbsolMode(absolMode);
@@ -113,8 +115,8 @@ public class Setup extends GameSubcommandData {
         // JUST DS
         if (discordantStarsMode != null) {
             if (discordantStarsMode) {
-                if (activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
-                if (activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
+                if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
+                if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
                 activeGame.setTechnologyDeckID("techs_ds");
             }
             activeGame.setDiscordantStarsMode(discordantStarsMode);
@@ -123,12 +125,16 @@ public class Setup extends GameSubcommandData {
         // JUST ABSOL
         if (absolMode != null) {
             if (absolMode) {
-                if (activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
-                if (activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
+                if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+                if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
                 activeGame.setTechnologyDeckID("techs_absol");
                 // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
             }
             activeGame.setAbsolMode(absolMode);
+        }
+
+        if (baseGameMode != null && baseGameMode) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "For Base Game Mode, please run /custom change_to_base_game. This mode is still Work in Progress");
         }
 
         return true;
