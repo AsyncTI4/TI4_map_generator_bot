@@ -942,47 +942,28 @@ public class GenerateMap {
         deltaX += 24;
         deltaY += 2;
 
-        BufferedImage factionImage;
-        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, fowPlayer);
+        boolean hideFactionIcon = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, fowPlayer);
 
         int tokenDeltaY = 0;
         int playerCount = 0;
         int maxTokenDeltaX = 0;
         for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
             int tokenDeltaX = 0;
-            String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
             if (controlID.contains("null")) {
                 continue;
             }
-            factionImage = null;
-            float scale = 0.60f;
-            if (!convertToGeneric) {
-                String faction = getFactionByControlMarker(activeGame.getPlayers().values(), controlID);
-                if (faction != null) {
-                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                    if (factionImagePath != null) {
-                        factionImage = ImageHelper.readScaled(factionImagePath, scale);
-                    }
-                }
-            }
 
-            BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+            float scale = 0.60f;
+            
+            BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+            BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
 
             for (int i = 0; i < debtToken.getValue(); i++) {
-                graphics.drawImage(bufferedImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
-                if (!convertToGeneric) {
-                    int centreCustomTokenHorizontally = 0;
-                    int centreCustomTokenVertically = 0;
-                    if (getPlayerByControlMarker(activeGame.getPlayers().values(), controlID).hasCustomFactionEmoji()) {
-                        factionImage = getFactionImageScaled(getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), 35, 35);
-                        factionImage = ImageHelper.scale(factionImage, 0.60f);
-                        centreCustomTokenHorizontally = bufferedImage.getWidth()/2 - factionImage.getWidth()/2;
-                        centreCustomTokenVertically = bufferedImage.getHeight()/2 - factionImage.getHeight()/2;
-                    }
-                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX + centreCustomTokenHorizontally, y + deltaY + tokenDeltaY + centreCustomTokenVertically, null);
-                }
+                drawControlToken(controlTokenImage, factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, activeGame, controlID, hideFactionIcon, scale);
                 tokenDeltaX += 15;
             }
+
             tokenDeltaY += 29;
             maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
             playerCount++;
@@ -997,6 +978,20 @@ public class GenerateMap {
         graphics.drawRect(x - 2, y - 2, deltaX, 152);
 
         return x + deltaX + 10;
+    }
+
+    private void drawControlToken(BufferedImage bottomTokenImage, BufferedImage factionImage, int x, int y, Game activeGame, String controlID, boolean hideFactionIcon, float scale) {
+        graphics.drawImage(bottomTokenImage, x, y, null);
+
+        if (hideFactionIcon) return;
+
+        int centreCustomTokenHorizontally = 0;
+        int centreCustomTokenVertically = 0;
+        if (getPlayerByControlMarker(activeGame.getPlayers().values(), controlID).hasCustomFactionEmoji()) {
+            centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
+            centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
+        }
+        graphics.drawImage(factionImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
     }
 
     private int abilityInfo(Player player, int x, int y) {
@@ -1853,7 +1848,6 @@ public class GenerateMap {
         int tempCounter = 0;
         int tempX = 0;
         int tempWidth = 0;
-        BufferedImage factionImage;
 
         if (isFoWPrivate != null && isFoWPrivate) {
             Collections.shuffle(players);
@@ -1864,37 +1858,20 @@ public class GenerateMap {
             try {
                 boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, fowPlayer);
                 String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
-                String faction = null;
-                if (player.getColor() != null && player.getFaction() != null) {
-                    String playerControlMarker = Mapper.getControlID(player.getColor());
-                    if (controlID.equals(playerControlMarker)) {
-                        faction = player.getFaction();
-                    }
-                }
 
-                factionImage = null;
                 float scale = 0.7f;
-                if (!convertToGeneric) {
-                    if (faction != null) {
-                        String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                        if (factionImagePath != null) {
-                            factionImage = ImageHelper.readScaled(factionImagePath, scale);
-                        }
-                    }
-                }
 
-                BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                tempWidth = bufferedImage.getWidth();
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
+                
+                tempWidth = controlTokenImage.getWidth();
                 Integer vpCount = userVPs.get(player);
                 if (vpCount == null) {
                     vpCount = 0;
                 }
                 int x = vpCount * width + 5 + tempX;
-                graphics.drawImage(bufferedImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
-                if (!convertToGeneric) {
-                    graphics.drawImage(factionImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
-                }
 
+                drawControlToken(controlTokenImage, factionImage, x , y + (tempCounter * controlTokenImage.getHeight()), activeGame, controlID, convertToGeneric, scale);
             } catch (Exception e) {
                 // nothing
                 // LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
@@ -2605,7 +2582,6 @@ public class GenerateMap {
         HashMap<Player, Integer> userVPs) {
         try {
             int tempX = 0;
-            BufferedImage factionImage;
             for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
@@ -2616,19 +2592,12 @@ public class GenerateMap {
                     if (controlID.contains("null")) {
                         continue;
                     }
-                    factionImage = null;
-                    float scale = 0.55f;
-                    if (!convertToGeneric) {
-                        String faction = getFactionByControlMarker(players.values(), controlID);
-                        if (faction != null) {
-                            String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                            if (factionImagePath != null) {
-                                factionImage = ImageHelper.readScaled(factionImagePath, scale);
-                            }
-                        }
-                    }
 
-                    BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    float scale = 0.55f;
+
+                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                    BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
+
                     Integer vpCount = userVPs.get(player);
                     if (vpCount == null) {
                         vpCount = 0;
@@ -2638,20 +2607,14 @@ public class GenerateMap {
                         vpCount += frequency * objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             if (!justCalculate) {
-                                graphics.drawImage(bufferedImage, x + tempX, y, null);
-                                if (!convertToGeneric) {
-                                    graphics.drawImage(factionImage, x + tempX, y, null);
-                                }
+                                drawControlToken(controlTokenImage, factionImage, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
                             }
                             tempX += scoreTokenWidth;
                         }
                     } else {
                         vpCount += objectiveWorth;
                         if (!justCalculate) {
-                            graphics.drawImage(bufferedImage, x + tempX, y, null);
-                            if (!convertToGeneric) {
-                                graphics.drawImage(factionImage, x + tempX, y, null);
-                            }
+                            drawControlToken(controlTokenImage, factionImage, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
                         }
                     }
                     userVPs.put(player, vpCount);
@@ -3438,5 +3401,21 @@ public class GenerateMap {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    public BufferedImage getCCControlImage(Game activeGame, Player player, float scale) {
+        if (player == null) return null;
+
+        if (player.hasCustomFactionEmoji()) {
+            BufferedImage factionImage = getFactionImageScaled(player, 35, 35);
+            return ImageHelper.scale(factionImage, scale);
+        }
+
+        String factionImagePath = Mapper.getCCPath("control_faction_" + player.getFaction() + ".png");
+        if (factionImagePath != null) {
+            return ImageHelper.readScaled(factionImagePath, scale);
+        }
+
+        return null;
     }
 }
