@@ -15,6 +15,8 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.model.Franken.FrankenBag;
+import ti4.model.Franken.FrankenItem;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -74,6 +76,8 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private FrankenBag frankenHand = new FrankenBag();
+    private FrankenBag currentFrankenBag = new FrankenBag();
     private List<String> frankenBagPersonal = new ArrayList<>();
     private List<String> frankenBagToPass = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -1213,6 +1217,21 @@ public class Player {
         return techs;
     }
 
+    public FrankenBag getFrankenHand() {
+        return frankenHand;
+    }
+
+    public void setFrankenHand(FrankenBag hand) {
+        frankenHand = hand;
+    }
+
+    public FrankenBag getCurrentFrankenBag() {
+        return currentFrankenBag;
+    }
+
+    public void setCurrentFrankenBag(FrankenBag bag) {
+        currentFrankenBag = bag;
+    }
     public List<String> getFrankenBagPersonal() {
         return frankenBagPersonal;
     }
@@ -1254,11 +1273,12 @@ public class Player {
     }
 
     public void setFrankenBagPersonal(List<String> frankenBagPersonal) {
-        List<String> newBag= new ArrayList<>();
+        FrankenBag newBag = new FrankenBag();
         for(String item : frankenBagPersonal){
-            newBag.add(item.replace("|"," "));
+            String[] split = item.split(":");
+            newBag.Contents.add(new FrankenItem(FrankenItem.Category.valueOf(split[0]), split[1]));
         }
-        this.frankenBagPersonal = newBag;
+        this.frankenHand = newBag;
     }
 
     public void setFrankenBagToPass(List<String> frankenBagToPass) {
