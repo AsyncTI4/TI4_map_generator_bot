@@ -229,7 +229,7 @@
     "homeSystem": "06",
     "startingFleet": "dn, cv, 3 ff, 5 inf 0,sd 0,pds 0",
     "commodities": 2,
-    "factionTech": ["it", "sdn2"],
+    "factionTech": ["is", "sdn2"],
     "startingTech": ["ps", "nm"],
     "homePlanets": ["0.0.0"],
     "abilities": ["assimilate", "harrow"],
