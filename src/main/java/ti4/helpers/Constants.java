@@ -8,6 +8,7 @@ public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
     public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
+    public static final String FRANKEN_ITEMS_TO_DRAFT = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
@@ -350,7 +351,9 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
-     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
+    public static final String START_FRANKEN_DRAFT = "start_franken_draft";
+
+    public static final String FORCE_BAG_PASS = "force_bag_swap";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";

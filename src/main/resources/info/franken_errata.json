@@ -1,0 +1,137 @@
+[
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "fragile",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "hubris",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "mitosis",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "devour",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "propagation",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "STARTINGTECH",
+    "ItemId": "sardakk",
+    "Undraftable" : true
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "amalgamation",
+    "AdditionalComponents" : [
+      {
+        "ItemCategory" : "ABILITY",
+        "ItemId": "devour"
+      }
+    ]
+  },
+  {
+    "ItemCategory": "ABILITY",
+    "ItemId": "riftmeld",
+    "AdditionalComponents" : [
+      {
+        "ItemCategory" : "ABILITY",
+        "ItemId": "devour"
+      }
+    ]
+  },
+  {
+    "ItemCategory": "AGENT",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "AGENT",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "COMMANDER",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "COMMANDER",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "STARTINGFLEET",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "STARTINGFLEET",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "STARTINGTECH",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "STARTINGTECH",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "FLAGSHIP",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "FLAGSHIP",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "PN",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "PN",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "MECH",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "MECH",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "HOMESYSTEM",
+    "ItemId": "keleresa",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "HOMESYSTEM",
+    "ItemId": "keleresm",
+    "Undraftable": true
+  },
+  {
+    "ItemCategory": "HOMESYSTEM",
+    "ItemId": "keleresx",
+    "Undraftable": true
+  }
+]
