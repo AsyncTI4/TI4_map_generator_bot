@@ -4,11 +4,11 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -73,6 +73,7 @@ public class Planet extends UnitHolder {
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
                 .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+                .filter(Objects::nonNull)
                 .anyMatch(u -> u.getIsGroundForce());
     }
 
