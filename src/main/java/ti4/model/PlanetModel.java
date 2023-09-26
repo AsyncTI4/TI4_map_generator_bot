@@ -32,6 +32,8 @@ public class PlanetModel {
     private String legendaryAbilityText;
     private String flavourText;
     private UnitTokenPosition unitPositions;
+    private int spaceCannonDieCount = 0;
+    private int spaceCannonHitsOn = 0;
 
     @JsonIgnore
     public String getNameNullSafe() {

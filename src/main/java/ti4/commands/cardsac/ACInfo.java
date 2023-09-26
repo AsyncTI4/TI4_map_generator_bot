@@ -186,7 +186,7 @@ public class ACInfo extends ACCardsSubcommandData {
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
             if (player.hasUnexhaustedLeader("nekroagent", activeGame)) {
-                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
                 acButtons.add(nekroButton);
             }
             

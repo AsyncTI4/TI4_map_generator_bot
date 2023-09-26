@@ -910,4 +910,7 @@ public class Constants {
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
     public static final String DEVELOPER = "developer";
+    public static final String FACTION_EMOJI = "faction_emoji";
+    public static final String FACTION_IMAGE_URL = "faction_image_url";
+    public static final String SET_FACTION_ICON = "set_faction_icon";
 }

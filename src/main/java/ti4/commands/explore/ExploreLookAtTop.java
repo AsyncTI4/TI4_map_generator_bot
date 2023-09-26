@@ -37,7 +37,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
 
         String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
-        String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+        String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
             sendMessage(traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
         }

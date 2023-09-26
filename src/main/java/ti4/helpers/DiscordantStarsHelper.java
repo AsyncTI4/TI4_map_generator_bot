@@ -19,11 +19,13 @@ public class DiscordantStarsHelper {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
-                                if (planet.hasGroundForces() && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                                if (planet.hasGroundForces(player) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                     planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                                } else if (!planet.hasGroundForces()) {
+                                } else if (!planet.hasGroundForces(player)) {
                                     planet.addToken(Constants.GARDEN_WORLDS_PNG);
                                 }
+                            } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                                planet.removeToken(Constants.GARDEN_WORLDS_PNG);
                             }
                         }
                     }
