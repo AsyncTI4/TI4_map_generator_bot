@@ -135,7 +135,7 @@ public class Setup extends PlayerSubcommandData {
             if (tech.trim().isEmpty()) {
                 continue;
             }
-            player.addTech(tech);
+            player.addTech(tech, activeGame);
         }
 
         
