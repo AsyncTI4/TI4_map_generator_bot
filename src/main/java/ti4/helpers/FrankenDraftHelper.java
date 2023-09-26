@@ -120,6 +120,7 @@ public class FrankenDraftHelper {
             sb.append(": ");
             sb.append(item.toHumanReadable());
             sb.append("\n");
+            itemNum++;
         }
 
         return sb.toString();
@@ -134,6 +135,7 @@ public class FrankenDraftHelper {
             sb.append(": ");
             sb.append(item.toHumanReadable());
             sb.append("\n");
+            itemNum++;
         }
 
         return sb.toString();
@@ -150,6 +152,7 @@ public class FrankenDraftHelper {
             sb.append(": ");
             sb.append(item.toHumanReadable());
             sb.append("\n");
+            itemNum++;
         }
 
         return sb.toString();
