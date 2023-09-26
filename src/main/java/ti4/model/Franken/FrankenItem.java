@@ -1,7 +1,11 @@
 package ti4.model.Franken;
 
 import ti4.generator.Mapper;
-import ti4.model.ModelInterface;
+import ti4.generator.TileHelper;
+import ti4.helpers.Helper;
+import ti4.model.*;
+
+import java.util.HashMap;
 
 public class FrankenItem implements ModelInterface {
     @Override
@@ -70,8 +74,132 @@ public class FrankenItem implements ModelInterface {
 
     public String toHumanReadable()
     {
-        // TODO: make this actually human readable
+        FactionModel faction = Mapper.getFactionSetup(ItemId);
+        switch (ItemCategory) {
+            case ABILITY -> {
+                return getAbilityHumanReadable();
+            }
+            case TECH -> {
+                return getTechHumanReadable();
+            }
+            case AGENT -> {
+                return getLeaderHumanReadable(faction);
+            }
+            case COMMANDER -> {
+                return getLeaderHumanReadable(faction);
+            }
+            case HERO -> {
+                return getLeaderHumanReadable(faction);
+            }
+            case MECH -> {
+                return getMech(faction);
+            }
+            case FLAGSHIP -> {
+                return getFlagship(faction);
+            }
+            case COMMODITIES -> {
+                return getCommodities(faction);
+            }
+            case PN -> {
+                return getPromissory(faction);
+            }
+            case HOMESYSTEM -> {
+                return getHomeSystem(faction);
+            }
+            case STARTINGTECH -> {
+                return "Starting Tech: " + faction.getFactionName();
+            }
+            case STARTINGFLEET -> {
+                return "Starting Fleet: " + faction.getFactionName();
+            }
+            case BLUETILE -> {
+                return "Blue Tile: " +TileHelper.getTile(ItemId).getName() + " (" + ItemId +")";
+            }
+            case REDTILE -> {
+                return "Red Tile: " +TileHelper.getTile(ItemId).getName() + " (" + ItemId +")";
+            }
+            case DRAFTORDER -> {
+                return "Speaker Order: " + (ItemId.equals("1") ?"Speaker":ItemId);
+            }
+        }
         return getAlias();
+    }
+
+    private String getHomeSystem(FactionModel faction) {
+        String homeSystemID = faction.getHomeSystem();
+        TileModel tile = TileHelper.getTile(homeSystemID);
+        return "Home System: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + tile.getName();
+    }
+
+    private String getPromissory(FactionModel faction) {
+        PromissoryNoteModel pn = Mapper.getPromissoryNotes().get(faction.getPromissoryNotes().get(0));
+        return "Promissory Note: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + pn.getName();
+    }
+
+    private String getCommodities(FactionModel faction) {
+        return "Commodities: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + faction.getCommodities();
+    }
+
+    private String getFlagship(FactionModel faction) {
+        UnitModel flag = null;
+        var units = Mapper.getUnits().entrySet();
+        for (var unit : units) {
+            if (unit.getValue().getBaseType().equals("flagship") && unit.getValue().getFaction() != null && faction.getAlias().equals(unit.getValue().getFaction())){
+                flag = unit.getValue();
+                break;
+            }
+
+        }
+        if (flag != null) {
+            return "Flagship: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + flag.getName();
+        }
+        return "Flagship: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " flagship";
+    }
+
+    private String getMech(FactionModel faction) {
+        UnitModel mech = null;
+        var units = Mapper.getUnits().entrySet();
+        for (var unit : units) {
+            if (unit.getValue().getBaseType().equals("mech") && unit.getValue().getFaction() != null && faction.getAlias().equals(unit.getValue().getFaction())){
+                mech = unit.getValue();
+                break;
+            }
+
+        }
+        if (mech != null) {
+            return "Mech: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + mech.getName();
+        }
+        return "Mech: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " mech";
+    }
+
+    private String getLeaderHumanReadable(FactionModel faction) {
+        var leaderIDs = faction.getLeaders();
+        String leaderType = ItemCategory.toString().toLowerCase();
+        String leaderId = "";
+        for (var l : leaderIDs) {
+            if (l.contains(leaderType)) {
+                leaderId = l;
+                break;
+            }
+        }
+        HashMap<String, String> leaders = Mapper.getLeaderRepresentations();
+
+        String leaderHumanReadable = Character.toTitleCase(leaderType.charAt(0)) + leaderType.substring(1);
+        return leaderHumanReadable + ": " +  Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + leaders.get(leaderId).split(";")[0];
+    }
+
+
+    private String getTechHumanReadable() {
+        TechnologyModel tech = Mapper.getTech(ItemId);
+        String factionName = Mapper.getFactionRepresentations().get(tech.getFaction());
+        return "Tech: " + Helper.getFactionIconFromDiscord(tech.getFaction()) + " " + tech.getName();
+    }
+
+    private String getAbilityHumanReadable() {
+        HashMap<String, String> abilities = Mapper.getFactionAbilities();
+        String[] abilitySplit = abilities.get(ItemId).split("\\|");
+
+        return "Ability: " + Helper.getFactionIconFromDiscord(abilitySplit[1]) + " " + abilitySplit[0];
     }
 
     public static int GetBagLimit(Category category, boolean powered, boolean largeMap) {
