@@ -14,7 +14,7 @@ public class TechAdd extends TechAddRemove {
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        player.addTech(techID);
+        player.addTech(techID, getActiveGame());
         ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, techID, getActiveGame());
         String message = Helper.getPlayerRepresentation(player, getActiveGame()) + " added tech: " + Helper.getTechRepresentation(techID);
         if("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))){

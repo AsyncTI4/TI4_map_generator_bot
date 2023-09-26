@@ -5,7 +5,7 @@
         "value": "-1",
         "persistenceType": "ALWAYS",
         "scope": "pd",
-        "forCombatAbility": "spacecannonoffence", 
+        "forCombatAbility": "SpaceCannonOffence",
         "related":[
             {"type":"opponent_tech", "alias":"amd"}
         ]
@@ -31,7 +31,7 @@
         "related":[
             {"type": "leader", "alias": "argentcommander"}
         ], 
-        "forCombatAbility": "afb"
+        "forCombatAbility": "AFB"
     },
     {
         "alias": "plus1_roll_argent_commander_bombard",
@@ -65,7 +65,7 @@
         "related":[
             {"type": "tech", "alias": "ps"}
         ], 
-        "forCombatAbility": "spacecannonoffence"
+        "forCombatAbility": "SpaceCannonOffence"
     },
     {
         "alias": "plus1_roll_plasmascoring",
@@ -295,7 +295,7 @@
             {"type": "leader", "alias": "kolumecommander"},
             {"type": "relic", "alias": "starfall_array"}
         ], 
-        "forCombatAbility": "afb"
+        "forCombatAbility": "AFB"
     }, 
     {
         "alias": "plus_x_frag_always_flagship_afb",
@@ -307,6 +307,6 @@
         "related":[
             {"type": "unit", "alias": "bentor_flagship"}
         ], 
-        "forCombatAbility": "afb"
+        "forCombatAbility": "AFB"
     }
 ]
