@@ -15,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+
+import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
 
 @JsonTypeName("planet")
@@ -29,6 +31,8 @@ public class Planet extends UnitHolder {
     private final ArrayList<String> planetType = new ArrayList<>();
     private final ArrayList<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility;
+    private int spaceCannonHitsOn = 0;
+    private int spaceCannonDieCount = 0;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -66,15 +70,17 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
-    public boolean hasGroundForces() {
-        return getUnits().keySet().stream().anyMatch(u -> u.contains("mf") || u.contains("gf"));
+    public boolean hasGroundForces(Player player) {
+        return getUnits().keySet().stream()
+                .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+                .anyMatch(u -> u.getIsGroundForce());
     }
 
     @Override
     public boolean removeToken(String tokenFileName) {
         boolean containedToken = super.removeToken(tokenFileName);
         if (containedToken) {
-            addRemoveTokenData(tokenFileName, true);
+            removeTokenData(tokenFileName);
         }
         return containedToken;
     }
@@ -83,64 +89,54 @@ public class Planet extends UnitHolder {
     public boolean addToken(String tokenFileName) {
         boolean newToken = super.addToken(tokenFileName);
         if (newToken) {
-            addRemoveTokenData(tokenFileName, false);
+            addTokenData(tokenFileName);
         }
         return newToken;
     }
 
-    private void addRemoveTokenData(String tokenFileName, boolean removeTokenData) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { //THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
-            if (removeTokenData) {
-                resetOriginalPlanetResInf();
-            } else {
-                resourcesOriginal = 2;
-                influenceOriginal = 0;
-            }
+    private void addTokenData(String tokenFileName) {
+        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+            resourcesOriginal = 2;
+            influenceOriginal = 0;
         }
 
-        List<String> attachmentInfoAll = Mapper.getAttachmentInfoAll();
-        for (String id : attachmentInfoAll) {
-            String attachmentID = Mapper.getAttachmentID(id);
-            if (tokenFileName.equals(attachmentID)) {
-                String attachmentInfo = Mapper.getAttachmentInfo(id);
-                String[] split = attachmentInfo.split(";");
+        AttachmentModel attachment = Mapper.getAttachmentInfo(tokenFileName);
+        if (attachment != null) {
 
-                try {
-                    if (removeTokenData) {
-                        resourcesModifier -= Integer.parseInt(split[0]);
-                        influenceModifier -= Integer.parseInt(split[1]);
-                    } else {
-                        resourcesModifier += Integer.parseInt(split[0]);
-                        influenceModifier += Integer.parseInt(split[1]);
-                    }
+            resourcesModifier += attachment.getResourcesModifier();
+            influenceModifier += attachment.getInfluenceModifier();
+            for (String planetType : attachment.getPlanetTypes()) {
+                addType(planetType);
+            }
+            for (String techSpeciality : attachment.getTechSpeciality()) {
+                addTechSpec(techSpeciality);
+            }
+            if (spaceCannonDieCount == 0 && attachment.getSpaceCannonDieCount() > 0) {
+                spaceCannonDieCount = attachment.getSpaceCannonDieCount();
+                spaceCannonHitsOn = attachment.getSpaceCannonHitsOn();
+            }
+        }
+    }
 
-                } catch (Exception e) {
-                    BotLogger.log("Could not parse res/inf in token of unitHolder " + getName(), e);
-                }
+    private void removeTokenData(String tokenFileName) {
+        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) {
+            resetOriginalPlanetResInf();
+        }
 
-                //ADD TYPES
-                if (split.length > 2) {
-                    String additional = split[2];
-                    if (additional.contains(",")) {
-                        String[] subSplit = additional.split(",");
-                        for (String type : subSplit) {
-                            if (removeTokenData) {
-                                planetType.remove(type);
-                            } else {
-                                addType(type);
-                            }
-                        }
-                    } else {
-                        if (removeTokenData) {
-                            techSpeciality.remove(additional);
-                            planetType.remove(additional);
-                        } else {
-                            addTechSpec(additional);
-                            addType(additional);
-                        }
-                    }
-                }
-                break;
+        AttachmentModel attachment = Mapper.getAttachmentInfo(tokenFileName);
+        if (attachment != null) {
+            resourcesModifier -= attachment.getResourcesModifier();
+            influenceModifier -= attachment.getInfluenceModifier();
+
+            for (String type : attachment.getPlanetTypes()) {
+                planetType.remove(type);
+            }
+            for (String speciality : attachment.getTechSpeciality()) {
+                techSpeciality.remove(speciality);
+            }
+            if (attachment.getSpaceCannonDieCount() > 0) {
+                spaceCannonDieCount = 0;
+                spaceCannonHitsOn = 0;
             }
         }
     }
@@ -205,5 +201,21 @@ public class Planet extends UnitHolder {
 
     public boolean isHasAbility() {
         return hasAbility;
+    }
+
+    public int getSpaceCannonDieCount() {
+        return spaceCannonDieCount;
+    }
+
+    public int getSpaceCannonHitsOn() {
+        return spaceCannonHitsOn;
+    }
+
+    public void setSpaceCannonDieCount(int dieCount) {
+        spaceCannonDieCount = dieCount;
+    }
+
+    public void setSpaceCannonHitsOn(int hitsOn) {
+        spaceCannonHitsOn = hitsOn;
     }
 }

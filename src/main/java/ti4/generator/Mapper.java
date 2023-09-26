@@ -38,7 +38,6 @@ public class Mapper {
     private static final Properties faction_representation = new Properties();
     private static final Properties leader_representation = new Properties();
     private static final Properties unit_representation = new Properties();
-    private static final Properties attachmentInfo = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
@@ -54,6 +53,8 @@ public class Mapper {
     private static final HashMap<String, RelicModel> relics = new HashMap<>();
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
     private static final HashMap<String, UnitModel> units = new HashMap<>();
+    private static final HashMap<String, AttachmentModel> attachments = new HashMap<>();
+
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
@@ -68,26 +69,33 @@ public class Mapper {
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("factions.properties", factions, "Could not read factions name file");
-        importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
+        importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class,
+                "Could not read secret objectives file");
         importJsonObjects("action_cards.json", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjects("agendas.json", agendas, AgendaModel.class, "Could not read agendas file");
-        importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
-        importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
+        importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class,
+                "Could not read public objective file");
+        importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class,
+                "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         importJsonObjects("relics.json", relics, RelicModel.class, "Could not read relic file");
         importJsonObjects("technology.json", technologies, TechnologyModel.class, "Could not read technology file");
         readData("planets.properties", planets, "Could not read planets file");
-        readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
-        readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
-        readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
+        importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
+        readData("faction_representation.properties", faction_representation,
+                "Could not read faction representation file");
+        readData("leader_representation.properties", leader_representation,
+                "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjects("decks.json", decks, DeckModel.class, "could not read decks file");
         importJsonObjects("units.json", units, UnitModel.class, "could not read units file");
-        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
-        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
+        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class,
+                "could not read strat cards file");
+        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class,
+                "could not read combat modifiers file");
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
     }
 
@@ -102,7 +110,8 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target, String error) {
+    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap,
+            Class<T> target, String error) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getInfoFile(jsonFileName);
@@ -117,7 +126,7 @@ public class Mapper {
                 BotLogger.log(e.getMessage());
             }
         }
-        
+
         List<String> badObjects = new ArrayList<>();
         allObjects.forEach(obj -> {
             if (obj.isValid()) {
@@ -126,7 +135,9 @@ public class Mapper {
                 badObjects.add(obj.getAlias());
             }
         });
-        if (!badObjects.isEmpty()) BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> " + String.join("\n> ", badObjects));
+        if (!badObjects.isEmpty())
+            BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
+                    + String.join("\n> ", badObjects));
     }
 
     public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
@@ -135,10 +146,12 @@ public class Mapper {
         if (isColorValid(color) && isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
-                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && !"Absol".equalsIgnoreCase(pn.getSource())) {
+                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
+                            && !"Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
-                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && "Absol".equalsIgnoreCase(pn.getSource())) {
+                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
+                            && "Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -193,21 +206,23 @@ public class Mapper {
 
     public static List<List<Boolean>> getHyperlaneData(String tileID) {
         String property = hyperlaneAdjacencies.getProperty(tileID);
-        if (property == null) return Collections.emptyList();
+        if (property == null)
+            return Collections.emptyList();
 
         List<String> directions = Arrays.stream(property.split(";")).toList();
         List<List<Boolean>> data = new ArrayList<>();
         for (String dir : directions) {
             List<String> info = Arrays.stream(dir.split(",")).toList();
             List<Boolean> connections = new ArrayList<>();
-            for (String value : info) connections.add("1".equals(value));
+            for (String value : info)
+                connections.add("1".equals(value));
             data.add(connections);
         }
         return data;
     }
 
     public static Set<String> getWormholes(String tileID) {
-        if(TileHelper.getAllTiles().get(tileID).getWormholes() == null){
+        if (TileHelper.getAllTiles().get(tileID).getWormholes() == null) {
             return null;
         }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
@@ -219,7 +234,7 @@ public class Mapper {
     public static Set<String> getWormholesTiles(String wormholeID) {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
-        if(wormhole == null){
+        if (wormhole == null) {
             return new HashSet<>();
         }
 
@@ -268,6 +283,7 @@ public class Mapper {
         }
         return unitMap;
     }
+
     public static Map<String, String> getDSHandcards() {
         Map<String, String> cards = new HashMap<>();
         for (Map.Entry<Object, Object> entry : ds_handcards.entrySet()) {
@@ -391,11 +407,12 @@ public class Mapper {
         if ((promStr == null) || !promStr.contains(";")) {
             return promStr;
         }
-        return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction() + promissoryNotes.get(id).getColour();
+        return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
+                + promissoryNotes.get(id).getColour();
     }
 
     public static String getPromissoryNoteOwner(String id) {
-        if(promissoryNotes.get(id) == null){
+        if (promissoryNotes.get(id) == null) {
             return "finNullDodger";
         }
         return promissoryNotes.get(id).getOwner();
@@ -412,11 +429,11 @@ public class Mapper {
     public static String getExplore(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
-        if(explore.get(id) != null){
+        if (explore.get(id) != null) {
             return (String) explore.get(id);
         }
         id = id.replace("_", "");
-        
+
         return (String) explore.get(id);
     }
 
@@ -430,16 +447,12 @@ public class Mapper {
         return TileHelper.getAllPlanets().get(id);
     }
 
-    public static String getAttachmentInfo(String id) {
-        return (String) attachmentInfo.get(id);
+    public static AttachmentModel getAttachmentInfo(String id) {
+        return attachments.get(id);
     }
 
-    public static List<String> getAttachmentInfoAll() {
-        return Stream.of(attachmentInfo.keySet(), tokens.keySet()).flatMap(Collection::stream)
-                .filter(token -> token instanceof String)
-                .map(token -> (String) token)
-                .sorted()
-                .collect(Collectors.toList());
+    public static List<AttachmentModel> getAttachmentInfoAll() {
+        return new ArrayList<>(attachments.values());
     }
 
     public static String getAgendaForOnly(String id) {
@@ -467,6 +480,7 @@ public class Mapper {
         }
         return agendaModel.getName().toUpperCase();
     }
+
     public static String getAgendaTitleNoCap(String id) {
         AgendaModel agendaModel = agendas.get(id);
         if (agendaModel == null) {
@@ -553,19 +567,21 @@ public class Mapper {
         }
         return agendaList;
     }
+
     public static HashMap<String, String> getAgendaJustNames(Game activeGame) {
         HashMap<String, String> agendaList = new HashMap<>();
         for (AgendaModel agenda : agendas.values()) {
-            if(activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")){
+            if (activeGame.isAbsolMode() && agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
-            if(!activeGame.isAbsolMode() && !agenda.getAlias().contains("absol_")){
+            if (!activeGame.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
-            
+
         }
         return agendaList;
     }
+
     @Nullable
     public static String getCCPath(String ccID) {
         return ResourceHelper.getInstance().getCCFile(ccID);
@@ -623,7 +639,6 @@ public class Mapper {
     public static boolean isValidPlanet(String id) {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
-
 
     public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
         return new HashMap<>(publicObjectives);

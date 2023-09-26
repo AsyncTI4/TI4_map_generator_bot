@@ -728,7 +728,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
-            player.addTech(AliasHandler.resolveTech(tech));
+            player.addTech(AliasHandler.resolveTech(tech), activeGame);
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, tech, activeGame);
             ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeGame);
             if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(tech))) {
@@ -1636,7 +1636,7 @@ public class ButtonListener extends ListenerAdapter {
                 String tech = pnID.replace("ra_", "");
                 pnID = pnID.replace("_" + tech, "");
                 String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech)) + " via Research Agreement";
-                player.addTech(AliasHandler.resolveTech(tech));
+                player.addTech(AliasHandler.resolveTech(tech), activeGame);
                 ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeGame);
                 if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "jolnar", event);
