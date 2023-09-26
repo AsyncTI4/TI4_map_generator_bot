@@ -19,7 +19,7 @@ public class StartFrankenDraft extends FrankenSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-       
+        FrankenDraftHelper.clearPlayerHands(activeGame);
 
         OptionMapping stratPings = event.getOption(Constants.POWERED);
         if (stratPings != null){
