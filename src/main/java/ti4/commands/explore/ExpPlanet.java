@@ -117,7 +117,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 
                         if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
                             
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                            String pF = player.getFactionEmoji();
                             
                             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Using Distant Suns,  " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeGame));
                             

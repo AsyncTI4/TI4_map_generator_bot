@@ -539,6 +539,8 @@ public class GameSaveLoadManager {
 
             writer.write(Constants.FACTION + " " + player.getFaction());
             writer.write(System.lineSeparator());
+            writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmoji());
+            writer.write(System.lineSeparator());
             //TODO Remove when no longer relevant
             String playerColor = player.getColor();
             if (player.getFaction() == null || "null".equals(player.getFaction())) {
@@ -1621,6 +1623,7 @@ public class GameSaveLoadManager {
             data = tokenizer.nextToken();
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
+                case Constants.FACTION_EMOJI -> player.setFactionEmoji(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());

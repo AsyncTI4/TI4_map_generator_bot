@@ -434,7 +434,7 @@ public class ButtonHelper {
                 continue;
             }
 
-            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
+            Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
             if (activeGame.isFoWMode()) {
                 int index = 0;
                 for (Player player_ : activeGame.getPlayers().values()) {
@@ -1092,7 +1092,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(activeGame, player);
-        String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+        String ident = player.getFactionEmoji();
         String msg = ident + " removed CC from " + tileRep;
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
@@ -1181,7 +1181,7 @@ public class ButtonHelper {
         for (Player player2 : activeGame.getRealPlayers()) {
             if (player.getAllianceMembers().contains(player2.getFaction())) {
                 buttonsToRemoveCC.add(
-                    Button.success("swapToFaction_" + player2.getFaction(), "Swap to " + player2.getFaction()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player2.getFaction()))));
+                    Button.success("swapToFaction_" + player2.getFaction(), "Swap to " + player2.getFaction()).withEmoji(Emoji.fromFormatted(player2.getFactionEmoji())));
             }
         }
         if (fromButton) {
@@ -1349,49 +1349,49 @@ public class ButtonHelper {
         Player titans = Helper.getPlayerFromUnlockedLeader(activeGame, "titansagent");
         if (!activeGame.isFoWMode() && titans != null && titans.hasUnexhaustedLeader("titansagent", activeGame)) {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("titans"))));
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
 
         Player sol = Helper.getPlayerFromUnlockedLeader(activeGame, "solagent");
         if (!activeGame.isFoWMode() && sol != null && sol.hasUnexhaustedLeader("solagent", activeGame) && "ground".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
 
         Player letnev = Helper.getPlayerFromUnlockedLeader(activeGame, "letnevagent");
         if ((!activeGame.isFoWMode() || letnev == p1) && letnev != null && letnev.hasUnexhaustedLeader("letnevagent", activeGame) && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + letnev.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("letnev"))));
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(activeGame, "nomadagentthundarian");
         if ((!activeGame.isFoWMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian", activeGame)) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use Thundarian").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use Thundarian").withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
         Player yin = Helper.getPlayerFromUnlockedLeader(activeGame, "yinagent");
         if ((!activeGame.isFoWMode() || yin == p1) && yin != null && yin.hasUnexhaustedLeader("yinagent", activeGame)) {
             String finChecker = "FFCC_" + yin.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "yinagent_" + pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+            buttons.add(Button.secondary(finChecker + "yinagent_" + pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
         }
 
         if (p1.hasAbility("technological_singularity")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p2.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p2.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
         if (p2.hasAbility("technological_singularity") && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+            buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
         if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
+            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
         if (p1.hasAbility("edict") || p1.hasAbility("imperia")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
+            buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
         if ("space".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Button.danger("retreat_" + pos, "Retreat"));
@@ -1410,22 +1410,22 @@ public class ButtonHelper {
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Use Sol Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+                        .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
                 if (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeGame.isFoWMode() && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Use Sol Commander on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+                        .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
                 if (p1.hasAbility("indoctrination") && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+                        .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
                 if (p2.hasAbility("indoctrination") && !activeGame.isFoWMode() && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+                        .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
             }
             if (nameOfHolder.equalsIgnoreCase("space")) {
@@ -1687,7 +1687,7 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
         }
         if (player.hasUnexhaustedLeader("naazagent", activeGame)) {
-            endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naaz"))));
+            endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
         }
 
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
@@ -1735,7 +1735,7 @@ public class ButtonHelper {
             startButtons.add(pass);
         } else {
             if (player.getTechs().contains("cm")) {
-                Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+                Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);
             }
             if (player.hasTech("td") && !player.getExhaustedTechs().contains("td")) {
@@ -1750,14 +1750,14 @@ public class ButtonHelper {
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
-            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             startButtons.add(hacanButton);
         }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasUnexhaustedLeader("nekroagent", activeGame) && player.getAc() > 0) {
-            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent on yourself").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent on yourself").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }
         if (activeGame.getLatestTransactionMsg() != null && !"".equalsIgnoreCase(activeGame.getLatestTransactionMsg())) {
@@ -1907,7 +1907,7 @@ public class ButtonHelper {
 
                 if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
 
-                    String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                    String pF = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Using Voidsailors,  " + pF + " found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation());
 
                 } else {
@@ -2087,7 +2087,7 @@ public class ButtonHelper {
         }
 
         if (player.hasUnexhaustedLeader("saaragent", activeGame)) {
-            Button saarButton = Button.secondary("exhaustAgent_saaragent", "Use Saar Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+            Button saarButton = Button.secondary("exhaustAgent_saaragent", "Use Saar Agent").withEmoji(Emoji.fromFormatted(Emojis.Saar));
             buttons.add(saarButton);
         }
 
@@ -2097,7 +2097,7 @@ public class ButtonHelper {
         }
 
         if (player.hasUnexhaustedLeader("ghostagent", activeGame) && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem(), player)) {
-            Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("ghost")));
+            Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
 
@@ -2236,7 +2236,7 @@ public class ButtonHelper {
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "ghostcommander")) {
             Button ghostC = Button.primary(finChecker + "placeGhostCommanderFF_" + tile.getPosition(), "Place fighter with Ghost Commander")
-                .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("ghost")));
+                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostC);
         }
         if (tile.getUnitHolders().size() > 1 && ButtonHelper.getTilesOfUnitsWithBombard(player, activeGame).contains(tile)) {
@@ -2351,20 +2351,20 @@ public class ButtonHelper {
     }
 
     public static String getIdent(Player player) {
-        return Helper.getFactionIconFromDiscord(player.getFaction());
+        return player.getFactionEmoji();
     }
 
     public static String getIdentOrColor(Player player, Game activeGame) {
         if (activeGame.isFoWMode()) {
             return StringUtils.capitalize(player.getColor());
         }
-        return Helper.getFactionIconFromDiscord(player.getFaction());
+        return player.getFactionEmoji();
     }
 
     public static String buildMessageFromDisplacedUnits(Game activeGame, boolean landing, Player player, String moveOrRemove) {
         String message;
         HashMap<String, Integer> displacedUnits = activeGame.getCurrentMovedUnitsFrom1System();
-        String prefix = " > " + Helper.getFactionIconFromDiscord(player.getFaction());
+        String prefix = " > " + player.getFactionEmoji();
 
         StringBuilder messageBuilder = new StringBuilder();
         for (String unit : displacedUnits.keySet()) {
@@ -3191,8 +3191,7 @@ public class ButtonHelper {
                     String pnShortHand = pn;
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
                     Player owner = activeGame.getPNOwner(pnShortHand);
-                    Button transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
-                        .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                    Button transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -3263,7 +3262,7 @@ public class ButtonHelper {
                     if (!activeGame.isFoWMode()) {
                         button = Button.secondary(finChecker + "transactWith_" + faction, " ");
 
-                        String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                        String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     } else {
                         button = Button.secondary(finChecker + "transactWith_" + player.getColor(), player.getColor());
@@ -3353,8 +3352,7 @@ public class ButtonHelper {
                     if (activeGame.isFoWMode()) {
                         transact = Button.success(finChecker + "send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() + " " + promissoryNote.getName());
                     } else {
-                        transact = Button.success(finChecker + "send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                            .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                        transact = Button.success(finChecker + "send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                     }
                     stuffToTransButtons.add(transact);
                 }
@@ -4239,7 +4237,7 @@ public class ButtonHelper {
             PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
             PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         }
-        String emojiToUse = activeGame.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
+        String emojiToUse = activeGame.isFoWMode() ? "" : owner.getFactionEmoji();
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: " + pnName + "\n");
         sb.append(emojiToUse).append(Emojis.PN);
         String pnText;
@@ -4280,7 +4278,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), sb.toString());
         if ("fires".equalsIgnoreCase(id)) {
-            player.addTech("ws");
+            player.addTech("ws", activeGame);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " acquired Warsun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeGame, activeGame.getGuild(), true) + " reduced your fleet cc by 1 due to fires being played";
@@ -4337,7 +4335,7 @@ public class ButtonHelper {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isFaction(faction)) {
                     Button button = Button.secondary("assignSpeaker_" + faction, " ");
-                    String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                    String factionEmojiString = player.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     assignSpeakerButtons.add(button);
                 }

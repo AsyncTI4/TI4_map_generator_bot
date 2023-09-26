@@ -917,31 +917,31 @@ public class AgendaHelper {
         afterButtons.add(playAfter);
 
         if (Helper.getPlayerFromColorOrFaction(activeGame, "keleres") != null && !activeGame.isFoWMode()) {
-            Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));
+            Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
         if (Helper.getPlayerFromColorOrFaction(activeGame, "edyn") != null && !activeGame.isFoWMode()) {
-            Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+            Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Emojis.edyn));
             afterButtons.add(playKeleresAfter);
         }
         if (Helper.getPlayerFromAbility(activeGame, "galactic_threat") != null && !activeGame.isFoWMode()) {
             Player nekroProbably = Helper.getPlayerFromAbility(activeGame, "galactic_threat");
             String finChecker = "FFCC_" + nekroProbably.getFaction() + "_";
             Button playNekroAfter = Button.secondary(finChecker + "play_after_Galactic Threat Rider", "Do Galactic Threat Rider")
-                .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+                .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             afterButtons.add(playNekroAfter);
         }
         if (Helper.getPlayerFromUnlockedLeader(activeGame, "keleresheroodlynn") != null) {
             Player keleresX = Helper.getPlayerFromUnlockedLeader(activeGame, "keleresheroodlynn");
             String finChecker = "FFCC_" + keleresX.getFaction() + "_";
-            Button playKeleresHero = Button.secondary(finChecker + "play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));
+            Button playKeleresHero = Button.secondary(finChecker + "play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresHero);
         }
         if (Helper.getPlayerFromAbility(activeGame, "radiance") != null) {
             Player edyn = Helper.getPlayerFromAbility(activeGame, "radiance");
             String finChecker = "FFCC_" + edyn.getFaction() + "_";
             Button playKeleresHero = Button.secondary(finChecker + "play_after_Edyn Radiance Ability", "Use Edyn Radiance Ability")
-                .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+                .withEmoji(Emoji.fromFormatted(Emojis.edyn));
             afterButtons.add(playKeleresHero);
         }
 
@@ -950,7 +950,7 @@ public class AgendaHelper {
                 Player edyn = p1;
                 String finChecker = "FFCC_" + edyn.getFaction() + "_";
                 Button playKeleresHero = Button.secondary(finChecker + "play_after_Edyn Unity Algorithm", "Use Edyn Unity Algorithm Tech")
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("edyn")));
+                    .withEmoji(Emoji.fromFormatted(Emojis.edyn));
                 afterButtons.add(playKeleresHero);
             }
         }
@@ -1171,7 +1171,7 @@ public class AgendaHelper {
                         } else {
                             button = Button.secondary(prefix + "_" + faction, " ");
                         }
-                        String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                        String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     } else {
                         if (rider != null) {

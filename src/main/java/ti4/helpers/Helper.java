@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -389,8 +391,7 @@ public class Helper {
 
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
         Emoji emojiToUse;
-        String playerFaction = player.getFaction();
-        emojiToUse = Emoji.fromFormatted(getFactionIconFromDiscord(playerFaction));
+        emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
         String messageId = message.getId();
 
         if (activeGame.isFoWMode()) {
@@ -405,6 +406,7 @@ public class Helper {
         return emojiToUse;
     }
 
+    @Nonnull
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
         //symbols = new ArrayList<>(testingEmoji);
@@ -428,6 +430,7 @@ public class Helper {
         return goodDogs.get(0);
     }
 
+    @Nonnull
     public static String getFactionIconFromDiscord(String faction) {
         if (faction == null) {
             return getRandomizedEmoji(0, null);
@@ -588,7 +591,7 @@ public class Helper {
         if (activeGame.isFoWMode()) {
             ident = player.getColor();
         } else {
-            ident = getFactionIconFromDiscord(player.getFaction());
+            ident = player.getFactionEmoji();
         }
         return ident;
     }
@@ -1093,7 +1096,7 @@ public class Helper {
     }
 
     private static String defaultPlayerRepresentation(Player player, Guild guild) {
-        StringBuilder sb = new StringBuilder(getFactionIconFromDiscord(player.getFaction()));
+        StringBuilder sb = new StringBuilder(player.getFactionEmoji());
         sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
@@ -1224,7 +1227,7 @@ public class Helper {
             String msg = getGamePing(event, activeGame) + " ";
             if (!activeGame.isFoWMode()) {
                 if (player != null) {
-                    msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
+                    msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
                     msg += getPlayerPing(player) + " ";
                 }
             }
