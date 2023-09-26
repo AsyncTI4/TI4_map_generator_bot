@@ -78,8 +78,7 @@ public class Player {
     private List<String> techs = new ArrayList<>();
     private FrankenBag frankenHand = new FrankenBag();
     private FrankenBag currentFrankenBag = new FrankenBag();
-    private List<String> frankenBagPersonal = new ArrayList<>();
-    private List<String> frankenBagToPass = new ArrayList<>();
+    private FrankenBag frankenItemsToDraft = new FrankenBag();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -1232,12 +1231,9 @@ public class Player {
     public void setCurrentFrankenBag(FrankenBag bag) {
         currentFrankenBag = bag;
     }
-    public List<String> getFrankenBagPersonal() {
-        return frankenBagPersonal;
-    }
 
-    public List<String> getFrankenBagToPass() {
-        return frankenBagToPass;
+    public FrankenBag getFrankenDraftQueue() {
+        return frankenItemsToDraft;
     }
 
     public boolean hasTech(String techID) {
@@ -1272,21 +1268,36 @@ public class Player {
         this.planets = planets;
     }
 
-    public void setFrankenBagPersonal(List<String> frankenBagPersonal) {
+    public void loadFrankenHand(List<String> saveString) {
         FrankenBag newBag = new FrankenBag();
-        for(String item : frankenBagPersonal){
-            String[] split = item.split(":");
-            newBag.Contents.add(new FrankenItem(FrankenItem.Category.valueOf(split[0]), split[1]));
+        for(String item : saveString){
+            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
         }
         this.frankenHand = newBag;
     }
 
-    public void setFrankenBagToPass(List<String> frankenBagToPass) {
-        List<String> newBag= new ArrayList<>();
-        for(String item : frankenBagToPass){
-            newBag.add(item.replace("|"," "));
+    public void loadCurrentFrankenBag(List<String> saveString) {
+        FrankenBag newBag = new FrankenBag();
+        for(String item : saveString){
+            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
         }
-        this.frankenBagToPass = newBag;
+        this.currentFrankenBag = newBag;
+    }
+
+    public void loadFrankenItemsToDraft(List<String> saveString) {
+        List<FrankenItem> items = new ArrayList<>();
+        for(String item : saveString){
+            items.add(FrankenItem.GenerateFromAlias(item));
+        }
+        this.frankenItemsToDraft.Contents = items;
+    }
+
+    public void queueFrankenItemToDraft(FrankenItem item) {
+        this.frankenItemsToDraft.Contents.add(item);
+    }
+
+    public void resetFrankenItemDraftQueue() {
+        this.frankenItemsToDraft.Contents.clear();
     }
 
     public List<String> getReadiedPlanets() {
@@ -1361,20 +1372,6 @@ public class Player {
         techs.add(techID);
 
         doAdditionalThingsWhenAddingTech(techID);
-    }
-
-    public void addToFrankenPersonalBag(String thing) {
-        if (frankenBagPersonal.contains(thing)) {
-            return;
-        }
-        frankenBagPersonal.add(thing);
-    }
-
-    public void addToFrankenPassingBag(String thing) {
-        if (frankenBagToPass.contains(thing)) {
-            return;
-        }
-        frankenBagToPass.add(thing);
     }
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
@@ -1455,10 +1452,6 @@ public class Player {
     public void removeTech(String tech) {
         techs.remove(tech);
         doAdditionalThingsWhenRemovingTech(tech);
-    }
-
-    public boolean removeElementFromBagToPass(String element) {
-        return frankenBagToPass.remove(element);
     }
 
     public void addPlanet(String planet) {

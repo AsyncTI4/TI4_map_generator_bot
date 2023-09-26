@@ -2,13 +2,8 @@ package ti4.helpers;
 
 import java.util.*;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
@@ -25,31 +20,41 @@ import ti4.model.TechnologyModel;
 public class FrankenDraftHelper {
     public static List<Button> getFrankenBagButtons(Game activeGame, Player player){
         List<Button> buttons = new ArrayList<>();
-        List<String> bagToPass = player.getFrankenBagToPass();
-        int numItem = 1;
-        Collections.sort(bagToPass);
-        for(String item : bagToPass){
-            String itemLabel = numItem + ". "+item;
-            if(item.contains("Blue Tile") || item.contains("Mech:")){
-                 buttons.add(Button.primary("frankenDraftAction_"+item,itemLabel));
-            }else if(item.contains("Red Tile") || item.contains("Faction Tech")){
-                 buttons.add(Button.danger("frankenDraftAction_"+item,itemLabel));
-            }else if(item.contains("Agent") || item.contains("Commander") || item.contains("Hero") || item.contains("Speaker Position")){
-                buttons.add(Button.secondary("frankenDraftAction_"+item,itemLabel));
-            }else{
-                buttons.add(Button.success("frankenDraftAction_"+item,itemLabel));
+        FrankenBag bagToPass = player.getCurrentFrankenBag();
+        int categoryCounter = 0;
+        bagToPass.Contents.sort(Comparator.comparing((FrankenItem a) -> a.ItemCategory));
+        FrankenItem.Category lastCategory = bagToPass.Contents.get(0).ItemCategory;
+        for(FrankenItem item : bagToPass.Contents) {
+            if (item.ItemCategory != lastCategory) {
+                lastCategory = item.ItemCategory;
+                categoryCounter = (categoryCounter + 1) % 4;
             }
-            numItem = numItem + 1;
-            
+            switch (categoryCounter) {
+                case 0:
+                    buttons.add(Button.primary("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    break;
+                case 1:
+                    buttons.add(Button.danger("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    break;
+                case 2:
+                    buttons.add(Button.secondary("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    break;
+                case 3:
+                    buttons.add(Button.success("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    break;
+            }
         }
         return buttons;
     }
 
     public static void resolveFrankenDraftAction(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
-        String item = buttonID.split("_")[1];
-        player.addToFrankenPersonalBag(item);
-        player.removeElementFromBagToPass(item);
-        if(player.getFrankenBagToPass().size() % 2 == 0 && player.getFrankenBagPersonal().size() != 1){
+        String selectedAlias = buttonID.split("_")[1];
+        FrankenBag currentBag = player.getCurrentFrankenBag();
+
+        currentBag.Contents.removeIf((FrankenItem bagItem) -> bagItem.getAlias().equals(selectedAlias));
+        player.queueFrankenItemToDraft(FrankenItem.GenerateFromAlias(selectedAlias));
+
+        if(currentBag.Contents.size() % 2 == 0 && player.getFrankenDraftQueue().Contents.size() > 1){
             player.setReadyToPassBag(true);
         }
         boolean everyoneReady = true;
@@ -58,7 +63,7 @@ public class FrankenDraftHelper {
                 everyoneReady = false;
             }
         }
-         String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you picked "+item;
+         String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you picked "+selectedAlias;
         
         if(!everyoneReady){
             if(player.isReadyToPassBag()){
@@ -70,39 +75,58 @@ public class FrankenDraftHelper {
             }
            
            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
-        }else{
+        } else {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
-            //passbags
-            Player firstPlayer = null;
-            List<String> bagToPass = new ArrayList<>();
-            for(Player p2 : activeGame.getRealPlayers()){
-                p2.setReadyToPassBag(false);
-                if(firstPlayer == null){
-                    firstPlayer = p2;
-                }
-                List<String> bagToPass2 = new ArrayList<>();
-                bagToPass2.addAll(p2.getFrankenBagToPass());
-                if(firstPlayer != p2){
-                    p2.setFrankenBagToPass(bagToPass);
-                    bagToPass = bagToPass2;
-                }else{
-                    bagToPass.addAll(p2.getFrankenBagToPass());
-                }
-                
-            }
-            firstPlayer.setFrankenBagToPass(bagToPass);
-            for(Player p2 : activeGame.getRealPlayers()){
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a bag, use buttons to select something", getFrankenBagButtons(activeGame, p2));
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"Here is a text version of the bag you were passed so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, p2));
-            }
+            PassBags(activeGame);
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), "Your current bag looks like: \n"+getCurrentPersonalBagRepresentation(activeGame, player));
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), "You are drafting the following from this bag: \n"+getDraftQueueRepresentation(activeGame, player));
+
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), "You previously drafted: \n"+getCurrentPersonalBagRepresentation(activeGame, player));
         event.getMessage().delete().queue();
+    }
+
+    public static void PassBags(Game activeGame) {
+        for(Player p : activeGame.getRealPlayers()) {
+            FrankenBag queuedItems = p.getFrankenDraftQueue();
+            p.getFrankenHand().Contents.addAll(queuedItems.Contents);
+            for(FrankenItem item : queuedItems.Contents) {
+                p.getCurrentFrankenBag().Contents.removeIf((FrankenItem i) -> i.getAlias().equals(item.getAlias()));
+            }
+            p.resetFrankenItemDraftQueue();
+        }
+
+        // pass bags
+        List<Player> players = activeGame.getRealPlayers();
+        FrankenBag firstPlayerBag = players.get(0).getCurrentFrankenBag();
+        for (int i = 0; i < players.size()-1; i++) {
+            players.get(i).setCurrentFrankenBag(players.get(i+1).getCurrentFrankenBag());
+        }
+        players.get(players.size()-1).setCurrentFrankenBag(firstPlayerBag);
+
+        for(Player p2 : activeGame.getRealPlayers()){
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a bag, use buttons to select something", getFrankenBagButtons(activeGame, p2));
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"Here is a text version of the bag you were passed so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, p2));
+        }
     }
 
     public static String getCurrentPersonalBagRepresentation(Game activeGame, Player player){
         StringBuilder sb = new StringBuilder();
         FrankenBag currentBag = player.getFrankenHand();
+        int itemNum = 1;
+        for(FrankenItem item : currentBag.Contents) {
+            sb.append(itemNum);
+            sb.append(": ");
+            sb.append(item.toHumanReadable());
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public static String getDraftQueueRepresentation(Game activeGame, Player player){
+        StringBuilder sb = new StringBuilder();
+        FrankenBag currentBag = player.getFrankenDraftQueue();
         int itemNum = 1;
         for(FrankenItem item : currentBag.Contents) {
             sb.append(itemNum);
@@ -137,11 +161,7 @@ public class FrankenDraftHelper {
     }
 
     private static void filterUndraftablesAndShuffle(List<FrankenItem> items) {
-        var frankenErrata = Mapper.getFrankenErrata().values();
-        for (var errata : frankenErrata) {
-            items.removeIf((FrankenItem item) -> item.getAlias().equals(errata.getAlias()) && errata.Undraftable);
-        }
-
+        items.removeIf((FrankenItem item) -> item.Undraftable);
         Collections.shuffle(items);
     }
 
@@ -168,9 +188,9 @@ public class FrankenDraftHelper {
         List<String> factionIds = getAllFactionIds(activeGame);
         List<FrankenItem> allItems = new ArrayList<FrankenItem>();
         for (String factionId: factionIds) {
-            allItems.add(new FrankenItem(category, factionId));
+            allItems.add(FrankenItem.Generate(category, factionId));
         }
-        Collections.shuffle(allItems);
+        filterUndraftablesAndShuffle(allItems);
         return allItems;
     }
 
@@ -191,9 +211,9 @@ public class FrankenDraftHelper {
     public static List<FrankenItem> buildDraftOrderSet(Game activeGame) {
         List<FrankenItem> allItems = new ArrayList<>();
         for(int i = 0; i < activeGame.getRealPlayers().size(); i++){
-            allItems.add(new FrankenItem(FrankenItem.Category.DRAFTORDER, Integer.toString(i+1)));
+            allItems.add(FrankenItem.Generate(FrankenItem.Category.DRAFTORDER, Integer.toString(i+1)));
         }
-        Collections.shuffle(allItems);
+        filterUndraftablesAndShuffle(allItems);
         return allItems;
     }
 
@@ -208,10 +228,10 @@ public class FrankenDraftHelper {
             allTiles = draftManager.getRed();
         }
         for(MiltyDraftTile tile : allTiles) {
-            allItems.add(new FrankenItem(blue ? FrankenItem.Category.BLUETILE : FrankenItem.Category.REDTILE,
+            allItems.add(FrankenItem.Generate(blue ? FrankenItem.Category.BLUETILE : FrankenItem.Category.REDTILE,
                         tile.getTile().getTileID()));
         }
-        Collections.shuffle(allItems);
+        filterUndraftablesAndShuffle(allItems);
         return allItems;
     }
 
@@ -222,12 +242,11 @@ public class FrankenDraftHelper {
         for (var ability : abilities.entrySet()){
             String abilityOwner = ability.getValue().split("\\|")[1];
             if (allFactions.contains(abilityOwner)) {
-                allAbilityItems.add(new FrankenItem(FrankenItem.Category.ABILITY,ability.getKey()));
+                allAbilityItems.add(FrankenItem.Generate(FrankenItem.Category.ABILITY,ability.getKey()));
             }
         }
 
         filterUndraftablesAndShuffle(allAbilityItems);
-        Collections.shuffle(allAbilityItems);
         return allAbilityItems;
     }
 
@@ -241,12 +260,12 @@ public class FrankenDraftHelper {
             String source = tech.getValue().getSource();
             if (allFactions.contains(faction)) {
                 if (validTechSources.contains(source)) {
-                    allDraftableTechs.add(new FrankenItem(FrankenItem.Category.TECH, tech.getKey()));
+                    allDraftableTechs.add(FrankenItem.Generate(FrankenItem.Category.TECH, tech.getKey()));
                 }
             }
         }
 
-        Collections.shuffle(allDraftableTechs);
+        filterUndraftablesAndShuffle(allDraftableTechs);
         return allDraftableTechs;
     }
 
@@ -286,43 +305,14 @@ public class FrankenDraftHelper {
             }
 
             player.setCurrentFrankenBag(bag);
-        }
-/*
-            // bagToPass.addAll(getRandomUnitType(2, alreadyHeld, "mech"));
-           // bagToPass.addAll(getRandomUnitType(2, alreadyHeld, "flagship"));
-           if(powered){
-                bagToPass.addAll(getRandomFactionAbilities(4, alreadyHeld));
-                bagToPass.addAll(getRandomFactionTech(3, alreadyHeld));
-           }else{
-            bagToPass.addAll(getRandomFactionAbilities(3, alreadyHeld));
-                bagToPass.addAll(getRandomFactionTech(2, alreadyHeld));
-           }
-
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Agent", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Commander", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Hero", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Mech", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Flagship", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Commodities",activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "PN", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Home System", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Starting Tech", activeGame));
-            bagToPass.addAll(getRandomFactionThing(2, alreadyHeld, "Fleet", activeGame));
-            if(activeGame.getRealPlayers().size() < 7){
-                bagToPass.addAll(getRandomTiles(3, red, alreadyHeld, "Red"));
-            }else{
-                bagToPass.addAll(getRandomTiles(2, red, alreadyHeld, "Red"));
-            }
-            bagToPass.addAll(getRandomTiles(4, blue, alreadyHeld, "Blue"));
-            bagToPass.addAll(getRandomDraftOrder(alreadyHeld, activeGame));
-            alreadyHeld.addAll(bagToPass);
-            player.setFrankenBagToPass(bagToPass);
+            player.resetFrankenItemDraftQueue();
             player.setReadyToPassBag(false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun, use buttons to select something", getFrankenBagButtons(activeGame, player));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Here is a text version of the bag so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, player));
+
         }
          MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " draft started. As a reminder, for the first bag you pick 3 items, and for "+
             "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
             " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready. Please note the bot does not enforce limits on how many of something you can pick. Be mindful of this and dont take more of something that you should have (dont take 8 faction abilities, for instance)");
- */   }
+    }
 }

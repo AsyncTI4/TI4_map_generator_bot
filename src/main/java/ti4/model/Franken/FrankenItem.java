@@ -1,5 +1,6 @@
 package ti4.model.Franken;
 
+import ti4.generator.Mapper;
 import ti4.model.ModelInterface;
 
 public class FrankenItem implements ModelInterface {
@@ -41,26 +42,36 @@ public class FrankenItem implements ModelInterface {
     public FrankenItem[] OptionalSwaps;
     public boolean Undraftable;
 
+    public static FrankenItem Generate(Category category, String itemId) {
+        FrankenItem item = new FrankenItem(category, itemId);
+
+        var frankenErrata = Mapper.getFrankenErrata().values();
+        for(FrankenItem errataItem : frankenErrata) {
+            if (errataItem.getAlias().equals(item.getAlias())) {
+                return errataItem;
+            }
+        }
+        return item;
+    }
+
+    public static FrankenItem GenerateFromAlias(String alias) {
+        String[] split = alias.split(":");
+        return Generate(Category.valueOf(split[0]), split[1]);
+    }
+
     public FrankenItem(){
     }
 
-    public FrankenItem(Category category, String itemId)
+    private FrankenItem(Category category, String itemId)
     {
         ItemCategory = category;
         ItemId = itemId;
     }
 
-    // What gets written to the save file
-    public String toStoreString()
-    {
-        return ItemCategory + ":" + ItemId;
-    }
-
     public String toHumanReadable()
     {
-        switch (ItemCategory) {
-        }
-        return "";
+        // TODO: make this actually human readable
+        return getAlias();
     }
 
     public static int GetBagLimit(Category category, boolean powered, boolean largeMap) {
