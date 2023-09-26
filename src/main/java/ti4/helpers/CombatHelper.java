@@ -19,6 +19,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 
 public class CombatHelper {
@@ -264,24 +265,25 @@ public class CombatHelper {
             entry -> new ImmutablePair<>(
                 player.getPriorityUnitByAsyncID(entry.getKey(), null),
                 entry.getValue()))
-            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
-        // TODO: This could be done better.
+        // Check for space cannon die on planets
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet) {
                 Planet planet = (Planet) unitHolder;
+                PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
-                if (planet.getControlList().contains(ccID)
-                        && planet.getTokenList().contains("attachment_titanshero.png")) {
-                    var titanHeroFakeUnit = new UnitModel();
-                    titanHeroFakeUnit.setSpaceCannonHitsOn(5);
-                    titanHeroFakeUnit.setSpaceCannonDieCount(3);
-                    titanHeroFakeUnit.setName(":Titans: Geoform attachment");
-                    titanHeroFakeUnit.setAsyncId("titanshero");
-                    titanHeroFakeUnit.setId("titanshero");
-                    titanHeroFakeUnit.setBaseType("pds");
-                    titanHeroFakeUnit.setFaction("Titans");
-                    unitsOnTile.put(titanHeroFakeUnit, 1);
+                if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
+                    var planetFakeUnit = new UnitModel();
+                    planetFakeUnit.setSpaceCannonHitsOn(planet.getSpaceCannonHitsOn());
+                    planetFakeUnit.setSpaceCannonDieCount(planet.getSpaceCannonDieCount());
+                    planetFakeUnit
+                            .setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+                    planetFakeUnit.setAsyncId(planet.getName() + "pds");
+                    planetFakeUnit.setId(planet.getName() + "pds");
+                    planetFakeUnit.setBaseType("pds");
+                    planetFakeUnit.setFaction(player.getFaction());
+                    unitsOnTile.put(planetFakeUnit, 1);
                 }
             }
         }

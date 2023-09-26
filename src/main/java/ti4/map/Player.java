@@ -19,6 +19,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -1351,13 +1352,13 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String techID) {
+    public void addTech(String techID, Game game) {
         if (techs.contains(techID)) {
             return;
         }
         techs.add(techID);
 
-        doAdditionalThingsWhenAddingTech(techID);
+        doAdditionalThingsWhenAddingTech(techID, game);
     }
 
     public void addToFrankenPersonalBag(String thing) {
@@ -1374,11 +1375,20 @@ public class Player {
         frankenBagToPass.add(thing);
     }
 
-    private void doAdditionalThingsWhenAddingTech(String techID) {
+    private void doAdditionalThingsWhenAddingTech(String techID, Game game) {
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
+
+            if (getPlanets().contains(Constants.MR)) {
+                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                if (mecatolRex != null) {
+                    PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                    mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                    mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+                }
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade
@@ -1402,10 +1412,17 @@ public class Player {
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
-    private void doAdditionalThingsWhenRemovingTech(String techID) {
+    private void doAdditionalThingsWhenRemovingTech(String techID, Game game) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
+            if (getPlanets().contains(Constants.MR)) {
+                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                if (mecatolRex != null) {
+                    mecatolRex.setSpaceCannonDieCount(0);
+                    mecatolRex.setSpaceCannonHitsOn(0);
+                }
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade
@@ -1449,9 +1466,9 @@ public class Player {
         if (isRemoved) refreshTech(tech);
     }
 
-    public void removeTech(String tech) {
+    public void removeTech(String tech, Game game) {
         techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech);
+        doAdditionalThingsWhenRemovingTech(tech, game);
     }
 
     public boolean removeElementFromBagToPass(String element) {
@@ -1762,5 +1779,9 @@ public class Player {
 
     public boolean hasPlanetReady(String planetID) {
         return hasPlanet(planetID) && !exhaustedPlanets.contains(planetID);
+    }
+
+    public boolean hasCustodiaVigilia() {
+        return planets.contains("custodiavigilia");
     }
 }
