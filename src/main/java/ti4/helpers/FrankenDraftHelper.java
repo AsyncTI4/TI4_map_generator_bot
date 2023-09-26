@@ -11,6 +11,7 @@ import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.Franken.FrankenBag;
 import ti4.model.Franken.FrankenItem;
 import ti4.model.TechnologyModel;
@@ -236,13 +237,12 @@ public class FrankenDraftHelper {
     }
 
     public static List<FrankenItem> buildAbilitySet(Game activeGame) {
-        HashMap<String, String> abilities = Mapper.getFactionAbilities();
         List<String> allFactions = getAllFactionIds(activeGame);
         List<FrankenItem> allAbilityItems = new ArrayList<>();
-        for (var ability : abilities.entrySet()){
-            String abilityOwner = ability.getValue().split("\\|")[1];
-            if (allFactions.contains(abilityOwner)) {
-                allAbilityItems.add(FrankenItem.Generate(FrankenItem.Category.ABILITY,ability.getKey()));
+        for (var factionId : allFactions) {
+            FactionModel faction  = Mapper.getFactionSetup(factionId);
+            for (var ability : faction.getAbilities()) {
+                allAbilityItems.add(FrankenItem.Generate(FrankenItem.Category.ABILITY,ability));
             }
         }
 
@@ -250,21 +250,15 @@ public class FrankenDraftHelper {
         return allAbilityItems;
     }
 
-    private static List<String> validTechSources = List.of(new String[]{"base", "pok", "ds"});
     public static List<FrankenItem> buildFactionTechSet(Game activeGame) {
-        HashMap<String, TechnologyModel> techs = Mapper.getTechs();
         List<String> allFactions = getAllFactionIds(activeGame);
         List<FrankenItem> allDraftableTechs = new ArrayList<>();
-        for (var tech : techs.entrySet()) {
-            String faction = tech.getValue().getFaction();
-            String source = tech.getValue().getSource();
-            if (allFactions.contains(faction)) {
-                if (validTechSources.contains(source)) {
-                    allDraftableTechs.add(FrankenItem.Generate(FrankenItem.Category.TECH, tech.getKey()));
-                }
+        for (var factionId : allFactions) {
+            FactionModel faction = Mapper.getFactionSetup(factionId);
+            for(var tech : faction.getFactionTech()) {
+                allDraftableTechs.add(FrankenItem.Generate(FrankenItem.Category.TECH, tech));
             }
         }
-
         filterUndraftablesAndShuffle(allDraftableTechs);
         return allDraftableTechs;
     }
