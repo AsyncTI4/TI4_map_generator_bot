@@ -373,8 +373,14 @@ public class GenerateMap {
         return factionFile;
     }
 
-    private BufferedImage getFactionImage(Player player) {
+    private static BufferedImage getFactionImage(Player player) {
         return getFactionImageScaled(player, 95, 95);
+    }
+
+    private static BufferedImage getFactionImageScaled(Player player, float scale) {
+        int scaledWidth = (int) (95 * scale);
+        int scaledHeight = (int) (95 * scale);
+        return getFactionImageScaled(player, scaledWidth, scaledHeight);
     }
 
     private static BufferedImage getFactionImageScaled(Player player, int width, int height) {
@@ -386,20 +392,20 @@ public class GenerateMap {
 
         String factionID = player.getFaction();
         String factionPath = getFactionPath(factionID);
-
+        if (width == 95 && height == 95) {
+            return ImageHelper.read(factionPath);
+        }
         return ImageHelper.readScaled(factionPath, width, height);
     }
 
-    private Image getPlayerDiscordAvatar(Player player) {
+    private static Image getPlayerDiscordAvatar(Player player) {
         String userID = player.getUserID();
         Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
         if (member == null)
             return null;
         Image image = null;
         try {
-            ImageProxy avatarProxy = member.getEffectiveAvatar();
-            InputStream inputStream = avatarProxy.download().get();
-            image = ImageHelper.readScaled(member.getUser().getName(), inputStream, 32, 32);
+            return ImageHelper.readURLScaled(member.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
             BotLogger.log("Could not get Avatar", e);
         }
@@ -954,10 +960,9 @@ public class GenerateMap {
             float scale = 0.60f;
             
             BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-            BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
 
             for (int i = 0; i < debtToken.getValue(); i++) {
-                drawControlToken(graphics, controlTokenImage, factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, activeGame, controlID, hideFactionIcon, scale);
+                drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, activeGame, controlID, hideFactionIcon, scale);
                 tokenDeltaX += 15;
             }
 
@@ -977,17 +982,16 @@ public class GenerateMap {
         return x + deltaX + 10;
     }
 
-    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, BufferedImage factionImage, int x, int y, Game activeGame, String controlID, boolean hideFactionIcon, float scale) {
+    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, Game activeGame, String controlID, boolean hideFactionIcon, float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
         if (hideFactionIcon) return;
+        scale = scale * 0.40f;
+        BufferedImage factionImage = getFactionImageScaled(player, scale);
 
-        int centreCustomTokenHorizontally = 0;
-        int centreCustomTokenVertically = 0;
-        if (getPlayerByControlMarker(activeGame.getPlayers().values(), controlID).hasCustomFactionEmoji()) {
-            centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
-            centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
-        }
+        int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
+        int centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
+
         graphics.drawImage(factionImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
     }
 
@@ -1859,7 +1863,6 @@ public class GenerateMap {
                 float scale = 0.7f;
 
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
                 
                 tempWidth = controlTokenImage.getWidth();
                 Integer vpCount = userVPs.get(player);
@@ -1868,7 +1871,7 @@ public class GenerateMap {
                 }
                 int x = vpCount * width + 5 + tempX;
 
-                drawControlToken(graphics, controlTokenImage, factionImage, x , y + (tempCounter * controlTokenImage.getHeight()), activeGame, controlID, convertToGeneric, scale);
+                drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), x , y + (tempCounter * controlTokenImage.getHeight()), activeGame, controlID, convertToGeneric, scale);
             } catch (Exception e) {
                 // nothing
                 // LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
@@ -2585,7 +2588,6 @@ public class GenerateMap {
                     float scale = 0.55f;
 
                     BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                    BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
 
                     Integer vpCount = userVPs.get(player);
                     if (vpCount == null) {
@@ -2596,14 +2598,14 @@ public class GenerateMap {
                         vpCount += frequency * objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             if (!justCalculate) {
-                                drawControlToken(graphics, controlTokenImage, factionImage, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
+                                drawControlToken(graphics, controlTokenImage, player, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
                             }
                             tempX += scoreTokenWidth;
                         }
                     } else {
                         vpCount += objectiveWorth;
                         if (!justCalculate) {
-                            drawControlToken(graphics, controlTokenImage, factionImage, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
+                            drawControlToken(graphics, controlTokenImage, player, x + tempX , y, activeGame, controlID, convertToGeneric, scale);
                         }
                     }
                     userVPs.put(player, vpCount);
@@ -3005,18 +3007,16 @@ public class GenerateMap {
                 float scale = 1.0f;
 
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                BufferedImage factionImage = getCCControlImage(activeGame, getPlayerByControlMarker(activeGame.getPlayers().values(), controlID), scale);
-
 
                 if (position != null) {
                     int imgX = TILE_PADDING + position.x;
                     int imgY = TILE_PADDING + position.y;
-                    drawControlToken(tileGraphics, controlTokenImage, factionImage, imgX , imgY, activeGame, controlID, convertToGeneric, scale);
+                    drawControlToken(tileGraphics, controlTokenImage, player, imgX , imgY, activeGame, controlID, convertToGeneric, scale);
                     rectangles.add(new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
                 } else {
                     int imgX = TILE_PADDING + centerPosition.x + xDelta;
                     int imgY = TILE_PADDING + centerPosition.y;
-                    drawControlToken(tileGraphics, controlTokenImage, factionImage, imgX , imgY, activeGame, controlID, convertToGeneric, scale);
+                    drawControlToken(tileGraphics, controlTokenImage, player, imgX , imgY, activeGame, controlID, convertToGeneric, scale);
                     rectangles.add(new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
                     xDelta += 10;
                 }
