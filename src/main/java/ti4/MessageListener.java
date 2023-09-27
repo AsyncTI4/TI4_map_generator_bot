@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -137,8 +138,10 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        Message msg = event.getMessage();
-        try {      
+        if (!isAsyncServer(event.getGuild().getId())) return;
+
+        try {
+            Message msg = event.getMessage();
             if (msg.getContentRaw().startsWith("[DELETE]")) {
                 msg.delete().queue();
             }
@@ -441,5 +444,12 @@ public class MessageListener extends ListenerAdapter {
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(), event.getChannel().asTextChannel().getId(), event.getAuthor().getId(), event.getMessage().getContentDisplay());
             }
         }
+    }
+
+    public static boolean isAsyncServer(String guildID) {
+        for (Guild guild : AsyncTI4DiscordBot.guilds) {
+            if (guild.getId().equals(guildID)) return true;
+        }
+        return false;
     }
 }
