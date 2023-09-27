@@ -19,6 +19,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.model.Franken.FrankenBag;
+import ti4.model.Franken.FrankenItem;
+import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -79,8 +82,9 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
-    private List<String> frankenBagPersonal = new ArrayList<>();
-    private List<String> frankenBagToPass = new ArrayList<>();
+    private FrankenBag frankenHand = new FrankenBag();
+    private FrankenBag currentFrankenBag = new FrankenBag();
+    private FrankenBag frankenItemsToDraft = new FrankenBag();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -1234,12 +1238,24 @@ public class Player {
         return techs;
     }
 
-    public List<String> getFrankenBagPersonal() {
-        return frankenBagPersonal;
+    public FrankenBag getFrankenHand() {
+        return frankenHand;
     }
 
-    public List<String> getFrankenBagToPass() {
-        return frankenBagToPass;
+    public void setFrankenHand(FrankenBag hand) {
+        frankenHand = hand;
+    }
+
+    public FrankenBag getCurrentFrankenBag() {
+        return currentFrankenBag;
+    }
+
+    public void setCurrentFrankenBag(FrankenBag bag) {
+        currentFrankenBag = bag;
+    }
+
+    public FrankenBag getFrankenDraftQueue() {
+        return frankenItemsToDraft;
     }
 
     public boolean hasTech(String techID) {
@@ -1274,20 +1290,36 @@ public class Player {
         this.planets = planets;
     }
 
-    public void setFrankenBagPersonal(List<String> frankenBagPersonal) {
-        List<String> newBag= new ArrayList<>();
-        for(String item : frankenBagPersonal){
-            newBag.add(item.replace("|"," "));
+    public void loadFrankenHand(List<String> saveString) {
+        FrankenBag newBag = new FrankenBag();
+        for(String item : saveString){
+            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
         }
-        this.frankenBagPersonal = newBag;
+        this.frankenHand = newBag;
     }
 
-    public void setFrankenBagToPass(List<String> frankenBagToPass) {
-        List<String> newBag= new ArrayList<>();
-        for(String item : frankenBagToPass){
-            newBag.add(item.replace("|"," "));
+    public void loadCurrentFrankenBag(List<String> saveString) {
+        FrankenBag newBag = new FrankenBag();
+        for(String item : saveString){
+            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
         }
-        this.frankenBagToPass = newBag;
+        this.currentFrankenBag = newBag;
+    }
+
+    public void loadFrankenItemsToDraft(List<String> saveString) {
+        List<FrankenItem> items = new ArrayList<>();
+        for(String item : saveString){
+            items.add(FrankenItem.GenerateFromAlias(item));
+        }
+        this.frankenItemsToDraft.Contents = items;
+    }
+
+    public void queueFrankenItemToDraft(FrankenItem item) {
+        this.frankenItemsToDraft.Contents.add(item);
+    }
+
+    public void resetFrankenItemDraftQueue() {
+        this.frankenItemsToDraft.Contents.clear();
     }
 
     public List<String> getReadiedPlanets() {
@@ -1355,34 +1387,29 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String techID) {
+    public void addTech(String techID, Game game) {
         if (techs.contains(techID)) {
             return;
         }
         techs.add(techID);
 
-        doAdditionalThingsWhenAddingTech(techID);
+        doAdditionalThingsWhenAddingTech(techID, game);
     }
 
-    public void addToFrankenPersonalBag(String thing) {
-        if (frankenBagPersonal.contains(thing)) {
-            return;
-        }
-        frankenBagPersonal.add(thing);
-    }
-
-    public void addToFrankenPassingBag(String thing) {
-        if (frankenBagToPass.contains(thing)) {
-            return;
-        }
-        frankenBagToPass.add(thing);
-    }
-
-    private void doAdditionalThingsWhenAddingTech(String techID) {
+    private void doAdditionalThingsWhenAddingTech(String techID, Game game) {
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
+
+            if (getPlanets().contains(Constants.MR)) {
+                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                if (mecatolRex != null) {
+                    PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                    mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                    mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+                }
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade
@@ -1406,10 +1433,17 @@ public class Player {
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
-    private void doAdditionalThingsWhenRemovingTech(String techID) {
+    private void doAdditionalThingsWhenRemovingTech(String techID, Game game) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
+            if (getPlanets().contains(Constants.MR)) {
+                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                if (mecatolRex != null) {
+                    mecatolRex.setSpaceCannonDieCount(0);
+                    mecatolRex.setSpaceCannonHitsOn(0);
+                }
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade
@@ -1453,13 +1487,9 @@ public class Player {
         if (isRemoved) refreshTech(tech);
     }
 
-    public void removeTech(String tech) {
+    public void removeTech(String tech, Game game) {
         techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech);
-    }
-
-    public boolean removeElementFromBagToPass(String element) {
-        return frankenBagToPass.remove(element);
+        doAdditionalThingsWhenRemovingTech(tech, game);
     }
 
     public void addPlanet(String planet) {
@@ -1766,5 +1796,9 @@ public class Player {
 
     public boolean hasPlanetReady(String planetID) {
         return hasPlanet(planetID) && !exhaustedPlanets.contains(planetID);
+    }
+
+    public boolean hasCustodiaVigilia() {
+        return planets.contains("custodiavigilia");
     }
 }

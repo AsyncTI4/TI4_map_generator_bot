@@ -17,6 +17,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,15 @@ public class PlanetAdd extends PlanetAddRemove {
             activeGame.clearPlanetsCache();
         }
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+
+        if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
+            Planet mecatolRex = (Planet) unitHolder;
+            if (mecatolRex != null) {
+                PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+            }
+        }
         String color = player.getColor();
         boolean moveTitanPN = false;
         if (unitHolder != null && color != null && !"null".equals(color)) {

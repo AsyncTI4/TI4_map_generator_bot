@@ -452,6 +452,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.POWERED_STATUS + " " + activeGame.getPoweredStatus());
+        writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
@@ -614,10 +616,13 @@ public class GameSaveLoadManager {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + String.join(",", player.getFrankenBagToPass()).replace(" ", "|"));
+            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + player.getCurrentFrankenBag().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + String.join(",", player.getFrankenBagPersonal()).replace(" ", "|"));
+            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + player.getFrankenHand().toStoreString());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.FRANKEN_ITEMS_TO_DRAFT + " " + player.getFrankenDraftQueue().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -1409,6 +1414,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.POWERED_STATUS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setPowered(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1703,8 +1716,9 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_BAG_TO_PASS -> player.setFrankenBagToPass(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_PERSONAL_BAG -> player.setFrankenBagPersonal(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_BAG_TO_PASS -> player.loadCurrentFrankenBag(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_ITEMS_TO_DRAFT -> player.loadFrankenItemsToDraft(getCardList(tokenizer.nextToken()));
+                case Constants.FRANKEN_PERSONAL_BAG -> player.loadFrankenHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));

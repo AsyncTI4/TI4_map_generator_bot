@@ -43,6 +43,7 @@ import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -530,6 +531,20 @@ public class Helper {
     public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
+    public static String getBasicTileRep(String tileID){
+       String name = TileHelper.getTile(tileID).getName();
+       if(TileHelper.getTile(tileID).getPlanets().size() > 0){
+        name = name + " (";
+       }
+        for(String planet :  TileHelper.getTile(tileID).getPlanets()){
+            name = name + Mapper.getPlanet(planet).getResources() + "/"+Mapper.getPlanet(planet).getInfluence()+ ", ";
+        }
+        if(TileHelper.getTile(tileID).getPlanets().size() > 0){
+          name = name.substring(0, name.length()-2) + ")";
+        }
+       return name;
     }
 
     public static String getPlanetRepresentation(String planet, Game activeGame) {
