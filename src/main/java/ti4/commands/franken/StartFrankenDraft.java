@@ -26,11 +26,14 @@ public class StartFrankenDraft extends FrankenSubcommandData {
             String stratP = stratPings.getAsString();
             if ("yes".equalsIgnoreCase(stratP)){
                 FrankenDraftHelper.makeBags(activeGame, true);
+                activeGame.setPowered(true);
             } else {
                 FrankenDraftHelper.makeBags(activeGame, false);
+                activeGame.setPowered(false);
             }
         }else{
             FrankenDraftHelper.makeBags(activeGame, false);
+            activeGame.setPowered(false);
         }
         GameSaveLoadManager.saveMap(activeGame, event);
        
