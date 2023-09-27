@@ -1,11 +1,14 @@
 package ti4.commands.franken;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -15,6 +18,7 @@ import ti4.message.MessageHelper;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,18 @@ public class FrankenCommand implements Command {
         if (event.getName().equals(getActionID())) {
             User user = event.getUser();
             String userID = user.getId();
+            if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
+                Member member = event.getMember();
+                List<Role> roles = member.getRoles();
+                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
+                }
+                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
+                return false;
+            }
+
             GameManager gameManager = GameManager.getInstance();
             if (!gameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
@@ -112,8 +128,8 @@ public class FrankenCommand implements Command {
         subcommands.add(new UnitAdd());
         subcommands.add(new UnitRemove());
         subcommands.add(new StartFrankenDraft());
-        subcommands.add(new FrankenForceBagPass());
         subcommands.add(new SetFactionIcon());
+        subcommands.add(new FrankenEdit());
         return subcommands;
     }
 

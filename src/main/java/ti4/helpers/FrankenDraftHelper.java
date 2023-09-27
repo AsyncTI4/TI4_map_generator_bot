@@ -160,8 +160,9 @@ public class FrankenDraftHelper {
 
         for(Player p2 : activeGame.getRealPlayers()){
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a new bag of cards!");
-            PromptPlayerBagSelection(activeGame, p2);
             DisplayPlayerCurrentBag(activeGame, p2);
+            PromptPlayerBagSelection(activeGame, p2);
+            DisplayPlayerHand(activeGame, p2);
         }
          MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
     }

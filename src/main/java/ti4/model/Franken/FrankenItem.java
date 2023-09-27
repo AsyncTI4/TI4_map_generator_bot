@@ -79,6 +79,12 @@ public class FrankenItem implements ModelInterface {
         return alwaysInclude;
     }
 
+    public FrankenItem(String alias) {
+        String[] split = alias.split(":");
+        ItemCategory = Category.valueOf(split[0]);
+        ItemId = split[1];
+    }
+
     public FrankenItem(){
     }
 
