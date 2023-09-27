@@ -21,6 +21,7 @@ public class ImageHelper {
   private static final Cache<String, BufferedImage> imageCache = CacheBuilder.newBuilder()
       .maximumSize(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 1000))
       .expireAfterAccess(24, TimeUnit.HOURS)
+      .recordStats() //for tuning cache size - comment out when done
       .build();
 
   private ImageHelper() {}
@@ -141,5 +142,12 @@ public class ImageHelper {
       BotLogger.log("Failed to read image URL:" + Arrays.toString(e.getStackTrace()));
     }
     return null;
+  }
+
+  public static String getCacheStats() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(imageCache.stats().toString()).append("\n");
+    sb.append("CacheSize: ").append(imageCache.size());
+    return sb.toString();
   }
 }
