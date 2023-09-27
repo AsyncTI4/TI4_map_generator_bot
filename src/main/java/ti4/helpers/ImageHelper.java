@@ -90,14 +90,14 @@ public class ImageHelper {
   public static BufferedImage scale(BufferedImage originalImage, float percent) {
     int scaledWidth = (int) (originalImage.getWidth() * percent);
     int scaledHeight = (int) (originalImage.getHeight() * percent);
-    Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_FAST);
+    Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
     BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
     outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
     return outputImage;
   }
 
   public static BufferedImage scale(BufferedImage originalImage, int scaledWidth, int scaledHeight) {
-    Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_FAST);
+    Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
     BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
     outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
     return outputImage;
