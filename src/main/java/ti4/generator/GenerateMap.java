@@ -361,7 +361,7 @@ public class GenerateMap {
     }
 
     @Nullable
-    private static String getFactionPath(String factionID) {
+    private static String getFactionIconPath(String factionID) {
         if ("null".equals(factionID)) {
             return null;
         }
@@ -373,17 +373,17 @@ public class GenerateMap {
         return factionFile;
     }
 
-    private static BufferedImage getFactionImage(Player player) {
-        return getFactionImageScaled(player, 95, 95);
+    private static BufferedImage getFactionIconImage(Player player) {
+        return getFactionIconImageScaled(player, 95, 95);
     }
 
-    private static BufferedImage getFactionImageScaled(Player player, float scale) {
+    private static BufferedImage getFactionIconImageScaled(Player player, float scale) {
         int scaledWidth = (int) (95 * scale);
         int scaledHeight = (int) (95 * scale);
-        return getFactionImageScaled(player, scaledWidth, scaledHeight);
+        return getFactionIconImageScaled(player, scaledWidth, scaledHeight);
     }
 
-    private static BufferedImage getFactionImageScaled(Player player, int width, int height) {
+    private static BufferedImage getFactionIconImageScaled(Player player, int width, int height) {
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
         if (factionEmoji instanceof CustomEmoji && !Helper.getFactionIconFromDiscord(player.getFaction()).equalsIgnoreCase(factionEmoji.getFormatted())) {
             CustomEmoji factionCustomEmoji = (CustomEmoji) factionEmoji;
@@ -391,7 +391,7 @@ public class GenerateMap {
         }
 
         String factionID = player.getFaction();
-        String factionPath = getFactionPath(factionID);
+        String factionPath = getFactionIconPath(factionID);
 
         return ImageHelper.readScaled(factionPath, width, height);
     }
@@ -480,7 +480,7 @@ public class GenerateMap {
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionImage(player);
+                    BufferedImage bufferedImage = getFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
@@ -985,7 +985,7 @@ public class GenerateMap {
 
         if (hideFactionIcon) return;
         scale = scale * 0.40f;
-        BufferedImage factionImage = getFactionImageScaled(player, scale);
+        BufferedImage factionImage = getFactionIconImageScaled(player, scale);
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
         int centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
@@ -1176,7 +1176,7 @@ public class GenerateMap {
 
         String faction = player.getFaction();
         if (faction != null) {
-            BufferedImage bufferedImage = getFactionImage(player);
+            BufferedImage bufferedImage = getFactionIconImage(player);
             if (bufferedImage != null) {
                 graphics.drawImage(bufferedImage, x + 178, y + 33, null);
             }
@@ -1979,7 +1979,7 @@ public class GenerateMap {
                 if (player.isPassed() || player.getSCs().size() == 0) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionImage(player);
+                    BufferedImage bufferedImage = getFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                         x += 100;
@@ -2359,7 +2359,7 @@ public class GenerateMap {
                     if (faction == null) {
                         paintAgendaIcon(y, x);
                     } else {
-                        String factionPath = convertToGeneric ? Mapper.getCCPath(Mapper.getControlID("gray")) : getFactionPath(faction);
+                        String factionPath = convertToGeneric ? Mapper.getCCPath(Mapper.getControlID("gray")) : getFactionIconPath(faction);
                         if (factionPath != null) {
                             BufferedImage bufferedImage = ImageHelper.read(factionPath);
                             graphics.drawImage(bufferedImage, x + 2, y + 2, null);
@@ -3372,7 +3372,7 @@ public class GenerateMap {
         if (player == null) return null;
 
         if (player.hasCustomFactionEmoji()) {
-            BufferedImage factionImage = getFactionImageScaled(player, 35, 35);
+            BufferedImage factionImage = getFactionIconImageScaled(player, 35, 35);
             return ImageHelper.scale(factionImage, scale);
         }
 
