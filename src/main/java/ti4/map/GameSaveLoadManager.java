@@ -1815,11 +1815,16 @@ public class GameSaveLoadManager {
     }
 
     private static Tile readTile(String tileData) {
-        StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
-        String tileID = tokenizer.nextToken();
-        String position = tokenizer.nextToken();
-        if (!PositionMapper.isTilePositionValid(position)) return null;
-        return new Tile(tileID, position);
+        try {
+            StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
+            String tileID = tokenizer.nextToken();
+            String position = tokenizer.nextToken();
+            if (!PositionMapper.isTilePositionValid(position)) return null;
+            return new Tile(tileID, position);   
+        } catch (Exception e) {
+            BotLogger.log("Error reading tileData: `" + tileData + "`", e);
+        }
+        return null;
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {
