@@ -1,253 +1,253 @@
 [
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "amalgamation",
-    "AdditionalComponents": [
-      "ABILITY:devour"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "awaken",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "coalescence",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "creussgate",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "dark_whispers",
-    "OptionalSwaps": [
-      "PN:dark_pact"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "devour",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "fragile",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "galactic_threat",
-    "OptionalSwaps": [
-      "TECH:vay"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "hubris",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "indoctrination",
-    "OptionalSwaps": [
-      "MECH:yin"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "mitosis",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "orbital_drop",
-    "OptionalSwaps": [
-      "MECH:sol"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "pillage",
-    "OptionalSwaps": [
-      "AGENT:mentak"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "propagation",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "riftmeld",
-    "AdditionalComponents": [
-      "ABILITY:devour"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "stall_tactics",
-    "OptionalSwaps": [
-      "MECH:yssaril"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "star_forge",
-    "OptionalSwaps": [
-      "MECH:muaat"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "technological_singularity",
-    "OptionalSwaps": [
-      "PN:nekro",
-      "TECH:vax"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "telepathic",
-    "OptionalSwaps": [
-      "PN:naalu"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "terragenesis",
-    "AdditionalComponents": [
-      "ABILITY:coalescence",
-      "ABILITY:awaken"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "the_company",
-    "AdditionalComponents": [
-      "AGENT:nomadagentartuno",
-      "AGENT:nomadagentthundarian"
-    ]
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemId": "the_tribuni",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "AGENT",
-    "ItemId": "keleresa",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "AGENT",
-    "ItemId": "mentak",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "COMMANDER",
-    "ItemId": "cabal",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "FLAGSHIP",
-    "ItemId": "nomad",
-    "OptionalSwaps": [
-      "TECH:m2"
-    ]
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemId": "cabal",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemId": "keleresm",
-    "AlwaysAddToPool": true
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemId": "keleresx",
-    "AlwaysAddToPool": true
-  },
-  {
-    "ItemCategory": "HOMESYSTEM",
-    "ItemId": "ghost",
-    "AdditionalComponents": [
-      "ABILITY:creussgate"
-    ]
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemId": "muaat",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemId": "sol",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemId": "yin",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemId": "yssaril",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "PN",
-    "ItemId": "dark_pact",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "PN",
-    "ItemId": "mentak",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "PN",
-    "ItemId": "naalu",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "PN",
-    "ItemId": "nekro",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "STARTINGTECH",
-    "ItemId": "sardakk",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "TECH",
-    "ItemId": "dt2",
-    "OptionalSwaps": [
-      "HERO:cabal",
-      "COMMANDER:cabal"
-    ]
-  },
-  {
-    "ItemCategory": "TECH",
-    "ItemId": "m2",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "TECH",
-    "ItemId": "vax",
-    "Undraftable": true
-  },
-  {
-    "ItemCategory": "TECH",
-    "ItemId": "vay",
-    "Undraftable": true
-  }
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "amalgamation",
+        "AdditionalComponents": [
+            "ABILITY:devour"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "awaken",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "coalescence",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "creuss_gate",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "dark_whispers",
+        "OptionalSwaps": [
+            "PN:dark_pact"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "devour",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "fragile",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "galactic_threat",
+        "OptionalSwaps": [
+            "TECH:vay"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "hubris",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "indoctrination",
+        "OptionalSwaps": [
+            "MECH:yin"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "mitosis",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "orbital_drop",
+        "OptionalSwaps": [
+            "MECH:sol"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "pillage",
+        "OptionalSwaps": [
+            "AGENT:mentak"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "propagation",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "riftmeld",
+        "AdditionalComponents": [
+            "ABILITY:devour"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "stall_tactics",
+        "OptionalSwaps": [
+            "MECH:yssaril"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "star_forge",
+        "OptionalSwaps": [
+            "MECH:muaat"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "technological_singularity",
+        "OptionalSwaps": [
+            "PN:nekro",
+            "TECH:vax"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "telepathic",
+        "OptionalSwaps": [
+            "PN:naalu"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "terragenesis",
+        "AdditionalComponents": [
+            "ABILITY:coalescence",
+            "ABILITY:awaken"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_company",
+        "AdditionalComponents": [
+            "AGENT:nomadagentartuno",
+            "AGENT:nomadagentthundarian"
+        ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_tribuni",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "keleresa",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "mentak",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "cabal",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "nomad",
+        "OptionalSwaps": [
+            "TECH:m2"
+        ]
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "cabal",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresm",
+        "AlwaysAddToPool": true
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresx",
+        "AlwaysAddToPool": true
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghost",
+        "AdditionalComponents": [
+            "ABILITY:creuss_gate"
+        ]
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "muaat",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "sol",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "yin",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "yssaril",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "dark_pact",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "mentak",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "naalu",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "nekro",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "STARTINGTECH",
+        "ItemId": "sardakk",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dt2",
+        "OptionalSwaps": [
+            "HERO:cabal",
+            "COMMANDER:cabal"
+        ]
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "m2",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "vax",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "vay",
+        "Undraftable": true
+    }
 ]
