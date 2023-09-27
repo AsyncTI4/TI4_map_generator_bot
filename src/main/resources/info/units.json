@@ -3845,7 +3845,7 @@
         "imageFileSuffix": "_tkn_inf.png",
         "name": "Gjen Specter II",
         "upgradesFromUnitId": "qulane_infantry",
-        "requiredTechId": "cl2",
+        "requiredTechId": "gjenspecterii",
         "source": "ignis_aurora",
         "faction": "Qulane",
         "capacityUsed": 0,
