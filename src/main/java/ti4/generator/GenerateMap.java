@@ -1122,10 +1122,7 @@ public class GenerateMap {
                 for (int i = 0; i < remainingReinforcements; i++) {
                     try {
                         String ccID = Mapper.getCCID(playerColor);
-                        String ccPath = Mapper.getCCPath(ccID);
-                        BufferedImage image = ImageHelper.read(ccPath);
                         Point position = reinforcementsPosition.getPosition(CC_TAG);
-                        // graphics.drawImage(image, x + position.x, y + position.y, null);
                         drawCCOfPlayer(graphics, ccID, x + position.x, y + position.y, 1, player, false);
                     } catch (Exception e) {
                         BotLogger.log("Could not parse file for CC: " + playerColor, e);
@@ -2967,10 +2964,6 @@ public class GenerateMap {
                 if (generateImage) {
                     int imgX = TILE_PADDING + 10 + deltaX;
                     int imgY = TILE_PADDING + centerPosition.y - 40 + deltaY;
-                    tileGraphics.drawImage(image, imgX, imgY, null);
-                    if (factionImage != null) {
-                        tileGraphics.drawImage(factionImage, imgX + DELTA_X, imgY + DELTA_Y, null);
-                    }
                     drawCCOfPlayer(tileGraphics, ccID, imgX, imgY, 1, player, convertToGeneric);
                 }
             } catch (Exception ignored) {
