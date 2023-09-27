@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -35,14 +36,6 @@ public class GlobalSettings {
 
     private static Map<String, Object> settings = new HashMap<>();
 
-    private static File getFile() {
-        return new File(Storage.getStoragePath() + "/global_settings.json");
-    }
-
-    public static <T> T getSetting(String attr, Class<T> clazz) {
-        return clazz.cast(settings.get(attr));
-    }
-
     public static <T> T getSetting(String attr, Class<T> clazz, T def) {
         if (!settings.containsKey(attr))
             return def;
@@ -66,12 +59,8 @@ public class GlobalSettings {
 
     public static void loadSettings() {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.reader();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
-        };
-
         try {
-            settings = reader.readValue(Files.readString(getFile().toPath()), HashMap.class);
+            settings = mapper.readValue(Files.readString(getFile().toPath()), HashMap.class);
         } catch (IOException e) {
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.
@@ -85,11 +74,14 @@ public class GlobalSettings {
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
-            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
+            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");
         return sb.toString();
     }
 
+    private static File getFile() {
+        return new File(Storage.getStoragePath() + "/global_settings.json");
+    }
 }
