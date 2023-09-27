@@ -112,11 +112,12 @@ public class FrankenItem implements ModelInterface {
             case STARTINGFLEET -> {
                 return "Starting Fleet: " + faction.getFactionName();
             }
+            //TileHelper.getTile(ItemId).getName()
             case BLUETILE -> {
-                return "Blue Tile: " +TileHelper.getTile(ItemId).getName() + " (" + ItemId +")";
+                return "Blue Tile: " +Helper.getBasicTileRep(ItemId);
             }
             case REDTILE -> {
-                return "Red Tile: " +TileHelper.getTile(ItemId).getName() + " (" + ItemId +")";
+                return "Red Tile: " +Mapper.getTileRepresentations().get(ItemId) + " (" + ItemId +")";
             }
             case DRAFTORDER -> {
                 return "Speaker Order: " + (ItemId.equals("1") ?"Speaker":ItemId);
@@ -128,16 +129,16 @@ public class FrankenItem implements ModelInterface {
     private String getHomeSystem(FactionModel faction) {
         String homeSystemID = faction.getHomeSystem();
         TileModel tile = TileHelper.getTile(homeSystemID);
-        return "Home System: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + tile.getName();
+        return "Home System: " + tile.getName();
     }
 
     private String getPromissory(FactionModel faction) {
         PromissoryNoteModel pn = Mapper.getPromissoryNotes().get(faction.getPromissoryNotes().get(0));
-        return "Promissory Note: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + pn.getName();
+        return "Promissory Note: " + pn.getName();
     }
 
     private String getCommodities(FactionModel faction) {
-        return "Commodities: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + faction.getCommodities();
+        return "Commodities: " + faction.getCommodities();
     }
 
     private String getFlagship(FactionModel faction) {
@@ -151,9 +152,9 @@ public class FrankenItem implements ModelInterface {
 
         }
         if (flag != null) {
-            return "Flagship: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + flag.getName();
+            return "Flagship: "  +faction.getFactionName() + flag.getName();
         }
-        return "Flagship: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " flagship";
+        return "Flagship: "  +faction.getFactionName() + " flagship";
     }
 
     private String getMech(FactionModel faction) {
@@ -167,9 +168,9 @@ public class FrankenItem implements ModelInterface {
 
         }
         if (mech != null) {
-            return "Mech: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + mech.getName();
+            return "Mech: " +faction.getFactionName() + mech.getName();
         }
-        return "Mech: " + Helper.getFactionIconFromDiscord(faction.getAlias()) + " mech";
+        return "Mech: " + faction.getFactionName() + " mech";
     }
 
     private String getLeaderHumanReadable(FactionModel faction) {
@@ -185,21 +186,21 @@ public class FrankenItem implements ModelInterface {
         HashMap<String, String> leaders = Mapper.getLeaderRepresentations();
 
         String leaderHumanReadable = Character.toTitleCase(leaderType.charAt(0)) + leaderType.substring(1);
-        return leaderHumanReadable + ": " +  Helper.getFactionIconFromDiscord(faction.getAlias()) + " " + leaders.get(leaderId).split(";")[0];
+        return leaderHumanReadable + ": " + leaders.get(leaderId).split(";")[0];
     }
 
-
+//Helper.getFactionIconFromDiscord(tech.getFaction())
     private String getTechHumanReadable() {
         TechnologyModel tech = Mapper.getTech(ItemId);
         String factionName = Mapper.getFactionRepresentations().get(tech.getFaction());
-        return "Tech: " + Helper.getFactionIconFromDiscord(tech.getFaction()) + " " + tech.getName();
+        return "Tech: " + tech.getName();
     }
 
     private String getAbilityHumanReadable() {
         HashMap<String, String> abilities = Mapper.getFactionAbilities();
         String[] abilitySplit = abilities.get(ItemId).split("\\|");
-
-        return "Ability: " + Helper.getFactionIconFromDiscord(abilitySplit[1]) + " " + abilitySplit[0];
+        //Helper.getFactionIconFromDiscord(abilitySplit[1])
+        return "Ability: " + abilitySplit[0];
     }
 
     public static int GetBagLimit(Category category, boolean powered, boolean largeMap) {
@@ -246,7 +247,7 @@ public class FrankenItem implements ModelInterface {
                 limit = 3;
             }
             case REDTILE -> {
-                limit = largeMap ? 2 : 3;
+                limit = 2;
             }
             case DRAFTORDER -> {
                 limit = 1;

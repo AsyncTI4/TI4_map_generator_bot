@@ -1658,7 +1658,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("putSleeperOnPlanet_")) {
             ButtonHelperFactionSpecific.putSleeperOn(buttonID, event, activeGame, player, ident);
-        } else if (buttonID.startsWith("frankenDraftAction_")) {
+        } else if (buttonID.startsWith("frankenDraftAction;")) {
             FrankenDraftHelper.resolveFrankenDraftAction(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
             ButtonHelperFactionSpecific.removeSleeper(buttonID, event, activeGame, player, ident);

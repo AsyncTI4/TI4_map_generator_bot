@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.*;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.milty.MiltyDraftManager;
@@ -30,18 +31,36 @@ public class FrankenDraftHelper {
                 lastCategory = item.ItemCategory;
                 categoryCounter = (categoryCounter + 1) % 4;
             }
+            FactionModel faction = Mapper.getFactionSetup(item.ItemId);
+
             switch (categoryCounter) {
                 case 0:
-                    buttons.add(Button.primary("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    if(faction != null){
+                        buttons.add(Button.primary("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction.getAlias()))));
+                    }else{
+                        buttons.add(Button.primary("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()));
+                    }
                     break;
                 case 1:
-                    buttons.add(Button.danger("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    if(faction != null){
+                        buttons.add(Button.danger("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction.getAlias()))));
+                    }else{
+                        buttons.add(Button.danger("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()));
+                    }
                     break;
                 case 2:
-                    buttons.add(Button.secondary("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    if(faction != null){
+                        buttons.add(Button.secondary("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction.getAlias()))));
+                    }else{
+                        buttons.add(Button.secondary("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()));
+                    }
                     break;
                 case 3:
-                    buttons.add(Button.success("frankenDraftAction_"+item.getAlias(),item.toHumanReadable()));
+                    if(faction != null){
+                        buttons.add(Button.success("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction.getAlias()))));
+                    }else{
+                        buttons.add(Button.success("frankenDraftAction;"+item.getAlias(),item.toHumanReadable()));
+                    }
                     break;
             }
         }
@@ -49,8 +68,32 @@ public class FrankenDraftHelper {
     }
 
     public static void resolveFrankenDraftAction(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
-        String selectedAlias = buttonID.split("_")[1];
+        String selectedAlias = buttonID.split(";")[1];
         FrankenBag currentBag = player.getCurrentFrankenBag();
+        System.out.println(selectedAlias);
+        FrankenItem selectedItem = FrankenItem.GenerateFromAlias(selectedAlias);
+
+        int limit = FrankenItem.GetBagLimit(selectedItem.ItemCategory, activeGame.getPoweredStatus(), false);
+        int currentAmount = 0;
+        for(FrankenItem item : player.getFrankenHand().Contents){
+            if(item.ItemCategory == selectedItem.ItemCategory){
+                currentAmount = currentAmount+1;
+            }
+        }
+        for(FrankenItem item : player.getFrankenDraftQueue().Contents){
+            if(item.ItemCategory == selectedItem.ItemCategory){
+                currentAmount = currentAmount+1;
+            }
+        }
+        if(currentAmount >= limit){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you are at or exceeding the limit for this category. Please pick something else");
+            return;
+        }
+        
+        if(currentAmount > 0 && player.getFrankenHand().Contents.size() < 1){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot pick 2 of the same thing in the first bag draft. Please pick something else");
+            return;
+        }
 
         currentBag.Contents.removeIf((FrankenItem bagItem) -> bagItem.getAlias().equals(selectedAlias));
         player.queueFrankenItemToDraft(FrankenItem.GenerateFromAlias(selectedAlias));
@@ -109,6 +152,7 @@ public class FrankenDraftHelper {
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a bag, use buttons to select something", getFrankenBagButtons(activeGame, p2));
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"Here is a text version of the bag you were passed so you will not forget what was in it later on when you pass it: \n"+getCurrentBagToPassRepresentation(activeGame, p2));
         }
+         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
     }
 
     public static String getCurrentPersonalBagRepresentation(Game activeGame, Player player){
@@ -310,6 +354,6 @@ public class FrankenDraftHelper {
         }
          MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + " draft started. As a reminder, for the first bag you pick 3 items, and for "+
             "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get" +
-            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready. Please note the bot does not enforce limits on how many of something you can pick. Be mindful of this and dont take more of something that you should have (dont take 8 faction abilities, for instance)");
+            " cleared away when you pick, others may remain. Please just leave those buttons be and use any new buttons generated. Once you have made your 2 picks (3 in the first bag), the bags will automatically be passed once everyone is ready.");
     }
 }

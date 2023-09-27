@@ -91,6 +91,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+    private boolean powerStatus;
+    @ExportableField
     private boolean dominusOrb;
     @ExportableField
     private boolean componentAction;
@@ -792,6 +794,10 @@ public class Game {
         return naaluAgent;
     }
 
+    public boolean getPoweredStatus() {
+        return powerStatus;
+    }
+
     public boolean getDominusOrbStatus() {
         return dominusOrb;
     }
@@ -802,6 +808,10 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+
+    public void setPowered(boolean powerStatus) {
+        this.powerStatus = powerStatus;
     }
 
     public void setDominusOrb(boolean onStatus) {
