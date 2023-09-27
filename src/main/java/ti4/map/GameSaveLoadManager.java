@@ -452,6 +452,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.POWERED_STATUS + " " + activeGame.getPoweredStatus());
+        writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
@@ -1408,6 +1410,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setNaaluAgent(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.POWERED_STATUS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setPowered(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
