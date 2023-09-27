@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -407,7 +405,7 @@ public class Helper {
         return emojiToUse;
     }
 
-    @Nonnull
+    @NotNull
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
         //symbols = new ArrayList<>(testingEmoji);
@@ -431,7 +429,7 @@ public class Helper {
         return goodDogs.get(0);
     }
 
-    @Nonnull
+    @NotNull
     public static String getFactionIconFromDiscord(String faction) {
         if (faction == null) {
             return getRandomizedEmoji(0, null);
@@ -1800,8 +1798,7 @@ public class Helper {
     }
 
     public static void setOrder(Game activeGame) {
-
-        List<Integer> hsLocations = new ArrayList<Integer>();
+        List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
         for (Player player : activeGame.getRealPlayers()) {
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
