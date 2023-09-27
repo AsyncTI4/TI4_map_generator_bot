@@ -104,7 +104,6 @@ public class GenerateMap {
     private Boolean isFoWPrivate;
     private Player fowPlayer;
 
-    private boolean debug = false;
     private long debugStartTime;
     private long debugTime;
     private long debugFowTime;
@@ -177,7 +176,7 @@ public class GenerateMap {
     }
 
     public File saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
-        debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug) {
             debugStartTime = System.nanoTime();
             System.out.printf("Map gen started for map %s%n", activeGame.getName());
