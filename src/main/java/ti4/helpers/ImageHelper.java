@@ -21,6 +21,7 @@ public class ImageHelper {
   private static final Cache<String, BufferedImage> imageCache = CacheBuilder.newBuilder()
       .maximumSize(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 1000))
       .expireAfterAccess(24, TimeUnit.HOURS)
+      .recordStats() //for tuning cache size - comment out when done
       .build();
 
   private ImageHelper() {}
@@ -29,6 +30,12 @@ public class ImageHelper {
   public static BufferedImage read(String filePath) {
     if (filePath == null) return null;
     return getOrLoad(filePath, () -> readImage(filePath));
+  }
+
+  @Nullable
+  public static BufferedImage readURL(String imageURL) {
+    if (imageURL == null) return null;
+    return getOrLoad(imageURL, () -> readImageURL(imageURL));
   }
 
   @Nullable
@@ -53,6 +60,30 @@ public class ImageHelper {
         return null;
       }
       return scale(image, percent);
+    });
+  }
+
+  @Nullable
+  public static BufferedImage readScaled(String filePath, int width, int height) {
+    if (filePath == null) return null;
+    return getOrLoad(width + "x" + height + filePath, () -> {
+      BufferedImage image = readImage(filePath);
+      if (image == null) {
+        return null;
+      }
+      return scale(image, width, height);
+    });
+  }
+
+  @Nullable
+  public static BufferedImage readURLScaled(String imageURL, int width, int height) {
+    if (imageURL == null) return null;
+    return getOrLoad(width + "x" + height + imageURL, () -> {
+      BufferedImage image = readURL(imageURL);
+      if (image == null) {
+        return null;
+      }
+      return scale(image, width, height);
     });
   }
 
@@ -101,7 +132,8 @@ public class ImageHelper {
     return null;
   }
 
-  public static BufferedImage readImageURL(String imageURL) {
+  private static BufferedImage readImageURL(String imageURL) {
+    ImageIO.setUseCache(false);
     try {
       URL url = new URL(imageURL);
       InputStream inputStream = url.openStream();
@@ -110,5 +142,12 @@ public class ImageHelper {
       BotLogger.log("Failed to read image URL:" + Arrays.toString(e.getStackTrace()));
     }
     return null;
+  }
+
+  public static String getCacheStats() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(imageCache.stats().toString()).append("\n");
+    sb.append("CacheSize: ").append(imageCache.size());
+    return sb.toString();
   }
 }
