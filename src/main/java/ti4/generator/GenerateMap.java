@@ -395,6 +395,10 @@ public class GenerateMap {
         String factionID = player.getFaction();
         String factionPath = getFactionIconPath(factionID);
 
+        if (width == 95 && height == 95) { //default faction image size is 95x95
+            return ImageHelper.read(factionPath);
+        }
+
         return ImageHelper.readScaled(factionPath, width, height);
     }
 
@@ -984,7 +988,7 @@ public class GenerateMap {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
         if (hideFactionIcon) return;
-        scale = scale * 0.40f;
+        scale = scale * 0.50f;
         BufferedImage factionImage = getFactionIconImageScaled(player, scale);
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
