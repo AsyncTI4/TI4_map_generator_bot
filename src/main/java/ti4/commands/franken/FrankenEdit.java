@@ -60,7 +60,7 @@ public class FrankenEdit extends FrankenSubcommandData {
         }
 
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
+        if (playerOption == null) {
             MessageHelper.replyToMessage(event, "That command requires a player argument.");
             return;
         }
