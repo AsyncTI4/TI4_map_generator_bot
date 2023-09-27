@@ -34,7 +34,8 @@ public class SetFactionIcon extends FrankenSubcommandData {
 
         Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
         if (!(factionEmoji instanceof CustomEmoji)) {
-            sendMessage("Must only enter a 'custom emoji'");
+            sendMessage("What you entered was not a custom emoji. Resetting to default.");
+            player.setFactionEmoji(null);
             return;
         }
         player.setFactionEmoji(factionEmojiString);
