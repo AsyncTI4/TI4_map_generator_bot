@@ -28,7 +28,11 @@ public class SetFactionIcon extends FrankenSubcommandData {
             return;
         }
 
-        
+        if (!activeGame.isFrankenGame()) {
+            sendMessage("This can only be run in Franken games.");
+            player.setFactionEmoji(null);
+            return;
+        }
         
         String factionEmojiString = event.getOption(Constants.FACTION_EMOJI, null, OptionMapping::getAsString);
 

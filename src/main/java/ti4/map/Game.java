@@ -608,6 +608,7 @@ public class Game {
                 put("Community", isCommunityMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFoWMode());
+                put("Franken", isFrankenGame());
                 put(Emojis.Absol + "Absol", isAbsolMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomeBrewSCMode());
@@ -617,7 +618,11 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode() || isFrankenGame());
+    }
+
+    public boolean isFrankenGame() {
+        return getPlayers().values().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
     @JsonIgnore
