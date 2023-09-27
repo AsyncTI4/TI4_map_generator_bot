@@ -74,24 +74,25 @@ public class FrankenDraftHelper {
         FrankenItem selectedItem = FrankenItem.GenerateFromAlias(selectedAlias);
 
         int limit = FrankenItem.GetBagLimit(selectedItem.ItemCategory, activeGame.getPoweredStatus(), false);
-        int currentAmount = 0;
+        int currentAmountInBag = 0;
+        int currentAmountInQueue = 0;
         for(FrankenItem item : player.getFrankenHand().Contents){
             if(item.ItemCategory == selectedItem.ItemCategory){
-                currentAmount = currentAmount+1;
+                currentAmountInBag = currentAmountInBag+1;
             }
         }
         for(FrankenItem item : player.getFrankenDraftQueue().Contents){
             if(item.ItemCategory == selectedItem.ItemCategory){
-                currentAmount = currentAmount+1;
+                currentAmountInQueue = currentAmountInQueue+1;
             }
         }
-        if(currentAmount >= limit){
+        if(currentAmountInBag+currentAmountInQueue >= limit){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you are at or exceeding the limit for this category. Please pick something else");
             return;
         }
         
-        if(currentAmount > 0 && player.getFrankenHand().Contents.size() < 1){
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot pick 2 of the same thing in the first bag draft. Please pick something else");
+        if(currentAmountInQueue > 0 && currentBag.Contents.size() > 4){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot pick 2 of the same thing. Please pick something else");
             return;
         }
 
@@ -138,6 +139,7 @@ public class FrankenDraftHelper {
                 p.getCurrentFrankenBag().Contents.removeIf((FrankenItem i) -> i.getAlias().equals(item.getAlias()));
             }
             p.resetFrankenItemDraftQueue();
+            p.setReadyToPassBag(false);
         }
 
         // pass bags
