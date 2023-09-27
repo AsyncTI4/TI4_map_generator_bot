@@ -397,17 +397,15 @@ public class GenerateMap {
     }
 
     private static Image getPlayerDiscordAvatar(Player player) {
-        String userID = player.getUserID();
-        Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(userID);
-        if (member == null)
-            return null;
-        Image image = null;
         try {
+            Member member = AsyncTI4DiscordBot.guildPrimary.getMemberById(player.getUserID());
+            if (member == null) return null;
+            
             return ImageHelper.readURLScaled(member.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
             BotLogger.log("Could not get Avatar", e);
         }
-        return image;
+        return null;
     }
 
     private void gameInfo(Game activeGame, DisplayType displayType) throws IOException {
