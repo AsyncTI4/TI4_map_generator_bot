@@ -751,8 +751,8 @@ public class Constants {
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String POWERED = "powered";
-    public static final String BOT_FACTION_REACTS= "bot_faction_reacts";
-    public static final String BOT_SHUSHING= "bot_shushing";
+    public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
+    public static final String BOT_SHUSHING = "bot_shushing";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
@@ -894,6 +894,7 @@ public class Constants {
     public static final String MEDIAN_TURN_TIME = "median_turn_time";
     public static final String SHOW_MEDIAN = "show_median";
     public static final String SHOW_AVERAGE_TURN_TIME = "show_average_turn_time";
+    public static final String SHOW_SECONDARIES = "show_secondaries";
 
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
