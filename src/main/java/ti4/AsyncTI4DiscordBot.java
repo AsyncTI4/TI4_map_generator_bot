@@ -60,8 +60,10 @@ import ti4.message.MessageHelper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class AsyncTI4DiscordBot {
@@ -79,6 +81,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guild3rd;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
+    public static Set<Guild> guilds = new HashSet<>();
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {
@@ -108,6 +111,7 @@ public class AsyncTI4DiscordBot {
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
+        guilds.add(guildPrimary);
         MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         TileHelper.init();
@@ -214,6 +218,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
+                guilds.add(guildCommunityPlays);
             }
         }
 
@@ -225,6 +230,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildFogOfWar);
             }
         }
 
@@ -236,6 +242,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildSecondary);
             }
         }
 
@@ -247,6 +254,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guild3rd);
             }
         }
 
