@@ -5,7 +5,9 @@ import ti4.generator.TileHelper;
 import ti4.helpers.Helper;
 import ti4.model.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FrankenItem implements ModelInterface {
     @Override
@@ -46,6 +48,8 @@ public class FrankenItem implements ModelInterface {
     public FrankenItem[] OptionalSwaps;
     public boolean Undraftable;
 
+    public boolean AlwaysAddToPool;
+
     public static FrankenItem Generate(Category category, String itemId) {
         FrankenItem item = new FrankenItem(category, itemId);
 
@@ -61,6 +65,18 @@ public class FrankenItem implements ModelInterface {
     public static FrankenItem GenerateFromAlias(String alias) {
         String[] split = alias.split(":");
         return Generate(Category.valueOf(split[0]), split[1]);
+    }
+
+    public static List<FrankenItem> GetAlwaysIncludeItems(Category type) {
+        List<FrankenItem> alwaysInclude = new ArrayList<>();
+        var frankenErrata = Mapper.getFrankenErrata().values();
+        for(FrankenItem errataItem : frankenErrata) {
+            if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
+                alwaysInclude.add(errataItem);
+            }
+        }
+
+        return alwaysInclude;
     }
 
     public FrankenItem(){
