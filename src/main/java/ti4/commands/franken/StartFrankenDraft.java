@@ -19,18 +19,21 @@ public class StartFrankenDraft extends FrankenSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-       
+        FrankenDraftHelper.clearPlayerHands(activeGame);
 
         OptionMapping stratPings = event.getOption(Constants.POWERED);
         if (stratPings != null){
             String stratP = stratPings.getAsString();
             if ("yes".equalsIgnoreCase(stratP)){
                 FrankenDraftHelper.makeBags(activeGame, true);
+                activeGame.setPowered(true);
             } else {
                 FrankenDraftHelper.makeBags(activeGame, false);
+                activeGame.setPowered(false);
             }
         }else{
             FrankenDraftHelper.makeBags(activeGame, false);
+            activeGame.setPowered(false);
         }
         GameSaveLoadManager.saveMap(activeGame, event);
        

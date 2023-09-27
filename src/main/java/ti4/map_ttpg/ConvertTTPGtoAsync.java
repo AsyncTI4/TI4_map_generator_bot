@@ -317,7 +317,7 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER TECHS
             for (String technology : ttpgPlayer.getTechnologies()) {
-                asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()));
+                asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()), asyncGame);
             }
 
             //PLAYER RELICS

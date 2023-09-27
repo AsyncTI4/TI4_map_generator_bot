@@ -4278,7 +4278,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), sb.toString());
         if ("fires".equalsIgnoreCase(id)) {
-            player.addTech("ws");
+            player.addTech("ws", activeGame);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " acquired Warsun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeGame, activeGame.getGuild(), true) + " reduced your fleet cc by 1 due to fires being played";

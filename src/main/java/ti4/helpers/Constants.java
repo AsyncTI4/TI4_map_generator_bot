@@ -8,6 +8,7 @@ public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
     public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
     public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
+    public static final String FRANKEN_ITEMS_TO_DRAFT = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
@@ -41,6 +42,7 @@ public class Constants {
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String POWERED_STATUS = "powered_status";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
@@ -350,7 +352,9 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
-     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
+    public static final String START_FRANKEN_DRAFT = "start_franken_draft";
+
+    public static final String FORCE_BAG_PASS = "force_bag_swap";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
@@ -747,8 +751,8 @@ public class Constants {
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String POWERED = "powered";
-    public static final String BOT_FACTION_REACTS= "bot_faction_reacts";
-    public static final String BOT_SHUSHING= "bot_shushing";
+    public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
+    public static final String BOT_SHUSHING = "bot_shushing";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
@@ -890,6 +894,7 @@ public class Constants {
     public static final String MEDIAN_TURN_TIME = "median_turn_time";
     public static final String SHOW_MEDIAN = "show_median";
     public static final String SHOW_AVERAGE_TURN_TIME = "show_average_turn_time";
+    public static final String SHOW_SECONDARIES = "show_secondaries";
 
     public static final String OLRADIN_MECH_RES_PNG = "attachment_olradin_mech_res.png";
     public static final String OLRADIN_MECH_INF_PNG = "attachment_olradin_mech_inf.png";
