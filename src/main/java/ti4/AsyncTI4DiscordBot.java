@@ -128,6 +128,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
+        adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
         adminRoles.add(jda.getRoleById("1149705227625316352"));
 
         adminRoles.removeIf(Objects::isNull);

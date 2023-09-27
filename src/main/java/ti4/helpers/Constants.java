@@ -354,7 +354,10 @@ public class Constants {
     public static final String INFO = "info";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
 
-    public static final String FORCE_BAG_PASS = "force_bag_swap";
+    public static final String FORCE_BAG_PASS = "franken_force_bag_pass";
+    public static final String FRANKEN_EDIT = "franken_edit";
+    public static final String FRANKEN_EDIT_ACTION = "edit_action";
+    public static final String FRANKEN_ITEM = "item";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
