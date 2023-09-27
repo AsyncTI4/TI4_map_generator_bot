@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Random;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;

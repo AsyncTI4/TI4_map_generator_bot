@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -32,6 +30,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
@@ -252,7 +251,7 @@ public class AgendaHelper {
                 String watchPartyPing = watchPartyPing(activeGame);
                 if (watchParty != null && !activeGame.isFoWMode()) {
                     Tile tile = Helper.getTileFromPlanet("mr", activeGame);
-                    if (watchParty != null && tile != null) {
+                    if (tile != null) {
                         File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
                         String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + AgendaHelper.getSummaryOfVotes(activeGame, true);
                         MessageHelper.sendMessageToChannel(watchParty, message);

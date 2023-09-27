@@ -2,8 +2,6 @@ package ti4.map;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import javax.annotation.Nonnull;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -839,9 +837,9 @@ public class Player {
         initAbilities();
     }
 
-    @NotNull @Nonnull
+    @NotNull
     public String getFactionEmoji() {
-        if (factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !factionEmoji.equals("null")) {
+        if (factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !"null".equals(factionEmoji)) {
             return factionEmoji;
         }
         return Helper.getFactionIconFromDiscord(getFaction());
@@ -852,14 +850,13 @@ public class Player {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !factionEmoji.equals("null") && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
+        return factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
     }
 
     private void initAbilities() {
         HashSet<String> abilities = new HashSet<>();
         for (String ability : getFactionStartingAbilities()) {
-            if (ability.isEmpty() || ability.isBlank()) {
-            } else {
+            if (!ability.isEmpty() && !ability.isBlank()) {
                 abilities.add(ability);
             }
         }
