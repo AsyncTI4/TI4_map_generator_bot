@@ -783,7 +783,9 @@ public class Game {
         if (getTileMap().isEmpty()) return 0;
         Map<String, Tile> tileMap = new HashMap<>(getTileMap());
         String highestPosition = tileMap.keySet().stream().filter(Helper::isInteger).max(Comparator.comparingInt(Integer::parseInt)).get();
-        return Integer.parseInt(StringUtils.left(highestPosition, highestPosition.length() - 2));
+        String lastTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
+        if (!Helper.isInteger(lastTwoDigits)) return 0;
+        return Integer.parseInt(lastTwoDigits);
     }
 
     public int getActivationCount() {
