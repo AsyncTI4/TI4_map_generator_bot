@@ -1,5 +1,7 @@
 package ti4.commands.franken;
 
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,8 +15,7 @@ public class SetFactionIcon extends FrankenSubcommandData {
 
     public SetFactionIcon() {
         super(Constants.SET_FACTION_ICON, "Set franken faction icon to use");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Emoji to use"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RESET, "Reset icon to default"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Emoji to use. Enter jibberish to reset.").setRequired(true));
     }
 
     @Override
@@ -27,15 +28,17 @@ public class SetFactionIcon extends FrankenSubcommandData {
             return;
         }
 
-        if (event.getOption(Constants.RESET) != null && event.getOption(Constants.RESET).getAsBoolean()) {
-            player.setFactionEmoji(null);
+        
+        
+        String factionEmojiString = event.getOption(Constants.FACTION_EMOJI, null, OptionMapping::getAsString);
+
+        Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
+        if (!(factionEmoji instanceof CustomEmoji)) {
+            sendMessage("Must only enter a 'custom emoji'");
             return;
         }
-
-        String factionEmoji = event.getOption(Constants.FACTION_EMOJI, null, OptionMapping::getAsString);
-        if (factionEmoji != null) {
-            player.setFactionEmoji(factionEmoji);
-        }
+        player.setFactionEmoji(factionEmojiString);
+        
     }
     
 }

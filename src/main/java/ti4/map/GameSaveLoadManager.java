@@ -87,7 +87,7 @@ public class GameSaveLoadManager {
 
     public static void saveMap(Game activeGame, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         //ADD COMMAND/BUTTON FOR UNDO INFORMATION
-        if (event != null && !keepModifiedDate) {
+        if (event != null) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
@@ -97,13 +97,21 @@ public class GameSaveLoadManager {
                 activeGame.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
         } else {
+            if (keepModifiedDate && activeGame.isHasEnded() && "Last Command Unknown - No Event Provided".equals(activeGame.getLatestCommand())) {
+                System.out.println("Skipped Saving Map: " + activeGame.getName() + " - Game has ended and has no changes since last save");
+                return;
+            }
             activeGame.setLatestCommand("Last Command Unknown - No Event Provided");
         }
-        
+         
         if (activeGame.isDiscordantStarsMode()) {
-            DiscordantStarsHelper.checkGardenWorlds(activeGame);
-            DiscordantStarsHelper.checkSigil(activeGame);
-            DiscordantStarsHelper.checkOlradinMech(activeGame);
+            try {
+                DiscordantStarsHelper.checkGardenWorlds(activeGame);
+                DiscordantStarsHelper.checkSigil(activeGame);
+                DiscordantStarsHelper.checkOlradinMech(activeGame);
+            } catch (Exception e) {
+                BotLogger.log("Error doing extra Discordant Stars stuff", e);
+            }
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -1815,11 +1823,16 @@ public class GameSaveLoadManager {
     }
 
     private static Tile readTile(String tileData) {
-        StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
-        String tileID = tokenizer.nextToken();
-        String position = tokenizer.nextToken();
-        if (!PositionMapper.isTilePositionValid(position)) return null;
-        return new Tile(tileID, position);
+        try {
+            StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
+            String tileID = tokenizer.nextToken();
+            String position = tokenizer.nextToken();
+            if (!PositionMapper.isTilePositionValid(position)) return null;
+            return new Tile(tileID, position);   
+        } catch (Exception e) {
+            BotLogger.log("Error reading tileData: `" + tileData + "`", e);
+        }
+        return null;
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {
