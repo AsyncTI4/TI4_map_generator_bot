@@ -368,7 +368,7 @@ public class GenerateMap {
         String factionFileName = Mapper.getFactionFileName(factionID);
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
         if (factionFile == null) {
-            BotLogger.log("Could not find faction: " + factionID);
+            BotLogger.log("Could not find image file for faction icon: " + factionID);
         }
         return factionFile;
     }
@@ -392,9 +392,7 @@ public class GenerateMap {
 
         String factionID = player.getFaction();
         String factionPath = getFactionPath(factionID);
-        if (width == 95 && height == 95) {
-            return ImageHelper.read(factionPath);
-        }
+
         return ImageHelper.readScaled(factionPath, width, height);
     }
 
