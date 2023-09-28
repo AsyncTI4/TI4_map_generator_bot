@@ -47,6 +47,45 @@ import ti4.model.PublicObjectiveModel;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void resolveReleaseButton(Player cabal, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String faction = buttonID.split("_")[1];
+        Player player = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        String unit = buttonID.split("_")[2];
+        new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), unit, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame), ButtonHelper.getTrueIdentity(cabal, activeGame) + " released 1 "+player.getColor() + " "+unit + " from prison");
+        if(cabal != player){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " a " +unit+" of yours was released from prison.");
+        }
+        if(!cabal.getNomboxTile().getUnitHolders().get("space").getUnits().keySet().contains(Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor())))
+        {
+             ButtonHelper.deleteTheOneButton(event);
+        }
+       
+    }
+
+    public static List<Button> getReleaseButtons(Player cabal, Game activeGame){
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()){
+            for(String unit :unitHolder.getUnits().keySet()){
+                for(Player player : activeGame.getRealPlayers()){
+                    String cID = Mapper.getColorID(player.getColor());
+                    if(unit.contains(cID)){
+                        String unitKey = unit.replace(cID + "_", "");
+                        unitKey = unitKey.replace(".png", "");
+                        unitKey = ButtonHelper.getUnitName(unitKey);
+                        if(activeGame.isFoWMode()){
+                            buttons.add(Button.secondary("cabalRelease_"+player.getFaction()+"_"+unitKey, "Release 1 "+player.getColor()+" "+unitKey));
+                        }else{
+                            buttons.add(Button.secondary("cabalRelease_"+player.getFaction()+"_"+unitKey, "Release 1 "+unitKey).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))));
+                        }
+                    }
+                }
+            }
+
+        }
+        return buttons;
+    }
+
     public static void checkForGeneticRecombination(Player voter, Game activeGame) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == voter) {

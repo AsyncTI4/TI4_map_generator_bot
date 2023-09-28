@@ -85,6 +85,10 @@ public class PNInfo extends PNCardsSubcommandData {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
+        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0) {
+            Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("cabal")));
+            buttons.add(release);
+        }
         if(player.hasRelicReady("e6-g0_network")){
             buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
