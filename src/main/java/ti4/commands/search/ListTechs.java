@@ -1,7 +1,6 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -13,24 +12,27 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
+import ti4.model.TechnologyModel;
 
-public class ListUnits extends HelpSubcommandData {
+public class ListTechs extends SearchSubcommandData {
 
-    public ListUnits() {
-        super(Constants.LIST_UNITS, "List all units");
+    public ListTechs() {
+        super(Constants.SEARCH_TECHS, "List all techs the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
-        List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
-            MessageEmbed representationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
+        if (Mapper.isValidTech(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true)).queue();
+            return;
+        }
+
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        for (TechnologyModel techModel : Mapper.getTechs().values().stream().sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

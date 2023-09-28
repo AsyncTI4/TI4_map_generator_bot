@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,9 +17,9 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListMyGames extends HelpSubcommandData {
+public class ListMyGames extends SearchSubcommandData {
     public ListMyGames() {
-        super(Constants.LIST_MY_GAMES, "List all of your games you are currently in");
+        super(Constants.SEARCH_MY_GAMES, "List all of your games you are currently in");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_MY_TURN, "True to only show games where it is your turn"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_AVERAGE_TURN_TIME, "True to show average turn time as well (default = false)"));

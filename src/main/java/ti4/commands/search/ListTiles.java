@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,10 +28,10 @@ import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 
-public class ListTiles extends HelpSubcommandData {
+public class ListTiles extends SearchSubcommandData {
 
     public ListTiles() {
-        super(Constants.LIST_TILES, "List all tiles");
+        super(Constants.SEARCH_TILES, "List all tiles");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"));
     }

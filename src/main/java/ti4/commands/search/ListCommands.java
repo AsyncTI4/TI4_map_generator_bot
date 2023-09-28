@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListCommands extends HelpSubcommandData {
+public class ListCommands extends SearchSubcommandData {
     public ListCommands() {
-        super(Constants.LIST_COMMANDS, "List all of the bot's commands and subcommands");
+        super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
     }
