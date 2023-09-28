@@ -1084,6 +1084,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveStellar(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("cabalAgentCapture_")) {
             ButtonHelperFactionSpecific.resolveCabalAgentCapture(buttonID, player, activeGame, event);
+        } else if (buttonID.startsWith("cabalRelease_")) {
+            ButtonHelperFactionSpecific.resolveReleaseButton(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("getReleaseButtons")) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " you can release units one at a time with the buttons", ButtonHelperFactionSpecific.getReleaseButtons(player, activeGame));
         } else if (buttonID.startsWith("arboAgentIn_")) {
             String pos = buttonID.substring(buttonID.indexOf("_") + 1);
             List<Button> buttons = ButtonHelperFactionSpecific.getUnitsToArboAgent(player, activeGame, event, activeGame.getTileByPosition(pos));

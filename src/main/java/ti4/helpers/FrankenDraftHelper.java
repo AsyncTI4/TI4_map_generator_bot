@@ -89,8 +89,12 @@ public class FrankenDraftHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you are at or exceeding the limit for this category. Please pick something else");
             return;
         }
+        if(player.isReadyToPassBag()){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you are already ready to pass your bag, you cannot pick another item. ");
+            return;
+        }
         
-        if(currentAmountInQueue > 0 && currentBag.Contents.size() > 4){
+        if(currentAmountInQueue > 0 && currentBag.Contents.size() > 20){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot pick 2 of the same thing. Please pick something else");
             return;
         }
