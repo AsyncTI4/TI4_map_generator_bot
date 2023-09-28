@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class ListExplores extends SearchSubcommandData {
 
     public ListExplores() {
-        super(Constants.LIST_EXPLORES, "List all explore cards the bot can use");
+        super(Constants.SEARCH_EXPLORES, "List all explore cards the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

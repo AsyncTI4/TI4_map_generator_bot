@@ -16,7 +16,7 @@ import ti4.model.AgendaModel;
 public class ListAgendas extends SearchSubcommandData {
 
     public ListAgendas() {
-        super(Constants.LIST_AGENDAS, "List all agendas the bot can use");
+        super(Constants.SEARCH_AGENDAS, "List all agendas the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

@@ -20,7 +20,7 @@ import ti4.model.PlanetModel;
 public class ListPlanets extends SearchSubcommandData {
 
     public ListPlanets() {
-        super(Constants.LIST_PLANETS, "List all planets");
+        super(Constants.SEARCH_PLANETS, "List all planets");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }

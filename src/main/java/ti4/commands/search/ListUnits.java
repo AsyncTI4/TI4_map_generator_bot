@@ -18,7 +18,7 @@ import ti4.model.UnitModel;
 public class ListUnits extends SearchSubcommandData {
 
     public ListUnits() {
-        super(Constants.LIST_UNITS, "List all units");
+        super(Constants.SEARCH_UNITS, "List all units");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }

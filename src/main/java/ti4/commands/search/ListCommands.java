@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 public class ListCommands extends SearchSubcommandData {
     public ListCommands() {
-        super(Constants.LIST_COMMANDS, "List all of the bot's commands and subcommands");
+        super(Constants.SEARCH_COMMANDS, "List all of the bot's commands and subcommands");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_OPTIONS, "True to include command options"));
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
     }

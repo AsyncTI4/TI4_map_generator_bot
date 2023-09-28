@@ -31,7 +31,7 @@ import ti4.model.TileModel;
 public class ListTiles extends SearchSubcommandData {
 
     public ListTiles() {
-        super(Constants.LIST_TILES, "List all tiles");
+        super(Constants.SEARCH_TILES, "List all tiles");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "True to also show the available aliases you can use"));
     }

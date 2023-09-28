@@ -17,7 +17,7 @@ import ti4.model.TechnologyModel;
 public class ListTechs extends SearchSubcommandData {
 
     public ListTechs() {
-        super(Constants.LIST_TECHS, "List all techs the bot can use");
+        super(Constants.SEARCH_TECHS, "List all techs the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

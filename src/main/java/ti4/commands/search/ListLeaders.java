@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class ListLeaders extends SearchSubcommandData {
 
     public ListLeaders() {
-        super(Constants.LIST_LEADERS, "List all leaders the bot can use");
+        super(Constants.SEARCH_LEADERS, "List all leaders the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

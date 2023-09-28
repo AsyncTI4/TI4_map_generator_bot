@@ -15,7 +15,7 @@ import ti4.model.PromissoryNoteModel;
 public class ListPromissoryNotes extends SearchSubcommandData {
 
     public ListPromissoryNotes() {
-        super(Constants.LIST_PROMISSORY_NOTES, "List all promissory notes the bot can use");
+        super(Constants.SEARCH_PROMISSORY_NOTES, "List all promissory notes the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

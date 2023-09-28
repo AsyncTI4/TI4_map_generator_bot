@@ -118,12 +118,25 @@ public class Constants {
     public static final String SAVE_GAMES = "save_games";
     public static final String SAVE_GAME = "save_game";
 
+    public static final String SEARCH_TILES = "tiles";
+    public static final String SEARCH_PLANETS = "planets";
+    public static final String SEARCH_UNITS = "units";
+    public static final String SEARCH_GAMES = "games";
+    public static final String SEARCH_ABILITIES = "abilities";
+    public static final String SEARCH_AGENDAS = "agendas";
+    public static final String SEARCH_SECRET_OBJECTIVES = "secret_objectives";
+    public static final String SEARCH_PUBLIC_OBJECTIVES = "public_objectives";
+    public static final String SEARCH_ACTION_CARDS = "action_cards";
+    public static final String SEARCH_RELICS = "relics";
+    public static final String SEARCH_TECHS = "techs";
+    public static final String SEARCH_LEADERS = "leaders";
+    public static final String SEARCH_PROMISSORY_NOTES = "promissory_notes";
+    public static final String SEARCH_EXPLORES = "explores";
+    public static final String SEARCH_COMMANDS = "commands";
+    public static final String SEARCH_MY_GAMES = "my_games";
+
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
-    public static final String LIST_TILES = "list_tiles";
-    public static final String LIST_PLANETS = "list_planets";
-    public static final String LIST_UNITS = "list_units";
-    public static final String LIST_GAMES = "list_games";
     public static final String CREATE_GAME = "create";
     public static final String DELETE_GAME = "delete_game";
     public static final String POSITION = "position";
@@ -723,7 +736,6 @@ public class Constants {
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
-    public static final String LIST_COMMANDS = "list_commands";
     public static final String INCLUDE_SUBCOMMANDS = "include_subcommands";
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
@@ -756,7 +768,6 @@ public class Constants {
     public static final String POWERED = "powered";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String BOT_SHUSHING = "bot_shushing";
-    public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
     public static final String SC_FOLLOW_1 = "sc_follow_1";
@@ -813,7 +824,6 @@ public class Constants {
     public static final String TIGL_GAME = "is_tigl_game";
     public static final String NORMAL_GAME = "normal_game";
     public static final String INCLUDE_ALIASES = "include_aliases";
-    public static final String LIST_ABILITIES = "list_abilities";
     public static final String SEARCH = "search";
     public static final String BENTOR_HAS_FOUND_CFRAG = "has_found_cfrag";
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
@@ -827,15 +837,6 @@ public class Constants {
     public static final String GARDEN_WORLDS = "garden_worlds";
     public static final String GARDEN_WORLDS_PNG = "attachment_garden_worlds.png";
     public static final String CREUSS_TOKEN_NAME = "creuss_token_name";
-    public static final String LIST_AGENDAS = "list_agendas";
-    public static final String LIST_SECRET_OBJECTIVES = "list_secret_objectives";
-    public static final String LIST_PUBLIC_OBJECTIVES = "list_public_objectives";
-    public static final String LIST_ACTION_CARDS = "list_action_cards";
-    public static final String LIST_RELICS = "list_relics";
-    public static final String LIST_TECHS = "list_techs";
-    public static final String LIST_LEADERS = "list_leaders";
-    public static final String LIST_PROMISSORY_NOTES = "list_promissory_notes";
-    public static final String LIST_EXPLORES = "list_explores";
     public static final String IS_MY_TURN = "is_my_turn";
     public static final String SET_DECK = "set_deck";
     public static final String DECK_NAME = "deck_name";

@@ -15,7 +15,7 @@ import ti4.model.ActionCardModel;
 public class ListActionCards extends SearchSubcommandData {
 
     public ListActionCards() {
-        super(Constants.LIST_ACTION_CARDS, "List all action cards the bot can use");
+        super(Constants.SEARCH_ACTION_CARDS, "List all action cards the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

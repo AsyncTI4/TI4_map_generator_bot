@@ -17,7 +17,7 @@ import ti4.model.PublicObjectiveModel;
 public class ListPublicObjectives extends SearchSubcommandData {
 
     public ListPublicObjectives() {
-        super(Constants.LIST_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
+        super(Constants.SEARCH_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

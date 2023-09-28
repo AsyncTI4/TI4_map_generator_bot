@@ -18,7 +18,7 @@ import ti4.model.RelicModel;
 public class ListRelics extends SearchSubcommandData {
 
     public ListRelics() {
-        super(Constants.LIST_RELICS, "List all relics the bot can use");
+        super(Constants.SEARCH_RELICS, "List all relics the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

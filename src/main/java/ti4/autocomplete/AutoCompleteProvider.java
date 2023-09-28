@@ -712,7 +712,7 @@ public class AutoCompleteProvider {
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         switch (subCommandName) {
-            case Constants.LIST_PLANETS -> {
+            case Constants.SEARCH_PLANETS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -726,7 +726,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_TILES -> {
+            case Constants.SEARCH_TILES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -740,7 +740,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_LEADERS -> {
+            case Constants.SEARCH_LEADERS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -755,7 +755,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_UNITS -> {
+            case Constants.SEARCH_UNITS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -770,7 +770,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_TECHS -> {
+            case Constants.SEARCH_TECHS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -784,7 +784,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_ABILITIES -> {
+            case Constants.SEARCH_ABILITIES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -799,7 +799,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_EXPLORES -> {
+            case Constants.SEARCH_EXPLORES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -814,7 +814,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_RELICS -> {
+            case Constants.SEARCH_RELICS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -828,7 +828,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_AGENDAS -> {
+            case Constants.SEARCH_AGENDAS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -843,7 +843,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_ACTION_CARDS -> {
+            case Constants.SEARCH_ACTION_CARDS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -858,7 +858,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_SECRET_OBJECTIVES -> {
+            case Constants.SEARCH_SECRET_OBJECTIVES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -873,7 +873,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_PUBLIC_OBJECTIVES -> {
+            case Constants.SEARCH_PUBLIC_OBJECTIVES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -888,7 +888,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_PROMISSORY_NOTES -> {
+            case Constants.SEARCH_PROMISSORY_NOTES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
