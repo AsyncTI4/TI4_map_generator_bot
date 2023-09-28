@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,27 +13,24 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.RelicModel;
+import ti4.model.UnitModel;
 
-public class ListRelics extends HelpSubcommandData {
+public class ListUnits extends SearchSubcommandData {
 
-    public ListRelics() {
-        super(Constants.LIST_RELICS, "List all relics the bot can use");
+    public ListUnits() {
+        super(Constants.LIST_UNITS, "List all units");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        
-        if (Mapper.isRelic(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true)).queue();
-            return;
-        }
-
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        for (RelicModel model : Mapper.getRelics().values().stream().sorted(Comparator.comparing(RelicModel::getName)).toList()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+
+        for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
+            MessageEmbed representationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

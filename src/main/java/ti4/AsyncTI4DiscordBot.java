@@ -41,6 +41,7 @@ import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
@@ -177,6 +178,7 @@ public class AsyncTI4DiscordBot {
 
         commandManager.addCommand(new MapCommand());
         commandManager.addCommand(new HelpCommand());
+        commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
 
