@@ -395,6 +395,10 @@ public class ButtonHelper {
             Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
             buttons.add(lost2C);
         }
+        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0 && !event.getId().contains("leadership")) {
+            Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("cabal")));
+            buttons.add(release);
+        }
 
         return buttons;
     }
