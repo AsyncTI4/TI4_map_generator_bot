@@ -1,7 +1,15 @@
 package ti4.model;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 
 public class PromissoryNoteModel implements ModelInterface {
     private String alias;
@@ -38,6 +46,12 @@ public class PromissoryNoteModel implements ModelInterface {
         return colour;
     }
 
+    public String getFactionOrColour() {
+        if (!StringUtils.isBlank(getFaction())) return faction;
+        if (!StringUtils.isBlank(getColour())) return colour;
+        return faction + "_" + colour;
+    }
+
     public Boolean getPlayArea() {
         return playArea;
     }
@@ -70,6 +84,43 @@ public class PromissoryNoteModel implements ModelInterface {
             "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
 
         return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
+    }
+
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        //TITLE
+        StringBuilder title = new StringBuilder();
+        title.append(Emojis.PN);
+        if (!StringUtils.isBlank(getFaction())) title.append(Helper.getFactionIconFromDiscord(getFaction()));
+        title.append("__**").append(getName()).append("**__");
+        if (!StringUtils.isBlank(getColour())) title.append(" (").append(getColour()).append(")");
+        title.append(getSourceEmoji());
+        eb.setTitle(title.toString());
+
+        //DESCRIPTION
+        StringBuilder description = new StringBuilder();
+        description.append(getText());
+        eb.setDescription(description.toString());
+
+        //FOOTER
+        StringBuilder footer = new StringBuilder();
+        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        eb.setFooter(footer.toString());
+        
+        eb.setColor(Color.blue);
+        return eb.build();
+    }
+
+    private String getSourceEmoji() {
+        return switch (getSource()) {
+            case "ds" -> Emojis.DiscordantStars;
+            default -> "";
+        };
     }
 
 }
