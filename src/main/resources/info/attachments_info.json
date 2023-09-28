@@ -281,7 +281,10 @@
     {
         "id": "lloyd_culturalboom",
         "imagePath": "attachment_culturalboom.png",
-        "influenceModifier": 2
+        "influenceModifier": 2,
+        "planetTypes": [
+            "cultural"
+        ]
     },
     {
         "id": "lloyd_interplanetaryhub",
