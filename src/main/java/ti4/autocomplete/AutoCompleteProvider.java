@@ -54,7 +54,7 @@ public class AutoCompleteProvider {
         switch (commandName) {
             case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
-            case Constants.HELP -> resolveHelpCommandAutoComplete(event, subCommandName, optionName);
+            case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
         }
 
@@ -710,9 +710,9 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveHelpCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
+    private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         switch (subCommandName) {
-            case Constants.LIST_PLANETS -> {
+            case Constants.SEARCH_PLANETS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -726,7 +726,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_TILES -> {
+            case Constants.SEARCH_TILES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -740,7 +740,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_LEADERS -> {
+            case Constants.SEARCH_LEADERS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -755,7 +755,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_UNITS -> {
+            case Constants.SEARCH_UNITS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -770,7 +770,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_TECHS -> {
+            case Constants.SEARCH_TECHS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -784,7 +784,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_ABILITIES -> {
+            case Constants.SEARCH_ABILITIES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -799,7 +799,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_EXPLORES -> {
+            case Constants.SEARCH_EXPLORES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -814,7 +814,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_RELICS -> {
+            case Constants.SEARCH_RELICS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -828,7 +828,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_AGENDAS -> {
+            case Constants.SEARCH_AGENDAS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -836,14 +836,13 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = agendas.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
                 }
             }
-            case Constants.LIST_ACTION_CARDS -> {
+            case Constants.SEARCH_ACTION_CARDS -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -851,14 +850,13 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = actionCards.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
                 }
             }
-            case Constants.LIST_SECRET_OBJECTIVES -> {
+            case Constants.SEARCH_SECRET_OBJECTIVES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -873,7 +871,7 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-            case Constants.LIST_PUBLIC_OBJECTIVES -> {
+            case Constants.SEARCH_PUBLIC_OBJECTIVES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -881,23 +879,21 @@ public class AutoCompleteProvider {
                         List<Command.Choice> options = publicObjectives.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
                 }
             }
-            case Constants.LIST_PROMISSORY_NOTES -> {
+            case Constants.SEARCH_PROMISSORY_NOTES -> {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>(Mapper.getPromissoryNotes());
                         List<Command.Choice> options = promissoryNotes.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getFactionOrColour().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getFactionOrColour() + ") (" + value.getValue().getSource() + ")", value.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }

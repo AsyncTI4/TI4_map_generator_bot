@@ -1,26 +1,23 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import java.util.Map;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 
-public class ListSecretObjectives extends HelpSubcommandData {
+public class ListSecretObjectives extends SearchSubcommandData {
 
     public ListSecretObjectives() {
-        super(Constants.LIST_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
+        super(Constants.SEARCH_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 

@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +12,10 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListAbilities extends HelpSubcommandData {
+public class ListAbilities extends SearchSubcommandData {
 
     public ListAbilities() {
-        super(Constants.LIST_ABILITIES, "List all abilities");
+        super(Constants.SEARCH_ABILITIES, "List all abilities");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
