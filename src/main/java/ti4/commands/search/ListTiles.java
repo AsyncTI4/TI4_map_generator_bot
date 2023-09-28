@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 
-public class ListTiles extends HelpSubcommandData {
+public class ListTiles extends SearchSubcommandData {
 
     public ListTiles() {
         super(Constants.LIST_TILES, "List all tiles");

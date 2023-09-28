@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class ListPublicObjectives extends HelpSubcommandData {
+public class ListPublicObjectives extends SearchSubcommandData {
 
     public ListPublicObjectives() {
         super(Constants.LIST_PUBLIC_OBJECTIVES, "List all public objectives the bot can use");

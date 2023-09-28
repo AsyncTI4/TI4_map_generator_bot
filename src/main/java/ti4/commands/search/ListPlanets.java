@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
 
-public class ListPlanets extends HelpSubcommandData {
+public class ListPlanets extends SearchSubcommandData {
 
     public ListPlanets() {
         super(Constants.LIST_PLANETS, "List all planets");

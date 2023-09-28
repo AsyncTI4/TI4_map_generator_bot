@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,13 +17,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class HelpCommand implements Command {
+public class SearchCommand implements Command {
 
-    private final Collection<HelpSubcommandData> subcommandData = getSubcommands();
+    private final Collection<SearchSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.HELP;
+        return Constants.SEARCH;
     }
 
     @Override
@@ -32,34 +32,10 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        HelpSubcommandData executedCommand = null;
-        for (HelpSubcommandData subcommand : subcommandData) {
+        SearchSubcommandData executedCommand = null;
+        for (SearchSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -77,16 +53,28 @@ public class HelpCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
     }
 
-
     protected String getActionDescription() {
-        return "Help";
+        return "Search game component descriptions";
     }
 
-    private Collection<HelpSubcommandData> getSubcommands() {
-        Collection<HelpSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new HelpAction());
-        subcommands.add(new SetupTemplatesAction());
-        subcommands.add(new HowToMoveUnits());
+    private Collection<SearchSubcommandData> getSubcommands() {
+        Collection<SearchSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new ListAbilities());
+        subcommands.add(new ListGames());
+        subcommands.add(new ListPlanets());
+        subcommands.add(new ListTiles());
+        subcommands.add(new ListUnits());
+        subcommands.add(new ListCommands());
+        subcommands.add(new ListMyGames());
+        subcommands.add(new ListAgendas());
+        subcommands.add(new ListSecretObjectives());
+        subcommands.add(new ListPublicObjectives());
+        subcommands.add(new ListRelics());
+        subcommands.add(new ListActionCards());
+        subcommands.add(new ListTechs());
+        subcommands.add(new ListLeaders());
+        subcommands.add(new ListPromissoryNotes());
+        subcommands.add(new ListExplores());
 
         return subcommands;
     }

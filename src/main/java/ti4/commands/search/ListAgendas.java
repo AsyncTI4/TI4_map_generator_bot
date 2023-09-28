@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class ListAgendas extends HelpSubcommandData {
+public class ListAgendas extends SearchSubcommandData {
 
     public ListAgendas() {
         super(Constants.LIST_AGENDAS, "List all agendas the bot can use");

@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class ListGames extends HelpSubcommandData {
+public class ListGames extends SearchSubcommandData {
 
     public ListGames() {
         super(Constants.LIST_GAMES, "List all games");

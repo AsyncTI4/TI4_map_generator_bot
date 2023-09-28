@@ -1,4 +1,4 @@
-package ti4.commands.help;
+package ti4.commands.search;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
-public class ListTechs extends HelpSubcommandData {
+public class ListTechs extends SearchSubcommandData {
 
     public ListTechs() {
         super(Constants.LIST_TECHS, "List all techs the bot can use");
