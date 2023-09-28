@@ -87,10 +87,10 @@ public class PromissoryNoteModel implements ModelInterface {
     }
 
     public MessageEmbed getRepresentationEmbed() {
-        return getRepresentationEmbed(false);
+        return getRepresentationEmbed(false, false, false);
     }
 
-    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+    public MessageEmbed getRepresentationEmbed(boolean justShowName, boolean includeID, boolean includeHelpfulText) {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
@@ -102,6 +102,8 @@ public class PromissoryNoteModel implements ModelInterface {
         title.append(getSourceEmoji());
         eb.setTitle(title.toString());
 
+        if (justShowName) return eb.build();
+
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
         description.append(getText());
@@ -109,7 +111,21 @@ public class PromissoryNoteModel implements ModelInterface {
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeHelpfulText) {
+            if (!StringUtils.isBlank(getAttachment())) footer.append("Attachment: ").append(getAttachment()).append("\n");
+            if (getPlayArea()) {
+                footer.append("Play area card. ");
+                if (isPlayedDirectlyToPlayArea()) {
+                    footer.append("Sent directly to play area when received.");
+                } else {
+                    footer.append("Must be played from hand to enter play area.");
+                }
+                footer.append("\n");
+            }
+        }
+        if (includeID) {
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource()).append("\n");
+        }
         eb.setFooter(footer.toString());
         
         eb.setColor(Color.blue);
@@ -118,7 +134,8 @@ public class PromissoryNoteModel implements ModelInterface {
 
     private String getSourceEmoji() {
         return switch (getSource()) {
-            case "ds" -> Emojis.DiscordantStars;
+            case "Discordant Stars" -> Emojis.DiscordantStars;
+            case "Absol" -> Emojis.Absol;
             default -> "";
         };
     }

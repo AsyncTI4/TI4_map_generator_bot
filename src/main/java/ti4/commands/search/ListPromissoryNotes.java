@@ -1,7 +1,6 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -13,7 +12,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.PromissoryNoteModel;
 
 public class ListPromissoryNotes extends SearchSubcommandData {
@@ -29,7 +27,7 @@ public class ListPromissoryNotes extends SearchSubcommandData {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (PromissoryNoteModel model : Mapper.getPromissoryNotes().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(false, true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
