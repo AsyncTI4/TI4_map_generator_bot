@@ -17,7 +17,7 @@ import ti4.model.SecretObjectiveModel;
 public class ListSecretObjectives extends SearchSubcommandData {
 
     public ListSecretObjectives() {
-        super(Constants.LIST_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
+        super(Constants.SEARCH_SECRET_OBJECTIVES, "List all secret objectives the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string.").setAutoComplete(true));
     }
 
