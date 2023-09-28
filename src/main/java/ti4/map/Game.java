@@ -622,7 +622,7 @@ public class Game {
     }
 
     public boolean isFrankenGame() {
-        return getPlayers().values().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
+        return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
     @JsonIgnore
