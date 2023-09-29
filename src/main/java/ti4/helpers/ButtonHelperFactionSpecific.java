@@ -47,12 +47,80 @@ import ti4.model.PublicObjectiveModel;
 
 public class ButtonHelperFactionSpecific {
 
+    public static List<Button> getTradePlanetsWithHacanMechButtons(Player hacan, Player receiver, Game activeGame){
+        List<Button> buttons = new ArrayList<Button>();
+        if(!hacan.hasUnit("hacan_mech")){
+            return buttons;
+        }
+        String colorID = Mapper.getColorID(hacan.getColor());
+        String mechKey = colorID + "_mf.png";
+        for(String planet : hacan.getPlanets(activeGame)){
+            if(planet.contains("custodia")){
+                continue;
+            }
+            if(ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getUnits().containsKey(mechKey)){
+                buttons.add(Button.secondary("hacanMechTradeStepOne_"+planet+"_"+receiver.getFaction(), Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        return buttons;
+    }
+
+    public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String origPlanet = buttonID.split("_")[1];
+        String receiverFaction = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : hacan.getPlanets(activeGame)){
+            if(!planet.equalsIgnoreCase(origPlanet)){
+                buttons.add(Button.secondary("hacanMechTradeStepTwo_"+origPlanet+"_"+receiverFaction+"_"+planet, "Relocate to "+Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(hacan, activeGame) + "Choose which planet to relocate your units to", buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveHacanMechTradeStepTwo(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String origPlanet = buttonID.split("_")[1];
+        String receiverFaction = buttonID.split("_")[2];
+        String newPlanet = buttonID.split("_")[3];
+        UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, activeGame);
+        List<String> units = new ArrayList<String>();
+        units.addAll(oriPlanet.getUnits().keySet());
+        for(String unit: oriPlanet.getUnits().keySet()){
+            int amount = oriPlanet.getUnits().get(unit);
+             String cID = Mapper.getColorID(hacan.getColor());
+             String unitKey = unit.replace(cID + "_", "");
+            unitKey = unitKey.replace(".png", "");
+            unitKey = ButtonHelper.getUnitName(unitKey);
+            new RemoveUnits().unitParsing(event, hacan.getColor(), Helper.getTileFromPlanet(origPlanet, activeGame), amount + " "+unitKey + " "+origPlanet, activeGame);
+             new AddUnits().unitParsing(event, hacan.getColor(), Helper.getTileFromPlanet(newPlanet, activeGame), amount + " "+unitKey + " "+newPlanet, activeGame);
+        }
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, receiverFaction);
+        new PlanetAdd().doAction(p2, origPlanet, activeGame, event);
+        
+        List<Button> goAgainButtons = new ArrayList<Button>();
+        Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
+        Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
+        Player p1 = hacan;
+        String ident = ButtonHelper.getIdent(hacan);
+        String message2 = ident+" traded the planet "+Helper.getPlanetRepresentation(origPlanet, activeGame) + " to "+ButtonHelper.getIdentOrColor(p2, activeGame)+" and relocated the unit(s) to "+Helper.getPlanetRepresentation(newPlanet, activeGame);
+        goAgainButtons.add(button);
+        goAgainButtons.add(done);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+        } else {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+        }
+        event.getMessage().delete().queue();
+    }
+
     public static void resolveReleaseButton(Player cabal, Game activeGame, String buttonID, ButtonInteractionEvent event){
         String faction = buttonID.split("_")[1];
         Player player = Helper.getPlayerFromColorOrFaction(activeGame, faction);
         String unit = buttonID.split("_")[2];
         new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), unit, activeGame);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame), ButtonHelper.getTrueIdentity(cabal, activeGame) + " released 1 "+player.getColor() + " "+unit + " from prison");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame), ButtonHelper.getTrueIdentity(cabal, activeGame) + " released 1 "+ButtonHelper.getIdentOrColor(player, activeGame)+ " "+unit + " from prison");
         if(cabal != player){
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " a " +unit+" of yours was released from prison.");
         }
@@ -1020,7 +1088,7 @@ public class ButtonHelperFactionSpecific {
             damaged = true;
         }
         String key = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged);
+        new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged, activeGame);
         String msg = Helper.getEmojiFromDiscord(unit.toLowerCase()) + " was removed via Arborec agent by " + ButtonHelper.getIdent(player);
         if (damaged) {
             msg = "A damaged " + msg;
@@ -1379,7 +1447,7 @@ public class ButtonHelperFactionSpecific {
             activeGame.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, activeGame);
         String key = Mapper.getUnitID(AliasHandler.resolveUnit("infantry"), player.getColor());
         //activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
-        new RemoveUnits().removeStuff(event, activeGame.getTile(AliasHandler.resolveTile(planetName)), 1, planetName, key, player.getColor(), false);
+        new RemoveUnits().removeStuff(event, activeGame.getTile(AliasHandler.resolveTile(planetName)), 1, planetName, key, player.getColor(), false, activeGame);
         String successMessage = ident + " Replaced an infantry with a mech on "
             + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), successMessage);
