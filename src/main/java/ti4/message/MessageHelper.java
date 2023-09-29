@@ -48,8 +48,12 @@ public class MessageHelper {
 		splitAndSent(messageText, channel);
 	}
 
-	public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText)  {
+	public static void sendMessageToBotLogChannel(GenericInteractionCreateEvent event, String messageText)  {
 		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
+	}
+
+	public static void sendMessageToBotLogChannel(String messageText)  {
+		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
