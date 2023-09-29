@@ -1772,8 +1772,8 @@ public class Game {
         return id;
     }
 
-    public boolean revealAgenda(String agendaID) {
-        if (agendas.remove(agendaID)) {
+    public boolean revealAgenda(String agendaID, boolean force) {
+        if (agendas.remove(agendaID) || force) {
             addDiscardAgenda(agendaID);
             return true;
         }

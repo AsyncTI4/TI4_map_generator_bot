@@ -26,7 +26,7 @@ import java.util.List;
 
 public class RevealSpecificAgenda extends AgendaSubcommandData {
     public RevealSpecificAgenda() {
-        super(Constants.REVEAL, "Reveal top Agenda from deck");
+        super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck");
         addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)").setRequired(true).setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the agenda (even if it's not in the deck)");
     }
@@ -42,7 +42,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         }
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
-        if (!force && !activeGame.revealAgenda(agendaID)) {
+        if (!activeGame.revealAgenda(agendaID, force)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda not found in deck, please retry");
             return;
         }
@@ -54,6 +54,10 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
     public void revealAgenda(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String agendaID) {
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
+        if (uniqueID == null) {
+            MessageHelper.sendMessageToChannel(channel, "Agenda `" + agendaID + "` not found in discard, please retry");
+            return;
+        }
 
         activeGame.setCurrentPhase("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
