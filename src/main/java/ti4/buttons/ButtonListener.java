@@ -126,7 +126,7 @@ public class ButtonListener extends ListenerAdapter {
 
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
-        gameName = gameName.substring(0, gameName.indexOf("-"));
+        gameName = StringUtils.substringBefore(gameName, "-");
         Game activeGame = GameManager.getInstance().getGame(gameName);
         Player player = activeGame.getPlayer(id);
         player = Helper.getGamePlayer(activeGame, player, event.getMember(), id);
