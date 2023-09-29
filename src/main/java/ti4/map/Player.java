@@ -478,12 +478,10 @@ public class Player {
     }
 
     public List<UnitModel> getUnitsByAsyncID(String asyncID) {
-        if (asyncID == null) return new ArrayList<>();
-        String convertUnitHolderUnitIDtoAsyncID = StringUtils.substringBetween(asyncID, "_", ".");
         return getUnitsOwned().stream()
             .map(Mapper::getUnit)
             .filter(Objects::nonNull)
-            .filter(unit -> convertUnitHolderUnitIDtoAsyncID.equalsIgnoreCase(unit.getAsyncId()))
+            .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
             .toList();
     }
 
