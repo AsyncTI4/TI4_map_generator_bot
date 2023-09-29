@@ -72,6 +72,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
+                .map(unitID -> StringUtils.substringBetween(unitID, "_", ".")) //convert "red_gf.png" to "gf"
                 .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
                 .filter(Objects::nonNull)
                 .anyMatch(u -> u.getIsGroundForce());
