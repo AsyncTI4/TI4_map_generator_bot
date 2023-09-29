@@ -344,7 +344,7 @@ public class GenerateMap {
         ImageHelper.getCacheStats().ifPresent(stats ->
             AsyncTI4DiscordBot.THREAD_POOL.execute(() ->
                 MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```")));
-        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        AsyncTI4DiscordBot.jda.getPresence().setStatus(OnlineStatus.ONLINE);
         return jpgFile;
     }
 
