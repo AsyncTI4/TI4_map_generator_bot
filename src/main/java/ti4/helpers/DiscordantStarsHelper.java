@@ -26,7 +26,7 @@ public class DiscordantStarsHelper {
                                 }
                             } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                 planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                            }
+                            } 
                         }
                     }
                 }

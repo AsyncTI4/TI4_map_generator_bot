@@ -74,7 +74,7 @@ public class ActionCardModel implements ModelInterface {
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
-        description.append(getText());
+        description.append("***").append(getWindow()).append(":***\n").append(getText());
         eb.setDescription(description.toString());
 
         //FLAVOUR TEXT
