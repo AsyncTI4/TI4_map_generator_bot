@@ -3,13 +3,10 @@ package ti4.helpers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Comparator;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import ti4.message.BotLogger;
@@ -22,11 +19,14 @@ public class GlobalSettings {
     //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
     public enum ImplementedSettings {
         DEBUG, //When true, additional show additional debug messages
-        UPLOAD_DATA_TO_WEB_SERVER, //Whether or not to send map and data to the web server
+        UPLOAD_DATA_TO_WEB_SERVER, //Whether to send map and data to the web server
         MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
         THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
-        IMAGE_CACHE_MAX_SIZE, //How many images to cache
-        ;
+        FILE_IMAGE_CACHE_MAX_SIZE,
+        FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
+        URL_IMAGE_CACHE_SIZE,
+        URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
+        LOG_CACHE_STATS_INTERVAL_MINUTES;
 
         @Override
         public String toString() {
