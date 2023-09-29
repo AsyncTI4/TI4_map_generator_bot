@@ -207,17 +207,20 @@
     {
         "id": "garden_worlds",
         "imagePath": "attachment_garden_worlds.png",
-        "resourcesModifier": 1
+        "resourcesModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "olradin_mech_res",
         "imagePath": "attachment_olradin_mech_res.png",
-        "resourcesModifier": 1
+        "resourcesModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "olradin_mech_inf",
         "imagePath": "attachment_olradin_mech_inf.png",
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "obelisk",
