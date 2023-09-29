@@ -1,5 +1,7 @@
 package ti4.model;
 
+import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -50,7 +52,9 @@ public class UnitModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return id != null && !id.isEmpty() && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
+        return id != null 
+            && !id.isEmpty()
+            && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
     @Override
@@ -173,6 +177,10 @@ public class UnitModel implements ModelInterface {
             default:
                 return getCombatHitsOn();
         }
+    }
+
+    public boolean getIsGroundForce() {
+        return Optional.ofNullable(isGroundForce).orElse(false);
     }
 
     private String getAsyncIDAliases() {
