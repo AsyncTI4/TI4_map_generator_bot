@@ -688,6 +688,10 @@ public class Mapper {
         return new HashMap<>(agendas);
     }
 
+    public static boolean isValidAgenda(String agendaID) {
+        return getAgendas().containsKey(agendaID);
+    }
+
     public static HashMap<String, DeckModel> getDecks() {
         return new HashMap<>(decks);
     }
