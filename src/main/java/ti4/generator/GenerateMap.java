@@ -989,6 +989,7 @@ public class GenerateMap {
         if (hideFactionIcon) return;
         scale = scale * 0.50f;
         BufferedImage factionImage = getFactionIconImageScaled(player, scale);
+        if (factionImage == null) return;
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
         int centreCustomTokenVertically = bottomTokenImage.getHeight() / 2 - factionImage.getHeight() / 2;
