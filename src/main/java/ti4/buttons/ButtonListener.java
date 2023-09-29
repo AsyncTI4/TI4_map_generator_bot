@@ -332,6 +332,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
         } else if (buttonID.startsWith("augerHeroSwap_")) {
             ButtonHelperFactionSpecific.augersHeroSwap(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("hacanMechTradeStepOne_")) {
+            ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("hacanMechTradeStepTwo_")) {
+            ButtonHelperFactionSpecific.resolveHacanMechTradeStepTwo(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("augersHeroStart_")) {
             ButtonHelperFactionSpecific.augersHeroResolution(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("augersPeak_")) {
