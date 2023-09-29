@@ -339,11 +339,11 @@ public class GenerateMap {
             sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
             sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
-            MessageHelper.sendMessageToEventChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
+            MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
         ImageHelper.getCacheStats().ifPresent(stats ->
             AsyncTI4DiscordBot.THREAD_POOL.execute(() ->
-                MessageHelper.sendMessageToEventChannel(event, "```\n" + stats + "\n```")));
+                MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```")));
         AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         return jpgFile;
     }
