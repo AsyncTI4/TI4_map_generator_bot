@@ -338,10 +338,12 @@ public class GenerateMap {
             sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
             sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
             sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
-            ImageHelper.getCacheStats().ifPresent(stats -> sb.append(stats).append("\n"));
             System.out.println(sb);
-            MessageHelper.sendMessageToChannel(BotLogger.getBotLogChannel(event), "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
+            MessageHelper.sendMessageToEventChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
+        ImageHelper.getCacheStats().ifPresent(stats ->
+            AsyncTI4DiscordBot.THREAD_POOL.execute(() ->
+                MessageHelper.sendMessageToEventChannel(event, "```\n" + stats + "\n```")));
         AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         return jpgFile;
     }

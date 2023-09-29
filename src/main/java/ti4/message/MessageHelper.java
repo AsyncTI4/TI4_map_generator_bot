@@ -40,12 +40,16 @@ public class MessageHelper {
 		void run(Message msg);
 	}
 
-	public interface ThreadFunction{
+	public interface ThreadFunction {
 		void run(ThreadChannel msg);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
 		splitAndSent(messageText, channel);
+	}
+
+	public static void sendMessageToEventChannel(GenericInteractionCreateEvent event, String messageText)  {
+		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
