@@ -95,7 +95,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new CreateGameChannels());
         subcommands.add(new CreateFOWGameChannels());
         subcommands.add(new ServerLimitStats());
-        subcommands.add(new ListOldChannels());
+        //subcommands.add(new ListOldChannels());
         subcommands.add(new ListOldThreads());
         subcommands.add(new ArchiveOldThreads());
         subcommands.add(new FixGameChannelPermissions());
@@ -107,6 +107,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new JazzCommand());
         subcommands.add(new Observer());
         subcommands.add(new ListButtons());
+        subcommands.add(new ListSlashCommandsUsed());
         return subcommands;
     }
 

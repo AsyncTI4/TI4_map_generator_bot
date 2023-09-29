@@ -719,6 +719,7 @@ public class Constants {
     public static final String RE_EXPORT_TILES = "re_export_tiles";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
+    public static final String LIST_SLASH_COMMANDS_USED = "list_slash_commands_used";
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";

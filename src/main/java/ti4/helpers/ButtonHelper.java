@@ -228,7 +228,7 @@ public class ButtonHelper {
             msg = msg + " and survived. May you always be so lucky.";
         } else {
             String key = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
-            new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged);
+            new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged, activeGame);
             msg = msg + " and failed. Condolences for your loss.";
             if (cabal != null && cabal != player && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, activeGame, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, 1, unit, event);
@@ -3302,6 +3302,10 @@ public class ButtonHelper {
             Button transact = Button.success(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments");
             stuffToTransButtons.add(transact);
         }
+        if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, activeGame).size() > 0) {
+            Button transact = Button.success(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            stuffToTransButtons.add(transact);
+        }
         return stuffToTransButtons;
     }
 
@@ -3333,6 +3337,10 @@ public class ButtonHelper {
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "Planets" -> {
+                String message = "Click the planet you would like to send";
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, activeGame));
             }
             case "ACs" -> {
                 String message = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true) + " Click the GREEN button that indicates the AC you would like to send";
