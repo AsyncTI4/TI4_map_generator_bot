@@ -28,6 +28,25 @@
         ]
     },
     {
+        "alias": "action_cards_basegame",
+        "name": "Base Game Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a the Base Game",
+        "cardIDs": [
+            "abs","assassin","assassin2","assassin3","assassin4","bribery","bribery2","bribery3","bribery4","bunker","confusing","const_rider","courageous","cripple","diplo_rider","dh1","dh2","dh3","dh4","disable","disable2","distinguished","distinguished2","economic_initiative","emergency","experimental","experimental2","f_prototype","fire_team","fs1","fs2","fs3","fs4","f_researched","f_researched2","f_researched3","f_researched4","f_deployment","f_deployment2","ghost_ship","ghost_ship2","imp_rider","silence_space","silence_space2","industrial_initiative","infiltrate","infiltrate2","insub","intercept","lead_rider","lost_star","lucky","mjets1","mjets2","mjets3","mjets4","mining_initiative","mb1","mb2","mb3","mb4","parley","plague","stability","politic_rider","disgrace","disgrace2","meltdown","reparations","repeal","messiah","sabo1","sabo2","sabo3","sabo4","salvage","sh1","sh2","sh3","sh4","jamming","s_retreat1","s_retreat2","s_retreat3","s_retreat4","spy","summit","tactical","tech_rider","trade_rider","unexpected","unexpected2","unstable","upgrade","uprising","veto","veto2","veto3","veto4","war_effort","war_rider"
+        ]
+    },
+    {
+        "alias": "action_cards_basegame_and_codex1",
+        "name": "Base Game Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a the Base Game, including Codex I",
+        "cardIDs": [
+            "abs","assassin","assassin2","assassin3","assassin4","bribery","bribery2","bribery3","bribery4","bunker","confusing","const_rider","courageous","cripple","diplo_rider","dh1","dh2","dh3","dh4","disable","disable2","distinguished","distinguished2","economic_initiative","emergency","experimental","experimental2","f_prototype","fire_team","fs1","fs2","fs3","fs4","f_researched","f_researched2","f_researched3","f_researched4","f_deployment","f_deployment2","ghost_ship","ghost_ship2","imp_rider","silence_space","silence_space2","industrial_initiative","infiltrate","infiltrate2","insub","intercept","lead_rider","lost_star","lucky","mjets1","mjets2","mjets3","mjets4","mining_initiative","mb1","mb2","mb3","mb4","parley","plague","stability","politic_rider","disgrace","disgrace2","meltdown","reparations","repeal","messiah","sabo1","sabo2","sabo3","sabo4","salvage","sh1","sh2","sh3","sh4","jamming","s_retreat1","s_retreat2","s_retreat3","s_retreat4","spy","summit","tactical","tech_rider","trade_rider","unexpected","unexpected2","unstable","upgrade","uprising","veto","veto2","veto3","veto4","war_effort","war_rider",
+            "blitz","counterstroke","counterstroke2","f_conscription","fsb","ghost_squad","hack","harness","impersonation","insider","insider2","master_plan","master_plan2","plagiarize","plagiarize2","rally","reflective","sanction","scramble","solar_flare","war_machine1","war_machine2","war_machine3","war_machine4"
+        ]
+    },
+    {
         "alias": "action_cards_pok",
         "name": "PoK Action Cards",
         "type": "action_card",
@@ -47,12 +66,39 @@
         ]
     },
     {
+        "alias": "secret_objectives_base",
+        "name": "Base Game Secret Objectives",
+        "type": "secret_objective",
+        "description": "All secret objectives in Base Game",
+        "cardIDs": [
+            "ans","btgk","ctr","csl","dtgs","eap","faa","fsn","fwm","gamf","lsc","mew","mlp","mrm","mp","ose","sar","te","ttfd","uf"
+        ]
+    },
+    {
         "alias": "secret_objectives_pok",
         "name": "PoK Secret Objectives",
         "type": "secret_objective",
         "description": "All secret objectives in a 'vanilla' PoK game",
         "cardIDs": [
             "ans","baf","bam","btv","btgk","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fc","fsn","fwm","fwp","gamf","hrm","lsc","mew","mlp","mp","mrm","mtm","ose","otf","pe","pem","sai","sar","sb","syc","te","ttfd","uf"
+        ]
+    },
+    {
+        "alias": "public_stage_1_objectives_base",
+        "name": "Base Game Public Stage I Objectives",
+        "type": "public_stage_1_objective",
+        "description": "All Stage I public objectives in Base Game game",
+        "cardIDs": [
+            "corner","develop","diversify","monument","expand_borders","research_outposts","intimidate","lead","trade_routes","sway_council"
+        ]
+    },
+    {
+        "alias": "public_stage_2_objectives_base",
+        "name": "Base Game Public Stage II Objectives",
+        "type": "public_stage_2_objective",
+        "description": "All Stage II public objectives in Base Game game",
+        "cardIDs": [
+            "centralize_trade","conquer","brain_trust","golden_age","galvanize","manipulate_law","master_science","revolutionize","subdue","unify_colonies"
         ]
     },
     {
