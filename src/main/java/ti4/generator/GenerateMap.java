@@ -864,10 +864,12 @@ public class GenerateMap {
             } else {
                 graphics.setColor(Color.WHITE);
             }
+
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            String leaderFileName = "pa_leaders_factionicon_" + player.getFaction() + "_rdy.png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, leaderFileName);
+
+            //TODO LeaderModel to get Faction Icon for Franken
+            graphics.drawImage(getFactionIconImageScaled(player, 42, 42), x + deltaX - 1, y + 108, null);
 
             if (leader.getTgCount() != 0) {
                 graphics.setColor(new Color(241, 176, 0));
@@ -1445,8 +1447,12 @@ public class GenerateMap {
                             originalPlanetType = "keleres";
                         }
 
-                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // if (Mapper.isFaction(originalPlanetType)) {
+                        //     graphics.drawImage(getFactionIconImageScaled(player, 52, 52), x + deltaX - 1, y -1, null);
+                        // } else {
+                            String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                            drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // }
                     }
                 }
 
