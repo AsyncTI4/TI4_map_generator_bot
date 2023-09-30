@@ -70,7 +70,7 @@ public class StellarConverter extends SpecialSubcommandData {
         }
         if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()){
             TextChannel watchPary= AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).get(0);
-            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, tile.getPosition(), event);
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, "Moments before disaster in game "+activeGame.getName(), false);
         }
         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");

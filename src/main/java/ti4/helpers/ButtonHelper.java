@@ -49,6 +49,7 @@ import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -1419,8 +1420,12 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
         if ("space".equalsIgnoreCase(groundOrSpace)) {
+            buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace)) {
             buttons.add(Button.danger("retreat_" + pos, "Retreat"));
         }
+        
         if (ButtonHelper.getTilesOfUnitsWithBombard(p1, activeGame).contains(tile) || ButtonHelper.getTilesOfUnitsWithBombard(p2, activeGame).contains(tile)) {
             if (tile.getUnitHolders().size() > 2) {
                 buttons.add(Button.secondary("bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
@@ -1681,6 +1686,23 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    public static List<Button> getEchoAvailableSystems(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.getUnitHolders().size() < 2){
+                buttons.add(Button.success("echoPlaceFrontier_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+            }
+        }
+        return buttons;
+    }
+    public static void resolveEchoPlaceFrontier(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " placed a frontier token in "+tile.getRepresentationForButtons(activeGame, player));
+        event.getMessage().delete().queue();
+    }
+
     public static List<Button> getEndOfTurnAbilities(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
@@ -1695,6 +1717,22 @@ public class ButtonHelper {
         planet = "hopesend";
         if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
             endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Hope's End Ability"));
+        }
+        planet = "silence";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Silence Ability"));
+        }
+        planet = "tarrock";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Tarrock Ability"));
+        }
+        planet = "echo";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Echo's Ability"));
+        }
+        planet = "domna";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            endButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use Domna's Ability"));
         }
         planet = "primor";
         if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
@@ -2059,6 +2097,18 @@ public class ButtonHelper {
         buttons.add(validTile2);
         return buttons;
     }
+    public static List<Button> getDomnaStepOneTiles(Player player, Game activeGame) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Button.success(finChecker + "domnaStepOne_" + tileEntry.getKey(), tile.getRepresentationForButtons(activeGame, player));
+                buttons.add(validTile);
+            }
+        }
+        return buttons;
+    }
 
     public static void offerBuildOrRemove(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -2129,6 +2179,10 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
+        }
+        String planet = "eko";
+        if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+            buttons.add(Button.secondary(finChecker + "planetAbilityExhaust_" + planet, "Use Eko's Ability To Ignore Anomalies"));
         }
 
         Button validTile = Button.danger(finChecker + "concludeMove", "Done moving");
@@ -2452,11 +2506,11 @@ public class ButtonHelper {
     public static String getUnitName(String id) {
         String name = "";
         switch (id) {
-            case "fs" -> name = "Flagship";
-            case "ws" -> name = "Warsun";
-            case "gf" -> name = "Infantry";
-            case "mf" -> name = "Mech";
-            case "sd" -> name = "Spacedock";
+            case "fs" -> name = "flagship";
+            case "ws" -> name = "warsun";
+            case "gf" -> name = "infantry";
+            case "mf" -> name = "mech";
+            case "sd" -> name = "spacedock";
             case "csd" -> name = "cabalspacedock";
             case "pd" -> name = "pds";
             case "ff" -> name = "fighter";
@@ -3915,7 +3969,10 @@ public class ButtonHelper {
         if (planets.isEmpty()) {
             youCanSpend = "You have available to you 0 unexhausted planets ";
         }
-        youCanSpend = youCanSpend + "and " + player.getTg() + " tgs";
+        if(!activeGame.getCurrentPhase().contains("agenda")){
+            youCanSpend = youCanSpend + "and " + player.getTg() + " tgs";
+        }
+        
 
         return youCanSpend;
     }

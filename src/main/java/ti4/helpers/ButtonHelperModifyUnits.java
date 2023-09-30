@@ -27,7 +27,10 @@ public class ButtonHelperModifyUnits {
                 continue;
             }
             Tile tile2 = activeGame.getTileByPosition(pos2);
-            buttons.add(Button.secondary(finChecker+"retreatUnitsFrom_"+pos1+"_"+pos2, "Retreat to "+tile2.getRepresentationForButtons(activeGame, player)));
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                buttons.add(Button.secondary(finChecker+"retreatUnitsFrom_"+pos1+"_"+pos2, "Retreat to "+tile2.getRepresentationForButtons(activeGame, player)));
+            }
+            
         }
         return buttons;
     }
@@ -556,6 +559,52 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Landed "+amount+ " "+unitkey + " on "+planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        for(String unit : tile.getUnitHolders().get("space").getUnits().keySet()){
+            String colorID = Mapper.getColorID(player.getColor());
+            if(unit.contains("gf.png")|| unit.contains("mf.png")){
+                continue;
+            }
+            String cID = Mapper.getColorID(player.getColor());
+            String unitKey = unit.replace(cID + "_", "");
+            unitKey = unitKey.replace(".png", "");
+            unitKey = ButtonHelper.getUnitName(unitKey);
+            Button validTile = Button.success("domnaStepTwo_" + pos+ "_"+unitKey, "Move 1 "+unitKey);
+            buttons.add(validTile);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select unit you want to move",buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void offerDomnaStep3Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos1 = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<>();
+        for(String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)){
+            if(pos1.equalsIgnoreCase(pos2)){
+                continue;
+            }
+            Tile tile2 = activeGame.getTileByPosition(pos2);
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                buttons.add(Button.secondary("domnaStepThree_"+pos1+"_"+unit+"_"+pos2, "Move "+unit+" to "+tile2.getRepresentationForButtons(activeGame, player)));
+            }
+        }
+         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to",buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveDomnaStep3Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos1 = buttonID.split("_")[1];
+        Tile tile1 = activeGame.getTileByPosition(pos1);
+        String unit = buttonID.split("_")[2];
+        String pos2 = buttonID.split("_")[3];
+        Tile tile2 = activeGame.getTileByPosition(pos2);
+        new AddUnits().unitParsing(event, player.getColor(), tile2, unit, activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile1, unit, activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " moved 1 "+unit+ " from "+tile1.getRepresentationForButtons(activeGame, player)+ " to "+tile2.getRepresentationForButtons(activeGame, player)+ " using Domna legendary ability.");
+        event.getMessage().delete().queue();
     }
     public static void resolvingCombatDrones(ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());

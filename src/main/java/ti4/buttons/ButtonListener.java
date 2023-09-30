@@ -417,10 +417,16 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.replace("retreat_", "");
             String message = trueIdentity + " Use buttons to select a system to retreat too. Warning: bot does not know what the valid retreat tiles are, you will need to verify these.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos));
-        } else if (buttonID.startsWith("exhaustAgent_")) {
+        } else if (buttonID.startsWith("exhaustAgent_")) {//"domnaStepThree_"
             ButtonHelperFactionSpecific.exhaustAgent(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("swapSCs_")) {
             ButtonHelperFactionSpecific.resolveSwapSC(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("domnaStepThree_")) {
+            ButtonHelperModifyUnits.resolveDomnaStep3Buttons(event, activeGame, player, buttonID);
+        } else if (buttonID.startsWith("domnaStepTwo_")) {
+            ButtonHelperModifyUnits.offerDomnaStep3Buttons(event, activeGame, player, buttonID);
+        } else if (buttonID.startsWith("domnaStepOne_")) {
+            ButtonHelperModifyUnits.offerDomnaStep2Buttons(event, activeGame, player, buttonID);
         } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {
             ButtonHelperFactionSpecific.resolveSelecteBeforeSwapSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("sardakkcommander_")) {
@@ -963,6 +969,8 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else if (buttonID.startsWith("combatRoll_")) {
             ButtonHelper.resolveCombatRoll(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("echoPlaceFrontier_")) {
+            ButtonHelper.resolveEchoPlaceFrontier(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("forceAbstainForPlayer_")) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Player was forcefully abstained");
             String faction = buttonID.replace("forceAbstainForPlayer_", "");
@@ -2614,6 +2622,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "startArbiter"->{
                     ButtonHelper.resolveImperialArbiter(event, activeGame, player);
                 }
+                case "announceARetreat"->{
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+ " announces a retreat");
+                }
                  case "startQDN"->{
                     ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
                 }
@@ -2998,6 +3009,20 @@ public class ButtonListener extends ListenerAdapter {
 
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                 finalCCs = finalCCs + ". Net CC gain was " + netGain;
+                if(activeGame.getCurrentPhase().equalsIgnoreCase("statusHomework")){
+                    if(player.hasAbility("versatile")|| player.hasTech("hm")){
+                        int properGain = 2;
+                        if(player.hasAbility("versatile")){
+                            properGain = properGain + 1;
+                        }
+                        if(player.hasTech("hm")){
+                            properGain = properGain + 1;
+                        }
+                        if(netGain < properGain){
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "# "+ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, bot thinks you should have gained "+properGain +" cc due to hyper and/or versatile.");
+                        }
+                    }
+                }
             }
             if (!activeGame.isFoWMode()) {
                 if ("Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) {
