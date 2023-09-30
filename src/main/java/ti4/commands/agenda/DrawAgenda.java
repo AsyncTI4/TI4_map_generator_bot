@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -68,6 +69,38 @@ public class DrawAgenda extends AgendaSubcommandData {
                 MessageHelper.sendMessageToUser(sb.toString(), event);
             }
         }
+    }
+
+    public void drawAgenda(int count, Game activeGame, Player player) {
+
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("-----------\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
+        sb.append(ButtonHelper.getTrueIdentity(player, activeGame)).append("\n");
+        sb.append("Drawn Agendas:\n");
+        int index = 1;
+        List<Button> buttons = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Map.Entry<String, Integer> entry = activeGame.drawAgenda();
+            if (entry != null) {
+                sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
+                index++;
+                sb.append("\n");
+                Button top = Button.primary("topAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the top of the agenda deck.");
+                Button bottom = Button.danger("bottomAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the bottom of the agenda deck.");
+                buttons.add(top);
+                buttons.add(bottom);
+            }
+        }
+        sb.append("-----------\n");
+        if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+        }
+            
+        
     }
 
 
