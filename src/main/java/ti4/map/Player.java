@@ -1053,10 +1053,10 @@ public class Player {
         }
     }
 
-    public void initPNs(Game activeGame) {
-        if (activeGame != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+    public void initPNs() {
+        if (getGame() != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeGame, color, faction);
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(getGame(), color, faction);
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
@@ -1100,7 +1100,8 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints(Game activeGame) {
+    public int getPublicVictoryPoints() {
+        Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
@@ -1125,9 +1126,9 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getSecretVictoryPoints(Game activeGame) {
+    public int getSecretVictoryPoints() {
         Map<String, Integer> scoredSecrets = getSecretsScored();
-        for (String id : activeGame.getSoToPoList()) {
+        for (String id : getGame().getSoToPoList()) {
             scoredSecrets.remove(id);
         }
         return scoredSecrets.size();
@@ -1146,8 +1147,8 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getTotalVictoryPoints(Game activeGame) {
-        return getPublicVictoryPoints(activeGame) + getSecretVictoryPoints(activeGame) + getSupportForTheThroneVictoryPoints();
+    public int getTotalVictoryPoints() {
+        return getPublicVictoryPoints() + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
@@ -1276,10 +1277,10 @@ public class Player {
         return allianceMembers.contains(player2.getFaction());
     }
 
-    public List<String> getPlanets(Game activeGame) {
+    public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(planets);
         if (!"".equalsIgnoreCase(allianceMembers)) {
-            for (Player player2 : activeGame.getRealPlayers()) {
+            for (Player player2 : getGame().getRealPlayers()) {
                 if (getAllianceMembers().contains(player2.getFaction())) {
                     newPlanets.addAll(player2.getPlanets());
                 }

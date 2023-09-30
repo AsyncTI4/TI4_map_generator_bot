@@ -1440,12 +1440,12 @@ public class AgendaHelper {
         List<Player> losers = new ArrayList<>();
         int most = 0;
         for (Player p : activeGame.getRealPlayers()) {
-            if (p.getTotalVictoryPoints(activeGame) > most) {
-                most = p.getTotalVictoryPoints(activeGame);
+            if (p.getTotalVictoryPoints() > most) {
+                most = p.getTotalVictoryPoints();
             }
         }
         for (Player p : activeGame.getRealPlayers()) {
-            if (p.getTotalVictoryPoints(activeGame) == most) {
+            if (p.getTotalVictoryPoints() == most) {
                 losers.add(p);
             }
         }
@@ -1456,12 +1456,12 @@ public class AgendaHelper {
         List<Player> losers = new ArrayList<>();
         int least = 20;
         for (Player p : activeGame.getRealPlayers()) {
-            if (p.getTotalVictoryPoints(activeGame) < least) {
-                least = p.getTotalVictoryPoints(activeGame);
+            if (p.getTotalVictoryPoints() < least) {
+                least = p.getTotalVictoryPoints();
             }
         }
         for (Player p : activeGame.getRealPlayers()) {
-            if (p.getTotalVictoryPoints(activeGame) == least) {
+            if (p.getTotalVictoryPoints() == least) {
                 losers.add(p);
             }
         }

@@ -654,7 +654,7 @@ public class Helper {
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         for (String planet : planets) {
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
@@ -778,7 +778,7 @@ public class Helper {
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         if (mahact == null) {
             for (String planet : planets) {
@@ -1838,7 +1838,7 @@ public class Helper {
     }
 
     public static void checkEndGame(Game activeGame, Player player) {
-        if (player.getTotalVictoryPoints(activeGame) >= activeGame.getVp()) {
+        if (player.getTotalVictoryPoints() >= activeGame.getVp()) {
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));

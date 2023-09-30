@@ -54,7 +54,7 @@ public class ButtonHelperFactionSpecific {
         }
         String colorID = Mapper.getColorID(hacan.getColor());
         String mechKey = colorID + "_mf.png";
-        for(String planet : hacan.getPlanets(activeGame)){
+        for(String planet : hacan.getPlanetsAllianceMode()){
             if(planet.contains("custodia")){
                 continue;
             }
@@ -69,7 +69,7 @@ public class ButtonHelperFactionSpecific {
         String origPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<Button>();
-        for(String planet : hacan.getPlanets(activeGame)){
+        for(String planet : hacan.getPlanetsAllianceMode()) {
             if(!planet.equalsIgnoreCase(origPlanet)){
                 buttons.add(Button.secondary("hacanMechTradeStepTwo_"+origPlanet+"_"+receiverFaction+"_"+planet, "Relocate to "+Helper.getPlanetRepresentation(planet, activeGame)));
             }
@@ -340,7 +340,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets(activeGame).contains(planet)) {
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -453,7 +453,7 @@ public class ButtonHelperFactionSpecific {
     public static String getAllOwnedPlanetTypes(Player player, Game activeGame) {
 
         String types = "";
-        for (String planetName : player.getPlanets(activeGame)) {
+        for (String planetName : player.getPlanetsAllianceMode()) {
             if (planetName.contains("custodia")) {
                 continue;
             }
@@ -1483,7 +1483,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isTileCreussIFFSuitable(Game activeGame, Player player, Tile tile) {
-        for (String planet : player.getPlanets(activeGame)) {
+        for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia")) {
                 continue;
             }
@@ -1531,7 +1531,7 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game activeGame, String finChecker) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         List<String> tiles = new ArrayList<>();
         for (String planet : planets) {
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
@@ -1597,7 +1597,7 @@ public class ButtonHelperFactionSpecific {
                 }
                 Planet planetReal = (Planet) unitHolder;
                 String planet = planetReal.getName();
-                if (player.getPlanets(activeGame).contains(planet)) {
+                if (player.getPlanetsAllianceMode().contains(planet)) {
                     String pp = unitHolder.getName();
                     Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_place_infantry_" + pp, "Produce 1 Infantry on " + Helper.getPlanetRepresentation(pp, activeGame));
                     inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
@@ -1947,7 +1947,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getXxchaPeaceAccordsButtons(Game activeGame, Player player, GenericInteractionCreateEvent event, String finChecker) {
         List<String> planetsChecked = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets(activeGame)) {
+        for (String planet : player.getPlanetsAllianceMode()) {
             Tile tile = Helper.getTileFromPlanet(planet, activeGame);
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
@@ -1958,7 +1958,7 @@ public class ButtonHelperFactionSpecific {
                     Planet planetReal2 = (Planet) planetUnit2;
                     String planet2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeGame);
-                    if (!player.getPlanets(activeGame).contains(planet2) && !planetRepresentation2.contains("Mecatol") && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
+                    if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol") && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
                         buttons.add(Button.success(finChecker + "peaceAccords_" + planet2, "Use peace accords to take control of " + planetRepresentation2)
                             .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
@@ -1989,7 +1989,7 @@ public class ButtonHelperFactionSpecific {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (player.getPlanets(activeGame).contains(planet)) {
+            if (player.getPlanetsAllianceMode().contains(planet)) {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_sardakkagent_" + activeGame.getActiveSystem() + "_" + planetId, "Use Sardakk Agent on " + planetRepresentation)
@@ -2010,7 +2010,7 @@ public class ButtonHelperFactionSpecific {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (player.getPlanets(activeGame).contains(planet)) {
+            if (player.getPlanetsAllianceMode().contains(planet)) {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_nomadagentmercer_" + activeGame.getActiveSystem() + "_" + planetId, "Use Nomad Agent General Mercer on " + planetRepresentation)
@@ -2030,7 +2030,7 @@ public class ButtonHelperFactionSpecific {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (player.getPlanets(activeGame).contains(planet) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planet)) {
+            if (player.getPlanetsAllianceMode().contains(planet) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planet)) {
                 String planetId = planetReal.getName();
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeGame);
                 buttons.add(Button.success("exhaustAgent_l1z1xagent_" + activeGame.getActiveSystem() + "_" + planetId, "Use L1Z1X Agent on " + planetRepresentation)

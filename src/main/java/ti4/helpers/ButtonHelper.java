@@ -1613,7 +1613,7 @@ public class ButtonHelper {
                 }
                 Planet planetReal2 = (Planet) planetUnit2;
                 String planet2 = planetReal2.getName();
-                if (!player.getPlanets(activeGame).contains(planet2)) {
+                if (!player.getPlanetsAllianceMode().contains(planet2)) {
                     planets.add(planet2);
                 }
             }
@@ -1629,7 +1629,7 @@ public class ButtonHelper {
             if (p2 == player) {
                 continue;
             }
-            for (String planet2 : p2.getPlanets(activeGame)) {
+            for (String planet2 : p2.getPlanetsAllianceMode()) {
                 PlanetModel mod = Mapper.getPlanet(planet2);
                 if (mod.getLegendaryAbilityName() != null && !"".equals(mod.getLegendaryAbilityName()) && !planetsToCheck.contains(planet2)) {
                     planetsToCheck.add(planet2);
@@ -1968,7 +1968,7 @@ public class ButtonHelper {
             }
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (planetReal.getOriginalPlanetType() != null && player.getPlanets(activeGame).contains(planet) && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (planetReal.getOriginalPlanetType() != null && player.getPlanetsAllianceMode().contains(planet) && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(activeGame, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -2834,7 +2834,7 @@ public class ButtonHelper {
             Tile tile = activeGame.getTileByPosition(pos);
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
-                    if (!player.getPlanets(activeGame).contains(planet.getName()) && !ButtonHelper.isPlanetLegendaryOrHome(unitHolder.getName(), activeGame, false, player)
+                    if (!player.getPlanetsAllianceMode().contains(planet.getName()) && !ButtonHelper.isPlanetLegendaryOrHome(unitHolder.getName(), activeGame, false, player)
                         && !planet.getName().toLowerCase().contains("rex")) {
                         buttons.add(Button.success(finChecker + "stellarConvert_" + planet.getName(), "Stellar Convert " + Helper.getPlanetRepresentation(planet.getName(), activeGame)));
                     }

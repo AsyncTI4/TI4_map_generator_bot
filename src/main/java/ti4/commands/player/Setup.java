@@ -149,7 +149,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING PNs
-        player.initPNs(activeGame);
+        player.initPNs();
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         player.setPromissoryNotesOwned(playerPNs);
 
