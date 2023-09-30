@@ -62,8 +62,8 @@ public class AddAllianceMember extends PlayerSubcommandData {
             player_.addMahactCC(player.getColor());
         }
         String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + Helper.getPlayerRepresentation(player_, activeGame, activeGame.getGuild(), true) + " pinging you into this";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame),msg);
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(activeGame),msg);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg);
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(),msg);
         
         sendMessage("Added "+player_.getFaction() + " as part of "+player.getFaction()+"'s alliance. This works 2 ways");
     }

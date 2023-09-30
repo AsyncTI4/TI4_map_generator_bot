@@ -521,7 +521,7 @@ public class DataMigrationManager {
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
-            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) {
                 continue;
             }

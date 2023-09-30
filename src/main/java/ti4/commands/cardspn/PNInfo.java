@@ -82,7 +82,7 @@ public class PNInfo extends PNCardsSubcommandData {
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
-        if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
+        if (player.hasUnexhaustedLeader("hacanagent")) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
@@ -99,7 +99,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 buttons.add(psycho);
         }
         
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 
    

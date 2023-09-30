@@ -213,7 +213,7 @@ public class Stats extends PlayerSubcommandData {
 	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
 		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " player's current stats:\n");
 
-		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveGame()));
+		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.tg).append(player.getTg());
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());

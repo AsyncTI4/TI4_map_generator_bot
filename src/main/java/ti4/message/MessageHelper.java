@@ -347,7 +347,7 @@ public class MessageHelper {
      */
     public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game activeGame, String messageText) {
         //GET CARDS INFO THREAD
-        ThreadChannel threadChannel = player.getCardsInfoThread(activeGame);
+        ThreadChannel threadChannel = player.getCardsInfoThread();
         if (threadChannel == null) {
             BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeGame.getName());
             return;
@@ -489,7 +489,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, String message, List<MessageEmbed> embeds) {
-			ThreadChannel channel = player.getCardsInfoThread(activeGame);
+			ThreadChannel channel = player.getCardsInfoThread();
 			if (channel == null || embeds == null || embeds.isEmpty()) return;
 			splitAndSent(message, channel);
 			for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message

@@ -273,7 +273,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if(player.hasLeader("mahactagent", activeGame)){
+            if(player.hasLeader("mahactagent")){
                 String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
                 Button placeCCInSystem = Button.success(
                         finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,

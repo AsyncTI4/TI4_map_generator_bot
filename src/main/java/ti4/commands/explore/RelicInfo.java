@@ -48,7 +48,7 @@ public class RelicInfo extends ExploreSubcommandData {
         List<Button> relicButtons = getRelicButtons(activeGame, player);
         if (relicButtons != null && !relicButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(purgeRelicMessage, relicButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
