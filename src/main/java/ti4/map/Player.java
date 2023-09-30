@@ -969,10 +969,18 @@ public class Player {
         return getLeaders().stream().map(Leader::getId).toList();
     }
 
-    public boolean hasLeader(String leaderID) {
-        if (!getLeaderIDs().contains(leaderID) && getLeaderIDs().contains("yssarilagent")) {
+    /**
+     * @param leaderID
+     * @return whether a player has access to this leader, typically by way of Yssaril Agent
+     */
+    public boolean hasExternalAccessToLeader(String leaderID) {
+        if (!hasLeader(leaderID) && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
         }
+        return false;
+    }
+
+    public boolean hasLeader(String leaderID) {
         return getLeaderIDs().contains(leaderID);
     }
 
