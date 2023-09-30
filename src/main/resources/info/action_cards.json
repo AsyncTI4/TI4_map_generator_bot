@@ -1471,7 +1471,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, you can negotiate transactions with players who are not your neighbor and players who resolve transactions gain 1 commodity.",
+    "text": "During this turn, both participating players gain 1 commodity after any transaction is resolved; you can negotiate transactions with players who are not your neighbor.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary. The Nomad's coffers will be filled.\"",
     "source": "action_deck_2"
   },
@@ -1552,7 +1552,7 @@
     "name": "Artifact Research",
     "phase": "Action",
     "window": "When you spend resources to research",
-    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may purge 1 relic fragment to research a technology.",
+    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may purge 2 relic fragments to research 1 additional technology.",
     "flavorText": "The observation team had protested with one voice, threatening to report to their respective governments and return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
   },
@@ -1597,8 +1597,8 @@
     "name": "Border Skirmish",
     "phase": "Action",
     "window": "Action",
-    "text": "Move all units in the space area of any system to an adjacent system that contains a different player's ships. Space combat is resolved in that system; neither player can retreat or resolve abilities that would move their ships. At the end of the first round of combat, move the attacking player's units to the system they originated in; the combat ends in a draw.",
-    "flavorText": "\"Our dominion knows no border.\"",
+    "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to greater than that ship's combat value, they produce 1 hit that must be assigned by the other player to their ships in those systems.",
+    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand. Suddenly, the projection expanded outwards to the edges of the galaxy, \"Our dominion knows no border.\"",
     "source": "action_deck_2"
   },
   {
