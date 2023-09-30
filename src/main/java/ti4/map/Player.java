@@ -970,8 +970,8 @@ public class Player {
     }
 
     public boolean hasLeader(String leaderID) {
-        if (!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, getGame())) {
-            return getLeaderIDs().contains("yssarilagent");
+        if (!getLeaderIDs().contains(leaderID) && getLeaderIDs().contains("yssarilagent")) {
+            return getGame().isLeaderInGame(leaderID);
         }
         return getLeaderIDs().contains(leaderID);
     }

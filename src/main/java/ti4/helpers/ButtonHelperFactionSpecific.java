@@ -1529,16 +1529,6 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static boolean doesAnyoneHaveThisLeader(String leaderID, Game activeGame) {
-        boolean someoneHasIt = false;
-        for (Player player : activeGame.getRealPlayers()) {
-            if (player.hasLeader(leaderID)) {
-                someoneHasIt = true;
-            }
-        }
-        return someoneHasIt;
-    }
-
     public static List<Button> getPlanetPlaceUnitButtonsForMechMitosis(Player player, Game activeGame, String finChecker) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets(activeGame));

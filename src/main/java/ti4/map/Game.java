@@ -2841,4 +2841,11 @@ public class Game {
                     .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
                     .findFirst();
     }
+
+    public boolean isLeaderInGame(String leaderID) {
+        for (Player player : getRealPlayers()) {
+            if (player.getLeaderIDs().contains(leaderID)) return true;
+        }
+        return false;
+    }
 }
