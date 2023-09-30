@@ -62,7 +62,6 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(discardCount).append(")\n");
             info.append(listNames(discard)).append("\n_ _\n");
 
-
             if (player == null || player.getSCs().isEmpty() || over || !activeGame.isFoWMode()) {
                 sendMessage(info.toString());
             }
