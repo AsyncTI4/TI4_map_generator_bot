@@ -711,7 +711,7 @@ public class Helper {
 
         if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
-            if (player.hasUnexhaustedLeader("argentagent", activeGame)) {
+            if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("argent")));
                 unitButtons.add(argentButton);

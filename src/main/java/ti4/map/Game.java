@@ -2101,7 +2101,7 @@ public class Game {
             }
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
-                player.setSecretScored(soID, activeGame);
+                player.setSecretScored(soID);
                 return true;
             }
         }
@@ -2375,12 +2375,12 @@ public class Game {
     }
 
     public void addPlayer(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
     }
 
     public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
         return player;
     }

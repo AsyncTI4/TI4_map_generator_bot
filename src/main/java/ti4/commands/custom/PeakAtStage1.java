@@ -39,6 +39,6 @@ public class PeakAtStage1 extends CustomSubcommandData {
       String sb = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) +
           " **Stage 1 Public Objective at location " + loc1 + "**" + "\n" +
           po.getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), sb);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
     }
 }

@@ -320,7 +320,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         buttons.add(Button.danger("deleteButtons", "Decline to change the next objective"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to resolve", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to resolve", buttons);
     }
 
     public static void augersHeroSwap(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
@@ -330,7 +330,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             activeGame.swapStage2(1, num);
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             ButtonHelper.getTrueIdentity(player, activeGame) + " put the objective at location " + num + " as next up. Feel free to peek at it to confirm it worked");
         GameSaveLoadManager.saveMap(activeGame, event);
         event.getMessage().delete().queue();
@@ -431,7 +431,7 @@ public class ButtonHelperFactionSpecific {
                 }
                 stuffToTransButtons.add(transact);
             }
-            MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeGame), message, stuffToTransButtons);
+            MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
         }
         event.getMessage().delete().queue();
     }
@@ -536,7 +536,7 @@ public class ButtonHelperFactionSpecific {
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(transact);
                         buttons.add(Button.danger("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), msg, buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                     }
                 }
             }
@@ -555,7 +555,7 @@ public class ButtonHelperFactionSpecific {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), msg, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }
@@ -630,7 +630,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveArtunoCheck(Player player, Game activeGame, int tg) {
-        if (player.hasUnexhaustedLeader("nomadagentartuno", activeGame)) {
+        if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg, "Exhaust Artuno with " + tg + " tg"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -975,13 +975,13 @@ public class ButtonHelperFactionSpecific {
             if (cabal == p2) {
                 continue;
             }
-            if (cabal.hasUnexhaustedLeader("cabalagent", activeGame)) {
+            if (cabal.hasUnexhaustedLeader("cabalagent")) {
                 List<Button> buttons = new ArrayList<>();
                 String msg = ButtonHelper.getTrueIdentity(cabal, activeGame) + " you have the ability to use cabal agent on " + ButtonHelper.getIdentOrColor(p2, activeGame) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Button.success("startCabalAgent_" + p2.getFaction(), "Use Agent"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(activeGame), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
         }
     }
@@ -991,7 +991,7 @@ public class ButtonHelperFactionSpecific {
         Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
         List<Button> buttons = getUnitsForCabalAgent(cabal, activeGame, event, p2);
         String msg = ButtonHelper.getTrueIdentity(cabal, activeGame) + " use buttons to capture a ship";
-        MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(activeGame), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1268,7 +1268,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> acButtons = ACInfo.getToBeStolenActionCardButtons(activeGame, victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
@@ -1347,8 +1347,8 @@ public class ButtonHelperFactionSpecific {
         }
         player2.removeActionCard(acNum);
         player.setActionCard(acID);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + "Acquired " + acID);
-        MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + "Acquired " + acID);
+        MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
             "# " + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true) + " Lost " + acID + " to mageon (or perhaps Yssaril hero)");
         ACInfo.sendActionCardInfo(activeGame, player2);
         ACInfo.sendActionCardInfo(activeGame, player);
@@ -1389,7 +1389,7 @@ public class ButtonHelperFactionSpecific {
             player.setTg(player.getTg() + 1);
             MessageHelper.sendMessageToChannel(channel2, pillagerMessage);
             MessageHelper.sendMessageToChannel(channel1, pillagedMessage);
-            if (player.hasUnexhaustedLeader("mentakagent", activeGame)) {
+            if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
                 Button winnuButton = Button.success("exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
@@ -1672,7 +1672,7 @@ public class ButtonHelperFactionSpecific {
             resolveArtunoCheck(player, activeGame, 2);
             String message = trueIdentity + " increased your tgs by 2 (" + (player.getTg() - 2) + "->" + player.getTg() + "). Use buttons in your cards info thread to discard an AC";
             MessageHelper.sendMessageToChannel(channel2, message);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), trueIdentity + " use buttons to discard",
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), trueIdentity + " use buttons to discard",
                 ACInfo.getDiscardActionCardButtons(activeGame, player, false));
         }
 

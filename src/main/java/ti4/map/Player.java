@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -42,6 +43,9 @@ public class Player {
 
     private String userID;
     private String userName;
+
+    @Getter
+    private String  gameID;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -140,10 +144,14 @@ public class Player {
     public Player() {
     }
 
-    public Player(@JsonProperty("userID") String userID,
-        @JsonProperty("userName") String userName) {
+    public Player(@JsonProperty("userID") String userID, @JsonProperty("userName") String userName, @JsonProperty("gameID") String gameID) {
         this.userID = userID;
         this.userName = userName;
+        this.gameID = gameID;
+    }
+
+    public Game getGame() {
+        return GameManager.getInstance().getGame(getGameID());
     }
 
     public Tile getNomboxTile() {
@@ -232,7 +240,8 @@ public class Player {
     }
 
     @JsonIgnore
-    public ThreadChannel getCardsInfoThread(Game activeGame) {
+    public ThreadChannel getCardsInfoThread() {
+        Game activeGame = getGame();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode() || activeGame.isCommunityMode()) actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
@@ -667,9 +676,9 @@ public class Player {
         return secretsScored;
     }
 
-    public void setSecretScored(String id, Game activeGame) {
+    public void setSecretScored(String id) {
         Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = activeGame.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
+        List<Integer> allIDs = getGame().getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -919,8 +928,8 @@ public class Player {
         return leader;
     }
 
-    public boolean hasUnexhaustedLeader(String leaderId, Game activeGame) {
-        if (hasLeader(leaderId, activeGame)) {
+    public boolean hasUnexhaustedLeader(String leaderId) {
+        if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         }
         return false;
@@ -961,11 +970,7 @@ public class Player {
     }
 
     public boolean hasLeader(String leaderID) {
-        return getLeaderIDs().contains(leaderID);
-    }
-
-    public boolean hasLeader(String leaderID, Game activeGame) {
-        if (!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeGame)) {
+        if (!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, getGame())) {
             return getLeaderIDs().contains("yssarilagent");
         }
         return getLeaderIDs().contains(leaderID);
