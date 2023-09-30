@@ -1435,12 +1435,12 @@ public class Player {
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
-    private void doAdditionalThingsWhenRemovingTech(String techID, Game game) {
+    private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     mecatolRex.setSpaceCannonDieCount(0);
                     mecatolRex.setSpaceCannonHitsOn(0);
@@ -1489,9 +1489,9 @@ public class Player {
         if (isRemoved) refreshTech(tech);
     }
 
-    public void removeTech(String tech, Game game) {
+    public void removeTech(String tech) {
         techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech, game);
+        doAdditionalThingsWhenRemovingTech(tech);
     }
 
     public void addPlanet(String planet) {
