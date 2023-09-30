@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -42,6 +43,9 @@ public class Player {
 
     private String userID;
     private String userName;
+
+    @Getter
+    private String  gameID;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -140,10 +144,14 @@ public class Player {
     public Player() {
     }
 
-    public Player(@JsonProperty("userID") String userID,
-        @JsonProperty("userName") String userName) {
+    public Player(@JsonProperty("userID") String userID, @JsonProperty("userName") String userName, @JsonProperty("gameID") String gameID) {
         this.userID = userID;
         this.userName = userName;
+        this.gameID = gameID;
+    }
+
+    public Game getGame() {
+        return GameManager.getInstance().getGame(getGameID());
     }
 
     public Tile getNomboxTile() {
@@ -232,7 +240,8 @@ public class Player {
     }
 
     @JsonIgnore
-    public ThreadChannel getCardsInfoThread(Game activeGame) {
+    public ThreadChannel getCardsInfoThread() {
+        Game activeGame = getGame();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode() || activeGame.isCommunityMode()) actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
@@ -667,9 +676,9 @@ public class Player {
         return secretsScored;
     }
 
-    public void setSecretScored(String id, Game activeGame) {
+    public void setSecretScored(String id) {
         Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = activeGame.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
+        List<Integer> allIDs = getGame().getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -919,8 +928,8 @@ public class Player {
         return leader;
     }
 
-    public boolean hasUnexhaustedLeader(String leaderId, Game activeGame) {
-        if (hasLeader(leaderId, activeGame)) {
+    public boolean hasUnexhaustedLeader(String leaderId) {
+        if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         }
         return false;
@@ -961,12 +970,8 @@ public class Player {
     }
 
     public boolean hasLeader(String leaderID) {
-        return getLeaderIDs().contains(leaderID);
-    }
-
-    public boolean hasLeader(String leaderID, Game activeGame) {
-        if (!getLeaderIDs().contains(leaderID) && ButtonHelperFactionSpecific.doesAnyoneHaveThisLeader(leaderID, activeGame)) {
-            return getLeaderIDs().contains("yssarilagent");
+        if (!getLeaderIDs().contains(leaderID) && getLeaderIDs().contains("yssarilagent")) {
+            return getGame().isLeaderInGame(leaderID);
         }
         return getLeaderIDs().contains(leaderID);
     }
@@ -1048,10 +1053,10 @@ public class Player {
         }
     }
 
-    public void initPNs(Game activeGame) {
-        if (activeGame != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+    public void initPNs() {
+        if (getGame() != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeGame, color, faction);
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(getGame(), color, faction);
             for (String promissoryNote : promissoryNotes) {
                 if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
@@ -1095,7 +1100,8 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints(Game activeGame) {
+    public int getPublicVictoryPoints() {
+        Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
@@ -1120,9 +1126,9 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getSecretVictoryPoints(Game activeGame) {
+    public int getSecretVictoryPoints() {
         Map<String, Integer> scoredSecrets = getSecretsScored();
-        for (String id : activeGame.getSoToPoList()) {
+        for (String id : getGame().getSoToPoList()) {
             scoredSecrets.remove(id);
         }
         return scoredSecrets.size();
@@ -1141,8 +1147,8 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getTotalVictoryPoints(Game activeGame) {
-        return getPublicVictoryPoints(activeGame) + getSecretVictoryPoints(activeGame) + getSupportForTheThroneVictoryPoints();
+    public int getTotalVictoryPoints() {
+        return getPublicVictoryPoints() + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
@@ -1271,10 +1277,10 @@ public class Player {
         return allianceMembers.contains(player2.getFaction());
     }
 
-    public List<String> getPlanets(Game activeGame) {
+    public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(planets);
         if (!"".equalsIgnoreCase(allianceMembers)) {
-            for (Player player2 : activeGame.getRealPlayers()) {
+            for (Player player2 : getGame().getRealPlayers()) {
                 if (getAllianceMembers().contains(player2.getFaction())) {
                     newPlanets.addAll(player2.getPlanets());
                 }
@@ -1384,23 +1390,23 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String techID, Game game) {
+    public void addTech(String techID) {
         if (techs.contains(techID)) {
             return;
         }
         techs.add(techID);
 
-        doAdditionalThingsWhenAddingTech(techID, game);
+        doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void doAdditionalThingsWhenAddingTech(String techID, Game game) {
+    private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
 
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
@@ -1430,12 +1436,12 @@ public class Player {
     }
 
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
-    private void doAdditionalThingsWhenRemovingTech(String techID, Game game) {
+    private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     mecatolRex.setSpaceCannonDieCount(0);
                     mecatolRex.setSpaceCannonHitsOn(0);
@@ -1484,9 +1490,9 @@ public class Player {
         if (isRemoved) refreshTech(tech);
     }
 
-    public void removeTech(String tech, Game game) {
+    public void removeTech(String tech) {
         techs.remove(tech);
-        doAdditionalThingsWhenRemovingTech(tech, game);
+        doAdditionalThingsWhenRemovingTech(tech);
     }
 
     public void addPlanet(String planet) {

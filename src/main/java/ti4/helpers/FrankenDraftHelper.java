@@ -122,9 +122,9 @@ public class FrankenDraftHelper {
                 PromptPlayerBagSelection(activeGame, player);
             }
            
-           MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
+           MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         } else {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), msg);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             PassBags(activeGame);
         }
 
@@ -134,12 +134,12 @@ public class FrankenDraftHelper {
     }
 
     private static void DisplayPlayerDraftQueue(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "You are drafting the following from this bag: \n"+getDraftQueueRepresentation(activeGame, player));
     }
 
     private static void DisplayPlayerHand(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "Your current Hand of drafted cards: \n" + getCurrentPersonalBagRepresentation(activeGame, player));
     }
 
@@ -163,7 +163,7 @@ public class FrankenDraftHelper {
         players.get(players.size()-1).setCurrentFrankenBag(firstPlayerBag);
 
         for(Player p2 : activeGame.getRealPlayers()){
-            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a new bag of cards!");
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a new bag of cards!");
             DisplayPlayerCurrentBag(activeGame, p2);
             PromptPlayerBagSelection(activeGame, p2);
             DisplayPlayerHand(activeGame, p2);
@@ -172,12 +172,12 @@ public class FrankenDraftHelper {
     }
 
     private static void PromptPlayerBagSelection(Game activeGame, Player p2) {
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 ButtonHelper.getTrueIdentity(p2, activeGame)+"Please select a card to draft:", getFrankenBagButtons(activeGame, p2));
     }
 
     private static void DisplayPlayerCurrentBag(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame),
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 ButtonHelper.getTrueIdentity(player, activeGame)+"Your current draft bag contains: \n"+getCurrentBagToPassRepresentation(activeGame, player));
     }
 
@@ -377,7 +377,7 @@ public class FrankenDraftHelper {
             player.resetFrankenItemDraftQueue();
             player.setReadyToPassBag(false);
 
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun!");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun!");
             DisplayPlayerCurrentBag(activeGame, player);
             PromptPlayerBagSelection(activeGame, player);
         }

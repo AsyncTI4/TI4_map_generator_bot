@@ -191,7 +191,7 @@ public class GameEnd extends GameSubcommandData {
         for (Player player : players.values()) {
             if (player.getFaction() == null || player.isDummy()) continue;
             
-            int playerVP = player.getTotalVictoryPoints(activeGame);
+            int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
             sb.append(Helper.getColourAsMention(AsyncTI4DiscordBot.guildPrimary, player.getColor()));
