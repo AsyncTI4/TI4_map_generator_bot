@@ -129,12 +129,17 @@ public class BotLogger {
             }
         }
         if (botLogChannel == null && AsyncTI4DiscordBot.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
-            for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
-                if ("bot-log".equals(textChannel.getName())) {
-                    botLogChannel = textChannel;
-                }
-            }
+            botLogChannel = getPrimaryBotLogChannel();
         }
         return botLogChannel;
+    }
+
+    public static TextChannel getPrimaryBotLogChannel() {
+        for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
+            if ("bot-log".equals(textChannel.getName())) {
+                return textChannel;
+            }
+        }
+        return null;
     }
 }

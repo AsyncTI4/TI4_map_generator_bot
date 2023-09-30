@@ -60,10 +60,10 @@ public class DrawAgenda extends AgendaSubcommandData {
                 if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
                    // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
 
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
                 } else {
                     //MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
                 }
             } else {
                 MessageHelper.sendMessageToUser(sb.toString(), event);

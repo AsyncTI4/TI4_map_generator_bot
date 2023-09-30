@@ -292,7 +292,7 @@ public class Turn extends PlayerSubcommandData {
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(activeGame), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
 
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");

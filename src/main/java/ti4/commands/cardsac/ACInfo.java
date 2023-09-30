@@ -130,7 +130,7 @@ public class ACInfo extends ACCardsSubcommandData {
         if (!acButtons.isEmpty()) {
             
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
@@ -185,7 +185,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
-            if (player.hasUnexhaustedLeader("nekroagent", activeGame)) {
+            if (player.hasUnexhaustedLeader("nekroagent")) {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
                 acButtons.add(nekroButton);
             }
