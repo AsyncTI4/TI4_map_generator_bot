@@ -58,9 +58,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
         sb.append("\n\n");
 
-        Set<Player> neighbours = Helper.getNeighbouringPlayers(activeGame, player);
-
-        for (Player player_ : neighbours) {
+        for (Player player_ : player.getNeighbouringPlayers()) {
             sb.append("_ _\n**__");
             sb.append(player_.getFactionEmoji());
             sb.append(Helper.getColourAsMention(event.getGuild(), player_.getColor())).append(" ");

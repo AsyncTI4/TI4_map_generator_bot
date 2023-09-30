@@ -2848,4 +2848,16 @@ public class Game {
         }
         return false;
     }
+
+    public Tile getTileFromPlanet(String planetName) {
+        for (Tile tile_ : getTileMap().values()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                    return tile_;
+                }
+            }
+        }
+        return null;
+    }
+    
 }

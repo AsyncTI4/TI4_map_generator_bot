@@ -216,12 +216,12 @@ public class ButtonHelperFactionSpecific {
         units.addAll(oriPlanet.getUnits().keySet());
         for(String unit: oriPlanet.getUnits().keySet()){
             int amount = oriPlanet.getUnits().get(unit);
-             String cID = Mapper.getColorID(hacan.getColor());
-             String unitKey = unit.replace(cID + "_", "");
+            String cID = Mapper.getColorID(hacan.getColor());
+            String unitKey = unit.replace(cID + "_", "");
             unitKey = unitKey.replace(".png", "");
             unitKey = ButtonHelper.getUnitName(unitKey);
-            new RemoveUnits().unitParsing(event, hacan.getColor(), Helper.getTileFromPlanet(origPlanet, activeGame), amount + " "+unitKey + " "+origPlanet, activeGame);
-             new AddUnits().unitParsing(event, hacan.getColor(), Helper.getTileFromPlanet(newPlanet, activeGame), amount + " "+unitKey + " "+newPlanet, activeGame);
+            new RemoveUnits().unitParsing(event, hacan.getColor(), activeGame.getTileFromPlanet(origPlanet), amount + " "+unitKey + " "+origPlanet, activeGame);
+            new AddUnits().unitParsing(event, hacan.getColor(), activeGame.getTileFromPlanet(newPlanet), amount + " "+unitKey + " "+newPlanet, activeGame);
         }
         Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, receiverFaction);
         new PlanetAdd().doAction(p2, origPlanet, activeGame, event);
@@ -494,7 +494,7 @@ public class ButtonHelperFactionSpecific {
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true);
                 String message = trueIdentity + " Due to your IIHQ tech, you get to gain 2 commmand counters when someone scores an imperial point.";
-                String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(p2) + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + p2.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message2, buttons);
                 break;
@@ -844,7 +844,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveFollowUpIndoctrinationQuestion(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
-        Tile tile = Helper.getTileFromPlanet(planet, activeGame);
+        Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, activeGame);
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
@@ -892,7 +892,7 @@ public class ButtonHelperFactionSpecific {
 
             Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
-            if (player.getTg() > 2 && Helper.getNeighbouringPlayers(activeGame, player).contains(pillager)) {
+            if (player.getTg() > 2 && player.getNeighbouringPlayers().contains(pillager)) {
                 List<Button> buttons = new ArrayList<>();
                 String playerIdent = StringUtils.capitalize(player.getFaction());
                 MessageChannel channel = activeGame.getMainGameChannel();
@@ -1309,11 +1309,11 @@ public class ButtonHelperFactionSpecific {
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
             message = "Rejected Distant Suns Ability";
-            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeGame), info[1], info[2],
+            new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 1, false);
         } else {
             message = "Exploring twice";
-            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeGame), info[1], info[2],
+            new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 2, false);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -1487,10 +1487,10 @@ public class ButtonHelperFactionSpecific {
             if (planet.toLowerCase().contains("custodia")) {
                 continue;
             }
-            if (Helper.getTileFromPlanet(planet, activeGame) == null) {
+            if (activeGame.getTileFromPlanet(planet) == null) {
                 continue;
             }
-            if (Helper.getTileFromPlanet(planet, activeGame).getPosition().equalsIgnoreCase(tile.getPosition())) {
+            if (activeGame.getTileFromPlanet(planet).getPosition().equalsIgnoreCase(tile.getPosition())) {
                 return true;
             }
         }
@@ -1579,8 +1579,8 @@ public class ButtonHelperFactionSpecific {
         String planetDestination = buttonID.split("_")[1];
         String planetRemoval = buttonID.split("_")[2];
         String unit = buttonID.split("_")[3];
-        new RemoveUnits().unitParsing(event, player.getColor(), Helper.getTileFromPlanet(planetRemoval, activeGame), unit + " " + planetRemoval, activeGame);
-        new AddUnits().unitParsing(event, player.getColor(), Helper.getTileFromPlanet(planetDestination, activeGame), unit + " " + planetDestination, activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetRemoval), unit + " " + planetRemoval, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetDestination), unit + " " + planetDestination, activeGame);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             ident + " moved 1 " + unit + " from " + Helper.getPlanetRepresentation(planetRemoval, activeGame) + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame));
     }
@@ -1651,7 +1651,7 @@ public class ButtonHelperFactionSpecific {
             Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
             Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-            String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player) + ". Use buttons to gain CCs";
+            String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
 
@@ -1863,10 +1863,10 @@ public class ButtonHelperFactionSpecific {
 
         String message = ident + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to " + planetRepresentation + " using Sardakk Commander";
         new RemoveUnits().unitParsing(event, p1.getColor(),
-            Helper.getTileFromPlanet(planet2, activeGame), "1 " + mechorInf + " " + planet2,
+            activeGame.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2,
             activeGame);
         new AddUnits().unitParsing(event, p1.getColor(),
-            Helper.getTileFromPlanet(planet1, activeGame), "1 " + mechorInf + " " + planet1,
+            activeGame.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
             activeGame);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), message);
@@ -1948,7 +1948,7 @@ public class ButtonHelperFactionSpecific {
         List<String> planetsChecked = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
-            Tile tile = Helper.getTileFromPlanet(planet, activeGame);
+            Tile tile = activeGame.getTileFromPlanet(planet);
             for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tile2 = activeGame.getTileByPosition(pos2);
                 for (UnitHolder planetUnit2 : tile2.getUnitHolders().values()) {
