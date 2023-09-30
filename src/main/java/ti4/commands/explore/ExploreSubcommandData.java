@@ -375,7 +375,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
-                String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player) + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }

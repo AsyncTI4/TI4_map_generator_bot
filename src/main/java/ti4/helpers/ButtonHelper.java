@@ -1171,7 +1171,7 @@ public class ButtonHelper {
         Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
         List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
         String trueIdentity = Helper.getPlayerRepresentation(target, activeGame, activeGame.getGuild(), true);
-        String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(target) + ". Use buttons to gain CCs";
+        String message2 = trueIdentity + "! Your current CCs are " + target.getCCRepresentation() + ". Use buttons to gain CCs";
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), message2, buttons);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), ButtonHelper.getTrueIdentity(target, activeGame)
             + " You've been hit with the Mahact mech ability. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",

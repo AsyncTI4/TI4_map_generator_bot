@@ -1081,6 +1081,10 @@ public class Player {
         }
     }
 
+    public String getCCRepresentation() {
+        return getTacticalCC() + "/" + getFleetCC() + "/" + getStrategicCC();
+    }
+
     public int getTacticalCC() {
         return tacticalCC;
     }

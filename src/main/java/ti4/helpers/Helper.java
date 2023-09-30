@@ -1878,11 +1878,6 @@ public class Helper {
 
     }
 
-    public static String getPlayerCCs(Player player) {
-        return player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-
-    }
-
     public static boolean mechCheck(String planetName, Game activeGame, Player player) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
