@@ -205,13 +205,25 @@ public class AutoCompleteProvider {
             }
             case Constants.AGENDA_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> agendas = Mapper.getAgendaJustNames(activeGame);
-                List<Command.Choice> options = agendas.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                switch (subCommandName) {
+                    case Constants.REVEAL_SPECIFIC -> {
+                        List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                                .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                    default -> {
+                        HashMap<String, String> agendas = Mapper.getAgendaJustNames(activeGame);
+                        List<Command.Choice> options = agendas.entrySet().stream()
+                                .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                                .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
             }
             case Constants.AC_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();

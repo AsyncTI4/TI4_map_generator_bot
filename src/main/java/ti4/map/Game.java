@@ -1772,6 +1772,14 @@ public class Game {
         return id;
     }
 
+    public boolean revealAgenda(String agendaID, boolean force) {
+        if (agendas.remove(agendaID) || force) {
+            addDiscardAgenda(agendaID);
+            return true;
+        }
+        return false;
+    }
+
     public boolean discardSpecificAgenda(String agendaID) {
         boolean succeeded = agendas.remove(agendaID);
         if (succeeded) {
@@ -2093,7 +2101,7 @@ public class Game {
             }
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
-                player.setSecretScored(soID, activeGame);
+                player.setSecretScored(soID);
                 return true;
             }
         }
@@ -2367,12 +2375,12 @@ public class Game {
     }
 
     public void addPlayer(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
     }
 
     public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
         return player;
     }
@@ -2833,4 +2841,23 @@ public class Game {
                     .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
                     .findFirst();
     }
+
+    public boolean isLeaderInGame(String leaderID) {
+        for (Player player : getRealPlayers()) {
+            if (player.getLeaderIDs().contains(leaderID)) return true;
+        }
+        return false;
+    }
+
+    public Tile getTileFromPlanet(String planetName) {
+        for (Tile tile_ : getTileMap().values()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                    return tile_;
+                }
+            }
+        }
+        return null;
+    }
+    
 }

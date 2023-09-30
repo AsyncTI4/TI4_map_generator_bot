@@ -343,6 +343,7 @@ public class Emojis {
 
     // HOMEBREW
     public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; //Symbol for Will's Action Deck 2 mod
+    public static final String Eronous = "<:eronous:1157307622920290444>"; //Symbol for Eronous' stuff
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols =

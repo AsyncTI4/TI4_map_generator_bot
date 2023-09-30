@@ -12,7 +12,7 @@ public class TechRemove extends TechAddRemove {
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        player.removeTech(techID, getActiveGame());
+        player.removeTech(techID);
         sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " removed tech: " + Helper.getTechRepresentation(techID));
     }
 }

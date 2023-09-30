@@ -1,6 +1,5 @@
 package ti4;
 
-import java.io.Console;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.dv8tion.jda.api.JDA;
@@ -69,6 +68,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AsyncTI4DiscordBot {
 
+    public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
     public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(
         Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
@@ -108,7 +108,7 @@ public class AsyncTI4DiscordBot {
             MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
-        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Starting Up"));
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
@@ -262,7 +262,7 @@ public class AsyncTI4DiscordBot {
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING MAPS: " + guildPrimary.getName());
-        jda.getPresence().setActivity(Activity.playing("Loading Maps"));
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Maps"));
         GameSaveLoadManager.loadMaps();
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
@@ -277,7 +277,7 @@ public class AsyncTI4DiscordBot {
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Restarting"));
+                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` LONGER ACCEPTING COMMANDS");
@@ -288,9 +288,6 @@ public class AsyncTI4DiscordBot {
                 GameSaveLoadManager.saveMaps();
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
-                TimeUnit.SECONDS.sleep(5);
-                jda.shutdown();
-                jda.awaitShutdown();
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
