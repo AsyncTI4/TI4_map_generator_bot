@@ -90,8 +90,8 @@ public class ButtonHelper {
 
     public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
         if (player == player2 || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player.hasAbility("guild_ships") || player.getPromissoryNotes().containsKey("convoys")
-            || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeGame, player2).contains(player)
-            || Helper.getNeighbouringPlayers(activeGame, player).contains(player2)) {
+            || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || player2.getNeighbouringPlayers().contains(player)
+            || player.getNeighbouringPlayers().contains(player2)) {
             return;
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
@@ -556,7 +556,7 @@ public class ButtonHelper {
                     if (activeGame.isFoWMode()) {
                         channel = player.getPrivateChannel();
                     }
-                    int numOfNeighbors = Helper.getNeighbourCount(activeGame, player);
+                    int numOfNeighbors = player.getNeighbourCount();
                     StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
                     message.append(" Minister of Commerce triggered, your tgs have increased due to your ");
                     message.append(numOfNeighbors).append(" neighbors (").append(player.getTg()).append("->").append(player.getTg() + numOfNeighbors).append(")");
@@ -649,7 +649,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " lost 1 fleet cc due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
                 }
             }
-            if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && Helper.playerHasProductionUnitInSystem(activeSystem, activeGame, nonActivePlayer)) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the arborec commander");
@@ -662,7 +662,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Arborec commander ", buttons);
                 }
             }
-            if (nonActivePlayer.hasUnit("mahact_mech") && Helper.playerHasMechInSystem(activeSystem, activeGame, nonActivePlayer) && nonActivePlayer.getMahactCC().contains(player.getColor())) {
+            if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor())) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger an opportunity for a mahact mech trigger");
@@ -987,7 +987,7 @@ public class ButtonHelper {
                 }
             }
             case "empyrean" -> {
-                if (Helper.getNeighbourCount(activeGame, player) > (activeGame.getRealPlayers().size() - 2)) {
+                if (player.getNeighbourCount() > (activeGame.getRealPlayers().size() - 2)) {
                     shouldBeUnlocked = true;
                 }
             }

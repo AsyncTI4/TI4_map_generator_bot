@@ -1902,73 +1902,6 @@ public class Helper {
 
     }
 
-    public static boolean playerHasMechInSystem(Tile tile, Game activeGame, Player player) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean playerHasProductionUnitInSystem(Tile tile, Game activeGame, Player player) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey;
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-            mechKey = colorID + "_sd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-            mechKey = colorID + "_csd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-            if (player.hasUnit("arborec_mech")) {
-                mechKey = colorID + "_mf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
-                    return true;
-                }
-            }
-            if (player.hasUnit("arborec_infantry") || player.hasTech("lw2")) {
-                mechKey = colorID + "_gf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static Set<Player> getNeighbouringPlayers(Game activeGame, Player player) {
-        Set<Player> adjacentPlayers = new HashSet<>();
-        Set<Player> realPlayers = new HashSet<>(activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
-
-        Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(activeGame, tile, player)) {
-                playersTiles.add(tile);
-            }
-        }
-
-        for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(activeGame, tile.getPosition(), false));
-            if (realPlayers.size() == adjacentPlayers.size()) break;
-        }
-        adjacentPlayers.remove(player);
-        return adjacentPlayers;
-    }
-
-    public static int getNeighbourCount(Game activeGame, Player player) {
-        return getNeighbouringPlayers(activeGame, player).size();
-    }
-
     /**
      * @return List of Strings
      */
@@ -2023,6 +1956,7 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
+    @Deprecated
     public static boolean isFakeAttachment(String attachmentName) {
         attachmentName = AliasHandler.resolveAttachment(attachmentName);
         return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);

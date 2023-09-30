@@ -14,6 +14,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
@@ -1811,5 +1812,73 @@ public class Player {
 
     public boolean hasCustodiaVigilia() {
         return planets.contains("custodiavigilia");
+    }
+
+    public boolean hasMechInSystem(Tile tile) {
+        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        String colorID = Mapper.getColorID(getColor());
+        String mechKey = colorID + "_mf.png";
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
+
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasProductionUnitInSystem(Tile tile) {
+        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        String colorID = Mapper.getColorID(getColor());
+        String mechKey;
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
+            mechKey = colorID + "_sd.png";
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return true;
+            }
+            mechKey = colorID + "_csd.png";
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return true;
+            }
+            if (hasUnit("arborec_mech")) {
+                mechKey = colorID + "_mf.png";
+                if (unitHolder.getUnits().get(mechKey) != null) {
+                    return true;
+                }
+            }
+            if (hasUnit("arborec_infantry") || hasTech("lw2")) {
+                mechKey = colorID + "_gf.png";
+                if (unitHolder.getUnits().get(mechKey) != null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Set<Player> getNeighbouringPlayers() {
+        Game activeGame = getGame();
+        Set<Player> adjacentPlayers = new HashSet<>();
+        Set<Player> realPlayers = new HashSet<>(activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
+
+        Set<Tile> playersTiles = new HashSet<>();
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if (FoWHelper.playerIsInSystem(activeGame, tile, this)) {
+                playersTiles.add(tile);
+            }
+        }
+
+        for (Tile tile : playersTiles) {
+            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(activeGame, tile.getPosition(), false));
+            if (realPlayers.size() == adjacentPlayers.size()) break;
+        }
+        adjacentPlayers.remove(this);
+        return adjacentPlayers;
+    }
+
+    public int getNeighbourCount() {
+        return getNeighbouringPlayers().size();
     }
 }

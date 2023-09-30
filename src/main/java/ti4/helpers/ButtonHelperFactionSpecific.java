@@ -892,7 +892,7 @@ public class ButtonHelperFactionSpecific {
 
             Player pillager = Helper.getPlayerFromAbility(activeGame, "pillage");
             String finChecker = "FFCC_" + pillager.getFaction() + "_";
-            if (player.getTg() > 2 && Helper.getNeighbouringPlayers(activeGame, player).contains(pillager)) {
+            if (player.getTg() > 2 && player.getNeighbouringPlayers().contains(pillager)) {
                 List<Button> buttons = new ArrayList<>();
                 String playerIdent = StringUtils.capitalize(player.getFaction());
                 MessageChannel channel = activeGame.getMainGameChannel();
