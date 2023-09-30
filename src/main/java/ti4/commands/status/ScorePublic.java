@@ -58,7 +58,7 @@ public class ScorePublic extends StatusSubcommandData {
         String poName = both.split("_")[0];
         if(poName.toLowerCase().contains("push boundaries")){
 			int aboveN = 0;
-			for(Player p2 : Helper.getNeighbouringPlayers(activeGame, player)){
+			for(Player p2 : player.getNeighbouringPlayers()){
 				if(player.getPlanets().size() > p2.getPlanets().size()){
 					aboveN = aboveN + 1;
 				}

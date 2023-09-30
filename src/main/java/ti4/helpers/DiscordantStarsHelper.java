@@ -37,7 +37,7 @@ public class DiscordantStarsHelper {
         for (Player player : activeGame.getPlayers().values()) {
             if (player.ownsUnit("edyn_mech")) {
                 for (Tile tile : activeGame.getTileMap().values()) {
-                    if (Helper.playerHasMechInSystem(tile, activeGame, player)) {
+                    if (player.hasMechInSystem(tile)) {
                         tile.addToken(Constants.SIGIL, Constants.SPACE);
                     } else {
                         tile.removeToken(Constants.SIGIL, Constants.SPACE);

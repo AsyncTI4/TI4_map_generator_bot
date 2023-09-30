@@ -1935,7 +1935,7 @@ public class AgendaHelper {
 
         //Absol's Syncretone - +1 vote for each neighbour
         if (player.hasRelicReady("absol_syncretone")) {
-            int count = Helper.getNeighbourCount(activeGame, player);
+            int count = player.getNeighbourCount();
             additionalVotesAndSources.put(Emojis.Relic + "Syncretone", count);
         }
 
