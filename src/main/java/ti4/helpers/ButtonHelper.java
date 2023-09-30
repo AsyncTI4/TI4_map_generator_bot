@@ -267,7 +267,7 @@ public class ButtonHelper {
             amount = "1";
         }
 
-        Tile tile = Helper.getTileFromPlanet(planet, activeGame);
+        Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, amount + " inf " + planet, activeGame);
         player.setStasisInfantry(player.getStasisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
@@ -1473,7 +1473,7 @@ public class ButtonHelper {
         if (!planetHolder.getName().toLowerCase().contains("rex") && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
             if (onlyIncludeYourHome && p1 != null && p1.getPlayerStatsAnchorPosition() != null) {
 
-                if (Helper.getTileFromPlanet(planetName, activeGame).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
+                if (activeGame.getTileFromPlanet(planetName).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
                     hasAbility = true;
                 }
                 if (p1.getFaction().equalsIgnoreCase("ghost") && planetName.equalsIgnoreCase("creuss")) {
@@ -1623,7 +1623,7 @@ public class ButtonHelper {
 
     public static List<Button> customRexLegendary(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
-        Tile rex = Helper.getTileFromPlanet("mr", activeGame);
+        Tile rex = activeGame.getTileFromPlanet("mr");
         List<String> planetsToCheck = getAllPlanetsAdjacentToTileNotOwnedByPlayer(rex, activeGame, player);
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
@@ -1676,7 +1676,7 @@ public class ButtonHelper {
         Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
         String mechOrInf = buttonID.split("_")[3];
         String msg = ident + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on " + Helper.getPlanetRepresentation(planet, activeGame);
-        new RemoveUnits().unitParsing(event, p2.getColor(), Helper.getTileFromPlanet(planet, activeGame), "1 " + mechOrInf + " " + planet, activeGame);
+        new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "1 " + mechOrInf + " " + planet, activeGame);
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), msg);
         event.getMessage().delete().queue();
     }
@@ -2373,7 +2373,7 @@ public class ButtonHelper {
     }
 
     public static UnitHolder getUnitHolderFromPlanetName(String planetName, Game activeGame) {
-        Tile tile = Helper.getTileFromPlanet(AliasHandler.resolvePlanet(planetName), activeGame);
+        Tile tile = activeGame.getTileFromPlanet(AliasHandler.resolvePlanet(planetName));
         if (tile == null) {
             return null;
         }
@@ -3896,7 +3896,7 @@ public class ButtonHelper {
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                 || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
             if (!"mr".equalsIgnoreCase(planet) && !"custodiavigilia".equalsIgnoreCase(planet) && !oneOfThree) {
-                return Helper.getTileFromPlanet(planet, activeGame);
+                return activeGame.getTileFromPlanet(planet);
             }
         }
 
@@ -4086,7 +4086,7 @@ public class ButtonHelper {
                             String titanshero = Mapper.getTokenID("titanshero");
                             System.out.println(titanshero);
                             Tile t = activeGame.getTile(AliasHandler.resolveTile(p1.getFaction()));
-                            if (Helper.getTileFromPlanet("elysium", activeGame) != null && Helper.getTileFromPlanet("elysium", activeGame).getPosition().equalsIgnoreCase(t.getPosition())) {
+                            if (activeGame.getTileFromPlanet("elysium") != null && activeGame.getTileFromPlanet("elysium").getPosition().equalsIgnoreCase(t.getPosition())) {
                                 t.addToken("attachment_titanshero.png", "elysium");
                                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
                                 new PlanetRefresh().doAction(p1, "elysium", activeGame);

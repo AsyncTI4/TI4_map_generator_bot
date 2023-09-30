@@ -591,7 +591,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("movedNExplored_")) {
             String bID = buttonID.replace("movedNExplored_", "");
             String[] info = bID.split("_");
-            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeGame), info[1], info[2], player, false, activeGame, 1, false);
+            new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false, activeGame, 1, false);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperFactionSpecific.distantSuns(buttonID, event, activeGame, player, ident);
@@ -611,7 +611,7 @@ public class ButtonListener extends ListenerAdapter {
             String[] info = bID.split("_");
             String cardID = info[0];
             String planetName = info[1];
-            Tile tile = Helper.getTileFromPlanet(planetName, activeGame);
+            Tile tile = activeGame.getTileFromPlanet(planetName);
             String messageText = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
                 "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
                 "> " + new ExpPlanet().displayExplore(cardID);

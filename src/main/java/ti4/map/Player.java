@@ -45,7 +45,6 @@ public class Player {
     private String userID;
     private String userName;
 
-    @Getter
     private String  gameID;
 
     private boolean passed;
@@ -152,7 +151,7 @@ public class Player {
     }
 
     public Game getGame() {
-        return GameManager.getInstance().getGame(getGameID());
+        return GameManager.getInstance().getGame(this.gameID);
     }
 
     public Tile getNomboxTile() {
@@ -853,6 +852,13 @@ public class Player {
             return factionEmoji;
         }
         return Helper.getFactionIconFromDiscord(getFaction());
+    }
+
+    public String getFactionEmojiOrColour() {
+        if (getGame().isFoWMode()) {
+            return Helper.getColourAsMention(getGame().getGuild(), getColor());
+        }
+        return getFactionEmoji();
     }
 
     public void setFactionEmoji(String factionEmoji) {
