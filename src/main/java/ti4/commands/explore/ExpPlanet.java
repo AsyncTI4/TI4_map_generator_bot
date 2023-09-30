@@ -42,7 +42,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet not found in map");
             return;
         }
-        Tile tile = Helper.getTileFromPlanet(planetName, activeGame);
+        Tile tile = activeGame.getTileFromPlanet(planetName);
         if (tile == null) {
             sendMessage("System not found that contains planet");
             return;

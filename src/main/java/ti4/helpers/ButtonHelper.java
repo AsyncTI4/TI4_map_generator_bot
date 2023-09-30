@@ -90,8 +90,8 @@ public class ButtonHelper {
 
     public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
         if (player == player2 || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player.hasAbility("guild_ships") || player.getPromissoryNotes().containsKey("convoys")
-            || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeGame, player2).contains(player)
-            || Helper.getNeighbouringPlayers(activeGame, player).contains(player2)) {
+            || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || player2.getNeighbouringPlayers().contains(player)
+            || player.getNeighbouringPlayers().contains(player2)) {
             return;
         }
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
@@ -267,7 +267,7 @@ public class ButtonHelper {
             amount = "1";
         }
 
-        Tile tile = Helper.getTileFromPlanet(planet, activeGame);
+        Tile tile = activeGame.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, amount + " inf " + planet, activeGame);
         player.setStasisInfantry(player.getStasisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
@@ -556,7 +556,7 @@ public class ButtonHelper {
                     if (activeGame.isFoWMode()) {
                         channel = player.getPrivateChannel();
                     }
-                    int numOfNeighbors = Helper.getNeighbourCount(activeGame, player);
+                    int numOfNeighbors = player.getNeighbourCount();
                     StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
                     message.append(" Minister of Commerce triggered, your tgs have increased due to your ");
                     message.append(numOfNeighbors).append(" neighbors (").append(player.getTg()).append("->").append(player.getTg() + numOfNeighbors).append(")");
@@ -649,7 +649,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " lost 1 fleet cc due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
                 }
             }
-            if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && Helper.playerHasProductionUnitInSystem(activeSystem, activeGame, nonActivePlayer)) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the arborec commander");
@@ -662,7 +662,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Arborec commander ", buttons);
                 }
             }
-            if (nonActivePlayer.hasUnit("mahact_mech") && Helper.playerHasMechInSystem(activeSystem, activeGame, nonActivePlayer) && nonActivePlayer.getMahactCC().contains(player.getColor())) {
+            if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor())) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger an opportunity for a mahact mech trigger");
@@ -987,7 +987,7 @@ public class ButtonHelper {
                 }
             }
             case "empyrean" -> {
-                if (Helper.getNeighbourCount(activeGame, player) > (activeGame.getRealPlayers().size() - 2)) {
+                if (player.getNeighbourCount() > (activeGame.getRealPlayers().size() - 2)) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -1171,7 +1171,7 @@ public class ButtonHelper {
         Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
         List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
         String trueIdentity = Helper.getPlayerRepresentation(target, activeGame, activeGame.getGuild(), true);
-        String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(target) + ". Use buttons to gain CCs";
+        String message2 = trueIdentity + "! Your current CCs are " + target.getCCRepresentation() + ". Use buttons to gain CCs";
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), message2, buttons);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), ButtonHelper.getTrueIdentity(target, activeGame)
             + " You've been hit with the Mahact mech ability. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
@@ -1473,7 +1473,7 @@ public class ButtonHelper {
         if (!planetHolder.getName().toLowerCase().contains("rex") && !planetHolder.getName().toLowerCase().contains("mr") && !oneOfThree) {
             if (onlyIncludeYourHome && p1 != null && p1.getPlayerStatsAnchorPosition() != null) {
 
-                if (Helper.getTileFromPlanet(planetName, activeGame).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
+                if (activeGame.getTileFromPlanet(planetName).getPosition().equalsIgnoreCase(p1.getPlayerStatsAnchorPosition())) {
                     hasAbility = true;
                 }
                 if (p1.getFaction().equalsIgnoreCase("ghost") && planetName.equalsIgnoreCase("creuss")) {
@@ -1623,7 +1623,7 @@ public class ButtonHelper {
 
     public static List<Button> customRexLegendary(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
-        Tile rex = Helper.getTileFromPlanet("mr", activeGame);
+        Tile rex = activeGame.getTileFromPlanet("mr");
         List<String> planetsToCheck = getAllPlanetsAdjacentToTileNotOwnedByPlayer(rex, activeGame, player);
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
@@ -1676,7 +1676,7 @@ public class ButtonHelper {
         Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
         String mechOrInf = buttonID.split("_")[3];
         String msg = ident + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on " + Helper.getPlanetRepresentation(planet, activeGame);
-        new RemoveUnits().unitParsing(event, p2.getColor(), Helper.getTileFromPlanet(planet, activeGame), "1 " + mechOrInf + " " + planet, activeGame);
+        new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "1 " + mechOrInf + " " + planet, activeGame);
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), msg);
         event.getMessage().delete().queue();
     }
@@ -2373,7 +2373,7 @@ public class ButtonHelper {
     }
 
     public static UnitHolder getUnitHolderFromPlanetName(String planetName, Game activeGame) {
-        Tile tile = Helper.getTileFromPlanet(AliasHandler.resolvePlanet(planetName), activeGame);
+        Tile tile = activeGame.getTileFromPlanet(AliasHandler.resolvePlanet(planetName));
         if (tile == null) {
             return null;
         }
@@ -3896,7 +3896,7 @@ public class ButtonHelper {
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                 || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
             if (!"mr".equalsIgnoreCase(planet) && !"custodiavigilia".equalsIgnoreCase(planet) && !oneOfThree) {
-                return Helper.getTileFromPlanet(planet, activeGame);
+                return activeGame.getTileFromPlanet(planet);
             }
         }
 
@@ -4086,7 +4086,7 @@ public class ButtonHelper {
                             String titanshero = Mapper.getTokenID("titanshero");
                             System.out.println(titanshero);
                             Tile t = activeGame.getTile(AliasHandler.resolveTile(p1.getFaction()));
-                            if (Helper.getTileFromPlanet("elysium", activeGame) != null && Helper.getTileFromPlanet("elysium", activeGame).getPosition().equalsIgnoreCase(t.getPosition())) {
+                            if (activeGame.getTileFromPlanet("elysium") != null && activeGame.getTileFromPlanet("elysium").getPosition().equalsIgnoreCase(t.getPosition())) {
                                 t.addToken("attachment_titanshero.png", "elysium");
                                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attachment added to Elysium and it has been readied");
                                 new PlanetRefresh().doAction(p1, "elysium", activeGame);

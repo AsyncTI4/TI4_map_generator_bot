@@ -261,7 +261,7 @@ public class AgendaHelper {
                 TextChannel watchParty = watchPartyChannel(activeGame);
                 String watchPartyPing = watchPartyPing(activeGame);
                 if (watchParty != null && !activeGame.isFoWMode()) {
-                    Tile tile = Helper.getTileFromPlanet("mr", activeGame);
+                    Tile tile = activeGame.getTileFromPlanet("mr");
                     if (tile != null) {
                         File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
                         String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + AgendaHelper.getSummaryOfVotes(activeGame, true);
@@ -1266,8 +1266,7 @@ public class AgendaHelper {
                             Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                             Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                             List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-                            String message = identity + "! Your current CCs are " + Helper.getPlayerCCs(winningR)
-                                + ". Use buttons to gain CCs";
+                            String message = identity + "! Your current CCs are " + winningR.getCCRepresentation() + ". Use buttons to gain CCs";
                             MessageHelper.sendMessageToChannel(channel, identity + " resolve rider by using the button to get 3 command counters");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
@@ -1935,7 +1934,7 @@ public class AgendaHelper {
 
         //Absol's Syncretone - +1 vote for each neighbour
         if (player.hasRelicReady("absol_syncretone")) {
-            int count = Helper.getNeighbourCount(activeGame, player);
+            int count = player.getNeighbourCount();
             additionalVotesAndSources.put(Emojis.Relic + "Syncretone", count);
         }
 
