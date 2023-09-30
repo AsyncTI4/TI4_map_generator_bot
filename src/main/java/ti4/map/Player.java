@@ -1389,23 +1389,23 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String techID, Game game) {
+    public void addTech(String techID) {
         if (techs.contains(techID)) {
             return;
         }
         techs.add(techID);
 
-        doAdditionalThingsWhenAddingTech(techID, game);
+        doAdditionalThingsWhenAddingTech(techID);
     }
 
-    private void doAdditionalThingsWhenAddingTech(String techID, Game game) {
+    private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
 
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) game.getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
