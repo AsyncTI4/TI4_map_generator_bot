@@ -261,7 +261,7 @@ public class AgendaHelper {
                 TextChannel watchParty = watchPartyChannel(activeGame);
                 String watchPartyPing = watchPartyPing(activeGame);
                 if (watchParty != null && !activeGame.isFoWMode()) {
-                    Tile tile = Helper.getTileFromPlanet("mr", activeGame);
+                    Tile tile = activeGame.getTileFromPlanet("mr");
                     if (tile != null) {
                         File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
                         String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + AgendaHelper.getSummaryOfVotes(activeGame, true);

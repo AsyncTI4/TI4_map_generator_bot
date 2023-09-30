@@ -243,7 +243,7 @@ public class DataMigrationManager {
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                             .findFirst();
                         if (firstHomePlanet.isPresent()) {
-                            Tile homeSystem = Helper.getTileFromPlanet(firstHomePlanet.get().toLowerCase(), game);
+                            Tile homeSystem = game.getTileFromPlanet(firstHomePlanet.get().toLowerCase());
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {
@@ -350,7 +350,7 @@ public class DataMigrationManager {
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                             .findFirst();
                         if (firstHomePlanet.isPresent()) {
-                            Tile homeSystem = Helper.getTileFromPlanet(firstHomePlanet.get().toLowerCase(), game);
+                            Tile homeSystem = game.getTileFromPlanet(firstHomePlanet.get().toLowerCase());
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {

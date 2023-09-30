@@ -1849,22 +1849,6 @@ public class Helper {
         }
     }
 
-    public static Tile getTileFromPlanet(String planetName, Game activeGame) {
-        Tile tile = null;
-        for (Tile tile_ : activeGame.getTileMap().values()) {
-            if (tile != null) {
-                break;
-            }
-            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
-                    tile = tile_;
-                    break;
-                }
-            }
-        }
-        return tile;
-    }
-
     public static String getExploreNameFromID(String cardID) {
         String card = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
