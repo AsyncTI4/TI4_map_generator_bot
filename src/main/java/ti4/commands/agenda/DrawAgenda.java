@@ -95,9 +95,9 @@ public class DrawAgenda extends AgendaSubcommandData {
         }
         sb.append("-----------\n");
         if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), sb.toString(), buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
         }
             
         
