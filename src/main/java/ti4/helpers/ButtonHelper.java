@@ -754,6 +754,27 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select a planet or tech to ready", buttons);
     }
 
+    public static List<Button> getPsychoTechPlanets(Game activeGame, Player player){
+         List<Button> buttons = new ArrayList<>();
+         for (String planet : player.getReadiedPlanets()) {
+            if ((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planet)) {
+                buttons.add(Button.success("psychoExhaust_" + planet, "Exhaust " + Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+        return buttons;
+    }
+    public static void resolvePsychoExhaust(Game activeGame, ButtonInteractionEvent event, Player player, String buttonID){
+        int oldTg = player.getTg();
+        player.setTg(oldTg+1);
+        String planet = buttonID.split("_")[1];
+        player.exhaustPlanet(planet);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), getIdent(player) + " exhausted "+Helper.getPlanetRepresentation(planet, activeGame)+ " and gained 1tg ("+oldTg+"->"+player.getTg()+")");
+        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     public static void bioStimsReady(Game activeGame, GenericInteractionCreateEvent event, Player player, String buttonID) {
         buttonID = buttonID.replace("biostimsReady_", "");
         String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
@@ -1747,6 +1768,11 @@ public class ButtonHelper {
                 transit = transit.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
                 startButtons.add(transit);
             }
+        }
+        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
+                Button psycho = Button.success(finChecker + "getPsychoButtons", "Use Psychoarcheology");
+                psycho = psycho.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
+                startButtons.add(psycho);
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
@@ -2951,6 +2977,65 @@ public class ButtonHelper {
         }
     }
 
+    public static void startMyTurn(GenericInteractionCreateEvent event, Game activeGame, Player player) {
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
+        String msg;
+        String msgExtra = "";
+        boolean allPicked = true;
+        Player privatePlayer =player;
+        
+        Player nextPlayer = player;
+        
+
+        //INFORM FIRST PLAYER IS UP FOR ACTION
+        if (nextPlayer != null) {
+            msgExtra += "# " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
+            privatePlayer = nextPlayer;
+            activeGame.updateActivePlayer(nextPlayer);
+            if (activeGame.isFoWMode()) {
+                FoWHelper.pingAllPlayersWithFullStats(activeGame, event, nextPlayer, "started turn");
+            }
+            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);
+
+            activeGame.setCurrentPhase("action");
+        }
+
+        msg = "";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        if (isFowPrivateGame) {
+            msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeGame, event.getGuild(), true) + " UP NEXT";
+            String fail = "User for next faction not found. Report to ADMIN";
+            String success = "The next player has been notified";
+            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeGame, event, msgExtra, fail, success);
+            activeGame.updateActivePlayer(privatePlayer);
+
+            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
+                getStartOfTurnButtons(privatePlayer, activeGame, false, event));
+            if (privatePlayer.getStasisInfantry() > 0) {
+                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, activeGame),
+                    "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.", getPlaceStatusInfButtons(activeGame, privatePlayer));
+            }
+            
+
+        } else {
+            if (!msgExtra.isEmpty()) {
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msgExtra);
+                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "\n Use Buttons to do turn.", getStartOfTurnButtons(privatePlayer, activeGame, false, event));
+                if (privatePlayer.getStasisInfantry() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, activeGame),
+                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.", getPlaceStatusInfButtons(activeGame, privatePlayer));
+                }
+            }
+        }
+    }
+
+    public static void resolveImperialArbiter(ButtonInteractionEvent event, Game activeGame, Player player){
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " decided to use the Imperial Arbiter Law to swap SCs with someone");
+        activeGame.removeLaw("arbiter");
+        List<Button> buttons = ButtonHelperFactionSpecific.getSwapSCButtons(activeGame, "imperialarbiter", player);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who you want to swap CCs with", buttons);
+        event.getMessage().delete().queue();
+    }
     //playerHasUnitsInSystem(player, tile);
     public static void startActionPhase(GenericInteractionCreateEvent event, Game activeGame) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
@@ -3023,10 +3108,26 @@ public class ButtonHelper {
                 }
             }
         }
+        if(allPicked){
+            for(Player p2: activeGame.getRealPlayers()){
+                List<Button> buttons = new ArrayList<Button>();
+                if(p2.hasTechReady("qdn")&& p2.getTg() >2 && p2.getStrategicCC() > 0){
+                    buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
+                }
+                if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
+                    buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
+                }
+            }
+        }
     }
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game activeGame) {
         int playersWithSCs = 0;
+        activeGame.setCurrentPhase("statusHomework");
         for (Player player2 : activeGame.getPlayers().values()) {
             if (playersWithSCs > 1) {
                 new Cleanup().runStatusCleanup(activeGame);
@@ -3158,6 +3259,17 @@ public class ButtonHelper {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game activeGame) {
+        if (activeGame.getNaaluAgent()) {
+            activeGame.setNaaluAgent(false);
+            for(Player p2 : activeGame.getRealPlayers()){
+                for(String planet : p2.getPlanets()){
+                    if(ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)){
+                        p2.exhaustPlanet(planet);
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Exhausted all home systems due to that one agenda");
+        }
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick SC.");
         }
@@ -3919,6 +4031,9 @@ public class ButtonHelper {
                     String message = getTrueIdentity(p1, activeGame) + " select type of wormhole you wish to drop";
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(p1, activeGame), message, buttons);
                 }
+                if ("pm".equalsIgnoreCase(buttonID)) {
+                    ButtonHelperFactionSpecific.resolveProductionBiomesStep1(p1, activeGame, event, buttonID);
+                }
                 if ("sr".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = new ArrayList<>();
                     List<Tile> tiles = getTilesOfPlayersSpecificUnit(activeGame, p1, "spacedock");
@@ -4335,7 +4450,7 @@ public class ButtonHelper {
     }
 
     public static void offerSpeakerButtons(Game activeGame, Player player) {
-        String assignSpeakerMessage = "Please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+        String assignSpeakerMessage = "Please, before you draw your action cards or look at agendas, click a faction below to assign Speaker " + Emojis.SpeakerToken;
         List<Button> assignSpeakerActionRow = getAssignSpeakerButtons(activeGame);
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
     }
