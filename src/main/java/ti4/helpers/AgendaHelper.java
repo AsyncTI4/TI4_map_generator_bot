@@ -246,6 +246,17 @@ public class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
+            if("constitution".equalsIgnoreCase(agID)){
+                if ("for".equalsIgnoreCase(winner)) {
+                    List<String> laws = new ArrayList<String>();
+                    laws.addAll(activeGame.getLaws().keySet());
+                    for(String law : laws){
+                        activeGame.removeLaw(agID);
+                    }
+                    activeGame.setNaaluAgent(true);
+                }
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
+            }
             if ("artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = watchPartyChannel(activeGame);
                 String watchPartyPing = watchPartyPing(activeGame);

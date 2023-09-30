@@ -385,8 +385,14 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("yinHeroStart")) {
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "yinHeroTarget", null);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
+        } else if (buttonID.startsWith("psychoExhaust_")) {
+            ButtonHelper.resolvePsychoExhaust(activeGame, event, player, buttonID);
+        } else if (buttonID.startsWith("productionBiomes_")) {
+            ButtonHelperFactionSpecific.resolveProductionBiomesStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperFactionSpecific.hacanAgentRefresh(buttonID, event, activeGame, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("getPsychoButtons")) {
+           MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), trueIdentity + " use buttons to get a tg per planet exhausted.", ButtonHelper.getPsychoTechPlanets(activeGame, player));
         } else if (buttonID.startsWith("retreatGroundUnits_")) {
             ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("naaluCommander")) {
@@ -413,6 +419,10 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos));
         } else if (buttonID.startsWith("exhaustAgent_")) {
             ButtonHelperFactionSpecific.exhaustAgent(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("swapSCs_")) {
+            ButtonHelperFactionSpecific.resolveSwapSC(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {
+            ButtonHelperFactionSpecific.resolveSelecteBeforeSwapSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("sardakkcommander_")) {
             ButtonHelperFactionSpecific.resolveSardakkCommander(activeGame, player, buttonID, event, ident);
         } else if (buttonID.startsWith("peaceAccords_")) {
@@ -2601,6 +2611,12 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
+                case "startArbiter"->{
+                    ButtonHelper.resolveImperialArbiter(event, activeGame, player);
+                }
+                 case "startQDN"->{
+                    ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
+                }
                 case "finishComponentAction" -> {
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
@@ -3119,7 +3135,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
                 if (activeGame.getNaaluAgent()) {
-                    player = Helper.getPlayerFromUnlockedLeader(activeGame, "naaluagent");
+                    player = activeGame.getPlayer(activeGame.getActivePlayer());
                     activeGame.setNaaluAgent(false);
                 }
 
