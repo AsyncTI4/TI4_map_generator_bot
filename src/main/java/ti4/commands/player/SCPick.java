@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
@@ -228,6 +229,21 @@ public class SCPick extends PlayerSubcommandData {
                     if(privatePlayer.getStasisInfantry() > 0){
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
                     }
+                }
+            }
+        }
+        if(allPicked){
+            for(Player p2: activeGame.getRealPlayers()){
+                List<Button> buttons = new ArrayList<Button>();
+                if(p2.hasTechReady("qdn") && p2.getTg() >2 && p2.getStrategicCC() > 0){
+                    buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
+                }
+                if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
+                    buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
                 }
             }
         }

@@ -175,7 +175,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeGame.isFoWMode() && scToPlay == 3) {
-            String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeGame) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeGame) + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker " + Emojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);

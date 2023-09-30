@@ -77,6 +77,136 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(hacan, activeGame) + "Choose which planet to relocate your units to", buttons);
         event.getMessage().delete().queue();
     }
+
+    public static void resolveProductionBiomesStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        Player player = Helper.getPlayerFromColorOrFaction(activeGame, buttonID.split("_")[1]);
+        int oldTg = player.getTg();
+        player.setTg(oldTg+2);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to production biomes ("+oldTg+"->"+player.getTg()+")");
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame), ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to production biomes");
+        }
+        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveProductionBiomesStep1(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        Player player = hacan;
+        int oldStratCC = player.getStrategicCC();
+         if(oldStratCC < 1){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " did not have enough strat cc. #rejected");
+            return;
+         }
+       
+        int oldTg = player.getTg();
+        player.setTg(oldTg+4);
+        player.setStrategicCC(oldStratCC-1);
+        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " lost a strat cc and gained 4tg ("+oldTg+"->"+player.getTg()+")");
+        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 4);
+        
+        List<Button> buttons = new ArrayList<Button>();
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == hacan){
+                continue;
+            }
+            if(activeGame.isFoWMode()){
+                buttons.add(Button.secondary("productionBiomes_"+p2.getFaction(), p2.getColor()));
+            }else{
+                Button button = Button.secondary("productionBiomes_"+p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who should get 2tg", buttons);
+    }
+    public static void resolveQuantumDataHubNodeStep1(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        Player player = hacan;
+        player.exhaustTech("qdn");
+        int oldStratCC = player.getStrategicCC();
+         if(oldStratCC < 1){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " did not have enough strat cc. #rejected");
+            return;
+         }
+       
+        int oldTg = player.getTg();
+        player.setStrategicCC(oldStratCC-1);
+        ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+        player.setTg(oldTg-3);
+        
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " lost a strat cc and 3tg ("+oldTg+"->"+player.getTg()+")");
+        
+        List<Button> buttons = getSwapSCButtons(activeGame, "qdn", hacan);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who you want to swap CCs with", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getSwapSCButtons(Game activeGame, String type, Player hacan){
+        List<Button> buttons = new ArrayList<Button>();
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == hacan){
+                continue;
+            }
+            if(p2.getSCs().size() > 1){
+                if(activeGame.isFoWMode()){
+                    buttons.add(Button.secondary("selectBeforeSwapSCs_"+p2.getFaction()+"_"+type, p2.getColor()));
+                }else{
+                    Button button = Button.secondary("selectBeforeSwapSCs_"+p2.getFaction()+"_"+type, " ");
+                    String factionEmojiString = p2.getFactionEmoji();
+                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                    buttons.add(button);
+                }
+            }else{
+                if(activeGame.isFoWMode()){
+                    buttons.add(Button.secondary("swapSCs_"+p2.getFaction()+"_"+type+"_"+p2.getSCs().toArray()[0]+"_"+hacan.getSCs().toArray()[0], p2.getColor()));
+                }else{
+                    Button button = Button.secondary("swapSCs_"+p2.getFaction()+"_"+type+"_"+p2.getSCs().toArray()[0]+"_"+hacan.getSCs().toArray()[0], " ");
+                    String factionEmojiString = p2.getFactionEmoji();
+                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                    buttons.add(button);
+                }
+            }
+        }
+        return buttons;
+    }
+
+
+    public static void resolveSelecteBeforeSwapSC(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String type = buttonID.split("_")[2];
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame,buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(Integer sc : p2.getSCs()){
+            for(Integer sc2 : player.getSCs()){
+                buttons.add(Button.secondary("swapSCs_"+p2.getFaction()+"_"+type+"_"+sc+"_"+sc2, "Swap "+sc2 + " with "+sc));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose which SC you want to swap with", buttons);
+    }
+    public static void resolveSwapSC(Player player1, Game activeGame, ButtonInteractionEvent event, String buttonID){
+
+        String type = buttonID.split("_")[2];
+        Player player2 = Helper.getPlayerFromColorOrFaction(activeGame,buttonID.split("_")[1]);
+        Integer player1SC = Integer.parseInt(buttonID.split("_")[4]);
+        Integer player2SC = Integer.parseInt(buttonID.split("_")[3]);
+        if(type.equalsIgnoreCase("qdn")){
+            int oldTg = player2.getTg();
+            player2.setTg(oldTg+3);
+            ButtonHelperFactionSpecific.pillageCheck(player2, activeGame);
+            ButtonHelperFactionSpecific.resolveArtunoCheck(player2, activeGame, 3);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), ButtonHelper.getIdent(player2) + " gained 3tg from QDN ("+oldTg+"->"+player2.getTg()+")");
+        }
+        player1.addSC(player2SC);
+        player1.removeSC(player1SC);
+        player2.addSC(player1SC);
+        player2.removeSC(player2SC);
+        String sb = Helper.getPlayerRepresentation(player1, activeGame) + " swapped SC with " + Helper.getPlayerRepresentation(player2, activeGame) + "\n" +
+            "> " + Helper.getPlayerRepresentation(player2, activeGame) + Helper.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player1SC) + "\n" +
+            "> " + Helper.getPlayerRepresentation(player1, activeGame) + Helper.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player2SC) + "\n";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
+    }
     public static void resolveHacanMechTradeStepTwo(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
         String origPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
@@ -495,6 +625,7 @@ public class ButtonHelperFactionSpecific {
             Button tileButton = Button.success("produceOneUnitInTile_" + tile.getPosition() + "_chaosM", tile.getRepresentationForButtons(activeGame, p1));
             buttons.add(tileButton);
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(p1)+" has chosen to use the chaos mapping technology");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
     }
 
