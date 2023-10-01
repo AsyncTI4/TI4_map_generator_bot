@@ -59,6 +59,7 @@ import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.Turn;
 import ti4.commands.special.NaaluCommander;
+import ti4.commands.special.NovaSeed;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -359,6 +360,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveCreussIFF(activeGame, player, buttonID, ident, event);
         } else if (buttonID.startsWith("acToSendTo_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("creussHeroStep1_")) {
+            ButtonHelperFactionSpecific.getGhostHeroTilesStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("creussHeroStep2_")) {
+            ButtonHelperFactionSpecific.resolveGhostHeroStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
             ButtonHelperFactionSpecific.resolveGhostCommanderPlacement(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
@@ -969,6 +974,9 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else if (buttonID.startsWith("combatRoll_")) {
             ButtonHelper.resolveCombatRoll(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("novaSeed_")) {
+           new NovaSeed().secondHalfOfNovaSeed(player, event, activeGame.getTileByPosition(buttonID.split("_")[1]), activeGame);
+           ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("echoPlaceFrontier_")) {
             ButtonHelper.resolveEchoPlaceFrontier(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("forceAbstainForPlayer_")) {
@@ -1374,15 +1382,23 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 event.getMessage().delete().queue();
             }
+         } else if (buttonID.startsWith("checksNBalancesPt2_")) {
+            new SCPick().resolvePt2ChecksNBalances(event, player, activeGame, buttonID);
         } else if (buttonID.startsWith("scPick_")) {
             Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
-            boolean pickSuccessful = stats.secondHalfOfPickSC(event, activeGame, player, scpick);
-            if (pickSuccessful) {
-                new SCPick().secondHalfOfSCPick(event, player, activeGame, scpick);
-                event.getMessage().delete().queue();
+
+            if(activeGame.getLaws().containsKey("checks")){
+                new SCPick().secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
+            }else{
+                boolean pickSuccessful = stats.secondHalfOfPickSC(event, activeGame, player, scpick);
+                if (pickSuccessful) {
+                    new SCPick().secondHalfOfSCPick(event, player, activeGame, scpick);
+                    event.getMessage().delete().queue();
+                }
             }
+            
 
         } else if (buttonID.startsWith("milty_")) {
 
