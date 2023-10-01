@@ -2323,6 +2323,11 @@ public class ButtonHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostC);
         }
+        if (player.hasLeaderUnlocked("muaathero")&&!tile.getTileID().equalsIgnoreCase("18")&&ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "warsun").contains(tile)) {
+            Button muaatH = Button.primary(finChecker + "novaSeed_" + tile.getPosition(), "Nova Seed This Tile")
+                .withEmoji(Emoji.fromFormatted(Emojis.Muaat));
+            buttons.add(muaatH);
+        }
         if (tile.getUnitHolders().size() > 1 && ButtonHelper.getTilesOfUnitsWithBombard(player, activeGame).contains(tile)) {
             if (tile.getUnitHolders().size() > 2) {
                 buttons.add(Button.secondary("bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment, "Roll Bombardment"));
@@ -3132,10 +3137,11 @@ public class ButtonHelper {
         msg = "";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         if (isFowPrivateGame) {
-            msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeGame, event.getGuild(), true) + " UP NEXT";
+            msgExtra = "Start phase command run";
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeGame, event, msgExtra, fail, success);
+            msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeGame, event.getGuild(), true) + " UP NEXT";
             activeGame.updateActivePlayer(privatePlayer);
 
             if (!allPicked) {
@@ -3338,16 +3344,20 @@ public class ButtonHelper {
             + " UP TO PICK SC\n";
         activeGame.updateActivePlayer(speaker);
         activeGame.setCurrentPhase("strategy");
+        String pickSCMsg = "Use Buttons to Pick SC";
+        if(activeGame.getLaws().containsKey("checks")){
+             pickSCMsg = "Use Buttons to Pick the SC you want to give someone";
+        }
         ButtonHelperFactionSpecific.giveKeleresCommsNTg(activeGame, event);
         if (activeGame.isFoWMode()) {
             if (!activeGame.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeGame, speaker));
+                    message + pickSCMsg, Helper.getRemainingSCButtons(event, activeGame, speaker));
             } else {
                 MessageHelper.sendPrivateMessageToPlayer(speaker, activeGame, message);
             }
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeGame, speaker));
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(event, activeGame, speaker));
         }
         for (Player player2 : activeGame.getRealPlayers()) {
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")
@@ -4166,6 +4176,11 @@ public class ButtonHelper {
                             buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
                                 + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
+                        }
+                        if ("ghosthero".equals(playerLeader.getId())) {
+                            List<Button> buttons = ButtonHelperFactionSpecific.getGhostHeroTilesStep1(activeGame, p1);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
+                                + " use the button to select the first tile you would like to swap with your hero.", buttons);
                         }
                         if ("augershero".equals(playerLeader.getId())) {
                             List<Button> buttons = new ArrayList<>();
