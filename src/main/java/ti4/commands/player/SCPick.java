@@ -1,7 +1,10 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -91,6 +94,105 @@ public class SCPick extends PlayerSubcommandData {
             return;
         }
         secondHalfOfSCPick(event, player, activeGame, scPicked);
+    }
+
+    public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked){
+        List<Button> buttons = new ArrayList<Button>();
+        List<Player> activePlayers = activeGame.getRealPlayers();
+        int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
+        if(maxSCsPerPlayer < 1){
+            maxSCsPerPlayer = 1;
+        }
+        int minNumOfSCs = 10;
+        for(Player p2 : activePlayers){
+            if(p2.getSCs().size() < minNumOfSCs){
+                minNumOfSCs= p2.getSCs().size();
+            }
+        }
+        if(minNumOfSCs == maxSCsPerPlayer){
+            return buttons;
+        }
+        for(Player p2 : activePlayers){
+            if(p2 == player){
+                continue;
+            }
+             if(p2.getSCs().size() == minNumOfSCs){
+                if(activeGame.isFoWMode()){
+                    buttons.add(Button.secondary("checksNBalancesPt2_"+scPicked+"_"+p2.getFaction(), p2.getColor()));
+                }else{
+                    buttons.add(Button.secondary("checksNBalancesPt2_"+scPicked+"_"+p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+                }
+             }
+        }
+        if(buttons.size() == 0){
+            buttons.add(Button.secondary("checksNBalancesPt2_"+scPicked+"_"+player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+        }
+
+        return buttons;
+    }
+    public void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, int scPicked) {
+        List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scPicked);
+        LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
+       
+		for (Player playerStats : activeGame.getRealPlayers()) {
+			if (playerStats.getSCs().contains(scPicked)) {
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scPicked+" is already picked.");
+				return;
+			}
+		}
+        Integer tgCount = scTradeGoods.get(scPicked);
+		if (tgCount != null && tgCount != 0) {
+			int tg = player.getTg();
+			tg += tgCount;
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player, activeGame)+" gained "+tgCount +" tgs from picking SC #"+scPicked);
+			if (activeGame.isFoWMode()) {
+				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
+				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
+			}
+			player.setTg(tg);
+			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
+			}
+			ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+            activeGame.setScTradeGood(scPicked, 0);
+		}
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " chose which player to give this SC", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game activeGame, String buttonID){
+        String scPicked = buttonID.split("_")[1];
+        int scpick = Integer.parseInt(scPicked);
+        String factionPicked = buttonID.split("_")[2];
+        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionPicked);
+        boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " was given SC #"+scpick);
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), p2.getColor() + " was given SC #"+scpick);
+
+        }
+        event.getMessage().delete().queue();
+        List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, activeGame, scpick);
+        if(buttons.size() == 0){
+            ButtonHelper.startActionPhase(event, activeGame);
+        }else{
+            boolean foundPlayer = false;
+            Player privatePlayer = null;
+            for(Player p3: activeGame.getRealPlayers()){
+                if(foundPlayer){
+                    privatePlayer = p3;
+                    foundPlayer = false;
+                }
+                if(p3 == player){
+                    foundPlayer = true;
+                }
+            }
+            if(privatePlayer == null){
+                privatePlayer = activeGame.getRealPlayers().get(0);
+            }
+            activeGame.setCurrentPhase("strategy");
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), ButtonHelper.getTrueIdentity(privatePlayer, activeGame)+"Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, activeGame, privatePlayer));
+        }
     }
 
     public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked) {
