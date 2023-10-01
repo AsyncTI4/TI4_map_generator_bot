@@ -933,7 +933,7 @@ public class GameSaveLoadManager {
         return null;
     }
 
-    private static Game loadMapJSON(String mapFile) {
+    public static Game loadMapJSONString(String mapFile) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
