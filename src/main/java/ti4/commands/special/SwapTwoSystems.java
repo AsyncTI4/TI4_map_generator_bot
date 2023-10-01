@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 public class SwapTwoSystems extends SpecialSubcommandData {
     public SwapTwoSystems() {
-        super(Constants.SWAP_SYSTEMS, "Swap two systems with there places");
+        super(Constants.SWAP_SYSTEMS, "Swap two systems");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true).setAutoComplete(true));
     }

@@ -78,6 +78,8 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    
+
     public static void resolveProductionBiomesStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
         Player player = Helper.getPlayerFromColorOrFaction(activeGame, buttonID.split("_")[1]);
         int oldTg = player.getTg();
@@ -171,6 +173,50 @@ public class ButtonHelperFactionSpecific {
             }
         }
         return buttons;
+    }
+
+    public static List<Button> getGhostHeroTilesStep1(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<Button>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.getPosition().contains("t") || tile.getPosition().contains("b")){
+                continue;
+            }
+            if(FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player) || FoWHelper.playerHasUnitsInSystem(player, tile)){
+                buttons.add(Button.secondary("creussHeroStep1_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+            }
+                    
+                
+        }
+        return buttons;
+    }
+    public static void getGhostHeroTilesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos1 = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<Button>();
+        Tile tile1 = activeGame.getTileByPosition(pos1);
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1){
+                continue;
+            }
+            if(FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player) || FoWHelper.playerHasUnitsInSystem(player, tile)){
+                buttons.add(Button.secondary("creussHeroStep2_"+pos1+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" Chose the tile you want to swap places with "+tile1.getRepresentationForButtons(activeGame, player), buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveGhostHeroStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String position = buttonID.split("_")[1];
+        String position2 = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(position);
+        Tile tile2 = activeGame.getTileByPosition(position2);
+        tile.setPosition(position2);
+        tile2.setPosition(position);
+        activeGame.setTile(tile);
+        activeGame.setTile(tile2);
+        activeGame.rebuildTilePositionAutoCompleteList();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" Chose to swap "+tile2.getRepresentationForButtons(activeGame, player)+" with "+tile.getRepresentationForButtons(activeGame, player));
+        event.getMessage().delete().queue();
     }
 
 
