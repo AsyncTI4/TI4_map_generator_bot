@@ -382,7 +382,8 @@ public class Constants {
     public static final String SC_PICK = "sc_pick";
     public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";
-    public static final String TURN = "turn_end";
+    public static final String TURN_END = "turn_end";
+    public static final String TURN_START = "turn_start";
     public static final String SPEAKER = "speaker";
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String ACTIVE_SYSTEM = "active_system";

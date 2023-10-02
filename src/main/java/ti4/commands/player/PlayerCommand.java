@@ -110,7 +110,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new SCUnplay());
         subcommands.add(new Pass());
         subcommands.add(new AbilityInfo());
-        subcommands.add(new Turn());
+        subcommands.add(new TurnEnd());
+        subcommands.add(new TurnStart());
         subcommands.add(new SCPick());
         subcommands.add(new SCUnpick());
         subcommands.add(new Speaker());

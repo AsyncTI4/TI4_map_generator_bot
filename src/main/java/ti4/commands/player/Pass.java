@@ -28,6 +28,6 @@ public class Pass extends PlayerSubcommandData {
         player.setPassed(true);
         String text = Helper.getPlayerRepresentation(player, activeGame) + " PASSED";
         sendMessage(text);
-        Turn.pingNextPlayer(event, activeGame, player);
+        TurnEnd.pingNextPlayer(event, activeGame, player);
     }
 }
