@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -864,7 +865,7 @@ public class ButtonHelperFactionSpecific {
                                                 + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
                                                 + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
                                         int context = 0;
-                                        File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
+                                        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
                                         MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
                                         List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
                                         MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);

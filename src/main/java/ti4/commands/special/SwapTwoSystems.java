@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
@@ -57,7 +58,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         activeGame.setTile(tileTo);
         activeGame.rebuildTilePositionAutoCompleteList();
         DisplayType displayType = DisplayType.map;
-        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-        MessageHelper.sendFileToChannel(event.getChannel(), file);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+        MessageHelper.sendFileUploadToChannel(event.getChannel(), file);
     }
 }

@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
@@ -675,7 +676,7 @@ public class ButtonListener extends ListenerAdapter {
             Player p1 = Helper.getPlayerFromColorOrFaction(activeGame, rest.split("_")[1]);
             Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, rest.split("_")[2]);
             String groundOrSpace = rest.split("_")[3];
-            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
+            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
             List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);

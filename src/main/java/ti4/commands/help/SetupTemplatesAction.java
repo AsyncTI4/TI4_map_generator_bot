@@ -14,11 +14,6 @@ public class SetupTemplatesAction extends HelpSubcommandData {
     }
 
     @Override
-    public String getActionID() {
-        return Constants.HELP;
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Setup Templates file");
         String helpFile = ResourceHelper.getInstance().getHelpFile("setup_templates.txt");

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -64,7 +65,7 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
         activeGame.rebuildTilePositionAutoCompleteList();
         GameSaveLoadManager.saveMap(activeGame, event);
         DisplayType displayType = DisplayType.map;
-        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-        MessageHelper.sendFileToChannel(event.getChannel(), file);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+        MessageHelper.sendFileUploadToChannel(event.getChannel(), file);
     }
 }
