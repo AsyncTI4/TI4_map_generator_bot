@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
@@ -106,8 +107,8 @@ public class StartMilty extends MiltySubcommandData {
         if (!slicesCreated) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Did not find correct slices, check settings");
         } else {
-            File file = generateImage(draftManager);
-            MessageHelper.sendFileToChannel(event.getChannel(), file);
+            FileUpload fileUpload = generateImage(draftManager);
+            MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
 
             String message = "Slices:\n\n";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
@@ -234,7 +235,7 @@ public class StartMilty extends MiltySubcommandData {
         return factionDraft;
     }
 
-    private File generateImage(MiltyDraftManager draftManager) {
+    private FileUpload generateImage(MiltyDraftManager draftManager) {
         List<MiltyDraftSlice> slices = draftManager.getSlices();
         int sliceCount = slices.size();
         float scale = 1.0f;
@@ -345,8 +346,9 @@ public class StartMilty extends MiltySubcommandData {
         //noinspection ResultOfMethodCallIgnored
         file.delete();
         File jpgFile = new File(absolutePath);
+        FileUpload fileUpload = FileUpload.fromData(jpgFile, jpgFile.getName());
         MapFileDeleter.addFileToDelete(jpgFile);
-        return jpgFile;
+        return fileUpload;
     }
 
 

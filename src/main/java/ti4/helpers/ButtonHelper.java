@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
@@ -825,7 +826,7 @@ public class ButtonHelper {
         String threadName = activeGame.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
         boolean foundsomething = false;
-        File file = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
         if (!activeGame.isFoWMode()) {
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
@@ -843,7 +844,7 @@ public class ButtonHelper {
                 }
             }
         } else {
-            MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
+            MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), file);
             foundsomething = true;
         }
         if (!foundsomething) {
@@ -1313,7 +1314,7 @@ public class ButtonHelper {
         if (playersWithPds2.size() > 0) {
             context = 1;
         }
-        File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
         MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(tc, "", buttons);
@@ -3214,8 +3215,8 @@ public class ButtonHelper {
                 playersWithSCs = -30;
                 if (!activeGame.isFoWMode()) {
                     DisplayType displayType = DisplayType.map;
-                    File stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-                    MessageHelper.sendFileToChannel(activeGame.getActionsChannel(), stats_file);
+                    FileUpload stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+                    MessageHelper.sendFileUploadToChannel(activeGame.getActionsChannel(), stats_file);
                 }
             }
             if (player2.isRealPlayer()) {
@@ -4443,7 +4444,7 @@ public class ButtonHelper {
             List<Button> systemButtons = getStartOfTurnButtons(p1, activeGame, true, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         }
-        File file = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
     }
 
     public static void offerNanoforgeButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {

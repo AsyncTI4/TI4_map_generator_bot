@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -72,7 +73,7 @@ public class GameCommand implements Command {
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
-        File file = GenerateMap.getInstance().saveImage(activeGame, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, event);
         if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
             MessageHelper.replyToMessage(event, file);
         }
