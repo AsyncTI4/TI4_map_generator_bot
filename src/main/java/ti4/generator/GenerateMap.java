@@ -110,6 +110,8 @@ public class GenerateMap {
     private long debugFowTime;
     private long debugTileTime;
     private long debugGameInfoTime;
+    private long debugGameImageWebsiteTime;
+    private long debugGameImageFileSaveTime;
 
     private static GenerateMap instance;
 
@@ -302,6 +304,7 @@ public class GenerateMap {
             gameInfo(activeGame, displayType);
             if (debug) debugGameInfoTime = System.nanoTime() - debugTime;
 
+            if (debug) debugTime = System.nanoTime();
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> {
@@ -312,10 +315,12 @@ public class GenerateMap {
                 Player player = getFowPlayer(activeGame, event);
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
             }
+            if (debug) debugGameImageWebsiteTime = System.nanoTime() - debugTime;
         } catch (IOException e) {
             BotLogger.log(activeGame.getName() + ": Could not save generated map");
         }
 
+        if (debug) debugTime = System.nanoTime();
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (
@@ -331,6 +336,7 @@ public class GenerateMap {
         }
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
+        if (debug) debugGameImageFileSaveTime = System.nanoTime() - debugTime;
 
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
@@ -339,6 +345,8 @@ public class GenerateMap {
             sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
             sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
             sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append("    Web time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageWebsiteTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageWebsiteTime / (double) total * 100.0)).append("\n");
+            sb.append("   File time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageFileSaveTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageFileSaveTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
             MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
@@ -911,34 +919,33 @@ public class GenerateMap {
                 leaderInfoFileName = "pa_leaders_envoy" + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
-            if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
-                List<String> mahactCCs = player.getMahactCC();
-                Collection<Player> players = activeGame.getPlayers().values();
-                for (Player player_ : players) {
-                    if (player_ != player) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        if (playerColor != null && mahactCCs.contains(playerColor)) {
-                            Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
-                            if (leader_ != null) {
-                                boolean locked = leader_.isLocked();
-                                String imperiaColorFile = "pa_leaders_imperia";
-                                if (locked) {
-                                    imperiaColorFile += "_exh";
-                                } else {
-                                    imperiaColorFile += "_rdy";
-                                }
-                                imperiaColorFile += ".png";
-                                String leaderFileName_ = "pa_leaders_factionicon_" + playerFaction + "_rdy.png";
-                                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-                                drawPAImage(x + deltaX, y, leaderFileName_);
-
-                                drawPAImage(x + deltaX, y, imperiaColorFile);
-                                String status_ = locked ? "_exh" : "_rdy";
-                                String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
-                                drawPAImage(x + deltaX, y, leaderPipInfo);
-                                deltaX += 48;
+        }
+        if (player.hasAbility("imperia")) {
+            deltaX += 5;
+            List<String> mahactCCs = player.getMahactCC();
+            Collection<Player> players = activeGame.getRealPlayers();
+            for (Player player_ : players) {
+                if (player_ != player) {
+                    String playerColor = player_.getColor();
+                    if (mahactCCs.contains(playerColor)) {
+                        Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
+                        if (leader_ != null) {
+                            boolean locked = leader_.isLocked();
+                            String imperiaColorFile = "pa_leaders_imperia";
+                            if (locked) {
+                                imperiaColorFile += "_exh";
+                            } else {
+                                imperiaColorFile += "_rdy";
                             }
+                            imperiaColorFile += ".png";
+                            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                            graphics.drawImage(getPlayerFactionIconImageScaled(player_, 42, 42), x + deltaX - 1, y + 108, null);
+
+                            drawPAImage(x + deltaX, y, imperiaColorFile);
+                            String status_ = locked ? "_exh" : "_rdy";
+                            String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
+                            drawPAImage(x + deltaX, y, leaderPipInfo);
+                            deltaX += 48;
                         }
                     }
                 }
