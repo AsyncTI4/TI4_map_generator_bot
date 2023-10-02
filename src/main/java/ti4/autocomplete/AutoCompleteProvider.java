@@ -756,12 +756,11 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> leaders = new HashMap<>(Mapper.getLeaderRepresentations());
+                        Map<String, LeaderModel> leaders = Mapper.getLeaders();
                         List<Command.Choice> options = leaders.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
