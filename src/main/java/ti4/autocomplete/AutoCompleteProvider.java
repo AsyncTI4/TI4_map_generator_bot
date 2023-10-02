@@ -258,8 +258,8 @@ public class AutoCompleteProvider {
             case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
                 List<String> leaderIDs = new ArrayList<>();
                 if (activeGame == null || activeGame.isFoWMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
-                    leaderIDs.addAll(Mapper.getLeaderRepresentations().keySet());
-                } else {      
+                    leaderIDs.addAll(Mapper.getLeaders().keySet());
+                } else {
                     leaderIDs.addAll(List.of("agent", "commander", "hero"));
                     for (Player player_ : activeGame.getPlayers().values()) {
                         leaderIDs.addAll(player_.getLeaderIDs());
@@ -756,12 +756,11 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> leaders = new HashMap<>(Mapper.getLeaderRepresentations());
+                        Map<String, LeaderModel> leaders = Mapper.getLeaders();
                         List<Command.Choice> options = leaders.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }

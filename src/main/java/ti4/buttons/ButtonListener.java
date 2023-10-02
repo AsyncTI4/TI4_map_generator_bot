@@ -57,7 +57,7 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
-import ti4.commands.player.Turn;
+import ti4.commands.player.TurnEnd;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
 import ti4.commands.status.Cleanup;
@@ -1840,8 +1840,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setPassed(true);
                     String text = Helper.getPlayerRepresentation(player, activeGame) + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
-                    Turn turn = new Turn();
-                    turn.sendMessage(turn.pingNextPlayer(event, activeGame, player), event);
+                    TurnEnd.pingNextPlayer(event, activeGame, player);
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Decided to skip waiting for afters and proceed to voting.");
@@ -2900,7 +2899,7 @@ public class ButtonListener extends ListenerAdapter {
                     playerUsedSC.put(messageID, players);
                 }
                 case "turnEnd" -> {
-                    new Turn().execute(event, player, activeGame);
+                    TurnEnd.pingNextPlayer(event, activeGame, player);
                     event.getMessage().delete().queue();
                     ButtonHelper.updateMap(activeGame, event);
                 }
@@ -2929,7 +2928,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "scoreAnObjective" -> {
-                    List<Button> poButtons = new Turn().getScoreObjectiveButtons(event, activeGame);
+                    List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(event, activeGame);
                     poButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                     MessageChannel channel = event.getMessageChannel();
                     if (activeGame.isFoWMode()) {

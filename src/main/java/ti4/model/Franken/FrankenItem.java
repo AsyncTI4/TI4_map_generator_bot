@@ -205,10 +205,10 @@ public class FrankenItem implements ModelInterface {
                 break;
             }
         }
-        HashMap<String, String> leaders = Mapper.getLeaderRepresentations();
+        HashMap<String, LeaderModel> leaders = Mapper.getLeaders();
 
         String leaderHumanReadable = Character.toTitleCase(leaderType.charAt(0)) + leaderType.substring(1);
-        return leaderHumanReadable + ": " + leaders.get(leaderId).split(";")[0];
+        return leaderHumanReadable + ": " + leaders.get(leaderId).getName();
     }
 
 //Helper.getFactionIconFromDiscord(tech.getFaction())
