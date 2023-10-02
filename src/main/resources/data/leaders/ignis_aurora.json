@@ -1,8 +1,8 @@
 [
     {
         "id": "qulaneagent",
-        "type": "qulane",
-        "faction": "agent",
+        "faction": "qulane",
+        "type": "agent",
         "name": "Alessiar the Wise",
         "title": "Eternal Recurrence",
         "abilityWindow": "At the end of a player's turn:",
@@ -12,8 +12,8 @@
     },
     {
         "id": "qulanecommander",
-        "type": "qulane",
-        "faction": "commander",
+        "faction": "qulane",
+        "type": "commander",
         "name": "Neravi the Resolute",
         "title": "The Time That Remains",
         "abilityWindow": "When using the Leadership Primary or Secondary:",
@@ -23,8 +23,8 @@
     },
     {
         "id": "qulanehero",
-        "type": "qulane",
-        "faction": "hero",
+        "faction": "qulane",
+        "type": "hero",
         "name": "Alvisa the All-Seeing",
         "title": "Differenda of Recognition",
         "abilityName": "True Attainment",
@@ -35,8 +35,8 @@
     },
     {
         "id": "baldrick_letnevhero",
-        "type": "hero",
-        "faction": "letnev",
+        "faction": "hero",
+        "type": "letnev",
         "name": "Darktalon Treilla ",
         "title": "Dark Matter Affinity ",
         "abilityName": "Void Transference",
@@ -47,8 +47,8 @@
     },
     {
         "id": "baldrick_solagent",
-        "type": "agent",
-        "faction": "sol",
+        "faction": "agent",
+        "type": "sol",
         "name": "Evelyn DeLouis ",
         "abilityWindow": "At the start of a ground combat round:",
         "abilityText": "You may exhaust this card and choose a player involved in the combat; that player must assign 1 hit to 1 of their ground forces. ",
@@ -57,8 +57,8 @@
     },
     {
         "id": "baldrick_letnevagent",
-        "type": "agent",
-        "faction": "letnev",
+        "faction": "agent",
+        "type": "letnev",
         "name": "Viscount Unlenn ",
         "abilityWindow": "At the start of a space combat round:",
         "abilityText": "You may exhaust this card to choose 1 ship in the active system; that ship rolls 1 additional die during this combat round. ",
