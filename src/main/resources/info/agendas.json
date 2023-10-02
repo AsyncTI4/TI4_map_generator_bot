@@ -2414,15 +2414,6 @@
     "source": "little_omega"
   },
   {
-    "alias": "mutiny",
-    "name": "Mutiny",
-    "type": "Directive",
-    "target": "For/Against",
-    "text1": "For: Each player that voted \"For\" gains 1 victory point.",
-    "text2": "Against: Each player that voted \"For\" loses 1 victory point.",
-    "source": "base"
-  },
-  {
     "alias": "little_omega_constitution",
     "name": "New Constitution",
     "type": "Directive",
