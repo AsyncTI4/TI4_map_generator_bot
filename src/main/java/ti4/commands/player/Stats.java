@@ -256,15 +256,6 @@ public class Stats extends PlayerSubcommandData {
 		return sb.toString();
 	}
 
-	@Override
-	public void reply(SlashCommandInteractionEvent event) {
-		String userID = event.getUser().getId();
-		Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-		GameSaveLoadManager.saveMap(activeGame, event);
-
-		GenerateMap.getInstance().saveImage(activeGame, event);
-	}
-
 	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
 		if (optionSC == null) {
 			return false;

@@ -94,7 +94,7 @@ public class PlayerCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        GenerateMap.getInstance().saveImage(activeGame, event);
+        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
     }
 
 
