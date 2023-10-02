@@ -120,6 +120,13 @@
         ]
     },
     {
+        "alias": "relics_base",
+        "name": "Base Game Relics (An Empty Deck)",
+        "type": "relic",
+        "description": "An empty Deck to handle base game",
+        "cardIDs": []
+    },
+    {
         "alias": "relics_pok",
         "name": "PoK Relics",
         "type": "relic",
@@ -161,6 +168,13 @@
         ]
     },
 
+    {
+        "alias": "explores_base",
+        "name": "Base Game Explore Cards (an Empty Deck)",
+        "type": "explore",
+        "description": "An empty Deck to handle base game",
+        "cardIDs": []
+    },
     {
         "alias": "explores_pok",
         "name": "PoK Explore Cards",
