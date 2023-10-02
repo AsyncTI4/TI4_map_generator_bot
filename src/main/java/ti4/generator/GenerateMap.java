@@ -1006,6 +1006,7 @@ public class GenerateMap {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
+        boolean addedAbilities = false;
         for (String abilityID : player.getAbilities()) {
 
             String abilityFileName = null;
@@ -1034,8 +1035,9 @@ public class GenerateMap {
             drawPAImage(x + deltaX, y, abilityFileName);
 
             deltaX += 48;
+            addedAbilities = true;
         }
-        return x + deltaX + 20;
+        return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
     private int reinforcements(Player player, Game activeGame, int xDeltaFromRightSide, int y, HashMap<String, Integer> unitCount) {
