@@ -43,7 +43,7 @@ public abstract class FOWSubcommandData extends SubcommandData {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-       // File file = GenerateMap.getInstance().saveImage(activeMap, event);
+       // FileUpload file = GenerateMap.getInstance().saveImage(activeMap, event);
       //  MessageHelper.replyToMessage(event, file);
     }
 }

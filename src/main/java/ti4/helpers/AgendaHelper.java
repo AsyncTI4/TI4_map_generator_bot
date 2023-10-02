@@ -30,6 +30,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.agenda.RevealAgenda;
@@ -263,7 +265,7 @@ public class AgendaHelper {
                 if (watchParty != null && !activeGame.isFoWMode()) {
                     Tile tile = activeGame.getTileFromPlanet("mr");
                     if (tile != null) {
-                        File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
+                        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
                         String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + AgendaHelper.getSummaryOfVotes(activeGame, true);
                         MessageHelper.sendMessageToChannel(watchParty, message);
                         MessageHelper.sendMessageWithFile(watchParty, systemWithContext, "Surrounding Mecatol Rex In " + activeGame.getName(), false);

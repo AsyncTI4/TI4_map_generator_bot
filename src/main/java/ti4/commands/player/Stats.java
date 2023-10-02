@@ -307,7 +307,6 @@ public class Stats extends PlayerSubcommandData {
 				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
-
 			player.setTg(tg);
 			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);

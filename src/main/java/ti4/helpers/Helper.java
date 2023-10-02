@@ -52,6 +52,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -672,6 +673,18 @@ public class Helper {
         return planetButtons;
     }
 
+    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix, @Nullable ButtonInteractionEvent event) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame);
+        for (Tile tile : tiles) {
+            if(AddCC.hasCC(event, player.getColor(), tile) ){
+                Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player));
+                planetButtons.add(button);
+            }
+        }
+        return planetButtons;
+    }
+
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
@@ -1121,27 +1134,22 @@ public class Helper {
         return getEmojiFromDiscord(leader.getId());
     }
 
+    @Deprecated
     public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         String leaderID = leader.getId();
 
-        String leaderRep = Mapper.getLeaderRepresentations().get(leaderID);
-        if (leaderRep == null) {
+        LeaderModel leaderModel = Mapper.getLeader(leaderID);
+        if (leaderModel == null) {
             BotLogger.log("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
             return leader.getId();
         }
 
-        //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
-        String[] leaderRepSplit = leaderRep.split(";");
-        if (leaderRepSplit.length != 6) {
-            BotLogger.log("Invalid `leaderID=" + leaderID + "` `leaderRepSplit.length=" + leaderRepSplit.length + "` caught within `Helper.getLeaderRepresentation`");
-            return leaderRep;
-        }
-        String leaderName = leaderRepSplit[0];
-        String leaderTitle = leaderRepSplit[1];
-        String heroAbilityName = leaderRepSplit[2];
-        String leaderAbilityWindow = leaderRepSplit[3];
-        String leaderAbilityText = leaderRepSplit[4];
-        String leaderUnlockCondition = leaderRepSplit[5];
+        String leaderName = leaderModel.getName();
+        String leaderTitle = leaderModel.getTitle();
+        String heroAbilityName = leaderModel.getAbilityName();
+        String leaderAbilityWindow = leaderModel.getAbilityWindow();
+        String leaderAbilityText = leaderModel.getAbilityText();
+        String leaderUnlockCondition = leaderModel.getUnlockCondition();
 
         StringBuilder representation = new StringBuilder();
         representation.append(getFactionLeaderEmoji(leader)).append(" **").append(leaderName).append("**");

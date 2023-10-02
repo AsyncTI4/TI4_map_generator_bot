@@ -1,0 +1,322 @@
+[
+  {
+    "alias": "corner",
+    "name": "Corner the Market",
+    "phase": "Status",
+    "text": "Control 4 planets that each have the same planet trait.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "develop",
+    "name": "Develop Weaponry",
+    "phase": "Status",
+    "text": "Own 2 unit upgrade technologies.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "diversify",
+    "name": "Diversify Research",
+    "phase": "Status",
+    "text": "Own 2 technologies in each of 2 colors.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "monument",
+    "name": "Erect a Monument",
+    "phase": "Status",
+    "text": "Spend 8 resources.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "expand_borders",
+    "name": "Expand Borders",
+    "phase": "Status",
+    "text": "Control 6 planets in non-home systems.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "research_outposts",
+    "name": "Found Research Outposts",
+    "phase": "Status",
+    "text": "Control 3 planets that have technology specialties.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "intimidate",
+    "name": "Intimidate Council",
+    "phase": "Status",
+    "text": "Have 1 or more ships in 2 systems that are adjacent to Mecatol Rex's system.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "lead",
+    "name": "Lead From the Front",
+    "phase": "Status",
+    "text": "Spend a total of 3 tokens from your tactic and/or strategy pools.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "trade_routes",
+    "name": "Negotiate Trade Routes",
+    "phase": "Status",
+    "text": "Spend 5 trade goods.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "sway_council",
+    "name": "Sway the Council",
+    "phase": "Status",
+    "text": "Spend 8 influence.",
+    "points": 1,
+    "source": "base"
+  },
+  {
+    "alias": "amass_wealth",
+    "name": "Amass Wealth",
+    "phase": "Status",
+    "text": "Spend 3 influence, 3 resources, and 3 trade goods.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "build_defenses",
+    "name": "Build Defenses",
+    "phase": "Status",
+    "text": "Have 4 or more structures.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "lost_outposts",
+    "name": "Discover Lost Outposts",
+    "phase": "Status",
+    "text": "Control 2 planets that have attachments.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "engineer_marvel",
+    "name": "Engineer a Marvel",
+    "phase": "Status",
+    "text": "Have your flagship or a war sun on the game board.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "deep_space",
+    "name": "Explore Deep Space",
+    "phase": "Status",
+    "text": "Have units in 3 systems that do not contain planets.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "infrastructure",
+    "name": "Improve Infrastructure",
+    "phase": "Status",
+    "text": "Have structures on 3 planets outside of your home system.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "make_history",
+    "name": "Make History",
+    "phase": "Status",
+    "text": "Have units in 2 systems that contain legendary planets, Mecatol Rex, or anomalies.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "outer_rim",
+    "name": "Populate the Outer Rim",
+    "phase": "Status",
+    "text": "Have units in 3 systems on the edge of the game board other than your home system.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "push_boundaries",
+    "name": "Push Boundaries",
+    "phase": "Status",
+    "text": "Control more planets than each of 2 of your neighbors.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "raise_fleet",
+    "name": "Raise a Fleet",
+    "phase": "Status",
+    "text": "Have 5 or more non-fighter ships in 1 system.",
+    "points": 1,
+    "source": "pok"
+  },
+  {
+    "alias": "centralize_trade",
+    "name": "Centralize Galactic Trade",
+    "phase": "Status",
+    "text": "Spend 10 trade goods.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "conquer",
+    "name": "Conquer the Weak",
+    "phase": "Status",
+    "text": "Control 1 planet that is in another player's home system.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "brain_trust",
+    "name": "Form Galactic Brain Trust",
+    "phase": "Status",
+    "text": "Control 5 planets that have technology specialties.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "golden_age",
+    "name": "Found a Golden Age",
+    "phase": "Status",
+    "text": "Spend 16 resources.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "galvanize",
+    "name": "Galvanize the People",
+    "phase": "Status",
+    "text": "Spend a total of 6 tokens from your tactic and/or strategy pools.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "manipulate_law",
+    "name": "Manipulate Galactic Law",
+    "phase": "Status",
+    "text": "Spend 16 influence.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "master_science",
+    "name": "Master the Sciences",
+    "phase": "Status",
+    "text": "Own 2 technologies in each of 4 colors.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "revolutionize",
+    "name": "Revolutionize Warfare",
+    "phase": "Status",
+    "text": "Own 3 unit upgrade technologies.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "subdue",
+    "name": "Subdue the Galaxy",
+    "phase": "Status",
+    "text": "Control 11 planets in non-home systems.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "unify_colonies",
+    "name": "Unify the Colonies",
+    "phase": "Status",
+    "text": "Control 6 planets that each have the same planet trait.",
+    "points": 2,
+    "source": "base"
+  },
+  {
+    "alias": "supremacy",
+    "name": "Achieve Supremacy",
+    "phase": "Status",
+    "text": "Have your flagship or war sun in another player's home system or the Mecatol Rex system.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "become_legend",
+    "name": "Become a Legend",
+    "phase": "Status",
+    "text": "Have units in 4 systems that contain legendary planets, Mecatol Rex, or anomalies.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "command_armada",
+    "name": "Command an Armada",
+    "phase": "Status",
+    "text": "Have 8 or more non-fighter ships in 1 system.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "massive_cities",
+    "name": "Construct Massive Cities",
+    "phase": "Status",
+    "text": "Have 7 or more structures.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "control_borderlands",
+    "name": "Control the Borderlands",
+    "phase": "Status",
+    "text": "Have units in 5 systems on the edge of the game board other than your home system.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "vast_reserves",
+    "name": "Hold Vast Reserves",
+    "phase": "Status",
+    "text": "Spend 6 influence, 6 resources, and 6 trade goods.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "vast_territories",
+    "name": "Patrol Vast Territories",
+    "phase": "Status",
+    "text": "Have units in 5 systems that do not contain planets.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "protect_border",
+    "name": "Protect the Border",
+    "phase": "Status",
+    "text": "Have structures on 5 planets outside of your home system.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "ancient_monuments",
+    "name": "Reclaim Ancient Monuments",
+    "phase": "Status",
+    "text": "Control 3 planets that have attachments.",
+    "points": 2,
+    "source": "pok"
+  },
+  {
+    "alias": "distant_lands",
+    "name": "Rule Distant Lands",
+    "phase": "Status",
+    "text": "Control 2 planets that are each in or adjacent to a different, other player's home system.",
+    "points": 2,
+    "source": "pok"
+  }
+]

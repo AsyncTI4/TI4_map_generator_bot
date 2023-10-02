@@ -12,8 +12,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -32,7 +31,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -41,6 +44,8 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +61,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.WebHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
-import ti4.map.MapFileDeleter;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -65,6 +69,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -109,6 +114,8 @@ public class GenerateMap {
     private long debugFowTime;
     private long debugTileTime;
     private long debugGameInfoTime;
+    private long debugWebsiteTime;
+    private long debugImageIOTime;
 
     private static GenerateMap instance;
 
@@ -116,6 +123,7 @@ public class GenerateMap {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         scoreTokenWidth = bufferedImage.getWidth();
+        ImageIO.setUseCache(false);
         init(null);
         resetImage();
     }
@@ -134,7 +142,7 @@ public class GenerateMap {
             int mostObjs = Math.max(Math.max(stage1, stage2), other);
             int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
-            int playerCountForMap = activeGame.getPlayerCountForMap();
+            int playerCountForMap = activeGame.getRealPlayers().size();
             int playerHeight = 340;
             int playerY = playerCountForMap * playerHeight;
 
@@ -168,14 +176,22 @@ public class GenerateMap {
         return instance;
     }
 
-    public File saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
+    public FileUpload saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
         if (activeGame.getDisplayTypeForced() != null) {
-            return saveImage(activeGame, activeGame.getDisplayTypeForced(), event);
+            return saveImage(activeGame, activeGame.getDisplayTypeForced(), event, false);
         }
-        return saveImage(activeGame, DisplayType.all, event);
+        return saveImage(activeGame, DisplayType.all, event, false);
     }
 
-    public File saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+    public void saveImageToWebsiteOnly(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        saveImage(activeGame, displayType, event, true);
+    }
+
+    public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        return saveImage(activeGame, displayType, event, false);
+    }
+
+    private FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug) {
             debugStartTime = System.nanoTime();
@@ -301,6 +317,7 @@ public class GenerateMap {
             gameInfo(activeGame, displayType);
             if (debug) debugGameInfoTime = System.nanoTime() - debugTime;
 
+            if (debug) debugTime = System.nanoTime();
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> {
@@ -311,41 +328,59 @@ public class GenerateMap {
                 Player player = getFowPlayer(activeGame, event);
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
             }
+            if (debug) debugWebsiteTime = System.nanoTime() - debugTime;
         } catch (IOException e) {
             BotLogger.log(activeGame.getName() + ": Could not save generated map");
         }
 
-        String timeStamp = getTimeStamp();
-        String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
-        try (
-            FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
+
+        if (debug) debugTime = System.nanoTime();
+        FileUpload fileUpload = null;
+
+        if (!skipDiscordFileUpload) {
+            // CONVERT PNG TO JPG
             BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
-            if (!canWrite) {
-                throw new IllegalStateException("Failed to write image.");
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+                imageWriter.setOutput(ImageIO.createImageOutputStream(out));
+                ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+                if (defaultWriteParam.canWriteCompressed()) {
+                    defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                    defaultWriteParam.setCompressionQuality(0.15f);
+                }
+                imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
+                out.close();
+
+                String fileName = activeGame.getName() + "_" + getTimeStamp()  + ".jpg";
+                fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
+            } catch (IOException e) {
+                BotLogger.log("Could not create FileUpload", e);
             }
-        } catch (IOException e) {
-            BotLogger.log("Could not save jpg file", e);
         }
-        File jpgFile = new File(absolutePath);
-        MapFileDeleter.addFileToDelete(jpgFile);
+        if (debug) debugImageIOTime = System.nanoTime() - debugTime;
 
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
             StringBuilder sb = new StringBuilder();
             sb.append(" Total time to generate map ").append(activeGame.getName()).append(": ").append(Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
-            sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
-            sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
-            sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append("    Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
+            sb.append("    Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
+            sb.append("    Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append("     Web time: ").append(Helper.getTimeRepresentationNanoSeconds(debugWebsiteTime)).append(String.format(" (%2.2f%%)", (double) debugWebsiteTime / (double) total * 100.0)).append("\n");
+            sb.append(" ImageIO time: ").append(Helper.getTimeRepresentationNanoSeconds(debugImageIOTime)).append(String.format(" (%2.2f%%)", (double) debugImageIOTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
             MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
+
         ImageHelper.getCacheStats().ifPresent(stats ->
             AsyncTI4DiscordBot.THREAD_POOL.execute(() ->
                 MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```")));
+
         AsyncTI4DiscordBot.jda.getPresence().setStatus(OnlineStatus.ONLINE);
-        return jpgFile;
+
+        return fileUpload;
     }
 
     private Player getFowPlayer(Game activeGame, @Nullable GenericInteractionCreateEvent event) {
@@ -374,17 +409,17 @@ public class GenerateMap {
         return factionFile;
     }
 
-    private static BufferedImage getFactionIconImage(Player player) {
-        return getFactionIconImageScaled(player, 95, 95);
+    private static BufferedImage getPlayerFactionIconImage(Player player) {
+        return getPlayerFactionIconImageScaled(player, 95, 95);
     }
 
-    private static BufferedImage getFactionIconImageScaled(Player player, float scale) {
+    private static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
         int scaledWidth = (int) (95 * scale);
         int scaledHeight = (int) (95 * scale);
-        return getFactionIconImageScaled(player, scaledWidth, scaledHeight);
+        return getPlayerFactionIconImageScaled(player, scaledWidth, scaledHeight);
     }
 
-    private static BufferedImage getFactionIconImageScaled(Player player, int width, int height) {
+    private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null) return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
         if (factionEmoji instanceof CustomEmoji && !Helper.getFactionIconFromDiscord(player.getFaction()).equalsIgnoreCase(factionEmoji.getFormatted())) {
@@ -393,9 +428,13 @@ public class GenerateMap {
             return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
         }
 
-        String factionID = player.getFaction();
-        String factionPath = getFactionIconPath(factionID);
+        return getFactionIconImageScaled(player.getFaction(), width, height);
+    }
 
+    private static BufferedImage getFactionIconImageScaled(String factionID, int width, int height) {
+        String factionPath = getFactionIconPath(factionID);
+        if (factionPath == null) return null;
+    
         if (width == 95 && height == 95) { //default faction image size is 95x95
             return ImageHelper.read(factionPath);
         }
@@ -485,7 +524,7 @@ public class GenerateMap {
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionIconImage(player);
+                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
@@ -845,7 +884,10 @@ public class GenerateMap {
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
             String relicFileName = "pa_relics_" + relicID + statusOfPlanet + ".png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+            if(!relicID.contains("axisorder")){
+                drawPAImage(x + deltaX, y, "pa_relics_icon.png");
+            }
+            
             drawPAImage(x + deltaX, y, relicFileName);
             deltaX += 48;
         }
@@ -864,10 +906,14 @@ public class GenerateMap {
             } else {
                 graphics.setColor(Color.WHITE);
             }
+
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            String leaderFileName = "pa_leaders_factionicon_" + player.getFaction() + "_rdy.png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, leaderFileName);
+
+            if (Mapper.isValidLeader(leader.getId())) {
+                LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+                graphics.drawImage(getFactionIconImageScaled(leaderModel.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
+            }
 
             if (leader.getTgCount() != 0) {
                 graphics.setColor(new Color(241, 176, 0));
@@ -899,34 +945,33 @@ public class GenerateMap {
                 leaderInfoFileName = "pa_leaders_envoy" + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
-            if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
-                List<String> mahactCCs = player.getMahactCC();
-                Collection<Player> players = activeGame.getPlayers().values();
-                for (Player player_ : players) {
-                    if (player_ != player) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        if (playerColor != null && mahactCCs.contains(playerColor)) {
-                            Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
-                            if (leader_ != null) {
-                                boolean locked = leader_.isLocked();
-                                String imperiaColorFile = "pa_leaders_imperia";
-                                if (locked) {
-                                    imperiaColorFile += "_exh";
-                                } else {
-                                    imperiaColorFile += "_rdy";
-                                }
-                                imperiaColorFile += ".png";
-                                String leaderFileName_ = "pa_leaders_factionicon_" + playerFaction + "_rdy.png";
-                                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-                                drawPAImage(x + deltaX, y, leaderFileName_);
-
-                                drawPAImage(x + deltaX, y, imperiaColorFile);
-                                String status_ = locked ? "_exh" : "_rdy";
-                                String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
-                                drawPAImage(x + deltaX, y, leaderPipInfo);
-                                deltaX += 48;
+        }
+        if (player.hasAbility("imperia")) {
+            deltaX += 5;
+            List<String> mahactCCs = player.getMahactCC();
+            Collection<Player> players = activeGame.getRealPlayers();
+            for (Player player_ : players) {
+                if (player_ != player) {
+                    String playerColor = player_.getColor();
+                    if (mahactCCs.contains(playerColor)) {
+                        Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
+                        if (leader_ != null) {
+                            boolean locked = leader_.isLocked();
+                            String imperiaColorFile = "pa_leaders_imperia";
+                            if (locked) {
+                                imperiaColorFile += "_exh";
+                            } else {
+                                imperiaColorFile += "_rdy";
                             }
+                            imperiaColorFile += ".png";
+                            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                            graphics.drawImage(getPlayerFactionIconImageScaled(player_, 42, 42), x + deltaX - 1, y + 108, null);
+
+                            drawPAImage(x + deltaX, y, imperiaColorFile);
+                            String status_ = locked ? "_exh" : "_rdy";
+                            String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
+                            drawPAImage(x + deltaX, y, leaderPipInfo);
+                            deltaX += 48;
                         }
                     }
                 }
@@ -990,7 +1035,7 @@ public class GenerateMap {
 
         if (hideFactionIcon) return;
         scale = scale * 0.50f;
-        BufferedImage factionImage = getFactionIconImageScaled(player, scale);
+        BufferedImage factionImage = getPlayerFactionIconImageScaled(player, scale);
         if (factionImage == null) return;
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
@@ -1004,6 +1049,7 @@ public class GenerateMap {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
+        boolean addedAbilities = false;
         for (String abilityID : player.getAbilities()) {
 
             String abilityFileName = null;
@@ -1032,8 +1078,9 @@ public class GenerateMap {
             drawPAImage(x + deltaX, y, abilityFileName);
 
             deltaX += 48;
+            addedAbilities = true;
         }
-        return x + deltaX + 20;
+        return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
     private int reinforcements(Player player, Game activeGame, int xDeltaFromRightSide, int y, HashMap<String, Integer> unitCount) {
@@ -1180,7 +1227,7 @@ public class GenerateMap {
 
         String faction = player.getFaction();
         if (faction != null) {
-            BufferedImage bufferedImage = getFactionIconImage(player);
+            BufferedImage bufferedImage = getPlayerFactionIconImage(player);
             if (bufferedImage != null) {
                 graphics.drawImage(bufferedImage, x + 178, y + 33, null);
             }
@@ -1445,8 +1492,12 @@ public class GenerateMap {
                             originalPlanetType = "keleres";
                         }
 
-                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // if (Mapper.isFaction(originalPlanetType)) {
+                        //     graphics.drawImage(getFactionIconImageScaled(player, 52, 52), x + deltaX - 1, y -1, null);
+                        // } else {
+                            String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                            drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // }
                     }
                 }
 
@@ -1983,7 +2034,7 @@ public class GenerateMap {
                 if (player.isPassed() || player.getSCs().size() == 0) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionIconImage(player);
+                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                         x += 100;
@@ -2175,7 +2226,7 @@ public class GenerateMap {
             BufferedImage factionImage = null;
             int centreCustomTokenHorizontally = 0;
             if (!hideFactionIcon) {
-                factionImage = getFactionIconImageScaled(player, 45, 45);
+                factionImage = getPlayerFactionIconImageScaled(player, 45, 45);
                 centreCustomTokenHorizontally = ccImage.getWidth() / 2 - factionImage.getWidth() / 2;
             }
 
@@ -2951,17 +3002,10 @@ public class GenerateMap {
 
                 String faction = getFactionByControlMarker(activeGame.getPlayers().values(), ccID);
                 Player player = getPlayerByControlMarker(activeGame.getPlayers().values(), ccID);
-                BufferedImage factionImage = null;
                 boolean convertToGeneric = isFrogPrivate != null && isFrogPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, frogPlayer);
-                if (faction != null) {
-                    if (!convertToGeneric || frogPlayer != null && frogPlayer.getFaction().equals(faction)) {
-                        factionImage = getFactionIconImageScaled(player, 0.50f);
-                    }
-                }
 
                 boolean generateImage = true;
                 if (ccID.startsWith("sweep")) {
-                    factionImage = null;
                     if (player != frogPlayer) {
                         generateImage = false;
                     }

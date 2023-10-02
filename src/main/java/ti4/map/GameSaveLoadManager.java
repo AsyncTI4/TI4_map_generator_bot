@@ -694,7 +694,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
+
             StringBuilder leaderInfo = new StringBuilder();
+            if (player.getLeaders().isEmpty()) leaderInfo.append("none");
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
@@ -933,7 +935,7 @@ public class GameSaveLoadManager {
         return null;
     }
 
-    private static Game loadMapJSON(String mapFile) {
+    public static Game loadMapJSONString(String mapFile) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
@@ -1746,7 +1748,12 @@ public class GameSaveLoadManager {
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));
                 case Constants.LEADERS -> {
-                    StringTokenizer leaderInfos = new StringTokenizer(tokenizer.nextToken(), ";");
+                    String nextToken = tokenizer.nextToken();
+                    if ("none".equals(nextToken)) {
+                        player.setLeaders(new ArrayList<>());
+                        break;
+                    }
+                    StringTokenizer leaderInfos = new StringTokenizer(nextToken, ";");
                     try {
                         List<Leader> leaderList = new ArrayList<>();
                         while (leaderInfos.hasMoreTokens()) {

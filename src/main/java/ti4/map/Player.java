@@ -1252,8 +1252,11 @@ public class Player {
         return commodities;
     }
 
-    public void setCommodities(int commodities) {
-        this.commodities = commodities;
+    public void setCommodities(int comms) {
+        if(comms > commoditiesTotal && commoditiesTotal > 0){
+            comms = commoditiesTotal;
+        }
+        commodities = comms;
     }
 
     public List<String> getTechs() {
