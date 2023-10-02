@@ -799,12 +799,12 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> abilities = new HashMap<>(Mapper.getFactionAbilities());
+                        Map<String, String> abilities = new HashMap<>(Mapper.getFactionAbilities());    
                         List<Command.Choice> options = abilities.entrySet().stream()
                                 .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(value -> value.getKey() + "=" + StringUtils.substringBefore(value.getValue(), "|"))
+                                .map(value -> new Command.Choice(value, StringUtils.substringBefore(value, "=")))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
