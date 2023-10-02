@@ -110,6 +110,8 @@ public class GenerateMap {
     private long debugFowTime;
     private long debugTileTime;
     private long debugGameInfoTime;
+    private long debugGameImageWebsiteTime;
+    private long debugGameImageFileSaveTime;
 
     private static GenerateMap instance;
 
@@ -302,6 +304,7 @@ public class GenerateMap {
             gameInfo(activeGame, displayType);
             if (debug) debugGameInfoTime = System.nanoTime() - debugTime;
 
+            if (debug) debugTime = System.nanoTime();
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> {
@@ -312,10 +315,12 @@ public class GenerateMap {
                 Player player = getFowPlayer(activeGame, event);
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
             }
+            if (debug) debugGameImageWebsiteTime = System.nanoTime() - debugTime;
         } catch (IOException e) {
             BotLogger.log(activeGame.getName() + ": Could not save generated map");
         }
 
+        if (debug) debugTime = System.nanoTime();
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + activeGame.getName() + "_" + timeStamp + ".jpg";
         try (
@@ -331,6 +336,7 @@ public class GenerateMap {
         }
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
+        if (debug) debugGameImageFileSaveTime = System.nanoTime() - debugTime;
 
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
@@ -339,6 +345,8 @@ public class GenerateMap {
             sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
             sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
             sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append("    Web time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageWebsiteTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageWebsiteTime / (double) total * 100.0)).append("\n");
+            sb.append("   File time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageFileSaveTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageFileSaveTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
             MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
