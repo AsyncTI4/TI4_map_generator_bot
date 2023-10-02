@@ -13,8 +13,6 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -63,7 +61,6 @@ import ti4.helpers.Storage;
 import ti4.helpers.WebHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
-import ti4.map.MapFileDeleter;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -117,9 +114,8 @@ public class GenerateMap {
     private long debugFowTime;
     private long debugTileTime;
     private long debugGameInfoTime;
-    private long debugGameImageWebsiteTime;
-    private long debugGameImageFileSaveTime;
-    private long debugGameFileUploadCreationTime;
+    private long debugWebsiteTime;
+    private long debugImageIOTime;
 
     private static GenerateMap instance;
 
@@ -127,6 +123,7 @@ public class GenerateMap {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         scoreTokenWidth = bufferedImage.getWidth();
+        ImageIO.setUseCache(false);
         init(null);
         resetImage();
     }
@@ -181,12 +178,20 @@ public class GenerateMap {
 
     public FileUpload saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
         if (activeGame.getDisplayTypeForced() != null) {
-            return saveImage(activeGame, activeGame.getDisplayTypeForced(), event);
+            return saveImage(activeGame, activeGame.getDisplayTypeForced(), event, false);
         }
-        return saveImage(activeGame, DisplayType.all, event);
+        return saveImage(activeGame, DisplayType.all, event, false);
+    }
+
+    public void saveImageToWebsiteOnly(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        saveImage(activeGame, displayType, event, true);
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        return saveImage(activeGame, displayType, event, false);
+    }
+
+    private FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug) {
             debugStartTime = System.nanoTime();
@@ -323,65 +328,48 @@ public class GenerateMap {
                 Player player = getFowPlayer(activeGame, event);
                 AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
             }
-            if (debug) debugGameImageWebsiteTime = System.nanoTime() - debugTime;
+            if (debug) debugWebsiteTime = System.nanoTime() - debugTime;
         } catch (IOException e) {
             BotLogger.log(activeGame.getName() + ": Could not save generated map");
         }
 
+
         if (debug) debugTime = System.nanoTime();
-        String timeStamp = getTimeStamp();
-        String fileName = activeGame.getName() + "_" + timeStamp  + ".jpg";
-        String absolutePath = Storage.getMapImageDirectory() + "/" + fileName;
+        FileUpload fileUpload = null;
 
-        float scale = 0.999f;
-        int newWidth = (int) (width * scale);
-        int newHeight = (int) (height * scale);
-        // BufferedImage convertedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        BufferedImage convertedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        // try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            // convertedImage.createGraphics().drawImage(mainImage, 0, 0, newWidth, newHeight, Color.black, null);
-        convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-        //     boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
-        //     if (!canWrite) {
-        //         throw new IllegalStateException("Failed to write image.");
-        //     }
-        // } catch (IOException e) {
-        //     BotLogger.log("Could not save jpg file", e);
-        // }
+        if (!skipDiscordFileUpload) {
+            // CONVERT PNG TO JPG
+            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
+                imageWriter.setOutput(ImageIO.createImageOutputStream(out));
+                ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+                if (defaultWriteParam.canWriteCompressed()) {
+                    defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                    defaultWriteParam.setCompressionQuality(0.15f);
+                }
+                imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
+                out.close();
 
-
-        // File jpgFile = new File(absolutePath);
-        // MapFileDeleter.addFileToDelete(jpgFile);
-        if (debug) debugGameImageFileSaveTime = System.nanoTime() - debugTime;
-        
-        
-        if (debug) debugTime = System.nanoTime();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()) {
-                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(0.2f);
+                String fileName = activeGame.getName() + "_" + getTimeStamp()  + ".jpg";
+                fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
+            } catch (IOException e) {
+                BotLogger.log("Could not create FileUpload", e);
             }
-            imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
-        } catch (IOException e) {
-            BotLogger.log("Could not create FileUpload", e);
         }
-        FileUpload fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
-        if (debug) debugGameFileUploadCreationTime = System.nanoTime() - debugTime;
+        if (debug) debugImageIOTime = System.nanoTime() - debugTime;
 
         if (debug) {
             long total = System.nanoTime() - debugStartTime;
             StringBuilder sb = new StringBuilder();
             sb.append(" Total time to generate map ").append(activeGame.getName()).append(": ").append(Helper.getTimeRepresentationNanoSeconds(total)).append("\n");
-            sb.append("   Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
-            sb.append("   Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
-            sb.append("   Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
-            sb.append("    Web time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageWebsiteTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageWebsiteTime / (double) total * 100.0)).append("\n");
-            sb.append("   File time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameImageFileSaveTime)).append(String.format(" (%2.2f%%)", (double) debugGameImageFileSaveTime / (double) total * 100.0)).append("\n");
-            sb.append("  FileUpload: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameFileUploadCreationTime)).append(String.format(" (%2.2f%%)", (double) debugGameFileUploadCreationTime / (double) total * 100.0)).append("\n");
+            sb.append("    Frog time: ").append(Helper.getTimeRepresentationNanoSeconds(debugFowTime)).append(String.format(" (%2.2f%%)", (double) debugFowTime / (double) total * 100.0)).append("\n");
+            sb.append("    Tile time: ").append(Helper.getTimeRepresentationNanoSeconds(debugTileTime)).append(String.format(" (%2.2f%%)", (double) debugTileTime / (double) total * 100.0)).append("\n");
+            sb.append("    Info time: ").append(Helper.getTimeRepresentationNanoSeconds(debugGameInfoTime)).append(String.format(" (%2.2f%%)", (double) debugGameInfoTime / (double) total * 100.0)).append("\n");
+            sb.append("     Web time: ").append(Helper.getTimeRepresentationNanoSeconds(debugWebsiteTime)).append(String.format(" (%2.2f%%)", (double) debugWebsiteTime / (double) total * 100.0)).append("\n");
+            sb.append(" ImageIO time: ").append(Helper.getTimeRepresentationNanoSeconds(debugImageIOTime)).append(String.format(" (%2.2f%%)", (double) debugImageIOTime / (double) total * 100.0)).append("\n");
             System.out.println(sb);
             MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
         }
@@ -3014,17 +3002,10 @@ public class GenerateMap {
 
                 String faction = getFactionByControlMarker(activeGame.getPlayers().values(), ccID);
                 Player player = getPlayerByControlMarker(activeGame.getPlayers().values(), ccID);
-                BufferedImage factionImage = null;
                 boolean convertToGeneric = isFrogPrivate != null && isFrogPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, frogPlayer);
-                if (faction != null) {
-                    if (!convertToGeneric || frogPlayer != null && frogPlayer.getFaction().equals(faction)) {
-                        factionImage = getPlayerFactionIconImageScaled(player, 0.50f);
-                    }
-                }
 
                 boolean generateImage = true;
                 if (ccID.startsWith("sweep")) {
-                    factionImage = null;
                     if (player != frogPlayer) {
                         generateImage = false;
                     }
