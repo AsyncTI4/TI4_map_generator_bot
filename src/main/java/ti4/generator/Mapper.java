@@ -82,7 +82,7 @@ public class Mapper {
         readData("planets.properties", planets, "Could not read planets file");
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
-        importMultipleJsonObjects("leaders", leaders, LeaderModel.class, "Could not read leader file");
+        importMultipleJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
@@ -96,7 +96,7 @@ public class Mapper {
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
-        String propFile = ResourceHelper.getInstance().getInfoFile(propertyFileName);
+        String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
@@ -106,8 +106,8 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importMultipleJsonObjects(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
-        String folderPath = ResourceHelper.getInstance().getInfoFolder(jsonFolderName);
+    private static <T extends ModelInterface> void importMultipleJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
+        String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
 
         try {
             File folder = new File(folderPath);
@@ -125,7 +125,7 @@ public class Mapper {
     private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target, String error) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
-        String filePath = ResourceHelper.getInstance().getInfoFile(jsonFileName);
+        String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
         JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
