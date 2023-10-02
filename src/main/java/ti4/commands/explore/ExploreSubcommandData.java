@@ -270,6 +270,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
+                if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+                }
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
@@ -375,7 +378,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
-                String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player) + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }

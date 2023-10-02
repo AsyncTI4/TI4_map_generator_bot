@@ -241,6 +241,15 @@ public class Turn extends PlayerSubcommandData {
     public void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
         activeGame.setCurrentPhase("status");
+        for(Player player : activeGame.getRealPlayers()){
+            List<String> relics = new ArrayList<>();
+            relics.addAll(player.getRelics());
+            for(String relic : relics){
+                if(player.getExhaustedRelics().contains(relic)&& relic.contains("axisorder")){
+                    player.removeRelic(relic);
+                }
+            }
+        }
         List<Button> poButtons = getScoreObjectiveButtons(event, activeGame);
         Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
         Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
@@ -292,7 +301,7 @@ public class Turn extends PlayerSubcommandData {
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(activeGame), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
 
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");

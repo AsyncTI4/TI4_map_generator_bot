@@ -123,7 +123,7 @@ public class PlayAC extends ACCardsSubcommandData {
             empyButtons.add(empyButton);
             Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
             empyButtons.add(refuse);
-            MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 Helper.getPlayerRepresentation(empy, activeGame, activeGame.getGuild(), true) + "You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.",
                 empyButtons);
 
@@ -137,7 +137,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 xxchaButtons.add(instinctButton);
                 Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
                 xxchaButtons.add(refuse);
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
                     + "You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel", xxchaButtons);
             }
 

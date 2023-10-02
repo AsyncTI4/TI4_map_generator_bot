@@ -448,7 +448,7 @@ abstract public class AddRemoveUnits implements Command {
                        if (player.getFaction() != null && player.getColor() != null) {
                            String colorID = Mapper.getColorID(player.getColor());
                            if (unitColor.equals(colorID)){
-                               if (!player.getPlanets(activeGame).contains(planetName)) {
+                               if (!player.getPlanetsAllianceMode().contains(planetName)) {
                                    new PlanetAdd().doAction(player, planetName, activeGame, event);
                                }
                                break;
