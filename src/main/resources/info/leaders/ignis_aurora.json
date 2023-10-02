@@ -1,0 +1,68 @@
+[
+    {
+        "id": "qulaneagent",
+        "type": "qulane",
+        "faction": "agent",
+        "name": "Alessiar the Wise",
+        "title": "Eternal Recurrence",
+        "abilityWindow": "At the end of a player's turn:",
+        "abilityText": "You may exhaust this card to allow that player to look at the top card of the event deck. Then, the player may shuffle the event deck.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "qulanecommander",
+        "type": "qulane",
+        "faction": "commander",
+        "name": "Neravi the Resolute",
+        "title": "The Time That Remains",
+        "abilityWindow": "When using the Leadership Primary or Secondary:",
+        "abilityText": "You gain 1 command token for every 2 influence spent.",
+        "unlockCondition": "An agenda you voted for or predicted is resolved.",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "qulanehero",
+        "type": "qulane",
+        "faction": "hero",
+        "name": "Alvisa the All-Seeing",
+        "title": "Differenda of Recognition",
+        "abilityName": "True Attainment",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Draw 5 unrevealed public objectives. Reveal 1 and place it near the public objective; shuffle the rest back into the deck. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "baldrick_letnevhero",
+        "type": "hero",
+        "faction": "letnev",
+        "name": "Darktalon Treilla ",
+        "title": "Dark Matter Affinity ",
+        "abilityName": "Void Transference",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Action: Gain 6 command tokens; you may redistribute any number of the command tokens on your command sheet. Then, purge this card. ",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "baldrick_solagent",
+        "type": "agent",
+        "faction": "sol",
+        "name": "Evelyn DeLouis ",
+        "abilityWindow": "At the start of a ground combat round:",
+        "abilityText": "You may exhaust this card and choose a player involved in the combat; that player must assign 1 hit to 1 of their ground forces. ",
+        "unlockCondition": "Always Unlocked",
+        "source": "ignis_aurora"
+    },
+    {
+        "id": "baldrick_letnevagent",
+        "type": "agent",
+        "faction": "letnev",
+        "name": "Viscount Unlenn ",
+        "abilityWindow": "At the start of a space combat round:",
+        "abilityText": "You may exhaust this card to choose 1 ship in the active system; that ship rolls 1 additional die during this combat round. ",
+        "unlockCondition": "Always Unlocked",
+        "source": "ignis_aurora"
+    }
+]
