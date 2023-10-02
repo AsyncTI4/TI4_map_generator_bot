@@ -35,7 +35,7 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         }
 
         leaderIDs.removeIf(StringUtils::isEmpty);
-        leaderIDs.removeIf(leaderID -> !Mapper.getLeaderRepresentations().containsKey(leaderID));
+        leaderIDs.removeIf(leaderID -> !Mapper.isValidLeader(leaderID));
 
         if (leaderIDs.isEmpty()) {
             sendMessage("No valid leaders were provided. Please see `/help list_leaders` for available choices.");

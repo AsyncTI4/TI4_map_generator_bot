@@ -546,14 +546,6 @@ public class Mapper {
         return leaders.containsKey(leaderID);
     }
 
-    public static HashMap<String, String> getLeaderRepresentations() {
-        HashMap<String, String> leaderRepresentations = new HashMap<>();
-        for (Map.Entry<String, LeaderModel> entry : leaders.entrySet()) {
-            leaderRepresentations.put(entry.getKey(), entry.getValue().getRepresentation(true, true, true));
-        }
-        return leaderRepresentations;
-    }
-
     public static Map<String, String> getTileRepresentations() {
         return TileHelper.getAllTiles().values().stream()
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
