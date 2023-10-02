@@ -67,6 +67,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
@@ -3768,14 +3769,13 @@ public class ButtonHelper {
             if (!leader.isExhausted() && !leader.isLocked()) {
                 String leaderID = leader.getId();
 
-                String leaderRep = Mapper.getLeaderRepresentations().get(leaderID);
-                if (leaderRep == null) {
+                LeaderModel leaderModel = Mapper.getLeader(leaderID);
+                if (leaderModel == null) {
                     continue;
                 }
-                //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
-                String[] leaderRepSplit = leaderRep.split(";");
-                String leaderName = leaderRepSplit[0];
-                String leaderAbilityWindow = leaderRepSplit[3];
+
+                String leaderName = leaderModel.getName();
+                String leaderAbilityWindow = leaderModel.getAbilityWindow();
 
                 String factionEmoji = Helper.getFactionLeaderEmoji(leader);
                 if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
