@@ -161,6 +161,10 @@ public class ResourceHelper {
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
 
+    public String getInfoFolder(String name) {
+        return Storage.getResourcePath() + File.separator + "info" + File.separator + name;
+    }
+
     @Nullable
     public String getWebFile(String name) {
         return getResourceFromFolder("web/", name, "Could not find web file");

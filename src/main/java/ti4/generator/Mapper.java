@@ -37,12 +37,11 @@ public class Mapper {
     private static final Properties explore = new Properties();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
-    private static final Properties leader_representation = new Properties();
     private static final Properties unit_representation = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
-
+    
     //TODO: (Jazz) Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
@@ -55,7 +54,8 @@ public class Mapper {
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
     private static final HashMap<String, UnitModel> units = new HashMap<>();
     private static final HashMap<String, AttachmentModel> attachments = new HashMap<>();
-
+    private static final HashMap<String, LeaderModel> leaders = new HashMap();
+    
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
@@ -71,33 +71,26 @@ public class Mapper {
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("factions.properties", factions, "Could not read factions name file");
-        importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class,
-                "Could not read secret objectives file");
+        importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjects("action_cards.json", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjects("agendas.json", agendas, AgendaModel.class, "Could not read agendas file");
-        importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class,
-                "Could not read public objective file");
-        importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class,
-                "Could not read promissory notes file");
+        importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
+        importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         importJsonObjects("relics.json", relics, RelicModel.class, "Could not read relic file");
         importJsonObjects("technology.json", technologies, TechnologyModel.class, "Could not read technology file");
         readData("planets.properties", planets, "Could not read planets file");
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
-        readData("faction_representation.properties", faction_representation,
-                "Could not read faction representation file");
-        readData("leader_representation.properties", leader_representation,
-                "Could not read leader representation file");
+        readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
+        importMultipleJsonObjects("leaders", leaders, LeaderModel.class, "Could not read leader file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjects("decks.json", decks, DeckModel.class, "could not read decks file");
         importJsonObjects("units.json", units, UnitModel.class, "could not read units file");
-        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class,
-                "could not read strat cards file");
-        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class,
-                "could not read combat modifiers file");
+        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
+        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         importJsonObjects("franken_errata.json", frankenErrata, FrankenItem.class, "Could not read faction setup file");
     }
@@ -113,8 +106,23 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap,
-            Class<T> target, String error) {
+    private static <T extends ModelInterface> void importMultipleJsonObjects(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
+        String folderPath = ResourceHelper.getInstance().getInfoFolder(jsonFolderName);
+
+        try {
+            File folder = new File(folderPath);
+            File[] listOfFiles = folder.listFiles();
+            for (File file : listOfFiles) {
+                if (file.isFile() && file.getName().endsWith(".json")) {
+                    importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target, error);
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log(error, e);
+        }
+    }
+
+    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target, String error) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getInfoFile(jsonFileName);
@@ -526,12 +534,24 @@ public class Mapper {
         return factions;
     }
 
+    public static HashMap<String, LeaderModel> getLeaders() {
+        return new HashMap<>(leaders);
+    }
+
+    public static LeaderModel getLeader(String leaderID) {
+        return leaders.get(leaderID);
+    }
+
+    public static boolean isLeader(String leaderID) {
+        return leaders.containsKey(leaderID);
+    }
+
     public static HashMap<String, String> getLeaderRepresentations() {
-        HashMap<String, String> leaders = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : leader_representation.entrySet()) {
-            leaders.put((String) entry.getKey(), (String) entry.getValue());
+        HashMap<String, String> leaderRepresentations = new HashMap<>();
+        for (Map.Entry<String, LeaderModel> entry : leaders.entrySet()) {
+            leaderRepresentations.put(entry.getKey(), entry.getValue().getRepresentation(true, true, true));
         }
-        return leaders;
+        return leaderRepresentations;
     }
 
     public static Map<String, String> getTileRepresentations() {
