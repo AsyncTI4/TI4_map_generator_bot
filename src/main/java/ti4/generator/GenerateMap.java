@@ -183,8 +183,8 @@ public class GenerateMap {
         return saveImage(activeGame, DisplayType.all, event, false);
     }
 
-    public void saveImageToWebsiteOnly(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
-        saveImage(activeGame, displayType, event, true);
+    public void saveImageToWebsiteOnly(Game activeGame, @Nullable GenericInteractionCreateEvent event) {
+        saveImage(activeGame, DisplayType.all, event, true);
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {

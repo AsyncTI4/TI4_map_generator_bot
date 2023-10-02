@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -94,6 +95,7 @@ public class InstallationCommand implements Command {
         String userID = event.getUser().getId();
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
+        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
