@@ -24,6 +24,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -123,11 +124,8 @@ public class MessageHelper {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
-	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
-		FileUpload fileUpload = FileUpload.fromData(file);
-		channel.sendFiles(fileUpload).queue();
-	}
-	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+
+	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
@@ -137,7 +135,28 @@ public class MessageHelper {
 				}
 			}
 		}
+		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload, boolean SCPlay) {
+		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
 		FileUpload fileUpload = FileUpload.fromData(file);
+		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
+		if(channel.getName().contains("-actions")){
+			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
+			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
+			for (ThreadChannel threadChannel_ : threadChannels) {
+				if (threadChannel_.getName().equals(threadName)) {
+					channel = threadChannel_;
+				}
+			}
+		}
 		channel.sendFiles(fileUpload).queue();
 		splitAndSent(message, channel, buttons);
 	}
@@ -146,22 +165,22 @@ public class MessageHelper {
 		splitAndSent(messageText, event.getMessageChannel());
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file) {
-		replyToMessage(event, file, false, null, false);
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload) {
+		replyToMessage(event, fileUpload, false, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap) {
-		replyToMessage(event, file, forceShowMap, null, false);
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap) {
+		replyToMessage(event, fileUpload, forceShowMap, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap, String messageText, boolean pinMessage) {
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap, String messageText, boolean pinMessage) {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
-				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
+				sendMessageWithFile((MessageChannel) event.getChannel(), fileUpload, messageText, pinMessage);
 				return;
 			}
 			if (event.getChannel() instanceof MessageChannel) {
-				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
+				sendMessageWithFile((MessageChannel)event.getChannel(), fileUpload, messageText, pinMessage);
 			}
 
 		} catch (Exception e) {
@@ -169,7 +188,7 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageWithFile(MessageChannel channel, File file, String messageText, boolean pinMessage) {
+	public static void sendMessageWithFile(MessageChannel channel, FileUpload fileUpload, String messageText, boolean pinMessage) {
 		
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
@@ -181,7 +200,6 @@ public class MessageHelper {
 			}
 		}
 		
-		FileUpload fileUpload = FileUpload.fromData(file);
 		MessageCreateBuilder message = new MessageCreateBuilder();
 		if (messageText != null) {
 			message.addContent(messageText);

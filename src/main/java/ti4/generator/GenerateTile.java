@@ -2,6 +2,7 @@ package ti4.generator;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,15 +83,15 @@ public class GenerateTile {
         return instance;
     }
 
-    public File saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
+    public FileUpload saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
         return saveImage(activeGame, 1, "000", event);
     }
 
-    public File saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
+    public FileUpload saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
         return saveImage(activeGame, context, focusTile, event, null);
     }
 
-    public File saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event, @Nullable Player p1) {
+    public FileUpload saveImage(Game activeGame, int context, String focusTile, @Nullable GenericInteractionCreateEvent event, @Nullable Player p1) {
         init(context, focusTile);
         reset();
 
@@ -161,7 +162,7 @@ public class GenerateTile {
         }
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
-        return jpgFile;
+        return FileUpload.fromData(jpgFile, jpgFile.getName());
     }
 
     private static Set<String> getTilesToShow(Game activeGame, int context, String focusTile) {
