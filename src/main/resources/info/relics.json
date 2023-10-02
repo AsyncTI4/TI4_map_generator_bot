@@ -276,6 +276,54 @@
         "source": "ds"
     },
     {
+        "alias": "axisordercv",
+        "name": "Axis Order Carrier",
+        "text": "At the end of your turn: Exhaust this card to place 1 carrier from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdn",
+        "name": "Axis Order Dreadnought",
+        "text": "At the end of your turn: Exhaust this card to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercr",
+        "name": "Axis Order Cruiser",
+        "text": "At the end of your turn: Exhaust this card to place 1 cruiser from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdd",
+        "name": "Axis Order Destroyer",
+        "text": "At the end of your turn: Exhaust this card to place 2 destroyers from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercvduplicate",
+        "name": "Axis Order Carrier",
+        "text": "At the end of your turn: Exhaust this card to place 1 carrier from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdnduplicate",
+        "name": "Axis Order Dreadnought",
+        "text": "At the end of your turn: Exhaust this card to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercrduplicate",
+        "name": "Axis Order Cruiser",
+        "text": "At the end of your turn: Exhaust this card to place 1 cruiser from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderddduplicate",
+        "name": "Axis Order Destroyer",
+        "text": "At the end of your turn: Exhaust this card to place 2 destroyers from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
         "alias": "starchartfrontier",
         "name": "Star Chart Frontier",
         "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",

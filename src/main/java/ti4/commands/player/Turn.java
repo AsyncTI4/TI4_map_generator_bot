@@ -241,6 +241,15 @@ public class Turn extends PlayerSubcommandData {
     public void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
         activeGame.setCurrentPhase("status");
+        for(Player player : activeGame.getRealPlayers()){
+            List<String> relics = new ArrayList<>();
+            relics.addAll(player.getRelics());
+            for(String relic : relics){
+                if(player.getExhaustedRelics().contains(relic)&& relic.contains("axisorder")){
+                    player.removeRelic(relic);
+                }
+            }
+        }
         List<Button> poButtons = getScoreObjectiveButtons(event, activeGame);
         Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
         Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
