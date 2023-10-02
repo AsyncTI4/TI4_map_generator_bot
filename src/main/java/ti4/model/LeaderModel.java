@@ -76,10 +76,10 @@ public class LeaderModel implements ModelInterface {
     }
 
     public MessageEmbed getRepresentationEmbed() {
-        return getRepresentationEmbed(false, false, false);
+        return getRepresentationEmbed(false, false, false, false);
     }
 
-    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean showUnlockConditions, boolean includeFlavourText) {
+    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
@@ -97,13 +97,15 @@ public class LeaderModel implements ModelInterface {
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
-        FactionModel faction = Mapper.getFactionSetup(getFaction());
-        if (faction != null) {
-            description.append(Helper.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
-        } else {
-            description.append(Helper.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
+        if (includeFactionType) {
+            FactionModel faction = Mapper.getFactionSetup(getFaction());
+            if (faction != null) {
+                description.append(Helper.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
+            } else {
+                description.append(Helper.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
+            }
+            description.append(" ").append(StringUtils.capitalize(getType()));
         }
-        description.append(" ").append(StringUtils.capitalize(getType()));
         if (showUnlockConditions && !"agent".equals(getType())) description.append("\n*Unlock: ").append(getUnlockCondition()).append("*");
         eb.setDescription(description.toString());
 
