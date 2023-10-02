@@ -724,6 +724,14 @@ public class Mapper {
         return factionAbilities;
     }
 
+    public static boolean isValidAbility(String abilityID) {
+        return faction_abilities.containsKey(abilityID);
+    }
+
+    public static String getAbility(String abilityID) {
+        return faction_abilities.getProperty(abilityID);
+    }
+
     public static List<String> getFactions() {
         return factions.keySet().stream()
                 .filter(token -> token instanceof String)
