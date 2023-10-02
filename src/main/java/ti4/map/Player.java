@@ -1252,11 +1252,11 @@ public class Player {
         return commodities;
     }
 
-    public void setCommodities(int commodities) {
-        if(commodities > getCommoditiesTotal()){
-            commodities = getCommoditiesTotal();
+    public void setCommodities(int comms) {
+        if(comms > commoditiesTotal){
+            comms = commoditiesTotal;
         }
-        this.commodities = commodities;
+        commodities = comms;
     }
 
     public List<String> getTechs() {
