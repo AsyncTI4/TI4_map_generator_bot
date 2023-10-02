@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -74,8 +75,8 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                File stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-                MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
+                FileUpload stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+                MessageHelper.sendFileUploadToChannel(event.getChannel(), stats_file);
 
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.system.getValue())) {
@@ -90,7 +91,7 @@ public class ShowGame implements Command {
     }
 
     private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
-        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
 
         List<Button> buttons = new ArrayList<>();
         if (!activeGame.isFoWMode()) {
