@@ -1253,7 +1253,7 @@ public class Player {
     }
 
     public void setCommodities(int comms) {
-        if(comms > commoditiesTotal){
+        if(comms > commoditiesTotal && commoditiesTotal > 0){
             comms = commoditiesTotal;
         }
         commodities = comms;
