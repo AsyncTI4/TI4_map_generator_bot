@@ -65,6 +65,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -374,17 +375,17 @@ public class GenerateMap {
         return factionFile;
     }
 
-    private static BufferedImage getFactionIconImage(Player player) {
-        return getFactionIconImageScaled(player, 95, 95);
+    private static BufferedImage getPlayerFactionIconImage(Player player) {
+        return getPlayerFactionIconImageScaled(player, 95, 95);
     }
 
-    private static BufferedImage getFactionIconImageScaled(Player player, float scale) {
+    private static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
         int scaledWidth = (int) (95 * scale);
         int scaledHeight = (int) (95 * scale);
-        return getFactionIconImageScaled(player, scaledWidth, scaledHeight);
+        return getPlayerFactionIconImageScaled(player, scaledWidth, scaledHeight);
     }
 
-    private static BufferedImage getFactionIconImageScaled(Player player, int width, int height) {
+    private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null) return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
         if (factionEmoji instanceof CustomEmoji && !Helper.getFactionIconFromDiscord(player.getFaction()).equalsIgnoreCase(factionEmoji.getFormatted())) {
@@ -393,9 +394,13 @@ public class GenerateMap {
             return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
         }
 
-        String factionID = player.getFaction();
-        String factionPath = getFactionIconPath(factionID);
+        return getFactionIconImageScaled(player.getFaction(), width, height);
+    }
 
+    private static BufferedImage getFactionIconImageScaled(String factionID, int width, int height) {
+        String factionPath = getFactionIconPath(factionID);
+        if (factionPath == null) return null;
+    
         if (width == 95 && height == 95) { //default faction image size is 95x95
             return ImageHelper.read(factionPath);
         }
@@ -485,7 +490,7 @@ public class GenerateMap {
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionIconImage(player);
+                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
@@ -867,10 +872,14 @@ public class GenerateMap {
             } else {
                 graphics.setColor(Color.WHITE);
             }
+
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            String leaderFileName = "pa_leaders_factionicon_" + player.getFaction() + "_rdy.png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, leaderFileName);
+
+            if (Mapper.isValidLeader(leader.getId())) {
+                LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+                graphics.drawImage(getFactionIconImageScaled(leaderModel.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
+            }
 
             if (leader.getTgCount() != 0) {
                 graphics.setColor(new Color(241, 176, 0));
@@ -993,7 +1002,7 @@ public class GenerateMap {
 
         if (hideFactionIcon) return;
         scale = scale * 0.50f;
-        BufferedImage factionImage = getFactionIconImageScaled(player, scale);
+        BufferedImage factionImage = getPlayerFactionIconImageScaled(player, scale);
         if (factionImage == null) return;
 
         int centreCustomTokenHorizontally = bottomTokenImage.getWidth() / 2 - factionImage.getWidth() / 2;
@@ -1007,6 +1016,7 @@ public class GenerateMap {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
+        boolean addedAbilities = false;
         for (String abilityID : player.getAbilities()) {
 
             String abilityFileName = null;
@@ -1035,8 +1045,9 @@ public class GenerateMap {
             drawPAImage(x + deltaX, y, abilityFileName);
 
             deltaX += 48;
+            addedAbilities = true;
         }
-        return x + deltaX + 20;
+        return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
     private int reinforcements(Player player, Game activeGame, int xDeltaFromRightSide, int y, HashMap<String, Integer> unitCount) {
@@ -1183,7 +1194,7 @@ public class GenerateMap {
 
         String faction = player.getFaction();
         if (faction != null) {
-            BufferedImage bufferedImage = getFactionIconImage(player);
+            BufferedImage bufferedImage = getPlayerFactionIconImage(player);
             if (bufferedImage != null) {
                 graphics.drawImage(bufferedImage, x + 178, y + 33, null);
             }
@@ -1448,8 +1459,12 @@ public class GenerateMap {
                             originalPlanetType = "keleres";
                         }
 
-                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // if (Mapper.isFaction(originalPlanetType)) {
+                        //     graphics.drawImage(getFactionIconImageScaled(player, 52, 52), x + deltaX - 1, y -1, null);
+                        // } else {
+                            String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                            drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
+                        // }
                     }
                 }
 
@@ -1986,7 +2001,7 @@ public class GenerateMap {
                 if (player.isPassed() || player.getSCs().size() == 0) continue;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getFactionIconImage(player);
+                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, deltaY - 70, null);
                         x += 100;
@@ -2178,7 +2193,7 @@ public class GenerateMap {
             BufferedImage factionImage = null;
             int centreCustomTokenHorizontally = 0;
             if (!hideFactionIcon) {
-                factionImage = getFactionIconImageScaled(player, 45, 45);
+                factionImage = getPlayerFactionIconImageScaled(player, 45, 45);
                 centreCustomTokenHorizontally = ccImage.getWidth() / 2 - factionImage.getWidth() / 2;
             }
 
@@ -2958,7 +2973,7 @@ public class GenerateMap {
                 boolean convertToGeneric = isFrogPrivate != null && isFrogPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, frogPlayer);
                 if (faction != null) {
                     if (!convertToGeneric || frogPlayer != null && frogPlayer.getFaction().equals(faction)) {
-                        factionImage = getFactionIconImageScaled(player, 0.50f);
+                        factionImage = getPlayerFactionIconImageScaled(player, 0.50f);
                     }
                 }
 
