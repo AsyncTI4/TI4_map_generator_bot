@@ -5,7 +5,9 @@ import java.awt.Color;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 
 @Data
 public class LeaderModel implements ModelInterface {
@@ -29,6 +31,22 @@ public class LeaderModel implements ModelInterface {
     @Override
     public String getAlias() {
         return getID();
+    }
+
+    public String getLeaderEmoji() {
+        return Helper.getEmojiFromDiscord(getID());
+    }
+
+    public String getRepresentation(boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
+        StringBuilder representation = new StringBuilder();
+        representation.append(getLeaderEmoji()).append(" **").append(getName()).append("**");
+        
+        if (includeTitle) representation.append(": ").append(getTitle()); //add title
+        if (includeAbility && Constants.HERO.equals(getType())) representation.append(" - ").append("__**").append(getAbilityName()).append("**__"); //add hero ability name
+        if (includeAbility) representation.append(" - *").append(getAbilityWindow()).append("* ").append(getAbilityText()); //add ability
+        if (includeUnlockCondition) representation.append(" *Unlock:* ").append(getUnlockCondition());
+
+        return representation.toString();
     }
 
     public MessageEmbed getRepresentationEmbed() {
