@@ -1746,6 +1746,14 @@ public class ButtonHelper {
         if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
             endButtons.add(Button.danger(finChecker + "exhaustTech_pi", "Exhaust Predictive Intelligence"));
         }
+        if(!player.hasAbility("arms_dealer")){
+            for(String shipOrder:ButtonHelper.getPlayersShipOrders(player)){
+                if(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "dreadnought", "placeOneNDone_skipbuild", null).size() > 0){
+                    endButtons.add(Button.success(finChecker + "resolveShipOrder_"+shipOrder, "Use "+Mapper.getRelic(shipOrder).getName()));
+                }
+            }
+        }
+        
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
         }
@@ -1755,6 +1763,15 @@ public class ButtonHelper {
 
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
+    }
+    public static List<String> getPlayersShipOrders(Player player){
+        List<String> shipOrders = new ArrayList<String>();
+        for(String relic : player.getRelics()){
+            if(relic.toLowerCase().contains("axisorder") && !player.getExhaustedRelics().contains(relic)){
+                shipOrders.add(relic);
+            }
+        }
+        return shipOrders;
     }
 
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
@@ -2520,6 +2537,7 @@ public class ButtonHelper {
             case "pd" -> name = "pds";
             case "ff" -> name = "fighter";
             case "ca" -> name = "cruiser";
+            case "cr" -> name = "cruiser";
             case "dd" -> name = "destroyer";
             case "cv" -> name = "carrier";
             case "dn" -> name = "dreadnought";
@@ -3462,8 +3480,12 @@ public class ButtonHelper {
             Button transact = Button.success(finChecker + "transact_TGs_" + p2.getFaction(), "TGs");
             stuffToTransButtons.add(transact);
         }
-        if (p1.getCommodities() > 0) {
+        if (p1.getCommodities() > 0 && !p1.hasAbility("military_industrial_complex")) {
             Button transact = Button.success(finChecker + "transact_Comms_" + p2.getFaction(), "Commodities");
+            stuffToTransButtons.add(transact);
+        }
+        if(ButtonHelper.getPlayersShipOrders(p1).size() > 0){
+             Button transact = Button.secondary(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
             stuffToTransButtons.add(transact);
         }
         if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
@@ -3510,6 +3532,14 @@ public class ButtonHelper {
                 String message = "Click the amount of commodities you would like to send";
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
                     Button transact = Button.success(finChecker + "send_Comms_" + p2.getFaction() + "_" + x, "" + x);
+                    stuffToTransButtons.add(transact);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "shipOrders"->{
+                String message = "Click the axis order you would like to send";
+                for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
+                    Button transact = Button.success(finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder, "" + Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -3628,6 +3658,11 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.pillageCheck(p2, activeGame);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, tgAmount, event);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
+            }
+            case "shipOrders" -> {
+                message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
+                p1.removeRelic(amountToTrans);
+                p2.addRelic(amountToTrans);
             }
             case "ACs" -> {
 
@@ -3758,6 +3793,11 @@ public class ButtonHelper {
                         led = "arborecagent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button.secondary(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Arborec agent").withEmoji(Emoji.fromFormatted(factionEmoji));
+                            compButtons.add(lButton);
+                        }
+                        led = "axisagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Button.secondary(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Axis agent").withEmoji(Emoji.fromFormatted(factionEmoji));
                             compButtons.add(lButton);
                         }
                         led = "xxchaagent";
@@ -4125,7 +4165,7 @@ public class ButtonHelper {
 
                 if (playerLeader != null && buttonID.contains("agent")) {
                     if (!"naaluagent".equalsIgnoreCase(buttonID) && !"muaatagent".equalsIgnoreCase(buttonID) && !"arborecagent".equalsIgnoreCase(buttonID)
-                        && !"xxchaagent".equalsIgnoreCase(buttonID)) {
+                        && !"xxchaagent".equalsIgnoreCase(buttonID)  && !"axisagent".equalsIgnoreCase(buttonID)) {
                         playerLeader.setExhausted(true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getFactionLeaderEmoji(playerLeader));
                         String messageText = Helper.getPlayerRepresentation(p1, activeGame) +
