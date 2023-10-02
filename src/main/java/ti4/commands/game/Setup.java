@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import java.util.Optional;
+import java.util.ArrayList;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class Setup extends GameSubcommandData {
@@ -111,8 +112,24 @@ public class Setup extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
             return false;
         } else if (baseGameMode) {
-            // TODO: Do base game mode setup here instead of separate command
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "For Base Game Mode, please run /custom change_to_base_game. This mode is still Work in Progress");
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_base"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_base"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_base"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_basegame_and_codex1"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
+
+            for (Player player : activeGame.getPlayers().values()) {
+                player.setLeaders(new ArrayList<>());
+            }
+
+            activeGame.setScSetID("base_game");
+
+            activeGame.setTechnologyDeckID("techs_base");
+            activeGame.setBaseGameMode(baseGameMode);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
             return true;
         }
         
@@ -125,6 +142,7 @@ public class Setup extends GameSubcommandData {
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
             activeGame.setAbsolMode(absolMode);
             activeGame.setDiscordantStarsMode(discordantStarsMode);
+            activeGame.setBaseGameMode(false);
             return true;
         }
     
@@ -134,6 +152,7 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
             activeGame.setTechnologyDeckID("techs_ds");
+            activeGame.setAbsolMode(false);
         }
         activeGame.setDiscordantStarsMode(discordantStarsMode);
 
@@ -143,6 +162,7 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
             activeGame.setTechnologyDeckID("techs_absol");
+            activeGame.setDiscordantStarsMode(false);
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
         }
         activeGame.setAbsolMode(absolMode);
@@ -153,6 +173,9 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
             activeGame.setTechnologyDeckID("techs_pok");
+            activeGame.setBaseGameMode(false);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
         }
 
         return true;

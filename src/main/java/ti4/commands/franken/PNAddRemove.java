@@ -20,6 +20,7 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
     public PNAddRemove(String name, String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -36,6 +37,7 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;

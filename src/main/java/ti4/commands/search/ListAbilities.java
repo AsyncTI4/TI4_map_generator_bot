@@ -24,8 +24,8 @@ public class ListAbilities extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, String> abilityList = Mapper.getFactionAbilities();
         List<String> searchedList = abilityList.keySet().stream()
-            .map(AbilityInfo::getAbilityRepresentation)
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString))
+            .map(AbilityInfo::getAbilityRepresentation)
             .sorted().toList();
 
         String searchDescription = searchString == null ? "" : " search: " + searchString;

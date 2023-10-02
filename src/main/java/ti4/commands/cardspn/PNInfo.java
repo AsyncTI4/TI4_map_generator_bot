@@ -34,13 +34,13 @@ public class PNInfo extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        checkAndAddPNs(activeGame, player);
-        activeGame.checkPromissoryNotes();
         sendPromissoryNoteInfo(activeGame, player, true, event);
         sendMessage("PN Info Sent");
     }
 
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
+        checkAndAddPNs(activeGame, player);
+        activeGame.checkPromissoryNotes();
         String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Heads up, someone used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendPromissoryNoteInfo(activeGame, player, longFormat);
