@@ -542,7 +542,7 @@ public class Mapper {
         return leaders.get(leaderID);
     }
 
-    public static boolean isLeader(String leaderID) {
+    public static boolean isValidLeader(String leaderID) {
         return leaders.containsKey(leaderID);
     }
 
