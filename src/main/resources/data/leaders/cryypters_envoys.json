@@ -71,7 +71,8 @@
         "type": "envoy",
         "name": "Yaluga Huin",
         "title": "University Headmaster",
-        "abilityText": "Each player that votes for the outcome you predict or vote for gains additional votes equal to the number of planets with technology specialties they exhausted.",
+        "abilityWindow": "When another player votes for the outcome you predicted or voted for:",
+        "abilityText": "That player gains additional votes equal to the number of planets with technology specialties they exhausted.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -235,6 +236,7 @@
         "type": "envoy",
         "name": "Perdin Perdona",
         "title": "Echoes Of The Lazax",
+        "abilityWindow": "When you cast votes:",
         "abilityText": "You may add the influence value of either your Home Planet or Mecatol Rex (if you control it) to your votes without exhausting it.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
@@ -245,7 +247,8 @@
         "type": "envoy",
         "name": "The Brothers Qquiar",
         "title": "Coalition Builders",
-        "abilityText": "Each other player that votes for the outcome you predict or vote for gains 2 additional votes.",
+        "abilityWindow": "When another player votes for the outcome you predicted or voted for:",
+        "abilityText": "That player gains 2 additional votes.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
