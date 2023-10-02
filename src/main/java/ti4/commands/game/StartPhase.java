@@ -32,7 +32,7 @@ public class StartPhase extends GameSubcommandData {
             case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
             case "statusScoring" -> {
-                new Turn().showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
+                Turn.showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
                 activeGame.updateActivePlayer(null);
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);
