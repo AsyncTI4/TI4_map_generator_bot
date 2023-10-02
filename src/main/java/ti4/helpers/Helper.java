@@ -672,6 +672,18 @@ public class Helper {
         return planetButtons;
     }
 
+    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix, @Nullable ButtonInteractionEvent event) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame);
+        for (Tile tile : tiles) {
+            if(AddCC.hasCC(event, player.getColor(), tile) ){
+                Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player));
+                planetButtons.add(button);
+            }
+        }
+        return planetButtons;
+    }
+
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");

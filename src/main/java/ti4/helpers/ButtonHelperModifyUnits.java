@@ -250,7 +250,12 @@ public class ButtonHelperModifyUnits {
                             "2 ff", activeGame);
                     successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
-                } else {
+                } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
+                    new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
+                            "2 destroyer", activeGame);
+                    successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+                            + AliasHandler.resolveTile(planetName) + ".";
+                } else{
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             unit, activeGame);
                     successMessage = "Produced a " + Helper.getEmojiFromDiscord(unitLong) + " in tile "

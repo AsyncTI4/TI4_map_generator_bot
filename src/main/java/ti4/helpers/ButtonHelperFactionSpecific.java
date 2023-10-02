@@ -47,6 +47,122 @@ import ti4.model.PublicObjectiveModel;
 
 public class ButtonHelperFactionSpecific {
 
+    public static boolean somebodyHasThisRelic(Game activeGame, String relic){
+        boolean somebodyHasIt = false;
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.hasRelic(relic)){
+                somebodyHasIt = true;
+                return true;
+            }
+        }
+        return somebodyHasIt;
+    }
+
+    public static List<Button> getBuyableAxisOrders(Player player, Game activeGame){
+        List<Button> buttons = new ArrayList<Button>();
+        int maxCost = player.getCommodities();
+
+        String relicName = "axisorderdd";
+        String extra = "duplicate";
+        int orderCost = 1;
+        if(orderCost < maxCost+1){
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+            relicName = relicName + extra;
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+        }
+        relicName = "axisordercr";
+        orderCost = 1;
+        if(orderCost < maxCost+1){
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+            relicName = relicName + extra;
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+        }
+         relicName = "axisordercv";
+        orderCost = 2;
+        if(orderCost < maxCost+1){
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+            relicName = relicName + extra;
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+        }
+         relicName = "axisorderdn";
+        orderCost = 3;
+        if(orderCost < maxCost+1){
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+            relicName = relicName + extra;
+            if(!somebodyHasThisRelic(activeGame, relicName)){
+                buttons.add(Button.secondary("buyAxisOrder_"+relicName+"_"+orderCost, "Buy an "+Mapper.getRelic(relicName).getName() + " for "+orderCost+" comms"));
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Delete these buttons"));
+
+        return buttons;
+    }
+
+    public static void resolveAxisOrderBuy(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String relicName = buttonID.split("_")[1];
+        String cost = buttonID.split("_")[2];
+        int lostComms = Integer.parseInt(cost);
+        int oldComms = player.getCommodities();
+        if(lostComms > oldComms){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you don't have that many comms");
+            return;
+        }
+        player.addRelic(relicName);
+        player.setCommodities(oldComms-lostComms);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " acquired "+Mapper.getRelic(relicName).getName() + " and paid "+lostComms+ " commodities ("+oldComms+"->"+player.getCommodities()+")");
+       ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void resolveAxisOrderExhaust(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String order = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+" Chose to Use "+Mapper.getRelic(order).getName());
+        List<Button> buttons = new ArrayList<>();
+        String message = "";
+        if(Mapper.getRelic(order).getName().contains("Dreadnought")){
+             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "dreadnought", "placeOneNDone_skipbuild", event));
+            message = "Use buttons to put 1 dreadnought in a system with your ships and cc";
+        }
+        if(Mapper.getRelic(order).getName().contains("Carrier")){
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "carrier", "placeOneNDone_skipbuild", event));
+            message = "Use buttons to put 1 carrier in a system with your ships and cc";
+        }
+        if(Mapper.getRelic(order).getName().contains("Cruiser")){
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild", event));
+            message = "Use buttons to put 1 cruiser in a system with your ships and cc";
+        }
+        if(Mapper.getRelic(order).getName().contains("Destroyer")){
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "2destroyer", "placeOneNDone_skipbuild", event));
+            message = "Use buttons to put 2 destroyers in a system with your ships and cc";
+        }
+        message = ButtonHelper.getTrueIdentity(player, activeGame) + " "+message;
+        ButtonHelper.deleteTheOneButton(event);
+        player.addExhaustedRelic(order);
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(p2, "axiscommander")){
+                activeGame.setComponentAction(true);
+                Button getTech = Button.success("acquireATech", "Get a tech");
+                List<Button> buttons2 = new ArrayList<>();
+                buttons2.add(getTech);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " a player has resolved an Axis Order ("+Mapper.getRelic(order).getName()+") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r", buttons2);
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
     public static List<Button> getTradePlanetsWithHacanMechButtons(Player hacan, Player receiver, Game activeGame){
         List<Button> buttons = new ArrayList<Button>();
         if(!hacan.hasUnit("hacan_mech")){
@@ -78,7 +194,21 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    
+    public static void resolveStep2OfAxisAgent(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String message = "";
+        if("cruiser".equalsIgnoreCase(buttonID.split("_")[1])){
+            MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+" Chose to place 1 cruiser with their ships from Axis Agent");
+            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
+            message = " Use buttons to put 1 cruiser with your ships";
+        }else{
+            MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+" Chose to place 1 destroyer with their ships from Axis Agent");
+            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
+            message = " Use buttons to put 1 destroyer with your ships";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + message, buttons);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveProductionBiomesStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
         Player player = Helper.getPlayerFromColorOrFaction(activeGame, buttonID.split("_")[1]);
@@ -1345,6 +1475,9 @@ public class ButtonHelperFactionSpecific {
             cabalAgentInitiation(activeGame, p2);
             message = "Refreshed " + p2.getColor() + "'s commodities";
         }
+        if(p2.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(p2, activeGame).size() > 1){
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(p2, activeGame));
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
     }
@@ -1857,6 +1990,27 @@ public class ButtonHelperFactionSpecific {
             }
             String message = "Use buttons to select which tile to use arborec agent in";
             List<Button> buttons = getTilesToArboAgent(p2, activeGame, event);
+            MessageHelper.sendMessageToChannelWithButtons(channel, Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true) + message, buttons);
+        }
+         if ("axisagent".equalsIgnoreCase(agent)) {
+            String faction = rest.replace("axisagent_", "");
+            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            MessageChannel channel = event.getMessageChannel();
+            if (activeGame.isFoWMode()) {
+                channel = p2.getPrivateChannel();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
+            }
+            String message = "Use buttons to select whether you want to place 1 cruiser or 1 destroyer in a system with your ships";
+            List<Button> buttons = new ArrayList<>();
+            if(p2 != player){
+                player.setCommodities(player.getCommodities()+2);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + "you gained 2 comms");
+                if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+                }
+            }
+            buttons.add(Button.success("step2axisagent_cruiser", "Place a cruiser"));
+            buttons.add(Button.success("step2axisagent_destroyer", "Place a destroyer"));
             MessageHelper.sendMessageToChannelWithButtons(channel, Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true) + message, buttons);
         }
 
