@@ -27,12 +27,12 @@ public class ListLeaders extends SearchSubcommandData {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         if (Mapper.isValidLeader(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getLeader(searchString).getRepresentationEmbed(true, true, true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getLeader(searchString).getRepresentationEmbed(true, true, true, true)).queue();
             return;
         }
 
         for (LeaderModel model : Mapper.getLeaders().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true, true);
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true, true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 4) {

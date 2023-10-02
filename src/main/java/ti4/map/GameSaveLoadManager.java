@@ -694,6 +694,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
+            
             StringBuilder leaderInfo = new StringBuilder();
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
