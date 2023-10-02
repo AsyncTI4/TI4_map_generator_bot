@@ -695,6 +695,17 @@ public class FoWHelper {
 		}
 		return false;
 	}
+	public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game activeGame) {
+		for(Player p2 : activeGame.getRealPlayers()){
+			if(p2 == player){
+				continue;
+			}
+			if(FoWHelper.playerHasShipsInSystem(p2, tile)){
+				return true;
+			}
+		}
+		return false;
+	}
 	public static boolean playerHasFightersInSystem(Player player, Tile tile) {
 		String colorID = Mapper.getColorID(player.getColor());
 		if (colorID == null) return false; // player doesn't have a color

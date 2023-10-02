@@ -935,6 +935,19 @@ public class GameSaveLoadManager {
         return null;
     }
 
+    public static Game loadMapJSONString(String mapFile) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
+        try {
+            return mapper.readValue(mapFile, Game.class);
+        } catch (Exception e) {
+            BotLogger.log("JSON STRING FAILED TO LOAD", e);
+            // System.out.println(mapFile.getAbsolutePath());
+            // System.out.println(ExceptionUtils.getStackTrace(e));
+        }
+
+        return null;
+    }
     @Nullable
     private static Game loadMap(File mapFile) {
         if (mapFile != null) {

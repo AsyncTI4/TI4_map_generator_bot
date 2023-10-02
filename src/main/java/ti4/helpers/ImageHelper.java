@@ -35,7 +35,7 @@ public class ImageHelper {
       .build();
 
   private static final int URL_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(
-      GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_SIZE.toString(), Integer.class, 2000);
+      GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_MAX_SIZE.toString(), Integer.class, 2000);
   private static final int URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(
       GlobalSettings.ImplementedSettings.URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
   private static final Cache<String, BufferedImage> urlImageCache = Caffeine.newBuilder()
