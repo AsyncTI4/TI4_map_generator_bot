@@ -190,6 +190,15 @@
         ]
     },
     {
+        "alias": "agendas_little_omega",
+        "name": "Little Omega Agendas",
+        "type": "agenda",
+        "description": "See the agendas tab: <https://docs.google.com/spreadsheets/d/1zcr-lKfsSIxpzlGPy33rCx4PcmPrZDCDz2tqExqQD9g/edit#gid=991205782>",
+        "cardIDs": [
+            "abolishment","arbiter","arms_reduction","articles_war","artifact","censure","checks","cladenstine","classified","committee","conscription","constitution","conventions","covert","crisis","defense_act","disarmamament","economic_equality","execution","grant_reallocation","incentive","minister_antiquities","minister_commrece","minister_exploration","minister_industry","minister_peace","minister_policy","minister_sciences","minister_war","miscount","mutiny","nexus","plowshares","prophecy","rearmament","redistribution","regulations","rep_govt","revolution","sanctions","schematics","secret","seed_empire","shared_research","standardization","travel_ban","unconventional","warrant","wormhole_recon","wormhole_research"
+        ]
+    },
+    {
         "alias": "relics_absol",
         "name": "Absol's Relics",
         "type": "relic",
