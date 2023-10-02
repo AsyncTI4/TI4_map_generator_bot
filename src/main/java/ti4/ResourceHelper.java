@@ -157,8 +157,12 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getInfoFile(String name) {
-        return getResourceFromFolder("info/", name, "Could not find info file");
+    public String getDataFile(String name) {
+        return getResourceFromFolder("data/", name, "Could not find data file");
+    }
+
+    public String getDataFolder(String name) {
+        return Storage.getResourcePath() + File.separator + "data" + File.separator + name;
     }
 
     @Nullable

@@ -1,0 +1,36 @@
+[
+    {
+        "id": "adminsagent",
+        "faction": "admins",
+        "type": "agent",
+        "name": "HolyTispoon",
+        "title": "Really ties the Community together",
+        "abilityWindow": "When a player would research a unit upgrade:",
+        "abilityText": "You may exhaust this card to allow that player to gain a different unit upgrade that has the same amount of prerequisites.",
+        "unlockCondition": "Always Unlocked",
+        "source": "admins"
+    },
+    {
+        "id": "adminscommander",
+        "faction": "admins",
+        "type": "commander",
+        "name": "Somno",
+        "title": "Graphics Tinker",
+        "abilityWindow": "During combat:",
+        "abilityText": "You may treat unit upgrades your opponent owns as if you would own them as well.",
+        "unlockCondition": "Control 3 planets that have tech specialties.",
+        "source": "admins"
+    },
+    {
+        "id": "adminshero",
+        "faction": "admins",
+        "type": "hero",
+        "name": "TerTerro",
+        "title": "Botfather",
+        "abilityName": "Who cares for the laws of physics anyway?",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Place this card near the game board. When you produce units you may place them in any one system that contains one of your ships during this game round. At the end of that game round, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "admins"
+    }
+]

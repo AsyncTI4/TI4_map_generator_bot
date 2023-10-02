@@ -65,7 +65,15 @@ public class BotLogger {
         System.out.println("[BOT-LOG] " + msg);
 
         if (botLogChannel == null) {
-            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + event.getGuild().getName() + "\nSending via webhook to main server.\n>" + msg);
+            String name;
+            if(event == null) {
+                name = "None";
+                System.out.println(e);
+                return;
+            } else {
+                name = event.getGuild().getName();
+            }
+            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + name + "\nSending via webhook to main server.\n>" + msg);
             return;
         }
 
