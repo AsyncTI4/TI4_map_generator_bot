@@ -1,8 +1,8 @@
 [
     {
         "id": "adminsagent",
-        "type": "admins",
-        "faction": "agent",
+        "faction": "admins",
+        "type": "agent",
         "name": "HolyTispoon",
         "title": "Really ties the Community together",
         "abilityWindow": "When a player would research a unit upgrade:",
@@ -12,8 +12,8 @@
     },
     {
         "id": "adminscommander",
-        "type": "admins",
-        "faction": "commander",
+        "faction": "admins",
+        "type": "commander",
         "name": "Somno",
         "title": "Graphics Tinker",
         "abilityWindow": "During combat:",
@@ -23,8 +23,8 @@
     },
     {
         "id": "adminshero",
-        "type": "admins",
-        "faction": "hero",
+        "faction": "admins",
+        "type": "hero",
         "name": "TerTerro",
         "title": "Botfather",
         "abilityName": "Who cares for the laws of physics anyway?",
