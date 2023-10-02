@@ -126,6 +126,7 @@ public class MessageHelper {
 	}
 
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
+		if (fileUpload == null) return;
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
@@ -143,21 +144,13 @@ public class MessageHelper {
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
+		if (file == null) return;
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
 
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
-		if(channel.getName().contains("-actions")){
-			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
-			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
-			for (ThreadChannel threadChannel_ : threadChannels) {
-				if (threadChannel_.getName().equals(threadName)) {
-					channel = threadChannel_;
-				}
-			}
-		}
-		channel.sendFiles(fileUpload).queue();
+		sendFileUploadToChannel(channel, fileUpload);
 		splitAndSent(message, channel, buttons);
 	}
 
