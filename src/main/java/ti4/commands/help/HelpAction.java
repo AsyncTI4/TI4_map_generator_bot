@@ -1,11 +1,8 @@
 package ti4.commands.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-
-import java.io.File;
 
 public class HelpAction extends HelpSubcommandData {
 
@@ -20,17 +17,6 @@ public class HelpAction extends HelpSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Help information is in help file");
-        String helpFile = ResourceHelper.getInstance().getHelpFile("help.txt");
-        if (helpFile != null) {
-            File file = new File(helpFile);
-            if (!file.exists()) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find help file");
-                return;
-            }
-            MessageHelper.sendFileToChannel(event.getChannel(), file);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find help file");
-        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Async Help Documentation can be found in [this Google Doc](https://docs.google.com/document/d/1yrVH0lEzYj1MbXNzQIK3thgBWAVIZmErluPHLot-OQg/edit)\n> Also, check out this channel: https://discord.com/channels/943410040369479690/947727176105623642");
     }
 }
