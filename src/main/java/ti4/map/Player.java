@@ -1253,6 +1253,9 @@ public class Player {
     }
 
     public void setCommodities(int commodities) {
+        if(commodities > getCommoditiesTotal()){
+            commodities = getCommoditiesTotal();
+        }
         this.commodities = commodities;
     }
 

@@ -270,6 +270,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
+                if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+                }
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
