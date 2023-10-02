@@ -58,19 +58,7 @@ public class Turn extends PlayerSubcommandData {
         //if (!nextMessage.isEmpty()) sendMessage(nextMessage); Sending message in ping next Player
     }
 
-    public void execute(GenericInteractionCreateEvent event, Player mainPlayer, Game activeGame) {
-        activeGame.setComponentAction(false);
-        if (activeGame.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
-        } else {
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getPlayerRepresentation(mainPlayer, activeGame) + " ended turn");
-
-        }
-        String nextMessage = pingNextPlayer(event, activeGame, mainPlayer);
-        if (!nextMessage.isEmpty()) MessageHelper.sendMessageToChannel(event.getMessageChannel(), nextMessage);
-    }
-
-    public Player findNextUnpassedPlayer(Game activeGame, Player currentPlayer) {
+    public static Player findNextUnpassedPlayer(Game activeGame, Player currentPlayer) {
         int startingInitiative = activeGame.getPlayersTurnSCInitiative(currentPlayer);
         //in a normal game, 8 is the maximum number, so we modulo on 9
         List<Player> unpassedPlayers = activeGame.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
@@ -90,8 +78,13 @@ public class Turn extends PlayerSubcommandData {
         }
     }
 
-    public String pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
         activeGame.setComponentAction(false);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
+        } else {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getPlayerRepresentation(mainPlayer, activeGame) + " ended turn");
+        }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();
 
@@ -105,7 +98,7 @@ public class Turn extends PlayerSubcommandData {
         if (activeGame.getPlayers().values().stream().allMatch(Player::isPassed)) {
             showPublicObjectivesWhenAllPassed(event, activeGame, gameChannel);
             activeGame.updateActivePlayer(null);
-            return "";
+            return;
         }
 
         Player nextPlayer = findNextUnpassedPlayer(activeGame, mainPlayer);
@@ -119,6 +112,10 @@ public class Turn extends PlayerSubcommandData {
                 //  Block of code to handle errors
             }
         }
+        turnStart(event, activeGame, mainPlayer, isFowPrivateGame, gameChannel, nextPlayer);
+    }
+
+    private static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer, boolean isFowPrivateGame, MessageChannel gameChannel, Player nextPlayer) {
         String text = "# " + Helper.getPlayerRepresentation(nextPlayer, activeGame, event.getGuild(), true) + " UP NEXT";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(nextPlayer, activeGame, false, event);
@@ -158,18 +155,10 @@ public class Turn extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(nextPlayer, activeGame),
                     "Use buttons to revive infantry. You have " + nextPlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, nextPlayer));
             }
-
-            return "";
         }
-
-        if(nextPlayer == null){
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
-        }
-       // MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
-        return "";
     }
 
-    private String getMissedSCFollowsText(Game activeGame, Player player) {
+    private static String getMissedSCFollowsText(Game activeGame, Player player) {
         if (!activeGame.isStratPings()) return null;
         boolean sendReminder = false;
 
@@ -189,7 +178,7 @@ public class Turn extends PlayerSubcommandData {
         return sendReminder ? sb.toString() : null;
     }
 
-    public List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
+    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
@@ -238,7 +227,7 @@ public class Turn extends PlayerSubcommandData {
         return poButtons;
     }
 
-    public void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
+    public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
         activeGame.setCurrentPhase("status");
         for(Player player : activeGame.getRealPlayers()){
