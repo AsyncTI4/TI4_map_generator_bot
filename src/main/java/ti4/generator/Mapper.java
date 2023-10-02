@@ -54,7 +54,7 @@ public class Mapper {
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
     private static final HashMap<String, UnitModel> units = new HashMap<>();
     private static final HashMap<String, AttachmentModel> attachments = new HashMap<>();
-    private static final HashMap<String, LeaderModel> leaders = new HashMap();
+    private static final HashMap<String, LeaderModel> leaders = new HashMap<>();
     
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
