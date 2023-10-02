@@ -911,34 +911,33 @@ public class GenerateMap {
                 leaderInfoFileName = "pa_leaders_envoy" + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
-            if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
-                List<String> mahactCCs = player.getMahactCC();
-                Collection<Player> players = activeGame.getPlayers().values();
-                for (Player player_ : players) {
-                    if (player_ != player) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        if (playerColor != null && mahactCCs.contains(playerColor)) {
-                            Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
-                            if (leader_ != null) {
-                                boolean locked = leader_.isLocked();
-                                String imperiaColorFile = "pa_leaders_imperia";
-                                if (locked) {
-                                    imperiaColorFile += "_exh";
-                                } else {
-                                    imperiaColorFile += "_rdy";
-                                }
-                                imperiaColorFile += ".png";
-                                String leaderFileName_ = "pa_leaders_factionicon_" + playerFaction + "_rdy.png";
-                                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-                                drawPAImage(x + deltaX, y, leaderFileName_);
-
-                                drawPAImage(x + deltaX, y, imperiaColorFile);
-                                String status_ = locked ? "_exh" : "_rdy";
-                                String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
-                                drawPAImage(x + deltaX, y, leaderPipInfo);
-                                deltaX += 48;
+        }
+        if (player.hasAbility("imperia")) {
+            deltaX += 5;
+            List<String> mahactCCs = player.getMahactCC();
+            Collection<Player> players = activeGame.getRealPlayers();
+            for (Player player_ : players) {
+                if (player_ != player) {
+                    String playerColor = player_.getColor();
+                    if (mahactCCs.contains(playerColor)) {
+                        Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
+                        if (leader_ != null) {
+                            boolean locked = leader_.isLocked();
+                            String imperiaColorFile = "pa_leaders_imperia";
+                            if (locked) {
+                                imperiaColorFile += "_exh";
+                            } else {
+                                imperiaColorFile += "_rdy";
                             }
+                            imperiaColorFile += ".png";
+                            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                            graphics.drawImage(getPlayerFactionIconImageScaled(player_, 42, 42), x + deltaX - 1, y + 108, null);
+
+                            drawPAImage(x + deltaX, y, imperiaColorFile);
+                            String status_ = locked ? "_exh" : "_rdy";
+                            String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
+                            drawPAImage(x + deltaX, y, leaderPipInfo);
+                            deltaX += 48;
                         }
                     }
                 }
