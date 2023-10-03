@@ -23,4 +23,14 @@ public class DraftErrataModel implements ModelInterface{
     public boolean Undraftable;
 
     public boolean AlwaysAddToPool;
+
+    public DraftErrataModel(String alias) {
+        String[] split = alias.split(":");
+        ItemCategory = DraftItem.Category.valueOf(split[0]);
+        ItemId = split[1];
+    }
+
+    public DraftErrataModel() {
+
+    }
 }

@@ -27,10 +27,10 @@ public abstract class BagDraft {
     public abstract String getSaveString();
     public abstract List<DraftBag> generateBags(Game game);
 
-    public ThreadChannel getDraftBagChannel(Game activeGame, Player player) {
+    public ThreadChannel regenerateBagChannel(Game activeGame, Player player) {
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (actionsChannel == null) {
-            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + activeGame.getName());
+            BotLogger.log("`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + activeGame.getName());
             return null;
         }
 
@@ -39,65 +39,10 @@ public abstract class BagDraft {
             threadName = activeGame.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
         }
 
-        //ATTEMPT TO FIND BY ID
-        String cardsInfoThreadID = player.getBagInfoThreadID();
-        try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
+        ThreadChannel existingChannel = findExistingBagChannel(actionsChannel, player, threadName);
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null) return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
-        }
-
-        //ATTEMPT TO FIND BY NAME
-        try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null) return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        player.setBagInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
+        if(existingChannel != null) {
+            existingChannel.delete().queue();
         }
 
         // CREATE NEW THREAD
@@ -114,5 +59,69 @@ public abstract class BagDraft {
         ThreadChannel threadChannel = threadAction.complete();
         player.setBagInfoThreadID(threadChannel.getId());
         return threadChannel;
+    }
+
+    private ThreadChannel findExistingBagChannel(TextChannel actionsChannel, Player player, String threadName) {
+        //ATTEMPT TO FIND BY ID
+        String bagInfoThread = player.getBagInfoThreadID();
+        try {
+            if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                if (threadChannel != null) return threadChannel;
+
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getId().equals(bagInfoThread)) {
+                        player.setBagInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equals(bagInfoThread)) {
+                        player.setBagInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread + " for potential thread name: " + threadName, e);
+        }
+
+        //ATTEMPT TO FIND BY NAME
+        try {
+            if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+
+                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
+                if (threadChannel != null) return threadChannel;
+
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        player.setBagInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        player.setBagInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName, e);
+        }
+        return null;
     }
 }

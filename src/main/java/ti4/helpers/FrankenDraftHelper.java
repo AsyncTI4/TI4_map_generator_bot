@@ -2,6 +2,8 @@ package ti4.helpers;
 
 import java.util.*;
 
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -126,14 +128,8 @@ public class FrankenDraftHelper {
             PassBags(activeGame);
         }
 
-        DisplayPlayerDraftQueue(activeGame, player);
         DisplayPlayerHand(activeGame, player);
         event.getMessage().delete().queue();
-    }
-
-    private static void DisplayPlayerDraftQueue(Game activeGame, Player player) {
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                "You are drafting the following from this bag: \n"+getDraftQueueRepresentation(activeGame, player));
     }
 
     private static void DisplayPlayerHand(Game activeGame, Player player) {
@@ -142,11 +138,13 @@ public class FrankenDraftHelper {
     }
 
     public static void showPlayerBag(Game activeGame, Player player) {
-        ThreadChannel bagChannel = activeGame.getActiveBagDraft().getDraftBagChannel(activeGame, player);
-        bagChannel.purgeMessages();
+        ThreadChannel bagChannel = activeGame.getActiveBagDraft().regenerateBagChannel(activeGame, player);
+        MessageHelper.sendMessageToChannel(bagChannel, ButtonHelper.getTrueIdentity(player, activeGame) + " here is your bag");
         for (DraftItem item : player.getCurrentDraftBag().Contents) {
             MessageHelper.sendMessageToChannel(bagChannel, item.getAlias());
         }
+        MessageHelper.sendMessageToChannel(bagChannel,
+                "You are drafting the following from this bag: \n"+getDraftQueueRepresentation(activeGame, player));
     }
 
     public static void PassBags(Game activeGame) {
@@ -178,9 +176,11 @@ public class FrankenDraftHelper {
     }
 
     private static void PromptPlayerBagSelection(Game activeGame, Player p2) {
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+
+        return;
+        /*MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 ButtonHelper.getTrueIdentity(p2, activeGame)+"Please select a card to draft:", getFrankenBagButtons(activeGame, p2));
-    }
+*/    }
 
     public static String getCurrentPersonalBagRepresentation(Game activeGame, Player player){
         StringBuilder sb = new StringBuilder();
