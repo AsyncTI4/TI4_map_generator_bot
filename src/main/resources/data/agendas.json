@@ -2322,7 +2322,7 @@
     "type": "Directive",
     "target": "For/Against",
     "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units on Mecatol Rex; then, each player with units in systems adjacent to Mecatol Rex destroys 3 of their units in each of those systems.",
-    "text2": "Against: Destroy all units on Mecatol Rex.",
+    "text2": "Against: Destroy all units on Mecatol Rex. Then, the player who controls Mecatol Rex researches 1 technology.",
     "source": "little_omega"
   },
   {
