@@ -639,6 +639,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.GAME_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = GameManager.getInstance().getGameNames().stream()
+                        .filter(token -> token.contains(enteredValue))
+                        .limit(25)
+                        .map(token -> new Command.Choice(token, token))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 
