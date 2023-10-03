@@ -12,7 +12,7 @@ import ti4.helpers.AliasHandler;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.*;
-import ti4.model.Franken.FrankenItem;
+import ti4.draft.DraftItem;
 import ti4.model.TechnologyModel.TechnologyType;
 
 import java.io.File;
@@ -59,7 +59,7 @@ public class Mapper {
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
-    private static final HashMap<String, FrankenItem> frankenErrata = new HashMap<>();
+    private static final HashMap<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
         readData("unit_image_suffixes.properties", unitImageSuffixes, "Could not read unit image suffix file");
@@ -92,7 +92,7 @@ public class Mapper {
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
-        importJsonObjects("franken_errata.json", frankenErrata, FrankenItem.class, "Could not read faction setup file");
+        importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -740,7 +740,7 @@ public class Mapper {
                 .collect(Collectors.toList());
     }
 
-    public static HashMap<String, FrankenItem> getFrankenErrata() {
+    public static HashMap<String, DraftErrataModel> getFrankenErrata() {
         return frankenErrata;
     }
 

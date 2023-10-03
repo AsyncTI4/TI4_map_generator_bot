@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -460,8 +461,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
-        writer.write(Constants.POWERED_STATUS + " " + activeGame.getPoweredStatus());
-        writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
@@ -510,6 +509,9 @@ public class GameSaveLoadManager {
         writer.write(Constants.AGENDA_DECK_ID + " " + activeGame.getAgendaDeckID());
         writer.write(System.lineSeparator());
         writer.write(Constants.EXPLORATION_DECK_ID + " " + activeGame.getExplorationDeckID());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.BAG_DRAFT + " " + (activeGame.getActiveBagDraft() == null ? "" : activeGame.getActiveBagDraft().getSaveString()));
         writer.write(System.lineSeparator());
 
         writer.write(Constants.STRATEGY_CARD_SET + " " + activeGame.getScSetID());
@@ -624,13 +626,13 @@ public class GameSaveLoadManager {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + player.getCurrentFrankenBag().toStoreString());
+            writer.write(Constants.DRAFT_BAG + " " + player.getCurrentDraftBag().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + player.getFrankenHand().toStoreString());
+            writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_ITEMS_TO_DRAFT + " " + player.getFrankenDraftQueue().toStoreString());
+            writer.write(Constants.DRAFT_QUEUE + " " + player.getFrankenDraftQueue().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -1437,14 +1439,6 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
-                case Constants.POWERED_STATUS -> {
-                    try {
-                        boolean value = Boolean.parseBoolean(info);
-                        activeGame.setPowered(value);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1589,6 +1583,13 @@ public class GameSaveLoadManager {
                     while (migrationInfo.hasMoreTokens()) {
                         String migration = migrationInfo.nextToken();
                         activeGame.addMigration(migration);
+                    }
+                }
+                case Constants.BAG_DRAFT -> {
+                    try {
+                        activeGame.setBagDraft(BagDraft.GenerateDraft(info));
+                    } catch (Exception e) {
+                        //Do nothing
                     }
                 }
             }
@@ -1739,9 +1740,9 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_BAG_TO_PASS -> player.loadCurrentFrankenBag(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_ITEMS_TO_DRAFT -> player.loadFrankenItemsToDraft(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_PERSONAL_BAG -> player.loadFrankenHand(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_BAG -> player.loadCurrentFrankenBag(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_QUEUE -> player.loadFrankenItemsToDraft(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_HAND -> player.loadFrankenHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));

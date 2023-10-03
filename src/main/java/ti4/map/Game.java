@@ -25,6 +25,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
+import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -90,8 +91,6 @@ public class Game {
     private boolean fowMode = false;
     @ExportableField
     private boolean naaluAgent;
-    @ExportableField
-    private boolean powerStatus;
     @ExportableField
     private boolean dominusOrb;
     @ExportableField
@@ -230,6 +229,7 @@ public class Game {
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
+    private BagDraft activeDraft;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -404,6 +404,9 @@ public class Game {
     public void removePurgedPN(String purgedPN) {
         this.purgedPN.remove(purgedPN);
     }
+
+    public BagDraft getActiveBagDraft() { return activeDraft; }
+    public void setBagDraft(BagDraft draft) { activeDraft = draft; }
 
     public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
@@ -802,10 +805,6 @@ public class Game {
         return naaluAgent;
     }
 
-    public boolean getPoweredStatus() {
-        return powerStatus;
-    }
-
     public boolean getDominusOrbStatus() {
         return dominusOrb;
     }
@@ -816,10 +815,6 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
-    }
-
-    public void setPowered(boolean powerStatus) {
-        this.powerStatus = powerStatus;
     }
 
     public void setDominusOrb(boolean onStatus) {

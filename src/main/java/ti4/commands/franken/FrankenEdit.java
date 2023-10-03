@@ -4,15 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.bothelper.BothelperSubcommandData;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.model.Franken.FrankenBag;
-import ti4.model.Franken.FrankenItem;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 
 import java.util.Objects;
 
@@ -46,8 +45,8 @@ public class FrankenEdit extends FrankenSubcommandData {
             MessageHelper.sendMessageToUser("====================\n" + activeGame.getName() +
                     " Frankendraft Status\n====================", getUser());
             for (var player: activeGame.getRealPlayers()) {
-                dmPlayerBag(activeGame, player, player.getCurrentFrankenBag(), "Held Bag");
-                dmPlayerBag(activeGame, player, player.getFrankenHand(), "Hand");
+                dmPlayerBag(activeGame, player, player.getCurrentDraftBag(), "Held Bag");
+                dmPlayerBag(activeGame, player, player.getDraftHand(), "Hand");
                 dmPlayerBag(activeGame, player, player.getFrankenDraftQueue(), "Queue");
             }
             return;
@@ -66,14 +65,14 @@ public class FrankenEdit extends FrankenSubcommandData {
         }
         Player editingPlayer = activeGame.getPlayer(playerOption.getAsUser().getId());
 
-        FrankenBag editingBag = null;
+        DraftBag editingBag = null;
         String bagName = "";
         if (command.contains("Bag")) {
-            editingBag = editingPlayer.getCurrentFrankenBag();
+            editingBag = editingPlayer.getCurrentDraftBag();
             bagName = "Held Bag";
         }
         if (command.contains("Hand")) {
-            editingBag = editingPlayer.getFrankenHand();
+            editingBag = editingPlayer.getDraftHand();
             bagName = "Hand";
         }
         if (command.contains("Queue")) {
@@ -84,16 +83,16 @@ public class FrankenEdit extends FrankenSubcommandData {
         if (editingBag != null) {
             if (command.contains("add")) {
                 if (card1 != null) {
-                    editingBag.Contents.add(FrankenItem.GenerateFromAlias(card1.getAsString()));
+                    editingBag.Contents.add(DraftItem.GenerateFromAlias(card1.getAsString()));
                 }
             } else if (command.contains("remove")) {
                 if (card1 != null) {
-                    editingBag.Contents.removeIf((FrankenItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
+                    editingBag.Contents.removeIf((DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
                 }
             } else if (command.contains("swap")) {
                 if (card1 != null && card2 != null) {
-                    editingBag.Contents.removeIf((FrankenItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
-                    editingBag.Contents.add(FrankenItem.GenerateFromAlias(card2.getAsString()));
+                    editingBag.Contents.removeIf((DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
+                    editingBag.Contents.add(DraftItem.GenerateFromAlias(card2.getAsString()));
                 }
             }
 
@@ -103,10 +102,10 @@ public class FrankenEdit extends FrankenSubcommandData {
         GameSaveLoadManager.saveMap(activeGame, event);
     }
 
-    private void dmPlayerBag(Game game, Player player, FrankenBag bag, String bagName) {
+    private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName) {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getName() + " " + player.getUserName() + " Current " + bagName + ":\n");
-        for (FrankenItem item : bag.Contents) {
+        for (DraftItem item : bag.Contents) {
             sb.append(item.getAlias());
             sb.append("\n");
         }
