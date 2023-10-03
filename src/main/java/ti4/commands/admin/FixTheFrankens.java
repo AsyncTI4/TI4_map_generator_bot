@@ -14,7 +14,7 @@ public class FixTheFrankens extends AdminSubcommandData {
 
     public FixTheFrankens() {
         super(Constants.FIX_THE_FRANKENS, "Change franken_X to frankenX in a game");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName").setRequired(true).setAutoComplete(true));
     }
 
     @Override

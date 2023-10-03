@@ -1,6 +1,7 @@
 package ti4.map;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameManager {
@@ -61,5 +62,7 @@ public class GameManager {
         return gameNameToGame.get(mapName);
     }
 
-
+    public List<String> getGameNames() {
+        return getGameNameToGame().keySet().stream().sorted().toList();
+    }
 }

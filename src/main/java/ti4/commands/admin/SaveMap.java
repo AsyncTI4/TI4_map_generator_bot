@@ -13,7 +13,7 @@ public class SaveMap extends AdminSubcommandData {
 
     public SaveMap() {
         super(Constants.SAVE_GAME, "Save game");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true).setAutoComplete(true));
     }
 
     @Override

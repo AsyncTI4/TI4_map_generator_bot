@@ -1,14 +1,12 @@
 package ti4.commands.game;
 
 import java.util.Map;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -27,32 +25,11 @@ public class SetOrder extends GameSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
-        User callerUser = event.getUser();
-        String mapName;
-        if (gameOption != null) {
-            mapName = event.getOptions().get(0).getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
-                return;
-            }
-        } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
-            if (userActiveGame == null){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
-                return;
-            }
-            mapName = userActiveGame.getName();
-        }
-
-        GameManager gameManager = GameManager.getInstance();
-        Game activeGame = gameManager.getGame(mapName);
-
+        Game activeGame = getActiveGame();
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
         LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());

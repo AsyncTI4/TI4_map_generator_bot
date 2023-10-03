@@ -20,7 +20,7 @@ public class Info extends GameSubcommandData {
 
     public Info() {
         super(Constants.INFO, "Game information:");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
     }
 
     @Override
