@@ -130,7 +130,11 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
 		if (optionC != null) {
+			
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
+			if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+			}
 		}
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
