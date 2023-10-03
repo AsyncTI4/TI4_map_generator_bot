@@ -736,6 +736,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID + " " + player.getBagInfoThreadID());
+            writer.write(System.lineSeparator());
+
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }
@@ -1839,6 +1842,7 @@ public class GameSaveLoadManager {
                 case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
+                case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
             }
         }
     }

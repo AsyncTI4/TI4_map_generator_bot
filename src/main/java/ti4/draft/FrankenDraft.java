@@ -9,6 +9,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 
 import java.util.*;
@@ -37,8 +38,8 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftItem.Category listCategory) {
-        var bal = Mapper.getFrankenErrata();
-        items.removeIf((DraftItem item) -> Mapper.getFrankenErrata().get(item.getAlias()).Undraftable);
+        HashMap<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
+        items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
         Collections.shuffle(items);
     }
