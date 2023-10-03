@@ -1,19 +1,19 @@
-package ti4.model.Franken;
+package ti4.draft;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FrankenBag {
-    public FrankenBag()
+public class DraftBag {
+    public DraftBag()
     {}
 
-    public List<FrankenItem> Contents = new ArrayList<>();
+    public List<DraftItem> Contents = new ArrayList<>();
 
 
     public String toStoreString()
     {
         StringBuilder sb = new StringBuilder();
-        for (FrankenItem item: Contents) {
+        for (DraftItem item: Contents) {
             sb.append(item.getAlias());
             sb.append(",");
         }

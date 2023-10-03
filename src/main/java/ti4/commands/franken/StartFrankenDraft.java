@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.draft.FrankenDraft;
+import ti4.draft.PoweredFrankenDraft;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
@@ -25,19 +27,16 @@ public class StartFrankenDraft extends FrankenSubcommandData {
         if (stratPings != null){
             String stratP = stratPings.getAsString();
             if ("yes".equalsIgnoreCase(stratP)){
-                FrankenDraftHelper.makeBags(activeGame, true);
-                activeGame.setPowered(true);
+                activeGame.setBagDraft(new PoweredFrankenDraft());
+                FrankenDraftHelper.startDraft(activeGame);
             } else {
-                FrankenDraftHelper.makeBags(activeGame, false);
-                activeGame.setPowered(false);
+                activeGame.setBagDraft(new FrankenDraft());
+                FrankenDraftHelper.startDraft(activeGame);
             }
         }else{
-            FrankenDraftHelper.makeBags(activeGame, false);
-            activeGame.setPowered(false);
+            activeGame.setBagDraft(new FrankenDraft());
+            FrankenDraftHelper.startDraft(activeGame);
         }
         GameSaveLoadManager.saveMap(activeGame, event);
-       
     }
-
-
 }

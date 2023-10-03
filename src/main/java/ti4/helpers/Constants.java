@@ -6,9 +6,9 @@ import java.util.List;
 
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
-    public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
-    public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
-    public static final String FRANKEN_ITEMS_TO_DRAFT = "franken_items_to_draft";
+    public static final String DRAFT_HAND = "franken_personal_bag";
+    public static final String DRAFT_BAG = "franken_bag_to_pass";
+    public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
@@ -42,7 +42,6 @@ public class Constants {
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
-    public static final String POWERED_STATUS = "powered_status";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
@@ -724,6 +723,7 @@ public class Constants {
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
+    public static final String BAG_INFO_THREAD_PREFIX = "Draft Bag-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
     public static final String PING_ACTIVE_PLAYER = "ping_active_player";
@@ -742,6 +742,8 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+
+    public static final String BAG_DRAFT = "bag_draft";
     public static final String ABILITY = "ability";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";

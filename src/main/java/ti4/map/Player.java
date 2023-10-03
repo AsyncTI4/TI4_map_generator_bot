@@ -12,14 +12,13 @@ import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
-import ti4.model.Franken.FrankenBag;
-import ti4.model.Franken.FrankenItem;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -34,7 +33,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -84,9 +82,9 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
-    private FrankenBag frankenHand = new FrankenBag();
-    private FrankenBag currentFrankenBag = new FrankenBag();
-    private FrankenBag frankenItemsToDraft = new FrankenBag();
+    private DraftBag draftHand = new DraftBag();
+    private DraftBag currentDraftBag = new DraftBag();
+    private DraftBag draftItemQueue = new DraftBag();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -109,6 +107,8 @@ public class Player {
     private String privateChannelID;
     @Nullable
     private String cardsInfoThreadID;
+    @Nullable
+    private String bagInfoThreadID;
 
     private int crf;
     private int hrf;
@@ -217,6 +217,9 @@ public class Player {
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
+    public String getBagInfoThreadID() {
+        return bagInfoThreadID;
+    }
 
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2") || getTechs().contains("pds2") || getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds");
@@ -237,6 +240,10 @@ public class Player {
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
+    }
+
+    public void setBagInfoThreadID(String bagInfoThreadID) {
+        this.bagInfoThreadID = bagInfoThreadID;
     }
 
     @JsonIgnore
@@ -1263,24 +1270,24 @@ public class Player {
         return techs;
     }
 
-    public FrankenBag getFrankenHand() {
-        return frankenHand;
+    public DraftBag getDraftHand() {
+        return draftHand;
     }
 
-    public void setFrankenHand(FrankenBag hand) {
-        frankenHand = hand;
+    public void setDraftHand(DraftBag hand) {
+        draftHand = hand;
     }
 
-    public FrankenBag getCurrentFrankenBag() {
-        return currentFrankenBag;
+    public DraftBag getCurrentDraftBag() {
+        return currentDraftBag;
     }
 
-    public void setCurrentFrankenBag(FrankenBag bag) {
-        currentFrankenBag = bag;
+    public void setCurrentDraftBag(DraftBag bag) {
+        currentDraftBag = bag;
     }
 
-    public FrankenBag getFrankenDraftQueue() {
-        return frankenItemsToDraft;
+    public DraftBag getFrankenDraftQueue() {
+        return draftItemQueue;
     }
 
     public boolean hasTech(String techID) {
@@ -1316,35 +1323,35 @@ public class Player {
     }
 
     public void loadFrankenHand(List<String> saveString) {
-        FrankenBag newBag = new FrankenBag();
+        DraftBag newBag = new DraftBag();
         for(String item : saveString){
-            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.frankenHand = newBag;
+        this.draftHand = newBag;
     }
 
     public void loadCurrentFrankenBag(List<String> saveString) {
-        FrankenBag newBag = new FrankenBag();
+        DraftBag newBag = new DraftBag();
         for(String item : saveString){
-            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.currentFrankenBag = newBag;
+        this.currentDraftBag = newBag;
     }
 
     public void loadFrankenItemsToDraft(List<String> saveString) {
-        List<FrankenItem> items = new ArrayList<>();
+        List<DraftItem> items = new ArrayList<>();
         for(String item : saveString){
-            items.add(FrankenItem.GenerateFromAlias(item));
+            items.add(DraftItem.GenerateFromAlias(item));
         }
-        this.frankenItemsToDraft.Contents = items;
+        this.draftItemQueue.Contents = items;
     }
 
-    public void queueFrankenItemToDraft(FrankenItem item) {
-        this.frankenItemsToDraft.Contents.add(item);
+    public void queueFrankenItemToDraft(DraftItem item) {
+        this.draftItemQueue.Contents.add(item);
     }
 
     public void resetFrankenItemDraftQueue() {
-        this.frankenItemsToDraft.Contents.clear();
+        this.draftItemQueue.Contents.clear();
     }
 
     public List<String> getReadiedPlanets() {
