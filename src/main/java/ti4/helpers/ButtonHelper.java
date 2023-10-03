@@ -1334,7 +1334,7 @@ public class ButtonHelper {
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
-        }
+        } 
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event) {
@@ -1463,7 +1463,9 @@ public class ButtonHelper {
             if (nameOfHolder.equalsIgnoreCase("space")) {
                 buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
             } else {
-                buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + ""));
+                buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(),
+                        "Roll Ground Combat for " + nameOfHolder + ""));
+                buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_"+unitH.getName()+"_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
             }
 
         }
@@ -2157,6 +2159,9 @@ public class ButtonHelper {
                     break;
                 case "spacecannonoffence":
                     rollType = CombatRollType.SpaceCannonOffence;
+                    break;
+                case "spacecannondefence":
+                    rollType = CombatRollType.SpaceCannonDefence;
                     break;
                 default:
                     break;
