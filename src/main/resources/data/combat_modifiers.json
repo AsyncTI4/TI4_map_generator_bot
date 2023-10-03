@@ -11,6 +11,48 @@
         ]
     },
     {
+        "alias": "plus1_roll_plasmascoring_spacecannon",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "ps"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "minus1_mod_pds_opponent_antimatter",
+        "type": "mods",
+        "value": "-1",
+        "persistenceType": "ALWAYS",
+        "scope": "pd",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [
+            {
+                "type": "opponent_tech",
+                "alias": "amd"
+            }
+        ]
+    },
+    {
+        "alias": "plus1_roll_plasmascoring_spacecannon",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "ps"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
         "alias": "plus1_roll_in_nebula",
         "type": "mods",
         "value": "+1",
@@ -55,17 +97,6 @@
             {"type": "unit", "alias": "naaz_flagship"}
         ], 
         "forCombatAbility": "combatround"
-    },
-    {
-        "alias": "plus1_roll_plasmascoring_spacecannon",
-        "type": "extrarolls",
-        "value": "+1",
-        "persistenceType": "ALWAYS",
-        "scope": "_best_",
-        "related":[
-            {"type": "tech", "alias": "ps"}
-        ], 
-        "forCombatAbility": "SpaceCannonOffence"
     },
     {
         "alias": "plus1_roll_plasmascoring",
