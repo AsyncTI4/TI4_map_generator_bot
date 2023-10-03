@@ -2215,7 +2215,7 @@
     "name": "Anti-Intellectual Revolution",
     "type": "Law",
     "target": "For/Against",
-    "text1": "For: When resolved, players return 1 of their non-unit, non-faction technologies that has the most prerequisites to their technology deck. Technologies require 1 additional prerequisite, matching any prerequisite they already have.",
+    "text1": "For: When resolved, players return 1 of their non-unit, non-faction technologies that has the most prerequisites to their technology deck. Technologies with prerequisites require 1 additional prerequisite, matching any they already have.",
     "text2": "Against: At the start of the next strategy phase, each player chooses and exhausts 1 planet they control for each technology they own.",
     "mapText": "Technologies require 1 additional prerequisite, matching any prerequisite they already have.",
     "source": "little_omega"
