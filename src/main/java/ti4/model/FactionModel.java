@@ -97,10 +97,10 @@ public class FactionModel implements ModelInterface {
     }
 
     private boolean validateLeaders() {
-        if (Mapper.getLeaderRepresentations().keySet().containsAll(getLeaders())) return true;
+        if (Mapper.getLeaders().keySet().containsAll(getLeaders())) return true;
         List<String> invalidLeaderIDs = new ArrayList<>();
         for (String leaderID : getLeaders()) {
-            if (!Mapper.getLeaderRepresentations().containsKey(leaderID)) invalidLeaderIDs.add(leaderID);
+            if (!Mapper.getLeaders().containsKey(leaderID)) invalidLeaderIDs.add(leaderID);
         }
 
         BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid leader IDs: `" + invalidLeaderIDs + "`");

@@ -107,7 +107,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                         sb.append("Drawn Agendas:\n");
                         sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                         sb.append("\n");
-                        MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(activeGame), sb.toString());
+                        MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb.toString());
                     }
                 }
 

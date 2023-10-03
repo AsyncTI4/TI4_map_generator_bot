@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
+import ti4.commands.franken.FrankenEdit;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -94,7 +95,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new CreateGameChannels());
         subcommands.add(new CreateFOWGameChannels());
         subcommands.add(new ServerLimitStats());
-        subcommands.add(new ListOldChannels());
+        //subcommands.add(new ListOldChannels());
         subcommands.add(new ListOldThreads());
         subcommands.add(new ArchiveOldThreads());
         subcommands.add(new FixGameChannelPermissions());
@@ -106,6 +107,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new JazzCommand());
         subcommands.add(new Observer());
         subcommands.add(new ListButtons());
+        subcommands.add(new ListSlashCommandsUsed());
         return subcommands;
     }
 

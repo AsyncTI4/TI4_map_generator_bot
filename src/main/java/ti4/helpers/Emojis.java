@@ -341,6 +341,10 @@ public class Emojis {
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
 
+    // HOMEBREW
+    public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; //Symbol for Will's Action Deck 2 mod
+    public static final String Eronous = "<:eronous:1157307622920290444>"; //Symbol for Eronous' stuff
+
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols =
         Arrays.asList(

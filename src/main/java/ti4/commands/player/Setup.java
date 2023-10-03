@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -85,6 +86,10 @@ public class Setup extends PlayerSubcommandData {
         player.getPlanets().clear();
         player.getTechs().clear();
 
+        if (activeGame.isBaseGameMode()) {
+            player.setLeaders(new ArrayList<>());
+        }
+
         FactionModel setupInfo = player.getFactionSetupInfo();
 
         // HOME SYSTEM
@@ -124,34 +129,43 @@ public class Setup extends PlayerSubcommandData {
 
         // STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if (!activeGame.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeGame) + " has been set up");
-        } else {
-            sendMessage("Player was set up.");
-        }
 
         // STARTING TECH
         for (String tech : setupInfo.getStartingTech()) {
             if (tech.trim().isEmpty()) {
                 continue;
             }
-            player.addTech(tech, activeGame);
+            player.addTech(tech);
         }
 
-        
-        
-
+        // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
-
         if (setSpeaker) {
             activeGame.setSpeaker(player.getUserID());
             sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeGame));
         }
 
         // STARTING PNs
-        player.initPNs(activeGame);
+        player.initPNs();
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         player.setPromissoryNotesOwned(playerPNs);
+        if (activeGame.isBaseGameMode()) {
+            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+            for (String pnID : pnsOwned) {
+                if (pnID.endsWith("_an") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Alliance")) {
+                    player.removeOwnedPromissoryNoteByID(pnID);
+                }
+            }
+        }
+        if (activeGame.isAbsolMode()) {
+            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+            for (String pnID : pnsOwned) {
+                if (pnID.endsWith("_ps") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Political Secret")) {
+                    player.removeOwnedPromissoryNoteByID(pnID);
+                    player.addOwnedPromissoryNoteByID("absol_" + pnID);
+                }
+            }
+        }
 
         // STARTING OWNED UNITS
         HashSet<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
@@ -163,7 +177,7 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
-        if(player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")){
+        if(player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             activeGame.setComponentAction(true);
             Button getTech = Button.success("acquireATech", "Get a tech");
             List<Button> buttons = new ArrayList<>();
@@ -174,6 +188,12 @@ public class Setup extends PlayerSubcommandData {
             activeGame.setUpPeakableObjectives(10);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player.");
             GameSaveLoadManager.saveMap(activeGame, event);
+        }
+
+        if (!activeGame.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeGame) + " has been set up");
+        } else {
+            sendMessage("Player was set up.");
         }
     }
 

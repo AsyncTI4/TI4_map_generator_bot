@@ -65,7 +65,15 @@ public class BotLogger {
         System.out.println("[BOT-LOG] " + msg);
 
         if (botLogChannel == null) {
-            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + event.getGuild().getName() + "\nSending via webhook to main server.\n>" + msg);
+            String name;
+            if(event == null) {
+                name = "None";
+                System.out.println(e);
+                return;
+            } else {
+                name = event.getGuild().getName();
+            }
+            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + name + "\nSending via webhook to main server.\n>" + msg);
             return;
         }
 
@@ -129,12 +137,17 @@ public class BotLogger {
             }
         }
         if (botLogChannel == null && AsyncTI4DiscordBot.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
-            for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
-                if ("bot-log".equals(textChannel.getName())) {
-                    botLogChannel = textChannel;
-                }
-            }
+            botLogChannel = getPrimaryBotLogChannel();
         }
         return botLogChannel;
+    }
+
+    public static TextChannel getPrimaryBotLogChannel() {
+        for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
+            if ("bot-log".equals(textChannel.getName())) {
+                return textChannel;
+            }
+        }
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -135,7 +136,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 sb.append("----------\n");
             }
-            File systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
+            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
             if(!activeGame.isFoWMode()){
                 for(Player player : activeGame.getRealPlayers()){

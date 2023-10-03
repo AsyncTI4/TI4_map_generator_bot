@@ -27,7 +27,10 @@ public class ButtonHelperModifyUnits {
                 continue;
             }
             Tile tile2 = activeGame.getTileByPosition(pos2);
-            buttons.add(Button.secondary(finChecker+"retreatUnitsFrom_"+pos1+"_"+pos2, "Retreat to "+tile2.getRepresentationForButtons(activeGame, player)));
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                buttons.add(Button.secondary(finChecker+"retreatUnitsFrom_"+pos1+"_"+pos2, "Retreat to "+tile2.getRepresentationForButtons(activeGame, player)));
+            }
+            
         }
         return buttons;
     }
@@ -107,7 +110,7 @@ public class ButtonHelperModifyUnits {
 
         String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
         //activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
-        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos1), amount, planet, key, player.getColor(), false);
+        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos1), amount, planet, key, player.getColor(), false, activeGame);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, activeGame, event, pos1, pos2);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Retreated "+amount+ " "+unitkey + " on "+planet +" to "+ activeGame.getTileByPosition(pos2).getRepresentationForButtons(activeGame,player));
@@ -152,7 +155,7 @@ public class ButtonHelperModifyUnits {
                                 damagedUnits = unitHolder.getUnitDamage().get(key);
                             }
                             String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitID, player.getColor(), false);
+                            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitID, player.getColor(), false, activeGame);
                             new AddUnits().unitParsing(event, player.getColor(),tile2, amount + " " + unitKey, activeGame);
                             if(damagedUnits > 0){
                                 activeGame.getTileByPosition(pos2).addUnitDamage("space", unitID, damagedUnits);
@@ -247,7 +250,12 @@ public class ButtonHelperModifyUnits {
                             "2 ff", activeGame);
                     successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
-                } else {
+                } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
+                    new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
+                            "2 destroyer", activeGame);
+                    successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+                            + AliasHandler.resolveTile(planetName) + ".";
+                } else{
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             unit, activeGame);
                     successMessage = "Produced a " + Helper.getEmojiFromDiscord(unitLong) + " in tile "
@@ -273,7 +281,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            if(player.hasLeader("mahactagent", activeGame)){
+            if(player.hasLeader("mahactagent")){
                 String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
                 Button placeCCInSystem = Button.success(
                         finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
@@ -557,6 +565,52 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
+    public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        for(String unit : tile.getUnitHolders().get("space").getUnits().keySet()){
+            String colorID = Mapper.getColorID(player.getColor());
+            if(unit.contains("gf.png")|| unit.contains("mf.png")){
+                continue;
+            }
+            String cID = Mapper.getColorID(player.getColor());
+            String unitKey = unit.replace(cID + "_", "");
+            unitKey = unitKey.replace(".png", "");
+            unitKey = ButtonHelper.getUnitName(unitKey);
+            Button validTile = Button.success("domnaStepTwo_" + pos+ "_"+unitKey, "Move 1 "+unitKey);
+            buttons.add(validTile);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select unit you want to move",buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void offerDomnaStep3Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos1 = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<>();
+        for(String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)){
+            if(pos1.equalsIgnoreCase(pos2)){
+                continue;
+            }
+            Tile tile2 = activeGame.getTileByPosition(pos2);
+            if(!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                buttons.add(Button.secondary("domnaStepThree_"+pos1+"_"+unit+"_"+pos2, "Move "+unit+" to "+tile2.getRepresentationForButtons(activeGame, player)));
+            }
+        }
+         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select tile you want to move to",buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveDomnaStep3Buttons(ButtonInteractionEvent event, Game activeGame, Player player, String buttonID){
+        String pos1 = buttonID.split("_")[1];
+        Tile tile1 = activeGame.getTileByPosition(pos1);
+        String unit = buttonID.split("_")[2];
+        String pos2 = buttonID.split("_")[3];
+        Tile tile2 = activeGame.getTileByPosition(pos2);
+        new AddUnits().unitParsing(event, player.getColor(), tile2, unit, activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile1, unit, activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " moved 1 "+unit+ " from "+tile1.getRepresentationForButtons(activeGame, player)+ " to "+tile2.getRepresentationForButtons(activeGame, player)+ " using Domna legendary ability.");
+        event.getMessage().delete().queue();
+    }
     public static void resolvingCombatDrones(ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         int numff = 0;
@@ -670,7 +724,7 @@ public class ButtonHelperModifyUnits {
                                }
                                String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
 
-                               new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false);
+                               new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false, activeGame);
 
                              //  validTile2 = Button.danger(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, moveOrRemove+" "+x+" Infantry from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                            }
@@ -695,7 +749,7 @@ public class ButtonHelperModifyUnits {
                                    }
                                    String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
 
-                                   new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
+                                   new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
                                    if(damagedUnits > 0){
                                        rest = unitKey+"damaged";
                                        amount = damagedUnits;
@@ -779,7 +833,7 @@ public class ButtonHelperModifyUnits {
                planetName = AliasHandler.resolvePlanet(planetName);
            }
 
-           new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), buttonLabel.toLowerCase().contains("damaged"));
+           new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
           // String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
            //activeMap.getTileByPosition(pos).removeUnit(planetName, key, amount);
        }
@@ -833,7 +887,7 @@ public class ButtonHelperModifyUnits {
                                     unitKey = ButtonHelper.getUnitName(unitKey);
                                     int amount = unitEntry.getValue();
                                     String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                                    new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false);
+                                    new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false, activeGame);
                                     if(cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName())&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
                                         ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, unitEntry.getValue(), unitKey, event);
                                     }
@@ -857,7 +911,7 @@ public class ButtonHelperModifyUnits {
                                         unitKey  = unitKey.replace(".png", "");
                                         unitKey = ButtonHelper.getUnitName(unitKey);
                                         String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                                        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
+                                        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
                                         if(cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
                                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, totalUnits, unitKey, event);
                                         }
@@ -907,7 +961,7 @@ public class ButtonHelperModifyUnits {
                     ButtonHelper.resolveInfantryDeath(activeGame, player, amount);
                 }
             }
-        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), buttonLabel.toLowerCase().contains("damaged"));
+        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
             
             
             String message = event.getMessage().getContentRaw();

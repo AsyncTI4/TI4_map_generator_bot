@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +52,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -407,7 +406,7 @@ public class Helper {
         return emojiToUse;
     }
 
-    @Nonnull
+    @NotNull
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
         //symbols = new ArrayList<>(testingEmoji);
@@ -431,7 +430,7 @@ public class Helper {
         return goodDogs.get(0);
     }
 
-    @Nonnull
+    @NotNull
     public static String getFactionIconFromDiscord(String faction) {
         if (faction == null) {
             return getRandomizedEmoji(0, null);
@@ -656,7 +655,7 @@ public class Helper {
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         for (String planet : planets) {
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, activeGame));
             planetButtons.add(button);
@@ -670,6 +669,18 @@ public class Helper {
         for (Tile tile : tiles) {
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player));
             planetButtons.add(button);
+        }
+        return planetButtons;
+    }
+
+    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game activeGame, String unit, String prefix, @Nullable ButtonInteractionEvent event) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeGame);
+        for (Tile tile : tiles) {
+            if(AddCC.hasCC(event, player.getColor(), tile) ){
+                Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player));
+                planetButtons.add(button);
+            }
         }
         return planetButtons;
     }
@@ -713,7 +724,7 @@ public class Helper {
 
         if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff) && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
-            if (player.hasUnexhaustedLeader("argentagent", activeGame)) {
+            if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("argent")));
                 unitButtons.add(argentButton);
@@ -780,7 +791,7 @@ public class Helper {
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets(activeGame));
+        List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         if (mahact == null) {
             for (String planet : planets) {
@@ -1123,27 +1134,22 @@ public class Helper {
         return getEmojiFromDiscord(leader.getId());
     }
 
+    @Deprecated
     public static String getLeaderRepresentation(Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         String leaderID = leader.getId();
 
-        String leaderRep = Mapper.getLeaderRepresentations().get(leaderID);
-        if (leaderRep == null) {
+        LeaderModel leaderModel = Mapper.getLeader(leaderID);
+        if (leaderModel == null) {
             BotLogger.log("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
             return leader.getId();
         }
 
-        //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
-        String[] leaderRepSplit = leaderRep.split(";");
-        if (leaderRepSplit.length != 6) {
-            BotLogger.log("Invalid `leaderID=" + leaderID + "` `leaderRepSplit.length=" + leaderRepSplit.length + "` caught within `Helper.getLeaderRepresentation`");
-            return leaderRep;
-        }
-        String leaderName = leaderRepSplit[0];
-        String leaderTitle = leaderRepSplit[1];
-        String heroAbilityName = leaderRepSplit[2];
-        String leaderAbilityWindow = leaderRepSplit[3];
-        String leaderAbilityText = leaderRepSplit[4];
-        String leaderUnlockCondition = leaderRepSplit[5];
+        String leaderName = leaderModel.getName();
+        String leaderTitle = leaderModel.getTitle();
+        String heroAbilityName = leaderModel.getAbilityName();
+        String leaderAbilityWindow = leaderModel.getAbilityWindow();
+        String leaderAbilityText = leaderModel.getAbilityText();
+        String leaderUnlockCondition = leaderModel.getUnlockCondition();
 
         StringBuilder representation = new StringBuilder();
         representation.append(getFactionLeaderEmoji(leader)).append(" **").append(leaderName).append("**");
@@ -1800,8 +1806,7 @@ public class Helper {
     }
 
     public static void setOrder(Game activeGame) {
-
-        List<Integer> hsLocations = new ArrayList<Integer>();
+        List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
         for (Player player : activeGame.getRealPlayers()) {
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
@@ -1841,7 +1846,7 @@ public class Helper {
     }
 
     public static void checkEndGame(Game activeGame, Player player) {
-        if (player.getTotalVictoryPoints(activeGame) >= activeGame.getVp()) {
+        if (player.getTotalVictoryPoints() >= activeGame.getVp()) {
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
@@ -1850,22 +1855,6 @@ public class Helper {
                     + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
         }
-    }
-
-    public static Tile getTileFromPlanet(String planetName, Game activeGame) {
-        Tile tile = null;
-        for (Tile tile_ : activeGame.getTileMap().values()) {
-            if (tile != null) {
-                break;
-            }
-            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
-                    tile = tile_;
-                    break;
-                }
-            }
-        }
-        return tile;
     }
 
     public static String getExploreNameFromID(String cardID) {
@@ -1878,11 +1867,6 @@ public class Helper {
             sb.append("Invalid ID ").append(cardID);
         }
         return sb.toString();
-
-    }
-
-    public static String getPlayerCCs(Player player) {
-        return player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
 
     }
 
@@ -1903,73 +1887,6 @@ public class Helper {
         }
         return numMechs > 0;
 
-    }
-
-    public static boolean playerHasMechInSystem(Tile tile, Game activeGame, Player player) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean playerHasProductionUnitInSystem(Tile tile, Game activeGame, Player player) {
-        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey;
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-            mechKey = colorID + "_sd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-            mechKey = colorID + "_csd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                return true;
-            }
-            if (player.hasUnit("arborec_mech")) {
-                mechKey = colorID + "_mf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
-                    return true;
-                }
-            }
-            if (player.hasUnit("arborec_infantry") || player.hasTech("lw2")) {
-                mechKey = colorID + "_gf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static Set<Player> getNeighbouringPlayers(Game activeGame, Player player) {
-        Set<Player> adjacentPlayers = new HashSet<>();
-        Set<Player> realPlayers = new HashSet<>(activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
-
-        Set<Tile> playersTiles = new HashSet<>();
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(activeGame, tile, player)) {
-                playersTiles.add(tile);
-            }
-        }
-
-        for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(activeGame, tile.getPosition(), false));
-            if (realPlayers.size() == adjacentPlayers.size()) break;
-        }
-        adjacentPlayers.remove(player);
-        return adjacentPlayers;
-    }
-
-    public static int getNeighbourCount(Game activeGame, Player player) {
-        return getNeighbouringPlayers(activeGame, player).size();
     }
 
     /**
@@ -2026,6 +1943,7 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
+    @Deprecated
     public static boolean isFakeAttachment(String attachmentName) {
         attachmentName = AliasHandler.resolveAttachment(attachmentName);
         return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);

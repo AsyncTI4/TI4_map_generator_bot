@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.generator.GenerateMap;
@@ -96,7 +97,7 @@ public class AddTileList extends MapSubcommandData {
 
         GameSaveLoadManager.saveMap(userActiveGame, event);
 
-        File file = GenerateMap.getInstance().saveImage(userActiveGame, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(userActiveGame, event);
         MessageHelper.replyToMessage(event, file);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
     }

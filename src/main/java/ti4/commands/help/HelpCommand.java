@@ -86,22 +86,6 @@ public class HelpCommand implements Command {
         Collection<HelpSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new HelpAction());
         subcommands.add(new SetupTemplatesAction());
-        subcommands.add(new ListAbilities());
-        subcommands.add(new ListGames());
-        subcommands.add(new ListPlanets());
-        subcommands.add(new ListTiles());
-        subcommands.add(new ListUnits());
-        subcommands.add(new ListCommands());
-        subcommands.add(new ListMyGames());
-        subcommands.add(new ListAgendas());
-        subcommands.add(new ListSecretObjectives());
-        subcommands.add(new ListPublicObjectives());
-        subcommands.add(new ListRelics());
-        subcommands.add(new ListActionCards());
-        subcommands.add(new ListTechs());
-        subcommands.add(new ListLeaders());
-        subcommands.add(new ListPromissoryNotes());
-        subcommands.add(new ListExplores());
         subcommands.add(new HowToMoveUnits());
 
         return subcommands;
