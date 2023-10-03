@@ -1,0 +1,332 @@
+[
+    {
+        "alias": "dominusorb",
+        "name": "Dominus Orb",
+        "text": "Before you move units during a tactical action, you may purge this card to move and transport units that are in systems that contain 1 of your command tokens.",
+        "source": "pok"
+    },
+    {
+        "alias": "mawofworlds",
+        "name": "Maw of Worlds",
+        "text": "At the start of the agenda phase, you may purge this card and exhaust all of your planets to gain any 1 technology.",
+        "source": "pok"
+    },
+    {
+        "alias": "emelpar",
+        "name": "Scepter of Emelpar",
+        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.",
+        "source": "pok"
+    },
+    {
+        "alias": "shard",
+        "name": "Shard of the Throne",
+        "text": "When you gain this card, gain 1 victory point, when you lose this card, lose 1 victory point. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains this card.",
+        "source": "pok"
+    },
+    {
+        "alias": "stellarconverter",
+        "name": "Stellar Converter",
+        "text": "Action: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have Bombardment, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "source": "pok"
+    },
+    {
+        "alias": "codex",
+        "name": "The Codex",
+        "text": "Action: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
+        "source": "pok"
+    },
+    {
+        "alias": "emphidia",
+        "name": "The Crown of Emphidia",
+        "text": "After you perform a tactical action, you may exhaust this card to explore 1 planet you control. At the end of the status phase, if you control the \"Tomb of Emphidia,\" you may purge this card to gain 1 victory point.",
+        "source": "pok"
+    },
+    {
+        "alias": "thalnos",
+        "name": "The Crown of Thalnos",
+        "text": "During each combat round, this card's owner may reroll any number of their dice, applying +1 to the results, any units that reroll dice but do not produce at least 1 hit are destroyed.",
+        "source": "pok"
+    },
+    {
+        "alias": "obsidian",
+        "name": "The Obsidian",
+        "text": "When you gain this card, draw 1 secret objective. You can have 1 additional scored or unscored secret objective.",
+        "source": "pok"
+    },
+    {
+        "alias": "prophetstears",
+        "name": "The Prophets Tears",
+        "text": "When you research a technology, you may exhaust this card to ignore 1 prerequisite or draw 1 action card.",
+        "source": "pok"
+    },
+    {
+        "alias": "dynamiscore",
+        "name": "Dynamis Core",
+        "text": "While this card is in your play area, your commodity value is increased by 2. Action: Purge this card to gain trade goods equal to your printed commodity value+2.",
+        "source": "codexii"
+    },
+    {
+        "alias": "titanprototype",
+        "name": "JR-XS455-O",
+        "text": "Action: Exhaust this agent and choose a player, that player may spend 3 resources to place a structure on a planet they control. If they do not, they gain 1 trade good.",
+        "source": "codexii"
+    },
+    {
+        "alias": "nanoforge",
+        "name": "Nanoforge",
+        "text": "Action: Attach this card to a non-legendary, non-home planet you control, its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
+        "source": "codexii"
+    },
+    {
+        "alias": "enigmaticdevice",
+        "name": "Enigmatic Device",
+        "text": "Place this card faceup in your play area. ACTION: You may spend 6 resources and purge this card to research 1 technology.",
+        "source": "pok"
+    },
+    {
+        "alias": "absol_dominusorb",
+        "name": "Dominus Orb",
+        "text": "After you activate a system, apply +1 to the move value of 1 of your ships during this tactical action. After you activate a system, you may move and transport units that are in systems that contain 1 of your command tokens. If you do, purge this card.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_dynamiscore",
+        "name": "Dynamis Core",
+        "text": "While this card is in your play area, your commodity value is increased by 2. Action: Gain trade goods equal to your commodity value +2. Then, purge this card.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_jr",
+        "name": "JR-SX455-O",
+        "text": "Action: Exhaust this agent and choose a planet. The player that controls that planet may place a structure on that planet. If they do not, they gain 1 trade good for each structure on that planet.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_luxarchtreatise",
+        "name": "Luxarch Treatise",
+        "text": "Other players' non-fighter ships in the active system lose all printed abilities while you have ships in the active system.At the start of a round of space combat, you may purge this card. If you do, your opponent must announce a retreat, if able.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_mawofworlds",
+        "name": "Maw of Worlds",
+        "text": "When you would exhaust a technology or a legendary planet ability card, you may exhaust this card instead. At the start of the agenda phase, you may purge this card and exhaust 3 of your planets to gain any 1 technology.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_nanoforge",
+        "name": "Nanoforge",
+        "text": "Action: Attach this card to a non-legendary, non-home planet you control. Its resource and influence values are increased by 2 and it is a legendary planet. Take the corresponding legendary planet ability card.  This action cannot be performed once attached. RECONSTRUCTION MATRIX: After you exhaust the planet Nano-Forge is attached to, you may exhaust this card to ready that planet.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_plenaryorbital",
+        "name": "Plenary Orbital",
+        "text": "PLENARY ORBITAL (Note: not a Space Dock) Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 10 fighters in this system do not count against your ships' capacity. Reduce the combined cost of units produced by this unit by 2. PRODUCTION 10, PLANETARY SHIELD",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_quantumcore",
+        "name": "Quantumcore",
+        "text": "[Cybernetic][Warfare] You space dock units gain the SPACE CANNON 8 and PLANETARY SHIELD abilities. When 1 or more of your units use SPACE CANNON, you may exhaust this card to treat all dice rolled as a result of 10.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_emelpar",
+        "name": "Sceptar of Emelpar",
+        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead. Action: Purge this card to ready your strategy card.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_shardofthethrone1",
+        "name": "Shard of the Throne (1)",
+        "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_shardofthethrone2",
+        "name": "Shard of the Throne (2)",
+        "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_shardofthethrone3",
+        "name": "Shard of the Throne (3)",
+        "text": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point. When you cast votes during the agenda phase, you cast 2 additional votes. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains one Shard of the Throne from your play area.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_stellarconverter",
+        "name": "Stellar Converter",
+        "text": "You may ignore the effects of supernovas. When your ships move out of or through a supernova, apply +1 to their move value. Action: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that contains or is adjacent to 1 or more of your units that have Bombardment. Destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_codex",
+        "name": "The Codex",
+        "text": "Increase your action card hand limit by 5.  Whenever you draw action cards, you draw 1 additional action card. Action: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_emphidia",
+        "name": "The Crown of Emphidia",
+        "text": "After you perform a tactical action, you may explore 1 planet you control in that system. At the start of the status phase, if you control the 'Tomb of Emphidia', you may purge this card to gain 1 victory point.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_thalnos",
+        "name": "The Crown of Thalnos",
+        "text": "Apply +1 to the result of each of your unit's combat rolls. During a combat round, if your opponent produces at least 1 hit, they produce 1 additional hit. At the start of a combat, you may destroy 3 of your non-fighter units participating in the combat to destroy all of your opponent's units in that combat.  If you do, purge this card.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_obsidian",
+        "name": "The Obsidian",
+        "text": "When you gain this card, draw 1 secret objective. You can have 1 additional scored or unscored secret objective.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_prophetstears",
+        "name": "The Prophet's Tears",
+        "text": "When you research a technology or use a faction ability instead of researching a technology, you may ignore 1 prerequisite or draw 1 action card. Action: Purge this card to research 2 technologies.  You may do this regardless of any other game effect.",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_syncretone",
+        "name": "The Syncretone",
+        "text": "When you cast votes, you cast 1 additional vote for each player that is your neighbor. If a game effect would prevent you from voting, you may exhaust this card to cast 1 vote. Before players vote on an agenda, you may purge this card to choose the outcome to be resolved",
+        "source": "absol"
+    },
+    {
+        "alias": "absol_tyrantslament",
+        "name": "Tyrant's Lament",
+        "text": "TYRANT'S LAMENT (Note: not a flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card. This unit is not affected by action cards, anomalies, or your faction abilities or technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
+        "source": "absol"
+    },
+    {
+        "alias": "ring_king_poon",
+        "name": "The Ring of King Poon",
+        "text": "Action: Exhaust this card to peek at a face down objective. Action: You may flip a face down public objective. Score a revealed public objective. Purge this card.",
+        "source": "pbd100"
+    },
+    {
+        "alias": "king_tis_golden_tooth",
+        "name": "King Tis's Golden Tooth",
+        "text": "Attach this card to a planet you control that is the farthest away from your home system. Gain 1 VP. If you lose control of the planet, lose 1 VP and give this card to the player who took the planet from you.",
+        "source": "pbd100"
+    },
+    {
+        "alias": "boon_of_the_cerulean_god",
+        "name": "Boon of the Cerulean God",
+        "text": "Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. When you produce 1 or more units reduce the combined cost of the produced units by 1.",
+        "source": "ds"
+    },
+    {
+        "alias": "decrypted_cartoglyph",
+        "name": "Decrypted Cartoglyph",
+        "text": "ACTION: Purge this card to draw 3 system tiles with a blue-colored back at random. Place 1 of those tiles at the edge of the game board, adjacent to at least 2 other systems. Purge the rest.",
+        "source": "ds"
+    },
+    {
+        "alias": "e6-g0_network",
+        "name": "E6-G0 Network",
+        "text": "You may have 2 additional action cards in your hand, game effects cannot prevent you from using this ability. At any time, you may exhaust this card to draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "alias": "eye_of_vogul",
+        "name": "Eye of Vogul",
+        "text": "After you activate a system: Purge this card to treat 2 of your ships as adjacent to the active system until the end of this tactical action.",
+        "source": "ds"
+    },
+    {
+        "alias": "starfall_array",
+        "name": "Starfall Array",
+        "text": "Apply +1 to the results of each of your unit's ability rolls.",
+        "source": "ds"
+    },
+    {
+        "alias": "throne_of_the_false_emperor",
+        "name": "Throne of the False Emperor",
+        "text": "ACTION: Purge this card to either gain 1 relic or immediately score 1 scored secret objective, or 1 of your unscored secret objectives, if you fulfill its requirements.",
+        "source": "ds"
+    },
+    {
+        "alias": "twilight_mirror",
+        "name": "Twilight Mirror",
+        "text": "At the start of the agenda phase, you may purge this card to resolve 1 action.",
+        "source": "ds"
+    },
+    {
+        "alias": "starchartcultural",
+        "name": "Star Chart Cultural",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "alias": "starcharthazardous",
+        "name": "Star Chart Hazardous",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "alias": "starchartindustrial",
+        "name": "Star Chart Industrial",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercv",
+        "name": "Axis Order Carrier",
+        "text": "At the end of your turn: Exhaust this card to place 1 carrier from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdn",
+        "name": "Axis Order Dreadnought",
+        "text": "At the end of your turn: Exhaust this card to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercr",
+        "name": "Axis Order Cruiser",
+        "text": "At the end of your turn: Exhaust this card to place 1 cruiser from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdd",
+        "name": "Axis Order Destroyer",
+        "text": "At the end of your turn: Exhaust this card to place 2 destroyers from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercvduplicate",
+        "name": "Axis Order Carrier",
+        "text": "At the end of your turn: Exhaust this card to place 1 carrier from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderdnduplicate",
+        "name": "Axis Order Dreadnought",
+        "text": "At the end of your turn: Exhaust this card to place 1 dreadnought from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisordercrduplicate",
+        "name": "Axis Order Cruiser",
+        "text": "At the end of your turn: Exhaust this card to place 1 cruiser from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "axisorderddduplicate",
+        "name": "Axis Order Destroyer",
+        "text": "At the end of your turn: Exhaust this card to place 2 destroyers from your reinforcements in a system that contains 1 or more of your ships and 1 of your command tokens. At the start of the status phase, if this card is exhausted, return it to the Axis players reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "starchartfrontier",
+        "name": "Star Chart Frontier",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    }
+]

@@ -1,6 +1,5 @@
 package ti4;
 
-import java.io.Console;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import net.dv8tion.jda.api.JDA;
@@ -41,6 +40,7 @@ import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
@@ -60,12 +60,15 @@ import ti4.message.MessageHelper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class AsyncTI4DiscordBot {
 
+    public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
     public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(
         Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
@@ -79,6 +82,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guild3rd;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
+    public static Set<Guild> guilds = new HashSet<>();
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {
@@ -104,10 +108,11 @@ public class AsyncTI4DiscordBot {
             MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
-        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Starting Up"));
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
+        guilds.add(guildPrimary);
         MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         TileHelper.init();
@@ -128,6 +133,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
+        adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
         adminRoles.add(jda.getRoleById("1149705227625316352"));
 
         adminRoles.removeIf(Objects::isNull);
@@ -172,6 +178,7 @@ public class AsyncTI4DiscordBot {
 
         commandManager.addCommand(new MapCommand());
         commandManager.addCommand(new HelpCommand());
+        commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
 
@@ -213,6 +220,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
+                guilds.add(guildCommunityPlays);
             }
         }
 
@@ -224,6 +232,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildFogOfWar);
             }
         }
 
@@ -235,6 +244,7 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildSecondary);
             }
         }
 
@@ -246,12 +256,13 @@ public class AsyncTI4DiscordBot {
                 CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guild3rd);
             }
         }
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING MAPS: " + guildPrimary.getName());
-        jda.getPresence().setActivity(Activity.playing("Loading Maps"));
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Maps"));
         GameSaveLoadManager.loadMaps();
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
@@ -266,7 +277,7 @@ public class AsyncTI4DiscordBot {
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing("Bot is Restarting"));
+                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` LONGER ACCEPTING COMMANDS");
@@ -277,9 +288,6 @@ public class AsyncTI4DiscordBot {
                 GameSaveLoadManager.saveMaps();
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
-                TimeUnit.SECONDS.sleep(5);
-                jda.shutdown();
-                jda.awaitShutdown();
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());

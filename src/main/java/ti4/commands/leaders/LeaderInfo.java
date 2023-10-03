@@ -57,7 +57,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         List<Button> leaderButtons = getLeaderButtons(activeGame, player);
         if (leaderButtons != null && !leaderButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(leaderPlayMsg, leaderButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }

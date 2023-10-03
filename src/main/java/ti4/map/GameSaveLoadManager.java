@@ -87,7 +87,7 @@ public class GameSaveLoadManager {
 
     public static void saveMap(Game activeGame, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         //ADD COMMAND/BUTTON FOR UNDO INFORMATION
-        if (event != null && !keepModifiedDate) {
+        if (event != null) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
@@ -97,13 +97,21 @@ public class GameSaveLoadManager {
                 activeGame.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
         } else {
+            if (keepModifiedDate && activeGame.isHasEnded() && "Last Command Unknown - No Event Provided".equals(activeGame.getLatestCommand())) {
+                System.out.println("Skipped Saving Map: " + activeGame.getName() + " - Game has ended and has no changes since last save");
+                return;
+            }
             activeGame.setLatestCommand("Last Command Unknown - No Event Provided");
         }
-        
+         
         if (activeGame.isDiscordantStarsMode()) {
-            DiscordantStarsHelper.checkGardenWorlds(activeGame);
-            DiscordantStarsHelper.checkSigil(activeGame);
-            DiscordantStarsHelper.checkOlradinMech(activeGame);
+            try {
+                DiscordantStarsHelper.checkGardenWorlds(activeGame);
+                DiscordantStarsHelper.checkSigil(activeGame);
+                DiscordantStarsHelper.checkOlradinMech(activeGame);
+            } catch (Exception e) {
+                BotLogger.log("Error doing extra Discordant Stars stuff", e);
+            }
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -686,7 +694,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
+
             StringBuilder leaderInfo = new StringBuilder();
+            if (player.getLeaders().isEmpty()) leaderInfo.append("none");
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
@@ -925,6 +935,19 @@ public class GameSaveLoadManager {
         return null;
     }
 
+    public static Game loadMapJSONString(String mapFile) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
+        try {
+            return mapper.readValue(mapFile, Game.class);
+        } catch (Exception e) {
+            BotLogger.log("JSON STRING FAILED TO LOAD", e);
+            // System.out.println(mapFile.getAbsolutePath());
+            // System.out.println(ExceptionUtils.getStackTrace(e));
+        }
+
+        return null;
+    }
     @Nullable
     private static Game loadMap(File mapFile) {
         if (mapFile != null) {
@@ -1725,7 +1748,12 @@ public class GameSaveLoadManager {
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));
                 case Constants.LEADERS -> {
-                    StringTokenizer leaderInfos = new StringTokenizer(tokenizer.nextToken(), ";");
+                    String nextToken = tokenizer.nextToken();
+                    if ("none".equals(nextToken)) {
+                        player.setLeaders(new ArrayList<>());
+                        break;
+                    }
+                    StringTokenizer leaderInfos = new StringTokenizer(nextToken, ";");
                     try {
                         List<Leader> leaderList = new ArrayList<>();
                         while (leaderInfos.hasMoreTokens()) {
@@ -1815,11 +1843,16 @@ public class GameSaveLoadManager {
     }
 
     private static Tile readTile(String tileData) {
-        StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
-        String tileID = tokenizer.nextToken();
-        String position = tokenizer.nextToken();
-        if (!PositionMapper.isTilePositionValid(position)) return null;
-        return new Tile(tileID, position);
+        try {
+            StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
+            String tileID = tokenizer.nextToken();
+            String position = tokenizer.nextToken();
+            if (!PositionMapper.isTilePositionValid(position)) return null;
+            return new Tile(tileID, position);   
+        } catch (Exception e) {
+            BotLogger.log("Error reading tileData: `" + tileData + "`", e);
+        }
+        return null;
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {

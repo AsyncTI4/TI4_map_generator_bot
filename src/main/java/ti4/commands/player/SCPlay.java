@@ -175,7 +175,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeGame.isFoWMode() && scToPlay == 3) {
-            String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeGame) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeGame) + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker " + Emojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
@@ -205,11 +205,11 @@ public class SCPlay extends PlayerSubcommandData {
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.add(0,emelpar);    
-                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player3, activeGame, activeGame.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(), Helper.getPlayerRepresentation(player3, activeGame, activeGame.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent", activeGame) && ButtonHelper.getTilesWithYourCC(player, activeGame, event).size() > 0) {
+                if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, activeGame, event).size() > 0) {
                     empNMahButtons.add(0,mahactA);
-                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player3, activeGame, activeGame.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(), Helper.getPlayerRepresentation(player3, activeGame, activeGame.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
                 }
             }
         }
@@ -234,7 +234,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (activeGame.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
                             } else {
-                                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeGame), acqMessage);
+                                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), acqMessage);
                             }
                         }
                     }

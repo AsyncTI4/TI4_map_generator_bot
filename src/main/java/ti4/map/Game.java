@@ -604,10 +604,12 @@ public class Game {
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
                 put("Normal", isNormalGame());
+                put("Base Game", isBaseGameMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Alliance", isAllianceMode());
                 put("FoW", isFoWMode());
+                put("Franken", isFrankenGame());
                 put(Emojis.Absol + "Absol", isAbsolMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomeBrewSCMode());
@@ -617,7 +619,11 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode() || isFrankenGame());
+    }
+
+    public boolean isFrankenGame() {
+        return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
     @JsonIgnore
@@ -783,7 +789,9 @@ public class Game {
         if (getTileMap().isEmpty()) return 0;
         Map<String, Tile> tileMap = new HashMap<>(getTileMap());
         String highestPosition = tileMap.keySet().stream().filter(Helper::isInteger).max(Comparator.comparingInt(Integer::parseInt)).get();
-        return Integer.parseInt(StringUtils.left(highestPosition, highestPosition.length() - 2));
+        String lastTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
+        if (!Helper.isInteger(lastTwoDigits)) return 0;
+        return Integer.parseInt(lastTwoDigits);
     }
 
     public int getActivationCount() {
@@ -1765,6 +1773,14 @@ public class Game {
         return id;
     }
 
+    public boolean revealAgenda(String agendaID, boolean force) {
+        if (agendas.remove(agendaID) || force) {
+            addDiscardAgenda(agendaID);
+            return true;
+        }
+        return false;
+    }
+
     public boolean discardSpecificAgenda(String agendaID) {
         boolean succeeded = agendas.remove(agendaID);
         if (succeeded) {
@@ -2086,7 +2102,7 @@ public class Game {
             }
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
-                player.setSecretScored(soID, activeGame);
+                player.setSecretScored(soID);
                 return true;
             }
         }
@@ -2234,6 +2250,28 @@ public class Game {
         this.actionCards = actionCards;
     }
 
+    public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getRevealedPublicObjectives().size() > 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
+            return false;
+        }
+
+        setStage1PublicDeckID(deck.getAlias());
+        setPublicObjectives1(deck.getNewShuffledDeck());
+        return true;
+    }
+
+    public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getRevealedPublicObjectives().size() > 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **" + deck.getName() + "** while there are revealed public objectives.");
+            return false;
+        }
+
+        setStage2PublicDeckID(deck.getAlias());
+        setPublicObjectives2(deck.getNewShuffledDeck());
+        return true;
+    }
+
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getDiscardActionCards().size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change action card deck to **" + deck.getName() + "** while there are action cards in the discard pile.");
@@ -2271,6 +2309,16 @@ public class Game {
         }
         setSoDeckID(deck.getAlias());
         setSecretObjectives(deck.getNewShuffledDeck());
+        return true;
+    }
+
+    public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
+        if (getAllExploreDiscard().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change explore deck to **" + deck.getName() + "** while there are explores in the discard pile.");
+            return false;
+        }
+        setExplorationDeckID(deck.getAlias());
+        setExploreDeck(deck.getNewShuffledDeck());
         return true;
     }
 
@@ -2360,12 +2408,12 @@ public class Game {
     }
 
     public void addPlayer(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
     }
 
     public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name);
+        Player player = new Player(id, name, getName());
         players.put(id, player);
         return player;
     }
@@ -2826,4 +2874,23 @@ public class Game {
                     .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
                     .findFirst();
     }
+
+    public boolean isLeaderInGame(String leaderID) {
+        for (Player player : getRealPlayers()) {
+            if (player.getLeaderIDs().contains(leaderID)) return true;
+        }
+        return false;
+    }
+
+    public Tile getTileFromPlanet(String planetName) {
+        for (Tile tile_ : getTileMap().values()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                    return tile_;
+                }
+            }
+        }
+        return null;
+    }
+    
 }

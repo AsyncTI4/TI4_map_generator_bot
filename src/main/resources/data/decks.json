@@ -1,0 +1,343 @@
+[
+    {
+        "alias": "template",
+        "name": "Deck Template",
+        "type": "template",
+        "description": "A template json deck",
+        "cardIDs": [
+            "card1","card2","card3"
+        ]
+    },
+    {
+        "alias": "agendas_base_game",
+        "name": "Base Game Agendas",
+        "type": "agenda",
+        "description": "All agendas in the Base Game of TI4",
+        "cardIDs": [
+            "abolishment","arbiter","arms_reduction","artifact","classified","committee","conscription","constitution","conventions","defense_act","disarmamament","economic_equality","execution","incentive","minister_commrece","minister_exploration","minister_industry","minister_peace","minister_policy","minister_sciences","minister_war","miscount","mutiny","plowshares","prophecy","redistribution","regulations","revolution","sanctions","schematics","secret","seed_empire","shared_research","travel_ban","unconventional","wormhole_recon","wormhole_research",
+            "core_mining","demilitarized_zone","holy_planet_of_ixth","representative_government","rt_biotic","rt_cybernetic","rt_propulsion","rt_warfare","senate_sancuary","shard_of_the_throne","terraforming_initiative","crown_of_emphidia","crown_of_thalnos"
+        ]
+    },
+    {
+        "alias": "agendas_pok",
+        "name": "PoK Agendas",
+        "type": "agenda",
+        "description": "All agendas in a 'vanilla' PoK game",
+        "cardIDs": [
+            "abolishment","arbiter","arms_reduction","articles_war","artifact","censure","checks","cladenstine","classified","committee","conscription","constitution","conventions","covert","crisis","defense_act","disarmamament","economic_equality","execution","grant_reallocation","incentive","minister_antiquities","minister_commrece","minister_exploration","minister_industry","minister_peace","minister_policy","minister_sciences","minister_war","miscount","mutiny","nexus","plowshares","prophecy","rearmament","redistribution","regulations","rep_govt","revolution","sanctions","schematics","secret","seed_empire","shared_research","standardization","travel_ban","unconventional","warrant","wormhole_recon","wormhole_research"
+        ]
+    },
+    {
+        "alias": "action_cards_basegame",
+        "name": "Base Game Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a the Base Game",
+        "cardIDs": [
+            "abs","assassin","bribery","bunker","confusing","const_rider","courageous","cripple","diplo_rider","dh1","dh2","dh3","dh4","disable","distinguished","economic_initiative","emergency","experimental","f_prototype","fire_team","fs1","fs2","fs3","fs4","f_researched","f_deployment","ghost_ship","imp_rider","silence_space","industrial_initiative","infiltrate","insub","intercept","lead_rider","lost_star","lucky","mjets1","mjets2","mjets3","mjets4","mining_initiative","mb1","mb2","mb3","mb4","parley","plague","stability","politic_rider","disgrace","meltdown","reparations","repeal","messiah","sabo1","sabo2","sabo3","sabo4","salvage","sh1","sh2","sh3","sh4","jamming","s_retreat1","s_retreat2","s_retreat3","s_retreat4","spy","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_rider"
+        ]
+    },
+    {
+        "alias": "action_cards_basegame_and_codex1",
+        "name": "Base Game + Codex I Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a the Base Game, including Codex I",
+        "cardIDs": [
+            "abs","assassin","bribery","bunker","confusing","const_rider","courageous","cripple","diplo_rider","dh1","dh2","dh3","dh4","disable","distinguished","economic_initiative","emergency","experimental","f_prototype","fire_team","fs1","fs2","fs3","fs4","f_researched","f_deployment","ghost_ship","imp_rider","silence_space","industrial_initiative","infiltrate","insub","intercept","lead_rider","lost_star","lucky","mjets1","mjets2","mjets3","mjets4","mining_initiative","mb1","mb2","mb3","mb4","parley","plague","stability","politic_rider","disgrace","meltdown","reparations","repeal","messiah","sabo1","sabo2","sabo3","sabo4","salvage","sh1","sh2","sh3","sh4","jamming","s_retreat1","s_retreat2","s_retreat3","s_retreat4","spy","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_rider",
+            "blitz","counterstroke","f_conscription","fsb","ghost_squad","hack","harness","impersonation","insider","master_plan","plagiarize","rally","reflective","sanction","scramble","solar_flare","war_machine1","war_machine2","war_machine3","war_machine4"
+        ]
+    },
+    {
+        "alias": "action_cards_pok",
+        "name": "PoK Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a 'vanilla' PoK game",
+        "cardIDs": [
+            "abs","arch_expedition","assassin","blitz","bribery","bunker","confounding","confusing","const_rider","counterstroke","coup","courageous","cripple","deadly_plot","decoy","dh1","dh2","dh3","dh4","diplo_rider","disable","disgrace","distinguished","divert_funding","dp1","dp2","dp3","dp4","economic_initiative","emergency","experimental","f_conscription","f_deployment","f_prototype","f_researched","fire_team","fs1","fs2","fs3","fs4","fsb","ghost_ship","ghost_squad","hack","harness","imp_rider","impersonation","industrial_initiative","infiltrate","insider","insub","intercept","investments","jamming","lead_rider","lost_star","lucky","master_plan","mb1","mb2","mb3","mb4","meltdown","messiah","mining_initiative","mjets1","mjets2","mjets3","mjets4","nav_suite","parley","plagiarize","plague","politic_rider","probe","rally","refit","reflective","reparations","repeal","reveal_prototype","reverse_engineer","rout","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","salvage","sanction","scramble","scuttle","seize","sh1","sh2","sh3","sh4","silence_space","solar_flare","spy","stability","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_machine1","war_machine2","war_machine3","war_machine4","war_rider","waylay"
+        ]
+    },
+    {
+        "alias": "action_cards_ds",
+        "name": "Dicordant Stars Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a 'vanilla' PoK game, plus additional DS Action Cards - see: https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+        "cardIDs": [
+            "abs","arch_expedition","assassin","blitz","bribery","bunker","confounding","confusing","const_rider","counterstroke","coup","courageous","cripple","deadly_plot","decoy","dh1","dh2","dh3","dh4","diplo_rider","disable","disgrace","distinguished","divert_funding","dp1","dp2","dp3","dp4","economic_initiative","emergency","experimental","f_conscription","f_deployment","f_prototype","f_researched","fire_team","fs1","fs2","fs3","fs4","fsb","ghost_ship","ghost_squad","hack","harness","imp_rider","impersonation","industrial_initiative","infiltrate","insider","insub","intercept","investments","jamming","lead_rider","lost_star","lucky","master_plan","mb1","mb2","mb3","mb4","meltdown","messiah","mining_initiative","mjets1","mjets2","mjets3","mjets4","nav_suite","parley","plagiarize","plague","politic_rider","probe","rally","refit","reflective","reparations","repeal","reveal_prototype","reverse_engineer","rout","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","salvage","sanction","scramble","scuttle","seize","sh1","sh2","sh3","sh4","silence_space","solar_flare","spy","stability","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_machine1","war_machine2","war_machine3","war_machine4","war_rider","waylay",
+            "fulfillment_protocols_ds","secured_trove","free_trade_network","carapace_plating","psionic_hammer","shields_holding_ds","special_session","diplomatic_pressure_ds","freedom_fighters_ds","morale_boost_ds","abyssal_starpaths","planetary_rigs","ai_augury","direct_hit_ds","aggressive_broker","meditative_firing_cycles","safety_overrides_ds","contagion","remnant_collection","sabotage_ds","hostile_world_ds","echo_shielding","illusory_duplication_ds","confused_sage","singularity_charge_ds","skilled_retreat_ds","renegotiation","forbidden_knowledge","war_machine_ds","bounty_contracts","flank_speed_ds","maneuvering_jets_ds","arbitrage","micrometeoroid_storm_ds","professional_archeologists","emergency_meeting","escape_clause","personnel_writ","preparation","classified_weapons"
+        ]
+    },
+    {
+        "alias": "secret_objectives_base",
+        "name": "Base Game Secret Objectives",
+        "type": "secret_objective",
+        "description": "All secret objectives in Base Game",
+        "cardIDs": [
+            "ans","btgk","ctr","csl","dtgs","eap","faa","fsn","fwm","gamf","lsc","mew","mlp","mrm","mp","ose","sar","te","ttfd","uf"
+        ]
+    },
+    {
+        "alias": "secret_objectives_pok",
+        "name": "PoK Secret Objectives",
+        "type": "secret_objective",
+        "description": "All secret objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "ans","baf","bam","btv","btgk","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fc","fsn","fwm","fwp","gamf","hrm","lsc","mew","mlp","mp","mrm","mtm","ose","otf","pe","pem","sai","sar","sb","syc","te","ttfd","uf"
+        ]
+    },
+    {
+        "alias": "public_stage_1_objectives_base",
+        "name": "Base Game Public Stage I Objectives",
+        "type": "public_stage_1_objective",
+        "description": "All Stage I public objectives in Base Game game",
+        "cardIDs": [
+            "corner","develop","diversify","monument","expand_borders","research_outposts","intimidate","lead","trade_routes","sway_council"
+        ]
+    },
+    {
+        "alias": "public_stage_2_objectives_base",
+        "name": "Base Game Public Stage II Objectives",
+        "type": "public_stage_2_objective",
+        "description": "All Stage II public objectives in Base Game game",
+        "cardIDs": [
+            "centralize_trade","conquer","brain_trust","golden_age","galvanize","manipulate_law","master_science","revolutionize","subdue","unify_colonies"
+        ]
+    },
+    {
+        "alias": "public_stage_1_objectives_pok",
+        "name": "PoK Public Stage I Objectives",
+        "type": "public_stage_1_objective",
+        "description": "All Stage I public objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "amass_wealth","build_defenses","corner","deep_space","develop","diversify","engineer_marvel","expand_borders","infrastructure","intimidate","lead","lost_outposts","make_history","monument","outer_rim","push_boundaries","raise_fleet","research_outposts","sway_council","trade_routes"
+        ]
+    },
+    {
+        "alias": "public_stage_2_objectives_pok",
+        "name": "PoK Public Stage II Objectives",
+        "type": "public_stage_2_objective",
+        "description": "All Stage II public objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "ancient_monuments","become_legend","brain_trust","centralize_trade","command_armada","conquer","control_borderlands","distant_lands","galvanize","golden_age","manipulate_law","massive_cities","master_science","protect_border","revolutionize","subdue","supremacy","unify_colonies","vast_reserves","vast_territories"
+        ]
+    },
+    {
+        "alias": "relics_base",
+        "name": "Base Game Relics (An Empty Deck)",
+        "type": "relic",
+        "description": "An empty Deck to handle base game",
+        "cardIDs": []
+    },
+    {
+        "alias": "relics_pok",
+        "name": "PoK Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game",
+        "cardIDs": [
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
+        ]
+    },
+
+    {
+        "alias": "relics_absol_ds",
+        "name": "Absol's Relics plus Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Absol Relics plus Discordant Stars Relics - DS relics at https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3",
+            "absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+    {
+        "alias": "relics_ds-pok-absol mix",
+        "name": "Curated mix of relics from DS, Absol and PoK",
+        "type": "relic",
+        "description": "Weaker PoK relics replaced with Absol, plus absol uniques, plus pok relics. DS relics at https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+        "cardIDs": [
+            "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament",
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+
+    {
+        "alias": "relics_ds",
+        "name": "Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game plus Discordant Stars Relics - see: https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+        "cardIDs": [
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype",
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+
+    {
+        "alias": "explores_base",
+        "name": "Base Game Explore Cards (an Empty Deck)",
+        "type": "explore",
+        "description": "An empty Deck to handle base game",
+        "cardIDs": []
+    },
+    {
+        "alias": "explores_pok",
+        "name": "PoK Explore Cards",
+        "type": "explore",
+        "description": "All explore cards in a 'vanilla' PoK game",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare"
+        ]
+    },
+    {
+        "alias": "explores_DS",
+        "name": "Discordant Stars Exploration Cards",
+        "type": "explore",
+        "description": "All explore cards in a 'vanilla' PoK game plus additional DS cards - see: https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
+            "starchartcultural","starcharthazardous","starchartindustrial","starchartfrontier","forgottentradestation","distinguishedadmiral","councilpreserve","warforgeruins","arcaneshieldemitter","hiddenlaboratory","seedyspaceport","ancientshipyard","orbitalfoundries","folderspace","suspiciouswreckage","darkvisions"
+        ]
+    },
+    {
+        "alias": "agendas_absol",
+        "name": "Absol's Agendas",
+        "type": "agenda",
+        "description": "All Agendas for Absol Mode",
+        "cardIDs": [
+            "absol_abolishment","absol_affirmation","absol_agreement","absol_arbiter","absol_articleswar","absol_artifact","absol_censure","absol_checks","absol_conscription","absol_constitution","absol_conventionswar","absol_covert","absol_crisis","absol_defenseact","absol_disarmamament","absol_emergency1","absol_emergency2","absol_emergency3","absol_emergency4","absol_equality","absol_execution","absol_formation","absol_government","absol_grant","absol_hyperlane","absol_incentive","absol_leak","absol_limits","absol_measures","absol_minsantique","absol_minscomm","absol_minsexp","absol_minsindus","absol_minspeace","absol_minspolicy","absol_minssci","absol_minswar","absol_miscount","absol_mutiny","absol_nexus","absol_operations","absol_pax","absol_prophecy","absol_recon","absol_redistribution","absol_reduction","absol_regulations","absol_revolution","absol_sanctions","absol_schematics","absol_secret","absol_seeds","absol_shared","absol_sites","absol_spending","absol_standardization","absol_swords","absol_travelban","absol_warrant","absol_whresearch"
+        ]
+    },
+    {
+        "alias": "agendas_little_omega",
+        "name": "Little Omega Agendas",
+        "type": "agenda",
+        "description": "See the agendas tab: <https://docs.google.com/spreadsheets/d/1zcr-lKfsSIxpzlGPy33rCx4PcmPrZDCDz2tqExqQD9g/edit#gid=991205782>\nOr check this image: <https://raw.githubusercontent.com/TI4-Online/TI4-Homebrew/main/assets/Textures/little-omega/card/agenda/face.jpg>",
+        "cardIDs": [
+            "little_omega_abolishment","arbiter","little_omega_arms_reduction","little_omega_articles_war","little_omega_artifact","censure","checks","little_omega_cladenstine","little_omega_classified","little_omega_committee","little_omega_conscription","little_omega_constitution","little_omega_conventions","covert","crisis","little_omega_defense_act","disarmamament","little_omega_economic_equality","little_omega_execution","little_omega_grant_reallocation","incentive","little_omega_minister_antiquities","little_omega_minister_commrece","little_omega_minister_exploration","little_omega_minister_industry","little_omega_minister_peace","little_omega_minister_policy","little_omega_minister_sciences","little_omega_minister_war","little_omega_miscount","mutiny","little_omega_nexus","plowshares","little_omega_prophecy","little_omega_rearmament","little_omega_redistribution","little_omega_regulations","little_omega_rep_govt","little_omega_revolution","little_omega_sanctions","little_omega_schematics","secret","seed_empire","little_omega_shared_research","standardization","little_omega_travel_ban","little_omega_unconventional","warrant","little_omega_wormhole_recon","little_omega_wormhole_research"
+        ]
+    },
+    {
+        "alias": "relics_absol",
+        "name": "Absol's Relics",
+        "type": "relic",
+        "description": "All Relics for Absol Mode",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament"
+        ]
+    },
+    {
+        "alias": "action_deck_2",
+        "name": "Action Deck 2",
+        "type": "action_card",
+        "description": "Homebrew collection of action cards that replaces many in the standard deck.\nSee: [PDF](https://github.com/TI4-Online/TI4-Homebrew/blob/main/assets/Textures/action-deck-2/info.pdf) | [Card List](https://github.com/TI4-Online/TI4-Homebrew/blob/main/assets/Textures/action-deck-2/card/action/face.jpg) | [Homebrew Discord Channel](https://discord.com/channels/743629929484386395/1111799687184396338)",
+        "cardIDs": [
+            "adrenaline_shots","ancient_data_archive","ancient_trade_routes","annexation","anti-gravity_drive","arms_deal","artifact_hunters","artifact_research","boarding_torpedoes","black_market_raid","brilliant_tactician","brutal_occupation","bureaucracy_rider","chain_reaction","close_quarters","collaborative_planning","concise_legal_text","border_skirmish","corporate_lobbying","spatial_collapse","custodian_support","cyberwarfare","deep_cover_operatives","deep_space_station","defectors","defense_installation","defense_rider","deflection_tactics","disrupt_logistics","early_voting","emergency_conscription","exploration_rider","fire_for_effect","firing_solution_","flawless_strategy","freedom_fighters","frontier_rider","fulfillment_protocols","garner_tribute","grand_heist","graviton_shielding","hostile_world","illusory_duplication","impeachment","intrigue","ixthian_gift","kickbacks","last_minute_deliberation","magen_engineers","micrometeoroid_storm","overtime","political_upheaval","production_rider","propaganda","prophecy","proxy_war","psychological_operations","public_outcry","rapid_mobilization","reconstruction","efficient_protocols","rehash_debates","relay_connection","relic_rider","rigged_explosives","risky_jump_piloting","safety_overrides","shock_and_awe","shock_troops","short-lived_clone","shrapnel_turrets","side_project","singularity_charge","smuggler_routes","space_mines","special_considerations","stasis_haul","steal_prototype","stranded_ship","technological_breakthrough","terraforming_initiative","timely_reinforcements","transference_protocol","virulent_gas_canisters",
+            "dh1","dh2","dh3","dh4","dp1","dp2","dp3","dp4","fs1","fs2","fs3","fs4","mb1","mb2","mb3","mb4","mjets1","mjets2","mjets3","mjets4","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","sh1","sh2","sh3","sh4","war_machine1","war_machine2","war_machine3","war_machine4"
+        ]
+    },
+    {
+        "alias": "pbd100_secret_objectives",
+        "name": "Secret Objectives for pbd100",
+        "type": "secret_objective",
+        "description": "Custom secret objectives for pbd100",
+        "cardIDs": [
+            "ans","baf","bam","btgk","btv","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fsn","fwm","gamf","hrm","mew","mlp","mp","mrm","mtm","ose","otf","pem","sar","syc","ttfd","uf",
+            "a_worthy_sacrifice_pbd100","accept_bribes_pbd100","alphabet_squadron_pbd100","ambush_their_fleets_pbd100","assemble_a_speedy_fleet_pbd100","assemble_a_swarm_pbd100","burn_their_shipyards_pbd100","bypass_their_defenses_pbd100","check_and_balance_pbd100","clear_the_way_pbd100","come_see_conquer_pbd100","command_a_diverse_fleet_pbd100","conspire_with_patience_pbd100","construct_transport_network_pbd100","construction_entusiast_pbd100","converge_forces_pbd100","core_expedition__pbd100","corner_your_enemies_pbd100","deal_in_obligations_pbd100","deep_space_research_pbd100","demilitirize_the_nation_pbd100","destroy_a_masterpiece_pbd100","diversify_research_pbd100","establish_a_new_home_pbd100","expand_borders_pbd100","exterminate_an_enemy_pbd100","field_test_advancements_pbd100","fight_with_precision_pbd100","form_a_contact_network_pbd100","form_the_heart_of_a_new_empire_pbd100","foster_cohesion_pbd100","galvanize_the_people_pbd100","gather_a_legion_pbd100","gather_abundance_pbd100","incorporate_legends_in_your_history_pbd100","indebt_your_leadership_pbd100","invest_in_infrastructure_pbd100","learn_from_others_pbd100","leave_no_survivors_pbd100","leverage_your_soft_power_pbd100","lone_survivor_pbd100","lure_them_in__pbd100","make_many_enemies_pbd100","meet_your_neighbors_pbd100","mercy_for_the_weak_pbd100","multiple_allegiances_pbd100","overrrun_defenses_pbd100","preserve_your_investments_pbd100","promote_peace_pbd100","prosecute_heretics_pbd100","prove_intense_endurance_pbd100","punish_the_weak_pbd100","really_learn_the_secrets_of_the_cosmos_pbd100","rebel_against_political_elites_pbd100","reclaim_ancient_monuments_pbd100","repair_and_recommission_pbd100","rule_a_diverse_empire_pbd100","save_the_homeland_pbd100","secure_a_path_pbd100","seize_an_icon_pbd100","spare_no_munitions_pbd100","sponsor_data_archives_pbd100","spread_your_wings_pbd100","strike_a_handsome_deal_pbd100","trade_conduit_pbd100","warning_shots_pbd100","watch_the_world_burn_pbd100","win_the_people's_favor_pbd100","wormhole_artillery_pbd100"
+        ]
+    },
+    {
+        "alias": "asteroid_actions",
+        "name": "Asteroid's Actions",
+        "type": "action_card",
+        "description": "A combination of PoK and homebrew action cards, with a lot of the chaff removed.",
+        "cardIDs": [
+            "lead_rider", "diplo_rider", "politic_rider", "const_rider", "trade_rider", "war_rider", "tech_rider", "imp_rider", "relic_rider", "bureaucracy_rider", "defense_rider", "exploration_rider", "frontier_rider", "production_rider",
+            "assassin", "assassin2", "assassin3", "assassin4", "bribery", "bribery2", "bribery3", "bribery4", "veto", "veto2", "veto3", "veto4", "corporate_lobbying", "corporate_lobbying2", "distinguished", "distinguished2", "insider", "insider2", "public_outcry", "public_outcry2", "confusing", "confounding", "contradictory_legal_text", "repeal", "sanction",
+            "fs1", "fs2", "fs3", "fs4", "mb1", "mb2", "mb3", "mb4", "sabo1", "sabo2", "sabo3", "sabo4", "sh1", "sh2", "sh3", "sh4", "s_retreat1", "s_retreat2", "s_retreat3", "s_retreat4", "dh1", "dh2", "f_conscription", "messiah",
+            "arch_expedition", "arch_expedition2", "arch_expedition3", "arch_expedition4", "artifact_hunters", "artifact_hunters2", "artifact_hunters3", "artifact_hunters4", "deep_space_station", "deep_space_station2", "deep_space_station3", "deep_space_station4", "probe", "probe2", "probe3", "probe4", "professional_archeologists", "professional_archeologists2", "professional_archeologists3", "professional_archeologists4", "planetary_rigs", "planetary_rigs2", "reconstruction", "reconstruction2", "secured_trove", "secured_trove2",
+            "f_researched", "f_researched2", "f_researched3", "f_researched4", "reveal_prototype", "reveal_prototype2", "reveal_prototype3", "reveal_prototype4", "steal_prototype", "steal_prototype2", "steal_prototype3", "steal_prototype4", "side_project", "side_project2", "side_project3", "side_project4", "artifact_research", "artifact_research2", "divert_funding", "divert_funding2", "plagiarize", "plagiarize2",
+            "timely_reinforcements", "timely_reinforcements2", "timely_reinforcements3", "timely_reinforcements4", "disable", "disable2", "experimental", "experimental2", "fire_for_effect", "fire_for_effect2", "rout", "rout2", "shrapnel_turrets", "shrapnel_turrets2",
+            "adrenaline_shots", "adrenaline_shots2", "anti-gravity_drive", "anti-gravity_drive2", "brutal_occupation", "brutal_occupation2", "counterstroke", "counterstroke2", "decoy", "decoy2", "f_deployment", "f_deployment2", "ghost_ship", "ghost_ship2", "silence_space", "silence_space2", "infiltrate", "infiltrate2", "asteroid_lost_star_1", "asteroid_lost_star_2", "master_plan", "master_plan2", "nav_suite", "nav_suite2", "overtime", "overtime2", "propaganda", "propaganda2", "prophecy", "confused_sage", "proxy_war", "proxy_war2", "disgrace", "disgrace2", "rapid_mobilization", "rapid_mobilization2", "relay_connection", "relay_connection2", "unexpected", "unexpected2", "black_market_raid", "ixthian_gift", "stability", "short-lived_clone"
+        ]
+    },
+    {
+        "alias": "explores_asteroid",
+        "name": "Asteroid's Exploration Decks",
+        "type": "explore",
+        "description": "(NOT READY FOR USE) All explore cards in a 'vanilla' PoK game, plus some additions",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
+            "imperial_research_institute", "trade_office", "spy_agency", "galactic_heritage_site", "distinguished_councilor","talented_officer1","talented_officer2","acrf1", "acrf2", "acrf3", "acrf4", "acrf5", "acrf6",
+            "weapons_research_facility","freighter_conversion1","freighter_conversion2","bootstrapping1","bootstrapping2","wormhole_generator1","wormhole_generator2","ahrf1","ahrf2","ahrf3","ahrf4",
+            "construction_yard1","construction_yard2","construction_yard3","construction_yard4","abandoned_keel1","abandoned_keel2","abandoned_keel3","lazax_manufactorum","airf1","airf2","airf3","airf4","airf5"
+        ]
+    },
+    {
+        "alias": "techs_base",
+        "name": "Base Techs",
+        "type": "technology",
+        "description": "All techs available in Base Game",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp"]
+    },
+    {
+        "alias": "techs_pok",
+        "name": "PoK Techs",
+        "type": "technology",
+        "description": "All techs available in PoK + Codexes. This is the default deck.",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+                    "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn"
+        ]
+    },
+    {
+        "alias": "techs_ds",
+        "name": "DS Techs",
+        "type": "technology",
+        "description": "All techs available in PoK + Codexes + DS.",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+                    "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn",
+                    "dsaxisb","dsaxisy","dsbentg","dsbenty","dsblexg","dsblexff","dsceldr","dsceldsd","dscheidn","dscheir","dscymiinf","dscymiy","dsdihmdn","dsdihmy","dsedyng","dsedyny","dsflorg","dsflorff","dsfreeg","dsfreey","dsghemcv","dsghemg","dsghotg","dsghoty","dsgledb","dsgledpds","dsaugug","dsauguy","dskjalg","dskjalcv","dskollb","dskolly","dskolug","dskolur","dskortg","dskortr","dskyrog","dskyroy","dslaneb","dslaner","dslizhb","dslizhff","dskhrag","dskhracr","dsmirvr","dsmirvpds","dsmortr","dsmorty","dsmykog","dsmykosd","dsnivymf","dsnivyy","dsnokadd","dsnokay","dsolrab","dsolrar","dsrhodb","dsrhody","dsrohdws","dsrohdy","dstneldd","dstnely","dsvadeb","dsvadey","dsvaylr","dsvaylcr","dsveldr","dsvelddn","dszelir","dszeliinf"
+        ]
+    },
+    {
+        "alias": "techs_absol",
+        "name": "Absol's Techs",
+        "type": "technology",
+        "description": "All techs for Absol mode",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+        "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn"
+    ]
+    },
+    {
+        "alias": "techs_ds_absol",
+        "name": "DS & Absol Techs",
+        "type": "technology",
+        "description": "All techs available in PoK + Codexes + DS, including Absol's edits",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+                    "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn",
+                    "dsaxisb","dsaxisy","dsbentg","dsbenty","dsblexg","dsblexff","dsceldr","dsceldsd","dscheidn","dscheir","dscymiinf","dscymiy","dsdihmdn","dsdihmy","dsedyng","dsedyny","dsflorg","dsflorff","dsfreeg","dsfreey","dsghemcv","dsghemg","dsghotg","dsghoty","dsgledb","dsgledpds","dsaugug","dsauguy","dskjalg","dskjalcv","dskollb","dskolly","dskolug","dskolur","dskortg","dskortr","dskyrog","dskyroy","dslaneb","dslaner","dslizhb","dslizhff","dskhrag","dskhracr","dsmirvr","dsmirvpds","dsmortr","dsmorty","dsmykog","dsmykosd","dsnivymf","dsnivyy","dsnokadd","dsnokay","dsolrab","dsolrar","dsrhodb","dsrhody","dsrohdws","dsrohdy","dstneldd","dstnely","dsvadeb","dsvadey","dsvaylr","dsvaylcr","dsveldr","dsvelddn","dszelir","dszeliinf"
+        ]
+    },
+    {
+        "alias": "techs_baldrick",
+        "name": "Baldricks Ignis Aurora Techs",
+        "type": "technology",
+        "description": "All techs for Ignis Aurora",
+        "cardIDs": ["baldrick_amd","baldrick_gd","baldrick_fl","baldrick_lwd","baldrick_nm","baldrick_dxa","baldrick_hm","baldrick_x89","baldrick_ps","da","asc","st","baldrick_td","ie","baldrick_ws","baldrick_sd2","baldrick_l4","cm","baldrick_pws2","qdn","baldrick_ac2","baldrick_sdn2","mc","baldrick_hcf2","vax","baldrick_exo2","cr2","baldrick_scc","baldrick_lgf","it","mi","baldrick_bio","nes","ffac2","mr","pm","baldrick_so2","wg","ds","baldrick_is","so","ng","vay","vpw","baldrick_ers","baldrick_dn2","dd2","baldrick_pds2","baldrick_cv2","baldrick_ff2","baldrick_inf2","baldrick_htp","nf","yso","baldrick_ic","tp",
+                    "det","sr","baldrick_bs","aida","sar","sdn","baldrick_pi","swa2","as","baldrick_cl2","pfa","m2","se2","ah","vw","gr","sc","tcs","baldrick_ht2","vtx","iihq","asn",
+                    "ciqineqreceptors","gjenspecterii","stellarcorridors","fabrilerealignment","precisiontargeting","syntheticreclamation","leviathaneruptor"
+        ]
+    },
+    {
+        "alias": "events_baldrick",
+        "name": "Baldricks Ignis Aurora Events",
+        "type": "event",
+        "description": "All Events for Ignis Aurora",
+        "cardIDs": ["baldrick_antiintellectual_revolution","baldrick_battle_royale","baldrick_cabinet_shuffle","baldrick_cavalcade","baldrick_acceleration_5000","baldrick_ansible_relays","baldrick_apotheosis","baldrick_bolide_flares","baldrick_cloak_and_dagger","baldrick_construction_initiative","baldrick_dimensional_gateway","baldrick_entrenchment","baldrick_galactic_conference","baldrick_good_tidings","baldrick_halsefar_doctrine","baldrick_hester's_belt","baldrick_intraspatial_fluxuation","baldrick_ixthian_artifact","baldrick_ixthian_diadem","baldrick_ixthian_urn","baldrick_mercenary_guilds","baldrick_mission_reset","baldrick_new_challenger","baldrick_overproduction","baldrick_pirate_strike","baldrick_race_for_the_prize","baldrick_recharge","baldrick_research_networks","baldrick_research_spinoffs","baldrick_revolt","baldrick_rising_empire","baldrick_shared_research","baldrick_tangled_wires","baldrick_theodolite_surveillance","baldrick_total_war","baldrick_twilight_of_the_idols","baldrick_weapon_schematics_leak","baldrick_wormhole_instability","baldrick_wormhole_reconstruction","baldrick_wormhole_research"]
+    },
+    {
+        "alias": "agendas_baldrick",
+        "name": "Baldricks Ignis Aurora Agendas",
+        "type": "agenda",
+        "description": "All Agendas for Ignis Aurora",
+        "cardIDs": [
+            
+        ]
+    }
+]
+

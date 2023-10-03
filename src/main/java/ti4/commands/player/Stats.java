@@ -130,7 +130,11 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
 		if (optionC != null) {
+			
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
+			if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+			}
 		}
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -213,7 +217,7 @@ public class Stats extends PlayerSubcommandData {
 	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
 		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " player's current stats:\n");
 
-		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveGame()));
+		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
 		sb.append("      ").append(Emojis.tg).append(player.getTg());
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -254,15 +258,6 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("\n");
 
 		return sb.toString();
-	}
-
-	@Override
-	public void reply(SlashCommandInteractionEvent event) {
-		String userID = event.getUser().getId();
-		Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-		GameSaveLoadManager.saveMap(activeGame, event);
-
-		GenerateMap.getInstance().saveImage(activeGame, event);
 	}
 
 	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
@@ -307,7 +302,6 @@ public class Stats extends PlayerSubcommandData {
 				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
-
 			player.setTg(tg);
 			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);

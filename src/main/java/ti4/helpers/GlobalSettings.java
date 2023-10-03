@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import ti4.message.BotLogger;
@@ -21,11 +19,14 @@ public class GlobalSettings {
     //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
     public enum ImplementedSettings {
         DEBUG, //When true, additional show additional debug messages
-        UPLOAD_DATA_TO_WEB_SERVER, //Whether or not to send map and data to the web server
+        UPLOAD_DATA_TO_WEB_SERVER, //Whether to send map and data to the web server
         MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
         THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
-        IMAGE_CACHE_MAX_SIZE, //How many images to cache
-        ;
+        FILE_IMAGE_CACHE_MAX_SIZE,
+        FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
+        URL_IMAGE_CACHE_MAX_SIZE,
+        URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
+        LOG_CACHE_STATS_INTERVAL_MINUTES;
 
         @Override
         public String toString() {
@@ -34,14 +35,6 @@ public class GlobalSettings {
     }
 
     private static Map<String, Object> settings = new HashMap<>();
-
-    private static File getFile() {
-        return new File(Storage.getStoragePath() + "/global_settings.json");
-    }
-
-    public static <T> T getSetting(String attr, Class<T> clazz) {
-        return clazz.cast(settings.get(attr));
-    }
 
     public static <T> T getSetting(String attr, Class<T> clazz, T def) {
         if (!settings.containsKey(attr))
@@ -66,12 +59,8 @@ public class GlobalSettings {
 
     public static void loadSettings() {
         ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.reader();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<>() {
-        };
-
         try {
-            settings = reader.readValue(Files.readString(getFile().toPath()), HashMap.class);
+            settings = mapper.readValue(Files.readString(getFile().toPath()), HashMap.class);
         } catch (IOException e) {
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.
@@ -85,11 +74,14 @@ public class GlobalSettings {
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).toList()) {
-            sb.append("").append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
+        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
+            sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");
         return sb.toString();
     }
 
+    private static File getFile() {
+        return new File(Storage.getStoragePath() + "/global_settings.json");
+    }
 }
