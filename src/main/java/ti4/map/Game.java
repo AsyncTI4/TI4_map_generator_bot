@@ -26,6 +26,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -36,6 +37,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.UnitModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -2891,6 +2893,39 @@ public class Game {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public Player getPlayerFromColorOrFaction(String factionOrColor) {
+        Player player = null;
+        if (factionOrColor != null) {
+            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
+            factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : getPlayers().values()) {
+                if ("keleres".equalsIgnoreCase(factionColor)) {
+                    if (Objects.equals(factionColor + "a", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+                    if (Objects.equals(factionColor + "x", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+                    if (Objects.equals(factionColor + "m", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+
+                }
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                    Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
     }
     
 }

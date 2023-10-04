@@ -113,39 +113,6 @@ public class Helper {
         return player;
     }
 
-    @Nullable
-    public static Player getPlayerFromColorOrFaction(Game activeGame, String factionOrColor) {
-        Player player = null;
-        if (factionOrColor != null) {
-            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
-            factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if ("keleres".equalsIgnoreCase(factionColor)) {
-                    if (Objects.equals(factionColor + "a", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "x", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-                    if (Objects.equals(factionColor + "m", player_.getFaction())) {
-                        player = player_;
-                        break;
-                    }
-
-                }
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
-    }
-
     public static boolean isAllianceModeAndPreviouslyOwnedCheck(Game activeGame, String planet) {
         return (activeGame.isAllianceMode() && doesAnyoneOwnPlanet(activeGame, planet));
     }
