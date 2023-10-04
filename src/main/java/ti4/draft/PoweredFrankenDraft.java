@@ -9,7 +9,7 @@ public class PoweredFrankenDraft extends FrankenDraft {
     }
 
     @Override
-    public int GetItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftItem.Category category) {
 
         int limit = 0;
         switch (category) {
@@ -33,5 +33,10 @@ public class PoweredFrankenDraft extends FrankenDraft {
     @Override
     public String getSaveString() {
         return "powered_franken";
+    }
+
+    @Override
+    public int getBagSize() {
+        return 33;
     }
 }

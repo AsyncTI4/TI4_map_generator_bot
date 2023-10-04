@@ -28,9 +28,20 @@ public abstract class BagDraft {
         this.owner = owner;
     }
 
-    public abstract int GetItemLimitForCategory(DraftItem.Category category);
+    public abstract int getItemLimitForCategory(DraftItem.Category category);
     public abstract String getSaveString();
     public abstract List<DraftBag> generateBags(Game game);
+    public abstract int getBagSize();
+
+    public boolean isDraftStageComplete() {
+        List<Player> players = owner.getRealPlayers();
+        for (Player p:players) {
+            if (p.getDraftHand().Contents.size() < getBagSize()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public void passBags() {
         List<Player> players = owner.getRealPlayers();

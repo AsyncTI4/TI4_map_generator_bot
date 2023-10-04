@@ -58,8 +58,14 @@ public class FrankenDraftHelper {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
 
-                    boolean everyoneReady = activeGame.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
-                    if (everyoneReady) {
+                    if (activeGame.getActiveBagDraft().isDraftStageComplete()) {
+                        String categoryForPlayers = Helper.getGamePing(event, activeGame);
+                        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), categoryForPlayers + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
+                        return;
+                    }
+
+                    boolean everyonePass = activeGame.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
+                    if (everyonePass) {
                         passBags(activeGame);
                     }
                     return;
