@@ -30,7 +30,6 @@ public class Mapper {
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties faction_abilities = new Properties();
-    private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
     private static final Properties explore = new Properties();
     private static final Properties planets = new Properties();
@@ -59,6 +58,7 @@ public class Mapper {
     private static final HashMap<String, FrankenItem> frankenErrata = new HashMap<>();
 
     public static void init() {
+        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
@@ -66,7 +66,6 @@ public class Mapper {
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
-        readData("factions.properties", factions, "Could not read factions name file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
@@ -86,8 +85,12 @@ public class Mapper {
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         importJsonObjects("franken_errata.json", frankenErrata, FrankenItem.class, "Could not read franken errata setup file");
+
+        //Ensure Faction Setup lists contain valid data
+        for (FactionModel faction : factionSetup.values()) {
+            faction.validationWarnings();
+        }
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -185,7 +188,7 @@ public class Mapper {
     }
 
     public static boolean isFaction(String faction) {
-        return factions.getProperty(faction) != null;
+        return factionSetup.containsKey(faction);
     }
 
     public static String getColorID(String color) {
@@ -251,7 +254,7 @@ public class Mapper {
     }
 
     public static String getFactionFileName(String factionID) {
-        return factions.getProperty(factionID);
+        return factionID + ".png";
     }
 
     public static String getGeneralFileName(String id) {
@@ -710,11 +713,11 @@ public class Mapper {
     }
 
     public static List<String> getFactions() {
-        return factions.keySet().stream()
-                .filter(token -> token instanceof String)
-                .map(token -> (String) token)
-                .sorted()
-                .collect(Collectors.toList());
+        return factionSetup.keySet().stream()
+            .filter(token -> token instanceof String)
+            .map(token -> (String) token)
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     public static HashMap<String, FrankenItem> getFrankenErrata() {

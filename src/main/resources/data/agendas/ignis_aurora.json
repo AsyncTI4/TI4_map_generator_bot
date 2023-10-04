@@ -907,7 +907,7 @@
         "alias": "baldrick_network_patrols",
         "name": "Network Patrols (Council Keleres)",
         "category": "faction",
-        "categoryDescription": "keleres",
+        "categoryDescription": "keleresm",
         "type": "Law",
         "text1": "Non-Keleres players must spend 1 influence to activate a system that contains another player's units.",
         "text2": "The Keleres player gains 2 trade goods.",
