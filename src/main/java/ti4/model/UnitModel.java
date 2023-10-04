@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
@@ -53,6 +54,7 @@ public class UnitModel implements ModelInterface {
     public boolean isValid() {
         return id != null 
             && !id.isEmpty()
+            && List.of("ca","cv","dd","dn","ff","fs","gf","mf","pd","sd","ws","csd","plenaryorbital","tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
