@@ -1286,7 +1286,7 @@ public class Player {
         currentDraftBag = bag;
     }
 
-    public DraftBag getFrankenDraftQueue() {
+    public DraftBag getDraftQueue() {
         return draftItemQueue;
     }
 
@@ -1322,7 +1322,7 @@ public class Player {
         this.planets = planets;
     }
 
-    public void loadFrankenHand(List<String> saveString) {
+    public void loadDraftHand(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for(String item : saveString){
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
@@ -1330,7 +1330,7 @@ public class Player {
         this.draftHand = newBag;
     }
 
-    public void loadCurrentFrankenBag(List<String> saveString) {
+    public void loadCurrentDraftBag(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for(String item : saveString){
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
@@ -1338,7 +1338,7 @@ public class Player {
         this.currentDraftBag = newBag;
     }
 
-    public void loadFrankenItemsToDraft(List<String> saveString) {
+    public void loadItemsToDraft(List<String> saveString) {
         List<DraftItem> items = new ArrayList<>();
         for(String item : saveString){
             items.add(DraftItem.GenerateFromAlias(item));
@@ -1346,11 +1346,11 @@ public class Player {
         this.draftItemQueue.Contents = items;
     }
 
-    public void queueFrankenItemToDraft(DraftItem item) {
+    public void queueDraftItem(DraftItem item) {
         this.draftItemQueue.Contents.add(item);
     }
 
-    public void resetFrankenItemDraftQueue() {
+    public void resetDraftQueue() {
         this.draftItemQueue.Contents.clear();
     }
 

@@ -632,7 +632,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DRAFT_QUEUE + " " + player.getFrankenDraftQueue().toStoreString());
+            writer.write(Constants.DRAFT_QUEUE + " " + player.getDraftQueue().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -1743,9 +1743,9 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.DRAFT_BAG -> player.loadCurrentFrankenBag(getCardList(tokenizer.nextToken()));
-                case Constants.DRAFT_QUEUE -> player.loadFrankenItemsToDraft(getCardList(tokenizer.nextToken()));
-                case Constants.DRAFT_HAND -> player.loadFrankenHand(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));

@@ -6,4 +6,5 @@ public interface FrankenDraftItem {
 
     void commitForPlayer(Player player);
 
+    String getFactionName();
 }
