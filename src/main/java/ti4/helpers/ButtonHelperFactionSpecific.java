@@ -212,7 +212,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveProductionBiomesStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID){
-        Player player = Helper.getPlayerFromColorOrFaction(activeGame, buttonID.split("_")[1]);
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int oldTg = player.getTg();
         player.setTg(oldTg+2);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to production biomes ("+oldTg+"->"+player.getTg()+")");
@@ -353,7 +353,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveSelecteBeforeSwapSC(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         String type = buttonID.split("_")[2];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame,buttonID.split("_")[1]);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<Button>();
         for(Integer sc : p2.getSCs()){
             for(Integer sc2 : player.getSCs()){
@@ -365,7 +365,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveSwapSC(Player player1, Game activeGame, ButtonInteractionEvent event, String buttonID){
 
         String type = buttonID.split("_")[2];
-        Player player2 = Helper.getPlayerFromColorOrFaction(activeGame,buttonID.split("_")[1]);
+        Player player2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         Integer player1SC = Integer.parseInt(buttonID.split("_")[4]);
         Integer player2SC = Integer.parseInt(buttonID.split("_")[3]);
         if(type.equalsIgnoreCase("qdn")){
@@ -400,7 +400,7 @@ public class ButtonHelperFactionSpecific {
             new RemoveUnits().unitParsing(event, hacan.getColor(), activeGame.getTileFromPlanet(origPlanet), amount + " "+unitKey + " "+origPlanet, activeGame);
             new AddUnits().unitParsing(event, hacan.getColor(), activeGame.getTileFromPlanet(newPlanet), amount + " "+unitKey + " "+newPlanet, activeGame);
         }
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, receiverFaction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(receiverFaction);
         new PlanetAdd().doAction(p2, origPlanet, activeGame, event);
         
         List<Button> goAgainButtons = new ArrayList<Button>();
@@ -424,7 +424,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveReleaseButton(Player cabal, Game activeGame, String buttonID, ButtonInteractionEvent event){
         String faction = buttonID.split("_")[1];
-        Player player = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player player = activeGame.getPlayerFromColorOrFaction(faction);
         String unit = buttonID.split("_")[2];
         new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), unit, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame), ButtonHelper.getTrueIdentity(cabal, activeGame) + " released 1 "+ButtonHelper.getIdentOrColor(player, activeGame)+ " "+unit + " from prison");
@@ -530,7 +530,7 @@ public class ButtonHelperFactionSpecific {
         buttonID = buttonID.replace("naaluHeroSend_", "");
         String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
         String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionToTrans);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(factionToTrans);
         String message2 = "";
         String ident = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), false);
         String ident2 = Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), false);
@@ -548,7 +548,7 @@ public class ButtonHelperFactionSpecific {
         boolean sendAlliance = false;
         String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
         if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
-            && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(Helper.getPlayerFromColorOrFaction(activeGame, promissoryNoteOwner))) {
+            && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(activeGame.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
             p2.setPromissoryNotesInPlayArea(id);
             if (id.endsWith("_sftt")) {
                 sendSftT = true;
@@ -700,7 +700,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game activeGame) {
-        if (Helper.getPlayerFromColorOrFaction(activeGame, Mapper.getPromissoryNoteOwner("ra")) == player) {
+        if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("ra")) == player) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction())) {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {
@@ -721,7 +721,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveMilitarySupportCheck(Player player, Game activeGame) {
-        if (Helper.getPlayerFromColorOrFaction(activeGame, Mapper.getPromissoryNoteOwner("ms")) == player) {
+        if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("ms")) == player) {
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -1165,7 +1165,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void startCabalAgent(Player cabal, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String faction = buttonID.split("_")[1];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         List<Button> buttons = getUnitsForCabalAgent(cabal, activeGame, event, p2);
         String msg = ButtonHelper.getTrueIdentity(cabal, activeGame) + " use buttons to capture a ship";
         MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
@@ -1311,7 +1311,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveVortexCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event) {
         String unit = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " a " + unit + " of yours has been captured by vortex.");
         cabalEatsUnit(p2, activeGame, player, 1, unit, event);
         event.getMessage().delete().queue();
@@ -1320,7 +1320,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveCabalAgentCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event) {
         String unit = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
             ButtonHelper.getTrueIdentity(p2, activeGame) + " a " + unit + " of yours has been captured by a cabal agent. Any comms you had have been washed.");
         p2.setTg(p2.getTg() + p2.getCommodities());
@@ -1465,7 +1465,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         String message;
         if (p2 == player) {
             p2.setCommodities(p2.getCommodities() + 2);
@@ -1505,7 +1505,7 @@ public class ButtonHelperFactionSpecific {
         int acNum = Integer.parseInt(buttonID.split("_")[0]);
 
         String faction2 = buttonID.split("_")[1];
-        Player player2 = Helper.getPlayerFromColorOrFaction(activeGame, faction2);
+        Player player2 = activeGame.getPlayerFromColorOrFaction(faction2);
         if (!player2.getActionCards().containsValue(acNum)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC added/lost");
             return;
@@ -1542,7 +1542,7 @@ public class ButtonHelperFactionSpecific {
         buttonID = buttonID.replace("pillage_", "");
         String colorPlayer = buttonID.split("_")[0];
         String checkedStatus = buttonID.split("_")[1];
-        Player pillaged = Helper.getPlayerFromColorOrFaction(activeGame, colorPlayer);
+        Player pillaged = activeGame.getPlayerFromColorOrFaction(colorPlayer);
         if (checkedStatus.contains("unchecked")) {
             List<Button> buttons = new ArrayList<>();
             String message2 = "Please confirm this is a valid pillage opportunity and that you wish to pillage.";
@@ -1854,7 +1854,7 @@ public class ButtonHelperFactionSpecific {
 
         if ("xxchaagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("xxchaagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             String message = "Use buttons to ready a planet. Removing the infantry is not automated but is an option for you to do.";
             List<Button> ringButtons = ButtonHelper.getXxchaAgentReadyButtons(activeGame, p2);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + message, ringButtons);
@@ -1864,14 +1864,14 @@ public class ButtonHelperFactionSpecific {
             String posNFaction = rest.replace("yinagent_", "");
             String pos = posNFaction.split("_")[0];
             String faction = posNFaction.split("_")[1];
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), true) + " Use buttons to resolve yin agent",
                 getYinAgentButtons(p2, activeGame, pos));
         }
 
         if ("naaluagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("naaluagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             activeGame.setNaaluAgent(true);
             MessageChannel channel = event.getMessageChannel();
             if (activeGame.isFoWMode()) {
@@ -1887,7 +1887,7 @@ public class ButtonHelperFactionSpecific {
 
         if ("mentakagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("mentakagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             String successMessage = ident + " drew an AC.";
             String successMessage2 = ButtonHelper.getIdent(p2) + " drew an AC.";
             activeGame.drawActionCard(player.getUserID());
@@ -1959,7 +1959,7 @@ public class ButtonHelperFactionSpecific {
 
         if ("muaatagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("muaatagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageChannel channel = event.getMessageChannel();
             if (activeGame.isFoWMode()) {
                 channel = p2.getPrivateChannel();
@@ -1983,7 +1983,7 @@ public class ButtonHelperFactionSpecific {
 
         if ("arborecagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("arborecagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageChannel channel = event.getMessageChannel();
             if (activeGame.isFoWMode()) {
                 channel = p2.getPrivateChannel();
@@ -1995,7 +1995,7 @@ public class ButtonHelperFactionSpecific {
         }
          if ("axisagent".equalsIgnoreCase(agent)) {
             String faction = rest.replace("axisagent_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             MessageChannel channel = event.getMessageChannel();
             if (activeGame.isFoWMode()) {
                 channel = p2.getPrivateChannel();
@@ -2291,7 +2291,7 @@ public class ButtonHelperFactionSpecific {
     public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         buttonID = buttonID.replace("yssarilcommander_", "");
         String enemyFaction = buttonID.split("_")[1];
-        Player enemy = Helper.getPlayerFromColorOrFaction(activeGame, enemyFaction);
+        Player enemy = activeGame.getPlayerFromColorOrFaction(enemyFaction);
         String message = "";
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {

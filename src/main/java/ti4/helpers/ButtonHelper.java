@@ -604,7 +604,7 @@ public class ButtonHelper {
         String activePlayerident = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
         MessageChannel channel = activeGame.getActionsChannel();
         if (justChecking) {
-            Player ghostPlayer = Helper.getPlayerFromColorOrFaction(activeGame, "ghost");
+            Player ghostPlayer = activeGame.getPlayerFromColorOrFaction("ghost");
             if (ghostPlayer != null && ghostPlayer != player && getNumberOfUnitsOnTheBoard(activeGame, ghostPlayer, "mech") > 0) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
@@ -1125,7 +1125,7 @@ public class ButtonHelper {
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             msg = getTrueIdentity(player, activeGame) + " " + msg + " using Mahact agent";
-            player = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            player = activeGame.getPlayerFromColorOrFaction(faction);
         }
         RemoveCC.removeCC(event, player.getColor(), tile, activeGame);
 
@@ -1680,7 +1680,7 @@ public class ButtonHelper {
     public static void resolveSpecialRex(Player player, Game activeGame, String buttonID, String ident, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
         String mechOrInf = buttonID.split("_")[3];
         String msg = ident + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on " + Helper.getPlanetRepresentation(planet, activeGame);
         new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "1 " + mechOrInf + " " + planet, activeGame);
@@ -3331,8 +3331,8 @@ public class ButtonHelper {
             buttons.add(getCCs);
             buttons.add(passOnAbilities);
         }
-        if (activeGame.getActionCards().size() > 130 && Helper.getPlayerFromColorOrFaction(activeGame, "hacan") != null
-            && getButtonsToSwitchWithAllianceMembers(Helper.getPlayerFromColorOrFaction(activeGame, "hacan"), activeGame, false).size() > 0) {
+        if (activeGame.getActionCards().size() > 130 && activeGame.getPlayerFromColorOrFaction("hacan") != null
+            && getButtonsToSwitchWithAllianceMembers(activeGame.getPlayerFromColorOrFaction("hacan"), activeGame, false).size() > 0) {
             buttons.add(Button.secondary("getSwapButtons_", "Swap"));
         }
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message2, buttons);
@@ -3516,7 +3516,7 @@ public class ButtonHelper {
         buttonID = buttonID.replace("transact_", "");
         String thingToTrans = buttonID.substring(0, buttonID.indexOf("_"));
         String factionToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionToTrans);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(factionToTrans);
         if (p2 == null) {
             return;
         }
@@ -3622,7 +3622,7 @@ public class ButtonHelper {
         buttonID = buttonID.replace(thingToTrans + "_", "");
         String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
         String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionToTrans);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(factionToTrans);
         String message2 = "";
         String ident = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), false);
         String ident2 = Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), false);
@@ -3700,7 +3700,7 @@ public class ButtonHelper {
                 boolean sendAlliance = false;
                 String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
                 if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
-                    && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(Helper.getPlayerFromColorOrFaction(activeGame, promissoryNoteOwner))) {
+                    && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(activeGame.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
                     p2.setPromissoryNotesInPlayArea(id);
                     if (id.endsWith("_sftt")) {
                         sendSftT = true;
@@ -4073,7 +4073,7 @@ public class ButtonHelper {
         String type = buttonID.split("_")[2];
         if (type.toLowerCase().contains("mahact")) {
             String color2 = type.replace("mahact", "");
-            Player mahactP = Helper.getPlayerFromColorOrFaction(activeGame, color2);
+            Player mahactP = activeGame.getPlayerFromColorOrFaction(color2);
             Tile tile = activeGame.getTileByPosition(planet);
             AddCC.addCC(event, color2, tile);
             Helper.isCCCountCorrect(event, activeGame, color2);

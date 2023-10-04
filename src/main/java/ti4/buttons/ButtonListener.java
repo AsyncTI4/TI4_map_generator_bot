@@ -327,7 +327,7 @@ public class ButtonListener extends ListenerAdapter {
             //
         } else if (buttonID.startsWith("swapToFaction_")) {
             String faction = buttonID.replace("swapToFaction_", "");
-            new Swap().secondHalfOfSwap(activeGame, player, Helper.getPlayerFromColorOrFaction(activeGame, faction), event.getUser(), event);
+            new Swap().secondHalfOfSwap(activeGame, player, activeGame.getPlayerFromColorOrFaction(faction), event.getUser(), event);
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("arcExp_")) {
@@ -380,7 +380,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("yinHeroTarget_")) {
             String faction = buttonID.replace("yinHeroTarget_", "");
             List<Button> buttons = new ArrayList<>();
-            Player target = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player target = activeGame.getPlayerFromColorOrFaction(faction);
             if (target != null) {
                 for (String planet : target.getPlanets()) {
                     buttons.add(Button.success(finsFactionCheckerPrefix + "yinHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
@@ -413,7 +413,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.split("_")[1];
             String color = buttonID.split("_")[2];
             Tile tile = activeGame.getTileByPosition(pos);
-            Player attacker = Helper.getPlayerFromColorOrFaction(activeGame, color);
+            Player attacker = activeGame.getPlayerFromColorOrFaction(color);
             ButtonHelper.resolveMahactMechAbilityUse(player, attacker, activeGame, tile, event);
         } else if (buttonID.startsWith("retreatUnitsFrom_")) {
             ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, activeGame, player);
@@ -640,7 +640,7 @@ public class ButtonListener extends ListenerAdapter {
             Player p2 = player;
             if (StringUtils.countMatches(buttonID, "_") > 1) {
                 String faction = buttonID.split("_")[2];
-                p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+                p2 = activeGame.getPlayerFromColorOrFaction(faction);
             }
 
             new PlanetRefresh().doAction(p2, planetName, activeGame);
@@ -673,8 +673,8 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("refreshViewOfSystem_")) {
             String rest = buttonID.replace("refreshViewOfSystem_", "");
             String pos = rest.split("_")[0];
-            Player p1 = Helper.getPlayerFromColorOrFaction(activeGame, rest.split("_")[1]);
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, rest.split("_")[2]);
+            Player p1 = activeGame.getPlayerFromColorOrFaction(rest.split("_")[1]);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(rest.split("_")[2]);
             String groundOrSpace = rest.split("_")[3];
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
@@ -847,7 +847,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         } else if (buttonID.startsWith("finishTransaction_")) {
             String player2Color = buttonID.split("_")[1];
-            Player player2 = Helper.getPlayerFromColorOrFaction(activeGame, player2Color);
+            Player player2 = activeGame.getPlayerFromColorOrFaction(player2Color);
             ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
             ButtonHelperFactionSpecific.pillageCheck(player2, activeGame);
             ButtonHelper.checkTransactionLegality(activeGame, player, player2);
@@ -989,7 +989,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("forceAbstainForPlayer_")) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Player was forcefully abstained");
             String faction = buttonID.replace("forceAbstainForPlayer_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, activeGame, p2);
         } else if (buttonID.startsWith("fixerVotes_")) {
             String voteMessage = "Thank you for specifying, please select from the available buttons to vote.";
@@ -1062,7 +1062,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
-            Player planetOwner = Helper.getPlayerFromColorOrFaction(activeGame, factionOrColor);
+            Player planetOwner = activeGame.getPlayerFromColorOrFaction(factionOrColor);
             String voteMessage = "Chose to vote for one of " + factionOrColor
                 + "'s planets. Click buttons for which outcome to vote for.";
             List<Button> outcomeActionRow;
@@ -1081,7 +1081,7 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("tiedPlanets_", "");
             buttonID = buttonID.replace("resolveAgendaVote_outcomeTie*_", "");
             String factionOrColor = buttonID;
-            Player planetOwner = Helper.getPlayerFromColorOrFaction(activeGame, factionOrColor);
+            Player planetOwner = activeGame.getPlayerFromColorOrFaction(factionOrColor);
             String voteMessage = "Chose to break tie for one of " + factionOrColor
                 + "'s planets. Use buttons to select which one.";
             List<Button> outcomeActionRow;
@@ -1091,7 +1091,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("planetRider_")) {
             buttonID = buttonID.replace("planetRider_", "");
             String factionOrColor = buttonID.substring(0, buttonID.indexOf("_"));
-            Player planetOwner = Helper.getPlayerFromColorOrFaction(activeGame, factionOrColor);
+            Player planetOwner = activeGame.getPlayerFromColorOrFaction(factionOrColor);
             String voteMessage = "Chose to rider for one of " + factionOrColor
                 + "'s planets. Use buttons to select which one.";
             List<Button> outcomeActionRow;
@@ -1226,7 +1226,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveCrownOfE(activeGame, player, event);
         } else if (buttonID.startsWith("jrResolution_")) {
             String faction2 = buttonID.split("_")[1];
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction2);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction2);
             Button sdButton = Button.success("jrStructure_sd", "Place A SD");
             sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
             Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
@@ -1241,7 +1241,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
             String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
-            Player notYssaril = Helper.getPlayerFromColorOrFaction(activeGame, playerFaction);
+            Player notYssaril = activeGame.getPlayerFromColorOrFaction(playerFaction);
             if (notYssaril != null) {
                 String message = Helper.getPlayerRepresentation(notYssaril, activeGame, activeGame.getGuild(), true)
                     + " the player of the yssaril hero has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded";
@@ -1254,7 +1254,7 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("yssarilHeroInitialOffering_", "");
             String acID = buttonID.split("_")[0];
             String yssarilFaction = buttonID.split("_")[1];
-            Player yssaril = Helper.getPlayerFromColorOrFaction(activeGame, yssarilFaction);
+            Player yssaril = activeGame.getPlayerFromColorOrFaction(yssarilFaction);
             if (yssaril != null) {
                 String offerName = player.getFaction();
                 if (activeGame.isFoWMode()) {
@@ -1305,7 +1305,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("nekroStealTech_")) {
             String faction = buttonID.replace("nekroStealTech_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             List<String> potentialTech = new ArrayList<>();
             potentialTech = ButtonHelperFactionSpecific.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, activeGame);
             List<Button> buttons = ButtonHelperFactionSpecific.getButtonsForPossibleTechForNekro(player, potentialTech, activeGame);
@@ -1429,7 +1429,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("getACFrom_")) {
             String faction = buttonID.replace("getACFrom_", "");
-            Player victim = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player victim = activeGame.getPlayerFromColorOrFaction(faction);
             List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(activeGame, player, victim);
             ShowAllAC.showAll(victim, player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)
@@ -1588,7 +1588,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("transactWith_")) {
             String faction = buttonID.replace("transactWith_", "");
-            Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, faction);
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
             List<Button> buttons;
             buttons = ButtonHelper.getStuffToTransButtons(activeGame, player, p2);
             String message = Helper.getPlayerRepresentation(player, activeGame)
