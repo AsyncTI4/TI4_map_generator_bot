@@ -61,6 +61,7 @@ public class CombatInfo extends CombatSubcommandData {
                 UnitHolder unitHolder = entry.getValue();
                 Map<String, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                     String key = unitEntry.getKey();
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
                         String combatNum = "10";
