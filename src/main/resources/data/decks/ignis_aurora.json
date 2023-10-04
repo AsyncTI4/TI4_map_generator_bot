@@ -1,0 +1,28 @@
+[
+    {
+        "alias": "techs_baldrick",
+        "name": "Baldricks Ignis Aurora Techs",
+        "type": "technology",
+        "description": "All techs for Ignis Aurora",
+        "cardIDs": ["baldrick_amd","baldrick_gd","baldrick_fl","baldrick_lwd","baldrick_nm","baldrick_dxa","baldrick_hm","baldrick_x89","baldrick_ps","da","asc","st","baldrick_td","ie","baldrick_ws","baldrick_sd2","baldrick_l4","cm","baldrick_pws2","qdn","baldrick_ac2","baldrick_sdn2","mc","baldrick_hcf2","vax","baldrick_exo2","cr2","baldrick_scc","baldrick_lgf","it","mi","baldrick_bio","nes","ffac2","mr","pm","baldrick_so2","wg","ds","baldrick_is","so","ng","vay","vpw","baldrick_ers","baldrick_dn2","dd2","baldrick_pds2","baldrick_cv2","baldrick_ff2","baldrick_inf2","baldrick_htp","nf","yso","baldrick_ic","tp",
+                    "det","sr","baldrick_bs","aida","sar","sdn","baldrick_pi","swa2","as","baldrick_cl2","pfa","m2","se2","ah","vw","gr","sc","tcs","baldrick_ht2","vtx","iihq","asn",
+                    "ciqineqreceptors","gjenspecterii","stellarcorridors","fabrilerealignment","precisiontargeting","syntheticreclamation","leviathaneruptor"
+        ]
+    },
+    {
+        "alias": "events_baldrick",
+        "name": "Baldricks Ignis Aurora Events",
+        "type": "event",
+        "description": "All Events for Ignis Aurora",
+        "cardIDs": ["baldrick_antiintellectual_revolution","baldrick_battle_royale","baldrick_cabinet_shuffle","baldrick_cavalcade","baldrick_acceleration_5000","baldrick_ansible_relays","baldrick_apotheosis","baldrick_bolide_flares","baldrick_cloak_and_dagger","baldrick_construction_initiative","baldrick_dimensional_gateway","baldrick_entrenchment","baldrick_galactic_conference","baldrick_good_tidings","baldrick_halsefar_doctrine","baldrick_hester's_belt","baldrick_intraspatial_fluxuation","baldrick_ixthian_artifact","baldrick_ixthian_diadem","baldrick_ixthian_urn","baldrick_mercenary_guilds","baldrick_mission_reset","baldrick_new_challenger","baldrick_overproduction","baldrick_pirate_strike","baldrick_race_for_the_prize","baldrick_recharge","baldrick_research_networks","baldrick_research_spinoffs","baldrick_revolt","baldrick_rising_empire","baldrick_shared_research","baldrick_tangled_wires","baldrick_theodolite_surveillance","baldrick_total_war","baldrick_twilight_of_the_idols","baldrick_weapon_schematics_leak","baldrick_wormhole_instability","baldrick_wormhole_reconstruction","baldrick_wormhole_research"]
+    },
+    {
+        "alias": "agendas_baldrick",
+        "name": "Baldricks Ignis Aurora Agendas",
+        "type": "agenda",
+        "description": "All Agendas for Ignis Aurora",
+        "cardIDs": [
+            
+        ]
+    }
+]
