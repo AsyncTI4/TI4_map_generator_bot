@@ -4,11 +4,7 @@ import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 
@@ -20,7 +16,7 @@ public class FrankenDraft extends BagDraft {
     }
 
     @Override
-    public int GetItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftItem.Category category) {
         int limit = 0;
         switch (category) {
             case ABILITY, BLUETILE -> {
@@ -171,7 +167,7 @@ public class FrankenDraft extends BagDraft {
             // Walk through each type of draftable...
             for (Map.Entry<DraftItem.Category, List<DraftItem>> draftableCollection:allDraftableItems.entrySet()) {
                 DraftItem.Category category = draftableCollection.getKey();
-                int categoryLimit = GetItemLimitForCategory(category);
+                int categoryLimit = getItemLimitForCategory(category);
                 // ... and pull out the appropriate number of items from its collection...
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
@@ -183,5 +179,10 @@ public class FrankenDraft extends BagDraft {
         }
 
         return bags;
+    }
+
+    @Override
+    public int getBagSize() {
+        return 31;
     }
 }

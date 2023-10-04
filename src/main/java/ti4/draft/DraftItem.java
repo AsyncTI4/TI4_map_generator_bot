@@ -2,13 +2,10 @@ package ti4.draft;
 
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.Helper;
 import ti4.map.Player;
 import ti4.model.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class DraftItem implements ModelInterface {
@@ -133,7 +130,7 @@ public abstract class DraftItem implements ModelInterface {
     public boolean isDraftable(Player player) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
-        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= draftRules.GetItemLimitForCategory(ItemCategory);
+        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
         if (isAtHandLimit) {
             return false;
         }
@@ -146,7 +143,7 @@ public abstract class DraftItem implements ModelInterface {
             if (ItemCategory == cat) {
                 continue;
             }
-            allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= draftRules.GetItemLimitForCategory(cat);
+            allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
         }
 
         if (hasDraftedThisBag) {
