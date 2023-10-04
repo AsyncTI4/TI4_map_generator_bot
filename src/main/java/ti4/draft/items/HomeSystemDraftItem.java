@@ -16,6 +16,7 @@ public class HomeSystemDraftItem extends DraftItem {
         super(Category.HOMESYSTEM, itemId);
     }
 
+
     @Override
     public String getShortDescription() {
         return Mapper.getFactionRepresentations().get(ItemId) + " Home System";

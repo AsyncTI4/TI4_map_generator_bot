@@ -39,7 +39,33 @@ public class FrankenDraftHelper {
     }
 
     public static void resolveFrankenDraftAction(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
-        String selectedAlias = buttonID.split(";")[1];
+        String action = buttonID.split(";")[1];
+
+        if (!action.contains(":")) {
+            switch (action) {
+                case "reset_queue":
+                    player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
+                    player.resetDraftQueue();
+                    showPlayerBag(activeGame, player);
+                    return;
+                case "confirm_draft":
+                    MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
+                    player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
+                    player.resetDraftQueue();
+                    player.setReadyToPassBag(true);
+
+                    activeGame.getActiveBagDraft().findExistingBagChannel(player).delete().queue();
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right: " + getBagReceipt(player.getCurrentDraftBag()));
+                    displayPlayerHand(activeGame, player);
+
+                    boolean everyoneReady = activeGame.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
+                    if (everyoneReady) {
+                        passBags(activeGame);
+                    }
+                    return;
+            }
+        }
+        String selectedAlias = action;
         DraftBag currentBag = player.getCurrentDraftBag();
         DraftItem selectedItem = DraftItem.GenerateFromAlias(selectedAlias);
 
@@ -50,54 +76,17 @@ public class FrankenDraftHelper {
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(selectedAlias));
         player.queueDraftItem(DraftItem.GenerateFromAlias(selectedAlias));
 
-
-        if (player.getDraftHand().Contents.size() < 3) {
-            player.setReadyToPassBag(player.getDraftQueue().Contents.size() >= 3);
-        } else if (player.getCurrentDraftBag().Contents.stream().noneMatch(draftItem -> draftItem.isDraftable(player))){
-            player.setReadyToPassBag(true);
-        } else if (player.getDraftQueue().Contents.size() >= 2) {
-            player.setReadyToPassBag(true);
-        }
-
-        if (!player.isReadyToPassBag()) {
-            showPlayerBag(activeGame, player);
-        }
-
-        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you picked "+selectedItem.getShortDescription();
-
-        boolean everyoneReady = true;
-        for(Player p2 : activeGame.getRealPlayers()){
-            if (!p2.isReadyToPassBag()) {
-                everyoneReady = false;
-                break;
-            }
-        }
-
-        if(!everyoneReady){
-            if(player.isReadyToPassBag()){
-                msg = msg + ". But not everyone has picked yet. Please wait and you will be pinged when the last person has picked.";
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), ButtonHelper.getIdent(player) + " is ready to pass their bag");
-            }else{
-                msg = msg + ". Please pick another item from this bag.";
-            }
-           
-           MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            PassBags(activeGame);
-        }
-
-        DisplayPlayerHand(activeGame, player);
+        showPlayerBag(activeGame, player);
         event.getMessage().delete().queue();
     }
 
-    private static void DisplayPlayerHand(Game activeGame, Player player) {
+    private static void displayPlayerHand(Game activeGame, Player player) {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "Your current Hand of drafted cards: \n" + getCurrentHandRepresentation(activeGame, player));
     }
 
     public static void showPlayerBag(Game activeGame, Player player) {
-        ThreadChannel bagChannel = activeGame.getActiveBagDraft().regenerateBagChannel(activeGame, player);
+        ThreadChannel bagChannel = activeGame.getActiveBagDraft().regenerateBagChannel(player);
 
         List<DraftItem> draftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
@@ -105,62 +94,72 @@ public class FrankenDraftHelper {
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
 
         MessageHelper.sendMessageToChannel(bagChannel, getCurrentBagRepresentation(draftables, undraftables));
-        MessageHelper.sendMessageToChannel(bagChannel,
-                "You are drafting the following from this bag: \n"+getDraftQueueRepresentation(activeGame, player));
 
+        int draftQueueCount = player.getDraftQueue().Contents.size();
+        boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
+        boolean isQueueFull = draftQueueCount >= 2 && !isFirstDraft || draftQueueCount >= 3;
         if (draftables.isEmpty()) {
-            MessageHelper.sendMessageToChannel(bagChannel,ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot legally draft anything from this bag right now. " +
-                    "It will pass to the next player once all other players are ready.");
+            MessageHelper.sendMessageToChannel(bagChannel,ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot legally draft anything from this bag right now.");
         }
-        else {
+        else if (!isQueueFull) {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel,
                     ButtonHelper.getTrueIdentity(player, activeGame) + " please select an item to draft:", getSelectionButtons(draftables));
         }
+
+        if (draftQueueCount > 0) {
+            List<Button> queueButtons = new ArrayList<>();
+            if (isQueueFull) {
+                queueButtons.add(Button.success("frankenDraftAction;confirm_draft", "I want to draft these cards."));
+            }
+            queueButtons.add(Button.danger("frankenDraftAction;reset_queue", "I want to draft different cards."));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel,
+                    "## Queued:\n - You are drafting the following from this bag:\n" + getDraftQueueRepresentation(activeGame, player), queueButtons);
+
+            if (isQueueFull) {
+                MessageHelper.sendMessageToChannel(bagChannel,
+                        ButtonHelper.getTrueIdentity(player, activeGame) + " please confirm or reset your draft picks.");
+            }
+        }
+
     }
 
-    public static void PassBags(Game activeGame) {
-        for(Player p : activeGame.getRealPlayers()) {
-            DraftBag queuedItems = p.getDraftQueue();
-            p.getDraftHand().Contents.addAll(queuedItems.Contents);
-            for(DraftItem item : queuedItems.Contents) {
-                p.getCurrentDraftBag().Contents.removeIf((DraftItem i) -> i.getAlias().equals(item.getAlias()));
-            }
-            p.resetDraftQueue();
-            p.setReadyToPassBag(false);
-        }
-
-        // pass bags
-        List<Player> players = activeGame.getRealPlayers();
-        DraftBag firstPlayerBag = players.get(0).getCurrentDraftBag();
-        for (int i = 0; i < players.size()-1; i++) {
-            players.get(i).setCurrentDraftBag(players.get(i+1).getCurrentDraftBag());
-        }
-        players.get(players.size()-1).setCurrentDraftBag(firstPlayerBag);
+    public static void passBags(Game activeGame) {
+        activeGame.getActiveBagDraft().passBags();
 
         for(Player p2 : activeGame.getRealPlayers()){
-            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame)+"You have been passed a new bag of cards!");
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame)+" You have been passed a new bag of cards!");
             showPlayerBag(activeGame, p2);
-            DisplayPlayerHand(activeGame, p2);
         }
-         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
     }
 
+    public static String getBagReceipt(DraftBag bag) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("The bag contained: ");
+        for (DraftItem item: bag.Contents) {
+            sb.append("**").append(item.getShortDescription()).append("**\n");
+        }
+        return sb.toString();
+    }
 
     public static String getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
         StringBuilder sb = new StringBuilder();
-        sb.append("The following draftable items are in your bag:\n");
+        sb.append("# Draftable:\n");
         for(DraftItem item : draftables) {
             buildItemDescription(item, sb);
             sb.append("\n");
         }
 
-        sb.append("The following items are in your bag but may not be drafted, either because you are at your hand limit, " +
-                "or because you just drafted a similar item, or because you have not drafted one of each item type yet:\n");
+        if (!undraftables.isEmpty()) {
+            sb.append("# Undraftable:\n");
+            sb.append("The following items are in your bag but may not be drafted, either because you are at your hand limit, " +
+                    "or because you just drafted a similar item, or because you have not drafted one of each item type yet:\n");
 
-        for(DraftItem item : undraftables) {
-            sb.append(item.getItemEmoji()).append(" ");
-            sb.append("**").append(item.getShortDescription()).append("**\n");
-            sb.append("\n");
+            for (DraftItem item : undraftables) {
+                sb.append(item.getItemEmoji()).append(" ");
+                sb.append("**").append(item.getShortDescription()).append("**\n");
+                sb.append("\n");
+            }
         }
 
         return sb.toString();
@@ -191,8 +190,8 @@ public class FrankenDraftHelper {
 
     private static void buildItemDescription(DraftItem item, StringBuilder sb) {
         try {
-            sb.append(item.getItemEmoji()).append(" ");
-            sb.append("**").append(item.getShortDescription()).append("**\n");
+            sb.append("### ").append(item.getItemEmoji()).append(" ");
+            sb.append(item.getShortDescription()).append("\n - ");
             sb.append(item.getLongDescription());
         }
         catch (Exception e) {

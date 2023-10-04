@@ -4,20 +4,29 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.FactionModel;
 
 public class StartingFleetDraftItem extends DraftItem {
     public StartingFleetDraftItem(String itemId) {
         super(Category.STARTINGFLEET, itemId);
     }
 
+
+    private FactionModel getFaction() {
+        if (ItemId.equals("keleres")) {
+            return Mapper.getFactionSetup("keleresa");
+        }
+        return Mapper.getFactionSetup(ItemId);
+    }
+
     @Override
     public String getShortDescription() {
-        return Mapper.getFactionRepresentations().get(ItemId) + " Starting Fleet";
+        return getFaction().getFactionName() + " Starting Fleet";
     }
 
     @Override
     public String getLongDescription() {
-        String[] fleetDesc = Mapper.getFactionSetup(ItemId).getStartingFleet().split(",");
+        String[] fleetDesc = getFaction().getStartingFleet().split(",");
         StringBuilder sb = new StringBuilder();
         for (String desc: fleetDesc) {
             String[] split = desc.split(" ");

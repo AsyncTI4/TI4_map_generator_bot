@@ -4,6 +4,7 @@ import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 
 import java.util.ArrayList;
@@ -14,9 +15,16 @@ public class StartingTechDraftItem extends DraftItem {
         super(Category.STARTINGTECH, itemId);
     }
 
+    private FactionModel getFaction() {
+        if (ItemId.equals("keleres")) {
+            return Mapper.getFactionSetup("keleresa");
+        }
+        return Mapper.getFactionSetup(ItemId);
+    }
+
     @Override
     public String getShortDescription() {
-        return Mapper.getFactionRepresentations().get(ItemId) + " Starting Tech";
+        return getFaction().getFactionName() + " Starting Tech";
     }
 
     @Override
@@ -44,7 +52,7 @@ public class StartingTechDraftItem extends DraftItem {
         } else if (ItemId.equals("winnu")) {
 
         }
-        return Mapper.getFactionSetup(ItemId).getStartingTech();
+        return getFaction().getStartingTech();
     }
 
     @Override

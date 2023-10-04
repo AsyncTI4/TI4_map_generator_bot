@@ -27,14 +27,14 @@ public class StartFrankenDraft extends FrankenSubcommandData {
         if (stratPings != null){
             String stratP = stratPings.getAsString();
             if ("yes".equalsIgnoreCase(stratP)){
-                activeGame.setBagDraft(new PoweredFrankenDraft());
+                activeGame.setBagDraft(new PoweredFrankenDraft(activeGame));
                 FrankenDraftHelper.startDraft(activeGame);
             } else {
-                activeGame.setBagDraft(new FrankenDraft());
+                activeGame.setBagDraft(new FrankenDraft(activeGame));
                 FrankenDraftHelper.startDraft(activeGame);
             }
         }else{
-            activeGame.setBagDraft(new FrankenDraft());
+            activeGame.setBagDraft(new FrankenDraft(activeGame));
             FrankenDraftHelper.startDraft(activeGame);
         }
         GameSaveLoadManager.saveMap(activeGame, event);

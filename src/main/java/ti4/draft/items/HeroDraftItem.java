@@ -23,12 +23,12 @@ public class HeroDraftItem extends DraftItem {
         {
             return getAlias();
         }
-        return "Hero - " + leader.getName();
+        return "Hero - " + leader.getName().replace("\n", "");
     }
 
     @Override
     public String getLongDescription() {
-        return "**" + getLeader().getAbilityName() + "** - " + "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
+        return "**" + getLeader().getAbilityName().replace("\n", "") + "** - " + "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
     }
 
     @Override
