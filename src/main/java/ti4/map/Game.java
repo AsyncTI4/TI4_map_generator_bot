@@ -2928,6 +2928,12 @@ public class Game {
         return player;
     }
 
+    public UnitModel getUnitFromImageName(String imageName) {
+        String colourID = StringUtils.substringBefore(imageName, "_");
+        Player player = getPlayerFromColorOrFaction(colourID);
+        return player.getUnitFromImageName(imageName);
+    }
+
     public String getUnitNameFromImageName(String imageName) {
         String colourID = StringUtils.substringBefore(imageName, "_");
         String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);
