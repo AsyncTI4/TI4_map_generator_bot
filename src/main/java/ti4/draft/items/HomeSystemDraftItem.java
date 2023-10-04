@@ -24,6 +24,9 @@ public class HomeSystemDraftItem extends DraftItem {
 
     @Override
     public String getLongDescription() {
+        if (ItemId.equals("ghosts")) {
+            return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
+        }
         FactionModel faction = Mapper.getFactionSetup(ItemId);
         TileModel tile = TileHelper.getTile(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
