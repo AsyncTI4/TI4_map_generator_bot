@@ -12,7 +12,7 @@ import ti4.helpers.AliasHandler;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.*;
-import ti4.model.Franken.FrankenItem;
+import ti4.draft.DraftItem;
 import ti4.model.TechnologyModel.TechnologyType;
 
 import java.io.File;
@@ -55,7 +55,7 @@ public class Mapper {
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
-    private static final HashMap<String, FrankenItem> frankenErrata = new HashMap<>();
+    private static final HashMap<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
@@ -85,7 +85,7 @@ public class Mapper {
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjects("franken_errata.json", frankenErrata, FrankenItem.class, "Could not read franken errata setup file");
+        importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
 
         //Ensure Faction Setup lists contain valid data
         for (FactionModel faction : factionSetup.values()) {
@@ -720,7 +720,7 @@ public class Mapper {
             .collect(Collectors.toList());
     }
 
-    public static HashMap<String, FrankenItem> getFrankenErrata() {
+    public static HashMap<String, DraftErrataModel> getFrankenErrata() {
         return frankenErrata;
     }
 
