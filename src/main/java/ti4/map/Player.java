@@ -45,7 +45,7 @@ public class Player {
     private String userID;
     private String userName;
 
-    private String  gameID;
+    private String gameID;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -53,7 +53,7 @@ public class Player {
     private boolean isDummy;
 
     private String faction;
-    private String factionEmoji = null;
+    private String factionEmoji;
 
     @Setter
     private String playerStatsAnchorPosition;
@@ -256,10 +256,10 @@ public class Player {
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
+        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
         try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
+            if (hasCardsInfoThreadId) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
@@ -287,9 +287,8 @@ public class Player {
 
         //ATTEMPT TO FIND BY NAME
         try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
+            if (hasCardsInfoThreadId) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
