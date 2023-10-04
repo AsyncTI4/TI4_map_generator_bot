@@ -697,10 +697,11 @@ public class ButtonHelperModifyUnits {
                    HashMap<String, Integer> units1 = unitHolder.getUnits();
                    Map<String, Integer> units = new HashMap<>(units1);
                
-                   if (unitHolder instanceof Planet planet) {
+                   if (unitHolder instanceof Planet) {
                        for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                           if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                            String key = unitEntry.getKey();
-                           if ((key.endsWith("gf.png") || key.endsWith("mf.png")) &&key.contains(cID)) {
+                           if ((key.endsWith("gf.png") || key.endsWith("mf.png"))) {
                                String unitKey = key.replace(cID+"_", "");
                                unitKey = unitKey.replace(".png", "");
                                unitKey = ButtonHelper.getUnitName(unitKey);

@@ -159,13 +159,14 @@ public class ButtonHelper {
             } else {
                 Map<String, Integer> tileUnits = new HashMap<>(units);
                 for (Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                     String key = unitEntry.getKey();
                     if (key.endsWith("gf.png") || key.endsWith("mf.png")
                         || ((!player.hasFF2Tech() && key.endsWith("ff.png")) || (cabal != null && (key.endsWith("ff.png") || key.endsWith("sd.png"))))) {
                         continue;
                     }
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                        if (key.endsWith(unitRepresentationKey)) {
                             String unitKey = key.replace(cID + "_", "");
                             int totalUnits = unitEntry.getValue();
                             unitKey = unitKey.replace(".png", "");
@@ -2565,6 +2566,7 @@ public class ButtonHelper {
             if (unitHolder instanceof Planet planet) {
             } else {
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
 
                     String key = unitEntry.getKey();
 
@@ -2574,7 +2576,7 @@ public class ButtonHelper {
                     }
 
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                        if (key.endsWith(unitRepresentationKey)) {
 
                             String unitKey = key.replace(cID + "_", "");
 
@@ -2641,9 +2643,10 @@ public class ButtonHelper {
 
             if (unitHolder instanceof Planet planet) {
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                     String key = unitEntry.getKey();
                     representation = representation.replace(" ", "").toLowerCase().replace("'", "").replace("-", "");
-                    if ((key.endsWith("gf.png") || key.endsWith("mf.png")) && key.contains(cID)) {
+                    if ((key.endsWith("gf.png") || key.endsWith("mf.png"))) {
                         String unitKey = key.replace(cID + "_", "");
                         unitKey = unitKey.replace(".png", "");
                         unitKey = getUnitName(unitKey);
@@ -2776,9 +2779,10 @@ public class ButtonHelper {
             HashMap<String, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet planet) {
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                     String key = unitEntry.getKey();
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                        if (key.endsWith(unitRepresentationKey)) {
                             String unitKey = key.replace(cID + "_", "");
                             unitKey = unitKey.replace(".png", "");
                             unitKey = getUnitName(unitKey);
@@ -2939,9 +2943,10 @@ public class ButtonHelper {
             HashMap<String, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet planet) {
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
                     String key = unitEntry.getKey();
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                        if (key.endsWith(unitRepresentationKey)) {
                             String unitKey = key.replace(cID + "_", "");
                             unitKey = unitKey.replace(".png", "");
                             unitKey = getUnitName(unitKey);
