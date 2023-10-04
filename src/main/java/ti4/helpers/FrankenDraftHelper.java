@@ -55,7 +55,7 @@ public class FrankenDraftHelper {
                     player.setReadyToPassBag(true);
 
                     activeGame.getActiveBagDraft().findExistingBagChannel(player).delete().queue();
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right: " + getBagReceipt(player.getCurrentDraftBag()));
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
 
                     boolean everyoneReady = activeGame.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
@@ -135,7 +135,6 @@ public class FrankenDraftHelper {
 
     public static String getBagReceipt(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
-        sb.append("The bag contained: ");
         for (DraftItem item: bag.Contents) {
             sb.append("**").append(item.getShortDescription()).append("**\n");
         }
