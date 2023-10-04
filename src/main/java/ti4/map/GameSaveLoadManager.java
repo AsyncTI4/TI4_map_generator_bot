@@ -1590,7 +1590,7 @@ public class GameSaveLoadManager {
                 }
                 case Constants.BAG_DRAFT -> {
                     try {
-                        activeGame.setBagDraft(BagDraft.GenerateDraft(info));
+                        activeGame.setBagDraft(BagDraft.GenerateDraft(info, activeGame));
                     } catch (Exception e) {
                         //Do nothing
                     }

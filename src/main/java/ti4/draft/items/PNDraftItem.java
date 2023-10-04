@@ -12,8 +12,15 @@ public class PNDraftItem extends DraftItem {
         super(Category.PN, itemId);
     }
 
+    private FactionModel getFaction() {
+        if (ItemId.equals("keleres")) {
+            return Mapper.getFactionSetup("keleresa");
+        }
+        return Mapper.getFactionSetup(ItemId);
+    }
+
     private PromissoryNoteModel getPn() {
-        FactionModel faction = Mapper.getFactionSetup(ItemId);
+        FactionModel faction =  getFaction();
         return Mapper.getPromissoryNoteByID(faction.getPromissoryNotes().get(0));
     }
     @Override

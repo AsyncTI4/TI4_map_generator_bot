@@ -53,7 +53,7 @@ public class FrankenEdit extends FrankenSubcommandData {
         }
 
         if ("forceSwap".equals(command)) {
-            FrankenDraftHelper.PassBags(activeGame);
+            FrankenDraftHelper.passBags(activeGame);
             GameSaveLoadManager.saveMap(activeGame, event);
             return;
         }

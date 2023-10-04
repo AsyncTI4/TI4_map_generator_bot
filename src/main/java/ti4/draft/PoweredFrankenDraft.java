@@ -1,6 +1,12 @@
 package ti4.draft;
 
+import ti4.map.Game;
+
 public class PoweredFrankenDraft extends FrankenDraft {
+
+    public PoweredFrankenDraft(Game owner) {
+        super(owner);
+    }
 
     @Override
     public int GetItemLimitForCategory(DraftItem.Category category) {

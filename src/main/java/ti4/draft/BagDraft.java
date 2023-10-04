@@ -12,34 +12,48 @@ import ti4.message.BotLogger;
 import java.util.List;
 
 public abstract class BagDraft {
-    public static BagDraft GenerateDraft(String draftType) {
+    protected Game owner;
+    public static BagDraft GenerateDraft(String draftType, Game game) {
         if (draftType.equals("franken")) {
-            return new FrankenDraft();
+            return new FrankenDraft(game);
         }
         else if (draftType.equals("powered_franken")) {
-            return new PoweredFrankenDraft();
+            return new PoweredFrankenDraft(game);
         }
 
         return null;
+    }
+
+    public BagDraft(Game owner) {
+        this.owner = owner;
     }
 
     public abstract int GetItemLimitForCategory(DraftItem.Category category);
     public abstract String getSaveString();
     public abstract List<DraftBag> generateBags(Game game);
 
-    public ThreadChannel regenerateBagChannel(Game activeGame, Player player) {
-        TextChannel actionsChannel = activeGame.getMainGameChannel();
+    public void passBags() {
+        List<Player> players = owner.getRealPlayers();
+        DraftBag firstPlayerBag = players.get(0).getCurrentDraftBag();
+        for (int i = 0; i < players.size()-1; i++) {
+            players.get(i).setCurrentDraftBag(players.get(i+1).getCurrentDraftBag());
+        }
+        players.get(players.size()-1).setCurrentDraftBag(firstPlayerBag);
+    }
+
+    public ThreadChannel regenerateBagChannel(Player player) {
+        TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
-            BotLogger.log("`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + activeGame.getName());
+            BotLogger.log("`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + owner.getName());
             return null;
         }
 
-        String threadName = Constants.BAG_INFO_THREAD_PREFIX + activeGame.getName() + "-" + player.getUserName().replaceAll("/", "");
-        if (activeGame.isFoWMode()) {
-            threadName = activeGame.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
+        if (owner.isFoWMode()) {
+            threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
         }
 
-        ThreadChannel existingChannel = findExistingBagChannel(actionsChannel, player, threadName);
+        ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
 
         if(existingChannel != null) {
             existingChannel.delete().queue();
@@ -47,8 +61,8 @@ public abstract class BagDraft {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!activeGame.isCommunityMode() && !activeGame.isFoWMode());
-        if (activeGame.getName().contains("pbd100") || activeGame.getName().contains("pbd500")) {
+        boolean isPrivateChannel = (!owner.isCommunityMode() && !owner.isFoWMode());
+        if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
@@ -61,7 +75,17 @@ public abstract class BagDraft {
         return threadChannel;
     }
 
-    private ThreadChannel findExistingBagChannel(TextChannel actionsChannel, Player player, String threadName) {
+    public ThreadChannel findExistingBagChannel(Player player) {
+
+        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
+        if (owner.isFoWMode()) {
+            threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
+        }
+        return findExistingBagChannel(player, threadName);
+    }
+
+    private ThreadChannel findExistingBagChannel(Player player, String threadName) {
+        TextChannel actionsChannel = owner.getActionsChannel();
         //ATTEMPT TO FIND BY ID
         String bagInfoThread = player.getBagInfoThreadID();
         try {

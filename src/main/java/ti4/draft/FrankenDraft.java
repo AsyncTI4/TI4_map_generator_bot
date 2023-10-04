@@ -15,6 +15,10 @@ import ti4.model.FactionModel;
 import java.util.*;
 
 public class FrankenDraft extends BagDraft {
+    public FrankenDraft(Game owner) {
+        super(owner);
+    }
+
     @Override
     public int GetItemLimitForCategory(DraftItem.Category category) {
         int limit = 0;
