@@ -79,7 +79,7 @@ public class Eliminate extends AddRemovePlayer {
 
                     PromissoryNoteModel pn = PNss.get(pnID);
                     if(pn!= null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())){
-                        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, pn.getOwner());
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
                         PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);

@@ -24,13 +24,6 @@ public class FactionModel implements ModelInterface {
     private String source;
 
     public boolean isValid() {
-        validateAbilities();
-        validateFactionTech();
-        validateHomePlanets();
-        validateStartingTech();
-        validateLeaders();
-        validatePromissoryNotes();
-        validateUnits();
         return alias != null
             && factionName != null
             && homeSystem != null
@@ -42,6 +35,16 @@ public class FactionModel implements ModelInterface {
             && leaders != null
             && promissoryNotes != null
             && units != null;
+    }
+
+    public void validationWarnings() {
+        validateAbilities();
+        validateFactionTech();
+        validateHomePlanets();
+        validateStartingTech();
+        validateLeaders();
+        validatePromissoryNotes();
+        validateUnits();
     }
 
     public String getAlias() {

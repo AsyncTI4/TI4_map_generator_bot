@@ -1299,7 +1299,7 @@ public class GenerateMap {
 
                 Point position = new Point(x, y);
                 boolean justNumber = false;
-                if (unitID.contains("_tkn_ff.png")) {
+                if (unitID.contains("_ff.png")) {
                     position.x += fighterPoint.x;
                     position.y += fighterPoint.y;
                     justNumber = true;
@@ -2374,7 +2374,7 @@ public class GenerateMap {
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
             }
-            if (optionalText != null && !optionalText.isEmpty() && Helper.getPlayerFromColorOrFaction(activeGame, optionalText) == null) {
+            if (optionalText != null && !optionalText.isEmpty() && activeGame.getPlayerFromColorOrFaction(optionalText) == null) {
                 agendaTitle += "   [" + optionalText + "]";
             }
             graphics.drawString(agendaTitle, x + 95, y + 30);
@@ -3326,7 +3326,7 @@ public class GenerateMap {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             for (int i = 0; i < unitCount; i++) {
                 Point position = unitTokenPosition.getPosition(unitID);
-                boolean fighterOrInfantry = unitID.contains("_tkn_ff.png") || unitID.contains("_tkn_gf.png");
+                boolean fighterOrInfantry = unitID.contains("_ff.png") || unitID.contains("_tkn_gf.png");
                 if (isSpace && position != null && !fighterOrInfantry) {
                     String id = unitID.substring(unitID.indexOf("_"));
                     Point point = unitOffset.get(id);

@@ -95,7 +95,7 @@ public class MessageHelper {
 			}
 			while (players.hasMoreTokens()) {
 				String player = players.nextToken();
-				Player player_ = Helper.getPlayerFromColorOrFaction(activeGame, player);
+				Player player_ = activeGame.getPlayerFromColorOrFaction(player);
 				addFactionReactToMessage(activeGame, player_, msg);
 			}
 
