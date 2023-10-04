@@ -685,7 +685,6 @@ public class ButtonHelperModifyUnits {
               
                activeGame.resetCurrentMovedUnitsFrom1System();
            }else{
-               Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
                Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
                String cID = Mapper.getColorID(player.getColor());
                for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -728,58 +727,57 @@ public class ButtonHelperModifyUnits {
                    }
                    else{
                        for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                            if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
+                            UnitModel unitModel = player.getUnitFromImageName(unitEntry.getKey());
+                            if (unitModel == null) continue;
 
-                           String key = unitEntry.getKey();
-                           for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                               if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
-                                   
-                                   String unitKey = key.replace(cID+"_", "");
-                                   
-                                   int totalUnits = unitEntry.getValue();
-                                   int amount;
-                                   unitKey  = unitKey.replace(".png", "");
-                                   unitKey = ButtonHelper.getUnitName(unitKey);
-                                   int damagedUnits = 0;
-                                   if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
-                                       damagedUnits = unitHolder.getUnitDamage().get(key);
-                                   }
-                                   String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+                            String key = unitEntry.getKey();
 
-                                   new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
-                                   if(damagedUnits > 0){
-                                       rest = unitKey+"damaged";
-                                       amount = damagedUnits;
-                                       if (currentSystem.containsKey(rest)) {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
-                                       } else {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
-                                       }
-                                       if (currentActivation.containsKey(rest)) {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(rest,
-                                                   currentActivation.get(rest) + amount);
-                                       } else {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(rest, amount);
-                                       }
-                                   }
-                                   rest = unitKey;
-                                   amount = totalUnits - damagedUnits;
-                                   if(amount > 0){
-                                       if (currentSystem.containsKey(rest)) {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
-                                       } else {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
-                                       }
-                                       if (currentActivation.containsKey(unitKey)) {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey,
-                                                   currentActivation.get(unitKey) + amount);
-                                       } else {
-                                           activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey, amount);
-                                       }
-                                   }
+                            String unitKey = unitModel.getAsyncId();
+                            
+                            int totalUnits = unitEntry.getValue();
+                            int amount;
+                            unitKey = ButtonHelper.getUnitName(unitKey);
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+
+                            new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
+                            if(damagedUnits > 0){
+                                rest = unitKey+"damaged";
+                                amount = damagedUnits;
+                                if (currentSystem.containsKey(rest)) {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                } else {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                }
+                                if (currentActivation.containsKey(rest)) {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(rest,
+                                            currentActivation.get(rest) + amount);
+                                } else {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(rest, amount);
+                                }
+                            }
+                            rest = unitKey;
+                            amount = totalUnits - damagedUnits;
+                            if(amount > 0){
+                                if (currentSystem.containsKey(rest)) {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                } else {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                }
+                                if (currentActivation.containsKey(unitKey)) {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey,
+                                            currentActivation.get(unitKey) + amount);
+                                } else {
+                                    activeGame.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey, amount);
+                                }
+                            }
                                    
                                    
-                               }
-                           }
+
                        }
                    }             
                }
