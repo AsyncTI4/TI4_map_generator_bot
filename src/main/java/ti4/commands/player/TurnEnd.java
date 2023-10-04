@@ -200,7 +200,7 @@ public class TurnEnd extends PlayerSubcommandData {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = activeGame.getPNOwner(pn);
-                if (!pnOwner.isRealPlayer()) {
+                if (pnOwner == null || !pnOwner.isRealPlayer()) {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
