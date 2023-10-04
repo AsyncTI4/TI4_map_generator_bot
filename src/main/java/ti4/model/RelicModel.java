@@ -1,7 +1,9 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.Optional;
 
+import javax.swing.text.html.Option;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,6 +18,7 @@ public class RelicModel implements ModelInterface {
     private String text;
     private String flavourText;
     private String source;
+    private Boolean isFakeRelic;
 
     @Override
     public boolean isValid() {
@@ -35,6 +38,14 @@ public class RelicModel implements ModelInterface {
             case "ds" -> Emojis.DiscordantStars;
             default -> "";
         };
+    }
+
+    /**
+     * @return whether this object is implemented as a relic, but is not actually a relic
+     */
+    public boolean isFakeRelic() {return getIsFakeRelic();}
+    private boolean getIsFakeRelic() {
+        return Optional.ofNullable(isFakeRelic).orElse(false);
     }
 
     public MessageEmbed getRepresentationEmbed() {
