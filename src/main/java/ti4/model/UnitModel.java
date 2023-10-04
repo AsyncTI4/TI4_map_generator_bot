@@ -71,6 +71,10 @@ public class UnitModel implements ModelInterface {
         return colour + getImageFileSuffix();
     }
 
+    public String getUnitEmoji() {
+        return Helper.getEmojiFromDiscord(getBaseType());
+    }
+
     public String getUnitRepresentation() {
         String faction = getFaction();
         String factionEmoji = Helper.getEmojiFromDiscord(faction);
