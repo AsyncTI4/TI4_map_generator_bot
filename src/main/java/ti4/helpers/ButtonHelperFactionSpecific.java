@@ -1333,50 +1333,47 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getUnitsToArboAgent(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        String cID = Mapper.getColorID(player.getColor());
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
             UnitHolder unitHolder = entry.getValue();
             HashMap<String, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet planet) {
-            } else {
-                Map<String, Integer> tileUnits = new HashMap<>(units);
-                for (Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
-                    String imageName = unitEntry.getKey();
-                    if (imageName.endsWith("gf.png") || imageName.endsWith("mf.png") || imageName.endsWith("ff.png")) {
-                        continue;
-                    }
+            if (unitHolder instanceof Planet) continue;
 
-                    UnitModel unitModel = activeGame.getUnitFromImageName(imageName);
+            Map<String, Integer> tileUnits = new HashMap<>(units);
+            for (Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
+                String imageName = unitEntry.getKey();
+                if (!player.colourMatchesUnitImageName(imageName)) continue;
 
+                if (imageName.endsWith("gf.png") || imageName.endsWith("mf.png") || imageName.endsWith("ff.png")) {
+                    continue;
+                }
 
-                    int totalUnits = unitEntry.getValue();
-                    String unitKey = unitModel.getAsyncId();
-                    unitKey = ButtonHelper.getUnitName(unitKey);
-                    int damagedUnits = 0;
-                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(imageName) != null) {
-                        damagedUnits = unitHolder.getUnitDamage().get(imageName);
+                UnitModel unitModel = activeGame.getUnitFromImageName(imageName);
+                String unitKey = unitModel.getAsyncId();
+
+                int totalUnits = unitEntry.getValue();
+                unitKey = ButtonHelper.getUnitName(unitKey);
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(imageName) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(imageName);
+                }
+                for (int x = 1; x < damagedUnits + 1; x++) {
+                    if (x > 1) {
+                        break;
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 1) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey + "damaged", "Remove A Damaged " + unitModel.getName())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
-                        buttons.add(validTile2);
+                    Button validTile2 = Button
+                        .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey + "damaged", "Remove A Damaged " + unitModel.getName())
+                        .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    buttons.add(validTile2);
+                }
+                totalUnits = totalUnits - damagedUnits;
+                for (int x = 1; x < totalUnits + 1; x++) {
+                    if (x > 1) {
+                        break;
                     }
-                    totalUnits = totalUnits - damagedUnits;
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        if (x > 1) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey, "Remove " + x + " " + unitModel.getName())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
-                        buttons.add(validTile2);
-                    }
+                    Button validTile2 = Button
+                        .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey, "Remove " + x + " " + unitModel.getName())
+                        .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    buttons.add(validTile2);
                 }
             }
         }
