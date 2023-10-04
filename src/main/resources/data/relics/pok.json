@@ -1,0 +1,62 @@
+[
+    {
+        "alias": "dominusorb",
+        "name": "Dominus Orb",
+        "text": "Before you move units during a tactical action, you may purge this card to move and transport units that are in systems that contain 1 of your command tokens.",
+        "source": "pok"
+    },
+    {
+        "alias": "mawofworlds",
+        "name": "Maw of Worlds",
+        "text": "At the start of the agenda phase, you may purge this card and exhaust all of your planets to gain any 1 technology.",
+        "source": "pok"
+    },
+    {
+        "alias": "emelpar",
+        "name": "Scepter of Emelpar",
+        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.",
+        "source": "pok"
+    },
+    {
+        "alias": "shard",
+        "name": "Shard of the Throne",
+        "text": "When you gain this card, gain 1 victory point, when you lose this card, lose 1 victory point. When a player gains control of a legendary planet you control or a planet you control in your home system, that player gains this card.",
+        "source": "pok"
+    },
+    {
+        "alias": "stellarconverter",
+        "name": "Stellar Converter",
+        "text": "Action: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have Bombardment, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "source": "pok"
+    },
+    {
+        "alias": "codex",
+        "name": "The Codex",
+        "text": "Action: Purge this card to take up to 3 action cards of your choice from the action card discard pile.",
+        "source": "pok"
+    },
+    {
+        "alias": "emphidia",
+        "name": "The Crown of Emphidia",
+        "text": "After you perform a tactical action, you may exhaust this card to explore 1 planet you control. At the end of the status phase, if you control the \"Tomb of Emphidia,\" you may purge this card to gain 1 victory point.",
+        "source": "pok"
+    },
+    {
+        "alias": "thalnos",
+        "name": "The Crown of Thalnos",
+        "text": "During each combat round, this card's owner may reroll any number of their dice, applying +1 to the results, any units that reroll dice but do not produce at least 1 hit are destroyed.",
+        "source": "pok"
+    },
+    {
+        "alias": "obsidian",
+        "name": "The Obsidian",
+        "text": "When you gain this card, draw 1 secret objective. You can have 1 additional scored or unscored secret objective.",
+        "source": "pok"
+    },
+    {
+        "alias": "prophetstears",
+        "name": "The Prophets Tears",
+        "text": "When you research a technology, you may exhaust this card to ignore 1 prerequisite or draw 1 action card.",
+        "source": "pok"
+    }
+]
