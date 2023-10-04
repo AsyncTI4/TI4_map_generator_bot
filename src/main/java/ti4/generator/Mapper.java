@@ -77,6 +77,7 @@ public class Mapper {
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
+        readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
@@ -548,6 +549,14 @@ public class Mapper {
     public static Map<String, String> getTileRepresentations() {
         return TileHelper.getAllTiles().values().stream()
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
+    }
+
+    public static HashMap<String, String> getUnitRepresentations() {
+        HashMap<String, String> units = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : unit_representation.entrySet()) {
+            units.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return units;
     }
 
     public static HashMap<String, String> getSecretObjectivesJustNames() {
