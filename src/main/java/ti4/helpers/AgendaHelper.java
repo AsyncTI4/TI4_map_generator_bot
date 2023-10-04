@@ -84,7 +84,7 @@ public class AgendaHelper {
 
         if (activeGame.getCurrentAgendaInfo().startsWith("Law")) {
             if (activeGame.getCurrentAgendaInfo().contains("Player")) {
-                Player player2 = Helper.getPlayerFromColorOrFaction(activeGame, winner);
+                Player player2 = activeGame.getPlayerFromColorOrFaction(winner);
                 if (player2 != null) {
                     activeGame.addLaw(aID, winner);
                 }
@@ -189,7 +189,7 @@ public class AgendaHelper {
             }
         } else {
             if (activeGame.getCurrentAgendaInfo().contains("Player")) {
-                Player player2 = Helper.getPlayerFromColorOrFaction(activeGame, winner);
+                Player player2 = activeGame.getPlayerFromColorOrFaction(winner);
                 if ("secret".equalsIgnoreCase(agID)) {
                     String message = "Drew Secret Objective for the elected player";
                     activeGame.drawSecretObjective(player2.getUserID());
@@ -929,11 +929,11 @@ public class AgendaHelper {
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
         afterButtons.add(playAfter);
 
-        if (Helper.getPlayerFromColorOrFaction(activeGame, "keleres") != null && !activeGame.isFoWMode()) {
+        if (activeGame.getPlayerFromColorOrFaction("keleres") != null && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
-        if (Helper.getPlayerFromColorOrFaction(activeGame, "edyn") != null && !activeGame.isFoWMode()) {
+        if (activeGame.getPlayerFromColorOrFaction("edyn") != null && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Edyn Rider", "Play Edyn PN Rider").withEmoji(Emoji.fromFormatted(Emojis.edyn));
             afterButtons.add(playKeleresAfter);
         }
@@ -1241,7 +1241,7 @@ public class AgendaHelper {
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
-                    Player winningR = Helper.getPlayerFromColorOrFaction(activeGame, faction.toLowerCase());
+                    Player winningR = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
 
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight"))) {
 
@@ -1354,7 +1354,7 @@ public class AgendaHelper {
                 String faction = specificVote.substring(0, specificVote.indexOf("_"));
                 String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                 if (vote.contains("Rider") || vote.contains("Sanction")) {
-                    Player rider = Helper.getPlayerFromColorOrFaction(activeGame, faction.toLowerCase());
+                    Player rider = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (rider != null) {
                         riders.add(rider);
                     }
@@ -1377,7 +1377,7 @@ public class AgendaHelper {
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
-                    Player loser = Helper.getPlayerFromColorOrFaction(activeGame, faction.toLowerCase());
+                    Player loser = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser)) {
                             losers.add(loser);
@@ -1401,7 +1401,7 @@ public class AgendaHelper {
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
-                    Player loser = Helper.getPlayerFromColorOrFaction(activeGame, faction.toLowerCase());
+                    Player loser = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null && !specificVote.contains("Rider") && !specificVote.contains("Sanction")) {
                         if (!losers.contains(loser)) {
                             losers.add(loser);
@@ -1425,7 +1425,7 @@ public class AgendaHelper {
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
-                    Player loser = Helper.getPlayerFromColorOrFaction(activeGame, faction.toLowerCase());
+                    Player loser = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser) && !specificVote.contains("Rider") && !specificVote.contains("Sanction")) {
                             losers.add(loser);

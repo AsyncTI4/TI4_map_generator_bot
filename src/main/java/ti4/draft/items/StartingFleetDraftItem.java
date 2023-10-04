@@ -5,6 +5,7 @@ import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 
 public class StartingFleetDraftItem extends DraftItem {
@@ -27,22 +28,23 @@ public class StartingFleetDraftItem extends DraftItem {
 
     @Override
     public String getLongDescription() {
-        var representations = Mapper.getUnitRepresentations();
         String[] fleetDesc = getFaction().getStartingFleet().split(",");
         StringBuilder sb = new StringBuilder();
         for (String desc: fleetDesc) {
             String[] split = desc.trim().split(" ");
             String alias;
+            int count = 0;
             if (StringUtils.isNumeric(split[0])) {
-                sb.append(split[0]).append(" ");
+                count = Integer.parseInt(split[0]);
                 alias = split[1];
-            }
-            else {
+            } else {
+                count = 1;
                 alias = split[0];
             }
 
-            sb.append(representations.get(AliasHandler.resolveUnit(alias)));
-            sb.append(", ");
+            for (int i = 1; i <= count; i++) {
+                sb.append(Helper.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
+            }
         }
         return sb.toString();
     }

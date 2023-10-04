@@ -24,20 +24,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Mapper {
-
-    private static final Properties unitImageSuffixes = new Properties();
     private static final Properties colors = new Properties();
     private static final Properties cc_tokens = new Properties();
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties faction_abilities = new Properties();
-    private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
     private static final Properties explore = new Properties();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
-    private static final Properties unit_representation = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
@@ -62,7 +58,7 @@ public class Mapper {
     private static final HashMap<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
-        readData("unit_image_suffixes.properties", unitImageSuffixes, "Could not read unit image suffix file");
+        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
@@ -70,14 +66,12 @@ public class Mapper {
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
-        readData("factions.properties", factions, "Could not read factions name file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
-        readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
@@ -91,8 +85,12 @@ public class Mapper {
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
+
+        //Ensure Faction Setup lists contain valid data
+        for (FactionModel faction : factionSetup.values()) {
+            faction.validationWarnings();
+        }
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -190,7 +188,7 @@ public class Mapper {
     }
 
     public static boolean isFaction(String faction) {
-        return factions.getProperty(faction) != null;
+        return factionSetup.containsKey(faction);
     }
 
     public static String getColorID(String color) {
@@ -256,20 +254,11 @@ public class Mapper {
     }
 
     public static String getFactionFileName(String factionID) {
-        return factions.getProperty(factionID);
+        return factionID + ".png";
     }
 
     public static String getGeneralFileName(String id) {
         return general.getProperty(id);
-    }
-
-    public static Map<String, String> getUnitImageSuffixes() {
-        Map<String, String> unitMap = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : unitImageSuffixes.entrySet()) {
-            String representation = (String) unit_representation.get(entry.getKey());
-            unitMap.put((String) entry.getValue(), representation);
-        }
-        return unitMap;
     }
 
     public static Map<String, UnitModel> getUnits() {
@@ -304,15 +293,14 @@ public class Mapper {
     }
 
     public static String getUnitID(String unitID, String color) {
-        String property = colors.getProperty(color);
-        return property + unitImageSuffixes.getProperty(unitID);
+        return colors.getProperty(color) + "_" + unitID + ".png";
     }
 
-    public static List<String> getUnitIDList() {
-        return unitImageSuffixes.keySet().stream().filter(unit -> unit instanceof String)
-                .map(unit -> (String) unit)
+    public static Set<String> getUnitIDList() {
+        return getUnits().values().stream()
+                .map(UnitModel::getAsyncId)
                 .sorted()
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public static String getCCID(String color) {
@@ -551,14 +539,6 @@ public class Mapper {
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getUnitRepresentations() {
-        HashMap<String, String> units = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : unit_representation.entrySet()) {
-            units.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return units;
-    }
-
     public static HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
@@ -733,15 +713,22 @@ public class Mapper {
     }
 
     public static List<String> getFactions() {
-        return factions.keySet().stream()
-                .filter(token -> token instanceof String)
-                .map(token -> (String) token)
-                .sorted()
-                .collect(Collectors.toList());
+        return factionSetup.keySet().stream()
+            .filter(token -> token instanceof String)
+            .map(token -> (String) token)
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     public static HashMap<String, DraftErrataModel> getFrankenErrata() {
         return frankenErrata;
     }
 
+    public static String getUnitBaseTypeFromAsyncID(String asyncID) {
+        return getUnits().values().stream()
+                .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
+                .map(UnitModel::getBaseType)
+                .findFirst()
+                .orElse(null);
+    }
 }

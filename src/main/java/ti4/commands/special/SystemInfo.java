@@ -17,11 +17,14 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
@@ -62,7 +65,6 @@ public class SystemInfo extends SpecialSubcommandData {
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
-            Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
             Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             Map<String, String> colorToId = Mapper.getColorToId();
             Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
@@ -124,14 +126,17 @@ public class SystemInfo extends SpecialSubcommandData {
 
                 HashMap<String, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-
-                    String key = unitEntry.getKey();
-
-                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey)) {
-                            addtFactionIcon(activeGame, sb, colorToId, key, privateGame);
-                            sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
-                        }
+                    String unitKey = unitEntry.getKey();
+                    String colourID = StringUtils.substringBefore(unitKey, "_");
+                    String colour = AliasHandler.resolveColor(colourID);
+                    Player player = activeGame.getPlayerFromColorOrFaction(colour);
+                    UnitModel unitModel = player.getUnitFromImageName(unitKey);
+                    sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourAsMention(event.getGuild(), colour));
+                    sb.append(" `").append(unitEntry.getValue()).append("x` ");
+                    if (unitModel != null) {
+                        sb.append(Helper.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
+                    } else {
+                        sb.append(unitKey).append("\n");
                     }
                 }
                 sb.append("----------\n");

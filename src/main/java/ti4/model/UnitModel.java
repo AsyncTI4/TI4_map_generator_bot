@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
@@ -16,7 +17,6 @@ public class UnitModel implements ModelInterface {
     private String id;
     private String baseType;
     private String asyncId;
-    private String imageFileSuffix;
     private String name;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
@@ -54,12 +54,27 @@ public class UnitModel implements ModelInterface {
     public boolean isValid() {
         return id != null 
             && !id.isEmpty()
+            && List.of("ca","cv","dd","dn","ff","fs","gf","mf","pd","sd","ws","csd","plenaryorbital","tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
     @Override
     public String getAlias() {
         return getId();
+    }
+
+    public String getImageFileSuffix() {
+        return "_" + getAsyncId() + ".png";
+    }
+
+    public String getColourAsyncID(String colour) {
+        colour = AliasHandler.resolveColor(colour);
+        colour = Mapper.getColorID(colour);
+        return colour + getImageFileSuffix();
+    }
+
+    public String getUnitEmoji() {
+        return Helper.getEmojiFromDiscord(getBaseType());
     }
 
     public String getUnitRepresentation() {
@@ -269,7 +284,6 @@ public class UnitModel implements ModelInterface {
         }
         return "";
     }
-
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield() != null && getPlanetaryShield()) {
             return "Planetary Shield\n";
