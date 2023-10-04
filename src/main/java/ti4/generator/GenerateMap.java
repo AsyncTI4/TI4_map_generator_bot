@@ -338,11 +338,10 @@ public class GenerateMap {
         FileUpload fileUpload = null;
 
         if (!skipDiscordFileUpload) {
-            // CONVERT PNG TO JPG
-            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                // CONVERT PNG TO JPG
+                BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
                 ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
                 imageWriter.setOutput(ImageIO.createImageOutputStream(out));
                 ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
@@ -350,8 +349,8 @@ public class GenerateMap {
                     defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
                     defaultWriteParam.setCompressionQuality(0.15f);
                 }
+
                 imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
-                out.close();
 
                 String fileName = activeGame.getName() + "_" + getTimeStamp()  + ".jpg";
                 fileUpload = FileUpload.fromData(out.toByteArray(), fileName);

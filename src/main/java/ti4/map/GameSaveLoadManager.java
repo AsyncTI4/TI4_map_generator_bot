@@ -71,10 +71,9 @@ public class GameSaveLoadManager {
     public static final boolean loadFromJSON = false; //TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
 
     public static void saveMaps() {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Map.Entry<String, Game> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue(), true, null);
-        }
+        //TODO: add last command time/last save time to cut down on saves
+        GameManager.getInstance().getGameNameToGame().values().parallelStream()
+            .forEach(game -> saveMap(game, true, null));
     }
 
     public static void saveMap(Game activeGame) {
