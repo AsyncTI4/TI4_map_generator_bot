@@ -73,7 +73,7 @@ public class Mapper {
         readData("factions.properties", factions, "Could not read factions name file");
         importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjects("action_cards.json", actionCards, ActionCardModel.class, "Could not read action cards file");
-        importJsonObjects("agendas.json", agendas, AgendaModel.class, "Could not read agendas file");
+        importMultipleJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
         importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
         importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
