@@ -5,6 +5,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
+
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -16,6 +19,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 public class ButtonHelperModifyUnits {
 
@@ -125,45 +129,36 @@ public class ButtonHelperModifyUnits {
         Tile tile2 = activeGame.getTileByPosition(pos2);
         tile2 = MoveUnits.flipMallice(event, tile2, activeGame);
         AddCC.addCC(event, player.getColor(), tile2, true);
-        Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
-        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        String cID = Mapper.getColorID(player.getColor());
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
-            if (representation == null){
-            }
             UnitHolder unitHolder = entry.getValue();
-            HashMap<String, Integer> units1 = unitHolder.getUnits();
-            Map<String, Integer> units = new HashMap<>(units1);
-            if (unitHolder instanceof Planet planet) {
-            }
-            else{
-                for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                    String key = unitEntry.getKey();
-                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
-                            
-                            String unitKey = key.replace(cID+"_", "");
-                            
-                            int totalUnits = unitEntry.getValue();
-                            int amount = unitEntry.getValue();
-                            unitKey  = unitKey.replace(".png", "");
-                            unitKey = ButtonHelper.getUnitName(unitKey);
-                            int damagedUnits = 0;
-                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
-                                damagedUnits = unitHolder.getUnitDamage().get(key);
-                            }
-                            String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                            new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitID, player.getColor(), false, activeGame);
-                            new AddUnits().unitParsing(event, player.getColor(),tile2, amount + " " + unitKey, activeGame);
-                            if(damagedUnits > 0){
-                                activeGame.getTileByPosition(pos2).addUnitDamage("space", unitID, damagedUnits);
-                            }
-                        }
-                    }
+            Map<String, Integer> units = new HashMap<>(unitHolder.getUnits());
+            if (unitHolder instanceof Planet) continue;
+
+            for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
+
+                UnitModel unitModel = activeGame.getUnitFromImageName(unitEntry.getKey());
+                String unitKey = unitModel.getAsyncId();
+
+                String key = unitEntry.getKey();
+
+                int totalUnits = unitEntry.getValue();
+                int amount = unitEntry.getValue();
+
+                unitKey = ButtonHelper.getUnitName(unitKey);
+                int damagedUnits = 0;
+                if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                    damagedUnits = unitHolder.getUnitDamage().get(key);
                 }
-            }             
+                String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+                new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitID, player.getColor(), false, activeGame);
+                new AddUnits().unitParsing(event, player.getColor(),tile2, amount + " " + unitKey, activeGame);
+                if(damagedUnits > 0){
+                    activeGame.getTileByPosition(pos2).addUnitDamage("space", unitID, damagedUnits);
+                }
+            
+            }
+                     
         }
     }
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident){
@@ -869,7 +864,6 @@ public class ButtonHelperModifyUnits {
             rest = rest.replace(pos + "_", "");
             Player cabal = Helper.getPlayerFromAbility(activeGame, "amalgamation");
             if(rest.contains("All")){
-                    Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
                     Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
                     String cID = Mapper.getColorID(player.getColor());
                     for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -903,20 +897,14 @@ public class ButtonHelperModifyUnits {
                         }
                         else{
                             for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                                String key = unitEntry.getKey();
-                                for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                                    if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {                         
-                                        String unitKey = key.replace(cID+"_", "");                    
-                                        int totalUnits = unitEntry.getValue();
-                                        unitKey  = unitKey.replace(".png", "");
-                                        unitKey = ButtonHelper.getUnitName(unitKey);
-                                        String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                                        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
-                                        if(cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
-                                            ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, totalUnits, unitKey, event);
-                                        }
-                                    }
-                                }         
+                                String unitKey = StringUtils.substringBetween(unitEntry.getKey(), "_", ".png");
+                                int totalUnits = unitEntry.getValue();
+                                unitKey = ButtonHelper.getUnitName(unitKey);
+                                String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+                                new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
+                                if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile) && !cabal.getFaction().equalsIgnoreCase(player.getFaction())) {
+                                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, totalUnits, unitKey, event);
+                                }    
                         }             
                     }
                 }

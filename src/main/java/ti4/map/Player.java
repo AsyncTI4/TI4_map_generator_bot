@@ -1907,6 +1907,10 @@ public class Player {
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
-        return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Add Filter to grab "best" unit if exists
+        return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Sort to grab "best" unit if exists
+    }
+
+    public boolean colourMatchesUnitImageName(String imageName) {
+        return getColor().equals(AliasHandler.resolveColor(StringUtils.substringBefore(imageName, "_")));
     }
 }
