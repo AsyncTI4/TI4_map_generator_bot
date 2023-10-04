@@ -16,7 +16,6 @@ public class UnitModel implements ModelInterface {
     private String id;
     private String baseType;
     private String asyncId;
-    private String imageFileSuffix;
     private String name;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
@@ -60,6 +59,16 @@ public class UnitModel implements ModelInterface {
     @Override
     public String getAlias() {
         return getId();
+    }
+
+    public String getImageFileSuffix() {
+        return "_" + getAsyncId() + ".png";
+    }
+
+    public String getColourAsyncID(String colour) {
+        colour = AliasHandler.resolveColor(colour);
+        colour = Mapper.getColorID(colour);
+        return colour + getImageFileSuffix();
     }
 
     public String getUnitRepresentation() {
@@ -269,7 +278,6 @@ public class UnitModel implements ModelInterface {
         }
         return "";
     }
-
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield() != null && getPlanetaryShield()) {
             return "Planetary Shield\n";

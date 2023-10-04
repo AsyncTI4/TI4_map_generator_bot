@@ -2927,5 +2927,15 @@ public class Game {
         }
         return player;
     }
-    
+
+    public String getUnitNameFromImageName(String imageName) {
+        String colourID = StringUtils.substringBefore(imageName, "_");
+        String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);
+        Player player = getPlayerFromColorOrFaction(colourID);
+        return player.getUnitModels().stream()
+            .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
+            .map(UnitModel::getName)
+            .findFirst()
+            .orElse(null);
+    }
 }
