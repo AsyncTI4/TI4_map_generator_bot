@@ -280,14 +280,13 @@ public class AsyncTI4DiscordBot {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` LONGER ACCEPTING COMMANDS");
-                TimeUnit.SECONDS.sleep(10);
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
+                TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING MAPS");
-                //TODO: add last command time/last save time to cut down on saves in this loop
-                //Also, make multithreaded
                 GameSaveLoadManager.saveMaps();
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                TimeUnit.SECONDS.sleep(2); // wait for BotLogger to log
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
