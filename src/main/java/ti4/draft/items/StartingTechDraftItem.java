@@ -29,6 +29,13 @@ public class StartingTechDraftItem extends DraftItem {
 
     @Override
     public String getLongDescription() {
+        if (ItemId.equals("winnu")) {
+            return "Choose any 1 technology that has no prerequisites.";
+        } else if (ItemId.equals("argent")) {
+            return "Choose TWO of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring";
+        } else if (ItemId.equals("keleres")) {
+            return "Choose 2 non-faction technologies owned by other players.";
+        }
         List<String> techs = startingTechs();
         StringBuilder builder = new StringBuilder();
         TechnologyModel tech;
@@ -47,11 +54,6 @@ public class StartingTechDraftItem extends DraftItem {
     }
 
     private List<String> startingTechs() {
-        if (ItemId.equals("argent")) {
-
-        } else if (ItemId.equals("winnu")) {
-
-        }
         return getFaction().getStartingTech();
     }
 
