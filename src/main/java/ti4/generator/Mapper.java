@@ -724,4 +724,11 @@ public class Mapper {
         return frankenErrata;
     }
 
+    public static String getUnitBaseTypeFromAsyncID(String asyncID) {
+        return getUnits().values().stream()
+                .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
+                .map(UnitModel::getBaseType)
+                .findFirst()
+                .orElse(null);
+    }
 }
