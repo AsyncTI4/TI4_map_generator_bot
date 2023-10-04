@@ -343,7 +343,7 @@
     {
         "id": "cabal_spacedock",
         "baseType": "spacedock",
-        "asyncId": "vsd",
+        "asyncId": "csd",
         "name": "Dimensional Tear I",
         "upgradesToUnitId": "cabal_spacedock2",
         "source": "pok",
@@ -355,7 +355,7 @@
     {
         "id": "cabal_spacedock2",
         "baseType": "spacedock",
-        "asyncId": "vsd",
+        "asyncId": "csd",
         "name": "Dimensional Tear II",
         "upgradesFromUnitId": "cabal_spacedock",
         "requiredTechId": "dt2",
