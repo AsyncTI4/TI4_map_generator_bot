@@ -476,6 +476,13 @@ public class Player {
         return unitsOwned.add(unitID);
     }
 
+    public List<UnitModel> getUnitModels() {
+        return getUnitsOwned().stream()
+            .map(Mapper::getUnit)
+            .filter(Objects::nonNull)
+            .toList();
+    }
+
     public UnitModel getUnitByType(String unitType) {
         return getUnitsOwned().stream()
             .map(Mapper::getUnit)
@@ -854,7 +861,7 @@ public class Player {
     }
 
     public String getFactionEmojiOrColour() {
-        if (getGame().isFoWMode()) {
+        if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
             return Helper.getColourAsMention(getGame().getGuild(), getColor());
         }
         return getFactionEmoji();
@@ -1892,5 +1899,14 @@ public class Player {
 
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
+    }
+
+    public UnitModel getUnitFromImageName(String imageName) {
+        String asyncID = StringUtils.substringBetween(imageName, "_", ".png");
+        return getUnitFromAsyncID(asyncID);
+    }
+
+    public UnitModel getUnitFromAsyncID(String asyncID) {
+        return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Add Filter to grab "best" unit if exists
     }
 }

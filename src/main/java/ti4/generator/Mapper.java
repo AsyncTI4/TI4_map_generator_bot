@@ -551,14 +551,6 @@ public class Mapper {
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getUnitRepresentations() {
-        HashMap<String, String> units = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : unit_representation.entrySet()) {
-            units.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return units;
-    }
-
     public static HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
