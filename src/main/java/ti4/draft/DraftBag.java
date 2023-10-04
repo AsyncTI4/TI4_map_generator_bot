@@ -20,4 +20,14 @@ public class DraftBag {
 
         return sb.toString();
     }
+
+    public int getCategoryCount(DraftItem.Category cat) {
+        int count = 0;
+        for (DraftItem item: Contents) {
+            if (item.ItemCategory == cat) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

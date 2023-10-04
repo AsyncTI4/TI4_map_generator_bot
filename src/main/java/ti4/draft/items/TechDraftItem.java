@@ -1,6 +1,9 @@
 package ti4.draft.items;
 
 import ti4.draft.DraftItem;
+import ti4.generator.Mapper;
+import ti4.helpers.Helper;
+import ti4.model.TechnologyModel;
 
 public class TechDraftItem extends DraftItem {
     public TechDraftItem(String itemId) {
@@ -9,16 +12,21 @@ public class TechDraftItem extends DraftItem {
 
     @Override
     public String getShortDescription() {
-        return null;
+        return getTech().getName();
+    }
+
+    private TechnologyModel getTech() {
+        return Mapper.getTech(ItemId);
     }
 
     @Override
     public String getLongDescription() {
-        return null;
+        return getTech().getText() + "\n**Requirements:** " + getTech().getRequirementsEmoji();
     }
 
     @Override
     public String getItemEmoji() {
-        return null;
+        TechnologyModel model = getTech();
+        return Helper.getEmojiFromDiscord(model.getType().toString().toLowerCase() + "tech");
     }
 }
