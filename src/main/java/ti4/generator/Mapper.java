@@ -72,8 +72,8 @@ public class Mapper {
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("factions.properties", factions, "Could not read factions name file");
         importJsonObjects("secret_objectives.json", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
-        importMultipleJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
-        importMultipleJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
+        importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
+        importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
         importJsonObjects("public_objectives.json", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
         importJsonObjects("promissory_notes.json", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
@@ -82,7 +82,7 @@ public class Mapper {
         readData("planets.properties", planets, "Could not read planets file");
         importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
-        importMultipleJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
+        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
@@ -106,7 +106,7 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importMultipleJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
 
         try {
