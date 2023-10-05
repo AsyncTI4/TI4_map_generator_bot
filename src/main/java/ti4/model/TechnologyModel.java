@@ -10,7 +10,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
-public class TechnologyModel implements ModelInterface {
+public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private TechnologyType type;
@@ -23,8 +23,7 @@ public class TechnologyModel implements ModelInterface {
     public enum TechnologyType {
         UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
 
-        @Override
-        public String toString() {
+            public String toString() {
             return super.toString().toLowerCase();
         }
     }
@@ -167,5 +166,13 @@ public class TechnologyModel implements ModelInterface {
             }
         }
         return "None";
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

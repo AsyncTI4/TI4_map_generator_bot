@@ -16,7 +16,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
-public class LeaderModel implements ModelInterface { 
+public class LeaderModel implements ModelInterface, EmbeddableModel { 
     private String ID;
     private String type;
     private String faction;

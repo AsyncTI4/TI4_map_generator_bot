@@ -3,15 +3,13 @@ package ti4.model;
 import java.awt.Color;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 
 @Data
-public class RelicModel implements ModelInterface {
+public class RelicModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String shortName;
@@ -20,7 +18,6 @@ public class RelicModel implements ModelInterface {
     private String source;
     private Boolean isFakeRelic;
 
-    @Override
     public boolean isValid() {
         return alias != null 
             && name != null 
@@ -60,5 +57,13 @@ public class RelicModel implements ModelInterface {
         eb.setDescription(getText());
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }
