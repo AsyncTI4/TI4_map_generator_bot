@@ -182,7 +182,7 @@ public class ImageHelper {
     if (logStatsScheduledTime.get().equals(oldValue)) {
       return Optional.empty();
     }
-    return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n" +
+    return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " +
         cacheStatsToString("urlImageCache", urlImageCache));
   }
 
