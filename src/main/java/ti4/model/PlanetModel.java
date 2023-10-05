@@ -49,8 +49,10 @@ public class PlanetModel {
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         
         EmbedBuilder eb = new EmbedBuilder();
-        String name = getName() == null ? "" : getName();
-        eb.setTitle("__" + name + "__", null);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(getEmoji()).append("__").append(getName()).append("__");
+        eb.setTitle(sb.toString());
 
         switch (getPlanetType()) {
             case HAZARDOUS -> eb.setColor(Color.red);
@@ -60,7 +62,7 @@ public class PlanetModel {
         }
         
         TileModel tile = TileHelper.getTile(getTileId());
-        StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: " + tile.getName());
         eb.setDescription(sb.toString());
