@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -1332,9 +1333,11 @@ public class GenerateMap {
 
                 BufferedImage decal = null;
                 try {
-                    if (!"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
-                        String decalFileName = String.format("%s_%s_%s", player.getDecalSet(), StringUtils.substringBetween(unitID, "_", "."), getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
-                        String decalPath = Tile.getUnitPath(decalFileName);
+                    String colour = AliasHandler.resolveColor(StringUtils.substringBefore(unitID, "_"));
+                    Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(colour);
+                    if (!"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
+                        String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", "."), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
+                        String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                         decal = ImageHelper.read(decalPath);
                     }
                 } catch (Exception e) {

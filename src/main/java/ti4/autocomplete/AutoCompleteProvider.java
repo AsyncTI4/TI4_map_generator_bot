@@ -323,6 +323,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.DECAL_SET -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Mapper.getDecals().stream()
+                        .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 String dir = Storage.getTTPGExportDirectory().getPath();
