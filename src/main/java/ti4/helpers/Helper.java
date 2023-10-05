@@ -585,7 +585,7 @@ public class Helper {
             case "zohbat" -> Emojis.Zohbat;
 
 
-            default -> ":ringed_planet:";
+            default -> Emojis.SemLore;
         };
     }
 
