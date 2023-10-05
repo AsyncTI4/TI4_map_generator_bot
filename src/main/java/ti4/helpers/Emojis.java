@@ -254,7 +254,7 @@ public class Emojis {
     // PLANETS
     public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
     public static final String Primor = "<:Primor:1068567710990077952>";
-    
+
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
@@ -287,7 +287,7 @@ public class Emojis {
     public static final String Creuss = "<:Creuss:1159490337400688682>";
     public static final String DalBootha = "<:DalBootha:1159490358967816212>";
     public static final String Darien = "<:Darien:1159490360859435070>";
-    public static final String Druua = "<:Druua:1159490362587488266>";
+    public static final String Druaa = "<:Druua:1159490362587488266>";
     public static final String Elysium = "<:Elysium:1159491456516505661>";
     public static final String Everra = "<:Everra:1159491751988432966>";
     public static final String Fria = "<:Fria:1159491774679629895>";

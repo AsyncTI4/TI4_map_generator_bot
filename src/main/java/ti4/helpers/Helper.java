@@ -495,8 +495,8 @@ public class Helper {
             case "alioprima" -> Emojis.AlioPrima;
             case "ang" -> Emojis.Ang;
             case "arcprime" -> Emojis.ArcPrime;
-            case "archonren" -> Emojis.ArchonRen;
-            case "archontau" -> Emojis.ArchonTau;
+            case "archonren", "archonrenk" -> Emojis.ArchonRen;
+            case "archontau", "archontauk" -> Emojis.ArchonTau;
             case "archonvail" -> Emojis.ArchonVail;
             case "arcturus" -> Emojis.Arcturus;
             case "arinam" -> Emojis.Arinam;
@@ -504,7 +504,7 @@ public class Helper {
             case "arretze" -> Emojis.Arretze;
             case "ashtroth" -> Emojis.Ashtroth;
             case "atlas" -> Emojis.Atlas;
-            case "avar" -> Emojis.Avar;
+            case "avar", "avark" -> Emojis.Avar;
             case "bakal" -> Emojis.Bakal;
             case "bereg" -> Emojis.Bereg;
             case "cealdri" -> Emojis.Cealdri;
@@ -514,7 +514,7 @@ public class Helper {
             case "creuss" -> Emojis.Creuss;
             case "dalbootha" -> Emojis.DalBootha;
             case "darien" -> Emojis.Darien;
-            case "druua" -> Emojis.Druua;
+            case "druaa" -> Emojis.Druaa;
             case "elysium" -> Emojis.Elysium;
             case "everra" -> Emojis.Everra;
             case "fria" -> Emojis.Fria;
