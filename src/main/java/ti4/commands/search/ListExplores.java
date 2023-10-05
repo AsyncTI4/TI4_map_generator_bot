@@ -1,16 +1,24 @@
 package ti4.commands.search;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
+import ti4.model.RelicModel;
 
 public class ListExplores extends SearchSubcommandData {
 
@@ -22,20 +30,21 @@ public class ListExplores extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> exploreList = Mapper.getExplores();
-        List<String> searchedList = exploreList.entrySet().stream()
-            .map(e -> Map.entry(e.getKey() + " = **" + e.getValue() + "**", Mapper.getExplore(e.getKey())))
-            .map(e -> e.getKey() + "\n> " + e.getValue())
-            .filter(s -> searchString == null || s.toLowerCase().contains(searchString.toLowerCase()))
-            .sorted().toList();
-        
-        String searchDescription = searchString == null ? "" : " search: " + searchString;
-        String message = "**__Explore List__**" + searchDescription + "\n" + String.join("\n", searchedList);
-        if (searchedList.size() > 5) {
-            String threadName = event.getFullCommandName() + searchDescription;
-            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
-        } else if (searchedList.size() > 0) {
-            event.getChannel().sendMessage(message).queue();
+        if (Mapper.isValidExplore(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getExplore(searchString).getRepresentationEmbed(true)).queue();
+            return;
+        }
+
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        for (ExploreModel model : Mapper.getExplores().values().stream().sorted(Comparator.comparing(ExploreModel::getName)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+            if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
+        }
+        if (messageEmbeds.size() > 3) {
+            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
+            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
+        } else if (messageEmbeds.size() > 0) {
+            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
         }
     }
 }

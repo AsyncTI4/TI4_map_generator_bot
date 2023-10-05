@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -362,7 +363,7 @@ public class ButtonHelper {
         for (int i = 0; i < 3; i++) {
             String cardID = activeGame.drawExplore(type);
             sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
-            String card = Mapper.getExplore(cardID);
+            String card = Mapper.getExploreRepresentation(cardID);
             String[] cardInfo = card.split(";");
             String cardType = cardInfo[3];
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
@@ -1978,10 +1979,10 @@ public class ButtonHelper {
             if (player.hasAbility("voidsailors")) {
                 String cardID = activeGame.drawExplore(Constants.FRONTIER);
                 String cardID2 = activeGame.drawExplore(Constants.FRONTIER);
-                String card = Mapper.getExplore(cardID);
+                String card = Mapper.getExploreRepresentation(cardID);
                 String[] cardInfo1 = card.split(";");
                 String name1 = cardInfo1[0];
-                String card2 = Mapper.getExplore(cardID2);
+                String card2 = Mapper.getExploreRepresentation(cardID2);
                 String[] cardInfo2 = card2.split(";");
                 String name2 = cardInfo2[0];
 
@@ -2550,17 +2551,11 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
 
-        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        String cID = Mapper.getColorID(player.getColor());
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
-            if (representation == null) {
-            }
             UnitHolder unitHolder = entry.getValue();
             HashMap<String, Integer> units = unitHolder.getUnits();
 
-            if (unitHolder instanceof Planet planet) {
+            if (unitHolder instanceof Planet) {
             } else {
                 for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                     if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
@@ -2584,22 +2579,16 @@ public class ButtonHelper {
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitKey + "damaged", "Rift " + x + " damaged " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                    for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
+                        Button validTile2 = Button.danger(finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitKey + "damaged", "Rift " + x + " damaged " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                     totalUnits = totalUnits - damagedUnits;
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button.danger(finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitKey, "Rift " + x + " " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
+                        Button validTile2 = Button.danger(finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitKey, "Rift " + x + " " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                 }
@@ -2683,25 +2672,16 @@ public class ButtonHelper {
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey + "damaged",
-                                moveOrRemove + " " + x + " damaged " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                    for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
+                        Button validTile2 = Button.danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey + "damaged", moveOrRemove + " " + x + " damaged " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                     totalUnits = totalUnits - damagedUnits;
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey,
-                                moveOrRemove + " " + x + " " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    for (int x = 1; x < totalUnits + 1 && x <=2; x++) {
+                        Button validTile2 = Button.danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey, moveOrRemove + " " + x + " " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                 }
@@ -2784,31 +2764,27 @@ public class ButtonHelper {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     int totalUnits = unitEntry.getValue() - damagedUnits;
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
+
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         Button validTile2 = Button
-                            .danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
-                                "Remove " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                                .danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
+                                "Remove " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame));
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                         if (key.contains("mf") || (key.contains("pd") && (player.getUnitsOwned().contains("Hel-Titan") || player.getTechs().contains("ht2")))) {
                             Button validTile3 = Button
-                                .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
-                                    "Sustain " + x + " " + unitModel.getBaseType() +
-                                        " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                                .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                                    .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
+                                    "Sustain " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame));
+                            if (emoji != null) validTile2.withEmoji(emoji);
                             buttons.add(validTile3);
                         }
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "_" + representation + "damaged", "Remove " + x + " damaged " +
-                            unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(unitModel.getBaseType()));
+                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
+                        Button validTile2 = Button.danger(
+                                finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "_" + representation + "damaged",
+                                "Remove " + x + " damaged " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame));
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                 }
@@ -2829,30 +2805,25 @@ public class ButtonHelper {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     totalUnits = totalUnits - damagedUnits;
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "damaged", "Remove " + x + " damaged " +
-                            unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
+                        Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey + "damaged",
+                                "Remove " + x + " damaged " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button
-                            .danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey, "Remove " + x + " " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
+                        Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitKey, "Remove " + x + " " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                     if ((("mech".equalsIgnoreCase(unitKey) && !activeGame.getLaws().containsKey("articles_war") && player.getUnitsOwned().contains("nomad_mech"))
-                        || "dreadnought".equalsIgnoreCase(unitKey) || "warsun".equalsIgnoreCase(unitKey) || "flagship".equalsIgnoreCase(unitKey)
-                        || ("cruiser".equalsIgnoreCase(unitKey) && player.hasTech("se2")) || ("carrier".equalsIgnoreCase(unitKey) && player.hasTech("ac2"))) && totalUnits > 0) {
+                    || "dreadnought".equalsIgnoreCase(unitKey) || "warsun".equalsIgnoreCase(unitKey) || "flagship".equalsIgnoreCase(unitKey)
+                    || ("cruiser".equalsIgnoreCase(unitKey) && player.hasTech("se2")) || ("carrier".equalsIgnoreCase(unitKey) && player.hasTech("ac2"))) && totalUnits > 0) {
                         Button validTile2 = Button
-                            .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitKey, "Sustain " + 1 + " " + unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                            .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitKey, "Sustain " + 1 + " " + unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                 }
@@ -2945,15 +2916,15 @@ public class ButtonHelper {
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
+
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+
+                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
                         Button validTile3 = Button
                             .success(finChecker + "repairDamage_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
                                 "Repair " + x + " " + unitModel.getBaseType() +
-                                    " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                                    " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame));
+                        if (emoji != null) validTile3.withEmoji(emoji);
                         buttons.add(validTile3);
                     }
                 }
@@ -2970,13 +2941,13 @@ public class ButtonHelper {
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
+
+                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+
+                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
                         Button validTile2 = Button.danger(finChecker + "repairDamage_" + tile.getPosition() + "_" + x + unitKey, "Repair " + x + " damaged " +
-                            unitModel.getBaseType())
-                            .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                            unitModel.getBaseType());
+                        if (emoji != null) validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
                 }

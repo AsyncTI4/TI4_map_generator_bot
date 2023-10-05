@@ -57,7 +57,7 @@ public class SendFragments extends ExploreSubcommandData {
 
         ArrayList<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
-        	String[] card = Mapper.getExplore(cardID).split(";");
+        	String[] card = Mapper.getExploreRepresentation(cardID).split(";");
         	if (card[1].equalsIgnoreCase(trait)) {
         		fragments.add(cardID);
         	}

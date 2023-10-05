@@ -1824,19 +1824,6 @@ public class Helper {
         }
     }
 
-    public static String getExploreNameFromID(String cardID) {
-        String card = Mapper.getExplore(cardID);
-        StringBuilder sb = new StringBuilder();
-        if (card != null) {
-            String[] cardInfo = card.split(";");
-            return cardInfo[0];
-        } else {
-            sb.append("Invalid ID ").append(cardID);
-        }
-        return sb.toString();
-
-    }
-
     public static boolean mechCheck(String planetName, Game activeGame, Player player) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
