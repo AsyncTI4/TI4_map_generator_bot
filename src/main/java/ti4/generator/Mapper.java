@@ -196,6 +196,7 @@ public class Mapper {
     }
 
     public static boolean isValidDecalSet(String decalID) {
+        if (decalID == null || "null".equals(decalID)) return false;
         return decals.containsKey(decalID);
     }
 
