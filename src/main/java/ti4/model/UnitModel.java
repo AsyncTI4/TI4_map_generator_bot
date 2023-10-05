@@ -50,7 +50,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     //Google Sheet to JSON script: https://gist.githubusercontent.com/pamelafox/1878143/raw/6c23f71231ce1fa09be2d515f317ffe70e4b19aa/exportjson.js?utm_source=thenewstack&utm_medium=website&utm_content=inline-mention&utm_campaign=platform
     //From: https://thenewstack.io/how-to-convert-google-spreadsheet-to-json-formatted-text/
 
-    @Override
     public boolean isValid() {
         return id != null 
             && !id.isEmpty()
@@ -58,7 +57,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
-    @Override
     public String getAlias() {
         return getId();
     }
@@ -85,7 +83,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
 
-    @Override
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
@@ -244,15 +241,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return "";
     }
 
-    @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        return getName().toLowerCase().contains(searchString) || getFaction().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getBaseType().toLowerCase().contains(searchString);
     }
 
-    @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getName() + " (" + getFaction() + " " + getBaseType() + ")";
     }
 }

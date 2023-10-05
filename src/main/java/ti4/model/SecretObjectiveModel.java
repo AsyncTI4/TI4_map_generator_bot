@@ -93,19 +93,16 @@ public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
 
     public Color getEmbedColour() {
         return switch (getPoints()) {
+            case 2 -> Color.BLACK;
             default -> Color.RED;
         };
     }
 
-    @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
     }
 
-    @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getName() + " (" + getSource() + ")";
     }
 }

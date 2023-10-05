@@ -147,15 +147,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
-    @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
     }
 
-    @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getName() + " (" + getSource() + ")";
     }
 }

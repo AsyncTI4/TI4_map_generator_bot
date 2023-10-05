@@ -18,7 +18,6 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String source;
     private Boolean isFakeRelic;
 
-    @Override
     public boolean isValid() {
         return alias != null 
             && name != null 
@@ -60,15 +59,11 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
-    @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        return getAlias().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString);
     }
 
-    @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getName() + " (" + getSource() + ")";
     }
 }

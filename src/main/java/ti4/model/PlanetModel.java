@@ -37,13 +37,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private int spaceCannonDieCount = 0;
     private int spaceCannonHitsOn = 0;
 
-    @Override
     public boolean isValid() {
         return getId() != null
             && name != null;
     }
 
-    @Override
     public String getAlias() {
         return getId();
     }
@@ -119,6 +117,22 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    private String getTechSpecialtyStringRepresentation() {
+        if (getTechSpecialties() == null || getTechSpecialties().isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (TechSpecialty techSpecialty : getTechSpecialties()) {
+            switch (techSpecialty) {
+                case BIOTIC -> sb.append("G");
+                case CYBERNETIC -> sb.append("Y");
+                case PROPULSION -> sb.append("B");
+                case WARFARE -> sb.append("R");
+                default -> sb.append("");
+                
+            }
+        }
+        return sb.toString();
+    }
+
     public boolean isLegendary() {
         return getLegendaryAbilityName() != null;
     }
@@ -136,15 +150,15 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return null;
     }
 
-    @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString);
     }
 
-    @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        StringBuilder sb = new StringBuilder();
+        sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
+        if (!getTechSpecialtyStringRepresentation().isBlank()) sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        sb.append(")");
+        return sb.toString();
     }
 }
