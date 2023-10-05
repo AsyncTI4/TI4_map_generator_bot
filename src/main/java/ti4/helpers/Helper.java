@@ -485,8 +485,6 @@ public class Helper {
 
     public static String getPlanetEmoji(String planet) {
         return switch (planet.toLowerCase()) {
-            case "primor" -> Emojis.Primor;
-            
             case "0.0.0" -> Emojis.Planet000;
             case "abaddon" -> Emojis.Abaddon;
             case "abyz" -> Emojis.Abyz;
@@ -537,8 +535,56 @@ public class Helper {
             case "maaluuk" -> Emojis.Maaluuk;
             case "mallice" -> Emojis.Mallice;
             case "mr" -> Emojis.Mecatol;
-
+            case "meer" -> Emojis.Meer;
+            case "meharxull" -> Emojis.MeharXull;
+            case "mellon" -> Emojis.Mellon;
+            case "mollprimus", "mollprimusk" -> Emojis.MollPrimus;
+            case "mordai" -> Emojis.Mordai;
+            case "muaat" -> Emojis.PlanetMuaat;
+            case "naazir" -> Emojis.Naazir;
+            case "nar" -> Emojis.Nar;
+            case "nestphar" -> Emojis.Nestphar;
+            case "newalbion" -> Emojis.NewAlbion;
+            case "perimeter" -> Emojis.Perimeter;
+            case "primor" -> Emojis.Primor;
+            case "quann" -> Emojis.Quann;
+            case "qucenn" -> Emojis.Qucenn;
+            case "quinarra" -> Emojis.Quinarra;
+            case "rahg" -> Emojis.Rahg;
+            case "rarron" -> Emojis.Rarron;
+            case "resculon" -> Emojis.Resculon;
+            case "retillon" -> Emojis.Retillon;
+            case "rigeli" -> Emojis.RigelI;
+            case "rigelii" -> Emojis.RigelII;
+            case "rigeliii" -> Emojis.RigelIII;
+            case "rokha" -> Emojis.Rokha;
+            case "sakulag" -> Emojis.Sakulag;
+            case "saudor" -> Emojis.Saudor;
             case "semlore" -> getRandomSemLore();
+            case "shalloq" -> Emojis.Shalloq;
+            case "siig" -> Emojis.Siig;
+            case "starpoint" -> Emojis.Starpoint;
+            case "tarmann" -> Emojis.Tarmann;
+            case "tequran" -> Emojis.Tequran;
+            case "thedark" -> Emojis.TheDark;
+            case "thibah" -> Emojis.Thibah;
+            case "torkan" -> Emojis.Torkan;
+            case "trenlak" -> Emojis.Trenlak;
+            case "valk", "valkk" -> Emojis.Valk;
+            case "vefut" -> Emojis.Vefut;
+            case "vegamajor" -> Emojis.VegaMajor;
+            case "vegaminor" -> Emojis.VegaMinor;
+            case "velnor" -> Emojis.Velnor;
+            case "vorhal" -> Emojis.Vorhal;
+            case "wellon" -> Emojis.Wellon;
+            case "winnu" -> Emojis.PlanetWinnu;
+            case "wrenterra" -> Emojis.WrenTerra;
+            case "xanhact" -> Emojis.Xanhact;
+            case "xxehan" -> Emojis.Xxehan;
+            case "ylir", "ylirk" -> Emojis.Ylir;
+            case "zohbat" -> Emojis.Zohbat;
+
+
             default -> ":ringed_planet:";
         };
     }
