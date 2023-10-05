@@ -3159,10 +3159,11 @@ public class ButtonHelper {
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
                 }
+                buttons = new ArrayList<Button>();
                 if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
                     buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use Imperial Arbiter", buttons);
                 }
             }
         }
@@ -3252,7 +3253,7 @@ public class ButtonHelper {
 
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                    String cyberMessage = Helper.getPlayerRepresentation(player2, activeGame, event.getGuild(), true)
+                    String cyberMessage = "# "+Helper.getPlayerRepresentation(player2, activeGame, event.getGuild(), true)
                         + " reminder to use cybernetic enhancements!";
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
                         cyberMessage);
@@ -3328,7 +3329,7 @@ public class ButtonHelper {
         activeGame.updateActivePlayer(speaker);
         activeGame.setCurrentPhase("strategy");
         String pickSCMsg = "Use Buttons to Pick SC";
-        if(activeGame.getLaws().containsKey("checks")){
+        if(activeGame.getLaws().containsKey("checks") || activeGame.getLaws().containsKey("absol_checks")){
              pickSCMsg = "Use Buttons to Pick the SC you want to give someone";
         }
         ButtonHelperFactionSpecific.giveKeleresCommsNTg(activeGame, event);
@@ -4180,6 +4181,11 @@ public class ButtonHelper {
                             buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
                                 + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
+                        }
+                        if ("mahacthero".equals(playerLeader.getId())) {
+                            List<Button> buttons = ButtonHelperFactionSpecific.getBenediction1stTileOptions(p1, activeGame);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
+                                + " use the button to decide which tile you wish to force ships to move from.", buttons);
                         }
                         if ("ghosthero".equals(playerLeader.getId())) {
                             List<Button> buttons = ButtonHelperFactionSpecific.getGhostHeroTilesStep1(activeGame, p1);

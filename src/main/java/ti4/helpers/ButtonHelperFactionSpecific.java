@@ -33,6 +33,7 @@ import ti4.commands.player.SendDebt;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -322,6 +323,148 @@ public class ButtonHelperFactionSpecific {
         }
         return buttons;
     }
+
+
+
+    
+    public static List<Button> getBenediction2ndTileOptions(Player player, Game activeGame,  String pos1) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        Player origPlayer = player;
+        Tile tile1 = activeGame.getTileByPosition(pos1);
+        List<Player> players2 = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile1);
+        if(players2.size() != 0){
+            player = players2.get(0);
+        }
+        for(String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)){
+            if(pos1.equalsIgnoreCase(pos2)){
+                continue;
+            }
+            Tile tile2 = activeGame.getTileByPosition(pos2);
+            if(FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                buttons.add(Button.secondary(finChecker+"mahactBenedictionFrom_"+pos1+"_"+pos2, tile2.getRepresentationForButtons(activeGame, origPlayer)));
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getBenediction1stTileOptions(Player player, Game activeGame) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+       for(Tile tile1 : activeGame.getTileMap().values()){
+            String pos1 = tile1.getPosition();
+            for(Player p2: activeGame.getRealPlayers()){
+                if(FoWHelper.playerHasShipsInSystem(p2, tile1)){
+                    boolean adjacentPeeps = false;
+                    for(String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, p2, false)){
+                        if(pos1.equalsIgnoreCase(pos2)){
+                            continue;
+                        }
+                        Tile tile2 = activeGame.getTileByPosition(pos2);
+                        if(FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)){
+                           adjacentPeeps = true;
+                        }
+                    }
+                    if(adjacentPeeps){
+                         buttons.add(Button.secondary(finChecker+"benedictionStep1_"+pos1, tile1.getRepresentationForButtons(activeGame, player)));
+                    }
+                    break;
+                }
+                
+            }
+            
+       }
+        
+        return buttons;
+    }
+
+    public static void mahactBenediction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        String pos1 = buttonID.split("_")[1];
+        String pos2 = buttonID.split("_")[2];
+        Tile tile1 = activeGame.getTileByPosition(pos1);
+        Tile tile2 = activeGame.getTileByPosition(pos2);
+        List<Player> players2 = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile1);
+        if(players2.size() != 0){
+            player = players2.get(0);
+        }
+        for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            Map<String, Integer> units = new HashMap<>(unitHolder.getUnits());
+            if (unitHolder instanceof Planet) continue;
+            for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                if (!player.colourMatchesUnitImageName(unitEntry.getKey())) continue;
+                UnitModel unitModel = activeGame.getUnitFromImageName(unitEntry.getKey());
+                String unitKey = unitModel.getAsyncId();
+                String key = unitEntry.getKey();
+                int totalUnits = unitEntry.getValue();
+                int amount = unitEntry.getValue();
+                unitKey = ButtonHelper.getUnitName(unitKey);
+                int damagedUnits = 0;
+                if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                    damagedUnits = unitHolder.getUnitDamage().get(key);
+                }
+                String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+                new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitID, player.getColor(), false, activeGame);
+                new AddUnits().unitParsing(event, player.getColor(),tile2, amount + " " + unitKey, activeGame);
+                if(damagedUnits > 0){
+                    activeGame.getTileByPosition(pos2).addUnitDamage("space", unitID, damagedUnits);
+                }
+            }
+            List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile2);
+            if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
+                Player player2 = players.get(0);
+                if (player2 == player) {
+                    player2 = players.get(1);
+                }
+
+                String threadName = ButtonHelper.combatThreadName(activeGame, player, player2, tile2);
+                if(threadName.contains("private")){
+                    threadName = threadName.replace("private", "benediction-private");
+                }else{
+                    threadName = threadName+"-benediction";
+                }
+                if (!activeGame.isFoWMode()) {
+                    ButtonHelper.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile2, event, "space");
+                } else {
+                    ButtonHelper.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile2, event, "space");
+                    ButtonHelper.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile2, event, "space");
+                    for (Player player3 : activeGame.getRealPlayers()) {
+                        if (player3 == player2 || player3 == player) {
+                            continue;
+                        }
+                        if (!tile2.getRepresentationForButtons(activeGame, player3).contains("(")) {
+                            continue;
+                        }
+                        ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile2, event, "space");
+                    }
+                }
+            }
+                     
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public static void getGhostHeroTilesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
         String pos1 = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<Button>();
@@ -2031,6 +2174,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeGame, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to select faction to give agent to.", buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
+        if(exhaustedMessage == null || exhaustedMessage.length() < 1 ){
+            exhaustedMessage="Combat";
+        }
         List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();

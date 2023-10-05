@@ -5,12 +5,14 @@
         "elokphi",
         "eloknu",
         "phi",
-        "nu"
+        "nu", 
+        "ephi",
+        "enu"
     ],
     "imagePath": "ER10_elokphi.png",
     "planetIds": [
-        "ephi",
-        "enu"
+        "elokphi",
+        "eloknu"
     ],
     "shipPositionsType": "TYPE02",
     "spaceTokenLocations": [

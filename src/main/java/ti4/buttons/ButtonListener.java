@@ -416,6 +416,18 @@ public class ButtonListener extends ListenerAdapter {
             Tile tile = activeGame.getTileByPosition(pos);
             Player attacker = activeGame.getPlayerFromColorOrFaction(color);
             ButtonHelper.resolveMahactMechAbilityUse(player, attacker, activeGame, tile, event);
+        }else if(buttonID.startsWith("benedictionStep1_")){
+            String pos1 = buttonID.split("_")[1];
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                trueIdentity + " choose the tile you wish to send the ships in "+activeGame.getTileByPosition(pos1).getRepresentationForButtons(activeGame, player)+" to.",ButtonHelperFactionSpecific.getBenediction2ndTileOptions(player, activeGame, pos1));
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("mahactBenedictionFrom_")) {
+            ButtonHelperFactionSpecific.mahactBenediction(buttonID, event, activeGame, player);
+            String pos1 = buttonID.split("_")[1];
+            String pos2 = buttonID.split("_")[1];
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                ident + " moved all units in space from "+activeGame.getTileByPosition(pos1).getRepresentationForButtons(activeGame, player)+" to " + activeGame.getTileByPosition(pos2).getRepresentationForButtons(activeGame, player) +" using Mahact hero. If they moved themselves and wish to move ground forces, they can do so either with slash command or modify units button.");
+                event.getMessage().delete().queue();
         } else if (buttonID.startsWith("retreatUnitsFrom_")) {
             ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, activeGame, player);
             String both = buttonID.replace("retreatUnitsFrom_", "");
@@ -1397,7 +1409,7 @@ public class ButtonListener extends ListenerAdapter {
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
 
-            if(activeGame.getLaws().containsKey("checks")){
+            if(activeGame.getLaws().containsKey("checks") || activeGame.getLaws().containsKey("absol_checks")){
                 new SCPick().secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
             }else{
                 boolean pickSuccessful = stats.secondHalfOfPickSC(event, activeGame, player, scpick);
@@ -3052,20 +3064,33 @@ public class ButtonListener extends ListenerAdapter {
             shortCCs = shortCCs.replace("CCs have gone from ", "");
             shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
             if (event.getMessage().getContentRaw().contains("Net gain")) {
-
+                boolean cyber = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                 finalCCs = finalCCs + ". Net CC gain was " + netGain;
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
+                        cyber = true;
+                       
+                    }
+                }
                 if(activeGame.getCurrentPhase().equalsIgnoreCase("statusHomework")){
-                    if(player.hasAbility("versatile")|| player.hasTech("hm")){
+                    if(player.hasAbility("versatile")|| player.hasTech("hm") || cyber){
                         int properGain = 2;
+                        String reasons = "";
                         if(player.hasAbility("versatile")){
                             properGain = properGain + 1;
+                            reasons = "versatile ";
                         }
                         if(player.hasTech("hm")){
                             properGain = properGain + 1;
+                            reasons = reasons + "hypermetabolism ";
+                        }
+                        if(cyber){
+                            properGain = properGain + 1;
+                            reasons = reasons + "cybernetics ";
                         }
                         if(netGain < properGain){
-                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "# "+ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, bot thinks you should have gained "+properGain +" cc due to hyper and/or versatile.");
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "# "+ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, bot thinks you should have gained "+properGain +" cc due to: "+reasons);
                         }
                     }
                 }

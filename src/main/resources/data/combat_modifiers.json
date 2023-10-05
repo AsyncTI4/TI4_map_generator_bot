@@ -68,6 +68,17 @@
         "forCombatAbility": "SpaceCannonOffence"
     },
     {
+        "alias": "plus1_roll_argent_commander_spacecannon",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related":[
+            {"type": "leader", "alias": "argentcommander"}
+        ], 
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
         "alias": "plus1_roll_plasmascoring",
         "type": "extrarolls",
         "value": "+1",
