@@ -486,9 +486,48 @@ public class Helper {
     public static String getPlanetEmoji(String planet) {
         return switch (planet.toLowerCase()) {
             case "mr" -> Emojis.MecatolRex;
-            case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
-            case "archonvail" -> Emojis.PlanetArchonVail;
+            
+            case "planet000" -> Emojis.Planet000;
+            case "abaddon" -> Emojis.Abaddon;
+            case "abyz" -> Emojis.Abyz;
+            case "accoen" -> Emojis.Accoen;
+            case "acheron" -> Emojis.Acheron;
+            case "alioprima" -> Emojis.AlioPrima;
+            case "ang" -> Emojis.Ang;
+            case "arcprime" -> Emojis.ArcPrime;
+            case "archonren" -> Emojis.ArchonRen;
+            case "archontau" -> Emojis.ArchonTau;
+            case "archonvail" -> Emojis.ArchonVail;
+            case "arcturus" -> Emojis.Arcturus;
+            case "arinam" -> Emojis.Arinam;
+            case "arnor" -> Emojis.Arnor;
+            case "arretze" -> Emojis.Arretze;
+            case "ashtroth" -> Emojis.Ashtroth;
+            case "atlas" -> Emojis.Atlas;
+            case "avar" -> Emojis.Avar;
+            case "bakal" -> Emojis.Bakal;
+            case "bereg" -> Emojis.Bereg;
+            case "cealdri" -> Emojis.Cealdri;
+            case "centauri" -> Emojis.Centauri;
+            case "cormund" -> Emojis.Cormund;
+            case "corneeq" -> Emojis.Corneeq;
+            case "creuss" -> Emojis.Creuss;
+            case "dalbootha" -> Emojis.DalBootha;
+            case "darien" -> Emojis.Darien;
+            case "druua" -> Emojis.Druua;
+            case "elysium" -> Emojis.Elysium;
+            case "everra" -> Emojis.Everra;
+            case "fria" -> Emojis.Fria;
+            case "gral" -> Emojis.Gral;
+            case "hercant" -> Emojis.Hercant;
+            case "hopesend" -> Emojis.HopesEnd;
+            case "ixth" -> Emojis.Ixth;
+            case "jeolir" -> Emojis.JeolIr;
+            case "jol" -> Emojis.Jol;
+            case "jord" -> Emojis.Jord;
+
+
             case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;
         };
