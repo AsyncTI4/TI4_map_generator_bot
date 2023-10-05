@@ -1600,8 +1600,8 @@ public class AgendaHelper {
             if (voteAmount != 0) {
                 Emoji emoji = Emoji.fromFormatted(Helper.getPlanetEmoji(planet));
                 Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")");
-                if (emoji != null) button.withEmoji(emoji);
-                planetButtons.add(button);   
+                if (emoji != null) button = button.withEmoji(emoji);
+                planetButtons.add(button);
             }
         }
 
