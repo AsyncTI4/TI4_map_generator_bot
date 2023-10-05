@@ -1,10 +1,13 @@
 package ti4.model;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
@@ -127,5 +130,20 @@ public class AgendaModel implements ModelInterface {
 
     public boolean displayElectedFaction() {
         return "Elect Player".equalsIgnoreCase(target);
+    }
+
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+        EmbedBuilder eb = new EmbedBuilder();
+        String name = getName() == null ? "" : getName();
+        eb.setTitle(Emojis.Agenda + "__" + name + "__" + getSourceEmoji(), null);
+        eb.setColor(Color.blue);
+        eb.setDescription(getType() + "\n" + getTarget());
+        eb.addField("", getText1() + "\n" + getText2(), false);
+        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        return eb.build();
     }
 }
