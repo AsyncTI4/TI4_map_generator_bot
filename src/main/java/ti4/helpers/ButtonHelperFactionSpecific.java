@@ -831,13 +831,13 @@ public class ButtonHelperFactionSpecific {
         String placePrefix = "placeOneNDone_skipbuild";
         String tp = tile.getPosition();
         Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp, "Place 2 Fighters");
-        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
         buttons.add(ff2Button);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet planet) {
                 String pp = planet.getName();
                 Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp, "Place 2 Infantry on " + Helper.getPlanetRepresentation(pp, activeGame));
-                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 buttons.add(inf2Button);
             }
         }
@@ -929,7 +929,7 @@ public class ButtonHelperFactionSpecific {
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         buttonID = buttonID.replace("replacePDSWithFS_", "");
         String planet = buttonID;
-        String message = ident + " replaced " + Helper.getEmojiFromDiscord("pds") + " on " + Helper.getPlanetRepresentation(planet, activeGame) + " with a " + Helper.getEmojiFromDiscord("flagship");
+        String message = ident + " replaced " + Emojis.pds + " on " + Helper.getPlanetRepresentation(planet, activeGame) + " with a " + Emojis.flagship;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTile(AliasHandler.resolveTile(planet)), "flagship", activeGame);
         String key = Mapper.getUnitID(AliasHandler.resolveUnit("pds"), player.getColor());
@@ -1734,9 +1734,9 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getCreusIFFTypeOptions(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("CreussBeta"))));
-        buttons.add(Button.danger("creussIFFStart_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("CreussGamma"))));
-        buttons.add(Button.secondary("creussIFFStart_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("CreussAlpha"))));
+        buttons.add(Button.success("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
+        buttons.add(Button.danger("creussIFFStart_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
+        buttons.add(Button.secondary("creussIFFStart_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
         return buttons;
     }
 
@@ -1913,10 +1913,10 @@ public class ButtonHelperFactionSpecific {
                 if (player.getPlanetsAllianceMode().contains(planet)) {
                     String pp = unitHolder.getName();
                     Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_place_infantry_" + pp, "Produce 1 Infantry on " + Helper.getPlanetRepresentation(pp, activeGame));
-                    inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf1Button);
                     Button mfButton = Button.success("FFCC_" + player.getFaction() + "_place_mech_" + pp, "Produce Mech on " + Helper.getPlanetRepresentation(pp, activeGame));
-                    mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                    mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                     unitButtons.add(mfButton);
                 }
             }
@@ -2050,7 +2050,7 @@ public class ButtonHelperFactionSpecific {
             String pos = posNPlanet.split("_")[0];
             String planetName = posNPlanet.split("_")[1];
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), "2 gf " + planetName, activeGame);
-            String successMessage = ident + " placed 2 " + Helper.getEmojiFromDiscord("infantry") + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+            String successMessage = ident + " placed 2 " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), successMessage);
         }
         if ("argentagent".equalsIgnoreCase(agent)) {
@@ -2086,7 +2086,7 @@ public class ButtonHelperFactionSpecific {
             String planetName = posNPlanet.split("_")[1];
             new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), "1 infantry " + planetName, activeGame);
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(pos), "1 mech " + planetName, activeGame);
-            String successMessage = ident + " replaced 1 " + Helper.getEmojiFromDiscord("infantry") + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with 1 mech.";
+            String successMessage = ident + " replaced 1 " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with 1 mech.";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), successMessage);
         }
 
@@ -2453,10 +2453,10 @@ public class ButtonHelperFactionSpecific {
         String pos = buttonID.replace("starforgeTile_", "");
         List<Button> buttons = new ArrayList<>();
         Button starforgerStroter = Button.danger("starforge_destroyer_" + pos, "Starforge Destroyer")
-            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("destroyer")));
+            .withEmoji(Emoji.fromFormatted(Emojis.destroyer));
         buttons.add(starforgerStroter);
         Button starforgerFighters = Button.danger("starforge_fighters_" + pos, "Starforge 2 Fighters")
-            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+            .withEmoji(Emoji.fromFormatted(Emojis.fighter));
         buttons.add(starforgerFighters);
         String message = "Use the buttons to select what you would like to starforge.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -2476,12 +2476,12 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
         if ("destroyer".equals(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", activeGame);
-            successMessage = "Produced 1 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+            successMessage = "Produced 1 " + Emojis.destroyer + " in tile "
                 + tile.getRepresentationForButtons(activeGame, player) + ".";
 
         } else {
             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", activeGame);
-            successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
+            successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                 + tile.getRepresentationForButtons(activeGame, player) + ".";
         }
         if (!activeGame.getLaws().containsKey("articles_war")) {
@@ -2504,22 +2504,22 @@ public class ButtonHelperFactionSpecific {
         switch (unit) {
             case "destroyer" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", activeGame);
-                successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+                successMessage = ident + " Placed 1 " + Emojis.destroyer + " in tile "
                     + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
             }
             case "cruiser" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
-                successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("cruiser") + " in tile "
+                successMessage = ident + " Placed 1 " + Emojis.cruiser + " in tile "
                     + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
             }
             case "carrier" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "carrier", activeGame);
-                successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("carrier") + " in tile "
+                successMessage = ident + " Placed 1 " + Emojis.carrier + " in tile "
                     + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
             }
             case "dreadnought" -> {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "dreadnought", activeGame);
-                successMessage = ident + " Placed 1 " + Helper.getEmojiFromDiscord("dreadnought") + " in tile "
+                successMessage = ident + " Placed 1 " + Emojis.dreadnought + " in tile "
                     + tile.getRepresentationForButtons(activeGame, player) + " via Arborec Agent.";
             }
         }
@@ -2561,11 +2561,11 @@ public class ButtonHelperFactionSpecific {
         new SleeperToken().addOrRemoveSleeper(event, activeGame, planetName, player);
         if ("mech".equalsIgnoreCase(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName + ", inf " + planetName, activeGame);
-            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with a " + Helper.getEmojiFromDiscord("mech") + " and "
-                + Helper.getEmojiFromDiscord("infantry");
+            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with a " + Emojis.mech + " and "
+                + Emojis.infantry;
         } else {
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, activeGame);
-            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with a " + Helper.getEmojiFromDiscord("pds");
+            message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName, activeGame) + " with a " + Emojis.pds;
             if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "titans", event);
             }
