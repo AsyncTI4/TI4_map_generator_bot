@@ -926,4 +926,6 @@ public class Constants {
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String FORCE = "force";
     public static final String REVEAL_SPECIFIC = "reveal_specific";
+    public static final String DECAL_SET = "decal_set";
+    public static final String CHANGE_UNIT_DECAL = "change_unit_decal";
 }

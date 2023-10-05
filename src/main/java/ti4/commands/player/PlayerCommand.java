@@ -120,6 +120,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new SendDebt());
         subcommands.add(new ClearDebt());
         subcommands.add(new ChangeColor());
+        subcommands.add(new ChangeUnitDecal());
         subcommands.add(new UnitInfo());
         subcommands.add(new AddAllianceMember());
         subcommands.add(new SetStatsAnchor());
