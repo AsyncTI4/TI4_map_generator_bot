@@ -539,7 +539,7 @@ public class Helper {
             case "mr" -> Emojis.Mecatol;
 
             case "semlore" -> getRandomSemLore();
-            default -> ":no_entry_sign:"; //Emojis.SemLor;
+            default -> ":ringed_planet:";
         };
     }
 
