@@ -74,7 +74,7 @@ public class ExpInfo extends ExploreSubcommandData {
     private String listNames(List<String> deck) {
         StringBuilder sb = new StringBuilder();
         for (String cardID : deck) {
-            String card = Mapper.getExplore(cardID);
+            String card = Mapper.getExploreRepresentation(cardID);
             String name = null;
             if (card != null) {
                 StringTokenizer cardInfo = new StringTokenizer(card, ";");
