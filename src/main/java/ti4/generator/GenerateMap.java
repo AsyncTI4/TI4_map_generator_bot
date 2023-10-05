@@ -3356,10 +3356,10 @@ public class GenerateMap {
 
             Point centerPosition = unitHolder.getHolderCenterPosition();
             for (int i = 0; i < unitCount; i++) {
-                Point position = unitTokenPosition.getPosition(unitID);
+                String id = unitID.substring(unitID.indexOf("_"));
+                Point position = unitTokenPosition.getPosition(id);
                 boolean fighterOrInfantry = unitID.contains("_ff.png") || unitID.contains("_tkn_gf.png");
                 if (isSpace && position != null && !fighterOrInfantry) {
-                    String id = unitID.substring(unitID.indexOf("_"));
                     Point point = unitOffset.get(id);
                     if (point == null) {
                         point = new Point(0, 0);
