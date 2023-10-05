@@ -1147,7 +1147,7 @@ public class GenerateMap {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
                         }
                         try {
-                            if (!"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
+                            if (image != null && !"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
                                 String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitID, getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
                                 String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                                 BufferedImage decal = ImageHelper.read(decalPath);
@@ -1346,14 +1346,14 @@ public class GenerateMap {
                 try {
                     String colour = AliasHandler.resolveColor(StringUtils.substringBefore(unitID, "_"));
                     Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(colour);
-                    if (!"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
+                    if (decalPlayer != null && !"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
                         String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", "."), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
                         String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                         decal = ImageHelper.read(decalPath);
                         image.getGraphics().drawImage(decal, 0, 0, null);
                     }
                 } catch (Exception e) {
-                    BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
+                    // BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
                 }
 
                 if (justNumber) {
@@ -3341,7 +3341,7 @@ public class GenerateMap {
             String colour = AliasHandler.resolveColor(StringUtils.substringBefore(unitID, "_"));
             Player decalPlayer = activeGame.getPlayerFromColorOrFaction(colour);
             try {
-                if (!"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(decalPlayer.getDecalSet())) {
+                if (image != null && decalPlayer != null && !"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(decalPlayer.getDecalSet())) {
                     String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", ".png"), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
                     String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                     decal = ImageHelper.read(decalPath);
