@@ -253,7 +253,6 @@ public class Emojis {
 
     // PLANETS
     public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
-    public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
     public static final String Primor = "<:Primor:1068567710990077952>";
     public static final String Mallice = "";
     public static final String Mirage = "";
@@ -264,6 +263,47 @@ public class Emojis {
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
+
+    // EMOJI FARM 7
+    public static final String Planet000 = "<:000:1159490197151563797>";
+    public static final String Abaddon = "<:Abaddon:1159490198992851068>";
+    public static final String Abyz = "<:Abyz:1159490201316499578>";
+    public static final String Accoen = "<:Accoen:1159490202960674836>";
+    public static final String Acheron = "<:Acheron:1159490205322072185>";
+    public static final String AlioPrima = "<:AlioPrima:1159490208199352330>";
+    public static final String Ang = "<:Ang:1159490211277975562>";
+    public static final String ArcPrime = "<:ArcPrime:1159490274519679117>";
+    public static final String ArchonRen = "<:ArchonRen:1159490213874237511>";
+    public static final String ArchonTau = "<:ArchonTau:1159490215258374154>";
+    public static final String ArchonVail = "<:ArchonVail:1159490217997254776>";
+    public static final String Arcturus = "<:Arcturus:1159490276583293000>";
+    public static final String Arinam = "<:Arinam:1159490278097432617>";
+    public static final String Arnor = "<:Arnor:1159490279267647498>";
+    public static final String Arretze = "<:Arretze:1159490281364799558>";
+    public static final String Ashtroth = "<:Ashtroth:1159490299668738169>";
+    public static final String Atlas = "<:Atlas:1159490302613139566>";
+    public static final String Avar = "<:Avar:1159490303804330087>";
+    public static final String Bakal = "<:Bakal:1159490304987123743>";
+    public static final String Bereg = "<:Bereg:1159490307117826048>";
+    public static final String Cealdri = "<:Cealdri:1159490330110988359>";
+    public static final String Centauri = "<:Centauri:1159490331931328562>";
+    public static final String Cormund = "<:Cormund:1159490333705502840>";
+    public static final String Corneeq = "<:Corneeq:1159490335056089178>";
+    public static final String Creuss = "<:Creuss:1159490337400688682>";
+    public static final String DalBootha = "<:DalBootha:1159490358967816212>";
+    public static final String Darien = "<:Darien:1159490360859435070>";
+    public static final String Druua = "<:Druua:1159490362587488266>";
+    public static final String Elysium = "<:Elysium:1159491456516505661>";
+    public static final String Everra = "<:Everra:1159491751988432966>";
+    public static final String Fria = "<:Fria:1159491774679629895>";
+    public static final String Gral = "<:Gral:1159491776508350535>";
+    public static final String Hercant = "<:Hercant:1159491778072825926>";
+    public static final String HopesEnd = "<:HopesEnd:1159492039772217474>";
+    public static final String Ixth = "<:Ixth:1159491781793173554>";
+    public static final String JeolIr = "<:JeolIr:1159492098190491789>";
+    public static final String Jol = "<:Jol:1159492099910156329>";
+    public static final String Jord = "<:Jord:1159492101558521916>";
+    // END OF EMOJI FARM 7
 
     // LIST OF SEM-LORES
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
