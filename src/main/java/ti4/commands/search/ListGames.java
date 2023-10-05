@@ -34,7 +34,6 @@ public class ListGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to also show ended games"));
     }
 
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
@@ -48,8 +47,6 @@ public class ListGames extends SearchSubcommandData {
         boolean includeFrankenGames = event.getOption(Constants.FRANKEN_MODE, false, OptionMapping::getAsBoolean);
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
 
-
-
         StringBuilder sb = new StringBuilder("__**Map List:**__\n");
         List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeNormalGames && map.getValue().isNormalGame()).toList());
@@ -59,7 +56,7 @@ public class ListGames extends SearchSubcommandData {
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFoWMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAbsolGames && map.getValue().isAbsolMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isDiscordantStarsMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isFrankenGame()).toList());
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFrankenGames && map.getValue().isFrankenGame()).toList());
 
         Set<Entry<String, Game>> filteredSetOfMaps = new HashSet<>(filteredListOfMaps);
 
