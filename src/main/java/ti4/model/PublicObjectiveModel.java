@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Helper;
 
-public class PublicObjectiveModel implements ModelInterface {
+public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -100,5 +100,17 @@ public class PublicObjectiveModel implements ModelInterface {
             case 2 -> Color.BLUE;
             default -> Color.WHITE;
         };
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

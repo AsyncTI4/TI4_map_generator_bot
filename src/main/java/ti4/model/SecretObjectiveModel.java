@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
-public class SecretObjectiveModel implements ModelInterface {
+public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -95,5 +95,17 @@ public class SecretObjectiveModel implements ModelInterface {
         return switch (getPoints()) {
             default -> Color.RED;
         };
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

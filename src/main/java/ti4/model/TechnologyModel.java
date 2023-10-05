@@ -10,7 +10,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
-public class TechnologyModel implements ModelInterface {
+public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private TechnologyType type;
@@ -167,5 +167,17 @@ public class TechnologyModel implements ModelInterface {
             }
         }
         return "None";
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

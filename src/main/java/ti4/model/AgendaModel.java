@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
-public class AgendaModel implements ModelInterface {
+public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String category;
@@ -145,5 +145,17 @@ public class AgendaModel implements ModelInterface {
         eb.addField("", getText1() + "\n" + getText2(), false);
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

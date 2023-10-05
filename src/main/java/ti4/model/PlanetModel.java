@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Data
-public class PlanetModel {
+public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String tileId;
     private String name;
@@ -36,6 +36,17 @@ public class PlanetModel {
     private UnitTokenPosition unitPositions;
     private int spaceCannonDieCount = 0;
     private int spaceCannonHitsOn = 0;
+
+    @Override
+    public boolean isValid() {
+        return getId() != null
+            && name != null;
+    }
+
+    @Override
+    public String getAlias() {
+        return getId();
+    }
 
     @JsonIgnore
     public String getNameNullSafe() {
@@ -123,5 +134,17 @@ public class PlanetModel {
             return customEmoji.getImageUrl();
         }
         return null;
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }
