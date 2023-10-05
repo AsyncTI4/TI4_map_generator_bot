@@ -1823,7 +1823,7 @@ public class Game {
     private ArrayList<String> getExplores(String reqType, List<String> superDeck) {
         ArrayList<String> deck = new ArrayList<>();
         for (String id : superDeck) {
-            String card = Mapper.getExplore(id);
+            String card = Mapper.getExploreRepresentation(id);
             if (card != null) {
                 String[] split = card.split(";");
                 String type = split[1];
@@ -1880,7 +1880,7 @@ public class Game {
 
     public void discardExplore(String id) {
         explore.remove(id);
-        if (Mapper.getExplore(id) != null) {
+        if (Mapper.getExploreRepresentation(id) != null) {
             discardExplore.add(id);
         }
     }
@@ -1891,7 +1891,7 @@ public class Game {
     }
 
     public void addExplore(String id) {
-        if (Mapper.getExplore(id) != null) {
+        if (Mapper.getExploreRepresentation(id) != null) {
             explore.add(id);
         }
         discardExplore.remove(id);
@@ -2799,7 +2799,7 @@ public class Game {
         if (exploreDeckModel == null) return -1;
         List<String> exploreDeck = new ArrayList<>();
         for (String exploreCardID : exploreDeckModel.getNewDeck()) {
-            String exploreCard = Mapper.getExplore(exploreCardID);
+            String exploreCard = Mapper.getExploreRepresentation(exploreCardID);
             if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
                 exploreDeck.add(exploreCard);
             }
