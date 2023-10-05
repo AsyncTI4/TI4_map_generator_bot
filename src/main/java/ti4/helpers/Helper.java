@@ -1825,7 +1825,7 @@ public class Helper {
     }
 
     public static String getExploreNameFromID(String cardID) {
-        String card = Mapper.getExplore(cardID);
+        String card = Mapper.getExploreRepresentation(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
             String[] cardInfo = card.split(";");

@@ -78,7 +78,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     }
 
     public String displayExplore(String cardID) {
-        String card = Mapper.getExplore(cardID);
+        String card = Mapper.getExploreRepresentation(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
             String[] cardInfo = card.split(";");
@@ -116,7 +116,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             message = "Card has been added to play area.";
             activeGame.purgeExplore(cardID);
         }
-        String card = Mapper.getExplore(cardID);
+        String card = Mapper.getExploreRepresentation(cardID);
         String[] cardInfo = card.split(";");
 
         if (player == null) {

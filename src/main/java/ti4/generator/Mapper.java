@@ -12,7 +12,6 @@ import ti4.helpers.AliasHandler;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.*;
-import ti4.draft.DraftItem;
 import ti4.model.TechnologyModel.TechnologyType;
 
 import java.io.File;
@@ -31,15 +30,15 @@ public class Mapper {
     private static final Properties special_case = new Properties();
     private static final Properties faction_abilities = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties explore = new Properties();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
     
-    //TODO: (Jazz) Finish moving all files over from properties to json
+    //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
+    private static final Map<String, ExploreModel> explore = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
@@ -67,11 +66,11 @@ public class Mapper {
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("planets.properties", planets, "Could not read planets file");
-        readData("exploration.properties", explore, "Could not read explore file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
+        importJsonObjectsFromFolder("explores", explore, ExploreModel.class, "Could not read explore file");
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
@@ -425,15 +424,21 @@ public class Mapper {
         return agendas.get(id);
     }
 
-    public static String getExplore(String id) {
+    public static String getExploreRepresentation(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         if (explore.get(id) != null) {
-            return (String) explore.get(id);
+            return (String) explore.get(id).getRepresentation();
         }
         id = id.replace("_", "");
 
-        return (String) explore.get(id);
+        return (String) explore.get(id).getRepresentation();
+    }
+
+    public static ExploreModel getExplore(String exploreId) {
+        exploreId = exploreId.replace("extra1", "");
+        exploreId = exploreId.replace("extra2", "");
+        return explore.get(exploreId);
     }
 
     public static RelicModel getRelic(String id) {
@@ -659,13 +664,12 @@ public class Mapper {
         return poList;
     }
 
-    public static HashMap<String, String> getExplores() {
-        HashMap<String, String> expList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : explore.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            expList.put((String) entry.getKey(), tokenizer.nextToken());
-        }
-        return expList;
+    public static HashMap<String, ExploreModel> getExplores() {
+        return new HashMap<>(explore);
+    }
+
+    public static boolean isValidExplore(String exploreID) {
+        return explore.containsKey(exploreID);
     }
 
     public static Map<String, RelicModel> getRelics() {
