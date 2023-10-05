@@ -199,7 +199,7 @@ public class GenerateMap {
             System.out.printf("Map gen started for map %s%n", activeGame.getName());
         }
 
-        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.playing(activeGame.getName()));
+        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(activeGame.getName()));
 
         activeGame.incrementMapImageGenerationCount();
         init(activeGame);
@@ -377,8 +377,6 @@ public class GenerateMap {
         ImageHelper.getCacheStats().ifPresent(stats ->
             AsyncTI4DiscordBot.THREAD_POOL.execute(() ->
                 MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```")));
-
-        AsyncTI4DiscordBot.jda.getPresence().setStatus(OnlineStatus.ONLINE);
 
         return fileUpload;
     }
