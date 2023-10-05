@@ -39,6 +39,8 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+     
+
     public static List<Button> getRetreatingGroundTroopsButtons(Player player, Game activeGame, ButtonInteractionEvent event, String pos1, String pos2) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();

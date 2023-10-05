@@ -101,6 +101,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
             }
         }
+        if ("Action".equalsIgnoreCase(actionCardWindow) && activeGame.getPlayer(activePlayerID) != player) {
+            return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
+        }
 
         activeGame.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
@@ -213,6 +216,24 @@ public class PlayAC extends ACCardsSubcommandData {
                     channel2 = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(p2.getActionCards().keySet().contains("reverse_engineer")){
+                        // List<Button> reverseButtons = new ArrayList<Button>();
+                        // String key = "reverse_engineer";
+                        // String ac_name = Mapper.getActionCardName(key);
+                        // if (ac_name != null) {
+                        //     reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key) +"_reverse_"+, "Reverse engineer "+ actionCardTitle));
+                        // }
+                        // reverseButtons.add(Button.danger("deleteButtons", "Decline"));
+                        String cyberMessage = ""+Helper.getPlayerRepresentation(p2, activeGame, event.getGuild(), true)
+                        + " reminder that you can use reverse engineer on "+actionCardTitle;
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                            cyberMessage);
+                    }
+                }
             }
         }
 
