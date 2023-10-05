@@ -1146,17 +1146,18 @@ public class GenerateMap {
                         } catch (Exception e) {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
                         }
+                        BufferedImage decal = null;
                         try {
                             if (image != null && !"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
                                 String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitID, getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
                                 String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
-                                BufferedImage decal = ImageHelper.read(decalPath);
-                                image.getGraphics().drawImage(decal, 0, 0, null);
+                                decal = ImageHelper.read(decalPath);
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not parse decal file for reinforcements: " + player.getDecalSet(), e);
                         }
                         graphics.drawImage(image, x + position.x, y + position.y, null);
+                        graphics.drawImage(decal, x + position.x, y + position.y, null);
                         if (aboveCap) {
                             i = remainingReinforcements;
                         }
@@ -1350,7 +1351,6 @@ public class GenerateMap {
                         String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", "."), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
                         String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                         decal = ImageHelper.read(decalPath);
-                        image.getGraphics().drawImage(decal, 0, 0, null);
                     }
                 } catch (Exception e) {
                     // BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
@@ -1365,6 +1365,7 @@ public class GenerateMap {
                 position.y -= (countOfUnits * 7);
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
+                    graphics.drawImage(decal, position.x, position.y + deltaY, null);
                     deltaY += 14;
                 }
             }
@@ -3291,7 +3292,7 @@ public class GenerateMap {
         }
         units.putAll(tempUnits);
         HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
-        float scaleOfUnit = 1.0f;
+        // float scaleOfUnit = 1.0f;
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition == null) {
             unitTokenPosition = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
@@ -3331,7 +3332,7 @@ public class GenerateMap {
 
             try {
                 String unitPath = Tile.getUnitPath(unitID);
-                image = ImageHelper.readScaled(unitPath, scaleOfUnit);
+                image = ImageHelper.read(unitPath);
             } catch (Exception e) {
                 BotLogger.log("Could not parse unit file for: " + unitID, e);
                 continue;
@@ -3345,7 +3346,6 @@ public class GenerateMap {
                     String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", ".png"), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
                     String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                     decal = ImageHelper.read(decalPath);
-                    image.getGraphics().drawImage(decal, 0, 0, null);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not parse decal file for reinforcements: " + decalPlayer.getDecalSet(), e);
@@ -3401,11 +3401,12 @@ public class GenerateMap {
                     imageY += Constants.MIRAGE_POSITION.y;
                 }
                 tileGraphics.drawImage(image, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 if (bulkUnitCount != null) {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
-                    int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
-                    int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);
+                    int scaledNumberPositionX = (int) (numberPositionPoint.x);
+                    int scaledNumberPositionY = (int) (numberPositionPoint.y);
                     tileGraphics.drawString(Integer.toString(bulkUnitCount), TILE_PADDING + imageX + scaledNumberPositionX, TILE_PADDING + imageY + scaledNumberPositionY);
                 }
 
