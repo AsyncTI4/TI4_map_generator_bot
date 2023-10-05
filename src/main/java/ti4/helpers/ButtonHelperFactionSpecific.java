@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -1356,23 +1357,16 @@ public class ButtonHelperFactionSpecific {
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(imageName) != null) {
                     damagedUnits = unitHolder.getUnitDamage().get(imageName);
                 }
-                for (int x = 1; x < damagedUnits + 1; x++) {
-                    if (x > 1) {
-                        break;
-                    }
-                    Button validTile2 = Button
-                        .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey + "damaged", "Remove A Damaged " + unitModel.getName())
-                        .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
+                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
+                    Button validTile2 = Button.danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey + "damaged", "Remove A Damaged " + unitModel.getName());
+                    if (emoji != null) validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
                 totalUnits = totalUnits - damagedUnits;
-                for (int x = 1; x < totalUnits + 1; x++) {
-                    if (x > 1) {
-                        break;
-                    }
-                    Button validTile2 = Button
-                        .danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey, "Remove " + x + " " + unitModel.getName())
-                        .withEmoji(Emoji.fromFormatted(unitModel.getUnitEmoji()));
+                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    Button validTile2 = Button.danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey, "Remove " + x + " " + unitModel.getName());
+                    if (emoji != null) validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
             }
@@ -1385,7 +1379,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getArboAgentReplacementOptions(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        String unitName = ButtonHelper.getUnitName(unit);
+
         boolean damaged = false;
         if (unit.contains("damaged")) {
             unit = unit.replace("damaged", "");
@@ -1401,18 +1395,18 @@ public class ButtonHelperFactionSpecific {
         String unit2;
         Button unitButton2;
         unit2 = "destroyer";
-        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Emojis.destroyer));
         buttons.add(unitButton2);
         unit2 = "cruiser";
-        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Emojis.cruiser));
         buttons.add(unitButton2);
         unit2 = "carrier";
-        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+        unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Emojis.carrier));
         buttons.add(unitButton2);
 
         if (!"destroyer".equals(unit)) {
             unit2 = "dreadnought";
-            unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger(finChecker + "arboAgentPutShip_" + unit2 + "_" + tile.getPosition(), "Place " + unit2).withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
             buttons.add(unitButton2);
         }
 
