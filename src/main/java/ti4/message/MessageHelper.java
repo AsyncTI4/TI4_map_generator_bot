@@ -509,11 +509,25 @@ public class MessageHelper {
 	}
 
     public static void sendMessageToBotLogWebhook(String message) {
-			if (!"943410040369479690".equals(AsyncTI4DiscordBot.guildPrimary.getId())) return; //Only run in Prod
-			DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
+			if (getBotLogWebhookURL() == null) {
+				System.out.println("[BOT-LOG-WEBHOOK] " + message);
+				return;
+			}
+			DiscordWebhook webhook = new DiscordWebhook(getBotLogWebhookURL());
 			webhook.setContent(message);
 			try {
 				webhook.execute();
 			} catch (Exception ignored) {}
-		}
+	}
+
+	/**
+	 * @return a webhook URL for a the bot-log channel of the Primary guild. Add your test server's ID and #bot-log channel webhook url here
+	 */
+	public static String getBotLogWebhookURL() {
+		return switch (AsyncTI4DiscordBot.guildPrimary.getId()) {
+			case "943410040369479690" -> "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v"; //AsyncTI4 Primary HUB Production Server
+			case "1059645656295292968" -> "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp"; //PrisonerOne's Test Server
+			default -> null;
+		};
+	}
 }
