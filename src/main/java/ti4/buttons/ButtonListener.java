@@ -374,7 +374,7 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = new ArrayList<>();
             for (int x = 1; x < 4; x++) {
                 buttons.add(Button.success(finsFactionCheckerPrefix + "yinHeroInfantry_" + planet + "_" + x, "Land " + x + " infantry")
-                    .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry"))));
+                    .withEmoji(Emoji.fromFormatted(Emojis.infantry)));
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select how many infantry you'd like to land on the planet", buttons);
             event.getMessage().delete().queue();
@@ -1241,9 +1241,9 @@ public class ButtonListener extends ListenerAdapter {
             String faction2 = buttonID.split("_")[1];
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction2);
             Button sdButton = Button.success("jrStructure_sd", "Place A SD");
-            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
             Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
-            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
             Button tgButton = Button.success("jrStructure_tg", "Gain a tg");
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);
@@ -1809,23 +1809,23 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = new ArrayList<>();
 
                     Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion", "Get a Blue Tech");
-                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Propulsiontech")));
+                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
                     buttons.add(propulsionTech);
 
                     Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic", "Get a Green Tech");
-                    bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
+                    bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
                     buttons.add(bioticTech);
 
                     Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic", "Get a Yellow Tech");
-                    cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
+                    cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                     buttons.add(cyberneticTech);
 
                     Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare", "Get a Red Tech");
-                    warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Warfaretech")));
+                    warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                     buttons.add(warfareTech);
 
                     Button unitupgradesTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
-                    unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("UnitUpgradeTech")));
+                    unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
                     buttons.add(unitupgradesTech);
 
                     String message = Helper.getPlayerRepresentation(player, activeGame) + " What type of tech would you want?";

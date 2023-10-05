@@ -185,7 +185,9 @@ public class GenerateMap {
     }
 
     public void saveImageToWebsiteOnly(Game activeGame, @Nullable GenericInteractionCreateEvent event) {
-        saveImage(activeGame, DisplayType.all, event, true);
+        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
+            saveImage(activeGame, DisplayType.all, event, true);
+        }
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
