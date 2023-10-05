@@ -1711,6 +1711,7 @@ public class GenerateMap {
     }
 
     private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
+        asyncId = AliasHandler.resolveUnit(asyncId);
         switch (asyncId) {
             case "gf" -> {
                 if (getFactionIconOffset)
@@ -1752,7 +1753,7 @@ public class GenerateMap {
                     return new Coord(204, 21);
                 return new Coord(191, 4);
             }
-            case "sd", "vsd" -> {
+            case "sd", "csd" -> {
                 if (getFactionIconOffset)
                     return new Coord(52, 65);
                 return new Coord(46, 49);
