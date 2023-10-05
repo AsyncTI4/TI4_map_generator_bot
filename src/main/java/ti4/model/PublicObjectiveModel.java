@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Helper;
 
-public class PublicObjectiveModel implements ModelInterface {
+public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -100,5 +100,13 @@ public class PublicObjectiveModel implements ModelInterface {
             case 2 -> Color.BLUE;
             default -> Color.WHITE;
         };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 
-public class ActionCardModel implements ModelInterface {
+public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -95,5 +95,13 @@ public class ActionCardModel implements ModelInterface {
             case "action_deck_2" -> Emojis.ActionDeck2;
             default -> "";
         };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

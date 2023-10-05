@@ -2,13 +2,14 @@ package ti4.model;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.message.BotLogger;
 
 import java.util.ArrayList;
 
-public class FactionModel implements ModelInterface {
+public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
     private String homeSystem;
@@ -174,5 +175,23 @@ public class FactionModel implements ModelInterface {
 
         BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid faction tech IDs: `" + invalidFactionTechIDs + "`");
         return false;
+    }
+
+    @Override
+    public MessageEmbed getRepresentationEmbed() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

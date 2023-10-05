@@ -26,6 +26,11 @@ public class ListSecretObjectives extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
+        if (Mapper.isValidSecretObjective(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getSecretObjective(searchString).getRepresentationEmbed(true)).queue();
+            return;
+        }
+
         for (SecretObjectiveModel model : Mapper.getSecretObjectives().values().stream().sorted(SecretObjectiveModel.sortByPointsAndName).toList()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
