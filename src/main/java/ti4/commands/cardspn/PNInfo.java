@@ -95,7 +95,7 @@ public class PNInfo extends PNCardsSubcommandData {
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
                 Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
-                psycho = psycho.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
+                psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
                 buttons.add(psycho);
         }
         

@@ -64,7 +64,7 @@ public class ButtonHelperModifyUnits {
                         if(x > 2){
                             break;
                         }
-                        Button validTile2 = Button.success(finChecker+"retreatGroundUnits_"+pos1+"_"+pos2+"_"+x+"infantry_"+representation, "Retreat "+x+" Infantry on "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                        Button validTile2 = Button.success(finChecker+"retreatGroundUnits_"+pos1+"_"+pos2+"_"+x+"infantry_"+representation, "Retreat "+x+" Infantry on "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.infantry));
                         buttons.add(validTile2);
                     }
                 }
@@ -73,7 +73,7 @@ public class ButtonHelperModifyUnits {
                         if(x > 2){
                             break;
                         }
-                        Button validTile2 = Button.primary(finChecker+"retreatGroundUnits_"+pos1+"_"+pos2+"_"+x+"mech_"+representation, "Retreat "+x+" Mech(s) on "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                        Button validTile2 = Button.primary(finChecker+"retreatGroundUnits_"+pos1+"_"+pos2+"_"+x+"mech_"+representation, "Retreat "+x+" Mech(s) on "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.mech));
                         buttons.add(validTile2);
                     }
                 }
@@ -198,14 +198,14 @@ public class ButtonHelperModifyUnits {
                 new AddUnits().unitParsing(event, player.getColor(),
                         activeGame.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
                     activeGame);
-                successMessage = "Placed a " + Helper.getEmojiFromDiscord("spacedock") + " on "
+                successMessage = "Placed a " + Emojis.spacedock + " on "
                         + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), unitLong + " " + planetName,
                 activeGame);
-            successMessage = "Placed a " + Helper.getEmojiFromDiscord("pds") + " on "
+            successMessage = "Placed a " + Emojis.pds + " on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
         } else {
              Tile tile;
@@ -216,13 +216,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             activeGame.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " on "+ Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced+" 2 " + Emojis.infantry + " on "+ Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     }else {
                         tile = activeGame.getTileByPosition(planetName.replace("space",""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, "2 gf",
                             activeGame);
-                        successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " in space.";
+                        successMessage = producedOrPlaced+" 2 " + Emojis.infantry + " in space.";
                     }
                 } else {
                    
@@ -245,12 +245,12 @@ public class ButtonHelperModifyUnits {
                 if ("2ff".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             "2 ff", activeGame);
-                    successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
+                    successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             "2 destroyer", activeGame);
-                    successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("destroyer") + " in tile "
+                    successMessage = "Produced 2 " + Emojis.destroyer + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
                 } else{
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
@@ -331,7 +331,7 @@ public class ButtonHelperModifyUnits {
             }
 
             if (editedMessage.contains("place 2 infantry")) {
-                successMessage = "Placed 2 " + Helper.getEmojiFromDiscord("infantry") + " on "
+                successMessage = "Placed 2 " + Emojis.infantry + " on "
                         + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
@@ -396,14 +396,14 @@ public class ButtonHelperModifyUnits {
                 new AddUnits().unitParsing(event, player.getColor(),
                         activeGame.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
                     activeGame);
-                successMessage = "Placed a " + Helper.getEmojiFromDiscord("spacedock") + " on "
+                successMessage = "Placed a " + Emojis.spacedock + " on "
                         + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
                     activeGame.getTile(AliasHandler.resolveTile(planetName)), unitLong + " " + planetName,
                 activeGame);
-            successMessage = "Placed a " + Helper.getEmojiFromDiscord("pds") + " on "
+            successMessage = "Placed a " + Emojis.pds + " on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
         } else {
             Tile tile;
@@ -413,13 +413,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             activeGame.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " on "+ Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced+" 2 " + Emojis.infantry + " on "+ Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     }else {
                         tile = activeGame.getTileByPosition(planetName.replace("space",""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, "2 gf ",
                             activeGame);
-                        successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " in space.";
+                        successMessage = producedOrPlaced+" 2 " + Emojis.infantry + " in space.";
                     }
                 } else {
                    
@@ -442,7 +442,7 @@ public class ButtonHelperModifyUnits {
                 if ("2ff".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             "2 ff", activeGame);
-                    successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "
+                    successMessage = producedOrPlaced+" 2 " + Emojis.fighter + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
@@ -723,7 +723,7 @@ public class ButtonHelperModifyUnits {
 
                                new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false, activeGame);
 
-                             //  validTile2 = Button.danger(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, moveOrRemove+" "+x+" Infantry from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                             //  validTile2 = Button.danger(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, moveOrRemove+" "+x+" Infantry from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Emojis.infantry")));
                            }
                        }
                    }
