@@ -1268,6 +1268,10 @@ public class Game {
                 }
             }
         }
+
+        if(round > 1 && discardAgendas.size() > 1){
+             custodiansTaken = true;
+        }
         return custodiansTaken;
     }
 
