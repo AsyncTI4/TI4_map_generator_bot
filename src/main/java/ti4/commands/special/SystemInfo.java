@@ -130,6 +130,7 @@ public class SystemInfo extends SpecialSubcommandData {
                     String colourID = StringUtils.substringBefore(unitKey, "_");
                     String colour = AliasHandler.resolveColor(colourID);
                     Player player = activeGame.getPlayerFromColorOrFaction(colour);
+                    if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromImageName(unitKey);
                     sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourAsMention(event.getGuild(), colour));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
