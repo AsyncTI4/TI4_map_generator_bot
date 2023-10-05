@@ -1599,13 +1599,9 @@ public class AgendaHelper {
 
             if (voteAmount != 0) {
                 Emoji emoji = Emoji.fromFormatted(Helper.getPlanetEmoji(planet));
-                if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
-                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")");
-                    planetButtons.add(button);
-                } else {
-                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")").withEmoji(emoji);
-                    planetButtons.add(button);
-                }
+                Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")");
+                if (emoji != null) button.withEmoji(emoji);
+                planetButtons.add(button);   
             }
         }
 
