@@ -19,7 +19,7 @@ public class DiscardFromDeckExp extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            String card = Mapper.getExplore(id);
+            String card = Mapper.getExploreRepresentation(id);
             if (card != null) {
                 activeGame.discardExplore(id);
                 sb.append("Card discarded: ").append(displayExplore(id)).append(System.lineSeparator());

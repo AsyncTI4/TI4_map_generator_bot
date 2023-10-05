@@ -741,7 +741,7 @@ public class Player {
         int cult = 0;
         int frontier = 0;
         for (String id : fragments) {
-            String[] cardInfo = Mapper.getExplore(id).split(";");
+            String[] cardInfo = Mapper.getExploreRepresentation(id).split(";");
             if ("hazardous".equalsIgnoreCase(cardInfo[1])) {
                 haz = haz + 1;
             } else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
@@ -781,7 +781,7 @@ public class Player {
     private void updateFragments() {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
-            String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+            String color = Mapper.getExploreRepresentation(cardID).split(";")[1].toLowerCase();
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;

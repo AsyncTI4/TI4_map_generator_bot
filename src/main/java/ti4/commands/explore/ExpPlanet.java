@@ -101,10 +101,10 @@ public class ExpPlanet extends ExploreSubcommandData {
                         }
                         String cardID2 = activeGame.drawExplore(drawColor);
 
-                        String card = Mapper.getExplore(cardID);
+                        String card = Mapper.getExploreRepresentation(cardID);
                         String[] cardInfo1 = card.split(";");
                         String name1 = cardInfo1[0];
-                        String card2 = Mapper.getExplore(cardID2);
+                        String card2 = Mapper.getExploreRepresentation(cardID2);
                         String[] cardInfo2 = card2.split(";");
                         String name2 = cardInfo2[0];
 

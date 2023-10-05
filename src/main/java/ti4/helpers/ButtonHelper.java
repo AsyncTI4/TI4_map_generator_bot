@@ -362,7 +362,7 @@ public class ButtonHelper {
         for (int i = 0; i < 3; i++) {
             String cardID = activeGame.drawExplore(type);
             sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
-            String card = Mapper.getExplore(cardID);
+            String card = Mapper.getExploreRepresentation(cardID);
             String[] cardInfo = card.split(";");
             String cardType = cardInfo[3];
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
@@ -1978,10 +1978,10 @@ public class ButtonHelper {
             if (player.hasAbility("voidsailors")) {
                 String cardID = activeGame.drawExplore(Constants.FRONTIER);
                 String cardID2 = activeGame.drawExplore(Constants.FRONTIER);
-                String card = Mapper.getExplore(cardID);
+                String card = Mapper.getExploreRepresentation(cardID);
                 String[] cardInfo1 = card.split(";");
                 String name1 = cardInfo1[0];
-                String card2 = Mapper.getExplore(cardID2);
+                String card2 = Mapper.getExploreRepresentation(cardID2);
                 String[] cardInfo2 = card2.split(";");
                 String name2 = cardInfo2[0];
 
