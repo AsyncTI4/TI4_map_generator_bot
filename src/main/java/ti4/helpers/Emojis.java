@@ -254,12 +254,7 @@ public class Emojis {
     // PLANETS
     public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
     public static final String Primor = "<:Primor:1068567710990077952>";
-    public static final String Mallice = "";
-    public static final String Mirage = "";
-    public static final String planet = "";
-    public static final String PlanetArchonVail = "<:PlanetArchonVail:1137029658118991932>";
-    public static final String PlanetMeharXull = "";
-    public static final String PlanetPerimeter = "";
+    
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
@@ -303,6 +298,18 @@ public class Emojis {
     public static final String JeolIr = "<:JeolIr:1159492098190491789>";
     public static final String Jol = "<:Jol:1159492099910156329>";
     public static final String Jord = "<:Jord:1159492101558521916>";
+    public static final String Kamdorn = "<:Kamdorn:1159506093496610866>";
+    public static final String Kraag = "<:Kraag:1159506108415737886>";
+    public static final String Lazar = "<:Lazar:1159506143358484490>";
+    public static final String LirtaIV = "<:LirtaIV:1159506145212370944>";
+    public static final String Lisis = "<:Lisis:1159506146672001086>";
+    public static final String LisisII = "<:LisisII:1159506148169371679>";
+    public static final String Lodor = "<:Lodor:1159506150430089287>";
+    public static final String Loki = "<:Loki:1159506175998570596>";
+    public static final String Lor = "<:Lor:1159506177797935144>";
+    public static final String Maaluuk = "<:Maaluuk:1159506179077193770>";
+    public static final String Mallice = "<:Mallice:1159506180641656832>";
+    public static final String Mecatol = "<:Mecatol:1159506366931664926>";
     // END OF EMOJI FARM 7
 
     // LIST OF SEM-LORES

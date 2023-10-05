@@ -485,10 +485,9 @@ public class Helper {
 
     public static String getPlanetEmoji(String planet) {
         return switch (planet.toLowerCase()) {
-            case "mr" -> Emojis.MecatolRex;
             case "primor" -> Emojis.Primor;
             
-            case "planet000" -> Emojis.Planet000;
+            case "0.0.0" -> Emojis.Planet000;
             case "abaddon" -> Emojis.Abaddon;
             case "abyz" -> Emojis.Abyz;
             case "accoen" -> Emojis.Accoen;
@@ -526,10 +525,21 @@ public class Helper {
             case "jeolir" -> Emojis.JeolIr;
             case "jol" -> Emojis.Jol;
             case "jord" -> Emojis.Jord;
-
+            case "kamdorn" -> Emojis.Kamdorn;
+            case "kraag" -> Emojis.Kraag;
+            case "lazar" -> Emojis.Lazar;
+            case "lirtaiv" -> Emojis.LirtaIV;
+            case "lisis" -> Emojis.Lisis;
+            case "lisisii" -> Emojis.LisisII;
+            case "lodor" -> Emojis.Lodor;
+            case "loki" -> Emojis.Loki;
+            case "lor" -> Emojis.Lor;
+            case "maaluuk" -> Emojis.Maaluuk;
+            case "mallice" -> Emojis.Mallice;
+            case "mr" -> Emojis.Mecatol;
 
             case "semlore" -> getRandomSemLore();
-            default -> Emojis.SemLor;
+            default -> ":no_entry_sign:"; //Emojis.SemLor;
         };
     }
 
