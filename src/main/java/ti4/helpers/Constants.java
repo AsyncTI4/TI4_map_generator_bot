@@ -370,6 +370,8 @@ public class Constants {
     public static final String FRANKEN_EDIT = "franken_edit";
     public static final String FRANKEN_EDIT_ACTION = "edit_action";
     public static final String FRANKEN_ITEM = "item";
+
+    public static final String SHOW_BAG = "show_bag";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
