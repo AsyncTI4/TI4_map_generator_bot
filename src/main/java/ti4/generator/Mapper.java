@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 public class Mapper {
     private static final Properties colors = new Properties();
+    private static final Properties decals = new Properties();
     private static final Properties cc_tokens = new Properties();
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
@@ -59,6 +60,7 @@ public class Mapper {
     public static void init() {
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
+        readData("decals.properties", decals, "Could not read decals name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
         readData("tokens.properties", tokens, "Could not read token name file");
@@ -179,6 +181,22 @@ public class Mapper {
 
     public static List<String> getAllPromissoryNoteIDs() {
         return new ArrayList<>(promissoryNotes.keySet());
+    }
+
+    public static Set<String> getDecals() {
+        return decals.keySet().stream()
+                .filter(decal -> decal instanceof String)
+                .map(decal -> (String) decal)
+                .sorted()
+                .collect(Collectors.toSet());
+    }
+
+    public static String getDecalName(String decalID) {
+        return decals.getProperty(decalID);
+    }
+
+    public static boolean isValidDecalSet(String decalID) {
+        return decals.containsKey(decalID);
     }
 
     public static boolean isColorValid(String color) {

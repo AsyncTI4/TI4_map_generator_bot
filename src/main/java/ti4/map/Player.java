@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map.Entry;
@@ -57,6 +58,9 @@ public class Player {
     private String playerStatsAnchorPosition;
     private String allianceMembers = "";
     private String color;
+
+    @Getter @Setter
+    private String decalSet;
     private String autoCompleteRepresentation;
 
     private int tacticalCC = 3;
@@ -152,6 +156,10 @@ public class Player {
 
     public Game getGame() {
         return GameManager.getInstance().getGame(this.gameID);
+    }
+
+    public String getDecalName() {
+        return Mapper.getDecalName(getDecalSet());
     }
 
     public Tile getNomboxTile() {

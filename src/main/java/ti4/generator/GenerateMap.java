@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -1137,14 +1138,25 @@ public class GenerateMap {
                 int remainingReinforcements = positionCount - count;
                 if (remainingReinforcements > 0) {
                     for (int i = 0; i < remainingReinforcements; i++) {
+                        Point position = reinforcementsPosition.getPosition(unitID);
+                        BufferedImage image = null;
                         try {
                             String unitPath = ResourceHelper.getInstance().getUnitFile(unitColorID);
-                            BufferedImage image = ImageHelper.read(unitPath);
-                            Point position = reinforcementsPosition.getPosition(unitID);
-                            graphics.drawImage(image, x + position.x, y + position.y, null);
+                            image = ImageHelper.read(unitPath);
                         } catch (Exception e) {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
                         }
+                        try {
+                            if (!"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
+                                String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitID, getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
+                                String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
+                                BufferedImage decal = ImageHelper.read(decalPath);
+                                image.getGraphics().drawImage(decal, 0, 0, null);
+                            }
+                        } catch (Exception e) {
+                            BotLogger.log("Could not parse decal file for reinforcements: " + player.getDecalSet(), e);
+                        }
+                        graphics.drawImage(image, x + position.x, y + position.y, null);
                         if (aboveCap) {
                             i = remainingReinforcements;
                         }
@@ -1330,6 +1342,20 @@ public class GenerateMap {
                     position.y += warSunPoint.y;
                 }
 
+                BufferedImage decal = null;
+                try {
+                    String colour = AliasHandler.resolveColor(StringUtils.substringBefore(unitID, "_"));
+                    Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(colour);
+                    if (!"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
+                        String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", "."), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
+                        String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
+                        decal = ImageHelper.read(decalPath);
+                        image.getGraphics().drawImage(decal, 0, 0, null);
+                    }
+                } catch (Exception e) {
+                    BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
+                }
+
                 if (justNumber) {
                     graphics.setFont(Storage.getFont40());
                     graphics.setColor(Color.WHITE);
@@ -1349,20 +1375,11 @@ public class GenerateMap {
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
         String id = "number_" + unitID;
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
+        if (textPosition == null) return;
+
         String text = "pa_reinforcements_numbers_" + reinforcementsCount;
         String colorID = Mapper.getColorID(color);
-        if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
-            || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
-            || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-            || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy") || colorID.startsWith("eth")) {
-            text += "_blk.png";
-        } else {
-            text += "_wht.png";
-
-        }
-        if (textPosition == null) {
-            return;
-        }
+        text += getBlackWhiteFileSuffix(colorID);
         Point position = textPosition.getPosition(id);
         drawPAImage(x + position.x, y + position.y, text);
     }
@@ -3319,6 +3336,22 @@ public class GenerateMap {
                 BotLogger.log("Could not parse unit file for: " + unitID, e);
                 continue;
             }
+
+            BufferedImage decal = null;
+            String colour = AliasHandler.resolveColor(StringUtils.substringBefore(unitID, "_"));
+            Player decalPlayer = activeGame.getPlayerFromColorOrFaction(colour);
+            try {
+                if (!"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(decalPlayer.getDecalSet())) {
+                    String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), StringUtils.substringBetween(unitID, "_", ".png"), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
+                    String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
+                    decal = ImageHelper.read(decalPath);
+                    image.getGraphics().drawImage(decal, 0, 0, null);
+                }
+            } catch (Exception e) {
+                BotLogger.log("Could not parse decal file for reinforcements: " + decalPlayer.getDecalSet(), e);
+            }
+
+
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
             }
@@ -3415,5 +3448,15 @@ public class GenerateMap {
         g.setFont(font);
         // Draw the String
         g.drawString(text, x, y);
+    }
+
+    private static String getBlackWhiteFileSuffix(String colourID) {
+        if (colourID.startsWith("ylw") || colourID.startsWith("org") || colourID.startsWith("pnk")
+            || colourID.startsWith("tan") || colourID.startsWith("crm") || colourID.startsWith("sns") || colourID.startsWith("tqs")
+            || colourID.startsWith("gld") || colourID.startsWith("lme") || colourID.startsWith("lvn") || colourID.startsWith("rse")
+            || colourID.startsWith("spr") || colourID.startsWith("tea") || colourID.startsWith("lgy") || colourID.startsWith("eth")) {
+            return "_blk.png";
+        }
+        return "_wht.png";
     }
 }
