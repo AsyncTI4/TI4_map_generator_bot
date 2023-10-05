@@ -146,7 +146,7 @@ public class MessageListener extends ListenerAdapter {
                 msg.delete().queue();
             }
             autoPingGames();
-            handleFoWWhispers(event, msg);
+            handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
         } catch (Exception e) {
@@ -266,7 +266,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
+    private void handleFoWWhispersAndFowCombats(MessageReceivedEvent event, Message msg) {
         if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
             try{
                     String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
