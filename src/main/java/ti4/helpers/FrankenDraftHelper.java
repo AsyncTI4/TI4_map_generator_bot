@@ -16,6 +16,9 @@ import ti4.draft.DraftItem;
 
 
 public class FrankenDraftHelper {
+
+    public static final String ActionName = "frankenDraftAction;";
+
     public static List<Button> getSelectionButtons(List<DraftItem> draftables){
         List<Button> buttons = new ArrayList<>();
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
@@ -33,7 +36,7 @@ public class FrankenDraftHelper {
                 case 2 -> ButtonStyle.SECONDARY;
                 default -> ButtonStyle.SUCCESS;
             };
-            buttons.add(Button.of(style, "frankenDraftAction;" + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji())));
+            buttons.add(Button.of(style, ActionName + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji())));
         }
         return buttons;
     }
@@ -68,6 +71,9 @@ public class FrankenDraftHelper {
                     if (everyonePass) {
                         passBags(activeGame);
                     }
+                    return;
+                case "show_bag":
+                    showPlayerBag(activeGame, player);
                     return;
             }
         }
@@ -133,7 +139,6 @@ public class FrankenDraftHelper {
         activeGame.getActiveBagDraft().passBags();
 
         for(Player p2 : activeGame.getRealPlayers()){
-            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame)+" You have been passed a new bag of cards!");
             showPlayerBag(activeGame, p2);
         }
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Bags have been passed");
@@ -216,11 +221,10 @@ public class FrankenDraftHelper {
         List<Player> realPlayers = activeGame.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            player.setCurrentDraftBag(bags.get(i));
+            activeGame.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
             player.setReadyToPassBag(false);
 
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame)+"Franken Draft has begun!");
             showPlayerBag(activeGame, player);
         }
 

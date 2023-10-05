@@ -2,13 +2,18 @@ package ti4.draft;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BagDraft {
@@ -47,9 +52,14 @@ public abstract class BagDraft {
         List<Player> players = owner.getRealPlayers();
         DraftBag firstPlayerBag = players.get(0).getCurrentDraftBag();
         for (int i = 0; i < players.size()-1; i++) {
-            players.get(i).setCurrentDraftBag(players.get(i+1).getCurrentDraftBag());
+            giveBagToPlayer(players.get(i+1).getCurrentDraftBag(), players.get(i));
         }
-        players.get(players.size()-1).setCurrentDraftBag(firstPlayerBag);
+        giveBagToPlayer(firstPlayerBag, players.get(players.size()-1));
+    }
+
+    public void giveBagToPlayer(DraftBag bag, Player player) {
+        player.setCurrentDraftBag(bag);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, owner) + " you have been passed a new draft bag!", Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
     public ThreadChannel regenerateBagChannel(Player player) {
