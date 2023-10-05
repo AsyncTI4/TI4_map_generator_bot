@@ -27,10 +27,16 @@ public class ListUnits extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+
+        if (Mapper.isValidUnit(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getUnit(searchString).getRepresentationEmbed(includeAliases)).queue();
+            return;
+        }
+
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
-            MessageEmbed representationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
+        for (UnitModel model : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(includeAliases);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {

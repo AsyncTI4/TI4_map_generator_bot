@@ -85,7 +85,7 @@ public class UnitModel implements ModelInterface {
         return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
 
-    public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
+    public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
 
         String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction());
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());

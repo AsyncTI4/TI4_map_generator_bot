@@ -22,6 +22,12 @@ public class ListAbilities extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+
+        if (Mapper.isValidAbility(searchString)) {
+            event.getChannel().sendMessage(AbilityInfo.getAbilityRepresentation((searchString))).queue();
+            return;
+        }
+
         HashMap<String, String> abilityList = Mapper.getFactionAbilities();
         List<String> searchedList = abilityList.keySet().stream()
             .filter(s -> searchString == null || s.toLowerCase().contains(searchString))

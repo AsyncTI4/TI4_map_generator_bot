@@ -23,6 +23,12 @@ public class ListAgendas extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+
+        if (Mapper.isValidAgenda(searchString)) {
+            event.getChannel().sendMessage(Helper.getAgendaRepresentation(searchString)).queue();
+            return;
+        }
+
         HashMap<String, AgendaModel> agendaList = Mapper.getAgendas();
         List<String> searchedList = agendaList.keySet().stream()
             .map(agendaKey -> agendaKey + " = " + Helper.getAgendaRepresentation(agendaKey))
