@@ -471,7 +471,12 @@ public class Mapper {
         }
         id = id.replace("_", "");
 
-        return (String) explore.get(id).getRepresentation();
+        if (explore.get(id) != null) {
+            return (String) explore.get(id).getRepresentation();
+        } else {
+            BotLogger.log("Cannot find explore with ID: " + id);
+            throw new NullPointerException();
+        }
     }
 
     public static ExploreModel getExplore(String exploreId) {
