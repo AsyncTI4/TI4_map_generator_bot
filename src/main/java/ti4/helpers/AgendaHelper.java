@@ -1630,6 +1630,41 @@ public class AgendaHelper {
         return planetButtons;
     }
 
+    public static void resolveAbsolAgainstChecksNBalances(Game activeGame){
+        StringBuilder message = new StringBuilder();
+        //Integer poIndex = activeGame.addCustomPO("Points Scored Prior to Absol C&B Wipe", 1);
+        //message.append("Custom PO 'Points Scored Prior to Absol C&B Wipe' has been added and people have scored it. \n");
+            
+        // activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
+        for(Player player : activeGame.getRealPlayers()){
+            int currentPoints = player.getPublicVictoryPoints(false)+ player.getSecretVictoryPoints();
+            
+            Integer poIndex = activeGame.addCustomPO(StringUtils.capitalize(player.getColor())+" VP Scored Prior to Agenda Wipe", currentPoints);
+            message.append("Custom PO '"+StringUtils.capitalize(player.getColor()+" VP Scored Prior to Agenda Wipe' has been added and scored by that color, worth "+currentPoints+" points. \n"));
+            activeGame.scorePublicObjective(player.getUserID(), poIndex);
+            HashMap<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
+            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+                if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey()) || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())) {
+                    if (scoredPublic.getValue().contains(player.getUserID())) {
+                        boolean scored = activeGame.unscorePublicObjective(player.getUserID(), scoredPublic.getKey());
+                    }
+                }
+            }
+            List<Integer> scoredSOs = new ArrayList<>();
+            scoredSOs.addAll(player.getSecretsScored().values());
+            for(int soID : scoredSOs){
+                boolean scored = activeGame.unscoreAndShuffleSecretObjective(player.getUserID(), soID);
+            }
+            
+
+         }
+        message.append("All SOs have been returned to the deck and all POs scored have been cleared. \n");
+
+               
+            
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
+    }
+
     public static List<Button> getPlanetRefreshButtons(GenericInteractionCreateEvent event, Player player, Game activeGame) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
