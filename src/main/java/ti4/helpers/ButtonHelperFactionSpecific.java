@@ -1301,7 +1301,7 @@ public class ButtonHelperFactionSpecific {
                 List<Button> buttons = new ArrayList<>();
                 String msg = ButtonHelper.getTrueIdentity(cabal, activeGame) + " you have the ability to use cabal agent on " + ButtonHelper.getIdentOrColor(p2, activeGame) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
-                buttons.add(Button.success("startCabalAgent_" + p2.getFaction(), "Use Agent"));
+                buttons.add(Button.success("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(), "Use Agent"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
@@ -1956,6 +1956,9 @@ public class ButtonHelperFactionSpecific {
         if ("naazagent".equalsIgnoreCase(agent)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+        }
+        if ("cabalagent".equalsIgnoreCase(agent)) {
+            ButtonHelperFactionSpecific.startCabalAgent(player, activeGame, rest.replace("cabalagent_",""), event);
         }
 
         if ("empyreanagent".equalsIgnoreCase(agent)) {

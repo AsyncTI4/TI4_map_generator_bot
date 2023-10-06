@@ -442,7 +442,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.replace("retreat_", "");
             String message = trueIdentity + " Use buttons to select a system to retreat too. Warning: bot does not know what the valid retreat tiles are, you will need to verify these.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos));
-        } else if (buttonID.startsWith("exhaustAgent_")) {//"domnaStepThree_"
+        } else if (buttonID.startsWith("exhaustAgent_")) {
             ButtonHelperFactionSpecific.exhaustAgent(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("swapSCs_")) {
             ButtonHelperFactionSpecific.resolveSwapSC(player, activeGame, event, buttonID);

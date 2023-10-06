@@ -1294,6 +1294,22 @@ public class Game {
         }
         return false;
     }
+    public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            scoredPlayerList.add(userID);
+            scoredPublicObjectives.put(id, scoredPlayerList);
+            return true;
+        }
+        return false;
+    }
 
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
         String id = "";
@@ -1303,6 +1319,14 @@ public class Game {
                 break;
             }
         }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            return scoredPlayerList.remove(userID);
+        }
+        return false;
+    }
+
+    public boolean unscorePublicObjective(String userID, String id) {    
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             return scoredPlayerList.remove(userID);
@@ -2124,6 +2148,27 @@ public class Game {
             if (!soID.isEmpty()) {
                 player.removeSecretScored(soIDNumber);
                 player.setSecret(soID);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> secrets = player.getSecretsScored();
+            String soID = "";
+            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+                if (so.getValue().equals(soIDNumber)) {
+                    soID = so.getKey();
+                    break;
+                }
+            }
+            if (!soID.isEmpty()) {
+                player.removeSecretScored(soIDNumber);
+                secretObjectives.add(soID);
+                Collections.shuffle(secretObjectives);
                 return true;
             }
         }
