@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
-public class SecretObjectiveModel implements ModelInterface {
+public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -93,7 +93,16 @@ public class SecretObjectiveModel implements ModelInterface {
 
     public Color getEmbedColour() {
         return switch (getPoints()) {
+            case 2 -> Color.BLACK;
             default -> Color.RED;
         };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

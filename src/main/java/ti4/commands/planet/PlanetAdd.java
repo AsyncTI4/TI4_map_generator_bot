@@ -11,6 +11,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -147,9 +148,9 @@ public class PlanetAdd extends PlanetAddRemove {
         if(numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")){
             
             Button sdButton = Button.success("winnuStructure_sd_"+planet, "Place A SD on "+Helper.getPlanetRepresentation(planet, activeGame));
-            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
             Button pdsButton = Button.success("winnuStructure_pds_"+planet, "Place a PDS on "+Helper.getPlanetRepresentation(planet, activeGame));
-            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
             Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);

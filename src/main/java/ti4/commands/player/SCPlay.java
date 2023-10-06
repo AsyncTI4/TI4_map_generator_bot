@@ -304,10 +304,10 @@ public class SCPlay extends PlayerSubcommandData {
     private List<Button> getConstructionButtons() {
         Button followButton = Button.success("sc_follow_4", "Spend A Strategy CC");
         Button sdButton = Button.success("construction_sd", "Place A SD");
-        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
         Button pdsButton = Button.success("construction_pds", "Place a PDS");
 
-        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
         Button noFollowButton = Button.primary("sc_no_follow_4", "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }

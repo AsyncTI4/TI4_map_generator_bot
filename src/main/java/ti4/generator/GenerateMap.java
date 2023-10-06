@@ -185,7 +185,9 @@ public class GenerateMap {
     }
 
     public void saveImageToWebsiteOnly(Game activeGame, @Nullable GenericInteractionCreateEvent event) {
-        saveImage(activeGame, DisplayType.all, event, true);
+        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
+            saveImage(activeGame, DisplayType.all, event, true);
+        }
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
@@ -1709,6 +1711,7 @@ public class GenerateMap {
     }
 
     private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
+        asyncId = AliasHandler.resolveUnit(asyncId);
         switch (asyncId) {
             case "gf" -> {
                 if (getFactionIconOffset)
@@ -1750,7 +1753,7 @@ public class GenerateMap {
                     return new Coord(204, 21);
                 return new Coord(191, 4);
             }
-            case "sd", "vsd" -> {
+            case "sd", "csd" -> {
                 if (getFactionIconOffset)
                     return new Coord(52, 65);
                 return new Coord(46, 49);

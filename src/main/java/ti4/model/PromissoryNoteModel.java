@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
-public class PromissoryNoteModel implements ModelInterface {
+public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String faction;
@@ -138,6 +138,14 @@ public class PromissoryNoteModel implements ModelInterface {
             case "Absol" -> Emojis.Absol;
             default -> "";
         };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getFactionOrColour() + ") (" + getSource() + ")";
     }
 
 }

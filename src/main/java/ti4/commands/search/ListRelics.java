@@ -26,7 +26,7 @@ public class ListRelics extends SearchSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         
-        if (Mapper.isRelic(searchString)) {
+        if (Mapper.isValidRelic(searchString)) {
             event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true)).queue();
             return;
         }

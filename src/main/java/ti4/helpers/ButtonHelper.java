@@ -248,9 +248,9 @@ public class ButtonHelper {
         if (player.hasTech("so2")) {
             d1 = new Die(5);
         }
-        String msg = Helper.getEmojiFromDiscord("infantry") + " rolled a " + d1.getResult();
+        String msg = Emojis.infantry + " rolled a " + d1.getResult();
         if (player.hasTech("cl2")) {
-            msg = Helper.getEmojiFromDiscord("infantry") + " died";
+            msg = Emojis.infantry + " died";
 
         }
         if (d1.isSuccess() || player.hasTech("cl2")) {
@@ -1823,13 +1823,13 @@ public class ButtonHelper {
             }
             if (player.hasTech("td") && !player.getExhaustedTechs().contains("td")) {
                 Button transit = Button.secondary(finChecker + "exhaustTech_td", "Exhaust Transit Diodes");
-                transit = transit.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
+                transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                 startButtons.add(transit);
             }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
                 Button psycho = Button.success(finChecker + "getPsychoButtons", "Use Psychoarcheology");
-                psycho = psycho.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
+                psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
                 startButtons.add(psycho);
         }
 
@@ -2283,7 +2283,7 @@ public class ButtonHelper {
                         Button validTile2 = Button
                             .danger(finChecker + "landUnits_" + tile.getPosition() + "_" + x + "infantry_" + representation,
                                 "Land " + x + " Infantry on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                            .withEmoji(Emoji.fromFormatted(Emojis.infantry));
                         buttons.add(validTile2);
                     }
                 }
@@ -2296,7 +2296,7 @@ public class ButtonHelper {
                         Button validTile2 = Button
                             .success(finChecker + "spaceUnits_" + tile.getPosition() + "_" + x + "infantry_" + representation,
                                 "Undo Landing of " + x + " Infantry on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                            .withEmoji(Emoji.fromFormatted(Emojis.infantry));
                         buttons.add(validTile2);
                     }
                 }
@@ -2310,7 +2310,7 @@ public class ButtonHelper {
                         Button validTile2 = Button
                             .primary(finChecker + "landUnits_" + tile.getPosition() + "_" + x + "mech_" + representation,
                                 "Land " + x + " Mech(s) on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                            .withEmoji(Emoji.fromFormatted(Emojis.mech));
                         buttons.add(validTile2);
                     }
                 }
@@ -2323,7 +2323,7 @@ public class ButtonHelper {
                         Button validTile2 = Button
                             .primary(finChecker + "spaceUnits_" + tile.getPosition() + "_" + x + "mech_" + representation,
                                 "Undo Landing of " + x + " Mech(s) on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                            .withEmoji(Emoji.fromFormatted(Emojis.mech));
                         buttons.add(validTile2);
                     }
                 }
@@ -2332,7 +2332,7 @@ public class ButtonHelper {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkCommanderButtons(activeGame, player, event));
         }
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("grift")));
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GRift));
         buttons.add(rift);
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
             Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability");
@@ -2395,7 +2395,7 @@ public class ButtonHelper {
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, numMechs + " infantry" + planetName, activeGame);
 
-                        successMessageBuilder.append("\n Put ").append(numMechs).append(" ").append(Helper.getEmojiFromDiscord("infantry")).append(" with the mechs in ")
+                        successMessageBuilder.append("\n Put ").append(numMechs).append(" ").append(Emojis.infantry).append(" with the mechs in ")
                             .append(tile.getRepresentationForButtons(activeGame, player));
                     }
                 }
@@ -2438,7 +2438,7 @@ public class ButtonHelper {
         activeGame.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + activeGame.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("grift")));
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GRift));
         buttons.add(rift);
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeGame, player));
@@ -2642,12 +2642,12 @@ public class ButtonHelper {
                                 validTile2 = Button
                                     .danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
                                         moveOrRemove + " " + x + " Infantry from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                                    .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                                    .withEmoji(Emoji.fromFormatted(Emojis.infantry));
                             } else {
                                 validTile2 = Button
                                     .danger(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unitKey + "_" + representation,
                                         moveOrRemove + " " + x + " Mech from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame))
-                                    .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                                    .withEmoji(Emoji.fromFormatted(Emojis.mech));
                             }
                             buttons.add(validTile2);
                         }
@@ -4237,9 +4237,9 @@ public class ButtonHelper {
                         p1.addExhaustedRelic(buttonID);
                         purgeOrExhaust = "Exhausted ";
                         Button sdButton = Button.success("jrStructure_sd", "Place A SD");
-                        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+                        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
                         Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
-                        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+                        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide who to use JR on", buttons2);
                     } else {
                         p1.removeRelic(buttonID);
@@ -4308,7 +4308,7 @@ public class ButtonHelper {
                     Tile tile = tiles.get(0);
                     List<Button> buttons = getStartOfTurnButtons(p1, activeGame, true, event);
                     new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", activeGame);
-                    successMessage = successMessage + "Produced 1 " + Helper.getEmojiFromDiscord("cruiser") + " in tile "
+                    successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "
                         + tile.getRepresentationForButtons(activeGame, p1) + ".";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
                     String message = "Use buttons to end turn or do another action";
