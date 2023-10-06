@@ -223,7 +223,6 @@ public class FrankenDraftHelper {
             Player player = realPlayers.get(i);
             activeGame.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
             player.resetDraftQueue();
-            player.setReadyToPassBag(false);
 
             showPlayerBag(activeGame, player);
         }
