@@ -1132,7 +1132,7 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints() {
+    public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
         int vpCount = 0;
@@ -1144,9 +1144,11 @@ public class Player {
                     if (po != null) {//IS A PO
                         vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
-                        int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
-                        int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
-                        vpCount += poValue * frequency;
+                        if(countCustoms){
+                            int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
+                            int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
+                            vpCount += poValue * frequency;
+                        }
                     }
                 } catch (Exception e) {
                     BotLogger.log("`Player.getPublicVictoryPoints   map=" + activeGame.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
@@ -1180,7 +1182,7 @@ public class Player {
 
     @JsonIgnore
     public int getTotalVictoryPoints() {
-        return getPublicVictoryPoints() + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
+        return getPublicVictoryPoints(true) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {

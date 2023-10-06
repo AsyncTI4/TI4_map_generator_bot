@@ -31,6 +31,7 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
             case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
+            case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
             case "statusScoring" -> {
                 TurnEnd.showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
                 activeGame.updateActivePlayer(null);
