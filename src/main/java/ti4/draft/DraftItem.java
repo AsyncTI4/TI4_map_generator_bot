@@ -135,8 +135,6 @@ public abstract class DraftItem implements ModelInterface {
             return false;
         }
         boolean hasDraftedThisBag = player.getDraftQueue().getCategoryCount(ItemCategory) > 0;
-        boolean hasDraftedOneOfEach = draftHand.Contents.size() >= Category.values().length;
-        boolean hasDraftedOneOfCategory = draftHand.getCategoryCount(ItemCategory) > 0;
 
         boolean allOtherCategoriesAtHandLimit = true;
         for (Category cat : Category.values()) {
@@ -148,9 +146,8 @@ public abstract class DraftItem implements ModelInterface {
 
         if (hasDraftedThisBag) {
             return allOtherCategoriesAtHandLimit;
-        } else {
-            return hasDraftedOneOfEach || !hasDraftedOneOfCategory;
         }
+        return true;
     }
 
 

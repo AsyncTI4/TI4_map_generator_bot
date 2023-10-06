@@ -59,6 +59,7 @@ public abstract class BagDraft {
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
+        player.setReadyToPassBag(bag.Contents.stream().noneMatch(draftItem -> draftItem.isDraftable(player)));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, owner) + " you have been passed a new draft bag!", Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
