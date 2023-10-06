@@ -50,6 +50,7 @@ public class DataMigrationManager {
     ///
     public static void runMigrations() {
         try {
+            runMigration("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
             runMigration("migrateRenameVeldyrAttachments_270923", DataMigrationManager::migrateRenameVeldyrAttachments_270923);
             runMigration("migrateGheminaAddCarrier_190923", DataMigrationManager::migrateGheminaAddCarrier_190923);
             runMigration("migrateNaaluMechsToOmega_180923", DataMigrationManager::migrateNaaluMechsToOmega_180923);
@@ -493,6 +494,35 @@ public class DataMigrationManager {
                     }
                 }
             }
+        }
+        return mapNeededMigrating;
+    }
+
+    private static Boolean migrateRenameDSExplores_061023(Game game) {
+        boolean mapNeededMigrating = false;
+        if (game.getExplorationDeckID().equals("explores_DS")) {
+            List<String> oldDeck = game.getAllExplores();
+            List<String> replacementDeck = new ArrayList<>();
+            for (String ex : oldDeck) {
+                String newEx = ex.replace("_", "");
+                replacementDeck.add(newEx);
+            }
+            if (!replacementDeck.equals(oldDeck)) {
+                game.setExploreDeck(new ArrayList<>(replacementDeck));
+                mapNeededMigrating = true;
+            }
+
+            List<String> oldDiscard = game.getAllExploreDiscard();
+            List<String> replacementDiscard = new ArrayList<>();
+            for (String ex : oldDiscard) {
+                String newEx = ex.replace("_", "");
+                replacementDiscard.add(newEx);
+            }
+            if (!replacementDiscard.equals(oldDiscard)) {
+                game.setExploreDiscard(new ArrayList<>(replacementDiscard));
+                mapNeededMigrating = true;
+            }
+            boolean x = false;
         }
         return mapNeededMigrating;
     }

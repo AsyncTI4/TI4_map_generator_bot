@@ -36,7 +36,7 @@ public class Mapper {
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
-    
+
     //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final Map<String, ExploreModel> explore = new HashMap<>();
@@ -51,7 +51,7 @@ public class Mapper {
     private static final HashMap<String, UnitModel> units = new HashMap<>();
     private static final HashMap<String, AttachmentModel> attachments = new HashMap<>();
     private static final HashMap<String, LeaderModel> leaders = new HashMap<>();
-    
+
     @Getter
     private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
     private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
@@ -147,7 +147,7 @@ public class Mapper {
         });
         if (!badObjects.isEmpty())
             BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
-                    + String.join("\n> ", badObjects));
+                + String.join("\n> ", badObjects));
     }
 
     public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
@@ -157,11 +157,11 @@ public class Mapper {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
-                            && !"Absol".equalsIgnoreCase(pn.getSource())) {
+                        && !"Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
                     if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
-                            && "Absol".equalsIgnoreCase(pn.getSource())) {
+                        && "Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -189,10 +189,10 @@ public class Mapper {
 
     public static Set<String> getDecals() {
         return decals.keySet().stream()
-                .filter(decal -> decal instanceof String)
-                .map(decal -> (String) decal)
-                .sorted()
-                .collect(Collectors.toSet());
+            .filter(decal -> decal instanceof String)
+            .map(decal -> (String) decal)
+            .sorted()
+            .collect(Collectors.toSet());
     }
 
     public static String getDecalName(String decalID) {
@@ -225,10 +225,10 @@ public class Mapper {
     public static List<String> getFrontierTileIds() {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
-                .filter(tileModel -> tileModel.getPlanetIds().size() == 0)
-                .map(TileModel::getId)
-                .toList();
+            .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
+            .filter(tileModel -> tileModel.getPlanetIds().size() == 0)
+            .map(TileModel::getId)
+            .toList();
     }
 
     public static String getTileID(String tileID) {
@@ -257,9 +257,9 @@ public class Mapper {
             return null;
         }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
-                .filter(Objects::nonNull)
-                .map(WormholeModel.Wormhole::toString)
-                .collect(Collectors.toSet());
+            .filter(Objects::nonNull)
+            .map(WormholeModel.Wormhole::toString)
+            .collect(Collectors.toSet());
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
@@ -270,9 +270,9 @@ public class Mapper {
         }
 
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
-                .map(TileModel::getId)
-                .collect(Collectors.toSet());
+            .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
+            .map(TileModel::getId)
+            .collect(Collectors.toSet());
     }
 
     public static String getFactionFileName(String factionID) {
@@ -297,9 +297,9 @@ public class Mapper {
 
     public static UnitModel getUnitModelByTechUpgrade(String techID) {
         return units.values().stream()
-                .filter(unitModel -> techID.equals(unitModel.getRequiredTechId()))
-                .findFirst()
-                .orElse(null);
+            .filter(unitModel -> techID.equals(unitModel.getRequiredTechId()))
+            .findFirst()
+            .orElse(null);
     }
 
     public static Map<String, String> getColorToId() {
@@ -324,9 +324,9 @@ public class Mapper {
 
     public static Set<String> getUnitIDList() {
         return getUnits().values().stream()
-                .map(UnitModel::getAsyncId)
-                .sorted()
-                .collect(Collectors.toSet());
+            .map(UnitModel::getAsyncId)
+            .sorted()
+            .collect(Collectors.toSet());
     }
 
     public static String getCCID(String color) {
@@ -363,17 +363,17 @@ public class Mapper {
 
     public static List<String> getColors() {
         return colors.keySet().stream().filter(color -> color instanceof String)
-                .map(color -> (String) color)
-                .sorted()
-                .collect(Collectors.toList());
+            .map(color -> (String) color)
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     public static List<String> getTokens() {
         return Stream.of(attachment_tokens.keySet(), tokens.keySet()).flatMap(Collection::stream)
-                .filter(token -> token instanceof String)
-                .map(token -> (String) token)
-                .sorted()
-                .collect(Collectors.toList());
+            .filter(token -> token instanceof String)
+            .map(token -> (String) token)
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     public static Map<String, String> getTokensToName() {
@@ -441,7 +441,7 @@ public class Mapper {
             return promStr;
         }
         return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
-                + promissoryNotes.get(id).getColour();
+            + promissoryNotes.get(id).getColour();
     }
 
     public static String getPromissoryNoteOwner(String id) {
@@ -555,7 +555,7 @@ public class Mapper {
 
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanets().values().stream()
-                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
+            .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
     public static Map<String, String> getFactionRepresentations() {
@@ -580,7 +580,7 @@ public class Mapper {
 
     public static Map<String, String> getTileRepresentations() {
         return TileHelper.getAllTiles().values().stream()
-                .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
+            .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
     public static HashMap<String, String> getSecretObjectivesJustNames() {
@@ -769,9 +769,9 @@ public class Mapper {
 
     public static String getUnitBaseTypeFromAsyncID(String asyncID) {
         return getUnits().values().stream()
-                .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .findFirst()
-                .orElse(null);
+            .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .findFirst()
+            .orElse(null);
     }
 }
