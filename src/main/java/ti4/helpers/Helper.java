@@ -485,12 +485,107 @@ public class Helper {
 
     public static String getPlanetEmoji(String planet) {
         return switch (planet.toLowerCase()) {
-            case "mr" -> Emojis.MecatolRex;
+            case "0.0.0" -> Emojis.Planet000;
+            case "abaddon" -> Emojis.Abaddon;
+            case "abyz" -> Emojis.Abyz;
+            case "accoen" -> Emojis.Accoen;
+            case "acheron" -> Emojis.Acheron;
+            case "alioprima" -> Emojis.AlioPrima;
+            case "ang" -> Emojis.Ang;
+            case "arcprime" -> Emojis.ArcPrime;
+            case "archonren", "archonrenk" -> Emojis.ArchonRen;
+            case "archontau", "archontauk" -> Emojis.ArchonTau;
+            case "archonvail" -> Emojis.ArchonVail;
+            case "arcturus" -> Emojis.Arcturus;
+            case "arinam" -> Emojis.Arinam;
+            case "arnor" -> Emojis.Arnor;
+            case "arretze" -> Emojis.Arretze;
+            case "ashtroth" -> Emojis.Ashtroth;
+            case "atlas" -> Emojis.Atlas;
+            case "avar", "avark" -> Emojis.Avar;
+            case "bakal" -> Emojis.Bakal;
+            case "bereg" -> Emojis.Bereg;
+            case "cealdri" -> Emojis.Cealdri;
+            case "centauri" -> Emojis.Centauri;
+            case "cormund" -> Emojis.Cormund;
+            case "corneeq" -> Emojis.Corneeq;
+            case "creuss" -> Emojis.Creuss;
+            case "dalbootha" -> Emojis.DalBootha;
+            case "darien" -> Emojis.Darien;
+            case "druaa" -> Emojis.Druaa;
+            case "elysium" -> Emojis.Elysium;
+            case "everra" -> Emojis.Everra;
+            case "fria" -> Emojis.Fria;
+            case "gral" -> Emojis.Gral;
+            case "hercant" -> Emojis.Hercant;
             case "hopesend" -> Emojis.HopesEnd;
+            case "ixth" -> Emojis.Ixth;
+            case "jeolir" -> Emojis.JeolIr;
+            case "jol" -> Emojis.Jol;
+            case "jord" -> Emojis.Jord;
+            case "kamdorn" -> Emojis.Kamdorn;
+            case "kraag" -> Emojis.Kraag;
+            case "lazar" -> Emojis.Lazar;
+            case "lirtaiv" -> Emojis.LirtaIV;
+            case "lisis" -> Emojis.Lisis;
+            case "lisisii" -> Emojis.LisisII;
+            case "lodor" -> Emojis.Lodor;
+            case "loki" -> Emojis.Loki;
+            case "lor" -> Emojis.Lor;
+            case "maaluuk" -> Emojis.Maaluuk;
+            case "mallice" -> Emojis.Mallice;
+            case "mr" -> Emojis.Mecatol;
+            case "meer" -> Emojis.Meer;
+            case "meharxull" -> Emojis.MeharXull;
+            case "mellon" -> Emojis.Mellon;
+            case "mollprimus", "mollprimusk" -> Emojis.MollPrimus;
+            case "mordai" -> Emojis.Mordai;
+            case "muaat" -> Emojis.PlanetMuaat;
+            case "naazir" -> Emojis.Naazir;
+            case "nar" -> Emojis.Nar;
+            case "nestphar" -> Emojis.Nestphar;
+            case "newalbion" -> Emojis.NewAlbion;
+            case "perimeter" -> Emojis.Perimeter;
             case "primor" -> Emojis.Primor;
-            case "archonvail" -> Emojis.PlanetArchonVail;
+            case "quann" -> Emojis.Quann;
+            case "qucenn" -> Emojis.Qucenn;
+            case "quinarra" -> Emojis.Quinarra;
+            case "rahg" -> Emojis.Rahg;
+            case "rarron" -> Emojis.Rarron;
+            case "resculon" -> Emojis.Resculon;
+            case "retillon" -> Emojis.Retillon;
+            case "rigeli" -> Emojis.RigelI;
+            case "rigelii" -> Emojis.RigelII;
+            case "rigeliii" -> Emojis.RigelIII;
+            case "rokha" -> Emojis.Rokha;
+            case "sakulag" -> Emojis.Sakulag;
+            case "saudor" -> Emojis.Saudor;
             case "semlore" -> getRandomSemLore();
-            default -> Emojis.SemLor;
+            case "shalloq" -> Emojis.Shalloq;
+            case "siig" -> Emojis.Siig;
+            case "starpoint" -> Emojis.Starpoint;
+            case "tarmann" -> Emojis.Tarmann;
+            case "tequran" -> Emojis.Tequran;
+            case "thedark" -> Emojis.TheDark;
+            case "thibah" -> Emojis.Thibah;
+            case "torkan" -> Emojis.Torkan;
+            case "trenlak" -> Emojis.Trenlak;
+            case "valk", "valkk" -> Emojis.Valk;
+            case "vefut" -> Emojis.Vefut;
+            case "vegamajor" -> Emojis.VegaMajor;
+            case "vegaminor" -> Emojis.VegaMinor;
+            case "velnor" -> Emojis.Velnor;
+            case "vorhal" -> Emojis.Vorhal;
+            case "wellon" -> Emojis.Wellon;
+            case "winnu" -> Emojis.PlanetWinnu;
+            case "wrenterra" -> Emojis.WrenTerra;
+            case "xanhact" -> Emojis.Xanhact;
+            case "xxehan" -> Emojis.Xxehan;
+            case "ylir", "ylirk" -> Emojis.Ylir;
+            case "zohbat" -> Emojis.Zohbat;
+
+
+            default -> Emojis.SemLore;
         };
     }
 
@@ -660,32 +755,32 @@ public class Helper {
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech()) {
                 Button wsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp, "Produce Warsun");
-                wsButton = wsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("warsun")));
+                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.warsun));
                 unitButtons.add(wsButton);
             }
             Button fsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship");
-            fsButton = fsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("flagship")));
+            fsButton = fsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
             unitButtons.add(fsButton);
         }
         Button dnButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp, "Produce Dreadnought");
-        dnButton = dnButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("dreadnought")));
+        dnButton = dnButton.withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
         unitButtons.add(dnButton);
         Button cvButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp, "Produce Carrier");
-        cvButton = cvButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("carrier")));
+        cvButton = cvButton.withEmoji(Emoji.fromFormatted(Emojis.carrier));
         unitButtons.add(cvButton);
         Button caButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp, "Produce Cruiser");
-        caButton = caButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("cruiser")));
+        caButton = caButton.withEmoji(Emoji.fromFormatted(Emojis.cruiser));
         unitButtons.add(caButton);
         Button ddButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp, "Produce Destroyer");
-        ddButton = ddButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("destroyer")));
+        ddButton = ddButton.withEmoji(Emoji.fromFormatted(Emojis.destroyer));
         unitButtons.add(ddButton);
         Button ff1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_fighter_" + tp, "Produce 1 Fighter");
-        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
+        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
         unitButtons.add(ff1Button);
         if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
             Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp, "Produce 2 Fighters");
-            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("fighter")));
+            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
             unitButtons.add(ff2Button);
         }
 
@@ -693,7 +788,7 @@ public class Helper {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent");
-                argentButton = argentButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("argent")));
+                argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.Argent));
                 unitButtons.add(argentButton);
             }
         }
@@ -716,35 +811,35 @@ public class Helper {
                 String pp = planet.getName();
                 if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button sdButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_sd_" + pp, "Place 1 Space Dock on " + getPlanetRepresentation(pp, activeGame));
-                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("spacedock")));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
                     unitButtons.add(sdButton);
                     Button pdsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_pds_" + pp, "Place 1 PDS on " + getPlanetRepresentation(pp, activeGame));
-                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("pds")));
+                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
                     unitButtons.add(pdsButton);
                 }
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp, "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
                 if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp, "Produce 2 Infantry on " + getPlanetRepresentation(pp, activeGame));
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, activeGame));
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("mech")));
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 unitButtons.add(mfButton);
 
             } else if (ButtonHelper.canIBuildGFInSpace(activeGame, player, tile, warfareNOtherstuff) && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(), "Produce 1 Infantry in space");
-                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
                 if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(), "Produce 2 Infantry in space");
-                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("infantry")));
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
                 }
                 Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_space" + tile.getPosition(), "Produce Mech in space");
-                mfButton = mfButton.withEmoji(Emoji.fromFormatted(getEmojiFromDiscord("mech")));
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 unitButtons.add(mfButton);
             }
         }

@@ -179,6 +179,10 @@ public class Mapper {
         return promissoryNotes.get(id);
     }
 
+    public static boolean isValidPromissoryNote(String id) {
+        return promissoryNotes.containsKey(id);
+    }
+
     public static List<String> getAllPromissoryNoteIDs() {
         return new ArrayList<>(promissoryNotes.keySet());
     }
@@ -287,6 +291,10 @@ public class Mapper {
         return units.get(unitID);
     }
 
+    public static boolean isValidUnit(String unitID) {
+        return units.containsKey(unitID);
+    }
+
     public static UnitModel getUnitModelByTechUpgrade(String techID) {
         return units.values().stream()
                 .filter(unitModel -> techID.equals(unitModel.getRequiredTechId()))
@@ -390,10 +398,18 @@ public class Mapper {
         return secretObjectives.get(id);
     }
 
+    public static boolean isValidSecretObjective(String id) {
+        return secretObjectives.containsKey(id);
+    }
+
     public static ActionCardModel getActionCard(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         return actionCards.get(id);
+    }
+
+    public static boolean isValidActionCard(String id) {
+        return actionCards.containsKey(id);
     }
 
     @Nullable
@@ -437,6 +453,10 @@ public class Mapper {
 
     public static PublicObjectiveModel getPublicObjective(String id) {
         return publicObjectives.get(id);
+    }
+
+    public static boolean isValidPublicObjective(String id) {
+        return publicObjectives.containsKey(id);
     }
 
     public static AgendaModel getAgenda(String id) {
@@ -695,7 +715,7 @@ public class Mapper {
         return new HashMap<>(relics);
     }
 
-    public static boolean isRelic(String relicID) {
+    public static boolean isValidRelic(String relicID) {
         return relics.containsKey(relicID);
     }
 

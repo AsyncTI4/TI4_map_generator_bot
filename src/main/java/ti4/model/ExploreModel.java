@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 
 @Data
-public class ExploreModel implements ModelInterface {
+public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private String type;
