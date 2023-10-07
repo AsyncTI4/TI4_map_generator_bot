@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -177,9 +178,16 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
                 MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
-                List<Button> scButtons = ButtonHelper.getArcExpButtons(activeGame, player);
+                List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
+            }
+            if (actionCardTitle.contains("Plagiarize")) {
+                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
+                List<Button> scButtons = new ArrayList<Button>();
+                scButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                    Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to resolve plagiarize", scButtons);
             }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
@@ -221,17 +229,17 @@ public class PlayAC extends ACCardsSubcommandData {
                         continue;
                     }
                     if(p2.getActionCards().keySet().contains("reverse_engineer")){
-                        // List<Button> reverseButtons = new ArrayList<Button>();
-                        // String key = "reverse_engineer";
-                        // String ac_name = Mapper.getActionCardName(key);
-                        // if (ac_name != null) {
-                        //     reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key) +"_reverse_"+, "Reverse engineer "+ actionCardTitle));
-                        // }
-                        // reverseButtons.add(Button.danger("deleteButtons", "Decline"));
+                        List<Button> reverseButtons = new ArrayList<Button>();
+                        String key = "reverse_engineer";
+                        String ac_name = Mapper.getActionCardName(key);
+                        if (ac_name != null) {
+                            reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key) +"_reverse_"+actionCardTitle, "Reverse engineer "+ actionCardTitle));
+                        }
+                        reverseButtons.add(Button.danger("deleteButtons", "Decline"));
                         String cyberMessage = ""+Helper.getPlayerRepresentation(p2, activeGame, event.getGuild(), true)
                         + " reminder that you can use reverse engineer on "+actionCardTitle;
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            cyberMessage);
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                            cyberMessage, reverseButtons);
                     }
                 }
             }
