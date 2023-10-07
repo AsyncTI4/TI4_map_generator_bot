@@ -73,6 +73,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.Constants;
@@ -190,6 +191,14 @@ public class ButtonListener extends ListenerAdapter {
                 channel = activeGame.getMainGameChannel();
             } else {
                 channel = actionsChannel;
+            }
+            if(acID.contains("reverse_")){
+                String actionCardTitle = acID.split("_")[2];
+                acID = acID.split("_")[0];
+                List<Button> scButtons = new ArrayList<Button>();
+                scButtons.add(Button.success("resolveReverse_"+actionCardTitle, "Pick up "+ actionCardTitle + " from the discard"));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false) + " After checking for sabos, use buttons to resolve reverse engineer", scButtons);
             }
 
             if (channel != null) {
@@ -332,7 +341,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("arcExp_")) {
-            ButtonHelper.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
+            ButtonHelperActionCards.resolveArcExpButtons(activeGame, player, buttonID, event, trueIdentity);
         } else if (buttonID.startsWith("augerHeroSwap_")) {
             ButtonHelperFactionSpecific.augersHeroSwap(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("hacanMechTradeStepOne_")) {
@@ -626,6 +635,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperFactionSpecific.distantSuns(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("getPlagiarizeButtons")) {
+           MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
+           List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+            Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
+           MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Exhaust stuff to pay the 5 influence", buttons);
+           event.getMessage().delete().queue();
         } else if (buttonID.startsWith("increaseTGonSC_")) {
             String sc = buttonID.replace("increaseTGonSC_", "");
             int scNum = Integer.parseInt(sc);
@@ -968,6 +984,12 @@ public class ButtonListener extends ListenerAdapter {
             activeGame.addExplore(cardRefused);
             new ExpFrontier().expFrontAlreadyDone(event, activeGame.getTileByPosition(pos), activeGame, player, cardChosen);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("finishComponentAction_")){
+            String message = "Use buttons to end turn or do another action.";
+            List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("pillage_")) {
             ButtonHelperFactionSpecific.pillage(buttonID, event, activeGame, player, ident, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("exhaust_")) {
@@ -1213,7 +1235,9 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
                 ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
             }
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue();//"resolveReverse_"
+        } else if (buttonID.startsWith("resolveReverse_")) {
+            ButtonHelperActionCards.resolveReverse(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("winnuStructure_")) {
             String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
             String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
