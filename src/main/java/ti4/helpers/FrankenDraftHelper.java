@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import ti4.draft.BagDraft;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -43,6 +44,7 @@ public class FrankenDraftHelper {
 
     public static void resolveFrankenDraftAction(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
         String action = buttonID.split(";")[1];
+        BagDraft draft = activeGame.getActiveBagDraft();
 
         if (!action.contains(":")) {
             switch (action) {
@@ -50,26 +52,35 @@ public class FrankenDraftHelper {
                     player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     showPlayerBag(activeGame, player);
+
+                    GameSaveLoadManager.saveMap(activeGame);
                     return;
                 case "confirm_draft":
-                    MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
-                    player.setReadyToPassBag(true);
+                    draft.setPlayerReadyToPass(player, true);
 
-                    activeGame.getActiveBagDraft().findExistingBagChannel(player).delete().queue();
+                    GameSaveLoadManager.saveMap(activeGame);
+
+                    draft.findExistingBagChannel(player).delete().queue();
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
 
-                    if (activeGame.getActiveBagDraft().isDraftStageComplete()) {
+                    if (draft.isDraftStageComplete()) {
                         String categoryForPlayers = Helper.getGamePing(event, activeGame);
                         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), categoryForPlayers + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
                         return;
                     }
 
-                    boolean everyonePass = activeGame.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
-                    if (everyonePass) {
+                    int passCounter = 0;
+                    while (draft.allPlayersReadyToPass()) {
                         passBags(activeGame);
+                        passCounter++;
+                        if (passCounter > activeGame.getRealPlayers().size()) {
+                            String categoryForPlayers = Helper.getGamePing(event, activeGame);
+                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), categoryForPlayers + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
+                            break;
+                        }
                     }
                     return;
                 case "show_bag":
@@ -88,7 +99,14 @@ public class FrankenDraftHelper {
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(selectedAlias));
         player.queueDraftItem(DraftItem.GenerateFromAlias(selectedAlias));
 
+
+        if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
+            draft.setPlayerReadyToPass(player, true);
+        }
+
         showPlayerBag(activeGame, player);
+
+        GameSaveLoadManager.saveMap(activeGame);
         event.getMessage().delete().queue();
     }
 
@@ -120,14 +138,14 @@ public class FrankenDraftHelper {
 
         if (draftQueueCount > 0) {
             List<Button> queueButtons = new ArrayList<>();
-            if (isQueueFull) {
+            if (isQueueFull || draftables.isEmpty()) {
                 queueButtons.add(Button.success("frankenDraftAction;confirm_draft", "I want to draft these cards."));
             }
             queueButtons.add(Button.danger("frankenDraftAction;reset_queue", "I want to draft different cards."));
             MessageHelper.sendMessageToChannelWithButtons(bagChannel,
                     "## Queued:\n - You are drafting the following from this bag:\n" + getDraftQueueRepresentation(activeGame, player), queueButtons);
 
-            if (isQueueFull) {
+            if (isQueueFull || draftables.isEmpty()) {
                 MessageHelper.sendMessageToChannel(bagChannel,
                         ButtonHelper.getTrueIdentity(player, activeGame) + " please confirm or reset your draft picks.");
             }
