@@ -536,7 +536,7 @@ public class ButtonHelperFactionSpecific {
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, activeGame);
         List<String> units = new ArrayList<String>();
         units.addAll(oriPlanet.getUnits().keySet());
-        for(String unit: oriPlanet.getUnits().keySet()){
+        for(String unit: units){
             int amount = oriPlanet.getUnits().get(unit);
             String cID = Mapper.getColorID(hacan.getColor());
             String unitKey = unit.replace(cID + "_", "");
@@ -603,6 +603,7 @@ public class ButtonHelperFactionSpecific {
             }
 
         }
+        buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
         return buttons;
     }
 
@@ -895,6 +896,18 @@ public class ButtonHelperFactionSpecific {
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " You gained tech while having Nekro commander, use buttons to resolve. ", buttons);
+            }else{
+                if(!player.hasAbility("technological_singularity")){
+                    int count = 1;
+                    for(String nekroTech : player.getTechs()){
+                        if ("".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction())) {
+                            count = count +1;
+                        }
+                    }
+                    if(count > 2){
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "# "+ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
+                    }
+                }
             }
         }
     }
@@ -1043,7 +1056,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Button.success("dropAMechToo", "Spend 3 resource to Drop a Mech Too");
         startButtons.add(tacticalAction);
-        Button componentAction = Button.danger("finishComponentAction", "Decline Mech");
+        Button componentAction = Button.danger("finishComponentAction_spitItOut", "Decline Mech");
         startButtons.add(componentAction);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Decide whether to drop mech",
             startButtons);

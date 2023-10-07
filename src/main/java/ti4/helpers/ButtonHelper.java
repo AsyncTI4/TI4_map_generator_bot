@@ -340,42 +340,7 @@ public class ButtonHelper {
 
     }
 
-    public static List<Button> getArcExpButtons(Game activeGame, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        List<String> types = getTypesOfPlanetPlayerHas(activeGame, player);
-        for (String type : types) {
-            if ("industrial".equals(type)) {
-                buttons.add(Button.success("arcExp_industrial", "Explore Industrials X 3"));
-            }
-            if ("cultural".equals(type)) {
-                buttons.add(Button.primary("arcExp_cultural", "Explore Culturals X 3"));
-            }
-            if ("hazardous".equals(type)) {
-                buttons.add(Button.danger("arcExp_hazardous", "Explore Hazardous X 3"));
-            }
-        }
-        return buttons;
-    }
-
-    public static void resolveArcExpButtons(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event, String trueIdentity) {
-        String type = buttonID.replace("arcExp_", "");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            String cardID = activeGame.drawExplore(type);
-            sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
-            String card = Mapper.getExploreRepresentation(cardID);
-            String[] cardInfo = card.split(";");
-            String cardType = cardInfo[3];
-            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                sb.append(trueIdentity).append(" Gained relic fragment\n");
-                player.addFragment(cardID);
-                activeGame.purgeExplore(cardID);
-            }
-        }
-        MessageChannel channel = getCorrectChannel(player, activeGame);
-        MessageHelper.sendMessageToChannel(channel, sb.toString());
-        event.getMessage().delete().queue();
-    }
+    
 
     public static List<Button> getExhaustButtonsWithTG(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeGame);
