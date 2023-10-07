@@ -41,7 +41,7 @@ public abstract class BagDraft {
     public boolean isDraftStageComplete() {
         List<Player> players = owner.getRealPlayers();
         for (Player p:players) {
-            if (p.getDraftHand().Contents.size() < getBagSize()) {
+            if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
                 return false;
             }
         }
@@ -59,8 +59,35 @@ public abstract class BagDraft {
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
-        player.setReadyToPassBag(bag.Contents.stream().noneMatch(draftItem -> draftItem.isDraftable(player)));
+        boolean newBagCanBeDraftedFrom = false;
+        for(DraftItem item : bag.Contents) {
+            if (item.isDraftable(player)) {
+                newBagCanBeDraftedFrom = true;
+                break;
+            }
+        }
+        player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, owner) + " you have been passed a new draft bag!", Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
+    }
+
+    public boolean allPlayersReadyToPass() {
+        for (Player p: owner.getRealPlayers()) {
+            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
+                setPlayerReadyToPass(p, true);
+            }
+        }
+        return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
+    }
+
+    public boolean playerHasDraftableItemInBag(Player player) {
+        return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
+    }
+
+    public void setPlayerReadyToPass(Player player, boolean ready) {
+        if (ready && !player.isReadyToPassBag()) {
+            MessageHelper.sendMessageToChannel(owner.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
+        }
+        player.setReadyToPassBag(ready);
     }
 
     public ThreadChannel regenerateBagChannel(Player player) {
@@ -169,5 +196,9 @@ public abstract class BagDraft {
             BotLogger.log("`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName, e);
         }
         return null;
+    }
+
+    public boolean playerHasItemInQueue(Player p) {
+        return !p.getDraftQueue().Contents.isEmpty();
     }
 }
