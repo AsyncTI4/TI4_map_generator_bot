@@ -131,8 +131,14 @@ public class CombatRoll extends SpecialSubcommandData {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
             return;
+        }
+        
+        if (rollType == CombatRollType.SpaceCannonDefence && !(combatOnHolder instanceof Planet)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
         }
 
         Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
