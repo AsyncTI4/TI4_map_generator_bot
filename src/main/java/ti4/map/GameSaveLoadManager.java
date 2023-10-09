@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -71,10 +72,9 @@ public class GameSaveLoadManager {
     public static final boolean loadFromJSON = false; //TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
 
     public static void saveMaps() {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Map.Entry<String, Game> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue(), true, null);
-        }
+        //TODO: add last command time/last save time to cut down on saves
+        GameManager.getInstance().getGameNameToGame().values().parallelStream()
+            .forEach(game -> saveMap(game, true, null));
     }
 
     public static void saveMap(Game activeGame) {
@@ -126,29 +126,30 @@ public class GameSaveLoadManager {
         if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
 
         File mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
-        if (mapFile != null) {
-            if (mapFile.exists()) {
-                saveUndo(activeGame, mapFile);
-            }
-            try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
-                HashMap<String, Tile> tileMap = activeGame.getTileMap();
-                writer.write(activeGame.getOwnerID());
-                writer.write(System.lineSeparator());
-                writer.write(activeGame.getOwnerName());
-                writer.write(System.lineSeparator());
-                writer.write(activeGame.getName());
-                writer.write(System.lineSeparator());
-                saveMapInfo(writer, activeGame, keepModifiedDate);
-
-                for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                    Tile tile = tileEntry.getValue();
-                    saveTile(writer, tile);
-                }
-            } catch (IOException e) {
-                BotLogger.log("Could not save map: " + activeGame.getName(), e);
-            }
-        } else {
+        if (mapFile == null) {
             BotLogger.log("Could not save map, error creating save file");
+            return;
+        }
+
+        if (mapFile.exists()) {
+            saveUndo(activeGame, mapFile);
+        }
+        try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
+            HashMap<String, Tile> tileMap = activeGame.getTileMap();
+            writer.write(activeGame.getOwnerID());
+            writer.write(System.lineSeparator());
+            writer.write(activeGame.getOwnerName());
+            writer.write(System.lineSeparator());
+            writer.write(activeGame.getName());
+            writer.write(System.lineSeparator());
+            saveMapInfo(writer, activeGame, keepModifiedDate);
+
+            for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+                Tile tile = tileEntry.getValue();
+                saveTile(writer, tile);
+            }
+        } catch (IOException e) {
+            BotLogger.log("Could not save map: " + activeGame.getName(), e);
         }
     }
 
@@ -460,8 +461,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
-        writer.write(Constants.POWERED_STATUS + " " + activeGame.getPoweredStatus());
-        writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
@@ -512,6 +511,9 @@ public class GameSaveLoadManager {
         writer.write(Constants.EXPLORATION_DECK_ID + " " + activeGame.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.BAG_DRAFT + " " + (activeGame.getActiveBagDraft() == null ? "" : activeGame.getActiveBagDraft().getSaveString()));
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.STRATEGY_CARD_SET + " " + activeGame.getScSetID());
         writer.write(System.lineSeparator());
 
@@ -557,6 +559,9 @@ public class GameSaveLoadManager {
                 playerColor = "null";
             }
             writer.write(Constants.COLOR + " " + playerColor);
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DECAL_SET + " " + player.getDecalSet());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
@@ -624,13 +629,13 @@ public class GameSaveLoadManager {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_BAG_TO_PASS + " " + player.getCurrentFrankenBag().toStoreString());
+            writer.write(Constants.DRAFT_BAG + " " + player.getCurrentDraftBag().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_PERSONAL_BAG + " " + player.getFrankenHand().toStoreString());
+            writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.FRANKEN_ITEMS_TO_DRAFT + " " + player.getFrankenDraftQueue().toStoreString());
+            writer.write(Constants.DRAFT_QUEUE + " " + player.getDraftQueue().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -732,6 +737,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID + " " + player.getBagInfoThreadID());
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -1437,14 +1445,6 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
-                case Constants.POWERED_STATUS -> {
-                    try {
-                        boolean value = Boolean.parseBoolean(info);
-                        activeGame.setPowered(value);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1591,6 +1591,13 @@ public class GameSaveLoadManager {
                         activeGame.addMigration(migration);
                     }
                 }
+                case Constants.BAG_DRAFT -> {
+                    try {
+                        activeGame.setBagDraft(BagDraft.GenerateDraft(info, activeGame));
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
             }
         }
     }
@@ -1658,6 +1665,7 @@ public class GameSaveLoadManager {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.FACTION_EMOJI -> player.setFactionEmoji(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
@@ -1739,9 +1747,9 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_BAG_TO_PASS -> player.loadCurrentFrankenBag(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_ITEMS_TO_DRAFT -> player.loadFrankenItemsToDraft(getCardList(tokenizer.nextToken()));
-                case Constants.FRANKEN_PERSONAL_BAG -> player.loadFrankenHand(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
@@ -1838,6 +1846,7 @@ public class GameSaveLoadManager {
                 case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
+                case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
             }
         }
     }

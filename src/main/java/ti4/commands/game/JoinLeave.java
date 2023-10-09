@@ -14,7 +14,7 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     public JoinLeave(@NotNull String name, @NotNull String description) {
         super(name, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
     @Override

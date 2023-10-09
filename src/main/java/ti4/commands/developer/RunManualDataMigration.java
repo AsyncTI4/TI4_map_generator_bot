@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.DataMigrationManager;
-import ti4.commands.admin.AdminSubcommandData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -18,7 +17,7 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
     public RunManualDataMigration() {
         super(Constants.RUN_MANUAL_DATA_MIGRATION, "Run a manual data migration on a game.");
         addOptions(new OptionData(OptionType.STRING, Constants.MIGRATION_NAME, "migration name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game to run the migration against").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game to run the migration against").setRequired(true).setAutoComplete(true));
     }
 
     @Override

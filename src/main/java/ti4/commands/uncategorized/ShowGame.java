@@ -13,12 +13,10 @@ import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,7 +107,7 @@ public class ShowGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }

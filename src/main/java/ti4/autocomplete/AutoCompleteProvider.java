@@ -323,6 +323,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.DECAL_SET -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Mapper.getDecals().stream()
+                        .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 String dir = Storage.getTTPGExportDirectory().getPath();
@@ -639,6 +648,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.GAME_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = GameManager.getInstance().getGameNames().stream()
+                        .filter(token -> token.contains(enteredValue))
+                        .limit(25)
+                        .map(token -> new Command.Choice(token, token))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 
@@ -728,11 +746,10 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        List<PlanetModel> planets = new ArrayList<>(TileHelper.getAllPlanets().values());
-                        List<Command.Choice> options = planets.stream()
-                                .filter(value -> value.getName().toLowerCase().contains(enteredValue))
+                        List<Command.Choice> options =  TileHelper.getAllPlanets().entrySet().stream()
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getName(), value.getId()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -772,10 +789,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, UnitModel> units = new HashMap<>(Mapper.getUnits());
                         List<Command.Choice> options = units.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -787,9 +803,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
                         List<Command.Choice> options = techs.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -814,12 +830,11 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> explores = new HashMap<>(Mapper.getExplores());
+                        Map<String, ExploreModel> explores = new HashMap<>(Mapper.getExplores());
                         List<Command.Choice> options = explores.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getKey())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -831,9 +846,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, RelicModel> relics = Mapper.getRelics();
                         List<Command.Choice> options = relics.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getText().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -845,9 +860,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, AgendaModel> agendas = new HashMap<>(Mapper.getAgendas());
                         List<Command.Choice> options = agendas.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -859,9 +874,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, ActionCardModel> actionCards = new HashMap<>(Mapper.getActionCards());
                         List<Command.Choice> options = actionCards.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -873,10 +888,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>(Mapper.getSecretObjectives());
                         List<Command.Choice> options = secretObjectives.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> value.getValue().getName())
-                                .map(value -> new Command.Choice(value, value))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -888,9 +902,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>(Mapper.getPublicObjectives());
                         List<Command.Choice> options = publicObjectives.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -902,9 +916,9 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>(Mapper.getPromissoryNotes());
                         List<Command.Choice> options = promissoryNotes.entrySet().stream()
-                                .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getFactionOrColour().toLowerCase().contains(enteredValue))
+                                .filter(entry -> entry.getValue().search(enteredValue))
                                 .limit(25)
-                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getFactionOrColour() + ") (" + value.getValue().getSource() + ")", value.getKey()))
+                                .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                                 .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }

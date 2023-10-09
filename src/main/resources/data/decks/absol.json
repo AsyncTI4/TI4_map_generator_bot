@@ -1,0 +1,29 @@
+[
+    {
+        "alias": "agendas_absol",
+        "name": "Absol's Agendas",
+        "type": "agenda",
+        "description": "All Agendas for Absol Mode",
+        "cardIDs": [
+            "absol_abolishment","absol_affirmation","absol_agreement","absol_arbiter","absol_articleswar","absol_artifact","absol_censure","absol_checks","absol_conscription","absol_constitution","absol_conventionswar","absol_covert","absol_crisis","absol_defenseact","absol_disarmamament","absol_emergency1","absol_emergency2","absol_emergency3","absol_emergency4","absol_equality","absol_execution","absol_formation","absol_government","absol_grant","absol_hyperlane","absol_incentive","absol_leak","absol_limits","absol_measures","absol_minsantique","absol_minscomm","absol_minsexp","absol_minsindus","absol_minspeace","absol_minspolicy","absol_minssci","absol_minswar","absol_miscount","absol_mutiny","absol_nexus","absol_operations","absol_pax","absol_prophecy","absol_recon","absol_redistribution","absol_reduction","absol_regulations","absol_revolution","absol_sanctions","absol_schematics","absol_secret","absol_seeds","absol_shared","absol_sites","absol_spending","absol_standardization","absol_swords","absol_travelban","absol_warrant","absol_whresearch"
+        ]
+    },
+    {
+        "alias": "relics_absol",
+        "name": "Absol's Relics",
+        "type": "relic",
+        "description": "All Relics for Absol Mode",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament"
+        ]
+    },
+    {
+        "alias": "techs_absol",
+        "name": "Absol's Techs",
+        "type": "technology",
+        "description": "All techs for Absol mode",
+        "cardIDs": ["amd","gd","fl","lwd","nm","dxa","hm","x89","ps","md","da","asc","st","gls","td","ie","ws","sd2","lw2","l4","cm","pws2","qdn","ac2","sdn2","mc","hcf2","vax","exo2","cr2","scc","lgf","it","mi","bio","nes","ffac2","mr","pm","so2","wg","ds","is","so","ng","vay","vpw","ers","dn2","dd2","pds2","cv2","ff2","inf2","htp","nf","yso","ic","tp",
+                    "det","sr","pa","bs","aida","sar","sdn","pi","swa2","as","cl2","pfa","m2","se2","dt2","ah","vw","gr","sc","tcs","ht2","vtx","iihq","asn"
+        ]
+    }
+]

@@ -25,7 +25,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player @playerName"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
     @Override

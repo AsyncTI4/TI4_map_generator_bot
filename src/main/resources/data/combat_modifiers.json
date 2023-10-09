@@ -6,8 +6,11 @@
         "persistenceType": "ALWAYS",
         "scope": "pd",
         "forCombatAbility": "SpaceCannonOffence",
-        "related":[
-            {"type":"opponent_tech", "alias":"amd"}
+        "related": [
+            {
+                "type": "opponent_tech",
+                "alias": "amd"
+            }
         ]
     },
     {
@@ -59,9 +62,13 @@
         "persistenceType": "CONDITIONAL",
         "condition": "nebula_defender",
         "scope": "_ship_",
-        "forCombatAbility": "combatround", 
-        "related":[
-            {"type":"custom", "alias":"custom","message": ":shield: Defenders get +1 to ship rolls in a nebula."}
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": ":shield: Defenders get +1 to ship rolls in a nebula."
+            }
         ]
     },
     {
@@ -70,9 +77,12 @@
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "_best_",
-        "related":[
-            {"type": "leader", "alias": "argentcommander"}
-        ], 
+        "related": [
+            {
+                "type": "leader",
+                "alias": "argentcommander"
+            }
+        ],
         "forCombatAbility": "AFB"
     },
     {
@@ -81,9 +91,12 @@
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "_best_",
-        "related":[
-            {"type": "leader", "alias": "argentcommander"}
-        ], 
+        "related": [
+            {
+                "type": "leader",
+                "alias": "argentcommander"
+            }
+        ],
         "forCombatAbility": "bombardment"
     },
     {
@@ -93,10 +106,27 @@
         "applyEachForQuantity": true,
         "persistenceType": "ALWAYS",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "naaz_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "naaz_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_roll_argent_commander_spacecannon",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "argentcommander"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
     },
     {
         "alias": "plus1_roll_plasmascoring",
@@ -118,9 +148,12 @@
         "value": "-1",
         "persistenceType": "ALWAYS",
         "scope": "",
-        "related":[
-            {"type": "ability", "alias": "fragile"}
-        ], 
+        "related": [
+            {
+                "type": "ability",
+                "alias": "fragile"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -129,10 +162,16 @@
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
-        "related":[
-            {"type": "ability", "alias": "unrelenting"},
-            {"type":"relic", "alias":"absol_thalnos"}
-        ], 
+        "related": [
+            {
+                "type": "ability",
+                "alias": "unrelenting"
+            },
+            {
+                "type": "relic",
+                "alias": "absol_thalnos"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -140,11 +179,14 @@
         "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
-        "condition":"units_two_matching_not_ff",
+        "condition": "units_two_matching_not_ff",
         "scope": "",
-        "related":[
-            {"type": "ability", "alias": "rule_of_two"}
-        ], 
+        "related": [
+            {
+                "type": "ability",
+                "alias": "rule_of_two"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -153,9 +195,12 @@
         "value": "+1",
         "scope": "ff",
         "persistenceType": "ALWAYS",
-        "related":[
-            {"type": "agenda", "alias":"prophecy"}
-        ], 
+        "related": [
+            {
+                "type": "agenda",
+                "alias": "prophecy"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -165,9 +210,12 @@
         "valueScalingType": "fragment",
         "persistenceType": "ALWAYS",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "bentor_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -177,9 +225,12 @@
         "valueScalingType": "law",
         "persistenceType": "ALWAYS",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "edyn_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "edyn_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -189,9 +240,12 @@
         "valueScalingType": "po_opponent_exclusively_scored",
         "persistenceType": "ALWAYS",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "kyro_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "kyro_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -202,9 +256,12 @@
         "valueScalingMultiplier": 0.5,
         "persistenceType": "ALWAYS",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "mirveda_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "mirveda_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -215,9 +272,12 @@
         "valueScalingMultiplier": 0.5,
         "persistenceType": "ALWAYS",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "nokar_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "nokar_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -226,10 +286,13 @@
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
-        "scopeExcept":"fs",
-        "related":[
-            {"type": "unit", "alias": "sardakk_flagship"}
-        ], 
+        "scopeExcept": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "sardakk_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -239,9 +302,12 @@
         "valueScalingType": "opponent_unit_tech",
         "persistenceType": "ALWAYS",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "zealots_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zealots_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -251,9 +317,12 @@
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_no_cc_fleet",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "mahact_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "mahact_flagship"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -263,9 +332,12 @@
         "valueScalingType": "opponent_faction_tech",
         "persistenceType": "ALWAYS",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "zealots_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zealots_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -275,9 +347,12 @@
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_frag",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "naalu_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "naalu_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -287,9 +362,12 @@
         "persistenceType": "CONDITIONAL",
         "condition": "has_ability_fragile",
         "scope": "gf",
-        "related":[
-            {"type": "unit", "alias": "jolnar_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "jolnar_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -297,11 +375,14 @@
         "type": "mods",
         "value": "+2",
         "persistenceType": "CONDITIONAL",
-        "condition":"opponent_stolen_faction_tech",
+        "condition": "opponent_stolen_faction_tech",
         "scope": "mf",
-        "related":[
-            {"type": "unit", "alias": "nekro_mech"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "nekro_mech"
+            }
+        ],
         "forCombatAbility": "combatround"
     },
     {
@@ -311,23 +392,32 @@
         "persistenceType": "CONDITIONAL",
         "condition": "planet_mr_legendary_home",
         "scope": "",
-        "related":[
-            {"type": "leader", "alias": "winnucommander"}
-        ], 
+        "related": [
+            {
+                "type": "leader",
+                "alias": "winnucommander"
+            }
+        ],
         "forCombatAbility": "combatround"
-    }, 
+    },
     {
         "alias": "plus_1_always_afb",
         "type": "mods",
         "value": "+1",
         "persistenceType": "ALWAYS",
         "scope": "",
-        "related":[
-            {"type": "leader", "alias": "kolumecommander"},
-            {"type": "relic", "alias": "starfall_array"}
-        ], 
+        "related": [
+            {
+                "type": "leader",
+                "alias": "kolumecommander"
+            },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
         "forCombatAbility": "AFB"
-    }, 
+    },
     {
         "alias": "plus_x_frag_always_flagship_afb",
         "type": "mods",
@@ -335,9 +425,12 @@
         "valueScalingType": "fragment",
         "persistenceType": "ALWAYS",
         "scope": "fs",
-        "related":[
-            {"type": "unit", "alias": "bentor_flagship"}
-        ], 
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
         "forCombatAbility": "AFB"
     }
 ]

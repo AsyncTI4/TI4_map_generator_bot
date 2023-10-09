@@ -113,7 +113,7 @@ public class AsyncTI4DiscordBot {
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
         guilds.add(guildPrimary);
-        MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
+        MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         TileHelper.init();
         PositionMapper.init();
@@ -134,7 +134,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
-        adminRoles.add(jda.getRoleById("1149705227625316352"));
+        adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -152,8 +152,8 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
-        bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
-        bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
+        bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
 
@@ -271,26 +271,27 @@ public class AsyncTI4DiscordBot {
 
         readyToReceiveCommands = true;
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING MAPS");
+        BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING MAPS");
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "# ` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` LONGER ACCEPTING COMMANDS");
-                TimeUnit.SECONDS.sleep(10);
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
+                TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING MAPS");
-                //TODO: add last command time/last save time to cut down on saves in this loop
-                //Also, make multithreaded
                 GameSaveLoadManager.saveMaps();
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                TimeUnit.SECONDS.sleep(1); // wait for BotLogger
+                jda.shutdown();
+                jda.awaitShutdown();
                 mainThread.join();
             } catch (Exception e) {
-                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
+                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
                 e.printStackTrace();
             }
         }));

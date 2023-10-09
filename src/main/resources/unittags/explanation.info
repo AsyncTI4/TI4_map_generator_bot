@@ -1,3 +1,3 @@
 # step 1: draw unittags_plaquette.png first
-# step 2: draw unittags_factionicon_faction.png second with an offset of 1,1
+# step 2: draw factionicon resized to 32x32 with 0,0 px offset relative to the unittags_plaquette.png
 # step 3: type three-letter-code from faction_setup.json with an offset of approximately 31,17 so text looks nice. Font size: 13 pt

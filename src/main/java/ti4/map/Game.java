@@ -25,7 +25,9 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
+import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -36,6 +38,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.UnitModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -90,8 +93,6 @@ public class Game {
     private boolean fowMode = false;
     @ExportableField
     private boolean naaluAgent;
-    @ExportableField
-    private boolean powerStatus;
     @ExportableField
     private boolean dominusOrb;
     @ExportableField
@@ -230,6 +231,7 @@ public class Game {
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
+    private BagDraft activeDraft;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -404,6 +406,9 @@ public class Game {
     public void removePurgedPN(String purgedPN) {
         this.purgedPN.remove(purgedPN);
     }
+
+    public BagDraft getActiveBagDraft() { return activeDraft; }
+    public void setBagDraft(BagDraft draft) { activeDraft = draft; }
 
     public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
@@ -802,10 +807,6 @@ public class Game {
         return naaluAgent;
     }
 
-    public boolean getPoweredStatus() {
-        return powerStatus;
-    }
-
     public boolean getDominusOrbStatus() {
         return dominusOrb;
     }
@@ -816,10 +817,6 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
-    }
-
-    public void setPowered(boolean powerStatus) {
-        this.powerStatus = powerStatus;
     }
 
     public void setDominusOrb(boolean onStatus) {
@@ -1271,6 +1268,10 @@ public class Game {
                 }
             }
         }
+
+        if(round > 1 && discardAgendas.size() > 1){
+             custodiansTaken = true;
+        }
         return custodiansTaken;
     }
 
@@ -1293,6 +1294,22 @@ public class Game {
         }
         return false;
     }
+    public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            scoredPlayerList.add(userID);
+            scoredPublicObjectives.put(id, scoredPlayerList);
+            return true;
+        }
+        return false;
+    }
 
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
         String id = "";
@@ -1302,6 +1319,14 @@ public class Game {
                 break;
             }
         }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            return scoredPlayerList.remove(userID);
+        }
+        return false;
+    }
+
+    public boolean unscorePublicObjective(String userID, String id) {    
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             return scoredPlayerList.remove(userID);
@@ -1822,7 +1847,7 @@ public class Game {
     private ArrayList<String> getExplores(String reqType, List<String> superDeck) {
         ArrayList<String> deck = new ArrayList<>();
         for (String id : superDeck) {
-            String card = Mapper.getExplore(id);
+            String card = Mapper.getExploreRepresentation(id);
             if (card != null) {
                 String[] split = card.split(";");
                 String type = split[1];
@@ -1879,7 +1904,7 @@ public class Game {
 
     public void discardExplore(String id) {
         explore.remove(id);
-        if (Mapper.getExplore(id) != null) {
+        if (Mapper.getExploreRepresentation(id) != null) {
             discardExplore.add(id);
         }
     }
@@ -1890,7 +1915,7 @@ public class Game {
     }
 
     public void addExplore(String id) {
-        if (Mapper.getExplore(id) != null) {
+        if (Mapper.getExploreRepresentation(id) != null) {
             explore.add(id);
         }
         discardExplore.remove(id);
@@ -2123,6 +2148,27 @@ public class Game {
             if (!soID.isEmpty()) {
                 player.removeSecretScored(soIDNumber);
                 player.setSecret(soID);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean unscoreAndShuffleSecretObjective(String userID, Integer soIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> secrets = player.getSecretsScored();
+            String soID = "";
+            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+                if (so.getValue().equals(soIDNumber)) {
+                    soID = so.getKey();
+                    break;
+                }
+            }
+            if (!soID.isEmpty()) {
+                player.removeSecretScored(soIDNumber);
+                secretObjectives.add(soID);
+                Collections.shuffle(secretObjectives);
                 return true;
             }
         }
@@ -2798,7 +2844,7 @@ public class Game {
         if (exploreDeckModel == null) return -1;
         List<String> exploreDeck = new ArrayList<>();
         for (String exploreCardID : exploreDeckModel.getNewDeck()) {
-            String exploreCard = Mapper.getExplore(exploreCardID);
+            String exploreCard = Mapper.getExploreRepresentation(exploreCardID);
             if (StringUtils.substringAfter(exploreCard, ";").toLowerCase().startsWith(exploreDeckID)) {
                 exploreDeck.add(exploreCard);
             }
@@ -2892,5 +2938,54 @@ public class Game {
         }
         return null;
     }
-    
+
+    @Nullable
+    public Player getPlayerFromColorOrFaction(String factionOrColor) {
+        Player player = null;
+        if (factionOrColor != null) {
+            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
+            factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : getPlayers().values()) {
+                if ("keleres".equalsIgnoreCase(factionColor)) {
+                    if (Objects.equals(factionColor + "a", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+                    if (Objects.equals(factionColor + "x", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+                    if (Objects.equals(factionColor + "m", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+
+                }
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                    Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
+    public UnitModel getUnitFromImageName(String imageName) {
+        String colourID = StringUtils.substringBefore(imageName, "_");
+        Player player = getPlayerFromColorOrFaction(colourID);
+        return player.getUnitFromImageName(imageName);
+    }
+
+    public String getUnitNameFromImageName(String imageName) {
+        String colourID = StringUtils.substringBefore(imageName, "_");
+        String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);
+        Player player = getPlayerFromColorOrFaction(colourID);
+        return player.getUnitModels().stream()
+            .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
+            .map(UnitModel::getName)
+            .findFirst()
+            .orElse(null);
+    }
 }

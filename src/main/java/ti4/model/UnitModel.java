@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
@@ -12,11 +13,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
-public class UnitModel implements ModelInterface {
+public class UnitModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String baseType;
     private String asyncId;
-    private String imageFileSuffix;
     private String name;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
@@ -50,16 +50,29 @@ public class UnitModel implements ModelInterface {
     //Google Sheet to JSON script: https://gist.githubusercontent.com/pamelafox/1878143/raw/6c23f71231ce1fa09be2d515f317ffe70e4b19aa/exportjson.js?utm_source=thenewstack&utm_medium=website&utm_content=inline-mention&utm_campaign=platform
     //From: https://thenewstack.io/how-to-convert-google-spreadsheet-to-json-formatted-text/
 
-    @Override
     public boolean isValid() {
         return id != null 
             && !id.isEmpty()
+            && List.of("ca","cv","dd","dn","ff","fs","gf","mf","pd","sd","ws","csd","plenaryorbital","tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
-    @Override
     public String getAlias() {
         return getId();
+    }
+
+    public String getImageFileSuffix() {
+        return "_" + getAsyncId() + ".png";
+    }
+
+    public String getColourAsyncID(String colour) {
+        colour = AliasHandler.resolveColor(colour);
+        colour = Mapper.getColorID(colour);
+        return colour + getImageFileSuffix();
+    }
+
+    public String getUnitEmoji() {
+        return Helper.getEmojiFromDiscord(getBaseType());
     }
 
     public String getUnitRepresentation() {
@@ -70,81 +83,26 @@ public class UnitModel implements ModelInterface {
         return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
 
-    public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
 
         String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction());
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
-        /*
-         * Set the title:
-         * 1. Arg: title as string
-         * 2. Arg: URL as string or could also be null
-         */
+      
         String name = getName() == null ? "" : getName();
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
 
-        /*
-         * Set the color
-         */
-        // eb.setColor(Color.red);
-        // eb.setColor(new Color(0xF40C0C));
-        // eb.setColor(new Color(255, 0, 54));
-
-        /*
-         * Set the text of the Embed:
-         * Arg: text as string
-         */
-        // eb.setDescription(getId());
-
-        // String afbText = unit.getAfbHitsOn() + 
-
-        /*
-         * Add fields to embed:
-         * 1. Arg: title as string
-         * 2. Arg: text as string
-         * 3. Arg: inline mode true / false
-         */
-        // eb.addField("Title of field", "test of field", false);
-        // eb.addField("Title of field", "test of field", false);
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility() != null) eb.addField("Ability:", getAbility(), false);
 
-        /*
-         * Add spacer like field
-         * Arg: inline mode true / false
-         */
-        // eb.addBlankField(false);
-
-        /*
-         * Add embed author:
-         * 1. Arg: name as string
-         * 2. Arg: url as string (can be null)
-         * 3. Arg: icon url as string (can be null)
-         */
-        // eb.setAuthor("name", null, "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
-
-        /*
-         * Set footer:
-         * 1. Arg: text as string
-         * 2. icon url as string (can be null)
-         */
-        // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
-
-        /*
-         * Set image:
-         * Arg: image url as string
-         */
-        // eb.setImage("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
-
-        /*
-         * Set thumbnail image:
-         * Arg: image url as string
-         */
-        // eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
 
         return eb.build();
     }
@@ -271,7 +229,6 @@ public class UnitModel implements ModelInterface {
         }
         return "";
     }
-
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield() != null && getPlanetaryShield()) {
             return "Planetary Shield\n";
@@ -284,5 +241,13 @@ public class UnitModel implements ModelInterface {
             return "Sustain Damage\n";
         }
         return "";
+    }
+
+    public boolean search(String searchString) {
+        return getName().toLowerCase().contains(searchString) || getFaction().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getBaseType().toLowerCase().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getFaction() + " " + getBaseType() + ")";
     }
 }
