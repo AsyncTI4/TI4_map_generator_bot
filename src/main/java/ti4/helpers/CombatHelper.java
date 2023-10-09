@@ -415,8 +415,10 @@ public class CombatHelper {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolder.getUnitColorsOnHolder().stream()
-            .filter(color -> !color.equals(playerColorID))
-            .map(color -> activeGame.getPlayerByColorID(color).get())
+                .filter(color -> !color.equals(playerColorID))
+                .map(color -> activeGame.getPlayerByColorID(color))
+                .filter(playerOptional -> playerOptional.isPresent())
+                .map(playerOptional -> playerOptional.get())
             .collect(Collectors.toList());
 
         if (opponents.size() >= 1) {
