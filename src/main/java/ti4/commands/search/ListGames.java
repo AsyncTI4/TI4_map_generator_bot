@@ -30,9 +30,9 @@ public class ListGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to include Fog of War games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to include Absol's Agenda & Relics games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to include Discordant Stars games"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FRANKEN_MODE, "True to include Franken games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to also show ended games"));
     }
-
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -44,9 +44,8 @@ public class ListGames extends SearchSubcommandData {
         boolean includeFoWGames = event.getOption(Constants.FOW_MODE, false, OptionMapping::getAsBoolean);
         boolean includeAbsolGames = event.getOption(Constants.ABSOL_MODE, false, OptionMapping::getAsBoolean);
         boolean includeDSGames = event.getOption(Constants.DISCORDANT_STARS_MODE, false, OptionMapping::getAsBoolean);
+        boolean includeFrankenGames = event.getOption(Constants.FRANKEN_MODE, false, OptionMapping::getAsBoolean);
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
-
-
 
         StringBuilder sb = new StringBuilder("__**Map List:**__\n");
         List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
@@ -57,6 +56,7 @@ public class ListGames extends SearchSubcommandData {
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFoWMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAbsolGames && map.getValue().isAbsolMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isDiscordantStarsMode()).toList());
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFrankenGames && map.getValue().isFrankenGame()).toList());
 
         Set<Entry<String, Game>> filteredSetOfMaps = new HashSet<>(filteredListOfMaps);
 

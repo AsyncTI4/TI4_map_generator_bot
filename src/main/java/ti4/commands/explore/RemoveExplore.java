@@ -7,10 +7,10 @@ import ti4.map.Game;
 
 public class RemoveExplore extends ExploreSubcommandData {
 
-	public RemoveExplore() {
-		super(Constants.REMOVE, "Remove an Exploration card from the game.");
-		addOptions(idOption.setRequired(true));
-	}
+    public RemoveExplore() {
+        super(Constants.REMOVE, "Remove an Exploration card from the game.");
+        addOptions(idOption.setRequired(true));
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -19,7 +19,11 @@ public class RemoveExplore extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            String card = Mapper.getExplore(id);
+            String card = null;
+            try {
+                card = Mapper.getExploreRepresentation(id);
+            } catch (Exception e) {
+            }
             if (card != null) {
                 activeGame.purgeExplore(id);
                 sb.append("Exploration card removed: ").append(displayExplore(id)).append(System.lineSeparator());

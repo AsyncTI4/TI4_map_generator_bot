@@ -6,9 +6,9 @@ import java.util.List;
 
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
-    public static final String FRANKEN_PERSONAL_BAG = "franken_personal_bag";
-    public static final String FRANKEN_BAG_TO_PASS = "franken_bag_to_pass";
-    public static final String FRANKEN_ITEMS_TO_DRAFT = "franken_items_to_draft";
+    public static final String DRAFT_HAND = "franken_personal_bag";
+    public static final String DRAFT_BAG = "franken_bag_to_pass";
+    public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
@@ -42,7 +42,6 @@ public class Constants {
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
-    public static final String POWERED_STATUS = "powered_status";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
@@ -371,6 +370,8 @@ public class Constants {
     public static final String FRANKEN_EDIT = "franken_edit";
     public static final String FRANKEN_EDIT_ACTION = "edit_action";
     public static final String FRANKEN_ITEM = "item";
+
+    public static final String SHOW_BAG = "show_bag";
     public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
@@ -724,6 +725,7 @@ public class Constants {
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
+    public static final String BAG_INFO_THREAD_PREFIX = "Draft Bag-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
     public static final String PING_ACTIVE_PLAYER = "ping_active_player";
@@ -742,6 +744,8 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+
+    public static final String BAG_DRAFT = "bag_draft";
     public static final String ABILITY = "ability";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
@@ -754,6 +758,7 @@ public class Constants {
     public static final String ABILITY_REMOVE = "ability_remove";
     public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
+    public static final String DRAFT_BAG_INFO_THREAD_CHANNEL_ID = "draft_bag_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
     public static final String BORDER_ANOMALIES = "border_anomalies";
     public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
@@ -923,4 +928,7 @@ public class Constants {
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String FORCE = "force";
     public static final String REVEAL_SPECIFIC = "reveal_specific";
+    public static final String DECAL_SET = "decal_set";
+    public static final String CHANGE_UNIT_DECAL = "change_unit_decal";
+    public static final String FRANKEN_MODE = "franken_mode";
 }

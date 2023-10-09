@@ -144,6 +144,16 @@
         "Undraftable": true
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresa",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "keleres",
+        "Undraftable": true
+    },
+    {
         "ItemCategory": "AGENT",
         "ItemId": "mentak",
         "Undraftable": true
@@ -167,12 +177,17 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "keleresm",
+        "ItemId": "keleresheroodlynn",
         "AlwaysAddToPool": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "keleresx",
+        "ItemId": "keleresherokuuasi",
+        "AlwaysAddToPool": true
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "keleresheroharka",
         "AlwaysAddToPool": true
     },
     {

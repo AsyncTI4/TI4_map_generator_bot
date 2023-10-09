@@ -164,7 +164,7 @@ public class SCPick extends PlayerSubcommandData {
         String scPicked = buttonID.split("_")[1];
         int scpick = Integer.parseInt(scPicked);
         String factionPicked = buttonID.split("_")[2];
-        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, factionPicked);
+        Player p2 = activeGame.getPlayerFromColorOrFaction(factionPicked);
         boolean pickSuccessful = new Stats().secondHalfOfPickSC(event, activeGame, p2, scpick);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " was given SC #"+scpick);
         if(activeGame.isFoWMode()){
@@ -342,10 +342,11 @@ public class SCPick extends PlayerSubcommandData {
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
                 }
+                buttons = new ArrayList<Button>();
                 if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
                     buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use Imperial Arbiter", buttons);
                 }
             }
         }

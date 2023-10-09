@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.SecretObjectiveModel;
 
 public class ListActionCards extends SearchSubcommandData {
 
@@ -26,6 +25,12 @@ public class ListActionCards extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
+
+        if (Mapper.isValidActionCard(searchString)) {
+            event.getChannel().sendMessageEmbeds(Mapper.getActionCard(searchString).getRepresentationEmbed(true, true)).queue();
+            return;
+        }
+
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (ActionCardModel model : Mapper.getActionCards().values()) {

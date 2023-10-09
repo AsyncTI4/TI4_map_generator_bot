@@ -95,7 +95,7 @@ public class Cleanup extends StatusSubcommandData {
             for(String pn: pns){
                 //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
                 Player pnOwner = activeGame.getPNOwner(pn);
-                if(!pnOwner.isRealPlayer() ){
+                if(pnOwner == null || !pnOwner.isRealPlayer() ){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);

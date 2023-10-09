@@ -12,14 +12,13 @@ import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
-import ti4.model.Franken.FrankenBag;
-import ti4.model.Franken.FrankenItem;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
@@ -45,7 +44,7 @@ public class Player {
     private String userID;
     private String userName;
 
-    private String  gameID;
+    private String gameID;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -53,12 +52,15 @@ public class Player {
     private boolean isDummy;
 
     private String faction;
-    private String factionEmoji = null;
+    private String factionEmoji;
 
     @Setter
     private String playerStatsAnchorPosition;
     private String allianceMembers = "";
     private String color;
+
+    @Getter @Setter
+    private String decalSet;
     private String autoCompleteRepresentation;
 
     private int tacticalCC = 3;
@@ -84,9 +86,9 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
-    private FrankenBag frankenHand = new FrankenBag();
-    private FrankenBag currentFrankenBag = new FrankenBag();
-    private FrankenBag frankenItemsToDraft = new FrankenBag();
+    private DraftBag draftHand = new DraftBag();
+    private DraftBag currentDraftBag = new DraftBag();
+    private DraftBag draftItemQueue = new DraftBag();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -109,6 +111,8 @@ public class Player {
     private String privateChannelID;
     @Nullable
     private String cardsInfoThreadID;
+    @Nullable
+    private String bagInfoThreadID;
 
     private int crf;
     private int hrf;
@@ -152,6 +156,10 @@ public class Player {
 
     public Game getGame() {
         return GameManager.getInstance().getGame(this.gameID);
+    }
+
+    public String getDecalName() {
+        return Mapper.getDecalName(getDecalSet());
     }
 
     public Tile getNomboxTile() {
@@ -217,6 +225,9 @@ public class Player {
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
+    public String getBagInfoThreadID() {
+        return bagInfoThreadID;
+    }
 
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2") || getTechs().contains("pds2") || getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds");
@@ -239,6 +250,10 @@ public class Player {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
+    public void setBagInfoThreadID(String bagInfoThreadID) {
+        this.bagInfoThreadID = bagInfoThreadID;
+    }
+
     @JsonIgnore
     public ThreadChannel getCardsInfoThread() {
         Game activeGame = getGame();
@@ -256,10 +271,10 @@ public class Player {
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
+        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
         try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
+            if (hasCardsInfoThreadId) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
@@ -287,9 +302,8 @@ public class Player {
 
         //ATTEMPT TO FIND BY NAME
         try {
-            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID)) {
+            if (hasCardsInfoThreadId) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
@@ -475,6 +489,13 @@ public class Player {
 
     public boolean addOwnedUnitByID(String unitID) {
         return unitsOwned.add(unitID);
+    }
+
+    public List<UnitModel> getUnitModels() {
+        return getUnitsOwned().stream()
+            .map(Mapper::getUnit)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     public UnitModel getUnitByType(String unitType) {
@@ -728,7 +749,7 @@ public class Player {
         int cult = 0;
         int frontier = 0;
         for (String id : fragments) {
-            String[] cardInfo = Mapper.getExplore(id).split(";");
+            String[] cardInfo = Mapper.getExploreRepresentation(id).split(";");
             if ("hazardous".equalsIgnoreCase(cardInfo[1])) {
                 haz = haz + 1;
             } else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
@@ -768,7 +789,7 @@ public class Player {
     private void updateFragments() {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
-            String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+            String color = Mapper.getExploreRepresentation(cardID).split(";")[1].toLowerCase();
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;
@@ -855,7 +876,7 @@ public class Player {
     }
 
     public String getFactionEmojiOrColour() {
-        if (getGame().isFoWMode()) {
+        if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
             return Helper.getColourAsMention(getGame().getGuild(), getColor());
         }
         return getFactionEmoji();
@@ -1119,7 +1140,7 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints() {
+    public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
         int vpCount = 0;
@@ -1131,9 +1152,11 @@ public class Player {
                     if (po != null) {//IS A PO
                         vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
-                        int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
-                        int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
-                        vpCount += poValue * frequency;
+                        if(countCustoms){
+                            int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
+                            int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
+                            vpCount += poValue * frequency;
+                        }
                     }
                 } catch (Exception e) {
                     BotLogger.log("`Player.getPublicVictoryPoints   map=" + activeGame.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
@@ -1167,7 +1190,7 @@ public class Player {
 
     @JsonIgnore
     public int getTotalVictoryPoints() {
-        return getPublicVictoryPoints() + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
+        return getPublicVictoryPoints(true) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
@@ -1263,24 +1286,24 @@ public class Player {
         return techs;
     }
 
-    public FrankenBag getFrankenHand() {
-        return frankenHand;
+    public DraftBag getDraftHand() {
+        return draftHand;
     }
 
-    public void setFrankenHand(FrankenBag hand) {
-        frankenHand = hand;
+    public void setDraftHand(DraftBag hand) {
+        draftHand = hand;
     }
 
-    public FrankenBag getCurrentFrankenBag() {
-        return currentFrankenBag;
+    public DraftBag getCurrentDraftBag() {
+        return currentDraftBag;
     }
 
-    public void setCurrentFrankenBag(FrankenBag bag) {
-        currentFrankenBag = bag;
+    public void setCurrentDraftBag(DraftBag bag) {
+        currentDraftBag = bag;
     }
 
-    public FrankenBag getFrankenDraftQueue() {
-        return frankenItemsToDraft;
+    public DraftBag getDraftQueue() {
+        return draftItemQueue;
     }
 
     public boolean hasTech(String techID) {
@@ -1315,36 +1338,36 @@ public class Player {
         this.planets = planets;
     }
 
-    public void loadFrankenHand(List<String> saveString) {
-        FrankenBag newBag = new FrankenBag();
+    public void loadDraftHand(List<String> saveString) {
+        DraftBag newBag = new DraftBag();
         for(String item : saveString){
-            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.frankenHand = newBag;
+        this.draftHand = newBag;
     }
 
-    public void loadCurrentFrankenBag(List<String> saveString) {
-        FrankenBag newBag = new FrankenBag();
+    public void loadCurrentDraftBag(List<String> saveString) {
+        DraftBag newBag = new DraftBag();
         for(String item : saveString){
-            newBag.Contents.add(FrankenItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.currentFrankenBag = newBag;
+        this.currentDraftBag = newBag;
     }
 
-    public void loadFrankenItemsToDraft(List<String> saveString) {
-        List<FrankenItem> items = new ArrayList<>();
+    public void loadItemsToDraft(List<String> saveString) {
+        List<DraftItem> items = new ArrayList<>();
         for(String item : saveString){
-            items.add(FrankenItem.GenerateFromAlias(item));
+            items.add(DraftItem.GenerateFromAlias(item));
         }
-        this.frankenItemsToDraft.Contents = items;
+        this.draftItemQueue.Contents = items;
     }
 
-    public void queueFrankenItemToDraft(FrankenItem item) {
-        this.frankenItemsToDraft.Contents.add(item);
+    public void queueDraftItem(DraftItem item) {
+        this.draftItemQueue.Contents.add(item);
     }
 
-    public void resetFrankenItemDraftQueue() {
-        this.frankenItemsToDraft.Contents.clear();
+    public void resetDraftQueue() {
+        this.draftItemQueue.Contents.clear();
     }
 
     public List<String> getReadiedPlanets() {
@@ -1893,5 +1916,18 @@ public class Player {
 
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
+    }
+
+    public UnitModel getUnitFromImageName(String imageName) {
+        String asyncID = StringUtils.substringBetween(imageName, "_", ".png");
+        return getUnitFromAsyncID(asyncID);
+    }
+
+    public UnitModel getUnitFromAsyncID(String asyncID) {
+        return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Sort to grab "best" unit if exists
+    }
+
+    public boolean colourMatchesUnitImageName(String imageName) {
+        return getColor().equals(AliasHandler.resolveColor(StringUtils.substringBefore(imageName, "_")));
     }
 }

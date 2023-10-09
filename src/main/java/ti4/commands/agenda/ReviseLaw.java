@@ -43,7 +43,7 @@ public class ReviseLaw extends AgendaSubcommandData {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
     
-        Player electedPlayer = Helper.getPlayerFromColorOrFaction(activeGame, optionText);
+        Player electedPlayer = activeGame.getPlayerFromColorOrFaction(optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();
         }

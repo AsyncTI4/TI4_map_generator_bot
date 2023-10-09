@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -39,7 +40,12 @@ public class ListTiles extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);      
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+
+        // if (TileHelper.isValidTile(searchString)) {
+        //     event.getChannel().sendMessageEmbeds(TileHelper.getTile(searchString).getRepresentationEmbed()).queue();
+        //     return;
+        // }
 
         List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> TileHelper.isValidTile(searchString) ? searchString.equals(tile.getId()) : true).sorted(Comparator.comparing(TileModel::getId)).toList();
         MessageChannel channel = event.getMessageChannel();
@@ -52,6 +58,7 @@ public class ListTiles extends SearchSubcommandData {
             if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed)); 
         }
 
+        //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link
         CompletableFuture<ThreadChannel> futureThread = null;
         if (tileEmbeds.size() > 3) {
             if (event.getChannel() instanceof TextChannel) {

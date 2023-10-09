@@ -1,0 +1,44 @@
+[
+    {
+        "alias": "boon_of_the_cerulean_god",
+        "name": "Boon of the Cerulean God",
+        "text": "Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. When you produce 1 or more units reduce the combined cost of the produced units by 1.",
+        "source": "ds"
+    },
+    {
+        "alias": "decrypted_cartoglyph",
+        "name": "Decrypted Cartoglyph",
+        "text": "ACTION: Purge this card to draw 3 system tiles with a blue-colored back at random. Place 1 of those tiles at the edge of the game board, adjacent to at least 2 other systems. Purge the rest.",
+        "source": "ds"
+    },
+    {
+        "alias": "e6-g0_network",
+        "name": "E6-G0 Network",
+        "text": "You may have 2 additional action cards in your hand, game effects cannot prevent you from using this ability. At any time, you may exhaust this card to draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "alias": "eye_of_vogul",
+        "name": "Eye of Vogul",
+        "text": "After you activate a system: Purge this card to treat 2 of your ships as adjacent to the active system until the end of this tactical action.",
+        "source": "ds"
+    },
+    {
+        "alias": "starfall_array",
+        "name": "Starfall Array",
+        "text": "Apply +1 to the results of each of your unit's ability rolls.",
+        "source": "ds"
+    },
+    {
+        "alias": "throne_of_the_false_emperor",
+        "name": "Throne of the False Emperor",
+        "text": "ACTION: Purge this card to either gain 1 relic or immediately score 1 scored secret objective, or 1 of your unscored secret objectives, if you fulfill its requirements.",
+        "source": "ds"
+    },
+    {
+        "alias": "twilight_mirror",
+        "name": "Twilight Mirror",
+        "text": "At the start of the agenda phase, you may purge this card to resolve 1 action.",
+        "source": "ds"
+    }
+]
