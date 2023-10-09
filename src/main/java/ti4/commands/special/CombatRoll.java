@@ -172,7 +172,10 @@ public class CombatRoll extends SpecialSubcommandData {
         autoExtraRolls = CombatModHelper.FilterRelevantMods(autoExtraRolls, unitsInCombat, rollType);
 
         String holderName = combatOnHolder.getName();
-        Planet holderPlanet = (Planet) combatOnHolder;
+        Planet holderPlanet = null;
+        if (combatOnHolder instanceof Planet) {
+            holderPlanet = (Planet) combatOnHolder;
+        }
         if (holderPlanet != null) {
             PlanetModel planetModel = Mapper.getPlanet(holderPlanet.getName());
             holderName = planetModel.getName();
