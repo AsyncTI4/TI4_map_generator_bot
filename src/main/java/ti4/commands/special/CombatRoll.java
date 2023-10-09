@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatHelper;
@@ -25,12 +26,14 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -115,6 +118,9 @@ public class CombatRoll extends SpecialSubcommandData {
             if (rollTypeOption.getAsString().equals("spacecannonoffence")) {
                 rollType = CombatRollType.SpaceCannonOffence;
             }
+            if (rollTypeOption.getAsString().equals("spacecannondefence")) {
+                rollType = CombatRollType.SpaceCannonDefence;
+            }
         }
 
         secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, rollType);
@@ -165,9 +171,19 @@ public class CombatRoll extends SpecialSubcommandData {
 
         autoExtraRolls = CombatModHelper.FilterRelevantMods(autoExtraRolls, unitsInCombat, rollType);
 
-        String combatTypeName = StringUtils.capitalize(combatOnHolder.getName()) + " combat";
+        String holderName = combatOnHolder.getName();
+        Planet holderPlanet = (Planet) combatOnHolder;
+        if (holderPlanet != null) {
+            PlanetModel planetModel = Mapper.getPlanet(holderPlanet.getName());
+            holderName = planetModel.getName();
+        }
+
+        String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
+            if (holderPlanet != null) {
+                combatTypeName += " on " + StringUtils.capitalize(holderName);
+            }
         }
         String message = String.format("**%s** rolls for %s on %s %s:  \n",
             combatTypeName, player.getFactionEmoji(),
