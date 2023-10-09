@@ -1,8 +1,7 @@
 package ti4.helpers;
 
 public enum CombatRollType {
-    combatround("Combat round"), AFB("Anti-fighter barrage"), bombardment("Bombardment"), SpaceCannonOffence("Space cannon offence");
-    //spacecannondefence("Space cannon defence"),
+    combatround("Combat round"), AFB("Anti-fighter barrage"), bombardment("Bombardment"), SpaceCannonOffence("Space cannon offence"),SpaceCannonDefence("Space cannon defence");
 
     public final String value;
 

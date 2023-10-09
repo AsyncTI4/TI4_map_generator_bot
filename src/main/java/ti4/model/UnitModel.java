@@ -116,6 +116,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case bombardment:
                 return getBombardDieCount();
             case SpaceCannonOffence:
+            case SpaceCannonDefence:
                 return getSpaceCannonDieCount();
             default:
                 return getCombatDieCount();
@@ -131,6 +132,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case bombardment:
                 return getBombardHitsOn();
             case SpaceCannonOffence:
+            case SpaceCannonDefence:
                 return getSpaceCannonHitsOn();
             default:
                 return getCombatHitsOn();
