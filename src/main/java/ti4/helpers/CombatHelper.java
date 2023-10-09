@@ -55,6 +55,10 @@ public class CombatHelper {
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
             GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
+        Planet unitHolderPlanet = null;
+        if (unitHolder instanceof Planet) {
+            unitHolderPlanet = (Planet)unitHolder;
+        }
         switch (roleType) {
             case combatround:
                 return GetUnitsInCombatRound(unitHolder, player, event);
@@ -65,7 +69,7 @@ public class CombatHelper {
             case SpaceCannonOffence:
                 return getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
             case SpaceCannonDefence:
-                return getUnitsInSpaceCannonDefence((Planet) unitHolder, player, event);
+                return getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
             default:
                 return GetUnitsInCombatRound(unitHolder, player, event);
         }
@@ -225,6 +229,9 @@ public class CombatHelper {
         String colorID = Mapper.getColorID(player.getColor());
 
         HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
+        if (planet == null) {
+            return new HashMap<>();
+        }
 
         HashMap<String, Integer> unitsOnHolderByAsyncId = planet.getUnitAsyncIdsOnHolder(colorID);
         for (Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
