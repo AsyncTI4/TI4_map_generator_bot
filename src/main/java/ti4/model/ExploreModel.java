@@ -2,6 +2,7 @@ package ti4.model;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,6 +34,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     @Override
     public String getAlias() {
         return  getId();
+    }
+
+    public String getAttachmentId() {
+        return Optional.ofNullable(attachmentId).orElse("");
     }
 
     public String getRepresentation() {
