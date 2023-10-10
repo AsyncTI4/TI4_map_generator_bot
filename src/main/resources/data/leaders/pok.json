@@ -96,7 +96,8 @@
         "abilityWindow": "After a player activates a system:",
         "abilityText": "You may exhaust this card to allow that player to replace 1 of their infantry in the active system with 1 mech from their reinforcements.",
         "unlockCondition": "Always Unlocked",
-        "source": "pok"
+        "source": "pok",
+        "searchTags": ["l1 agent"]
     },
     {
         "id": "letnevagent",
@@ -393,7 +394,8 @@
         "abilityWindow": "At any time:",
         "abilityText": "Units that have Planetary Shield do not prevent you from using Bombardment.",
         "unlockCondition": "Have 4 dreadnoughts on the game board.",
-        "source": "pok"
+        "source": "pok",
+        "searchTags": ["l1 commander", "l1 comm"]
     },
     {
         "id": "letnevcommander",
@@ -701,7 +703,8 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose 1 system that does not contain other players' ships. you may move your flagship and any number of your dreadnoughts from other systems into the chosen system. Then, purge this card.[Note: This can move/carry ground forces and fighters up to capacity, but cannot land them]",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "pok"
+        "source": "pok",
+        "searchTags": ["l1 hero"]
     },
     {
         "id": "letnevhero",
