@@ -108,35 +108,23 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType) {
-        switch (rollType) {
-            case combatround:
-                return getCombatDieCount();
-            case AFB:
-                return getAfbDieCount();
-            case bombardment:
-                return getBombardDieCount();
-            case SpaceCannonOffence:
-            case SpaceCannonDefence:
-                return getSpaceCannonDieCount();
-            default:
-                return getCombatDieCount();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatDieCount();
+            case AFB -> getAfbDieCount();
+            case bombardment -> getBombardDieCount();
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount();
+            default -> getCombatDieCount();
+        };
     }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
-        switch (rollType) {
-            case combatround:
-                return getCombatHitsOn();
-            case AFB:
-                return getAfbHitsOn();
-            case bombardment:
-                return getBombardHitsOn();
-            case SpaceCannonOffence:
-            case SpaceCannonDefence:
-                return getSpaceCannonHitsOn();
-            default:
-                return getCombatHitsOn();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatHitsOn();
+            case AFB -> getAfbHitsOn();
+            case bombardment -> getBombardHitsOn();
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
+            default -> getCombatHitsOn();
+        };
     }
 
     public boolean getIsGroundForce() {
