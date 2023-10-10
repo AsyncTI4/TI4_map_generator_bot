@@ -232,10 +232,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString) || getFaction().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getBaseType().toLowerCase().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || (getFaction() != null && getFaction().toLowerCase().contains(searchString)) || getId().toLowerCase().contains(searchString) || getBaseType().toLowerCase().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFaction() + " " + getBaseType() + ")";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getName()).append(" (");
+        if (getFaction() != null) sb.append(getFaction()).append(" ");
+        sb.append(getBaseType()).append(")");
+        return sb.toString();
     }
 }
