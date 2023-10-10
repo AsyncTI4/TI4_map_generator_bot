@@ -873,7 +873,7 @@ public class Player {
 
     @NotNull
     public String getFactionEmoji() {
-        if (factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !"null".equals(factionEmoji)) {
+        if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             return factionEmoji;
         }
         return Helper.getFactionIconFromDiscord(getFaction());
@@ -891,7 +891,7 @@ public class Player {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
+        return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
     }
 
     private void initAbilities() {
