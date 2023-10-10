@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
+    private List<String> searchTags = new ArrayList<>();
 
     //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing
     //Google Sheet to JSON script: https://gist.githubusercontent.com/pamelafox/1878143/raw/6c23f71231ce1fa09be2d515f317ffe70e4b19aa/exportjson.js?utm_source=thenewstack&utm_medium=website&utm_content=inline-mention&utm_campaign=platform
@@ -108,35 +110,23 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType) {
-        switch (rollType) {
-            case combatround:
-                return getCombatDieCount();
-            case AFB:
-                return getAfbDieCount();
-            case bombardment:
-                return getBombardDieCount();
-            case SpaceCannonOffence:
-            case SpaceCannonDefence:
-                return getSpaceCannonDieCount();
-            default:
-                return getCombatDieCount();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatDieCount();
+            case AFB -> getAfbDieCount();
+            case bombardment -> getBombardDieCount();
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount();
+            default -> getCombatDieCount();
+        };
     }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
-        switch (rollType) {
-            case combatround:
-                return getCombatHitsOn();
-            case AFB:
-                return getAfbHitsOn();
-            case bombardment:
-                return getBombardHitsOn();
-            case SpaceCannonOffence:
-            case SpaceCannonDefence:
-                return getSpaceCannonHitsOn();
-            default:
-                return getCombatHitsOn();
-        }
+        return switch (rollType) {
+            case combatround -> getCombatHitsOn();
+            case AFB -> getAfbHitsOn();
+            case bombardment -> getBombardHitsOn();
+            case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
+            default -> getCombatHitsOn();
+        };
     }
 
     public boolean getIsGroundForce() {
@@ -244,10 +234,18 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString) || getFaction().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getBaseType().toLowerCase().contains(searchString);
+        return getName().toLowerCase().contains(searchString)
+            || (getFaction() != null && getFaction().toLowerCase().contains(searchString))
+            || getId().toLowerCase().contains(searchString)
+            || getBaseType().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFaction() + " " + getBaseType() + ")";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getName()).append(" (");
+        if (getFaction() != null) sb.append(getFaction()).append(" ");
+        sb.append(getBaseType()).append(")");
+        return sb.toString();
     }
 }
