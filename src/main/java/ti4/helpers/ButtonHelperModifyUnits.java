@@ -266,17 +266,7 @@ public class ButtonHelperModifyUnits {
             if (activeGame.isFoWMode() || !"action".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);
             } else {
-                List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                if (threadChannels == null)
-                    return;
-                String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-construction";
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        MessageHelper.sendMessageToChannel(threadChannel_,
-                                playerRep + " " + successMessage);
-                    }
-                }
+                ButtonHelper.sendMessageToRightStratThread(player, activeGame, playerRep + " " + successMessage, "construction");
             }
             if(player.hasLeader("mahactagent")){
                 String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
@@ -304,18 +294,8 @@ public class ButtonHelperModifyUnits {
                                 playerRep + " Placed A CC From Reinforcements In The "
                                         + Helper.getPlanetRepresentation(planetName, activeGame) + " system");
                     } else {
-                        List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                        if (threadChannels == null)
-                            return;
-                        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-construction";
-                        // SEARCH FOR EXISTING OPEN THREAD
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                MessageHelper.sendMessageToChannel(threadChannel_,
-                                        playerRep + " Placed A CC From Reinforcements In The "
-                                                + Helper.getPlanetRepresentation(planetName, activeGame) + " system");
-                            }
-                        }
+                        ButtonHelper.sendMessageToRightStratThread(player, activeGame, playerRep + " Placed A CC From Reinforcements In The "
+                                                + Helper.getPlanetRepresentation(planetName, activeGame) + " system", "construction");
                     }
                 }
             }
@@ -898,14 +878,16 @@ public class ButtonHelperModifyUnits {
                         }
                         else{
                             for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                                String unitKey = StringUtils.substringBetween(unitEntry.getKey(), "_", ".png");
-                                int totalUnits = unitEntry.getValue();
-                                unitKey = ButtonHelper.getUnitName(unitKey);
-                                String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
-                                new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
-                                if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile) && !cabal.getFaction().equalsIgnoreCase(player.getFaction())) {
-                                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, totalUnits, unitKey, event);
-                                }    
+                                if (unitEntry.getKey().contains(cID)) {
+                                    String unitKey = StringUtils.substringBetween(unitEntry.getKey(), "_", ".png");
+                                    int totalUnits = unitEntry.getValue();
+                                    unitKey = ButtonHelper.getUnitName(unitKey);
+                                    String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+                                    new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false, activeGame);
+                                    if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile) && !cabal.getFaction().equalsIgnoreCase(player.getFaction())) {
+                                        ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, totalUnits, unitKey, event);
+                                    }    
+                                }
                         }             
                     }
                 }

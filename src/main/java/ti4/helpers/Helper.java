@@ -1708,8 +1708,10 @@ public class Helper {
         String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
-
-    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
+     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player){
+        return getTechButtons(techs, techType, player, "nope");
+     }
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player, String jolNarHeroTech) {
         List<Button> techButtons = new ArrayList<>();
 
         techs.sort(TechnologyModel.sortByTechRequirements);
@@ -1717,6 +1719,9 @@ public class Helper {
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
             String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
+            if(!jolNarHeroTech.equalsIgnoreCase("nope")){
+                buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" +jolNarHeroTech+"_"+ tech.getAlias();
+            }
             Button techB;
             //String requirementsEmoji = tech.getRequirementsEmoji();
             switch (techType) {
