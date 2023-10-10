@@ -867,6 +867,10 @@ public class Player {
         initAbilities();
     }
 
+    public String getRepresentationShort() {
+        return Helper.getPlayerRepresentation(this, getGame(), false);
+    }
+
     @NotNull
     public String getFactionEmoji() {
         if (factionEmoji != null && !factionEmoji.isBlank() && !factionEmoji.isEmpty() && !"null".equals(factionEmoji)) {
