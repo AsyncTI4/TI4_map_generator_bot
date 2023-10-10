@@ -1679,13 +1679,13 @@ public class ButtonHelperFactionSpecific {
                 EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     Button validTile2 = Button.danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey + "damaged", "Remove A Damaged " + unitModel.getName());
-                    if (emoji != null) validTile2.withEmoji(emoji);
+                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Button.danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitKey, "Remove " + x + " " + unitModel.getName());
-                    if (emoji != null) validTile2.withEmoji(emoji);
+                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
             }
