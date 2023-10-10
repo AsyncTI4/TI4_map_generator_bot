@@ -19,7 +19,11 @@ public class AgentDraftItem extends DraftItem {
     }
 
     private LeaderModel getLeader() {
-        return Mapper.getLeader(getFaction().getLeaders().get(0));
+        FactionModel faction = getFaction();
+        if (faction != null) {
+            return Mapper.getLeader(faction.getLeaders().get(0));
+        }
+        return null;
     }
 
     @Override
@@ -34,11 +38,19 @@ public class AgentDraftItem extends DraftItem {
 
     @Override
     public String getLongDescriptionImpl() {
-        return "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+        }
+        return "";
     }
 
     @Override
     public String getItemEmoji() {
-        return Helper.getEmojiFromDiscord(getLeader().getID());
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return Helper.getEmojiFromDiscord(leader.getID());
+        }
+        return "";
     }
 }
