@@ -323,8 +323,12 @@ public class AgendaHelper {
                         activeGame.drawActionCard(playerWL.getUserID());
                         if (playerWL.hasAbility("scheming")) {
                             activeGame.drawActionCard(playerWL.getUserID());
+                            ACInfo.sendActionCardInfo(activeGame, playerWL, event);
+                            MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), ButtonHelper.getTrueIdentity(playerWL, activeGame) + " use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, playerWL, false));
+                        }else{
+                            ACInfo.sendActionCardInfo(activeGame, playerWL, event);
                         }
-                        ACInfo.sendActionCardInfo(activeGame, playerWL, event);
+                        
                         if (playerWL.getLeaderIDs().contains("yssarilcommander") && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
                             ButtonHelper.commanderUnlockCheck(playerWL, activeGame, "yssaril", event);
                         }

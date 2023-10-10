@@ -243,6 +243,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeGame, player, event);
+                if(hasSchemingAbility){
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+                }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
                 ButtonHelper.checkACLimit(activeGame, event, player);
             }
