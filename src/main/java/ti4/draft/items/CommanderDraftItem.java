@@ -42,11 +42,19 @@ public class CommanderDraftItem extends DraftItem {
 
     @Override
     public String getLongDescriptionImpl() {
-        return "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText() + " **Unlock:** " + getLeader().getUnlockCondition();
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText() + " **Unlock:** " + leader.getUnlockCondition();
+        }
+        return "";
     }
 
     @Override
     public String getItemEmoji() {
-        return Helper.getEmojiFromDiscord(getLeader().getID());
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return Helper.getEmojiFromDiscord(leader.getID());
+        }
+        return "";
     }
 }

@@ -46,11 +46,20 @@ public class HeroDraftItem extends DraftItem {
 
     @Override
     public String getLongDescriptionImpl() {
-        return "**" + getLeader().getAbilityName().replace("\n", "") + "** - " + "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return "**" + leader.getAbilityName().replace("\n", "") + "** - " + "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+        }
+        return "";
     }
 
     @Override
     public String getItemEmoji() {
-        return Helper.getEmojiFromDiscord(getLeader().getID());
+
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            return Helper.getEmojiFromDiscord(leader.getID());
+        }
+        return "";
     }
 }
