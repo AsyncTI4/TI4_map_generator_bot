@@ -422,7 +422,7 @@ public class GenerateMap {
     private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null) return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-        if (factionEmoji instanceof CustomEmoji && !Helper.getFactionIconFromDiscord(player.getFaction()).equalsIgnoreCase(factionEmoji.getFormatted())) {
+        if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji) {
             CustomEmoji factionCustomEmoji = (CustomEmoji) factionEmoji;
             int urlImagePadding = 5;
             return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);

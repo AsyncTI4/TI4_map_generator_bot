@@ -759,7 +759,7 @@ public class ButtonHelperFactionSpecific {
                         if(activeGame.isFoWMode()){
                             buttons.add(Button.secondary("cabalRelease_"+player.getFaction()+"_"+unitKey, "Release 1 "+player.getColor()+" "+unitKey));
                         }else{
-                            buttons.add(Button.secondary("cabalRelease_"+player.getFaction()+"_"+unitKey, "Release 1 "+unitKey).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))));
+                            buttons.add(Button.secondary("cabalRelease_"+player.getFaction()+"_"+unitKey, "Release 1 "+unitKey).withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
                         }
                     }
                 }
