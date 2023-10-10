@@ -15,7 +15,7 @@ public class SpeakerOrderDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         if (ItemId.equals("1")) {
             return "Speaker Token + Table Position 1";
         }

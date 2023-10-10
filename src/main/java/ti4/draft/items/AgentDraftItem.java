@@ -33,7 +33,7 @@ public class AgentDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         return "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
     }
 

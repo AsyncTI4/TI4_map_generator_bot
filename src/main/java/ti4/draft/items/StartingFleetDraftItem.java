@@ -27,7 +27,7 @@ public class StartingFleetDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         String[] fleetDesc = getFaction().getStartingFleet().split(",");
         StringBuilder sb = new StringBuilder();
         for (String desc: fleetDesc) {

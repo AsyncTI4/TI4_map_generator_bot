@@ -16,7 +16,7 @@ public class AbilityDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         String[] split = getAbilityStringSplit();
         if (!split[2].equals(" ")) {
             return split[2];

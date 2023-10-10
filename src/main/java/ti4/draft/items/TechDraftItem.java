@@ -20,8 +20,8 @@ public class TechDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
-        return getTech().getText() + "\n**Requirements:** " + getTech().getRequirementsEmoji();
+    public String getLongDescriptionImpl() {
+        return getTech().getText() + " " + getTech().getRequirementsEmoji();
     }
 
     @Override

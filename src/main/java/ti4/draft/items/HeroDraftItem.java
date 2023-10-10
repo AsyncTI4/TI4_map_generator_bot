@@ -45,7 +45,7 @@ public class HeroDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         return "**" + getLeader().getAbilityName().replace("\n", "") + "** - " + "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText();
     }
 

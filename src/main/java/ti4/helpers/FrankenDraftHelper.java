@@ -173,6 +173,7 @@ public class FrankenDraftHelper {
     public static String getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
         StringBuilder sb = new StringBuilder();
         sb.append("# Draftable:\n");
+        draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         for(DraftItem item : draftables) {
             buildItemDescription(item, sb);
             sb.append("\n");
@@ -183,6 +184,7 @@ public class FrankenDraftHelper {
             sb.append("The following items are in your bag but may not be drafted, either because you are at your hand limit, " +
                     "or because you just drafted a similar item, or because you have not drafted one of each item type yet:\n");
 
+            undraftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
             for (DraftItem item : undraftables) {
                 sb.append(item.getItemEmoji()).append(" ");
                 sb.append("**").append(item.getShortDescription()).append("**\n");
@@ -195,14 +197,7 @@ public class FrankenDraftHelper {
     }
 
     public static String getCurrentHandRepresentation(Game activeGame, Player player){
-        StringBuilder sb = new StringBuilder();
-        DraftBag currentBag = player.getDraftHand();
-        for(DraftItem item : currentBag.Contents) {
-            buildItemDescription(item, sb);
-            sb.append("\n");
-        }
-
-        return sb.toString();
+        return activeGame.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand());
     }
 
     public static String getDraftQueueRepresentation(Game activeGame, Player player){
