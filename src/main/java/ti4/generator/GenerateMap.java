@@ -2426,25 +2426,22 @@ public class GenerateMap {
                 if ("1".equals(agendaType) || optionalText == null || optionalText.isEmpty()) {
                     paintAgendaIcon(y, x);
                 } else if ("0".equals(agendaType)) {
-                    String faction = null;
+                    Player electedPlayer = null;
                     boolean convertToGeneric = false;
                     for (Player player : activeGame.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
                             if (isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeGame, player, fowPlayer)) {
                                 convertToGeneric = true;
                             }
-                            faction = player.getFaction();
+                            electedPlayer = player;
                             break;
                         }
                     }
-                    if (faction == null) {
+                    if (convertToGeneric || electedPlayer == null) {
                         paintAgendaIcon(y, x);
                     } else {
-                        String factionPath = convertToGeneric ? Mapper.getCCPath(Mapper.getControlID("gray")) : getFactionIconPath(faction);
-                        if (factionPath != null) {
-                            BufferedImage bufferedImage = ImageHelper.read(factionPath);
-                            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
-                        }
+                        BufferedImage bufferedImage = getPlayerFactionIconImage(electedPlayer);
+                        graphics.drawImage(bufferedImage, x + 2, y + 2, null);
                     }
                 }
 
