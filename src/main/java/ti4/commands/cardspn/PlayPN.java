@@ -78,25 +78,23 @@ public class PlayPN extends PNCardsSubcommandData {
 
         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
         String pnName = promissoryNote.getName();
-        String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
+        Player pnOwner = activeGame.getPNOwner(pnID);
         if (promissoryNote.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(pnID);
         } else { //return to owner
             player.removePromissoryNote(pnID);
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if (player_.getPromissoryNotesOwned().contains(pnID)) {
-                    player_.setPromissoryNote(pnID);
-                    PNInfo.sendPromissoryNoteInfo(activeGame, player_, false, event);
-                    pnOwner = player_.getFaction();
-                    break;
+            if (pnOwner != null) {
+                if (pnOwner.getPromissoryNotesOwned().contains(pnID)) {
+                    pnOwner.setPromissoryNote(pnID);
+                    PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false, event);
                 }
             }
         }
         
        
 
-        String emojiToUse = activeGame.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: "+pnName+"\n");
+        String emojiToUse = activeGame.isFoWMode() ? "" : pnOwner.getFactionEmoji();
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: " + pnName + "\n");
         sb.append(emojiToUse).append(Emojis.PN);
         String pnText;
 
