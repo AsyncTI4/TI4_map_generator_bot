@@ -1,7 +1,9 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,6 +21,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String baseUpgrade;
     private String source;
     private String text;
+    private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
         UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
@@ -169,7 +172,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

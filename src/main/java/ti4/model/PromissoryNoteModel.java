@@ -1,16 +1,18 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-
+@Data
 public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
@@ -20,6 +22,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String attachment;
     private String source;
     private String text;
+    private List<String> searchTags = new ArrayList<>();
 
   public boolean isValid() {
         return alias != null
@@ -141,7 +144,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
