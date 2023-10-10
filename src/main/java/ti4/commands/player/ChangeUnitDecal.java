@@ -11,8 +11,8 @@ import ti4.map.*;
 
 public class ChangeUnitDecal extends PlayerSubcommandData {
     public ChangeUnitDecal() {
-        super(Constants.CHANGE_UNIT_DECAL, "Player Color Change");
-        addOptions(new OptionData(OptionType.STRING, Constants.DECAL_SET, "Decals for units").setRequired(true).setAutoComplete(true));
+        super(Constants.CHANGE_UNIT_DECAL, "Player Change Unit Decals");
+        addOptions(new OptionData(OptionType.STRING, Constants.DECAL_SET, "Decals for units. Enter 'none' to remove current decals.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
@@ -29,10 +29,17 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
         }
 
         String newDecalSet = event.getOption(Constants.DECAL_SET).getAsString().toLowerCase();
-        if (!Mapper.isValidDecalSet(newDecalSet)) {
-            sendMessage("Decal Set not valid: " + newDecalSet);
+        if ("none".equals(newDecalSet)) {
+            sendMessage("Decal Set removed: " + player.getDecalSet());
+            player.setDecalSet(null);
             return;
         }
+        if (!Mapper.isValidDecalSet(newDecalSet)) {
+            sendMessage("Decal Set not valid: " + newDecalSet);
+            player.setDecalSet(null);
+            return;
+        }
+
 
         player.setDecalSet(newDecalSet);
         sendMessage(player.getFactionEmojiOrColour() + " changed their decal set to " + newDecalSet);
