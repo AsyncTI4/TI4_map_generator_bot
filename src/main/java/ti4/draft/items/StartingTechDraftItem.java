@@ -28,7 +28,7 @@ public class StartingTechDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         if (ItemId.equals("winnu")) {
             return "Choose any 1 technology that has no prerequisites.";
         } else if (ItemId.equals("argent")) {

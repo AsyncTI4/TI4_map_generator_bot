@@ -23,7 +23,7 @@ public class RedTileDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         TileModel tile = TileHelper.getTile(ItemId);
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanetIds();

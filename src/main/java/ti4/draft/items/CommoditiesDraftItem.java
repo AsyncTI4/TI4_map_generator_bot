@@ -22,7 +22,7 @@ public class CommoditiesDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         int comms = getFaction().getCommodities();
         return comms + " Commodities";
     }

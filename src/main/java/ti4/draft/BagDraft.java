@@ -13,7 +13,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BagDraft {
@@ -88,6 +87,41 @@ public abstract class BagDraft {
             MessageHelper.sendMessageToChannel(owner.getActionsChannel(), player.getUserName() + " is ready to pass draft bags.");
         }
         player.setReadyToPassBag(ready);
+    }
+
+    public String getShortBagRepresentation(DraftBag bag) {
+        StringBuilder sb = new StringBuilder();
+        for (DraftItem.Category cat: DraftItem.Category.values()) {
+            sb.append("### ").append(cat.toString()).append(" (");
+            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
+            sb.append("):\n");
+            for (DraftItem item : bag.Contents){
+                if (item.ItemCategory != cat) {
+                    continue;
+                }
+                sb.append(" - ").append(item.getItemEmoji()).append(item.getShortDescription()).append("\n");
+            }
+        }
+        sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
+        return sb.toString();
+    }
+
+    public String getLongBagRepresentation(DraftBag bag) {
+        StringBuilder sb = new StringBuilder();
+        for (DraftItem.Category cat: DraftItem.Category.values()) {
+            sb.append("### ").append(cat.toString()).append(" (");
+            sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
+            sb.append("):\n");
+            for (DraftItem item : bag.Contents){
+                if (item.ItemCategory != cat) {
+                    continue;
+                }
+                sb.append("- ").append(item.getShortDescription()).append("\n");
+                sb.append(" - ").append(item.getLongDescription()).append("\n");
+            }
+        }
+        sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
+        return sb.toString();
     }
 
     public ThreadChannel regenerateBagChannel(Player player) {

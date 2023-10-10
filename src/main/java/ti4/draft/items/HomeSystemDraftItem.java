@@ -23,7 +23,7 @@ public class HomeSystemDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         if (ItemId.equals("ghosts")) {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
         }

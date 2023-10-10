@@ -27,7 +27,7 @@ public class FlagshipDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
         if (unit == null) {
             return ItemId;

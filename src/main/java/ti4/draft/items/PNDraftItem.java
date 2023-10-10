@@ -30,7 +30,7 @@ public class PNDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         PromissoryNoteModel pn = getPn();
         return pn.getText();
     }

@@ -42,60 +42,63 @@ public abstract class DraftItem implements ModelInterface {
     // The system ID of the item. Only convert this to player-readable text when necessary
     public String ItemId;
 
+    public DraftErrataModel Errata;
 
     public static DraftItem Generate(Category category, String itemId) {
         if (itemId.contains("keleres") && category != Category.HERO) {
             itemId = "keleres";
         }
+        DraftItem item = null;
         switch (category) {
 
             case ABILITY -> {
-                return new AbilityDraftItem(itemId);
+                item =  new AbilityDraftItem(itemId);
             }
             case TECH -> {
-                return new TechDraftItem(itemId);
+                item =  new TechDraftItem(itemId);
             }
             case AGENT -> {
-                return new AgentDraftItem(itemId);
+                item =  new AgentDraftItem(itemId);
             }
             case COMMANDER -> {
-                return new CommanderDraftItem(itemId);
+                item =  new CommanderDraftItem(itemId);
             }
             case HERO -> {
-                return new HeroDraftItem(itemId);
+                item =  new HeroDraftItem(itemId);
             }
             case MECH -> {
-                return new MechDraftItem(itemId);
+                item =  new MechDraftItem(itemId);
             }
             case FLAGSHIP -> {
-                return new FlagshipDraftItem(itemId);
+                item =  new FlagshipDraftItem(itemId);
             }
             case COMMODITIES -> {
-                return new CommoditiesDraftItem(itemId);
+                item =  new CommoditiesDraftItem(itemId);
             }
             case PN -> {
-                return new PNDraftItem(itemId);
+                item =  new PNDraftItem(itemId);
             }
             case HOMESYSTEM -> {
-                return new HomeSystemDraftItem(itemId);
+                item =  new HomeSystemDraftItem(itemId);
             }
             case STARTINGTECH -> {
-                return new StartingTechDraftItem(itemId);
+                item =  new StartingTechDraftItem(itemId);
             }
             case STARTINGFLEET -> {
-                return new StartingFleetDraftItem(itemId);
+                item =  new StartingFleetDraftItem(itemId);
             }
             case BLUETILE -> {
-                return new BlueTileDraftItem(itemId);
+                item =  new BlueTileDraftItem(itemId);
             }
             case REDTILE -> {
-                return new RedTileDraftItem(itemId);
+                item =  new RedTileDraftItem(itemId);
             }
             case DRAFTORDER -> {
-                return new SpeakerOrderDraftItem(itemId);
+                item =  new SpeakerOrderDraftItem(itemId);
             }
         }
-        return null;
+        item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
+        return item;
     }
 
     public static DraftItem GenerateFromAlias(String alias) {
@@ -123,7 +126,32 @@ public abstract class DraftItem implements ModelInterface {
 
     public abstract String getShortDescription();
 
-    public abstract String getLongDescription();
+    public String getLongDescription() {
+        StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
+        if (Errata != null) {
+            if (Errata.AdditionalComponents != null) {
+                sb.append(" *Also adds: ");
+                for (DraftErrataModel i: Errata.AdditionalComponents) {
+                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    sb.append(item.getItemEmoji()).append(item.getShortDescription());
+                    sb.append(", ");
+                }
+                sb.append("*");
+            }
+            if (Errata.OptionalSwaps != null) {
+                sb.append(" *Includes optional swaps: ");
+                for (DraftErrataModel i: Errata.OptionalSwaps) {
+                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    sb.append(item.getItemEmoji()).append(item.getShortDescription());
+                    sb.append(", ");
+                }
+                sb.append("*");
+            }
+        }
+        return sb.toString();
+    }
+
+    protected abstract String getLongDescriptionImpl();
 
     public abstract String getItemEmoji();
 

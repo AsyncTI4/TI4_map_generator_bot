@@ -23,7 +23,7 @@ public class MechDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
         StringBuilder sb = new StringBuilder();
         sb.append("Cost: ");

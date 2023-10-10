@@ -41,7 +41,7 @@ public class CommanderDraftItem extends DraftItem {
     }
 
     @Override
-    public String getLongDescription() {
+    public String getLongDescriptionImpl() {
         return "*" + getLeader().getAbilityWindow() +"* " + getLeader().getAbilityText() + " **Unlock:** " + getLeader().getUnlockCondition();
     }
 
