@@ -24,7 +24,7 @@ public class HomeSystemDraftItem extends DraftItem {
 
     @Override
     public String getLongDescriptionImpl() {
-        if (ItemId.equals("ghosts")) {
+        if (ItemId.equals("ghost")) {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
         }
         FactionModel faction = Mapper.getFactionSetup(ItemId);
