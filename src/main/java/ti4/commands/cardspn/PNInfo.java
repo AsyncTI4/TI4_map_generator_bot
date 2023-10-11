@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -33,13 +34,13 @@ public class PNInfo extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        checkAndAddPNs(activeGame, player);
-        activeGame.checkPromissoryNotes();
         sendPromissoryNoteInfo(activeGame, player, true, event);
         sendMessage("PN Info Sent");
     }
 
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
+        checkAndAddPNs(activeGame, player);
+        activeGame.checkPromissoryNotes();
         String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Heads up, someone used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendPromissoryNoteInfo(activeGame, player, longFormat);
@@ -64,7 +65,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 if(activeGame.isFoWMode()){
                     transact = Button.success("resolvePNPlay_"  + pnShortHand, "Play " +owner.getColor() +" "+ promissoryNote.getName());
                 }else{
-                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                 }
                 buttons.add(transact);
             }
@@ -74,18 +75,31 @@ public class PNInfo extends PNCardsSubcommandData {
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
         if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")){
-            Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naalu")));
+            Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Emojis.Naalu));
             buttons.add(naalu);
         }
-        if (player.hasUnexhaustedLeader("hacanagent", activeGame)) {
-            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+        if(player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")){
+            Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
+            buttons.add(augers);
+        }
+        if (player.hasUnexhaustedLeader("hacanagent")) {
+            Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
+        }
+        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0) {
+            Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Emojis.Cabal));
+            buttons.add(release);
         }
         if(player.hasRelicReady("e6-g0_network")){
             buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
+        if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
+                Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
+                psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+                buttons.add(psycho);
+        }
         
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeGame), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 
    
@@ -160,7 +174,7 @@ public class PNInfo extends PNCardsSubcommandData {
         String pnText = pnModel.getText();
         Player pnOwner = activeGame.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
-            if (!activeGame.isFoWMode()) sb.append(Helper.getFactionIconFromDiscord(pnOwner.getFaction()));
+            if (!activeGame.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
             sb.append(Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
             // if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));

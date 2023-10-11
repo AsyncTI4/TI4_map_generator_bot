@@ -20,7 +20,7 @@ public class Info extends GameSubcommandData {
 
     public Info() {
         super(Constants.INFO, "Game information:");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
     }
 
     @Override
@@ -64,12 +64,12 @@ public class Info extends GameSubcommandData {
         }
         sb.append("Strategy Card Set: `").append(activeGame.getScSetID()).append("`").append(NEW_LINE);
         sb.append("Decks: ").append(NEW_LINE);
-        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ")
-            .append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
+        sb.append("- ").append(Emojis.ActionCard).append("Action Card Deck: `").append(activeGame.getAcDeckID()).append("` ").append(activeGame.getActionCardDeckSize()).append("/").append(activeGame.getActionCardFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.SecretObjective).append("Secret Objective Deck: `").append(activeGame.getSoDeckID()).append("` ").append(activeGame.getSecretObjectiveDeckSize()).append("/").append(activeGame.getSecretObjectiveFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(activeGame.getStage1PublicDeckID()).append("` ").append(activeGame.getPublicObjectives1DeckSize()).append("/").append(activeGame.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(activeGame.getStage2PublicDeckID()).append("` ").append(activeGame.getPublicObjectives2DeckSize()).append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/").append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
+        if (activeGame.getEventDeckID() != null) sb.append("- ").append("").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/").append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
         sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/").append(activeGame.getRelicFullDeckSize()).append(NEW_LINE);
         sb.append("- Exploration Deck: `").append(activeGame.getExplorationDeckID()).append("`").append(NEW_LINE);
@@ -81,7 +81,7 @@ public class Info extends GameSubcommandData {
         sb.append("### Settings: ").append(NEW_LINE);
         sb.append("Beta Test Mode: ").append(activeGame.isTestBetaFeaturesMode()).append(NEW_LINE);
         sb.append("Auto-Ping Time Interval (hrs): ").append(activeGame.getAutoPingSpacer()).append(NEW_LINE);
-        sb.append("Text Size: ").append(activeGame.getLargeText()).append(NEW_LINE);
+        sb.append("Text Size: ").append(activeGame.getTextSize()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(activeGame.getOutputVerbosity()).append(NEW_LINE);
         if (activeGame.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(activeGame.getTableTalkChannel().getAsMention()).append(NEW_LINE);
         if (activeGame.getActionsChannel() != null) sb.append("Actions Channel: ").append(activeGame.getActionsChannel().getAsMention()).append(NEW_LINE);
@@ -91,7 +91,7 @@ public class Info extends GameSubcommandData {
             sb.append("### Players: ").append(NEW_LINE);
             int index = 1;
             for (Player player : activeGame.getRealPlayers()) {
-                sb.append("> `").append(index).append(".` ").append(Helper.getFactionIconFromDiscord(player.getFaction())).append(player.getUserName()).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                sb.append("> `").append(index).append(".` ").append(player.getFactionEmoji()).append(player.getUserName()).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
                 if (player.getRoleForCommunity() != null) sb.append(" - Community Role: ").append(player.getRoleForCommunity().getName());
                 sb.append(NEW_LINE);
                 index++;

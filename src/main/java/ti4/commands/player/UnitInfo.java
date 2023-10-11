@@ -52,7 +52,7 @@ public class UnitInfo extends PlayerSubcommandData {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (UnitModel unitModel : player.getUnitsOwned().stream().sorted().map(Mapper::getUnit).toList()) {
-            MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(false);
+            MessageEmbed unitRepresentationEmbed = unitModel.getRepresentationEmbed(false);
             messageEmbeds.add(unitRepresentationEmbed);
         }
         return messageEmbeds;

@@ -67,7 +67,7 @@ public class SOInfo extends SOCardsSubcommandData {
             List<Button> buttons = new ArrayList<>();
             Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
             Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             buttons.add(scoreB);
             buttons.add(discardB);
             if(activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0){

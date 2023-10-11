@@ -78,7 +78,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     }
 
     public String displayExplore(String cardID) {
-        String card = Mapper.getExplore(cardID);
+        String card = Mapper.getExploreRepresentation(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
             String[] cardInfo = card.split(";");
@@ -116,7 +116,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             message = "Card has been added to play area.";
             activeGame.purgeExplore(cardID);
         }
-        String card = Mapper.getExplore(cardID);
+        String card = Mapper.getExploreRepresentation(cardID);
         String[] cardInfo = card.split(";");
 
         if (player == null) {
@@ -125,7 +125,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (activeGame != null && !activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
-            String factionIcon = Helper.getFactionIconFromDiscord(player.getFaction());
+            String factionIcon = player.getFactionEmoji();
             if (planetName != null) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), factionIcon + " found a " + cardInfo[0] + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
             } else {
@@ -243,6 +243,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeGame, player, event);
+                if(hasSchemingAbility){
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+                }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
                 ButtonHelper.checkACLimit(activeGame, event, player);
             }
@@ -270,6 +273,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                 ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
+                if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+                }
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
@@ -287,7 +293,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge") && event != null) {
-                    String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                    String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
                     ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
@@ -297,7 +303,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 final String ministerOfExploration = "minister_exploration";
                 if (activeGame.getLaws().keySet().contains(ministerOfExploration)) {
                     if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction()) && event != null) {
-                        String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                        String fac = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                         player.setTg(player.getTg() + 1);
                         ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
@@ -375,7 +381,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
-                String message2 = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player) + ". Use buttons to gain CCs";
+                String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }

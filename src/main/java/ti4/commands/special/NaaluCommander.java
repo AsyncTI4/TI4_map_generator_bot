@@ -58,11 +58,9 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
         sb.append("\n\n");
 
-        Set<Player> neighbours = Helper.getNeighbouringPlayers(activeGame, player);
-
-        for (Player player_ : neighbours) {
+        for (Player player_ : player.getNeighbouringPlayers()) {
             sb.append("_ _\n**__");
-            sb.append(Helper.getFactionIconFromDiscord(player_.getFaction()));
+            sb.append(player_.getFactionEmoji());
             sb.append(Helper.getColourAsMention(event.getGuild(), player_.getColor())).append(" ");
             sb.append(player_.getUserName()).append("'s Promissory Notes:__**\n");
             sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false));

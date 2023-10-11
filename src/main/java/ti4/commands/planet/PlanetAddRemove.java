@@ -117,16 +117,16 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 case "hopesend" ->  Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
                 case "primor" ->  Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
                 case "mallice" ->  Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**: You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities into trade goods";
-                case "mirage" ->  Emojis.Mirage + Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
-                default -> Emojis.planet + " " + planet;
+                case "mirage" ->  Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
+                default -> planet;
             };
         } else if (getActionID().equals(Constants.PLANET_REFRESH_ABILITY)) {
             return switch (planet) {
                 case "hopesend" ->  Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**";
                 case "primor" ->  Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**";
                 case "mallice" ->  Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**";
-                case "mirage" ->  Emojis.Mirage + Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
-                default -> Emojis.planet + " " + planet;
+                case "mirage" ->  Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
+                default -> planet;
             };
         } else {
             return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveGame());

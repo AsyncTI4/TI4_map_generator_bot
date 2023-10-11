@@ -55,6 +55,6 @@ public abstract class SpecialSubcommandData extends SubcommandData {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        GenerateMap.getInstance().saveImage(activeGame, event);
+        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
     }
 }

@@ -61,6 +61,14 @@ public class Eliminate extends AddRemovePlayer {
         // }
         if (option != null){
             
+            // OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
+            
+            // if (removeOption == null) {
+            //     MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
+            //     return;
+            // }
+            
+            // Player player = Helper.getPlayer(activeGame, null, event);
             User extraUser = option.getAsUser();
             Player player = activeGame.getPlayer(extraUser.getId());
             HashMap<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
@@ -71,7 +79,7 @@ public class Eliminate extends AddRemovePlayer {
 
                     PromissoryNoteModel pn = PNss.get(pnID);
                     if(pn!= null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())){
-                        Player p2 = Helper.getPlayerFromColorOrFaction(activeGame, pn.getOwner());
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
                         PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
@@ -108,7 +116,7 @@ public class Eliminate extends AddRemovePlayer {
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());
                 for(int so : acs.values()){
-                    boolean scored = activeGame.unscoreSecretObjective(extraUser.getId(), so);
+                    boolean scored = activeGame.unscoreSecretObjective(player.getUserID(), so);
                 }
                 //discard all of a players SOs
 
@@ -122,14 +130,14 @@ public class Eliminate extends AddRemovePlayer {
                    player.removeSC(sc);
                 }
             }
-            activeGame.removePlayer(extraUser.getId());
+            activeGame.removePlayer(player.getUserID());
             Guild guild = event.getGuild();
-            Member removedMember = guild.getMemberById(extraUser.getId());
+            Member removedMember = guild.getMemberById(player.getUserID());
             List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
             if (removedMember != null && roles.size() == 1) {
                 guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
             }
-            sb.append("Eliminated player: ").append(extraUser.getName()).append(" from game: ").append(activeGame.getName()).append("\n");
+            sb.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(activeGame.getName()).append("\n");
             MessageHelper.sendMessageToChannel(event.getChannel(),sb.toString());
         }
     }

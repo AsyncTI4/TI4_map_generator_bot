@@ -36,7 +36,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
     }
     public void doSwords(Player player, GenericInteractionCreateEvent event, Game activeGame){
         List<String> planets = player.getPlanets();
-        String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+        String ident = player.getFactionEmoji();
         StringBuilder message = new StringBuilder();
         int oldTg = player.getTg();
         for (Tile tile : activeGame.getTileMap().values()) {

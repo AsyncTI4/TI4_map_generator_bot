@@ -24,6 +24,7 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_2, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_3, "Leader Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER_4, "Leader Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -35,7 +36,7 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         }
 
         leaderIDs.removeIf(StringUtils::isEmpty);
-        leaderIDs.removeIf(leaderID -> !Mapper.getLeaderRepresentations().containsKey(leaderID));
+        leaderIDs.removeIf(leaderID -> !Mapper.isValidLeader(leaderID));
 
         if (leaderIDs.isEmpty()) {
             sendMessage("No valid leaders were provided. Please see `/help list_leaders` for available choices.");
@@ -45,6 +46,7 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;

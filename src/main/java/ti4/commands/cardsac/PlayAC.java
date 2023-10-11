@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -101,6 +102,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
             }
         }
+        if ("Action".equalsIgnoreCase(actionCardWindow) && activeGame.getPlayer(activePlayerID) != player) {
+            return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
+        }
 
         activeGame.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
@@ -118,12 +122,12 @@ public class PlayAC extends ACCardsSubcommandData {
         Player empy = Helper.getPlayerFromUnit(activeGame, "empyrean_mech");
         if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeGame, player, empy) && !activeGame.getLaws().containsKey("articles_war")) {
             Button empyButton = Button.secondary("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Empyrean Mech ")
-                .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                .withEmoji(Emoji.fromFormatted(Emojis.mech));
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(empyButton);
             Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
             empyButtons.add(refuse);
-            MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(activeGame),
+            MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
                 Helper.getPlayerRepresentation(empy, activeGame, activeGame.getGuild(), true) + "You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.",
                 empyButtons);
 
@@ -132,12 +136,12 @@ public class PlayAC extends ACCardsSubcommandData {
         for (Player player2 : activeGame.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
                 Button instinctButton = Button.secondary("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training")
-                    .withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Xxcha));
                 List<Button> xxchaButtons = new ArrayList<>();
                 xxchaButtons.add(instinctButton);
                 Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
                 xxchaButtons.add(refuse);
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(activeGame), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
                     + "You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel", xxchaButtons);
             }
 
@@ -174,9 +178,16 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
                 MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
-                List<Button> scButtons = ButtonHelper.getArcExpButtons(activeGame, player);
+                List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
+            }
+            if (actionCardTitle.contains("Plagiarize")) {
+                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
+                List<Button> scButtons = new ArrayList<Button>();
+                scButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                    Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to resolve plagiarize", scButtons);
             }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
@@ -213,6 +224,24 @@ public class PlayAC extends ACCardsSubcommandData {
                     channel2 = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(p2.getActionCards().keySet().contains("reverse_engineer")){
+                        List<Button> reverseButtons = new ArrayList<Button>();
+                        String key = "reverse_engineer";
+                        String ac_name = Mapper.getActionCardName(key);
+                        if (ac_name != null) {
+                            reverseButtons.add(Button.success(Constants.AC_PLAY_FROM_HAND + p2.getActionCards().get(key) +"_reverse_"+actionCardTitle, "Reverse engineer "+ actionCardTitle));
+                        }
+                        reverseButtons.add(Button.danger("deleteButtons", "Decline"));
+                        String cyberMessage = ""+Helper.getPlayerRepresentation(p2, activeGame, event.getGuild(), true)
+                        + " reminder that you can use reverse engineer on "+actionCardTitle;
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                            cyberMessage, reverseButtons);
+                    }
+                }
             }
         }
 

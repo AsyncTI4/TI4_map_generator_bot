@@ -1,11 +1,11 @@
 package ti4;
 
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -27,6 +27,7 @@ import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
+import ti4.commands.developer.DeveloperCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
@@ -39,6 +40,7 @@ import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
@@ -58,12 +60,15 @@ import ti4.message.MessageHelper;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class AsyncTI4DiscordBot {
 
+    public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
     public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(
         Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
@@ -77,33 +82,38 @@ public class AsyncTI4DiscordBot {
     public static Guild guild3rd;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
+    public static Set<Guild> guilds = new HashSet<>();
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
 
         jda = JDABuilder.createDefault(args[0])
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                .build();
+            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            .setMemberCachePolicy(MemberCachePolicy.ALL)
+            .setChunkingFilter(ChunkingFilter.ALL)
+            .setEnableShutdownHook(false)
+            .build();
 
         jda.addEventListener(
-            new MessageListener(), 
-            new ButtonListener(), 
+            new MessageListener(),
+            new ButtonListener(),
             new UserJoinServerListener(),
             new AutoCompleteListener());
-            
+
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
             MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
+        jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
+
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
-        MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
+        guilds.add(guildPrimary);
+        MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         TileHelper.init();
         PositionMapper.init();
@@ -123,7 +133,8 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
-        adminRoles.add(jda.getRoleById("1149705227625316352"));
+        adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
+        adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
 
         adminRoles.removeIf(Objects::isNull);
 
@@ -141,8 +152,8 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
-        bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
-        bothelperRoles.add(jda.getRoleById("1131925041219653714"));//Jonjo's Server
+        bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
 
         bothelperRoles.removeIf(Objects::isNull);
 
@@ -167,21 +178,20 @@ public class AsyncTI4DiscordBot {
 
         commandManager.addCommand(new MapCommand());
         commandManager.addCommand(new HelpCommand());
+        commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
 
-
+        commandManager.addCommand(new DeveloperCommand());
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
-
 
         commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
-
 
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
@@ -197,14 +207,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new StatisticsCommand());
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
-        
-        // TODO: Delete these
-        // commandManager.addCommand(new AddTile());
-        // commandManager.addCommand(new RemoveTile());
-        // commandManager.addCommand(new AddTileList());
-        // commandManager.addCommand(new AddBorderAnomaly());
-        // commandManager.addCommand(new RemoveBorderAnomaly());
-        
+
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
@@ -213,10 +216,11 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
             if (guildCommunityPlays != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildCommunityPlays.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildCommunityPlays.getName());
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
+                guilds.add(guildCommunityPlays);
             }
         }
 
@@ -224,10 +228,11 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             if (guildFogOfWar != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildFogOfWar.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildFogOfWar);
             }
         }
 
@@ -235,10 +240,11 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
             if (guildSecondary != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guildSecondary.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildSecondary.getName());
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guildSecondary);
             }
         }
 
@@ -246,39 +252,46 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 7) {
             guild3rd = jda.getGuildById(args[6]);
             if (guild3rd != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) +"`  BOT STARTED UP: " + guild3rd.getName());
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guild3rd.getName());
                 CommandListUpdateAction commandsD = guild3rd.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                guilds.add(guild3rd);
             }
         }
 
         BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING MAPS: " + guildPrimary.getName());
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Maps"));
         GameSaveLoadManager.loadMaps();
 
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT CHECKING FOR DATA MIGRATIONS");
-        DataMigrationManager.runMigrations(); 
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT FINISHED CHECKING FOR DATA MIGRATIONS");
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  CHECKING FOR DATA MIGRATIONS");
+        DataMigrationManager.runMigrations();
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT HAS FINISHED LOADING MAPS");
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING MAPS");
 
         // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
+                jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "# ` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` BOT IS NO LONGER ACCEPTING COMMANDS ");
-                TimeUnit.SECONDS.sleep(10);
-                //TODO: add last command time/last save time to cut down on saves in this loop
-                //Also, make multithreaded
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
+                TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SAVING MAPS");
                 GameSaveLoadManager.saveMaps();
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
-                MessageHelper.sendMessageToBotLogWebhook("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` MAPS HAVE BEEN SAVED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS COMPLETE");
+                TimeUnit.SECONDS.sleep(1); // wait for BotLogger
+                jda.shutdown();
+                jda.awaitShutdown();
                 mainThread.join();
             } catch (Exception e) {
-                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook: " + e.getMessage());
+                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
                 e.printStackTrace();
             }
         }));

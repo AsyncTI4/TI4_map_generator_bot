@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -58,11 +59,25 @@ public class MessageListener extends ListenerAdapter {
         String userID = event.getUser().getId();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
-        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
+        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS) && !event.getInteraction().getName().equals(Constants.SEARCH) && event.getOption(Constants.GAME_NAME) == null) { //SKIP /help COMMANDS
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
                 event.reply("Command canceled. Execute command in correctly named channel that starts with the game name.\n> For example, for game `pbd123`, the channel name should start with `pbd123`").setEphemeral(true).queue();
                 return;
+            }else{
+                GameManager gameManager = GameManager.getInstance();
+                Game userActiveGame = gameManager.getUserActiveGame(userID);
+                if(userActiveGame != null){
+                    userActiveGame.increaseSlashCommandsRun();
+                    String command = event.getName()+" "+event.getSubcommandName();
+                    Integer count = userActiveGame.getAllSlashCommandsUsed().get(command);
+                    if(count == null){
+                        userActiveGame.setSpecificSlashCommandCount(command, 1);
+                    }else{
+                        userActiveGame.setSpecificSlashCommandCount(command, 1+count);
+                    }
+                }
+                
             }
         }
 
@@ -102,7 +117,7 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN);
+        boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN) || eventName.contains(Constants.DEVELOPER);
         boolean isUnprotectedCommandSubcommand = (Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName));
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
@@ -123,13 +138,15 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        Message msg = event.getMessage();
-        try {      
+        if (!isAsyncServer(event.getGuild().getId())) return;
+
+        try {
+            Message msg = event.getMessage();
             if (msg.getContentRaw().startsWith("[DELETE]")) {
                 msg.delete().queue();
             }
             autoPingGames();
-            handleFoWWhispers(event, msg);
+            handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
         } catch (Exception e) {
@@ -195,7 +212,7 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity + " this is a brusk missive stating that while you may sleep, the game never does.";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*4) ){
-                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absense.";
+                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absence.";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*5) ){
                                         ping = realIdentity + " this is a firm request that you do something to end this situation.";
@@ -249,20 +266,24 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
+    private void handleFoWWhispersAndFowCombats(MessageReceivedEvent event, Message msg) {
         if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
             try{
-                    MessageHistory mHistory = event.getChannel().getHistory();
-                    RestAction<List<Message>> lis = mHistory.retrievePast(4);
-                    boolean allNonBots = true;
-                    for(Message m : lis.complete()){
-                        if(m.getAuthor().isBot() || m.getReactions().size() > 0){
-                            allNonBots = false;
-                            break;
+                    String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
+                    Game activeGame = GameManager.getInstance().getGame(gameName);
+                    if(activeGame != null && activeGame.getPublicObjectives1() != null && activeGame.getPublicObjectives1().size() > 1 && activeGame.getBotShushing()){
+                        MessageHistory mHistory = event.getChannel().getHistory();
+                        RestAction<List<Message>> lis = mHistory.retrievePast(4);
+                        boolean allNonBots = true;
+                        for(Message m : lis.complete()){
+                            if(m.getAuthor().isBot() || m.getReactions().size() > 0){
+                                allNonBots = false;
+                                break;
+                            }
                         }
-                    }
-                    if(allNonBots){
-                        event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+                        if(allNonBots){
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+                        }
                     }
                 }catch (Exception e){
                     BotLogger.log("Reading previous message", e);
@@ -290,16 +311,12 @@ public class MessageListener extends ListenerAdapter {
                     RestAction<List<Message>> lis = mHistory.retrievePast(2);
                     if(!event.getMessage().getAuthor().getId().equalsIgnoreCase(lis.complete().get(1).getAuthor().getId())){
                         if(player != null && player.isRealPlayer() ){
-                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()))).queue();
+                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted(player.getFactionEmoji())).queue();
                         }
                     }
                 }catch (Exception e){
                     BotLogger.log("Reading previous message", e);
                 }
-                
-                
-                
-                
             }
         }
 
@@ -427,5 +444,12 @@ public class MessageListener extends ListenerAdapter {
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(), event.getChannel().asTextChannel().getId(), event.getAuthor().getId(), event.getMessage().getContentDisplay());
             }
         }
+    }
+
+    public static boolean isAsyncServer(String guildID) {
+        for (Guild guild : AsyncTI4DiscordBot.guilds) {
+            if (guild.getId().equals(guildID)) return true;
+        }
+        return false;
     }
 }

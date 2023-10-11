@@ -85,10 +85,8 @@ public class DeleteGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Delete selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES")
-                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES").setRequired(true))
         );
     }
 }

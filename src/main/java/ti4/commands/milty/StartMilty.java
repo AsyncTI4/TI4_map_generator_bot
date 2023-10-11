@@ -27,10 +27,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
@@ -104,8 +107,8 @@ public class StartMilty extends MiltySubcommandData {
         if (!slicesCreated) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Did not find correct slices, check settings");
         } else {
-            File file = generateImage(draftManager);
-            MessageHelper.sendFileToChannel(event.getChannel(), file);
+            FileUpload fileUpload = generateImage(draftManager);
+            MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
 
             String message = "Slices:\n\n";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
@@ -232,7 +235,7 @@ public class StartMilty extends MiltySubcommandData {
         return factionDraft;
     }
 
-    private File generateImage(MiltyDraftManager draftManager) {
+    private FileUpload generateImage(MiltyDraftManager draftManager) {
         List<MiltyDraftSlice> slices = draftManager.getSlices();
         int sliceCount = slices.size();
         float scale = 1.0f;
@@ -343,8 +346,9 @@ public class StartMilty extends MiltySubcommandData {
         //noinspection ResultOfMethodCallIgnored
         file.delete();
         File jpgFile = new File(absolutePath);
+        FileUpload fileUpload = FileUpload.fromData(jpgFile, jpgFile.getName());
         MapFileDeleter.addFileToDelete(jpgFile);
-        return jpgFile;
+        return fileUpload;
     }
 
 
@@ -417,7 +421,7 @@ public class StartMilty extends MiltySubcommandData {
         return slicesCreated;
     }
 
-    private void initDraftTiles(MiltyDraftManager draftManager) {
+    public void initDraftTiles(MiltyDraftManager draftManager) {
         Map<String, TileModel> allTiles = TileHelper.getAllTiles();
         for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
             String tileID = tileModel.getId();
@@ -434,17 +438,25 @@ public class StartMilty extends MiltySubcommandData {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);
+                        continue;
                     }
                 }
             }
             Tile tile = new Tile(tileID, "none");
+            if(tileID.length() > 2){
+                continue;
+            }
+           
+            if(ButtonHelper.isTileHomeSystem(tile) || tile.getRepresentation().contains("Hyperlane") || tile.getRepresentation().contains("Keleres") ){
+                continue;
+            }
             draftTile.setTile(tile);
-
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 if (unitHolder instanceof Planet planet) {
                     int resources = planet.getResources();
                     int influence = planet.getInfluence();
+                
                     draftTile.addResources(resources);
                     draftTile.addInfluence(influence);
                     if (resources > influence) {
@@ -466,7 +478,7 @@ public class StartMilty extends MiltySubcommandData {
             int resources = draftTile.getResources();
             int influence = draftTile.getInfluence();
             int combinedResources = resources + influence;
-            if (combinedResources == 0) {
+            if (combinedResources == 0 || tile.isAnomaly()) {
                 draftTile.setTierList(TierList.red);
             } else if (combinedResources < 4) {
                 draftTile.setTierList(TierList.low);

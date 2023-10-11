@@ -24,6 +24,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,12 +37,28 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
-	interface MessageFunction{
+	public interface MessageFunction{
 		void run(Message msg);
+	}
+
+	public interface ThreadFunction {
+		void run(ThreadChannel msg);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
 		splitAndSent(messageText, channel);
+	}
+
+	public static void sendMessageToBotLogChannel(GenericInteractionCreateEvent event, String messageText)  {
+		splitAndSent(messageText, BotLogger.getBotLogChannel(event));
+	}
+
+	public static void sendMessageToBotLogChannel(String messageText)  {
+		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
+	}
+
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
+		splitAndSent(messageText, channel, Collections.singletonList(buttons));
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
@@ -59,6 +76,7 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeGame, player, msg);
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
+
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game activeGame, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players;
@@ -77,7 +95,7 @@ public class MessageHelper {
 			}
 			while (players.hasMoreTokens()) {
 				String player = players.nextToken();
-				Player player_ = Helper.getPlayerFromColorOrFaction(activeGame, player);
+				Player player_ = activeGame.getPlayerFromColorOrFaction(player);
 				addFactionReactToMessage(activeGame, player_, msg);
 			}
 
@@ -106,11 +124,9 @@ public class MessageHelper {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
-	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
-		FileUpload fileUpload = FileUpload.fromData(file);
-		channel.sendFiles(fileUpload).queue();
-	}
-	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+
+	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
+		if (fileUpload == null) return;
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
@@ -120,8 +136,21 @@ public class MessageHelper {
 				}
 			}
 		}
+		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload, boolean SCPlay) {
+		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
+		if (file == null) return;
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
+	}
+
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
+		sendFileUploadToChannel(channel, fileUpload);
 		splitAndSent(message, channel, buttons);
 	}
 
@@ -129,22 +158,22 @@ public class MessageHelper {
 		splitAndSent(messageText, event.getMessageChannel());
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file) {
-		replyToMessage(event, file, false, null, false);
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload) {
+		replyToMessage(event, fileUpload, false, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap) {
-		replyToMessage(event, file, forceShowMap, null, false);
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap) {
+		replyToMessage(event, fileUpload, forceShowMap, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap, String messageText, boolean pinMessage) {
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap, String messageText, boolean pinMessage) {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
-				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
+				sendMessageWithFile((MessageChannel) event.getChannel(), fileUpload, messageText, pinMessage);
 				return;
 			}
 			if (event.getChannel() instanceof MessageChannel) {
-				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
+				sendMessageWithFile((MessageChannel)event.getChannel(), fileUpload, messageText, pinMessage);
 			}
 
 		} catch (Exception e) {
@@ -152,7 +181,7 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageWithFile(MessageChannel channel, File file, String messageText, boolean pinMessage) {
+	public static void sendMessageWithFile(MessageChannel channel, FileUpload fileUpload, String messageText, boolean pinMessage) {
 		
 		if(channel.getName().contains("-actions")){
 			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
@@ -164,7 +193,6 @@ public class MessageHelper {
 			}
 		}
 		
-		FileUpload fileUpload = FileUpload.fromData(file);
 		MessageCreateBuilder message = new MessageCreateBuilder();
 		if (messageText != null) {
 			message.addContent(messageText);
@@ -183,7 +211,7 @@ public class MessageHelper {
 		splitAndSentWithAction(messageText, channel, null, buttons);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+	public static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
 		splitAndSentWithAction(messageText, channel, restAction, null);
 	}
 
@@ -330,7 +358,7 @@ public class MessageHelper {
      */
     public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Game activeGame, String messageText) {
         //GET CARDS INFO THREAD
-        ThreadChannel threadChannel = player.getCardsInfoThread(activeGame);
+        ThreadChannel threadChannel = player.getCardsInfoThread();
         if (threadChannel == null) {
             BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeGame.getName());
             return;
@@ -472,7 +500,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageEmbedsToCardsInfoThread(Game activeGame, Player player, String message, List<MessageEmbed> embeds) {
-			ThreadChannel channel = player.getCardsInfoThread(activeGame);
+			ThreadChannel channel = player.getCardsInfoThread();
 			if (channel == null || embeds == null || embeds.isEmpty()) return;
 			splitAndSent(message, channel);
 			for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
@@ -481,11 +509,25 @@ public class MessageHelper {
 	}
 
     public static void sendMessageToBotLogWebhook(String message) {
-			if (!"943410040369479690".equals(AsyncTI4DiscordBot.guildPrimary.getId())) return; //Only run in Prod
-			DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
+			if (getBotLogWebhookURL() == null) {
+				System.out.println("[BOT-LOG-WEBHOOK] " + message);
+				return;
+			}
+			DiscordWebhook webhook = new DiscordWebhook(getBotLogWebhookURL());
 			webhook.setContent(message);
 			try {
 				webhook.execute();
 			} catch (Exception ignored) {}
-		}
+	}
+
+	/**
+	 * @return a webhook URL for a the bot-log channel of the Primary guild. Add your test server's ID and #bot-log channel webhook url here
+	 */
+	public static String getBotLogWebhookURL() {
+		return switch (AsyncTI4DiscordBot.guildPrimary.getId()) {
+			case "943410040369479690" -> "https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v"; //AsyncTI4 Primary HUB Production Server
+			case "1059645656295292968" -> "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp"; //PrisonerOne's Test Server
+			default -> null;
+		};
+	}
 }

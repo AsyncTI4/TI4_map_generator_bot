@@ -19,12 +19,14 @@ public class DiscordantStarsHelper {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
-                                if (planet.hasGroundForces() && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                                if (planet.hasGroundForces(player) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                     planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                                } else if (!planet.hasGroundForces()) {
+                                } else if (!planet.hasGroundForces(player)) {
                                     planet.addToken(Constants.GARDEN_WORLDS_PNG);
                                 }
-                            }
+                            } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                                planet.removeToken(Constants.GARDEN_WORLDS_PNG);
+                            } 
                         }
                     }
                 }
@@ -35,7 +37,7 @@ public class DiscordantStarsHelper {
         for (Player player : activeGame.getPlayers().values()) {
             if (player.ownsUnit("edyn_mech")) {
                 for (Tile tile : activeGame.getTileMap().values()) {
-                    if (Helper.playerHasMechInSystem(tile, activeGame, player)) {
+                    if (player.hasMechInSystem(tile)) {
                         tile.addToken(Constants.SIGIL, Constants.SPACE);
                     } else {
                         tile.removeToken(Constants.SIGIL, Constants.SPACE);

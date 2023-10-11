@@ -62,7 +62,6 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(discardCount).append(")\n");
             info.append(listNames(discard)).append("\n_ _\n");
 
-
             if (player == null || player.getSCs().isEmpty() || over || !activeGame.isFoWMode()) {
                 sendMessage(info.toString());
             }
@@ -75,7 +74,7 @@ public class ExpInfo extends ExploreSubcommandData {
     private String listNames(List<String> deck) {
         StringBuilder sb = new StringBuilder();
         for (String cardID : deck) {
-            String card = Mapper.getExplore(cardID);
+            String card = Mapper.getExploreRepresentation(cardID);
             String name = null;
             if (card != null) {
                 StringTokenizer cardInfo = new StringTokenizer(card, ";");

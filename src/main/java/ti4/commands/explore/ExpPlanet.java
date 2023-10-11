@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
@@ -41,7 +42,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet not found in map");
             return;
         }
-        Tile tile = Helper.getTileFromPlanet(planetName, activeGame);
+        Tile tile = activeGame.getTileFromPlanet(planetName);
         if (tile == null) {
             sendMessage("System not found that contains planet");
             return;
@@ -100,10 +101,10 @@ public class ExpPlanet extends ExploreSubcommandData {
                         }
                         String cardID2 = activeGame.drawExplore(drawColor);
 
-                        String card = Mapper.getExplore(cardID);
+                        String card = Mapper.getExploreRepresentation(cardID);
                         String[] cardInfo1 = card.split(";");
                         String name1 = cardInfo1[0];
-                        String card2 = Mapper.getExplore(cardID2);
+                        String card2 = Mapper.getExploreRepresentation(cardID2);
                         String[] cardInfo2 = card2.split(";");
                         String name2 = cardInfo2[0];
 
@@ -116,7 +117,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 
                         if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
                             
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                            String pF = player.getFactionEmoji();
                             
                             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Using Distant Suns,  " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeGame));
                             
@@ -150,6 +151,11 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")){
+            new PlanetRefresh().doAction(player, planetName, activeGame);
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+            ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
         }
     }
 }

@@ -1,8 +1,16 @@
 package ti4.model;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 
-public class ActionCardModel implements ModelInterface {
+@Data
+public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -10,6 +18,7 @@ public class ActionCardModel implements ModelInterface {
     private String text;
     private String flavorText;
     private String source;
+    private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
         return alias != null
@@ -52,5 +61,52 @@ public class ActionCardModel implements ModelInterface {
     public String getRepresentation() {
         return Emojis.ActionCard + "__**" + name + "**__" + " *(" + phase + " Phase)*: " +
             "_" + window + ":_ " + text + "\n";
+    }
+
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false, false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        //TITLE
+        StringBuilder title = new StringBuilder();
+        title.append(Emojis.ActionCard);
+        title.append("__**").append(getName()).append("**__");
+        title.append(getSourceEmoji());
+        eb.setTitle(title.toString());
+
+        //DESCRIPTION
+        StringBuilder description = new StringBuilder();
+        description.append("***").append(getWindow()).append(":***\n").append(getText());
+        eb.setDescription(description.toString());
+
+        //FLAVOUR TEXT
+        if (includeFlavourText && getFlavorText() != null) eb.addField("", "*" + getFlavorText() + "*", true);
+
+        //FOOTER
+        StringBuilder footer = new StringBuilder();
+        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        eb.setFooter(footer.toString());
+        
+        eb.setColor(Color.orange);
+        return eb.build();
+    }
+
+    private String getSourceEmoji() {
+        return switch (getSource()) {
+            case "ds" -> Emojis.DiscordantStars;
+            case "action_deck_2" -> Emojis.ActionDeck2;
+            default -> "";
+        };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

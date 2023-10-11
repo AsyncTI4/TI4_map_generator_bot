@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +21,10 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
@@ -47,6 +50,8 @@ public class DataMigrationManager {
     ///
     public static void runMigrations() {
         try {
+            runMigration("migrateRenameDSExplores_061023", DataMigrationManager::migrateRenameDSExplores_061023);
+            runMigration("migrateRenameVeldyrAttachments_270923", DataMigrationManager::migrateRenameVeldyrAttachments_270923);
             runMigration("migrateGheminaAddCarrier_190923", DataMigrationManager::migrateGheminaAddCarrier_190923);
             runMigration("migrateNaaluMechsToOmega_180923", DataMigrationManager::migrateNaaluMechsToOmega_180923);
             runMigration("migrateFixkeleresUnits_010823", DataMigrationManager::migrateFixkeleresUnits_010823);
@@ -239,7 +244,7 @@ public class DataMigrationManager {
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                             .findFirst();
                         if (firstHomePlanet.isPresent()) {
-                            Tile homeSystem = Helper.getTileFromPlanet(firstHomePlanet.get().toLowerCase(), game);
+                            Tile homeSystem = game.getTileFromPlanet(firstHomePlanet.get().toLowerCase());
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {
@@ -346,7 +351,7 @@ public class DataMigrationManager {
                         Optional<String> firstHomePlanet = subfactionHomePlanetsWithoutKeleresSuffix.stream()
                             .findFirst();
                         if (firstHomePlanet.isPresent()) {
-                            Tile homeSystem = Helper.getTileFromPlanet(firstHomePlanet.get().toLowerCase(), game);
+                            Tile homeSystem = game.getTileFromPlanet(firstHomePlanet.get().toLowerCase());
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {
@@ -463,6 +468,65 @@ public class DataMigrationManager {
         return mapNeededMigrating;
     }
 
+    private static Boolean migrateRenameVeldyrAttachments_270923(Game game) {
+        boolean mapNeededMigrating = false;
+        for (Entry<String, UnitHolder> entry : game.getPlanetsInfo().entrySet()) {
+            if (entry.getValue() instanceof Planet) {
+                Planet p = (Planet) entry.getValue();
+                HashSet<String> tokens = new HashSet<>(p.getTokenList());
+                for (String token : tokens) {
+                    if (token.equals("attachment_veldyr1.png")) {
+                        p.removeToken(token);
+                        p.addToken("attachment_veldyrtaxhaven.png");
+                        mapNeededMigrating = true;
+                    } else if (token.equals("attachment_veldyr2.png")) {
+                        p.removeToken(token);
+                        p.addToken("attachment_veldyrbroadcasthub.png");
+                        mapNeededMigrating = true;
+                    } else if (token.equals("attachment_veldyr3.png")) {
+                        p.removeToken(token);
+                        p.addToken("attachment_veldyrreservebank.png");
+                        mapNeededMigrating = true;
+                    } else if (token.equals("attachment_veldyr4.png")) {
+                        p.removeToken(token);
+                        p.addToken("attachment_veldyrorbitalshipyard.png");
+                        mapNeededMigrating = true;
+                    }
+                }
+            }
+        }
+        return mapNeededMigrating;
+    }
+
+    private static Boolean migrateRenameDSExplores_061023(Game game) {
+        boolean mapNeededMigrating = false;
+        if (game.getExplorationDeckID().equals("explores_DS")) {
+            List<String> oldDeck = game.getAllExplores();
+            List<String> replacementDeck = new ArrayList<>();
+            for (String ex : oldDeck) {
+                String newEx = ex.replace("_", "");
+                replacementDeck.add(newEx);
+            }
+            if (!replacementDeck.equals(oldDeck)) {
+                game.setExploreDeck(new ArrayList<>(replacementDeck));
+                mapNeededMigrating = true;
+            }
+
+            List<String> oldDiscard = game.getAllExploreDiscard();
+            List<String> replacementDiscard = new ArrayList<>();
+            for (String ex : oldDiscard) {
+                String newEx = ex.replace("_", "");
+                replacementDiscard.add(newEx);
+            }
+            if (!replacementDiscard.equals(oldDiscard)) {
+                game.setExploreDiscard(new ArrayList<>(replacementDiscard));
+                mapNeededMigrating = true;
+            }
+            boolean x = false;
+        }
+        return mapNeededMigrating;
+    }
+
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
 
         String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
@@ -487,7 +551,7 @@ public class DataMigrationManager {
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
-            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints(game) >= game.getVp());
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) {
                 continue;
             }

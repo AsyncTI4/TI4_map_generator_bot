@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -16,7 +17,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,8 +73,8 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                File stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-                MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
+                FileUpload stats_file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+                MessageHelper.sendFileUploadToChannel(event.getChannel(), stats_file);
 
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.system.getValue())) {
@@ -89,7 +89,7 @@ public class ShowGame implements Command {
     }
 
     private static void simpleShowGame(Game activeGame, GenericInteractionCreateEvent event, DisplayType displayType) {
-        File file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
 
         List<Button> buttons = new ArrayList<>();
         if (!activeGame.isFoWMode()) {
@@ -107,7 +107,7 @@ public class ShowGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }

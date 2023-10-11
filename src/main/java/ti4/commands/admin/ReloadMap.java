@@ -14,7 +14,7 @@ public class ReloadMap extends AdminSubcommandData {
 
     public ReloadMap() {
         super(Constants.RELOAD_GAME, "Reload game from save file");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true).setAutoComplete(true));
     }
 
     @Override

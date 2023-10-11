@@ -94,7 +94,7 @@ public class PlayerCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        GenerateMap.getInstance().saveImage(activeGame, event);
+        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
     }
 
 
@@ -110,7 +110,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new SCUnplay());
         subcommands.add(new Pass());
         subcommands.add(new AbilityInfo());
-        subcommands.add(new Turn());
+        subcommands.add(new TurnEnd());
+        subcommands.add(new TurnStart());
         subcommands.add(new SCPick());
         subcommands.add(new SCUnpick());
         subcommands.add(new Speaker());
@@ -119,6 +120,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new SendDebt());
         subcommands.add(new ClearDebt());
         subcommands.add(new ChangeColor());
+        subcommands.add(new ChangeUnitDecal());
         subcommands.add(new UnitInfo());
         subcommands.add(new AddAllianceMember());
         subcommands.add(new SetStatsAnchor());

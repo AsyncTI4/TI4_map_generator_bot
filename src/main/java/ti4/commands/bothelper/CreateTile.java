@@ -47,11 +47,11 @@ public class CreateTile extends BothelperSubcommandData {
         TileModel tile = null;
         try {
             tile = createNewTile(
-                    event.getOption(Constants.TILE_ID).getAsString(),
+                    event.getOption(Constants.TILE_ID).getAsString().toLowerCase(),
                     event.getOption(Constants.TILE_NAME).getAsString(),
                     event.getOption(Constants.TILE_ALIASES).getAsString(),
                     event.getOption(Constants.TILE_IMAGE).getAsString(),
-                    event.getOption(Constants.TILE_PLANET_IDS).getAsString(),
+                    event.getOption(Constants.TILE_PLANET_IDS).getAsString().toLowerCase(),
                     event.getOption(Constants.TILE_TYPE).getAsString(),
                     whString,
                     event.getOption(Constants.IS_ASTEROID_FIELD, false, OptionMapping::getAsBoolean),

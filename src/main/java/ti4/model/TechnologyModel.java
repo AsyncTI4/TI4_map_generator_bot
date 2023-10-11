@@ -1,7 +1,9 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -10,7 +12,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
-public class TechnologyModel implements ModelInterface {
+public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private TechnologyType type;
@@ -19,12 +21,12 @@ public class TechnologyModel implements ModelInterface {
     private String baseUpgrade;
     private String source;
     private String text;
+    private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
         UNITUPGRADE, PROPULSION, BIOTIC, CYBERNETIC, WARFARE, NONE;
 
-        @Override
-        public String toString() {
+            public String toString() {
             return super.toString().toLowerCase();
         }
     }
@@ -76,7 +78,7 @@ public class TechnologyModel implements ModelInterface {
         String techFaction = getFaction();
         if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
-        eb.setTitle(techEmoji  + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
+        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
@@ -88,7 +90,7 @@ public class TechnologyModel implements ModelInterface {
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
-        
+
         eb.setColor(getEmbedColour());
         return eb.build();
     }
@@ -97,7 +99,7 @@ public class TechnologyModel implements ModelInterface {
         return switch (getType()) {
             case PROPULSION -> Color.blue; //Color.decode("#00FF00");
             case CYBERNETIC -> Color.yellow;
-            case BIOTIC -> Color.green; 
+            case BIOTIC -> Color.green;
             case WARFARE -> Color.red;
             case UNITUPGRADE -> Color.black;
             default -> Color.white;
@@ -114,6 +116,9 @@ public class TechnologyModel implements ModelInterface {
 
     public String getRequirementsEmoji() {
         switch (getType()) {
+            case NONE -> {
+                return "None";
+            }
             case PROPULSION -> {
                 return switch (getRequirements()) {
                     case "B" -> Emojis.PropulsionTech;
@@ -130,7 +135,7 @@ public class TechnologyModel implements ModelInterface {
                     default -> "None";
                 };
             }
-            case BIOTIC -> { 
+            case BIOTIC -> {
                 return switch (getRequirements()) {
                     case "G" -> Emojis.BioticTech;
                     case "GG" -> Emojis.Biotic2;
@@ -164,5 +169,13 @@ public class TechnologyModel implements ModelInterface {
             }
         }
         return "None";
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

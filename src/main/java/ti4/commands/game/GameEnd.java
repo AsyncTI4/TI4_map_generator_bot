@@ -91,8 +91,8 @@ public class GameEnd extends GameSubcommandData {
         activeGame.setAutoPingSpacer(0);
         
         //SEND THE MAP IMAGE
-        File file = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
-        MessageHelper.replyToMessage(event, file);
+        FileUpload fileUpload = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
+        MessageHelper.replyToMessage(event, fileUpload);
 
         //CREATE POST IN #THE-PBD-CHRONICLES
         TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
@@ -113,7 +113,6 @@ public class GameEnd extends GameSubcommandData {
         
         if(!activeGame.isFoWMode()) {
             //INFORM PLAYERS
-            FileUpload fileUpload = FileUpload.fromData(file);
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                 m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
                 m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
@@ -174,7 +173,7 @@ public class GameEnd extends GameSubcommandData {
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_,
-                "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+                "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
             }
         }
     }
@@ -191,9 +190,9 @@ public class GameEnd extends GameSubcommandData {
         for (Player player : players.values()) {
             if (player.getFaction() == null || player.isDummy()) continue;
             
-            int playerVP = player.getTotalVictoryPoints(activeGame);
+            int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
-            sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+            sb.append(player.getFactionEmoji());
             sb.append(Helper.getColourAsMention(AsyncTI4DiscordBot.guildPrimary, player.getColor()));
             sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
             sb.append(" - *").append(playerVP).append("VP* ");

@@ -51,7 +51,7 @@ public class TechInfo extends TechSubcommandData {
         List<Button> techButtons = getTechButtons(activeGame, player);
         if (techButtons != null && !techButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(exhaustTechMsg, techButtons);
-            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeGame);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }

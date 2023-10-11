@@ -53,7 +53,7 @@ public class GameCreate extends GameSubcommandData {
         newGame.setOwnerName(gameOwner.getEffectiveName());
         newGame.setName(mapName);
         newGame.setAutoPing(true);
-        newGame.setAutoPingSpacer(36);
+        newGame.setAutoPingSpacer(24);
         GameManager gameManager = GameManager.getInstance();
         gameManager.addGame(newGame);
         boolean setMapSuccessful = gameManager.setGameForUser(ownerID, mapName);
@@ -73,8 +73,9 @@ public class GameCreate extends GameSubcommandData {
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {
+                    String guildName = newGame.getGuild() == null ? "null_no_action_channel" : newGame.getGuild().getName();
                     MessageHelper.sendMessageToChannel(threadChannel_,
-                            "Game: **" + mapName + "** on server **" + event.getGuild().getName() + "** has been created.");
+                            "Game: **" + mapName + "** on server **" + guildName + "** has been created.");
                 }
             }
         }

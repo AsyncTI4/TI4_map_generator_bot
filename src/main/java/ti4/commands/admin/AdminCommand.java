@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
+import ti4.commands.developer.RunManualDataMigration;
+import ti4.commands.developer.SetGlobalSetting;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -98,9 +100,7 @@ public class AdminCommand implements Command {
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
         subcommands.add(new Statistics());
-        subcommands.add(new SetGlobalSetting());
         subcommands.add(new UpdateThreadArchiveTime());
-        subcommands.add(new RunManualDataMigration());
         return subcommands;
     }
 

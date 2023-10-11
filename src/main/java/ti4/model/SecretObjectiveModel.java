@@ -1,20 +1,25 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
+import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
-public class SecretObjectiveModel implements ModelInterface {
+@Data
+public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
     private String text;
     private int points;
     private String source;
+    private List<String> searchTags = new ArrayList<>();
 
   public boolean isValid() {
         return alias != null
@@ -93,7 +98,16 @@ public class SecretObjectiveModel implements ModelInterface {
 
     public Color getEmbedColour() {
         return switch (getPoints()) {
+            case 2 -> Color.BLACK;
             default -> Color.RED;
         };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getSource() + ")";
     }
 }

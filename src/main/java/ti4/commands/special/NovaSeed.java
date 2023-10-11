@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,7 +18,6 @@ public class NovaSeed extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player using nova seed").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using nova seed").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DESTROY_OTHER_UNITS, "Destroy other players units"));
     }
 
     @Override
@@ -43,15 +43,18 @@ public class NovaSeed extends SpecialSubcommandData {
             return;
         }
 
+        secondHalfOfNovaSeed(player, event, tile, activeGame);
+    }
+
+    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game activeGame){
         //Remove all other players units from the tile in question
-        OptionMapping destroyOption = event.getOption(Constants.DESTROY_OTHER_UNITS);
-        if (destroyOption == null || destroyOption.getAsBoolean()) {
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if (player_ != player) {
-                    tile.removeAllUnits(player_.getColor());
-                }
+       
+        for (Player player_ : activeGame.getPlayers().values()) {
+            if (player_ != player) {
+                tile.removeAllUnits(player_.getColor());
             }
         }
+        
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.removeAllTokens();
         activeGame.removeTile(tile.getPosition());
@@ -59,6 +62,17 @@ public class NovaSeed extends SpecialSubcommandData {
         //Add the muaat supernova to the map and copy over the space unitholder
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         activeGame.setTile(novaTile);
+
+        if(player.hasLeaderUnlocked("muaathero")){
+            Leader playerLeader = player.getLeader("muaathero").orElse(null);
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            boolean purged = player.removeLeader(playerLeader);
+            if (purged) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "muaathero" + " has been purged");
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+            }
+        }
     }
 
 }

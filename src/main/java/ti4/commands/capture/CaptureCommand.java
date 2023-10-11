@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -94,8 +95,7 @@ public class CaptureCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-       // File file = GenerateMap.getInstance().saveImage(activeMap, event);
-       // MessageHelper.replyToMessage(event, file);
+        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
     }
 
 

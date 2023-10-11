@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.Turn;
+import ti4.commands.player.TurnEnd;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -31,8 +31,9 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, activeGame);
             case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
+            case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
             case "statusScoring" -> {
-                new Turn().showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
+                TurnEnd.showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
                 activeGame.updateActivePlayer(null);
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);

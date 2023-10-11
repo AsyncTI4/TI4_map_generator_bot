@@ -17,6 +17,7 @@ public class Storage {
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
     private static Font TI_FONT_8;
     private static Font TI_FONT_12;
+    private static Font TI_FONT_13;
     private static Font TI_FONT_14;
     private static Font TI_FONT_16;
     private static Font TI_FONT_18;
@@ -46,6 +47,14 @@ public class Storage {
         }
         TI_FONT_12 = getFont(12f);
         return TI_FONT_12;
+    }
+
+    public static Font getFont13() {
+        if (TI_FONT_13 != null) {
+            return TI_FONT_13;
+        }
+        TI_FONT_13 = getFont(13f);
+        return TI_FONT_13;
     }
 
     public static Font getFont14() {

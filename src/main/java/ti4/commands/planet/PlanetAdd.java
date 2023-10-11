@@ -11,12 +11,14 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,15 @@ public class PlanetAdd extends PlanetAddRemove {
             activeGame.clearPlanetsCache();
         }
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+
+        if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
+            Planet mecatolRex = (Planet) unitHolder;
+            if (mecatolRex != null) {
+                PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+            }
+        }
         String color = player.getColor();
         boolean moveTitanPN = false;
         if (unitHolder != null && color != null && !"null".equals(color)) {
@@ -108,7 +119,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && event != null)
         {
-            String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+            String fac = player.getFactionEmoji();
             
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
             player.setTg(player.getTg()+1);
@@ -118,7 +129,7 @@ public class PlanetAdd extends PlanetAddRemove {
         for(String law : activeGame.getLaws().keySet()){
             if("minister_exploration".equalsIgnoreCase(law)){
                 if(activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null){
-                    String fac = Helper.getFactionIconFromDiscord(player.getFaction());
+                    String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Minister of Exploration ("+player.getTg()+"->"+(player.getTg()+1)+"). You do have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
                     ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
@@ -137,9 +148,9 @@ public class PlanetAdd extends PlanetAddRemove {
         if(numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")){
             
             Button sdButton = Button.success("winnuStructure_sd_"+planet, "Place A SD on "+Helper.getPlanetRepresentation(planet, activeGame));
-            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
             Button pdsButton = Button.success("winnuStructure_pds_"+planet, "Place a PDS on "+Helper.getPlanetRepresentation(planet, activeGame));
-            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
             Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);

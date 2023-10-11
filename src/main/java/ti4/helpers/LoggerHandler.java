@@ -13,7 +13,7 @@ public class LoggerHandler {
     private static LoggerHandler loggerHandler;
 
     private LoggerHandler() {
-      String logFilePropertiesPath = ResourceHelper.getInstance().getInfoFile("logging.properties");
+      String logFilePropertiesPath = ResourceHelper.getInstance().getDataFile("logging.properties");
 
         try (InputStream stream = new FileInputStream(logFilePropertiesPath)) {
             LogManager.getLogManager().readConfiguration(stream);

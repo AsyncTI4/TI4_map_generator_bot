@@ -8,11 +8,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Random;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;
     private final HashMap<String, String> unitCache = new HashMap<>();
+    private final HashMap<String, String> decalCache = new HashMap<>();
     private final HashMap<String, String> tileCache = new HashMap<>();
     private final HashMap<String, String> ccCache = new HashMap<>();
     private final HashMap<String, String> attachmentCache = new HashMap<>();
@@ -78,15 +78,26 @@ public class ResourceHelper {
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
-                return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
+                return getResourceFromFolder("units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
             }
         }
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
             return unitPath;
         }
-        String unit = getResourceFromFolder("units/new_units/", name, "Could not find unit file");
+        String unit = getResourceFromFolder("units/", name, "Could not find unit file");
         unitCache.put(name, unit);
+        return unit;
+    }
+
+    @Nullable
+    public String getDecalFile(String name) {
+        String decalPath = decalCache.get(name);
+        if (decalPath != null) {
+            return decalPath;
+        }
+        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        decalCache.put(name, unit);
         return unit;
     }
 
@@ -158,8 +169,12 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getInfoFile(String name) {
-        return getResourceFromFolder("info/", name, "Could not find info file");
+    public String getDataFile(String name) {
+        return getResourceFromFolder("data/", name, "Could not find data file");
+    }
+
+    public String getDataFolder(String name) {
+        return Storage.getResourcePath() + File.separator + "data" + File.separator + name;
     }
 
     @Nullable
