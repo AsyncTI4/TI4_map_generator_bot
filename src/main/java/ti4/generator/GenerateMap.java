@@ -3416,7 +3416,7 @@ public class GenerateMap {
                     if (unitModel != null && unitModel.getIsShip() != null && unitModel.getIsShip()) {
                         String factionTag = player != null ? StringUtils.left(player.getFaction(),3).toUpperCase() : null;
                         BufferedImage plaquette = ImageHelper.read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
-                        Point plaquetteOffset = new Point(-20 + unitImage.getHeight()/4, unitImage.getHeight() - 30);
+                        Point plaquetteOffset = getUnitTagLocation(StringUtils.substringBetween(id, "_", ".png"));
                         
                         tileGraphics.drawImage(plaquette, TILE_PADDING + imageX + plaquetteOffset.x, TILE_PADDING + imageY + plaquetteOffset.y, null);
                         BufferedImage factionIconForPlaquette = getPlayerFactionIconImageScaled(player, 32, 32);
@@ -3424,7 +3424,7 @@ public class GenerateMap {
                         
                         tileGraphics.setColor(Color.WHITE);
                         drawCenteredString(tileGraphics, factionTag, new Rectangle(TILE_PADDING + imageX + plaquetteOffset.x + 25, TILE_PADDING + imageY + plaquetteOffset.y + 17, 40, 13), Storage.getFont13());
-                }
+                    }
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -3476,5 +3476,21 @@ public class GenerateMap {
             return "_blk.png";
         }
         return "_wht.png";
+    }
+
+    private static Point getUnitTagLocation(String unitID) {
+        return switch (unitID) {
+            case "ws" -> new Point(-10, 45); //War Sun
+            case "fs", "lord", "lady", "tyrantslament" -> new Point(10, 55); //Flagship
+            case "dn" -> new Point(10, 50); //Dreadnought
+            case "ca" -> new Point(0, 40); //Cruiser
+            case "cv" -> new Point(0, 40); //Carrier
+            case "gf", "ff" -> new Point(0, 20); //Infantry/Fighter
+            case "dd" -> new Point(-10, 30); //Destroyer
+            case "mf" -> new Point(-10, 20); //Mech
+            case "pd" -> new Point(-10, 20); //PDS
+            case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); //Space Dock
+            default -> new Point(0, 0);
+        };
     }
 }
