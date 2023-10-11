@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
+import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
 
 @Data
@@ -44,9 +45,22 @@ public class TileModel {
 
     public MessageEmbed getHelpMessageEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("(" + getId() + ") __" + getNameNullSafe() + "__");
+
+        //TITLE
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(getId()).append(") __").append(getNameNullSafe()).append("__");
+        eb.setTitle(sb.toString());
+
+        sb = new StringBuilder();
+        if (isEmpty()) sb.append(Emojis.Frontier);
+        if (isAsteroidField()) sb.append(Emojis.Asteroid);
+        if (isSupernova()) sb.append(Emojis.Supernova);
+        if (isNebula()) sb.append(Emojis.Nebula);
+        if (isGravityRift()) sb.append(Emojis.GravityRift);
+        if (hasPlanets()) sb.append("\nPlanets: " + getPlanets().toString());
+        eb.setDescription(sb.toString());
+
         eb.setThumbnail("attachment://" + getImagePath());
-        if (!getPlanets().isEmpty()) eb.setDescription("Planets: " + getPlanets().toString());
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();
     }
