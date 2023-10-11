@@ -132,12 +132,17 @@ public class Setup extends GameSubcommandData {
             activeGame.setDiscordantStarsMode(false);
             return true;
         }
+        activeGame.setBaseGameMode(baseGameMode);
         
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (absolMode && discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds_absol");
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
             activeGame.setAbsolMode(absolMode);
@@ -149,8 +154,12 @@ public class Setup extends GameSubcommandData {
         // JUST DS
         if (discordantStarsMode && !absolMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_ds"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds");
             activeGame.setAbsolMode(false);
         }
@@ -159,19 +168,27 @@ public class Setup extends GameSubcommandData {
         // JUST ABSOL
         if (absolMode && !discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             activeGame.setTechnologyDeckID("techs_absol");
             activeGame.setDiscordantStarsMode(false);
             // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
         }
         activeGame.setAbsolMode(absolMode);
-
+        
         // JUST PoK
         if (!absolMode && !discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
             if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_pok"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             activeGame.setTechnologyDeckID("techs_pok");
             activeGame.setBaseGameMode(false);
             activeGame.setAbsolMode(false);
