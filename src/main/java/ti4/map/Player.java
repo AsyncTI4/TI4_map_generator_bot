@@ -861,6 +861,11 @@ public class Player {
         return faction;
     }
 
+    @JsonIgnore
+    public FactionModel getFactionModel() {
+        return Mapper.getFactionSetup(faction);
+    }
+
     public void setFaction(String faction) {
         this.faction = faction;
         initLeaders();
