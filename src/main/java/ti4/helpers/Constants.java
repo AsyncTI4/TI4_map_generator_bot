@@ -931,4 +931,5 @@ public class Constants {
     public static final String DECAL_SET = "decal_set";
     public static final String CHANGE_UNIT_DECAL = "change_unit_decal";
     public static final String FRANKEN_MODE = "franken_mode";
+    public static final String SHOW_UNIT_TAGS = "show_unit_tags";
 }

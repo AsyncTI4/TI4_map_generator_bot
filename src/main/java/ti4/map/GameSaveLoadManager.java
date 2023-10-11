@@ -118,7 +118,7 @@ public class GameSaveLoadManager {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
         } catch (IOException e) {
-            // BotLogger.log(map.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY");
+            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY", e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
@@ -489,9 +489,11 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_FACTION_REACTS + " " + activeGame.getBotFactionReacts());
         writer.write(System.lineSeparator());
-         writer.write(Constants.BOT_SHUSHING + " " + activeGame.getBotShushing());
+        writer.write(Constants.BOT_SHUSHING + " " + activeGame.getBotShushing());
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_UNIT_TAGS + " " + activeGame.isShowUnitTags());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AC_DECK_ID + " " + activeGame.getAcDeckID());
@@ -1481,6 +1483,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setHomeBrewSCMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SHOW_UNIT_TAGS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setShowUnitTags(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

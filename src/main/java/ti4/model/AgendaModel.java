@@ -1,16 +1,19 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
+import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
+@Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
@@ -22,6 +25,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String text2;
     private String mapText;
     private String source;
+    private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
         return alias != null
@@ -148,7 +152,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String text;
     private String attachmentId;
     private String source;
+    private List<String> searchTags = new ArrayList<>();
 
     @Override
     public boolean isValid() {
@@ -46,7 +48,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
