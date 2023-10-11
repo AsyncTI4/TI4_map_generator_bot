@@ -173,7 +173,7 @@ public class GameEnd extends GameSubcommandData {
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_,
-                "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+                "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
             }
         }
     }
