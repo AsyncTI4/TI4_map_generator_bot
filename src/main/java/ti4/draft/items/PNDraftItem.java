@@ -20,8 +20,12 @@ public class PNDraftItem extends DraftItem {
     }
 
     private PromissoryNoteModel getPn() {
-        FactionModel faction =  getFaction();
-        return Mapper.getPromissoryNoteByID(faction.getPromissoryNotes().get(0));
+        var pn = Mapper.getPromissoryNoteByID(ItemId);
+        if (pn == null) {
+            FactionModel faction = getFaction();
+            return Mapper.getPromissoryNoteByID(faction.getPromissoryNotes().get(0));
+        }
+        return pn;
     }
     @Override
     public String getShortDescription() {
