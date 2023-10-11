@@ -3411,7 +3411,7 @@ public class GenerateMap {
                 }
 
                 // UNIT TAGS
-                if (i == 0 && !fighterOrInfantry && activeGame.isTestBetaFeaturesMode()) { //DRAW TAG
+                if (i == 0 && !fighterOrInfantry && activeGame.isShowUnitTags()) { //DRAW TAG
                     UnitModel unitModel = activeGame.getUnitFromImageName(unitID);
                     if (unitModel != null && unitModel.getIsShip() != null && unitModel.getIsShip()) {
                         String factionTag = player != null ? StringUtils.left(player.getFaction(),3).toUpperCase() : null;
