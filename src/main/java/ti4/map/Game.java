@@ -240,7 +240,10 @@ public class Game {
         lastModifiedDate = new Date().getTime();
 
         miltyDraftManager = new MiltyDraftManager();
+    }
 
+    public void newGameSetup() {
+        
         secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
         explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
@@ -249,14 +252,13 @@ public class Game {
         agendas = Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck();
         events = new ArrayList<>();
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
-
         addCustomPO(Constants.CUSTODIAN, 1);
-
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
     }
+
 
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
