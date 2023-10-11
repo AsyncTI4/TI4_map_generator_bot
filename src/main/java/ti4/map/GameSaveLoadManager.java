@@ -118,7 +118,7 @@ public class GameSaveLoadManager {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
         } catch (IOException e) {
-            // BotLogger.log(map.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY");
+            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY", e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
