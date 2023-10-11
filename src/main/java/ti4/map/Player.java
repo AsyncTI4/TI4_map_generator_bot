@@ -154,6 +154,7 @@ public class Player {
         this.gameID = gameID;
     }
 
+    @JsonIgnore
     public Game getGame() {
         return GameManager.getInstance().getGame(this.gameID);
     }
@@ -225,23 +226,28 @@ public class Player {
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
     }
+
     public String getBagInfoThreadID() {
         return bagInfoThreadID;
     }
 
+    @JsonIgnore
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2") || getTechs().contains("pds2") || getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds");
     }
 
+    @JsonIgnore
     public boolean hasInf2Tech() {//"dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2") || getTechs().contains("lw2") || getTechs().contains("dscymiinf")
             || getTechs().contains("dszeliinf");
     }
 
+    @JsonIgnore
     public boolean hasWarsunTech() {
         return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws") || "muaat".equalsIgnoreCase(getFaction());
     }
 
+    @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff") || getTechs().contains("dslizhff");
     }
@@ -491,6 +497,7 @@ public class Player {
         return unitsOwned.add(unitID);
     }
 
+    @JsonIgnore
     public List<UnitModel> getUnitModels() {
         return getUnitsOwned().stream()
             .map(Mapper::getUnit)
@@ -562,6 +569,7 @@ public class Player {
         return null;
     }
 
+    @JsonIgnore
     public Map<String, Integer> getUnitsOwnedByBaseType() {
         Map<String, Integer> unitCount = new HashMap<>();
         for (String unitID : getUnitsOwned()) {
@@ -742,6 +750,7 @@ public class Player {
         return fragments;
     }
 
+    @JsonIgnore
     public boolean enoughFragsForRelic() {
         boolean enough = false;
         int haz = 0;
@@ -1903,6 +1912,7 @@ public class Player {
         return false;
     }
 
+    @JsonIgnore
     public Set<Player> getNeighbouringPlayers() {
         Game activeGame = getGame();
         Set<Player> adjacentPlayers = new HashSet<>();
@@ -1923,6 +1933,7 @@ public class Player {
         return adjacentPlayers;
     }
 
+    @JsonIgnore
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
     }

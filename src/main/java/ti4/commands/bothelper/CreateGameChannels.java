@@ -153,14 +153,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (missingMembers.size() > 0) {
-            sendMessage(
-                "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join the server **"
-                    + guild.getName() + "**\n");
-            sendMessage(Helper.getGuildInviteURL(guild));
-            sendMessage("The following players were not on the above server:");
+            StringBuilder sb = new StringBuilder();
+            sb.append("### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
+            sb.append(guild.getName()).append("** server.\n");
+            sb.append(Helper.getGuildInviteURL(guild)).append("\n");
+            sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
-                sendMessage("> " + member.getAsMention());
+                sb.append("> ").append(member.getAsMention()).append("\n");
             }
+            sb.append("You will be automatically added to the game channels when you join the server.");
+            sendMessage(sb.toString());
         }
 
         //CREATE ROLE
@@ -236,10 +238,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/tech add` for factions who need to add tech\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
-            "> `/game replace` to replace a player in the game with a new one\n" +
-            "> `/role remove` to remove the game role to any replaced players\n" +
-            "> `/role add` to add the game role to any replacing players\n";
-        // botGetStartedMessage.append("> `/status po_reveal_stage1` to reveal the first" + Emojis.Public1 + "Stage 1 Public Objective\n");
+            "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
@@ -322,39 +321,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         return pbdNumbers;
         //return pbdNumbers.stream().filter(num -> num != 1000).toList();
-    }
-
-    private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        ArrayList<Integer> pbdNumbers = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            System.out.println(guild.getName());
-            List<Role> pbdRoles = guild.getRoles().stream()
-                .filter(r -> r.getName().startsWith("fow"))
-                .toList();
-
-            //EXISTING ROLE NAMES
-            for (Role role : pbdRoles) {
-                String pbdNum = role.getName().replace("fow", "");
-                if (Helper.isInteger(pbdNum)) {
-                    pbdNumbers.add(Integer.parseInt(pbdNum));
-                }
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
-            .filter(mapName -> mapName.startsWith("fow"))
-            .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("fow", "");
-            if (Helper.isInteger(pbdNum)) {
-                pbdNumbers.add(Integer.parseInt(pbdNum));
-            }
-        }
-        return pbdNumbers;
     }
 
     private static Guild getNextAvailableServer() {

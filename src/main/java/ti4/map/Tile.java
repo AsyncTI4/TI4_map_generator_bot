@@ -299,6 +299,8 @@ public class Tile {
         }
         return null;
     }
+    
+    @JsonIgnore
     public String getRepresentationForButtons(Game activeGame, Player player) {
         try {
             if(activeGame.isFoWMode())
@@ -331,6 +333,7 @@ public class Tile {
         }
     }
 
+    @JsonIgnore
     public List<String> getPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
         for (UnitHolder unitHolder : getUnitHolders().values()) {
@@ -343,26 +346,32 @@ public class Tile {
         return planetsWithSleepers;
     }
 
+    @JsonIgnore
     public TileModel getTileModel() {
         return TileHelper.getTile(getTileID());
     }
 
+    @JsonIgnore
     public boolean isAsteroidField() {
         return getTileModel().isAsteroidField();
     }
 
+    @JsonIgnore
     public boolean isSupernova() {
         return getTileModel().isSupernova();
     }
 
+    @JsonIgnore
     public boolean isNebula() {
         return getTileModel().isNebula();
     }
 
+    @JsonIgnore
     public boolean isGravityRift() {
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
     }
 
+    @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken() {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             Set<String> tokenList = unitHolder.getTokenList();
@@ -378,6 +387,7 @@ public class Tile {
         return false;
     }
 
+    @JsonIgnore
     public boolean isAnomaly() {
         if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
             return true;
