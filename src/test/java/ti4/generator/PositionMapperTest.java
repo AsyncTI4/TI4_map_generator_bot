@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class PositionMapperTest {
     // @Test
-    // void testGetAdjacentTilePositionsNew() {
+    // public void testGetAdjacentTilePositionsNew() {
     //     assertEquals(List.of("101", "102", "103", "104", "105", "106"), PositionMapper.getAdjacentTilePositionsNew("0"));
     //     assertEquals(List.of("101", "102", "103", "104", "105", "106"), PositionMapper.getAdjacentTilePositionsNew("000"));
     //     assertEquals(List.of("401", "402", "302", "201", "318", "424"), PositionMapper.getAdjacentTilePositionsNew("301"));
@@ -33,7 +33,7 @@ public class PositionMapperTest {
     // }
 
     @Test
-    void testIsCornerOfHexRing() {
+    public void testIsCornerOfHexRing() {
         assertTrue(PositionMapper.isCornerOfHexRing("201"));
         assertTrue(PositionMapper.isCornerOfHexRing("203"));
         assertTrue(PositionMapper.isCornerOfHexRing("526"));
@@ -49,7 +49,7 @@ public class PositionMapperTest {
     }
 
     @Test
-    void testGetSideNumberOfHexRing() {
+    public void testGetSideNumberOfHexRing() {
         assertSame(1, PositionMapper.getRingSideNumberOfTileID("201"));
         assertSame(1, PositionMapper.getRingSideNumberOfTileID("202"));
         assertSame(2, PositionMapper.getRingSideNumberOfTileID("203"));
@@ -72,7 +72,7 @@ public class PositionMapperTest {
     }
 
     @Test
-    void testGetCornerPositionOfHexRing() {
+    public void testGetCornerPositionOfHexRing() {
         assertEquals("201", PositionMapper.getTileIDAtCornerPositionOfRing(2, 1));
         assertEquals("203", PositionMapper.getTileIDAtCornerPositionOfRing(2, 2));
         assertEquals("205", PositionMapper.getTileIDAtCornerPositionOfRing(2, 3));
