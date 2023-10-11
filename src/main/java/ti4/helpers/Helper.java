@@ -1158,14 +1158,22 @@ public class Helper {
         return mention;
     }
 
-    // Pass the buck
     public static String getPlayerRepresentation(Player player, Game activeGame) {
-        if (activeGame == null) return getPlayerRepresentation(player, null, null, false);
-        return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false);
+        return getPlayerRepresentation(player, activeGame, true);
+    }
+
+    // Pass the buck
+    public static String getPlayerRepresentation(Player player, Game activeGame, boolean includePing) {
+        if (activeGame == null) return getPlayerRepresentation(player, null, null, false, includePing);
+        return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false, includePing);
+    }
+
+    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
+        return getPlayerRepresentation(player, activeGame, guild, overrideFow, true);
     }
 
     // One representation to rule them all
-    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
+    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
             return getColourAsMention(guild, player.getColor());
@@ -1174,18 +1182,18 @@ public class Helper {
         if (activeGame != null && activeGame.isCommunityMode()) {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
-                return defaultPlayerRepresentation(player, guild);
+                return defaultPlayerRepresentation(player, guild, includePing);
             } else {
                 return getRoleMentionByName(guild, roleForCommunity.getName());
             }
         }
 
-        return defaultPlayerRepresentation(player, guild);
+        return defaultPlayerRepresentation(player, guild, includePing);
     }
 
-    private static String defaultPlayerRepresentation(Player player, Guild guild) {
+    private static String defaultPlayerRepresentation(Player player, Guild guild, boolean includePing) {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-        sb.append(" ").append(getPlayerPing(player));
+        if (includePing) sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
         }

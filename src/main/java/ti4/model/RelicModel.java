@@ -1,6 +1,8 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
@@ -17,6 +19,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String flavourText;
     private String source;
     private Boolean isFakeRelic;
+    private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
         return alias != null 
@@ -60,7 +63,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

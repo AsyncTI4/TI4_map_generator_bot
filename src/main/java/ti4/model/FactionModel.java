@@ -1,6 +1,9 @@
 package ti4.model;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
@@ -12,6 +15,7 @@ import java.util.ArrayList;
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
+    private String shortTag;
     private String homeSystem;
     private String startingFleet;
     private int commodities;
@@ -54,6 +58,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public String getFactionName() {
         return factionName;
+    }
+
+    public String getShortTag() {
+        return Optional.ofNullable(shortTag).orElse(StringUtils.left(getAlias(), 3).toUpperCase());
     }
 
     public String getHomeSystem() {

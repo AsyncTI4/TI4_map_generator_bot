@@ -109,6 +109,8 @@ public class Game {
     private String textSize = "medium";
     @ExportableField
     private boolean absolMode = false;
+    @Getter @Setter
+    private boolean showUnitTags = false;
     @Getter
     @Setter
     private String acDeckID = "action_cards_pok";
@@ -443,7 +445,7 @@ public class Game {
         return buttonPress;
     }
     public void increaseButtonPressCount() {
-       buttonPress = buttonPress +1;
+       buttonPress++;
     }
     public void setButtonPressCount(int count) {
        buttonPress = count;
@@ -452,7 +454,7 @@ public class Game {
        slashCommandsRun = count;
     }
     public void increaseSlashCommandsRun() {
-       slashCommandsRun = slashCommandsRun +1;
+       slashCommandsRun++;;
     }
     public int getSlashCommandsRunCount(){
         return slashCommandsRun;
@@ -1867,6 +1869,7 @@ public class Game {
         return getExplores(reqType, discardExplore);
     }
 
+    @JsonIgnore
     public List<String> getTechnologyDeck() {
         return Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
     }
@@ -2761,74 +2764,89 @@ public class Game {
         return runDataMigrations;
     }
 
+    @JsonIgnore
     public StrategyCardModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
     }
 
+    @JsonIgnore
     public int getActionCardDeckSize() {
         return getActionCards().size();
     }
 
+    @JsonIgnore
     public int getActionCardFullDeckSize() {
         DeckModel acDeckModel = Mapper.getDeck(getAcDeckID());
         if (acDeckModel != null) return acDeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getAgendaDeckSize() {
         return getAgendas().size();
     }
 
+    @JsonIgnore
     public int getAgendaFullDeckSize() {
         DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
         if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getEventDeckSize() {
         return getEvents().size();
     }
 
+    @JsonIgnore
     public int getEventFullDeckSize() {
         DeckModel eventDeckModel = Mapper.getDeck(getEventDeckID());
         if (eventDeckModel != null) return eventDeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getPublicObjectives1DeckSize() {
         return getPublicObjectives1().size();
     }
 
+    @JsonIgnore
     public int getPublicObjectives1FullDeckSize() {
         DeckModel po1DeckModel = Mapper.getDeck(getStage1PublicDeckID());
         if (po1DeckModel != null) return po1DeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getPublicObjectives2DeckSize() {
         return getPublicObjectives2().size();
     }
 
+    @JsonIgnore
     public int getPublicObjectives2FullDeckSize() {
         DeckModel po2DeckModel = Mapper.getDeck(getStage2PublicDeckID());
         if (po2DeckModel != null) return po2DeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getRelicDeckSize() {
         return getAllRelics().size();
     }
 
+    @JsonIgnore
     public int getRelicFullDeckSize() {
         DeckModel relicDeckModel = Mapper.getDeck(getRelicDeckID());
         if (relicDeckModel != null) return relicDeckModel.getCardCount();
         return -1;
     }
 
+    @JsonIgnore
     public int getSecretObjectiveDeckSize() {
         return getSecretObjectives().size();
     }
 
+    @JsonIgnore
     public int getSecretObjectiveFullDeckSize() {
         DeckModel soDeckModel = Mapper.getDeck(getSoDeckID());
         if (soDeckModel != null) return soDeckModel.getCardCount();
@@ -2852,34 +2870,42 @@ public class Game {
         return exploreDeck.size();
     }
 
+    @JsonIgnore
     public int getHazardousExploreDeckSize() {
         return getExploreDeckSize(Constants.HAZARDOUS);
     }
 
+    @JsonIgnore
     public int getHazardousExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.HAZARDOUS);
     }
 
+    @JsonIgnore
     public int getCulturalExploreDeckSize() {
         return getExploreDeckSize(Constants.CULTURAL);
     }
 
+    @JsonIgnore
     public int getCulturalExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.CULTURAL);
     }
 
+    @JsonIgnore
     public int getIndustrialExploreDeckSize() {
         return getExploreDeckSize(Constants.INDUSTRIAL);
     }
 
+    @JsonIgnore
     public int getIndustrialExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.INDUSTRIAL);
     }
 
+    @JsonIgnore
     public int getFrontierExploreDeckSize() {
         return getExploreDeckSize(Constants.FRONTIER);
     }
 
+    @JsonIgnore
     public int getFrontierExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.FRONTIER);
     }
@@ -2903,6 +2929,7 @@ public class Game {
         return false;
     }
 
+    @JsonIgnore
     public List<String> getAllPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
         for(Tile tile : getTileMap().values()){
@@ -2911,6 +2938,7 @@ public class Game {
         return planetsWithSleepers;
     }
 
+    @JsonIgnore
     public int getSleeperTokensPlacedCount() {
         return getAllPlanetsWithSleeperTokens().size();
     }

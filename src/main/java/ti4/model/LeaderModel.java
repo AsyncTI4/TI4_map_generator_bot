@@ -1,6 +1,8 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +31,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String flavourText;
     private String emoji;
     private String source;
+    private List<String> searchTags = new ArrayList<>();
 
     @Override
     public boolean isValid() {
@@ -134,7 +137,15 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
-        return getID().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getTitle().toLowerCase().contains(searchString) || getAbilityName().toLowerCase().contains(searchString) || getAbilityWindow().toLowerCase().contains(searchString) || getAbilityText().toLowerCase().contains(searchString) || getUnlockCondition().toLowerCase().contains(searchString);
+        return getID().toLowerCase().contains(searchString)
+            || getName().toLowerCase().contains(searchString) 
+            || getTitle().toLowerCase().contains(searchString) 
+            || getAbilityName().toLowerCase().contains(searchString) 
+            || getAbilityWindow().toLowerCase().contains(searchString) 
+            || getAbilityText().toLowerCase().contains(searchString)
+            || getUnlockCondition().toLowerCase().contains(searchString)
+            || getAutoCompleteName().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

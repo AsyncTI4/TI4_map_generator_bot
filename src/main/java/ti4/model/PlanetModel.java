@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private UnitTokenPosition unitPositions;
     private int spaceCannonDieCount = 0;
     private int spaceCannonHitsOn = 0;
+    private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
         return getId() != null
@@ -151,7 +153,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

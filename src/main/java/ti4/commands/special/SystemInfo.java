@@ -175,7 +175,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         if (privateGame != null && privateGame) {
                             sb.append(" (").append(color).append(") ");
                         } else {
-                            sb.append(Helper.getFactionIconFromDiscord(player_.getFaction())).append(" ").append(" (").append(color).append(") ");
+                            sb.append(player_.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
                         }
                     }
                 }
