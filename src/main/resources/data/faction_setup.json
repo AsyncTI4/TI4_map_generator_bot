@@ -2,6 +2,7 @@
   {
     "alias": "franken1",
     "factionName": "Franken 1",
+    "shortTag": "FK1",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -16,6 +17,7 @@
   {
     "alias": "franken2",
     "factionName": "Franken 2",
+    "shortTag": "FK2",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -30,6 +32,7 @@
   {
     "alias": "franken3",
     "factionName": "Franken 3",
+    "shortTag": "FK3",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -44,6 +47,7 @@
   {
     "alias": "franken4",
     "factionName": "Franken 4",
+    "shortTag": "FK4",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -58,6 +62,7 @@
   {
     "alias": "franken5",
     "factionName": "Franken 5",
+    "shortTag": "FK5",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -72,6 +77,7 @@
   {
     "alias": "franken6",
     "factionName": "Franken 6",
+    "shortTag": "FK6",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -86,6 +92,7 @@
   {
     "alias": "franken7",
     "factionName": "Franken 7",
+    "shortTag": "FK7",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -100,6 +107,7 @@
   {
     "alias": "franken8",
     "factionName": "Franken 8",
+    "shortTag": "FK8",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,

@@ -109,6 +109,8 @@ public class Game {
     private String textSize = "medium";
     @ExportableField
     private boolean absolMode = false;
+    @Getter @Setter
+    private boolean showUnitTags = false;
     @Getter
     @Setter
     private String acDeckID = "action_cards_pok";
