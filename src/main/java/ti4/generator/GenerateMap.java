@@ -3413,8 +3413,9 @@ public class GenerateMap {
                 // UNIT TAGS
                 if (i == 0 && !fighterOrInfantry && activeGame.isShowUnitTags()) { //DRAW TAG
                     UnitModel unitModel = activeGame.getUnitFromImageName(unitID);
-                    if (unitModel != null && unitModel.getIsShip() != null && unitModel.getIsShip()) {
-                        String factionTag = player != null ? StringUtils.left(player.getFaction(),3).toUpperCase() : null;
+                    if (player != null && unitModel != null && unitModel.getIsShip() != null && unitModel.getIsShip()) {
+                        //TODO: Only paint the tag of the most expensive ship per player, or if no ships, the "bottom most" unit on a planet
+                        String factionTag = player.getFactionModel().getShortTag();
                         BufferedImage plaquette = ImageHelper.read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
                         Point plaquetteOffset = getUnitTagLocation(StringUtils.substringBetween(id, "_", ".png"));
                         
