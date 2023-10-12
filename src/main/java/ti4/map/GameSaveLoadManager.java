@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -37,12 +38,14 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 public class GameSaveLoadManager {
 
@@ -92,7 +95,11 @@ public class GameSaveLoadManager {
             if (event instanceof SlashCommandInteractionEvent) {
                 activeGame.setLatestCommand(username + " used: " + ((CommandInteractionPayload) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
-                activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId());
+                if(event.getMessageChannel() instanceof ThreadChannel || activeGame.isFoWMode()){
+                    activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId());
+                }else{
+                    activeGame.setLatestCommand(username + " pressed button: " + ((ButtonInteraction) event).getButton().getId() + " -- "+((ButtonInteraction) event).getButton().getLabel());
+                }
             } else {
                 activeGame.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
@@ -182,6 +189,9 @@ public class GameSaveLoadManager {
                     Game loadedGame = loadMap(originalMapFile);
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
+                    if(loadedGame != null && loadedGame.getSavedButtons().size() > 0){
+                        MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
+                    }
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -378,7 +388,9 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", activeGame.getPurgedPN()));
         writer.write(System.lineSeparator());
-         writer.write(Constants.PO1PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives1Peakable()));
+        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives1Peakable()));
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SAVED_BUTTONS + " " + String.join(",", activeGame.getSavedButtons()));
         writer.write(System.lineSeparator());
         writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeGame.getPublicObjectives2Peakable()));
         writer.write(System.lineSeparator());
@@ -446,6 +458,10 @@ public class GameSaveLoadManager {
         writer.write(Constants.TABLE_TALK_CHANNEL + " " + activeGame.getTableTalkChannelID());
         writer.write(System.lineSeparator());
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + activeGame.getMainGameChannelID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SAVED_CHANNEL + " " + activeGame.getSavedChannelID());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SAVED_MESSAGE + " " + activeGame.getSavedMessage());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + activeGame.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
@@ -1133,6 +1149,7 @@ public class GameSaveLoadManager {
                 case Constants.PO1 -> activeGame.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> activeGame.setPublicObjectives2(getCardList(info));
                 case Constants.PO1PEAKABLE -> activeGame.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.SAVED_BUTTONS -> activeGame.setSavedButtons(getCardList(info));
                 case Constants.PO2PEAKABLE -> activeGame.setPublicObjectives2Peakable(getCardList(info));
                 case Constants.SO_TO_PO -> activeGame.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> activeGame.setPurgedPNs(getCardList(info));
@@ -1372,6 +1389,8 @@ public class GameSaveLoadManager {
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> activeGame.setPlayersWhoHitPersistentNoWhen(info);
                 case Constants.TABLE_TALK_CHANNEL ->  activeGame.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> activeGame.setMainGameChannelID(info);
+                case Constants.SAVED_CHANNEL -> activeGame.setSavedChannelID(info);
+                case Constants.SAVED_MESSAGE -> activeGame.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> activeGame.setBotMapUpdatesThreadID(info);
 
                 //GAME MODES
