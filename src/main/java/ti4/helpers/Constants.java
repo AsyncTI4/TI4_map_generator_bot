@@ -393,6 +393,8 @@ public class Constants {
 
     public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
+    public static final String SAVED_CHANNEL = "saved_channel";
+    public static final String SAVED_MESSAGE = "saved_message";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
@@ -572,6 +574,7 @@ public class Constants {
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
     public static final String PO1PEAKABLE = "publicObjectives1peakable";
+    public static final String SAVED_BUTTONS = "saved_buttons";
     public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
