@@ -159,6 +159,7 @@ public class Player {
         return GameManager.getInstance().getGame(this.gameID);
     }
 
+    @JsonIgnore
     public String getDecalName() {
         return Mapper.getDecalName(getDecalSet());
     }
