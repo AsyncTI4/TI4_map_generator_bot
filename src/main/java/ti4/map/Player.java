@@ -1388,6 +1388,7 @@ public class Player {
         this.draftItemQueue.Contents.clear();
     }
 
+    @JsonIgnore
     public List<String> getReadiedPlanets() {
         List<String> planets = new ArrayList<>(getPlanets());
         planets.removeAll(getExhaustedPlanets());
