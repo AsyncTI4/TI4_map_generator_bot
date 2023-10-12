@@ -180,7 +180,9 @@ public class ButtonListener extends ListenerAdapter {
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
         String ident = player.getFactionEmoji();
-
+        if(!buttonID.equalsIgnoreCase("ultimateundo")){
+            ButtonHelper.saveButtons(event, activeGame);
+        }
         if (activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
@@ -2563,6 +2565,8 @@ public class ButtonListener extends ListenerAdapter {
                     if (!failed) {
                         message = message + "Gained 1 tg (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
                         player.setTg(player.getTg() + 1);
+                        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
                     if (!failed) {
@@ -2572,6 +2576,7 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                         }
                     }
+                    
                 }
                 case "mallice_2_tg" -> {
                     String playerRep = player.getFactionEmoji();
@@ -3006,6 +3011,12 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Choose a system to move from.";
                     List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeGame, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+                }
+                case "ultimateUndo" -> {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());
+                    GameSaveLoadManager.undo(activeGame);
+                    event.getMessage().delete().queue();
+                    return;
                 }
                 case "getDiscardButtonsACs" -> {
                     String msg = trueIdentity + " use buttons to discard";
