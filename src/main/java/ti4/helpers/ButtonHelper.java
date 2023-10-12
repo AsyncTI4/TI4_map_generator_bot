@@ -1331,6 +1331,79 @@ public class ButtonHelper {
             event.getMessage().delete().queue();
         }
     }
+    public static void saveButtons(ButtonInteractionEvent event, Game activeGame) {
+        activeGame.setSavedButtons(new ArrayList<String>());
+        String exhaustedMessage = event.getMessage().getContentRaw();
+        if ("".equalsIgnoreCase(exhaustedMessage)) {
+            exhaustedMessage = "Updated";
+        }
+        activeGame.setSavedChannelID(event.getMessageChannel().getId());
+        activeGame.setSavedMessage(exhaustedMessage);
+        List<Button> buttons = new ArrayList<>();
+        List<ActionRow> actionRow2 = new ArrayList<>();
+        for (ActionRow row : event.getMessage().getActionRows()) {
+            List<ItemComponent> buttonRow = row.getComponents();
+            for(ItemComponent but : buttonRow){
+                Button button = (Button) but;
+                if(button != null){
+                    buttons.add(button);
+                }
+            }
+        }
+        for(Button button : buttons){
+            if(button.getId() == null || button.getId().equalsIgnoreCase("ultimateUndo")){
+                continue;
+            }
+            String builder = button.getId() + ";"+button.getLabel() + ";"+button.getStyle().toString();
+            if(button.getEmoji() != null && !button.getEmoji().toString().equalsIgnoreCase("")){
+                builder = builder + ";"+button.getEmoji().toString();
+            }
+            activeGame.saveButton(builder);
+        }
+    }
+    public static List<Button> getSavedButtons(Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        List<String> ids = new ArrayList<String>();
+        for(String buttonString : activeGame.getSavedButtons()){
+            System.out.println(buttonString);
+            String id = buttonString.split(";")[0];
+            String label = buttonString.split(";")[1];
+           
+            String style = buttonString.split(";")[2].toLowerCase();
+            String emoji = "";
+            if(StringUtils.countMatches(buttonString, ";") > 2){
+                emoji = buttonString.split(";")[3];
+                String name = StringUtils.substringBetween(emoji, ":","(");
+                String emojiID = StringUtils.substringBetween(emoji, "=",")");
+                emoji = "<:"+name+":"+emojiID+">";
+            }else if(style.equalsIgnoreCase("success")){
+                if(emoji.length() > 0){
+                    buttons.add(Button.success(id, label).withEmoji(Emoji.fromFormatted(emoji)));
+                }else{
+                    buttons.add(Button.success(id, label));
+                }
+            }else if(style.equalsIgnoreCase("danger")){
+                if(emoji.length() > 0){
+                    buttons.add(Button.danger(id, label).withEmoji(Emoji.fromFormatted(emoji)));
+                }else{
+                    buttons.add(Button.danger(id, label));
+                }
+            }else if(style.equalsIgnoreCase("secondary")){
+                if(emoji.length() > 0){
+                    buttons.add(Button.secondary(id, label).withEmoji(Emoji.fromFormatted(emoji)));
+                }else{
+                    buttons.add(Button.secondary(id, label));
+                }
+            }else {
+                if(emoji.length() > 0){
+                    buttons.add(Button.primary(id, label).withEmoji(Emoji.fromFormatted(emoji)));
+                }else{
+                    buttons.add(Button.primary(id, label));
+                }
+            }
+        }
+        return buttons;
+    }
 
     public static List<Button> getButtonsForPictureCombats(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = activeGame.getTileByPosition(pos);

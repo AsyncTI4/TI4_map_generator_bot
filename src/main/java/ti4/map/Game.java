@@ -155,6 +155,8 @@ public class Game {
     private String tableTalkChannelID;
     @Nullable
     private String mainChannelID;
+    private String savedChannelID;
+    private String savedMessage;
     @Nullable
     private String botMapUpdatesThreadID;
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -224,6 +226,7 @@ public class Game {
     private List<String> publicObjectives2;
     private List<String> publicObjectives1Peakable = new ArrayList<>();
     private List<String> publicObjectives2Peakable = new ArrayList<>();
+    private List<String> savedButtons = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
     @JsonIgnore
     private ArrayList<String> purgedPN = new ArrayList<>();
@@ -676,13 +679,34 @@ public class Game {
         }
         return null;
     }
+    @JsonIgnore
+    public TextChannel getSavedChannel() {
+        try {
+            return AsyncTI4DiscordBot.jda.getTextChannelById(getSavedChannelID());
+        } catch (Exception e) {
+            return getMainGameChannel();
+        }
+    }
 
     public void setMainGameChannelID(String channelID) {
         mainChannelID = channelID;
     }
 
+    public void setSavedChannelID(String channelID) {
+        savedChannelID= channelID;
+    }
+    public void setSavedMessage(String msg) {
+        savedMessage = msg;
+    }
+
     public String getMainGameChannelID() {
         return mainChannelID;
+    }
+    public String getSavedChannelID() {
+        return savedChannelID;
+    }
+    public String getSavedMessage() {
+        return savedMessage;
     }
 
     @JsonIgnore
@@ -1088,6 +1112,16 @@ public class Game {
 
     public List<String> getPublicObjectives1() {
         return publicObjectives1;
+    }
+
+    public List<String> getSavedButtons(){
+        return savedButtons;
+    }
+    public void saveButton(String button){
+        savedButtons.add(button);
+    }
+    public void setSavedButtons(List<String> savedButtonsPassed){
+        savedButtons = savedButtonsPassed;
     }
 
     public List<String> getPublicObjectives1Peakable() {
