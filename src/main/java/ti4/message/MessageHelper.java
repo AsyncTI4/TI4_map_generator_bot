@@ -62,7 +62,10 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
-		buttons.add(Button.success("ultimateUndo", "UNDO"));
+		if(buttons instanceof ArrayList){
+			buttons.add(Button.success("ultimateUndo", "UNDO"));
+		}
+		
 		splitAndSent(messageText, channel, buttons);
 	}
 
