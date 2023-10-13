@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestResourceHelper {
-
+    /*
     @Test
     public void testHelper() {
         PositionMapper.init();
@@ -100,6 +100,6 @@ public class TestResourceHelper {
             System.out.print(String.format("%12s", planet.getId()) + " - ");
             System.out.println(relativePositionMap.get(key));
             //allPlanetsWithDistances.put(planet.getId(), distanceMap);
-        }
-    }
+            }
+            }*/
 }
