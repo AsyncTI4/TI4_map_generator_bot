@@ -109,16 +109,16 @@ public class CombatRoll extends SpecialSubcommandData {
 
         CombatRollType rollType = CombatRollType.combatround;
         if (rollTypeOption != null) {
-            if (rollTypeOption.getAsString().equals("afb")) {
+            if (rollTypeOption.getAsString().toLowerCase().equals("afb")) {
                 rollType = CombatRollType.AFB;
             }
-            if (rollTypeOption.getAsString().equals("bombardment")) {
+            if (rollTypeOption.getAsString().toLowerCase().equals("bombardment")) {
                 rollType = CombatRollType.bombardment;
             }
-            if (rollTypeOption.getAsString().equals("spacecannonoffence")) {
+            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannonoffence")) {
                 rollType = CombatRollType.SpaceCannonOffence;
             }
-            if (rollTypeOption.getAsString().equals("spacecannondefence")) {
+            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannondefence")) {
                 rollType = CombatRollType.SpaceCannonDefence;
             }
         }
