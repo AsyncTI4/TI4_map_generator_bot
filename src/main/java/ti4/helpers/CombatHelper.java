@@ -411,23 +411,23 @@ public class CombatHelper {
         return output;
     }
 
-    public static Player GetOpponent(Player player, UnitHolder unitHolder, Game activeGame) {
+    public static Player GetOpponent(Player player, List<UnitHolder> unitHolders, Game activeGame) {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
-        List<Player> opponents = unitHolder.getUnitColorsOnHolder().stream()
+        List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
                 .filter(color -> !color.equals(playerColorID))
                 .map(color -> activeGame.getPlayerByColorID(color))
                 .filter(playerOptional -> playerOptional.isPresent())
                 .map(playerOptional -> playerOptional.get())
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         if (opponents.size() >= 1) {
             opponent = opponents.get(0);
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
-                .findAny();
+                    .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
+                    .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
             }
