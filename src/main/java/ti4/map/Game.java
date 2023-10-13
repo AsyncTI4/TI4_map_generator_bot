@@ -214,6 +214,7 @@ public class Game {
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
     private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
+    private List<String> messageIDsForSaboReacts = new ArrayList<>();
     @ExportableField
     private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
@@ -1064,6 +1065,19 @@ public class Game {
 
     public void discardEvent(String eventID) {
         discardedEvents.add(eventID);
+    }
+
+    public void addMessageIDForSabo(String messageID) {
+        messageIDsForSaboReacts.add(messageID);
+    }
+    public void removeMessageIDForSabo(String messageID) {
+        messageIDsForSaboReacts.remove(messageID);
+    }
+     public void setMessageIDForSabo(List<String> messageIDs) {
+        messageIDsForSaboReacts = messageIDs;
+    }
+    public List<String> getMessageIDsForSabo() {
+        return messageIDsForSaboReacts;
     }
 
     public void addRevealedPublicObjective(String id) {

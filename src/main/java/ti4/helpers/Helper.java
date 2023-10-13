@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.game.SetOrder;
@@ -161,6 +162,46 @@ public class Helper {
             }
         }
         return player;
+    }
+    public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID){
+        if(player.getAutoSaboPassMedian() == 0){
+            return false;
+        }
+        if(player.hasTechReady("it") && player.getStrategicCC() > 0){
+            return false;
+        }
+        if(player.getActionCards().keySet().contains("sabo1") || player.getActionCards().keySet().contains("sabo2") ||
+            player.getActionCards().keySet().contains("sabo3") || player.getActionCards().keySet().contains("sabo4")){
+            return false;
+        }
+        if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "mech").size() > 0){
+            return false;
+        }
+        if(ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)){
+            return false;
+        }
+        int highNum = player.getAutoSaboPassMedian()*6*3/2;
+        int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
+        System.out.println(result + " "+highNum);
+        if(result == highNum){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static void checkAllSaboWindows(Game activeGame){
+        List<String> messageIDs = new ArrayList<>();
+        messageIDs.addAll(activeGame.getMessageIDsForSabo());
+        for(String messageID : messageIDs){
+            for(Player player : activeGame.getRealPlayers()){
+                if(shouldPlayerLeaveAReact(player, activeGame, messageID)){
+                    String message = activeGame.isFoWMode() ? "No sabotage" : null;
+                    ButtonHelper.addReaction(player, false, false, message, null, messageID, activeGame);
+                }
+            }
+            
+        }
     }
 
     public static Player getPlayerFromUnlockedLeader(Game activeGame, String leader) {

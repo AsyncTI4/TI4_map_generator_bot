@@ -119,6 +119,7 @@ public class CustomCommand implements Command {
         subcommands.add(new RevealSpecificStage1());
         subcommands.add(new RevealSpecificStage2());
         subcommands.add(new SpinTilesInFirstThreeRings());
+        subcommands.add(new OfferAutoPassOptions());
         subcommands.add(new ChangeToBaseGame());
         subcommands.add(new CustomizationOptions());
         return subcommands;

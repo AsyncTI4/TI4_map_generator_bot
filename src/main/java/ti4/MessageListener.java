@@ -183,6 +183,9 @@ public class MessageListener extends ListenerAdapter {
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
             
             for (Game activeGame : mapList.values()) {
+                if(!activeGame.isHasEnded()){
+                    Helper.checkAllSaboWindows(activeGame);
+                }
                 if (activeGame.getAutoPingStatus() && activeGame.getAutoPingSpacer() != 0) {
                     String playerID = activeGame.getActivePlayer();
                     
