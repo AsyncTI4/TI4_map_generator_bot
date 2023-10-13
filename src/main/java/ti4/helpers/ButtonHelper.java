@@ -2406,7 +2406,7 @@ public class ButtonHelper {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkCommanderButtons(activeGame, player, event));
         }
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GRift));
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
             Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability");
@@ -2517,7 +2517,7 @@ public class ButtonHelper {
         activeGame.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + activeGame.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GRift));
+        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperFactionSpecific.getSardakkAgentButtons(activeGame, player));
