@@ -1340,7 +1340,6 @@ public class ButtonHelper {
         activeGame.setSavedChannelID(event.getMessageChannel().getId());
         activeGame.setSavedMessage(exhaustedMessage);
         List<Button> buttons = new ArrayList<>();
-        List<ActionRow> actionRow2 = new ArrayList<>();
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
             for(ItemComponent but : buttonRow){
@@ -1376,7 +1375,10 @@ public class ButtonHelper {
                 String name = StringUtils.substringBetween(emoji, ":","(");
                 String emojiID = StringUtils.substringBetween(emoji, "=",")");
                 emoji = "<:"+name+":"+emojiID+">";
-            }else if(style.equalsIgnoreCase("success")){
+                System.out.println(emoji);
+                System.out.println(Helper.getEmojiFromDiscord("infantry"));
+            }
+            if(style.equalsIgnoreCase("success")){
                 if(emoji.length() > 0){
                     buttons.add(Button.success(id, label).withEmoji(Emoji.fromFormatted(emoji)));
                 }else{
@@ -2528,6 +2530,31 @@ public class ButtonHelper {
         Button concludeMove = Button.danger(finChecker + "doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
         buttons.add(concludeMove);
         return buttons;
+    }
+
+    public static void offerSetAutoPassOnSaboButtons(Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        int x = 1;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 2;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 4;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 6;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 8;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 16;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 24;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        x = 36;
+        buttons.add(Button.secondary("setAutoPassMedian_"+x, ""+x));
+        buttons.add(Button.danger("deleteButtons", "Decline"));
+        for(Player player : activeGame.getRealPlayers()){
+            String message = getTrueIdentity(player, activeGame) + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        }
     }
 
     public static UnitHolder getUnitHolderFromPlanetName(String planetName, Game activeGame) {
@@ -4038,6 +4065,60 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
+    }
+
+
+
+    public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game activeGame) {
+        
+       
+        Guild guild = activeGame.getGuild();
+        
+        HashMap<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
+        List<RichCustomEmoji> emojis = guild.getEmojis();
+        if (emojiMap != null && emojiMap.size() != emojis.size()) {
+            emojiMap.clear();
+        }
+        if (emojiMap == null || emojiMap.isEmpty()) {
+            emojiMap = new HashMap<>();
+            for (Emoji emoji : emojis) {
+                emojiMap.put(emoji.getName().toLowerCase(), emoji);
+            }
+        }
+        Message mainMessage;
+        try{
+            mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageID).complete();
+        }catch(Error e){
+            activeGame.removeMessageIDForSabo(messageID);
+            return;
+        }
+        
+        Emoji emojiToUse = Helper.getPlayerEmoji(activeGame, player, mainMessage);
+        String messageId = mainMessage.getId();
+
+        if (!skipReaction) {
+            activeGame.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+            new ButtonListener().checkForAllReactions(messageId, activeGame);
+            if (message == null || message.isEmpty()) {
+                return;
+            }
+        }
+
+        String text = Helper.getPlayerRepresentation(player, activeGame) + " " + message;
+        if (activeGame.isFoWMode() && sendPublic) {
+            text = message;
+        } else if (activeGame.isFoWMode() && !sendPublic) {
+            text = "(You) " + emojiToUse.getFormatted() + " " + message;
+        }
+
+        if (!additionalMessage.isEmpty()) {
+            text += Helper.getGamePing(guild, activeGame) + " " + additionalMessage;
+        }
+
+        if (activeGame.isFoWMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, activeGame, text);
+            return;
+        }
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game activeGame) {
