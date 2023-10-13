@@ -1118,6 +1118,33 @@ public class Helper {
             case "gheminacommander" -> Emojis.GheminaCommander;
             case "gheminaherolady" -> Emojis.GheminaHeroLady;
             case "gheminaherolord" -> Emojis.GheminaHeroLord;
+            case "cymiaeagent" -> Emojis.CymiaeAgent;
+            case "cymiaecommander" -> Emojis.CymiaeCommander;
+            case "cymiaehero" -> Emojis.CymiaeHero;
+            case "dihmohnagent" -> Emojis.DihmohnAgent;
+            case "dihmohncommander" -> Emojis.DihmohnCommander;
+            case "dihmohnhero" -> Emojis.DihmohnHero;
+            case "edynagent" -> Emojis.EdynAgent;
+            case "edyncommander" -> Emojis.EdynCommander;
+            case "edynhero" -> Emojis.EdynHero;
+            case "florzenagent" -> Emojis.FlorzenAgent;
+            case "florzencommander" -> Emojis.FlorzenCommander;
+            case "florzenhero" -> Emojis.FlorzenHero;
+            case "freesystemcommander" -> Emojis.FreesystemCommander;
+            case "freesystemhero" -> Emojis.FreesystemHero;
+            case "freesystemsagent" -> Emojis.FreesystemsAgent;
+            case "ghotiagent" -> Emojis.GhotiAgent;
+            case "ghoticommander" -> Emojis.GhotiCommander;
+            case "ghotihero" -> Emojis.GhotiHero;
+            case "gledgeagent" -> Emojis.GledgeAgent;
+            case "gledgecommander" -> Emojis.GledgeCommander;
+            case "gledgehero" -> Emojis.GledgeHero;
+            case "khraskagent" -> Emojis.KhraskAgent;
+            case "khraskcommander" -> Emojis.KhraskCommander;
+            case "khraskhero" -> Emojis.KhraskHero;
+            case "kjalengardagent" -> Emojis.KjalengardAgent;
+            case "kjalengardcommander" -> Emojis.KjalengardCommander;
+            case "kjalengardhero" -> Emojis.KjalengardHero;
 
             //OTHER
             case "whalpha" -> Emojis.WHalpha;

@@ -247,6 +247,36 @@ public class Emojis {
     public static final String GheminaHeroLord = "<:GheminaHeroLord:1162427717791256677>";
     // END OF EMOJI FARM 5
 
+    // EMOJI FARM 6
+    public static final String CymiaeAgent = "<:CymiaeAgent:1162423164702314547>";
+    public static final String CymiaeCommander = "<:CymiaeCommander:1162423166262575165>";
+    public static final String CymiaeHero = "<:CymiaeHero:1162423167546048677>";
+    public static final String DihmohnAgent = "<:DihmohnAgent:1162423159648170094>";
+    public static final String DihmohnCommander = "<:DihmohnCommander:1162423161988591706>";
+    public static final String DihmohnHero = "<:DihmohnHero:1162423163368525845>";
+    public static final String EdynAgent = "<:EdynAgent:1162423214190891029>";
+    public static final String EdynCommander = "<:EdynCommander:1162423215990247535>";
+    public static final String EdynHero = "<:EdynHero:1162423217235955722>";
+    public static final String FlorzenAgent = "<:FlorzenAgent:1162423218540396594>";
+    public static final String FlorzenCommander = "<:FlorzenCommander:1162423220369104978>";
+    public static final String FlorzenHero = "<:FlorzenHero:1162423221690310656>";
+    public static final String FreesystemCommander = "<:FreesystemCommander:1162423239646122055>";
+    public static final String FreesystemHero = "<:FreesystemHero:1162423241286090762>";
+    public static final String FreesystemsAgent = "<:FreesystemsAgent:1162423242456313996>";
+    public static final String GhotiAgent = "<:GhotiAgent:1162423285485670561>";
+    public static final String GhotiCommander = "<:GhotiCommander:1162423286899155025>";
+    public static final String GhotiHero = "<:GhotiHero:1162423287981297755>";
+    public static final String GledgeAgent = "<:GledgeAgent:1162423289281515632>";
+    public static final String GledgeCommander = "<:GledgeCommander:1162423290837598248>";
+    public static final String GledgeHero = "<:GledgeHero:1162423283841503292>";
+    public static final String KhraskAgent = "<:KhraskAgent:1162423321388912760>";
+    public static final String KhraskCommander = "<:KhraskCommander:1162423325977477220>";
+    public static final String KhraskHero = "<:KhraskHero:1162423327143501967>";
+    public static final String KjalengardAgent = "<:KjalengardAgent:1162423340141658112>";
+    public static final String KjalengardCommander = "<:KjalengardCommander:1162423346768646266>";
+    public static final String KjalengardHero = "<:KjalengardHero:1162423348828065932>";
+    // END OF EMOJI FARM 6
+
     // RESOURCE AND INFLUENCE SYMBOLS
     public static final String influence = "<:influence:959575421337358336>";
     public static final String resources = "<:resources:959575421274451998>";
