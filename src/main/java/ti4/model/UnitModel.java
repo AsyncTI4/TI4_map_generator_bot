@@ -57,6 +57,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && !id.isEmpty()
             && baseType != null
             && asyncId != null
+            && source != null
             && List.of("ca","cv","dd","dn","ff","fs","gf","mf","pd","sd","ws","csd","plenaryorbital","tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }

@@ -287,6 +287,10 @@ public class Mapper {
         return units;
     }
 
+    public static List<String> getUnitSources() {
+        return units.values().stream().map(unit -> unit.getSource()).distinct().sorted().toList();
+    }
+
     public static UnitModel getUnit(String unitID) {
         return units.get(unitID);
     }
