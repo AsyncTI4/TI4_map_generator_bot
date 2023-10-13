@@ -153,7 +153,7 @@ public class PlayAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
             if (Helper.isSaboAllowed(activeGame, player)) {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeGame, player, buttons);
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeGame, player, buttons, true);
             } else {
                 MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
                 MessageHelper.sendMessageToChannel(mainGameChannel,

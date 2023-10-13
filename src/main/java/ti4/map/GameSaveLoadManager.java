@@ -272,6 +272,9 @@ public class GameSaveLoadManager {
         writer.write(Constants.SO + " " + String.join(",", activeGame.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.MESSAGEID_FOR_SABOS + " " + String.join(",", activeGame.getMessageIDsForSabo()));
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.AC + " " + String.join(",", activeGame.getActionCards()));
         writer.write(System.lineSeparator());
 
@@ -692,6 +695,8 @@ public class GameSaveLoadManager {
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
 
             UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
@@ -1148,6 +1153,7 @@ public class GameSaveLoadManager {
                 case Constants.PHASE_OF_GAME -> activeGame.setCurrentPhase(info);
                 case Constants.LATEST_UPNEXT_MSG -> activeGame.setLatestUpNextMsg(info);
                 case Constants.SO -> activeGame.setSecretObjectives(getCardList(info));
+                case Constants.MESSAGEID_FOR_SABOS -> activeGame.setMessageIDForSabo(getCardList(info));
                 case Constants.AC -> activeGame.setActionCards(getCardList(info));
                 case Constants.PO1 -> activeGame.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> activeGame.setPublicObjectives2(getCardList(info));
@@ -1722,6 +1728,7 @@ public class GameSaveLoadManager {
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.AUTO_SABO_PASS_MEDIAN -> player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {
                     UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
                     StringTokenizer unitTokens = new StringTokenizer(tokenizer.nextToken(), ";");

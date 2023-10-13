@@ -889,7 +889,9 @@ public class ButtonListener extends ListenerAdapter {
             String type = typeNName.substring(0, typeNName.indexOf("_"));
             String acName = typeNName.replace(type + "_", "");
             String message = "Cancelling the AC \"" + acName + "\" using ";
-
+            if(activeGame.getMessageIDsForSabo().contains(event.getMessageId())){
+                activeGame.removeMessageIDForSabo(event.getMessageId());
+            }
             boolean sendReact = true;
             if ("empy".equalsIgnoreCase(type)) {
                 message = message + "a Watcher mech! The Watcher should be removed now by the owner.";
@@ -1170,6 +1172,12 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("arboAgentPutShip_")) {
             ButtonHelperFactionSpecific.arboAgentPutShip(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("setAutoPassMedian_")) {
+            String hours = buttonID.split("_")[1];
+            int median = Integer.parseInt(hours);
+            player.setAutoSaboPassMedian(median);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to "+median + " hours");
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("arboAgentOn_")) {
             String pos = buttonID.split("_")[1];
             String unit = buttonID.split("_")[2];
@@ -2273,6 +2281,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     RevealStage1.revealTwoStage1(event, activeGame.getMainGameChannel());
                     ButtonHelper.startStrategyPhase(event, activeGame);
+                    ButtonHelper.offerSetAutoPassOnSaboButtons(activeGame);
                     event.getMessage().delete().queue();
                 }
                 case "gain_2_comms" -> {
@@ -3327,6 +3336,74 @@ public class ButtonListener extends ListenerAdapter {
         }
     }
 
+     public void checkForAllReactions(String messageId, Game activeGame) {
+        
+
+        Message mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
+
+        int matchingFactionReactions = 0;
+        for (Player player : activeGame.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                matchingFactionReactions++;
+                continue;
+            }
+
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || "null".equals(faction)) {
+                matchingFactionReactions++;
+                continue;
+            }
+
+            Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+            if (activeGame.isFoWMode()) {
+                int index = 0;
+                for (Player player_ : activeGame.getPlayers().values()) {
+                    if (player_ == player)
+                        break;
+                    index++;
+                }
+                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            }
+            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+            if (reaction != null)
+                matchingFactionReactions++;
+        }
+        int numberOfPlayers = activeGame.getPlayers().size();
+        if (matchingFactionReactions >= numberOfPlayers) {
+           mainMessage.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            if(activeGame.getMessageIDsForSabo().contains(messageId)){
+                activeGame.removeMessageIDForSabo(messageId);
+            }
+        }
+    }
+
+     public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game activeGame) {
+        Message mainMessage;
+        try{
+            mainMessage= activeGame.getMainGameChannel().retrieveMessageById(messageId).complete();
+        }catch(Exception e){
+            activeGame.removeMessageIDForSabo(messageId);
+            return true;
+        }
+        
+        Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+        if (activeGame.isFoWMode()) {
+            int index = 0;
+            for (Player player_ : activeGame.getPlayers().values()) {
+                if (player_ == player)
+                    break;
+                index++;
+            }
+            reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+        }
+        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+        if (reaction != null){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game activeGame) {
         String buttonID = event.getButton().getId();
         if (activeGame == null || buttonID == null) {
@@ -3359,7 +3436,12 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
 
             }
-            case "no_sabotage" -> event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            case "no_sabotage" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+                if(activeGame.getMessageIDsForSabo().contains(event.getMessageId())){
+                    activeGame.removeMessageIDForSabo(event.getMessageId());
+                }
+            }
 
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
                 String message2 = "All players have indicated scoring. Flip the relevant PO using the buttons. This will automatically run status clean-up if it has not been run already.";

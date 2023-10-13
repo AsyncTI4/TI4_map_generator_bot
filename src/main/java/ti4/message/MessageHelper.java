@@ -80,6 +80,13 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeGame, player, msg);
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game activeGame, Player player, List<Button> buttons, boolean saboable) {
+		MessageFunction addFactionReact = (msg) -> {
+			addFactionReactToMessage(activeGame, player, msg);
+			activeGame.addMessageIDForSabo(msg.getId());
+		};
+		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
+	}
 
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Game activeGame, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {

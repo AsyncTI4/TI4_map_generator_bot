@@ -71,6 +71,7 @@ public class Player {
     private int commodities;
     private int commoditiesTotal;
     private int stasisInfantry;
+    private int autoSaboPassMedian;
 
     private Set<Integer> followedSCs = new HashSet<>();
 
@@ -1596,6 +1597,13 @@ public class Player {
 
     public int getStasisInfantry() {
         return stasisInfantry;
+    }
+
+    public int getAutoSaboPassMedian() {
+        return autoSaboPassMedian;
+    }
+    public void setAutoSaboPassMedian(int median) {
+        autoSaboPassMedian = median;
     }
 
     public void setStasisInfantry(int stasisInfantry) {
