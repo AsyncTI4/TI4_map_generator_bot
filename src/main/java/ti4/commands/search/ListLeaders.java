@@ -31,7 +31,7 @@ public class ListLeaders extends SearchSubcommandData {
             return;
         }
 
-        for (LeaderModel model : Mapper.getLeaders().values()) {
+        for (LeaderModel model : Mapper.getLeaders().values().stream().sorted((o1, o2) -> o1.getID().compareTo(o2.getID())).toList()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true, true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
