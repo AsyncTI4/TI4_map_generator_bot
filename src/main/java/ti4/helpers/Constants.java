@@ -13,6 +13,7 @@ public class Constants {
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
     public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
+    public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
@@ -459,6 +460,7 @@ public class Constants {
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String STASIS_INFANTRY = "stasis_infantry";
+    public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
     public static final String FACTION = "faction";
     public static final String AC = "action_cards";
     public static final String ACTION_CARD = "action_card";
@@ -470,6 +472,7 @@ public class Constants {
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String SO = "secret_objectives";
+    public static final String MESSAGEID_FOR_SABOS = "messageid_for_sabos";
     public static final String SECRET_OBJECTIVE = "secret_objective";
     public static final String SO_DECK = "so_deck";
     public static final String SO_SCORED = "secret_objectives_scored";
