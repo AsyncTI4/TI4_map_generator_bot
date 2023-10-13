@@ -171,7 +171,7 @@ public class Helper {
             return false;
         }
         if(player.getActionCards().keySet().contains("sabo1") || player.getActionCards().keySet().contains("sabo2") ||
-            player.getActionCards().keySet().contains("sabo3") || player.getActionCards().keySet().contains("sabo4")){
+            player.getActionCards().keySet().contains("sabo3") || player.getActionCards().keySet().contains("sabo4") || (activeGame.getActionCardDeckSize()+activeGame.getDiscardActionCards().size()) > 180){
             return false;
         }
         if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "mech").size() > 0){
