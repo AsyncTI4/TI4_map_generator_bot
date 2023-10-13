@@ -5,12 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-
 
 public class CardsInfoForPlayer extends AdminSubcommandData {
     public CardsInfoForPlayer() {
