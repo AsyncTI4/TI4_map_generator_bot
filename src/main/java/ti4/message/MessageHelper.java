@@ -62,8 +62,8 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
-		if(buttons instanceof ArrayList){
-			buttons.add(Button.success("ultimateUndo", "UNDO"));
+		if(buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")){
+			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
 		}
 		
 		splitAndSent(messageText, channel, buttons);
