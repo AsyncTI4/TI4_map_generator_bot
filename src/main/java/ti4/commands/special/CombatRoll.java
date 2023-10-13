@@ -1,6 +1,7 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +163,14 @@ public class CombatRoll extends SpecialSubcommandData {
 
             return;
         }
-        Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeGame);
+        
+        List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(Arrays.asList(combatOnHolder));
+        if (rollType == CombatRollType.SpaceCannonDefence) {
+            // Including space for finding opponents for pds - since people will fire before landing sometimes
+            // and fire after landing other times.
+            combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
+        }
+        Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, activeGame);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent,
