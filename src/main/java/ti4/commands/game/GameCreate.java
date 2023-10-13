@@ -42,45 +42,45 @@ public class GameCreate extends GameSubcommandData {
             return;
         }
 
-        createNewGame(event, mapName, member);
+        Game game = createNewGame(event, mapName, member);
+        reportNewGameCreated(game);
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
     }
 
-    public static Game createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
+    public static Game createNewGame(SlashCommandInteractionEvent event, String gameName, Member gameOwner) {
         Game newGame = new Game();
+        newGame.newGameSetup(); 
         String ownerID = gameOwner.getId();
         newGame.setOwnerID(ownerID);
         newGame.setOwnerName(gameOwner.getEffectiveName());
-        newGame.setName(mapName);
+        newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
         GameManager gameManager = GameManager.getInstance();
         gameManager.addGame(newGame);
-        boolean setMapSuccessful = gameManager.setGameForUser(ownerID, mapName);
+        boolean setMapSuccessful = gameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
+            MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
         }
         GameSaveLoadManager.saveMap(newGame, event);
-        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).size() > 0){
-            TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-            //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-            List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-            if (threadChannels == null){
-                return newGame;
-            }
-            String threadName = "game-starts-and-ends";
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    String guildName = newGame.getGuild() == null ? "null_no_action_channel" : newGame.getGuild().getName();
-                    MessageHelper.sendMessageToChannel(threadChannel_,
-                            "Game: **" + mapName + "** on server **" + guildName + "** has been created.");
-                }
-            }
-        }
-        
         return newGame;
     }
-    
+
+    public static void reportNewGameCreated(Game game) {
+        if (game == null) return;
+        TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).stream().findFirst().orElse(null);
+        if (bothelperLoungeChannel == null) return;
+        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+        if (threadChannels == null || threadChannels.isEmpty()) return;
+        String threadName = "game-starts-and-ends";
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                String guildName = game.getGuild() == null ? "Server Unknown" : game.getGuild().getName();
+                MessageHelper.sendMessageToChannel(threadChannel_, "Game: **" + game.getName() + "** on server **" + guildName + "** has been created.");
+                break;
+            }
+        }
+    }
 }

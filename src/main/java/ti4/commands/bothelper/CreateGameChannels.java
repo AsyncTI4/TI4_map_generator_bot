@@ -257,6 +257,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             thread.getManager().setArchived(true).queue();
             thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
         }
+
+        GameCreate.reportNewGameCreated(newGame);
     }
 
     private static String getNextGameName() {
