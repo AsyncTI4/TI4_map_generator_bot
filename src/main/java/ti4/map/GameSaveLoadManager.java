@@ -132,15 +132,12 @@ public class GameSaveLoadManager {
 
         if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
 
-        File mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
+       File mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
         if (mapFile == null) {
             BotLogger.log("Could not save map, error creating save file");
             return;
         }
 
-        if (mapFile.exists()) {
-            saveUndo(activeGame, mapFile);
-        }
         try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
             HashMap<String, Tile> tileMap = activeGame.getTileMap();
             writer.write(activeGame.getOwnerID());
@@ -157,6 +154,11 @@ public class GameSaveLoadManager {
             }
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + activeGame.getName(), e);
+        }
+         
+       mapFile = Storage.getMapImageStorage(activeGame.getName() + TXT);
+        if (mapFile.exists()) {
+            saveUndo(activeGame, mapFile);
         }
     }
 
@@ -182,6 +184,7 @@ public class GameSaveLoadManager {
                             .map(Integer::parseInt).toList();
                     int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value)
                             .max().orElseThrow(NoSuchElementException::new);
+
                     File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
