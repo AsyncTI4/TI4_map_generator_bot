@@ -121,14 +121,14 @@ public class GameSaveLoadManager {
             }
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
-        } catch (IOException e) {
-            BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY", e);
-        } catch (Exception e) {
-            BotLogger.log("JSON SAVER", e);
-        }
+        // ObjectMapper mapper = new ObjectMapper();
+        // try {
+        //     mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(activeGame.getName() + JSON), activeGame);
+        // } catch (IOException e) {
+        //     BotLogger.log(activeGame.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY", e);
+        // } catch (Exception e) {
+        //     BotLogger.log("JSON SAVER", e);
+        // }
 
         if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
 
