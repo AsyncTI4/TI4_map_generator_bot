@@ -979,15 +979,15 @@ public class Player {
         return leader;
     }
 
-    public boolean isAFK(){
-        if(getHoursThatPlayerIsAFK().length() < 1){
+    public boolean isAFK() {
+        if (getHoursThatPlayerIsAFK().length() < 1) {
             return false;
         }
         String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
         int currentHour = Helper.getCurrentHour();
-        for(String hour : hoursAFK){
+        for (String hour : hoursAFK) {
             int h = Integer.parseInt(hour);
-            if(h == currentHour){
+            if (h == currentHour) {
                 return true;
             }
         }
@@ -997,8 +997,8 @@ public class Player {
     public boolean hasUnexhaustedLeader(String leaderId) {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
-        }else{
-            if (hasExternalAccessToLeader(leaderId) && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true)){
+        } else {
+            if (hasExternalAccessToLeader(leaderId) && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true)) {
                 return true;
             }
         }
@@ -1110,16 +1110,18 @@ public class Player {
     }
 
     public void addHourThatIsAFK(String hour) {
-        if(hoursThatPlayerIsAFK.length() < 1){
+        if (hoursThatPlayerIsAFK.length() < 1) {
             hoursThatPlayerIsAFK = hour;
-        }else{
-            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";"+hour;
+        } else {
+            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";" + hour;
         }
     }
+
     public void setHoursThatPlayerIsAFK(String hours) {
         hoursThatPlayerIsAFK = hours;
     }
-    public String getHoursThatPlayerIsAFK(){
+
+    public String getHoursThatPlayerIsAFK() {
         return hoursThatPlayerIsAFK;
     }
 
@@ -1637,6 +1639,7 @@ public class Player {
     public int getAutoSaboPassMedian() {
         return autoSaboPassMedian;
     }
+
     public void setAutoSaboPassMedian(int median) {
         autoSaboPassMedian = median;
     }
@@ -1998,7 +2001,7 @@ public class Player {
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
-        return getColor().equals(unit.getColorID());
+        return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
     }
 
     @Deprecated

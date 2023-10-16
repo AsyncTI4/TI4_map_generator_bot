@@ -14,6 +14,10 @@ public class Units {
         public UnitType unitType;
         public String colorID;
 
+        public String getColor() {
+            return AliasHandler.resolveColor(colorID);
+        }
+
         public String asyncID() {
             return unitType.toString();
         }
