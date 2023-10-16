@@ -3081,8 +3081,8 @@ public class ButtonListener extends ListenerAdapter {
                             if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])) {
                                 MessageHelper.sendMessageToChannel(event.getChannel(),
                                     "You were not the player who pressed the latest button. Use /game undo if you truly want to undo " + activeGame.getLatestCommand());
+                                    return;
                             }
-                            return;
                         }
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());

@@ -273,7 +273,7 @@ public class MessageListener extends ListenerAdapter {
                                             MessageHelper.sendMessageToChannel(gameChannel, ping);
                                             if(ping != null && ping.contains("courtesy notice")){
                                                 List<Button> buttons = new ArrayList<Button>();
-                                                buttons.add(Button.danger("disablePingsTemporarily", "Disable Pings For Turn"));
+                                                buttons.add(Button.danger("temporaryPingDisable", "Disable Pings For Turn"));
                                                 buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
                                                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesnt annoy you. It will turn back on for the next turn.", buttons);
                                             }

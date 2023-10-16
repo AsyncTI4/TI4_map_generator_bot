@@ -19,6 +19,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -196,6 +198,14 @@ public class Setup extends PlayerSubcommandData {
             sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeGame) + " has been set up");
         } else {
             sendMessage("Player was set up.");
+        }
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        for (Game activeGame2 : mapList.values()) {
+            for (Player player2 : activeGame2.getRealPlayers()) {
+                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                    player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+                }
+            }
         }
     }
 
