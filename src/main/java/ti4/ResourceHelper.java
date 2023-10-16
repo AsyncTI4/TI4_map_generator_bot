@@ -77,7 +77,7 @@ public class ResourceHelper {
     }
 
     @Nullable
-    @Deprecated
+    //@Deprecated
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {

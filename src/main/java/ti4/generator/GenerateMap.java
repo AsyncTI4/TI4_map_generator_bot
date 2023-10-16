@@ -522,7 +522,7 @@ public class GenerateMap {
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
                 String userName = player.getUserName() + ("null".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
-                if(player.isAFK()){
+                if (player.isAFK()) {
                     userName = userName + " -- AFK";
                 }
                 graphics.drawString(userName, x + 34, y);
@@ -606,7 +606,7 @@ public class GenerateMap {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
-                } 
+                }
 
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
@@ -2242,18 +2242,18 @@ public class GenerateMap {
                 point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
                 graphics.setColor(new Color(50, 230, 80));
                 graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
-                
-                if(player.isAFK()){
+
+                if (player.isAFK()) {
                     graphics.setColor(Color.GRAY);
                     graphics.drawString("(AFK)", point.x + deltaX + 124, point.y + deltaY);
                 }
                 graphics.setColor(Color.WHITE);
-            }else if (player.isAFK()) {
+            } else if (player.isAFK()) {
                 point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
                 graphics.setColor(Color.GRAY);
                 graphics.drawString("AFK", point.x + deltaX + 4, point.y + deltaY);
                 graphics.setColor(Color.WHITE);
-                
+
             }
             deltaY += PLAYER_STATS_HEIGHT;
         }
@@ -3424,7 +3424,7 @@ public class GenerateMap {
                         //TODO: Only paint the tag of the most expensive ship per player, or if no ships, the "bottom most" unit on a planet
                         String factionTag = player.getFactionModel().getShortTag();
                         BufferedImage plaquette = ImageHelper.read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
-                        Point plaquetteOffset = getUnitTagLocation(StringUtils.substringBetween(id, "_", ".png"));
+                        Point plaquetteOffset = getUnitTagLocation(id);
 
                         tileGraphics.drawImage(plaquette, TILE_PADDING + imageX + plaquetteOffset.x, TILE_PADDING + imageY + plaquetteOffset.y, null);
                         BufferedImage factionIconForPlaquette = getPlayerFactionIconImageScaled(player, 32, 32);
