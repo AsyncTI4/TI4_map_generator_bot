@@ -1664,11 +1664,12 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
-        Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
+        List<String> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun)
+            .stream().map(UnitType::getValue).toList();
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         for (UnitModel ownedUnit : player.getUnitModels()) {
             if (ownedUnit.getCost() < removedUnit.getCost() + 2) {
-                if (allowedUnits.contains(UnitType.valueOf(ownedUnit.getAsyncId()))) {
+                if (allowedUnits.contains(ownedUnit.getAsyncId())) {
                     String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getAsyncId() + "_" + tile.getPosition();
                     String buttonText = "Place " + ownedUnit.getName();
                     buttons.add(Button.danger(buttonID, buttonText).withEmoji(Emoji.fromFormatted(ownedUnit.getUnitEmoji())));
