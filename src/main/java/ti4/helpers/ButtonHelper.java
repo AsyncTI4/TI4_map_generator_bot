@@ -438,7 +438,7 @@ public class ButtonHelper {
             for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                 if (unitEntry.getValue() > 0 && player.unitBelongsToPlayer(unitEntry.getKey())) {
                     UnitModel model = player.getUnitFromUnitKey(unitEntry.getKey());
-                    if (model.getProductionValue() > 0) return true;
+                    if (model != null && model.getProductionValue() > 0) return true;
                 }
             }
         }
