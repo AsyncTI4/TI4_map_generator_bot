@@ -3,6 +3,7 @@ package ti4;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
@@ -185,8 +187,10 @@ public class MessageListener extends ListenerAdapter {
             for (Game activeGame : mapList.values()) {
                 if(!activeGame.isHasEnded()){
                     Helper.checkAllSaboWindows(activeGame);
+                }else{
+                    continue;
                 }
-                if (activeGame.getAutoPingStatus() && activeGame.getAutoPingSpacer() != 0) {
+                if (activeGame.getAutoPingStatus() && activeGame.getAutoPingSpacer() != 0 && !activeGame.getTemporaryPingDisable()) {
                     String playerID = activeGame.getActivePlayer();
                     
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
@@ -201,7 +205,7 @@ public class MessageListener extends ListenerAdapter {
                                 String ping = null;
                                 if(player != null){
                                     realIdentity = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
-                                    ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
+                                    ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                 }
                                 if ("agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())){
                                     AgendaHelper.pingMissingPlayers(activeGame);
@@ -209,34 +213,55 @@ public class MessageListener extends ListenerAdapter {
                                      long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
                                      int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int) activeGame.getAutoPingSpacer());
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*2) ){
-                                        ping = realIdentity + " this is a courtesy notice that the game AWAITS.";
+                                        ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*3) ){
-                                        ping = realIdentity + " this is a brusk missive stating that while you may sleep, the game never does.";
+                                        ping = realIdentity + " this is a brusk missive stating that while you may sleep, the bot never does (and its been told to ping you about it).";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*4) ){
-                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absence.";
+                                        ping = realIdentity + " this is a sternly worded letter from the bot regarding your noted absence. Do you know how much paperwork this creates? (none in reality but a lot in theory)";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*5) ){
-                                        ping = realIdentity + " this is a firm request that you do something to end this situation.";
+                                        ping = realIdentity + " this is a firm request from the bot that you do something to end this situation. At this rate you will never make the top 100 fastest players";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*6) ){
-                                        ping = realIdentity + " Half dozen times the charm they say. Surely the game will move now ";
+                                        ping = realIdentity + " Half dozen times the charm they say. I have it on good authority that if you move in the next 10 ms, you're guaranteed to win the next combat you have, bot's honor. Wait too long though and your dice get cursed. ";
                                     }
                                     if(pingNumber == 7){
-                                         ping = realIdentity + " I can write whatever I want here, not like anyone reads these anyways.";
+                                         ping = realIdentity + " I can write whatever I want here, not like it's likely that you've checked in to read any of it anyways.";
                                     }
                                     if(pingNumber == 8){
-                                         ping = realIdentity + " What rhymes with send burn, do you know? I don't";
+                                         ping = realIdentity + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the angry bear";
                                     }
-                                    if(pingNumber > 8){
-                                         ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that I'd know anything about that. ";
+                                    if(pingNumber == 9){
+                                         ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that the bot would know anything about that (who are we kidding, the bot knows everything, it just acts dumb sometimes to fool you into a state of compliance) ";
                                     }
-                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeGame.getAutoPingSpacer()*11) && !activeGame.isFoWMode()){
-                                        ping = realIdentity + " this is your final reminder. I hope you are doing well, wherever you are, and I'm sure whatever you are doing is far more important than TI. Or your name is Frox";
+                                    if(pingNumber == 10){
+                                         ping = realIdentity + " Do you ever wonder what we're doing here? Such a short time here on earth, and here we are, spending some of it waiting for a TI4 game to move. Well, at least some of us probably are ";
+                                    }
+                                    if(pingNumber == 11){
+                                         ping = realIdentity + " We should hire some monkeys to write these prompts. Then at least these reminders would be productive and maybe one day produce Shakespeare ";
+                                    }
+                                    if(pingNumber == 12){
+                                         ping = realIdentity + " This is lucky number 12. You wanna move now to avoid the bad luck of 13. Don't say we didn't warn you";
+                                    }
+                                    if(pingNumber == 13){
+                                         ping = realIdentity + " All your troops decided it was holiday leave and they went home. Good luck getting them back into combat readiness by the time you need them. ";
+                                    }
+                                    if(pingNumber == 14){
+                                         ping = realIdentity + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
+                                    }
+                                    if(pingNumber == 15){
+                                         ping = realIdentity + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
+                                    }
+                                    if(pingNumber > 15){
+                                         ping = realIdentity + " Your name is goin be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you dont wanna join em ";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*16) && milliSinceLastTurnChange < (60*60*multiplier* activeGame.getAutoPingSpacer()*17) && !activeGame.isFoWMode()){
+                                        ping = realIdentity + " this is your final reminder. Stopping pinging now so we dont come back in 2 months and find 600+ messages";
                                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
                                     }
-                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*11) && !activeGame.isFoWMode()){
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*17) && !activeGame.isFoWMode()){
                                         continue;
                                     }
                                     if (activeGame.isFoWMode()) {
@@ -246,6 +271,12 @@ public class MessageListener extends ListenerAdapter {
                                         MessageChannel gameChannel = activeGame.getMainGameChannel();
                                         if (gameChannel != null) {
                                             MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                            if(ping != null && ping.contains("courtesy notice")){
+                                                List<Button> buttons = new ArrayList<Button>();
+                                                buttons.add(Button.danger("disablePingsTemporarily", "Disable Pings For Turn"));
+                                                buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
+                                                MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesnt annoy you. It will turn back on for the next turn.", buttons);
+                                            }
                                         }
                                     }
                                 }
@@ -270,29 +301,29 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private void handleFoWWhispersAndFowCombats(MessageReceivedEvent event, Message msg) {
-        if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
-            try{
-                    String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
-                    Game activeGame = GameManager.getInstance().getGame(gameName);
-                    if(activeGame != null && activeGame.getPublicObjectives1() != null && activeGame.getPublicObjectives1().size() > 1 && activeGame.getBotShushing()){
-                        MessageHistory mHistory = event.getChannel().getHistory();
-                        RestAction<List<Message>> lis = mHistory.retrievePast(4);
-                        boolean allNonBots = true;
-                        for(Message m : lis.complete()){
-                            if(m.getAuthor().isBot() || m.getReactions().size() > 0){
-                                allNonBots = false;
-                                break;
-                            }
-                        }
-                        if(allNonBots){
-                            event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
-                        }
-                    }
-                }catch (Exception e){
-                    BotLogger.log("Reading previous message", e);
-                }
-           // event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
-        }
+        // if(event.getChannel().getName().contains("-actions") && !event.getAuthor().isBot() ){
+        //     try{
+        //             String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));
+        //             Game activeGame = GameManager.getInstance().getGame(gameName);
+        //             if(activeGame != null && activeGame.getPublicObjectives1() != null && activeGame.getPublicObjectives1().size() > 1 && activeGame.getBotShushing()){
+        //                 MessageHistory mHistory = event.getChannel().getHistory();
+        //                 RestAction<List<Message>> lis = mHistory.retrievePast(4);
+        //                 boolean allNonBots = true;
+        //                 for(Message m : lis.complete()){
+        //                     if(m.getAuthor().isBot() || m.getReactions().size() > 0){
+        //                         allNonBots = false;
+        //                         break;
+        //                     }
+        //                 }
+        //                 if(allNonBots){
+        //                     event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:Actions_Channel:1154220656695713832>")).queue();
+        //                 }
+        //             }
+        //         }catch (Exception e){
+        //             BotLogger.log("Reading previous message", e);
+        //         }
+        //    // event.getChannel().addReactionById(event.getMessageId(), Emoji.fromFormatted("<:this_is_the_actions_channel:1152245957489082398>")).queue();
+        // }
 
         if(!event.getAuthor().isBot() && event.getChannel().getName().contains("-")){
             String gameName = event.getChannel().getName().substring(0,  event.getChannel().getName().indexOf("-"));

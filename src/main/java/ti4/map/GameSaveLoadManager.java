@@ -483,6 +483,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
+        writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
@@ -592,6 +594,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
              writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
+            writer.write(System.lineSeparator());
+
+             writer.write(Constants.AFK_HOURS + " " + player.getHoursThatPlayerIsAFK());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
@@ -1475,6 +1480,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.TEMPORARY_PING_DISABLE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setTemporaryPingDisable(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.DOMINUS_ORB -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1706,6 +1719,7 @@ public class GameSaveLoadManager {
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
+                case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
