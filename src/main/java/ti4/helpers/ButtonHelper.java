@@ -3042,7 +3042,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && model.getDeepSpaceCannon()) {
+                    if (model != null && model.getDeepSpaceCannon() != null && model.getDeepSpaceCannon()) {
                         playersWithPds2.add(owningPlayer);
                     }
                 }
