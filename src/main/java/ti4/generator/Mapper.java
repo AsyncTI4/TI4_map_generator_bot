@@ -325,7 +325,8 @@ public class Mapper {
     // }
 
     public static UnitKey getUnitKey(String unitID, String color) {
-        return Units.getUnitKey(unitID, getColorID(color));
+        String colorID = getColorID(color) == null ? color : getColorID(color);
+        return Units.getUnitKey(unitID, colorID);
     }
 
     public static Set<String> getUnitIDList() {
