@@ -254,7 +254,7 @@
         "name": "Shared Research ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players may ignore the effects of anomalies that do not contain a frontier token during their tactical actions.",
+        "text1": "For: When a player's ships move, they may ignore the effect of any anomaly if it does not contain a frontier token.",
         "text2": "Against: Each player who has ships in an anomaly may research 1 technology. Then, each player destroys all of their ships in anomalies that do not contain their space docks.",
         "mapText": "Players may ignore the effects of anomalies that do not contain a frontier token during their tactical actions.",
         "source": "little_omega"
