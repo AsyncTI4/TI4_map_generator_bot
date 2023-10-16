@@ -1,10 +1,11 @@
 package ti4.commands.event;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.EventModel;
 
 import java.util.List;
 
@@ -21,7 +22,9 @@ public class ShowDiscardedEvents extends EventSubcommandData {
         List<String> discardEvents = activeGame.getDiscardedEvents();
         int index = 1;
         for (String eventID : discardEvents) {
-            sb.append(index).append(". ").append(Helper.getAgendaRepresentation(eventID));
+            EventModel eventModel = Mapper.getEvent(eventID);
+            if (eventModel == null) continue;
+            sb.append(index).append(". ").append(eventModel.getRepresentation());
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

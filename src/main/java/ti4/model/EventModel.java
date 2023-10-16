@@ -97,6 +97,10 @@ public class EventModel implements ModelInterface, EmbeddableModel {
       };
     }
 
+    public String getRepresentation() {
+        return getRepresentation(null);
+    }
+
     public String getRepresentation(@Nullable Integer uniqueID) {
         StringBuilder sb = new StringBuilder();
 

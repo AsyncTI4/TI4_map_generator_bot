@@ -1888,6 +1888,21 @@ public class Game {
         return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
+    public String revealEvent(boolean revealFromBottom) {
+        int index = revealFromBottom ? events.size() - 1 : 0;
+        String id = events.remove(index);
+        discardEvent(id);
+        return id;
+    }
+
+    public boolean revealEvent(String eventID, boolean force) {
+        if (events.remove(eventID) || force) {
+            discardEvent(eventID);
+            return true;
+        }
+        return false;
+    }
+
     public String revealAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? agendas.size() - 1 : 0;
         String id = agendas.remove(index);

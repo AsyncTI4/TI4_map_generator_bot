@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class ResetEvents extends EventSubcommandData {
     public ResetEvents() {
-        super(Constants.RESET_AGENDAS, "Reset agenda deck");
+        super(Constants.RESET_EVENTS, "Reset event deck");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -20,7 +20,7 @@ public class ResetEvents extends EventSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveGame().resetAgendas();
-        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+        getActiveGame().resetEvents();
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getEventDeckID() + "`. Discards removed. All shuffled as new");
     }
 }
