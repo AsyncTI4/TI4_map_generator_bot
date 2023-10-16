@@ -2864,7 +2864,7 @@ public class ButtonHelper {
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
 
-                        if (unitModel.getSustainDamage()) {
+                        if (unitModel.getSustainDamage() != null && unitModel.getSustainDamage()) {
                             buttonID = finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
                             buttonText = "Sustain " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame);
                             Button validTile3 = Button.secondary(buttonID, buttonText);
