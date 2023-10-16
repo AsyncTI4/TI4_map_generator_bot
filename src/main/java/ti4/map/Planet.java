@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             originalPlanetType = planetInfo.getPlanetType().toString();
-            if(Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
+            if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
             if (!StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;
@@ -72,10 +73,10 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-                .map(unitID -> StringUtils.substringBetween(unitID, "_", ".")) //convert "red_gf.png" to "gf"
-                .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
-                .filter(Objects::nonNull)
-                .anyMatch(u -> u.getIsGroundForce());
+            .map(UnitKey::asyncID)
+            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+            .filter(Objects::nonNull)
+            .anyMatch(u -> u.getIsGroundForce());
     }
 
     @Override

@@ -1,6 +1,12 @@
 package ti4.commands.special;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,15 +21,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.helpers.Units.UnitKey;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
@@ -129,14 +134,13 @@ public class SystemInfo extends SpecialSubcommandData {
                     sb.append("\n");
                 }
 
-                HashMap<String, Integer> units = unitHolder.getUnits();
-                for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                    String unitKey = unitEntry.getKey();
-                    String colourID = StringUtils.substringBefore(unitKey, "_");
-                    String colour = AliasHandler.resolveColor(colourID);
+                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey unitKey = unitEntry.getKey();
+                    String colour = AliasHandler.resolveColor(unitKey.getColorID());
                     Player player = activeGame.getPlayerFromColorOrFaction(colour);
                     if (player == null) continue;
-                    UnitModel unitModel = player.getUnitFromImageName(unitKey);
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                     sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourAsMention(event.getGuild(), colour));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {

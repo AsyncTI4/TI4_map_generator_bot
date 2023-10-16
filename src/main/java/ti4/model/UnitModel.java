@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
-import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;

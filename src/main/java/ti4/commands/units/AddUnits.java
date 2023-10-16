@@ -10,24 +10,26 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.tokens.AddCC;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         tile.addUnit(planetName, unitID, count);
     }
+
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, Game activeGame) {
-        
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+
         tile.addUnit(planetName, unitID, count);
-        
+
     }
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
         OptionMapping option = event.getOption(Constants.CC_USE);
-        if (option != null){
+        if (option != null) {
             String value = option.getAsString().toLowerCase();
             switch (value) {
                 case "t/tactics", "t", "tactics", "tac", "tact" -> {
@@ -42,7 +44,7 @@ public class AddUnits extends AddRemoveUnits {
             }
         }
         OptionMapping optionSlingRelay = event.getOption(Constants.SLING_RELAY);
-        if (optionSlingRelay != null){
+        if (optionSlingRelay != null) {
             boolean useSlingRelay = optionSlingRelay.getAsBoolean();
             if (useSlingRelay) {
                 String userID = event.getUser().getId();
@@ -67,8 +69,7 @@ public class AddUnits extends AddRemoveUnits {
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
-        
-       
+
     }
 
     @Override
@@ -81,18 +82,16 @@ public class AddUnits extends AddRemoveUnits {
         return "Add units to map";
     }
 
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r - default is 'no'").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Sling Relay Tech"))
-                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"))
-        );
+            Commands.slash(getActionID(), getActionDescription())
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r - default is 'no'").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Sling Relay Tech"))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
     }
 }
