@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +46,7 @@ import ti4.commands.milty.StartMilty;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -902,7 +903,7 @@ public class Helper {
 
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
 
-                    if ((planet.getUnits().get(sdKey) == null || planet.getUnits().get(sdKey) == 0) && !"saar".equalsIgnoreCase(player.getFaction())) {
+                    if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1 && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
                         continue;
                     }
                 }

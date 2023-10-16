@@ -1585,7 +1585,7 @@ public class ButtonHelper {
     public static void checkFleetAndCapacity(Player player, Game activeGame, Tile tile, GenericInteractionCreateEvent event) {
         int armadaValue = 0;
         if (player.hasAbility("armada")) {
-            armadaValue = 2;
+            armadaValue = 1;
         }
         int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
