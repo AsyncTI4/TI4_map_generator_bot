@@ -3,6 +3,8 @@ package ti4;
 import java.util.concurrent.ThreadLocalRandom;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -75,6 +77,7 @@ public class ResourceHelper {
     }
 
     @Nullable
+    @Deprecated
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
@@ -88,6 +91,18 @@ public class ResourceHelper {
         String unit = getResourceFromFolder("units/", name, "Could not find unit file");
         unitCache.put(name, unit);
         return unit;
+    }
+
+    @Nullable
+    public String getUnitFile(UnitKey unit) {
+        String name = unit.getFileName();
+        String unitPath = unitCache.get(name);
+        if (unitPath != null) {
+            return unitPath;
+        }
+        String filePath = getResourceFromFolder("units/", name, "Could not find unit file");
+        unitCache.put(name, filePath);
+        return filePath;
     }
 
     @Nullable

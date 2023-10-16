@@ -22,6 +22,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -79,7 +81,7 @@ public class TurnEnd extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getPlayerRepresentation(mainPlayer, activeGame) + " ended turn");
         }
-        
+
         MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();
 
         //MAKE ALL NON-REAL PLAYERS PASSED
@@ -165,11 +167,11 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
         activeGame.setCurrentPhase("status");
-        for(Player player : activeGame.getRealPlayers()){
+        for (Player player : activeGame.getRealPlayers()) {
             List<String> relics = new ArrayList<>();
             relics.addAll(player.getRelics());
-            for(String relic : relics){
-                if(player.getExhaustedRelics().contains(relic)&& relic.contains("axisorder")){
+            for (String relic : relics) {
+                if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
                     player.removeRelic(relic);
                 }
             }
@@ -232,12 +234,11 @@ public class TurnEnd extends PlayerSubcommandData {
 
         if (solPlayer != null) {
             String colorID = Mapper.getColorID(solPlayer.getColor());
-            String fsKey = colorID + "_fs.png";
-            String infKey = colorID + "_gf.png";
+            UnitKey infKey = Mapper.getUnitKey("gf", colorID);
             for (Tile tile : activeGame.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
+                        if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeGame, event.getGuild(), true)
                                 + " an infantry was added to the space area of your flagship automatically.";

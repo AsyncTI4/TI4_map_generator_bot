@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -177,14 +178,15 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeGame, player, event);
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
-        if(player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
+        if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             activeGame.setComponentAction(true);
             Button getTech = Button.success("acquireATech", "Get a tech");
             List<Button> buttons = new ArrayList<>();
             buttons.add(getTech);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
         }
-        if(player.hasAbility("oracle_ai")){
+        if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player.");
             GameSaveLoadManager.saveMap(activeGame, event);
@@ -220,7 +222,7 @@ public class Setup extends PlayerSubcommandData {
             if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
-            String unitID = Mapper.getUnitID(unit, color);
+            UnitKey unitID = Mapper.getUnitKey(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 sendMessage("Unit: " + unit + " is not valid and not supported.");

@@ -320,12 +320,12 @@ public class Mapper {
         return cards;
     }
 
-    public static String getUnitID(String unitID, String color) {
-        return colors.getProperty(color) + "_" + unitID + ".png";
-    }
+    // public static String getUnitID(String unitID, String color) {
+    //     return colors.getProperty(color) + "_" + unitID + ".png";
+    // }
 
     public static UnitKey getUnitKey(String unitID, String color) {
-        return Units.getUnitKey(unitID, colors.getProperty(color));
+        return Units.getUnitKey(unitID, getColorID(color));
     }
 
     public static Set<String> getUnitIDList() {
