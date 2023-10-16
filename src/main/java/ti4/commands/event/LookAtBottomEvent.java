@@ -11,8 +11,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class LookAtBottomAgenda extends EventSubcommandData {
-    public LookAtBottomAgenda() {
+public class LookAtBottomEvent extends EventSubcommandData {
+    public LookAtBottomEvent() {
         super(Constants.LOOK_AT_BOTTOM, "Look at bottom Agenda from deck");
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
     }

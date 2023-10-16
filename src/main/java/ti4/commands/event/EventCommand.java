@@ -86,23 +86,22 @@ public class EventCommand implements Command {
 
     private Collection<EventSubcommandData> getSubcommands() {
         Collection<EventSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new DrawAgenda());
-        subcommands.add(new PutAgendaTop());
-        subcommands.add(new PutAgendaBottom());
-        subcommands.add(new LookAtTopAgenda());
-        subcommands.add(new LookAtBottomAgenda());
-        subcommands.add(new RevealAgenda());
-        subcommands.add(new RevealSpecificAgenda());
-        subcommands.add(new AddLaw());
-        subcommands.add(new RemoveLaw());
-        subcommands.add(new ReviseLaw());
-        subcommands.add(new ShowDiscardedAgendas());
+        subcommands.add(new DrawEvent());
+        subcommands.add(new PutEventTop());
+        subcommands.add(new PutEventBottom());
+        subcommands.add(new LookAtTopEvent());
+        subcommands.add(new LookAtBottomEvent());
+        subcommands.add(new RevealEvent());
+        subcommands.add(new RevealSpecificEvent());
+        subcommands.add(new AddPermanentEvent());
+        subcommands.add(new RemoveEvent());
+        subcommands.add(new ReviseEvent());
+        subcommands.add(new ShowDiscardedEvents());
         subcommands.add(new ListVoteCount());
-        subcommands.add(new ShuffleAgendas());
-        subcommands.add(new ResetAgendas());
-        subcommands.add(new Cleanup());
-        subcommands.add(new ResetDrawStateAgendas());
-        subcommands.add(new PutDiscardBackIntoDeckAgendas());
+        subcommands.add(new ShuffleEvents());
+        subcommands.add(new ResetEvents());
+        subcommands.add(new ResetDrawStateEvents());
+        subcommands.add(new PutDiscardBackIntoDeckEvents());
         return subcommands;
     }
 

@@ -1,6 +1,5 @@
 package ti4.commands.event;
 
-import java.awt.Button;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -9,29 +8,36 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class PutAgendaTop extends EventSubcommandData {
-    public PutAgendaTop() {
-        super(Constants.PUT_TOP, "Put Agenda top");
+public class PutEventBottom extends EventSubcommandData {
+    public PutEventBottom() {
+        super(Constants.PUT_BOTTOM, "Put Agenda bottom");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
 
-    public void putTop(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
-        boolean success = activeGame.putAgendaTop(agendaID);
+    public void putBottom(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
+        boolean success = activeGame.putAgendaBottom(agendaID);
         if (success && !activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on bottom");
+            List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
+            if (threadChannels == null) return;
+            String threadName = activeGame.getName()+"-round-"+ activeGame.getRound()+"-politics";
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    MessageHelper.sendMessageToChannel(threadChannel_, "Agenda put on bottom");
+                }
+            }
 
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on top");
-            ButtonHelper.sendMessageToRightStratThread(activeGame.getPlayer(activeGame.getActivePlayer()), activeGame, "Agenda put on top", "politics");
+
         } else {
             if (!activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Agenda ID found");
             }
-
         }
     }
     @Override
@@ -42,6 +48,6 @@ public class PutAgendaTop extends EventSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        putTop(event, option.getAsInt(), activeGame);
+        putBottom(event, option.getAsInt(), activeGame);
     }
 }

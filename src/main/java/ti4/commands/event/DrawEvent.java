@@ -20,8 +20,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAgenda extends EventSubcommandData {
-    public DrawAgenda() {
+public class DrawEvent extends EventSubcommandData {
+    public DrawEvent() {
         super(Constants.DRAW, "Draw Agenda");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }

@@ -12,8 +12,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ReviseLaw extends EventSubcommandData {
-    public ReviseLaw() {
+public class ReviseEvent extends EventSubcommandData {
+    public ReviseEvent() {
         super(Constants.REVISE_LAW, "Revise a law");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction").setRequired(false));

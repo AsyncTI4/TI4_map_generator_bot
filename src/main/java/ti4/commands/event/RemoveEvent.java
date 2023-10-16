@@ -8,8 +8,8 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class RemoveLaw extends EventSubcommandData {
-    public RemoveLaw() {
+public class RemoveEvent extends EventSubcommandData {
+    public RemoveEvent() {
         super(Constants.REMOVE_LAW, "Remove Law");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }

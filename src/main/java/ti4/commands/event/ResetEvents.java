@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ResetDrawStateAgendas extends EventSubcommandData {
-    public ResetDrawStateAgendas() {
-        super(Constants.RESET_DRAW_STATE_FOR_AGENDAS, "Reset draw state of agenda deck");
+public class ResetEvents extends EventSubcommandData {
+    public ResetEvents() {
+        super(Constants.RESET_AGENDAS, "Reset agenda deck");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -20,7 +20,7 @@ public class ResetDrawStateAgendas extends EventSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveGame().resetDrawStateAgendas();
-        MessageHelper.replyToMessage(event, "Agenda draw state reset.");
+        getActiveGame().resetAgendas();
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
     }
 }

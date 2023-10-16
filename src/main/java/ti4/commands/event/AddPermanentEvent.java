@@ -25,7 +25,7 @@ public class AddPermanentEvent extends EventSubcommandData {
         Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.EVENT_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No Event ID defined");
             return;
         }
 

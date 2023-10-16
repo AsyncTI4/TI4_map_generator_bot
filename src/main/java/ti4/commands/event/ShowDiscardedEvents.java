@@ -9,8 +9,8 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 
-public class ShowDiscardedAgendas extends EventSubcommandData {
-    public ShowDiscardedAgendas() {
+public class ShowDiscardedEvents extends EventSubcommandData {
+    public ShowDiscardedEvents() {
         super(Constants.SHOW_DISCARDED, "Show discarded Agendas");
     }
 

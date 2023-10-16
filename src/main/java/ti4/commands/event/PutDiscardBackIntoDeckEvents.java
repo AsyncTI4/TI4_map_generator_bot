@@ -8,8 +8,8 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class PutDiscardBackIntoDeckAgendas extends EventSubcommandData {
-    public PutDiscardBackIntoDeckAgendas() {
+public class PutDiscardBackIntoDeckEvents extends EventSubcommandData {
+    public PutDiscardBackIntoDeckEvents() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SHUFFLE_AGENDAS, "Enter YES to shuffle, otherwise NO to put on top").setRequired(true));
