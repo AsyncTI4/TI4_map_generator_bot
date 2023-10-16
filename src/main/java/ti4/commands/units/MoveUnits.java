@@ -184,12 +184,12 @@ public class MoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
-
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+        unitAction((GenericInteractionCreateEvent) event, tile, count, planetName, unitID, color, activeGame);
     }
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
         if (toAction) {
             tile.addUnit(planetName, unitID, count);
             tile.addUnitDamage(planetName, unitID, unitsDamage.get(unitID));
