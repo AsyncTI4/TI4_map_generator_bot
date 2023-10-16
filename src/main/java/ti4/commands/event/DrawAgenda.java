@@ -20,16 +20,13 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAgenda extends AgendaSubcommandData {
+public class DrawAgenda extends EventSubcommandData {
     public DrawAgenda() {
         super(Constants.DRAW, "Draw Agenda");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 
-
     public void drawAgenda(GenericInteractionCreateEvent event, int count, Game activeGame, Player player) {
-
-
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeGame.getName()).append("\n");

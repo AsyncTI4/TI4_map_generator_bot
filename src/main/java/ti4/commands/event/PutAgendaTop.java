@@ -14,7 +14,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class PutAgendaTop extends AgendaSubcommandData {
+public class PutAgendaTop extends EventSubcommandData {
     public PutAgendaTop() {
         super(Constants.PUT_TOP, "Put Agenda top");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));

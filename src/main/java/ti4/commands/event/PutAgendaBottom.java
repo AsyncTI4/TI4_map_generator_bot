@@ -12,7 +12,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class PutAgendaBottom extends AgendaSubcommandData {
+public class PutAgendaBottom extends EventSubcommandData {
     public PutAgendaBottom() {
         super(Constants.PUT_BOTTOM, "Put Agenda bottom");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));

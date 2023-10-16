@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class RevealAgenda extends AgendaSubcommandData {
+public class RevealAgenda extends EventSubcommandData {
     public RevealAgenda() {
         super(Constants.REVEAL, "Reveal top Agenda from deck");
         addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the agenda from the bottom of the deck instead of the top");

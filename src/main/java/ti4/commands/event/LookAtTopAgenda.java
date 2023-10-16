@@ -11,7 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class LookAtTopAgenda extends AgendaSubcommandData {
+public class LookAtTopAgenda extends EventSubcommandData {
     public LookAtTopAgenda() {
         super(Constants.LOOK_AT_TOP, "Look at top Agenda from deck");
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");

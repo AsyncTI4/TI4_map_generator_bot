@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ShuffleAgendas extends AgendaSubcommandData {
+public class ShuffleAgendas extends EventSubcommandData {
     public ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));

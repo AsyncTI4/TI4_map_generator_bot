@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 
-public class ListVoteCount extends AgendaSubcommandData {
+public class ListVoteCount extends EventSubcommandData {
     public ListVoteCount() {
         super(Constants.VOTE_COUNT, "List Vote count for agenda");
     }
