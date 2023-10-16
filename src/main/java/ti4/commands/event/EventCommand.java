@@ -68,7 +68,7 @@ public class EventCommand implements Command {
         subcommands.add(new LookAtBottomEvent());
         subcommands.add(new RevealEvent());
         subcommands.add(new RevealSpecificEvent());
-        subcommands.add(new AddPermanentEvent());
+        subcommands.add(new AddEvent());
         subcommands.add(new RemoveEvent());
         subcommands.add(new ShowDiscardedEvents());
         subcommands.add(new ShuffleEvents());

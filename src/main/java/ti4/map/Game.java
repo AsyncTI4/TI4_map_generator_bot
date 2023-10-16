@@ -216,6 +216,8 @@ public class Game {
     private List<String> events = new ArrayList<>();
     @Getter
     private List<String> discardedEvents = new ArrayList<>();
+    @Getter @Setter
+    private LinkedHashMap<String, Integer> eventsInEffect = new LinkedHashMap<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
@@ -1695,6 +1697,28 @@ public class Game {
         return discardAgendas;
     }
 
+    public boolean addEventInEffect(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+
+            Collection<Integer> values = eventsInEffect.values();
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = ThreadLocalRandom.current().nextInt(1000);
+            }
+            discardAgendas.remove(id);
+            eventsInEffect.put(id, identifier);
+            return true;
+        }
+        return false;
+    }
+    
     public boolean addLaw(Integer idNumber, String optionalText) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
