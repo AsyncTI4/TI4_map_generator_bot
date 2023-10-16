@@ -11,10 +11,13 @@ public class Constants {
     public static final String DRAFT_QUEUE = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
+    public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
     public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
+    public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
+    public static final String AFK_HOURS = "afk_hours";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
     public static final String ELIMINATE = "eliminate";
@@ -84,6 +87,7 @@ public class Constants {
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
+    public static final String COMPARE_AFK_TIMES = "compare_afk_times";
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
@@ -856,6 +860,7 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
+    public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";
     public static final String SET_POLICY = "set_policy";
     public static final String SET_PEOPLE = "set_people";
     public static final String SET_ENVIRONMENT = "set_environment";

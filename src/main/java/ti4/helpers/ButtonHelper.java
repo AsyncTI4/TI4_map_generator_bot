@@ -430,7 +430,7 @@ public class ButtonHelper {
     public static boolean canIBuildGFInSpace(Game activeGame, Player player, Tile tile, String kindOfBuild) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
 
-        if ("freelancers".equalsIgnoreCase(kindOfBuild) || "genericBuild".equalsIgnoreCase(kindOfBuild)) {
+        if ("freelancers".equalsIgnoreCase(kindOfBuild) || "genericBuild".equalsIgnoreCase(kindOfBuild)|| "muaatagent".equalsIgnoreCase(kindOfBuild)) {
             return true;
         }
         String colorID = Mapper.getColorID(player.getColor());
@@ -1289,7 +1289,7 @@ public class ButtonHelper {
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
         MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
-        MessageHelper.sendMessageToChannelWithButtons(tc, "", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
         if (playersWithPds2.size() > 0 && !activeGame.isFoWMode() && "space".equalsIgnoreCase(spaceOrGround)) {
             StringBuilder pdsMessage = new StringBuilder("The following players have pds2 cover in the region, and can use the button to fire it:");
             for (Player playerWithPds : playersWithPds2) {
@@ -1331,7 +1331,7 @@ public class ButtonHelper {
             event.getMessage().delete().queue();
         }
     }
-    public static void saveButtons(ButtonInteractionEvent event, Game activeGame) {
+    public static void saveButtons(ButtonInteractionEvent event, Game activeGame, Player player) {
         activeGame.setSavedButtons(new ArrayList<String>());
         String exhaustedMessage = event.getMessage().getContentRaw();
         if ("".equalsIgnoreCase(exhaustedMessage)) {
@@ -1353,7 +1353,7 @@ public class ButtonHelper {
             if(button.getId() == null || button.getId().equalsIgnoreCase("ultimateUndo")){
                 continue;
             }
-            String builder = button.getId() + ";"+button.getLabel() + ";"+button.getStyle().toString();
+            String builder = player.getFaction() + ";" +button.getId() + ";"+button.getLabel() + ";"+button.getStyle().toString();
             if(button.getEmoji() != null && !button.getEmoji().toString().equalsIgnoreCase("")){
                 builder = builder + ";"+button.getEmoji().toString();
             }
@@ -1364,19 +1364,19 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         List<String> ids = new ArrayList<String>();
         for(String buttonString : activeGame.getSavedButtons()){
-            System.out.println(buttonString);
-            String id = buttonString.split(";")[0];
-            String label = buttonString.split(";")[1];
-           
-            String style = buttonString.split(";")[2].toLowerCase();
+            int x = 0;
+            if(activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[x]) != null){
+                x = 1;
+            }
+            String id = buttonString.split(";")[x];
+            String label = buttonString.split(";")[x+1];
+            String style = buttonString.split(";")[x+2].toLowerCase();
             String emoji = "";
             if(StringUtils.countMatches(buttonString, ";") > 2){
-                emoji = buttonString.split(";")[3];
+                emoji = buttonString.split(";")[x+3];
                 String name = StringUtils.substringBetween(emoji, ":","(");
                 String emojiID = StringUtils.substringBetween(emoji, "=",")");
                 emoji = "<:"+name+":"+emojiID+">";
-                System.out.println(emoji);
-                System.out.println(Helper.getEmojiFromDiscord("infantry"));
             }
             if(style.equalsIgnoreCase("success")){
                 if(emoji.length() > 0){
@@ -3414,6 +3414,9 @@ public class ButtonHelper {
             for(Player p2 : activeGame.getRealPlayers()){
                 for(String planet : p2.getPlanets()){
                     if(ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)){
+                        if(planet.contains("custodia")){
+                            continue;
+                        }
                         p2.exhaustPlanet(planet);
                     }
                 }
@@ -3577,6 +3580,31 @@ public class ButtonHelper {
             stuffToTransButtons.add(transact);
         }
         return stuffToTransButtons;
+    }
+
+    public static void resolveSetAFKTime(Game activeGameOG, Player player, String buttonID, ButtonInteractionEvent event){
+        String time = buttonID.split("_")[1];
+        player.addHourThatIsAFK(time);
+        deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+" Set hour "+time +" as a time that you are afk");
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        String afkTimes = ""+player.getHoursThatPlayerIsAFK();
+        for (Game activeGame : mapList.values()) {
+            if(!activeGame.isHasEnded()){
+                for(Player player2 : activeGame.getRealPlayers()){
+                    if(player2.getUserID().equalsIgnoreCase(player.getUserID())){
+                        player2.setHoursThatPlayerIsAFK(afkTimes);
+                        GameSaveLoadManager.saveMap(activeGame);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void offerAFKTimeOptions(Game activeGame, Player player){
+        List<Button> buttons = ButtonHelper.getSetAFKButtons(activeGame);
+        player.setHoursThatPlayerIsAFK("");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.", buttons);
     }
 
     public static void resolveSpecificTransButtons(Game activeGame, Player p1, String buttonID, ButtonInteractionEvent event) {
@@ -3814,6 +3842,14 @@ public class ButtonHelper {
         GameSaveLoadManager.saveMap(activeGame, event);
 
     }
+     public static List<Button> getSetAFKButtons(Game activeGame) {
+        List<Button> buttons = new ArrayList<>();
+        for(int x = 0; x < 24; x++){
+            buttons.add(Button.secondary("setHourAsAFK_"+x, ""+x));
+        }
+        buttons.add(Button.danger("deleteButtons", "Done"));
+        return buttons;
+     }
 
     public static List<Button> getAllPossibleCompButtons(Game activeGame, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
@@ -4183,7 +4219,7 @@ public class ButtonHelper {
                     count = count + unitH.getUnits().get(unitKey);
                 }
             }
-            for (Player player_ : activeGame.getPlayers().values()) {
+            for (Player player_ : activeGame.getRealPlayers()) {
                 UnitHolder unitH = player_.getNomboxTile().getUnitHolders().get(Constants.SPACE);
                 if (unitH == null) {
                 } else {

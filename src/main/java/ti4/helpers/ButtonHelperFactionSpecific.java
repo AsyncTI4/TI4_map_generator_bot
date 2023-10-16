@@ -1562,7 +1562,6 @@ public class ButtonHelperFactionSpecific {
                                 && !unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit("pds"), p3.getColor()))
                                 && !unit.equalsIgnoreCase(Mapper.getUnitID(AliasHandler.resolveUnit("csd"), p3.getColor()))) {
                                 unit2 = "mech";
-                                System.out.println("BOOO " + Mapper.getUnitID(AliasHandler.resolveUnit(unit2), p3.getColor()));
                                 if (unit.equalsIgnoreCase(Mapper.getUnitID(unit2, p3.getColor())) && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p3, unit2) < 4) {
                                     unitButton2 = Button.danger("cabalVortextCapture_" + unit2 + "_" + p3.getFaction(), "Capture " + StringUtils.capitalize(p3.getColor()) + " " + unit2)
                                         .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));

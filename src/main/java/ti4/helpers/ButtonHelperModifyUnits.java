@@ -268,14 +268,17 @@ public class ButtonHelperModifyUnits {
             } else {
                 ButtonHelper.sendMessageToRightStratThread(player, activeGame, playerRep + " " + successMessage, "construction");
             }
-            if(player.hasLeader("mahactagent")){
+            if(player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")){
                 String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
                 Button placeCCInSystem = Button.success(
                         finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
                         "Place A CC From Reinforcements In The System.");
+                Button placeConstructionCCInSystem = Button.secondary(
+                finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
+                    "Place A CC From The Construction Holder's Reinforcements In The System Because Mahact Agent was used.");
                 Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
                         "Don't Place A CC In The System.");
-                List<Button> buttons = List.of(placeCCInSystem, NoDontWantTo);
+                List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem,NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }else{
                 if(!player.getSCs().contains(Integer.parseInt("4")) && "action".equalsIgnoreCase(activeGame.getCurrentPhase())){
@@ -423,6 +426,12 @@ public class ButtonHelperModifyUnits {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                             "2 ff", activeGame);
                     successMessage = producedOrPlaced+" 2 " + Emojis.fighter + " in tile "
+                            + AliasHandler.resolveTile(planetName) + ".";
+                }
+                else if ("2destroyer".equalsIgnoreCase(unitLong)) {
+                    new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
+                            "2 destroyer", activeGame);
+                    successMessage = producedOrPlaced+" 2 " + Emojis.destroyer + " in tile "
                             + AliasHandler.resolveTile(planetName) + ".";
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),

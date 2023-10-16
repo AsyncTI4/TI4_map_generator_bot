@@ -73,6 +73,7 @@ public class TurnEnd extends PlayerSubcommandData {
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
         activeGame.setComponentAction(false);
+        activeGame.setTemporaryPingDisable(false);
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {

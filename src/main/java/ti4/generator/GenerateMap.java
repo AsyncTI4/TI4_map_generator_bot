@@ -516,6 +516,9 @@ public class GenerateMap {
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
                 String userName = player.getUserName() + ("null".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
+                if(player.isAFK()){
+                    userName = userName + " -- AFK";
+                }
                 graphics.drawString(userName, x + 34, y);
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
@@ -597,7 +600,7 @@ public class GenerateMap {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(new Color(50, 230, 80));
                     graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
-                }
+                } 
 
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
@@ -2230,7 +2233,18 @@ public class GenerateMap {
                 point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
                 graphics.setColor(new Color(50, 230, 80));
                 graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
+                
+                if(player.isAFK()){
+                    graphics.setColor(Color.GRAY);
+                    graphics.drawString("(AFK)", point.x + deltaX + 124, point.y + deltaY);
+                }
                 graphics.setColor(Color.WHITE);
+            }else if (player.isAFK()) {
+                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+                graphics.setColor(Color.GRAY);
+                graphics.drawString("AFK", point.x + deltaX + 4, point.y + deltaY);
+                graphics.setColor(Color.WHITE);
+                
             }
             deltaY += PLAYER_STATS_HEIGHT;
         }

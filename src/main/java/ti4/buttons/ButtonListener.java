@@ -181,7 +181,7 @@ public class ButtonListener extends ListenerAdapter {
         String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
         String ident = player.getFactionEmoji();
         if(!buttonID.equalsIgnoreCase("ultimateundo")){
-            ButtonHelper.saveButtons(event, activeGame);
+            ButtonHelper.saveButtons(event, activeGame, player);
         }
         if (activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
             activeGame.setLastActivePlayerPing(new Date());
@@ -463,6 +463,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.resolveDomnaStep3Buttons(event, activeGame, player, buttonID);
         } else if (buttonID.startsWith("domnaStepTwo_")) {
             ButtonHelperModifyUnits.offerDomnaStep3Buttons(event, activeGame, player, buttonID);
+        } else if (buttonID.startsWith("setHourAsAFK_")) {
+            ButtonHelper.resolveSetAFKTime(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("domnaStepOne_")) {
             ButtonHelperModifyUnits.offerDomnaStep2Buttons(event, activeGame, player, buttonID);
         } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {
@@ -640,6 +642,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperFactionSpecific.distantSuns(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
+            activeGame.setComponentAction(true);
            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
             Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
@@ -1621,6 +1624,31 @@ public class ButtonListener extends ListenerAdapter {
             String message =  playerRep + " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("placeHolderOfConInSystem_")) {
+            String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+            String planet = buttonID.replace("placeHolderOfConInSystem_", "");
+            String tileID = AliasHandler.resolveTile(planet.toLowerCase());
+            Tile tile = activeGame.getTile(tileID);
+            if (tile == null) {
+                tile = activeGame.getTileByPosition(tileID);
+            }
+            if (tile == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+                return;
+            }
+            String color = player.getColor();
+            for(Player p2 : activeGame.getRealPlayers()){
+                if(p2.getSCs().contains(4)){
+                    color = p2.getColor();
+                }
+            }
+            
+            if (Mapper.isColorValid(color)) {
+                AddCC.addCC(event, color, tile);
+            }
+            String message =  playerRep + " Placed A "+StringUtils.capitalize(color)+" CC  In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
+            ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("transactWith_")) {
             String faction = buttonID.replace("transactWith_", "");
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
@@ -1631,6 +1659,9 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("transact_")) {
+            ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID, event);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("transact_")) {
             ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID, event);
             event.getMessage().delete().queue();
 
@@ -2625,6 +2656,11 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " declined explore");
                     }
                 }
+                case "temporaryPingDisable" -> {
+                    activeGame.setTemporaryPingDisable(true);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Disabled autopings for this turn");
+                    event.getMessage().delete().queue();
+                }
                 case "confirm_cc" -> {
                     if (player.getMahactCC().size() > 0) {
                         ButtonHelper.addReaction(event, true, false, "Confirmed CCs: " + player.getTacticalCC() + "/" + player.getFleetCC() + "(+"
@@ -3022,9 +3058,20 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
                 case "ultimateUndo" -> {
+                    if(activeGame.getSavedButtons().size() > 0){
+                        String buttonString = activeGame.getSavedButtons().get(0);
+                        if(activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null){
+                            if(player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])){
+                                MessageHelper.sendMessageToChannel(event.getChannel(), "You were not the player who pressed the latest button. Use /game undo if you truly want to undo " + activeGame.getLatestCommand());
+                            }
+                            return;
+                        }
+                    }
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());
                     GameSaveLoadManager.undo(activeGame);
-                    event.getMessage().delete().queue();
+                    if(activeGame.getCurrentPhase().equalsIgnoreCase("action")){
+                        event.getMessage().delete().queue();
+                    }
                     return;
                 }
                 case "getDiscardButtonsACs" -> {
