@@ -947,4 +947,6 @@ public class Constants {
     public static final String EVENT = "event";
     public static final String ADD_EVENT = "add_event";
     public static final String EVENT_ID = "event_id";
+    public static final String SHUFFLE_EVENTS = "shuffle_events";
+    public static final String EVENT_DECK = "event_deck";
 }

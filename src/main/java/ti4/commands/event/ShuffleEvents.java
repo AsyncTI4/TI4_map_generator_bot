@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class ShuffleEvents extends EventSubcommandData {
     public ShuffleEvents() {
-        super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck");
+        super(Constants.SHUFFLE_EVENTS, "Shuffle event deck");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -20,7 +20,7 @@ public class ShuffleEvents extends EventSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveGame().shuffleAgendas();
+        getActiveGame().shuffleEvents();
         MessageHelper.replyToMessage(event, "Agenda deck shuffled");
     }
 }
