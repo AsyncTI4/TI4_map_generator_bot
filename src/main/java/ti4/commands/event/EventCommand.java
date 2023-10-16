@@ -76,6 +76,7 @@ public class EventCommand implements Command {
         subcommands.add(new ResetEvents());
         subcommands.add(new ResetDrawStateEvents());
         subcommands.add(new PutDiscardBackIntoDeckEvents());
+        subcommands.add(new EventInfo());
         return subcommands;
     }
 

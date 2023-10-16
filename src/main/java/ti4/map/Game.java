@@ -213,7 +213,7 @@ public class Game {
     private boolean hasHackElectionBeenPlayed;
     private List<String> agendas;
     @Getter
-    private List<String> events;
+    private List<String> events = new ArrayList<>();
     @Getter
     private List<String> discardedEvents = new ArrayList<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
@@ -1936,6 +1936,25 @@ public class Game {
             actionCards.addAll(discardActionCards.keySet());
             discardActionCards.clear();
             Collections.shuffle(actionCards);
+            return drawActionCard(userID);
+        }
+        return null;
+    }
+
+    @Nullable
+    public LinkedHashMap<String, Integer> drawEvent(String userID) {
+        if (!events.isEmpty()) {
+            String id = events.get(0);
+            Player player = getPlayer(userID);
+            if (player != null) {
+                events.remove(id);
+                player.setEvent(id);
+                return player.getActionCards();
+            }
+        } else {
+            events.addAll(discardedEvents);
+            discardedEvents.clear();
+            Collections.shuffle(events);
             return drawActionCard(userID);
         }
         return null;

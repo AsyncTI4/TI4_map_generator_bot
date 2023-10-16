@@ -114,41 +114,40 @@ public class RevealEvent extends EventSubcommandData {
             }
             
         }
-        activeGame.resetCurrentAgendaVotes();
-        activeGame.setHackElectionStatus(false);
-        activeGame.setPlayersWhoHitPersistentNoAfter("");
-        activeGame.setPlayersWhoHitPersistentNoWhen("");
-        activeGame.setLatestOutcomeVotedFor("");
-        activeGame.setLatestWhenMsg("");
-        activeGame.setLatestAfterMsg("");
-        MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(id, uniqueID));
-        String text = Helper.getGamePing(event, activeGame) + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
+        // activeGame.resetCurrentAgendaVotes();
+        // activeGame.setHackElectionStatus(false);
+        // activeGame.setPlayersWhoHitPersistentNoAfter("");
+        // activeGame.setPlayersWhoHitPersistentNoWhen("");
+        // activeGame.setLatestOutcomeVotedFor("");
+        // activeGame.setLatestWhenMsg("");
+        // activeGame.setLatestAfterMsg("");
+        // MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(id, uniqueID));
+        // String text = Helper.getGamePing(event, activeGame) + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
 
         
-        Date newTime = new Date();
-        activeGame.setLastActivePlayerPing(newTime);
-        List<Button> whenButtons = AgendaHelper.getWhenButtons(activeGame);
-        List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
+        // Date newTime = new Date();
+        // activeGame.setLastActivePlayerPing(newTime);
+        // List<Button> whenButtons = AgendaHelper.getWhenButtons(activeGame);
+        // List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
 
-        MessageHelper.sendMessageToChannel(channel, text);
+        // MessageHelper.sendMessageToChannel(channel, text);
 
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", activeGame, whenButtons, "when");
-        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", activeGame, afterButtons,"after");
+        // MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", activeGame, whenButtons, "when");
+        // MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", activeGame, afterButtons,"after");
 
-        ListVoteCount.turnOrder(event, activeGame, channel);
-        Button proceed = Button.danger( "proceedToVoting", "Skip waiting and start the voting for everyone");
-        List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
-        Button transaction = Button.primary("transaction", "Transaction");
-        proceedButtons.add(transaction);
-        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
-        if(cov){
-            MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
-        }
-        for(Player player : activeGame.getRealPlayers()){
-            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame).size() > 0){
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) +" you have Florzen commander and can thus explore and ready a planet", ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame));
-            }
-        }
+        // Button proceed = Button.danger( "proceedToVoting", "Skip waiting and start the voting for everyone");
+        // List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
+        // Button transaction = Button.primary("transaction", "Transaction");
+        // proceedButtons.add(transaction);
+        // proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        // MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
+        // if(cov){
+        //     MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
+        // }
+        // for(Player player : activeGame.getRealPlayers()){
+        //     if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame).size() > 0){
+        //         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) +" you have Florzen commander and can thus explore and ready a planet", ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame));
+        //     }
+        // }
     }
 }

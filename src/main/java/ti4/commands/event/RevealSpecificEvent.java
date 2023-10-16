@@ -149,7 +149,6 @@ public class RevealSpecificEvent extends EventSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", activeGame, whenButtons, "when");
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", activeGame, afterButtons,"after");
 
-        ListVoteCount.turnOrder(event, activeGame, channel);
         Button proceed = Button.danger( "proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Button.primary("transaction", "Transaction");
