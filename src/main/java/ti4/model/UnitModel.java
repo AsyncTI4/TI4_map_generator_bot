@@ -129,10 +129,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         };
     }
 
-    public boolean getIsGroundForce() {
-        return Optional.ofNullable(isGroundForce).orElse(false);
-    }
-
     private String getAsyncIDAliases() {
         String aliases = AliasHandler.getUnitListForHelp().getOrDefault(asyncId, asyncId);
         return getAsyncId() + "=" + aliases;
@@ -215,20 +211,20 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getSpaceCannonText() {
         if (getSpaceCannonDieCount() > 0) {
-            return ((getDeepSpaceCannon() != null && getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+            return ((getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
     }
 
     private String getPlanetaryShieldText() {
-        if (getPlanetaryShield() != null && getPlanetaryShield()) {
+        if (getPlanetaryShield()) {
             return "Planetary Shield\n";
         }
         return "";
     }
 
     private String getSustainDamageText() {
-        if (getSustainDamage() != null && getSustainDamage()) {
+        if (getSustainDamage()) {
             return "Sustain Damage\n";
         }
         return "";
@@ -248,5 +244,37 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (getFaction() != null) sb.append(getFaction()).append(" ");
         sb.append(getBaseType()).append(")");
         return sb.toString();
+    }
+
+    public boolean getDeepSpaceCannon() {
+        return Optional.ofNullable(deepSpaceCannon).orElse(false);
+    }
+    
+    public boolean getPlanetaryShield() {
+        return Optional.ofNullable(planetaryShield).orElse(false);
+    }
+
+    public boolean getSustainDamage() {
+        return Optional.ofNullable(sustainDamage).orElse(false);
+    }
+
+    public boolean getDisablesPlanetaryShield() {
+        return Optional.ofNullable(disablesPlanetaryShield).orElse(false);
+    }
+
+    public boolean getCanBeDirectHit() {
+        return Optional.ofNullable(canBeDirectHit).orElse(false);
+    }
+
+    public boolean getIsStructure() {
+        return Optional.ofNullable(isStructure).orElse(false);
+    }
+
+    public boolean getIsGroundForce() {
+        return Optional.ofNullable(isGroundForce).orElse(false);
+    }
+
+    public boolean getIsShip() {
+        return Optional.ofNullable(isShip).orElse(false);
     }
 }
