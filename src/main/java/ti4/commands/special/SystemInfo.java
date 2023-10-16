@@ -1,6 +1,12 @@
 package ti4.commands.special;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,16 +21,14 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.helpers.Units.UnitKey;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
@@ -45,12 +49,18 @@ public class SystemInfo extends SpecialSubcommandData {
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
         if (ringsMapping != null) {
             context = ringsMapping.getAsInt();
-            if (context > 2) context = 2;
-            if (context < 0) context = 0;
+            int newContext = 0;
+            if (context > 2) newContext = 2;
+            if (context < 0) newContext = 0;
+            if (context == 333) newContext = 3;
+            if (context == 444) newContext = 4;
+            if (context == 555) newContext = 5;
+            if (context == 666) newContext = 6;
+            context = newContext;
         }
 
         for (OptionMapping tileOption : event.getOptions()) {
-            if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)){
+            if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)) {
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
@@ -71,7 +81,7 @@ public class SystemInfo extends SpecialSubcommandData {
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 String representation = planetRepresentations.get(name);
-                if (representation == null){
+                if (representation == null) {
                     representation = name;
                 }
                 UnitHolder unitHolder = entry.getValue();
@@ -84,7 +94,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 sb.append("\n");
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCCList()) {
-                    if (!hasCC){
+                    if (!hasCC) {
                         sb.append("Command Counters: ");
                         hasCC = true;
                     }
@@ -95,7 +105,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 boolean hasControl = false;
                 for (String control : unitHolder.getControlList()) {
-                    if (!hasControl){
+                    if (!hasControl) {
                         sb.append("Control Counters: ");
                         hasControl = true;
                     }
@@ -107,31 +117,30 @@ public class SystemInfo extends SpecialSubcommandData {
                 boolean hasToken = false;
                 Map<String, String> tokensToName = Mapper.getTokensToName();
                 for (String token : unitHolder.getTokenList()) {
-                    if (!hasToken){
+                    if (!hasToken) {
                         sb.append("Tokens: ");
                         hasToken = true;
                     }
                     for (Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
                         String key = entry_.getKey();
                         String value = entry_.getValue();
-                        if (token.contains(key)){
-                                sb.append(value).append(" ");
+                        if (token.contains(key)) {
+                            sb.append(value).append(" ");
 
-                            }
                         }
+                    }
                 }
                 if (hasToken) {
                     sb.append("\n");
                 }
 
-                HashMap<String, Integer> units = unitHolder.getUnits();
-                for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                    String unitKey = unitEntry.getKey();
-                    String colourID = StringUtils.substringBefore(unitKey, "_");
-                    String colour = AliasHandler.resolveColor(colourID);
+                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey unitKey = unitEntry.getKey();
+                    String colour = AliasHandler.resolveColor(unitKey.getColorID());
                     Player player = activeGame.getPlayerFromColorOrFaction(colour);
                     if (player == null) continue;
-                    UnitModel unitModel = player.getUnitFromImageName(unitKey);
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                     sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourAsMention(event.getGuild(), colour));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
@@ -144,22 +153,21 @@ public class SystemInfo extends SpecialSubcommandData {
             }
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
-            if(!activeGame.isFoWMode()){
-                for(Player player : activeGame.getRealPlayers()){
+            if (!activeGame.isFoWMode()) {
+                for (Player player : activeGame.getRealPlayers()) {
 
                     List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
-                    if(players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())){
+                    if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())) {
                         Player player2 = players.get(0);
-                        if(player2 == player){
+                        if (player2 == player) {
                             player2 = players.get(1);
                         }
-                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame,  tile.getPosition(), player, player2, "space");
+                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "space");
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         break;
                     }
                 }
             }
-                            
 
         }
     }
@@ -169,7 +177,7 @@ public class SystemInfo extends SpecialSubcommandData {
         for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
             String colorKey = colorEntry.getKey();
             String color = colorEntry.getValue();
-            if (key.contains(colorKey)){
+            if (key.contains(colorKey)) {
                 for (Player player_ : activeGame.getPlayers().values()) {
                     if (Objects.equals(player_.getColor(), color)) {
                         if (privateGame != null && privateGame) {

@@ -1787,7 +1787,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Remove up to 2 of your neighbor's ships that do not have a capacity value from the game board. Then, place matching units from your reinforcements in any system containing your ships.",
-    "flavorText": "“Then she was… assimilated… by the Letani after all.  Now, you… want me to… to… terminate her.” The operative's words struggled to come out, as she refused to process what she was being ordered to do. “What’s left of her,” said the Hacan, not unkindly.",
+    "flavorText": "“Then she was… assimilated… by the Letani after all.  Now, you… want me to… to… terminate her.” The operative's words struggled to come out, as she refused to process what she was being ordered to do. “What's left of her,” said the Hacan, not unkindly.",
     "source": "action_deck_2"
   },
   {
@@ -2543,7 +2543,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Choose 1 player with the most victory points. Look at up to 1 of their unscored secret objectives, at random.",
-    "flavorText": "The Cymiaen locked eyes with the diplomat. It didn’t move again until the screams had stopped.",
+    "flavorText": "The Cymiaen locked eyes with the diplomat. It didn't move again until the screams had stopped.",
     "source": "ds"
   },
   {
@@ -2578,7 +2578,7 @@
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "At the start of ground combat:",
-    "text": "You may roll 1 die for up to 2 of your ground forces on that planet. For each result equal to or greater than that unit’s combat value, produce and assign 1 hit to 1 of your opponent’s ground forces on that planet.",
+    "text": "You may roll 1 die for up to 2 of your ground forces on that planet. For each result equal to or greater than that unit's combat value, produce and assign 1 hit to 1 of your opponent's ground forces on that planet.",
     "flavorText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
     "source": "ds"
   },
@@ -2588,7 +2588,7 @@
     "phase": "Action",
     "window": "At the start of a combat round:",
     "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
-    "flavorText": "“Drink deep, be hearty! Tomorrow we die!” —Ghemina war song",
+    "flavorText": "\"Drink deep, be hearty! Tomorrow we die!\" - Ghemina war song",
     "source": "ds"
   },
   {
@@ -2605,8 +2605,8 @@
     "name": "Planetary Rigs",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet’s corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
-    "flavorText": "Gledge dig deep, and certainly greedily, but they’re the best at it.",
+    "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet's corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
+    "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
     "source": "ds"
   },
   {
@@ -2614,8 +2614,8 @@
     "name": "Planetary Rigs",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet’s corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
-    "flavorText": "Gledge dig deep, and certainly greedily, but they’re the best at it.",
+    "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet's corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
+    "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
     "source": "ds"
   },
   {
@@ -2642,7 +2642,7 @@
     "phase": "Any",
     "window": "When a player purges a component:",
     "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
-    "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don’t. They brought the money, let’s make this quick.”",
+    "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.”",
     "source": "ds"
   },
   {
@@ -2650,7 +2650,7 @@
     "name": "Meditative Firing Cycles",
     "phase": "Any",
     "window": "At any time:",
-    "text": "You may use the SPACE CANNON ability of 1 of your units in any system against another player’s ship in or adjacent to that system.",
+    "text": "You may use the SPACE CANNON ability of 1 of your units in any system against another player's ship in or adjacent to that system.",
     "flavorText": "",
     "source": "ds"
   },
@@ -2667,9 +2667,9 @@
     "alias": "contagion",
     "name": "Contagion",
     "phase": "Action",
-    "window": "After you destroy 1 or more of another player’s infantry on a planet:",
+    "window": "After you destroy 1 or more of another player's infantry on a planet:",
     "text": "Destroy half of that player's infantry on that planet, rounded up.",
-    "flavorText": "The Soladity’s Blight has many strains, some more virulent than others.",
+    "flavorText": "The Soladity's Blight has many strains, some more virulent than others.",
     "source": "ds"
   },
   {
@@ -2678,7 +2678,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Purge any number of your relic fragments to draw an equal number of action cards.",
-    "flavorText": "Vassa Hagi wasn’t entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
+    "flavorText": "Vassa Hagi wasn't entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
     "source": "ds"
   },
   {
@@ -2695,8 +2695,8 @@
     "name": "Hostile World",
     "phase": "Action",
     "window": "After a player commits ground forces to land on a planet you control:",
-    "text": "Roll 2 dice. For each result equal to or less than either that planet’s resource or influence value, choose and destroy up to 1 of those ground forces.",
-    "flavorText": "“Y’ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship’s engines. “We’re touching down on a world that wants us dead.”",
+    "text": "Roll 2 dice. For each result equal to or less than either that planet's resource or influence value, choose and destroy up to 1 of those ground forces.",
+    "flavorText": "“Y'ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship's engines. “We're touching down on a world that wants us dead.”",
     "source": "ds"
   },
   {
@@ -2705,7 +2705,7 @@
     "phase": "Action",
     "window": "At the start of invasion:",
     "text": "Choose 1 of your units in the active system; that unit gains PLANETARY SHIELD until the end of this tactical action.",
-    "flavorText": "The admiral swore as a shimmering veil spread to envelope the planet’s critical infrastructure.",
+    "flavorText": "The admiral swore as a shimmering veil spread to envelope the planet's critical infrastructure.",
     "source": "ds"
   },
   {
@@ -2723,7 +2723,7 @@
     "phase": "Any",
     "window": "After a die is rolled:",
     "text": "Apply +3 or -3 to the result before resolving the effects of that roll.",
-    "flavorText": "“No no no. That can’t be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
+    "flavorText": "“No no no. That can't be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
     "source": "ds"
   },
   {
@@ -2732,7 +2732,7 @@
     "phase": "Action",
     "window": "At the start of a round of combat:",
     "text": "Choose 1 unit participating in that combat; that unit becomes damaged, if able.",
-    "flavorText": "Mosk Graezon knew the time had come, if he couldn’t have the system, he’d take as many down with him as he could.",
+    "flavorText": "Mosk Graezon knew the time had come, if he couldn't have the system, he'd take as many down with him as he could.",
     "source": "ds"
   },
   {
@@ -2741,7 +2741,7 @@
     "phase": "Action",
     "window": "At the start of a combat round:",
     "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships; the space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-    "flavorText": "Jack Hallard hadn’t been captured yet, and today would not be the day he was.",
+    "flavorText": "Jack Hallard hadn't been captured yet, and today would not be the day he was.",
     "source": "ds"
   },
   {
@@ -2758,7 +2758,7 @@
     "name": "Forbidden Knowledge",
     "phase": "Any",
     "window": "When you research a technology that is not a unit upgrade technology:",
-    "text": "You may ignore 1 of that technology’s prerequisites.",
+    "text": "You may ignore 1 of that technology's prerequisites.",
     "flavorText": "The Zealots knew many secrets long forgotten.",
     "source": "ds"
   },
@@ -2804,7 +2804,7 @@
     "phase": "Action",
     "window": "When you pass:",
     "text": "Gain 4 commodities; for each commodity you would gain in excess of your commodity value, gain 1 trade good instead.",
-    "flavorText": "The Sovereignty’s Corporations have mastered the art of using money to make money.",
+    "flavorText": "The Sovereignty's Corporations have mastered the art of using money to make money.",
     "source": "ds"
   },
   {
@@ -2812,7 +2812,7 @@
     "name": "Micrometeoroid Storm",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "Choose 1 system that contains another player’s ships. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
+    "text": "Choose 1 system that contains another player's ships. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
     "flavorText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
     "source": "ds"
   },
@@ -2894,7 +2894,7 @@
     "phase": "Action",
     "window": "Before 1 or more of your units would make a combat roll or roll for a unit ability:",
     "text": "Hits produced by that roll cannot be canceled.",
-    "flavorText": "Dr. Morden stood still, in awe. “They’re… beautiful.”",
+    "flavorText": "Dr. Morden stood still, in awe. “They're… beautiful.”",
     "source": "ds"
   }
 ]

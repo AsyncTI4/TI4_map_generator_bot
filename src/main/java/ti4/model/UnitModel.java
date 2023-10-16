@@ -53,9 +53,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     //From: https://thenewstack.io/how-to-convert-google-spreadsheet-to-json-formatted-text/
 
     public boolean isValid() {
-        return id != null 
+        return id != null
             && !id.isEmpty()
-            && List.of("ca","cv","dd","dn","ff","fs","gf","mf","pd","sd","ws","csd","plenaryorbital","tyrantslament").contains(getAsyncId())
+            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
 
@@ -95,7 +95,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
-      
+
         String name = getName() == null ? "" : getName();
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
 
@@ -219,6 +219,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
         return "";
     }
+
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield() != null && getPlanetaryShield()) {
             return "Planetary Shield\n";
