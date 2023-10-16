@@ -1571,7 +1571,7 @@ public class ButtonHelperFactionSpecific {
     public static Button buildVortexButton(Game activeGame, UnitKey unitKey) {
         String faction = activeGame.getPlayerByColorID(unitKey.getColorID()).map(Player::getFaction).get();
         String buttonID = "cabalVortextCapture_" + unitKey.unitName() + "_" + faction;
-        String buttonText = String.format("Capture %s %s", unitKey.getColorID(), unitKey.getUnitType().humanReadableName());
+        String buttonText = String.format("Capture %s %s", unitKey.getColor(), unitKey.getUnitType().humanReadableName());
         return Button.danger(buttonID, buttonText).withEmoji(Emoji.fromFormatted(unitKey.unitEmoji()));
     }
 
