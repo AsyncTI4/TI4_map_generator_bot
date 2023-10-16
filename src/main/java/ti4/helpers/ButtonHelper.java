@@ -1370,9 +1370,12 @@ public class ButtonHelper {
             }
             String id = buttonString.split(";")[x];
             String label = buttonString.split(";")[x+1];
+            if(label.length()< 1){
+                label = "Edited";
+            }
             String style = buttonString.split(";")[x+2].toLowerCase();
             String emoji = "";
-            if(StringUtils.countMatches(buttonString, ";") > 2){
+            if(StringUtils.countMatches(buttonString, ";") > x+2){
                 emoji = buttonString.split(";")[x+3];
                 String name = StringUtils.substringBetween(emoji, ":","(");
                 String emojiID = StringUtils.substringBetween(emoji, "=",")");
