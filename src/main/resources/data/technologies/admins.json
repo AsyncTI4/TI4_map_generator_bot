@@ -1,0 +1,22 @@
+[
+    {
+        "alias": "adminsy",
+        "name": "Molecular Transference",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "faction": "admins",
+        "baseUpgrade": "",
+        "source": "homebrew",
+        "text": "Systems that contain a planet with one of your Space Docks on it are considered adjacent to each other for all game effects."
+    },
+    {
+        "alias": "adminssd",
+        "name": "Tunnel Network II",
+        "type": "UNITUPGRADE",
+        "requirements": "YY",
+        "faction": "admins",
+        "baseUpgrade": "sd2",
+        "source": "homebrew",
+        "text": "Up to 4 fighters in this system do not count towards your ships' capacity. PRODUCTION 7, DEEP SPACE CANNON 7"
+    }
+]
