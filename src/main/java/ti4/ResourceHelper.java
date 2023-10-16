@@ -4,7 +4,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -76,8 +75,8 @@ public class ResourceHelper {
         return tile;
     }
 
-    @Nullable
     //@Deprecated
+    @Nullable
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
             if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {

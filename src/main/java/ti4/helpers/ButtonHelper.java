@@ -147,7 +147,6 @@ public class ButtonHelper {
         Tile tile = activeGame.getTileByPosition(pos);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        // String cID = Mapper.getColorID(player.getColor());
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
             String representation = planetRepresentations.get(name);
@@ -4074,8 +4073,8 @@ public class ButtonHelper {
     }
 
     public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game activeGame) {
-
         Guild guild = activeGame.getGuild();
+        if (guild == null) return;
 
         HashMap<String, Emoji> emojiMap = ButtonListener.emoteMap.get(guild);
         List<RichCustomEmoji> emojis = guild.getEmojis();

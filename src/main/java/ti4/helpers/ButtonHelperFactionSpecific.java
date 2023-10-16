@@ -1665,7 +1665,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
-        UnitModel removedUnit = player.getUnitByID(unitKey.asyncID());
+        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         for (UnitModel ownedUnit : player.getUnitModels()) {
             if (ownedUnit.getCost() < removedUnit.getCost() + 2) {
                 if (allowedUnits.contains(UnitType.valueOf(ownedUnit.getAsyncId()))) {

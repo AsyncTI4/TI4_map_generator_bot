@@ -1813,7 +1813,7 @@ public class GenerateMap {
                     continue;
                 }
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
-                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), Mapper.getColorID(player.getColor()));
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
 
                 if (!techInformation.getFaction().isEmpty()) {
