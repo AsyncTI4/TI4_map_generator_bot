@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.uncategorized;
 
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
@@ -51,7 +51,7 @@ public class CardsInfo implements Command {
                 }
             }
             Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame.isCommunityMode()){
+            if (userActiveGame.isCommunityMode()) {
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
@@ -61,7 +61,7 @@ public class CardsInfo implements Command {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
-            if (!event.getChannel().getName().startsWith(userActiveGame.getName()+"-")){
+            if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
                 MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
                 return false;
             }
@@ -99,6 +99,7 @@ public class CardsInfo implements Command {
     }
 
     public static void sendCardsInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        if (player == null) return;
         String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendCardsInfo(activeGame, player);
@@ -119,10 +120,9 @@ public class CardsInfo implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false))
-        );
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false)));
     }
 
 }

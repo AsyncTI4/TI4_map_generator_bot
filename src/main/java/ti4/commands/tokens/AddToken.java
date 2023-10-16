@@ -14,6 +14,8 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -56,10 +58,10 @@ public class AddToken extends AddRemoveToken {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = null;
-            if(event instanceof SlashCommandInteractionEvent){
+            if (event instanceof SlashCommandInteractionEvent) {
                 option = ((CommandInteractionPayload) event).getOption(Constants.PLANET);
             }
-            
+
             if (option != null) {
                 unitHolder = option.getAsString().toLowerCase();
             } else {
@@ -88,22 +90,22 @@ public class AddToken extends AddRemoveToken {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
-            if (tokenID.contains("dmz")){
+            if (tokenID.contains("dmz")) {
                 HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                if (planetUnitHolder != null && spaceUnitHolder != null){
-                    Map<String, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                if (planetUnitHolder != null && spaceUnitHolder != null) {
+                    Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
                     for (Player player_ : activeGame.getPlayers().values()) {
                         String color = player_.getColor();
                         planetUnitHolder.removeAllUnits(color);
                     }
-                    HashMap<String, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                        String key = unitEntry.getKey();
-                        if (key.contains("ff") || key.contains("gf") || key.contains("mf")){
+                    HashMap<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                        UnitKey key = unitEntry.getKey();
+                        if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
                             Integer count = spaceUnits.get(key);
-                            if (count == null){
+                            if (count == null) {
                                 count = unitEntry.getValue();
                             } else {
                                 count += unitEntry.getValue();
@@ -115,13 +117,11 @@ public class AddToken extends AddRemoveToken {
                 }
             }
             tile.addToken(tokenID, planet);
-            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)){
+            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)) {
                 Helper.addMirageToTile(tile);
             }
         }
     }
-
-
 
     @Override
     protected String getActionDescription() {
@@ -138,10 +138,10 @@ public class AddToken extends AddRemoveToken {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
+            Commands.slash(getActionID(), getActionDescription())
+                .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
 
         );
     }
