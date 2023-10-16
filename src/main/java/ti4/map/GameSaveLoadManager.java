@@ -372,6 +372,11 @@ public class GameSaveLoadManager {
         writeCards(activeGame.getSentAgendas(), writer, Constants.SENT_AGENDAS);
         writeCards(activeGame.getLaws(), writer, Constants.LAW);
 
+        writer.write(Constants.EVENTS + " " + String.join(",", activeGame.getEvents()));
+        writer.write(System.lineSeparator());
+        writer.write(Constants.DISCARDED_EVENTS + " " + String.join(",", activeGame.getDiscardedEvents()));
+        writer.write(System.lineSeparator());
+
         sb = new StringBuilder();
         for (Map.Entry<String, String> entry : activeGame.getLawsInfo().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
@@ -535,6 +540,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.AGENDA_DECK_ID + " " + activeGame.getAgendaDeckID());
         writer.write(System.lineSeparator());
+        writer.write(Constants.EVENT_DECK_ID + " " + activeGame.getEventDeckID());
+        writer.write(System.lineSeparator());
         writer.write(Constants.EXPLORATION_DECK_ID + " " + activeGame.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
@@ -632,6 +639,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
+            writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
 
             writer.write(Constants.PROMISSORY_NOTES_OWNED + " " + String.join(",", player.getPromissoryNotesOwned()));
@@ -1177,6 +1185,7 @@ public class GameSaveLoadManager {
                 case Constants.TECH_DECK_ID -> activeGame.setTechnologyDeckID(info);
                 case Constants.RELIC_DECK_ID -> activeGame.setRelicDeckID(info);
                 case Constants.AGENDA_DECK_ID -> activeGame.setAgendaDeckID(info);
+                case Constants.EVENT_DECK_ID -> activeGame.setEventDeckID(info);
                 case Constants.EXPLORATION_DECK_ID -> activeGame.setExplorationDeckID(info);
                 case Constants.STRATEGY_CARD_SET -> activeGame.setScSetID(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
@@ -1214,6 +1223,8 @@ public class GameSaveLoadManager {
                 case Constants.DISCARDED_AGENDAS -> activeGame.setDiscardAgendas(getParsedCards(info));
                 case Constants.SENT_AGENDAS -> activeGame.setSentAgendas(getParsedCards(info));
                 case Constants.LAW -> activeGame.setLaws(getParsedCards(info));
+                case Constants.EVENTS -> activeGame.setEvents(getCardList(info));
+                case Constants.DISCARDED_EVENTS -> activeGame.setDiscardedEvents(getCardList(info));
                 case Constants.EXPLORE -> activeGame.setExploreDeck(getCardList(info));
                 case Constants.RELICS -> activeGame.setRelics(getCardList(info));
                 case Constants.DISCARDED_EXPLORES -> activeGame.setExploreDiscard(getCardList(info));
@@ -1762,6 +1773,15 @@ public class GameSaveLoadManager {
                         String id = actionCardInfo.nextToken();
                         Integer index = Integer.parseInt(actionCardInfo.nextToken());
                         player.setActionCard(id, index);
+                    }
+                }
+                case Constants.EVENTS -> {
+                    StringTokenizer eventToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (eventToken.hasMoreTokens()) {
+                        StringTokenizer eventInfo = new StringTokenizer(eventToken.nextToken(), ",");
+                        String id = eventInfo.nextToken();
+                        Integer index = Integer.parseInt(eventInfo.nextToken());
+                        player.setEvent(id, index);
                     }
                 }
                 case Constants.LIZHO_TRAP_CARDS -> {

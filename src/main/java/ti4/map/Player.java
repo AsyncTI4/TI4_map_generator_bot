@@ -656,6 +656,10 @@ public class Player {
         actionCards.put(id, identifier);
     }
 
+    public void setEvent(String id, Integer identifier) {
+        events.put(id, identifier);
+    }
+
     public void setTrapCard(String id, Integer identifier) {
         trapCards.put(id, identifier);
     }
