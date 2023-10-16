@@ -54,10 +54,10 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
-            GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
+        GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
         Planet unitHolderPlanet = null;
         if (unitHolder instanceof Planet) {
-            unitHolderPlanet = (Planet)unitHolder;
+            unitHolderPlanet = (Planet) unitHolder;
         }
         switch (roleType) {
             case combatround:
@@ -174,7 +174,7 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInBombardment(Tile tile, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -188,22 +188,22 @@ public class CombatHelper {
             }
         }
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
         List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
 
         // Gracefully fail when units don't exist
         StringBuilder error = new StringBuilder();
@@ -214,7 +214,7 @@ public class CombatHelper {
         }
         if (dupes.size() > 0) {
             error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+                "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
             error.append("> Duplicate units: ").append(dupes);
         }
         if (missing.size() > 0 || dupes.size() > 0) {
@@ -225,7 +225,7 @@ public class CombatHelper {
     }
 
     public static HashMap<UnitModel, Integer> getUnitsInSpaceCannonDefence(Planet planet, Player player,
-            GenericInteractionCreateEvent event) {
+        GenericInteractionCreateEvent event) {
         String colorID = Mapper.getColorID(player.getColor());
 
         HashMap<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -243,21 +243,19 @@ public class CombatHelper {
         }
 
         Map<UnitModel, Integer> unitsOnPlanet = unitsByAsyncId.entrySet().stream().map(
-                entry -> new ImmutablePair<>(
-                        player.getPriorityUnitByAsyncID(entry.getKey(), null),
-                        entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            entry -> new ImmutablePair<>(
+                player.getPriorityUnitByAsyncID(entry.getKey(), null),
+                entry.getValue()))
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
         if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
-            var planetFakeUnit = new UnitModel();
+            UnitModel planetFakeUnit = new UnitModel();
             planetFakeUnit.setSpaceCannonHitsOn(planet.getSpaceCannonHitsOn());
             planetFakeUnit.setSpaceCannonDieCount(planet.getSpaceCannonDieCount());
-            planetFakeUnit
-                    .setName(
-                            Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+            planetFakeUnit.setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
             planetFakeUnit.setAsyncId(planet.getName() + "pds");
             planetFakeUnit.setId(planet.getName() + "pds");
             planetFakeUnit.setBaseType("pds");
@@ -266,17 +264,17 @@ public class CombatHelper {
         }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnPlanet.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
         List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
+            .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+            .collect(Collectors.toList());
 
         // Gracefully fail when units don't exist
         StringBuilder error = new StringBuilder();
@@ -287,7 +285,7 @@ public class CombatHelper {
         }
         if (dupes.size() > 0) {
             error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
+                "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
             error.append("> Duplicate units: ").append(dupes);
         }
         if (event != null && (missing.size() > 0 || dupes.size() > 0)) {
@@ -343,7 +341,7 @@ public class CombatHelper {
             entry -> new ImmutablePair<>(
                 player.getPriorityUnitByAsyncID(entry.getKey(), null),
                 entry.getValue()))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planets
         for (UnitHolder unitHolder : unitHolders) {
@@ -352,11 +350,10 @@ public class CombatHelper {
                 PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
                 if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
-                    var planetFakeUnit = new UnitModel();
+                    UnitModel planetFakeUnit = new UnitModel();
                     planetFakeUnit.setSpaceCannonHitsOn(planet.getSpaceCannonHitsOn());
                     planetFakeUnit.setSpaceCannonDieCount(planet.getSpaceCannonDieCount());
-                    planetFakeUnit
-                            .setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
+                    planetFakeUnit.setName(Helper.getPlanetRepresentationPlusEmoji(planetModel.getId()) + " space cannon");
                     planetFakeUnit.setAsyncId(planet.getName() + "pds");
                     planetFakeUnit.setId(planet.getName() + "pds");
                     planetFakeUnit.setBaseType("pds");
@@ -415,19 +412,19 @@ public class CombatHelper {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
-                .filter(color -> !color.equals(playerColorID))
-                .map(color -> activeGame.getPlayerByColorID(color))
-                .filter(playerOptional -> playerOptional.isPresent())
-                .map(playerOptional -> playerOptional.get())
-                .collect(Collectors.toList());
+            .filter(color -> !color.equals(playerColorID))
+            .map(color -> activeGame.getPlayerByColorID(color))
+            .filter(playerOptional -> playerOptional.isPresent())
+            .map(playerOptional -> playerOptional.get())
+            .collect(Collectors.toList());
 
         if (opponents.size() >= 1) {
             opponent = opponents.get(0);
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                    .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
-                    .findAny();
+                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayer()))
+                .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
             }

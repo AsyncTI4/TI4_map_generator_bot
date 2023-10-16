@@ -2,12 +2,16 @@ package ti4.map;
 
 import java.util.List;
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,8 +23,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = Space.class, name = "space"),
-        @JsonSubTypes.Type(value = Planet.class, name = "planet")
+    @JsonSubTypes.Type(value = Space.class, name = "space"),
+    @JsonSubTypes.Type(value = Planet.class, name = "planet")
 })
 abstract public class UnitHolder {
     private final String name;
@@ -28,9 +32,9 @@ abstract public class UnitHolder {
     private final Point holderCenterPosition;
 
     // ID, Count
-    private final HashMap<String, Integer> units = new HashMap<>();
-    // ID, Count
-    private final HashMap<String, Integer> unitsDamage = new HashMap<>();
+    private final HashMap<UnitKey, Integer> units = new HashMap<>();
+    private final HashMap<UnitKey, Integer> unitsDamage = new HashMap<>();
+
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
     protected final HashSet<String> tokenList = new HashSet<>();
@@ -41,12 +45,12 @@ abstract public class UnitHolder {
 
     @JsonCreator
     public UnitHolder(@JsonProperty("name") String name,
-            @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
+        @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
     }
 
-    public void addUnit(String unit, Integer count) {
+    public void addUnit(UnitKey unit, Integer count) {
         if (count != null && count > 0) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
@@ -95,7 +99,7 @@ abstract public class UnitHolder {
         ccList.clear();
     }
 
-    public void removeUnit(String unit, Integer count) {
+    public void removeUnit(UnitKey unit, Integer count) {
         if (count != null && count > 0) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
@@ -109,7 +113,7 @@ abstract public class UnitHolder {
         }
     }
 
-    public void addUnitDamage(String unit, Integer count) {
+    public void addUnitDamage(UnitKey unit, Integer count) {
         if (count != null && count > 0) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
@@ -121,7 +125,7 @@ abstract public class UnitHolder {
         }
     }
 
-    public void removeUnitDamage(String unit, Integer count) {
+    public void removeUnitDamage(UnitKey unit, Integer count) {
         if (count != null && count > 0) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
@@ -139,7 +143,7 @@ abstract public class UnitHolder {
         String colorID = Mapper.getColorID(color);
         if (colorID == null)
             return;
-        unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
+        unitsDamage.keySet().removeIf(key -> key.getColorID().equals(colorID));
     }
 
     public void removeAllUnitDamage() {
@@ -150,11 +154,20 @@ abstract public class UnitHolder {
         String colorID = Mapper.getColorID(color);
         if (colorID == null)
             return;
-        units.keySet().removeIf(key -> key.startsWith(colorID));
+        units.keySet().removeIf(key -> key.getColorID().equals(colorID));
     }
 
-    public HashMap<String, Integer> getUnits() {
+    public HashMap<UnitKey, Integer> getUnits() {
         return units;
+    }
+
+    @NotNull
+    public Integer getUnitCount(UnitType unitType, String color) {
+        if (units == null || unitType == null || color == null) return 0;
+        Integer value = units.entrySet().stream()
+            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(color))
+            .findFirst().map(Entry::getValue).orElse(0);
+        return value == null ? 0 : value;
     }
 
     @JsonIgnore
@@ -162,8 +175,17 @@ abstract public class UnitHolder {
         return !getUnits().isEmpty();
     }
 
-    public HashMap<String, Integer> getUnitDamage() {
+    public HashMap<UnitKey, Integer> getUnitDamage() {
         return unitsDamage;
+    }
+
+    @NotNull
+    public Integer getUnitDamageCount(UnitType unitType, String color) {
+        if (unitsDamage == null) return 0;
+        Integer value = unitsDamage.entrySet().stream()
+            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(color))
+            .findFirst().map(Entry::getValue).orElse(0);
+        return value == null ? 0 : value;
     }
 
     public HashSet<String> getCCList() {
@@ -184,28 +206,22 @@ abstract public class UnitHolder {
 
     public HashMap<String, Integer> getUnitAsyncIdsOnHolder(String color) {
         return new HashMap<>(units.entrySet().stream()
-                .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
-                .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
+            .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
+            .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
     }
 
     public List<String> getUnitColorsOnHolder() {
         return getUnits().keySet().stream()
-                .map(this::getUnitColor)
-                .distinct()
-                .collect(Collectors.toList());
+            .map(this::getUnitColor)
+            .distinct()
+            .collect(Collectors.toList());
     }
 
-    public String getUnitAliasId(String unitHolderString) {
-        String unitHolderFileSuffix = ".png";
-        String unitId = unitHolderString.substring(unitHolderString.indexOf("_") + 1);
-        unitId = unitId.replace(unitHolderFileSuffix, "");
-        return unitId;
+    public String getUnitAliasId(UnitKey unitKey) {
+        return unitKey.asyncID();
     }
 
-    public String getUnitColor(String unitHolderString) {
-        String unitHolderFileSuffix = ".png";
-        String unitColor = unitHolderString.substring(0, unitHolderString.indexOf("_"));
-        unitColor = unitColor.replace(unitHolderFileSuffix, "");
-        return unitColor;
+    public String getUnitColor(UnitKey unitKey) {
+        return unitKey.getColorID();
     }
 }

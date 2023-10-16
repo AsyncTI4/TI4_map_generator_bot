@@ -13,6 +13,8 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 
@@ -25,8 +27,8 @@ public class Tile {
     private String position;
     private final HashMap<String, UnitHolder> unitHolders = new HashMap<>();
 
-    private final HashMap<Player,Boolean> fog = new HashMap<>();
-    private final HashMap<Player,String> fogLabel = new HashMap<>();
+    private final HashMap<Player, Boolean> fog = new HashMap<>();
+    private final HashMap<Player, String> fogLabel = new HashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
@@ -56,15 +58,15 @@ public class Tile {
         unitHolders.put(Constants.SPACE, space);
         Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
-        if(Optional.ofNullable(tilePlanetPositions).isPresent())
+        if (Optional.ofNullable(tilePlanetPositions).isPresent())
             tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable
-    public static String getUnitPath(String unitID) {
+    public static String getUnitPath(UnitKey unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
-            BotLogger.log("Could not find unit: " + unitID);
+            BotLogger.log("Could not find unit: " + unitID.toString());
             return null;
         }
         return unitPath;
@@ -72,7 +74,7 @@ public class Tile {
 
     @Nullable
     public String getCCPath(String ccID) {
-       return Mapper.getCCPath(ccID);
+        return Mapper.getCCPath(ccID);
     }
 
     @Nullable
@@ -90,20 +92,20 @@ public class Tile {
         return unitHolders.get(spaceHolder) != null;
     }
 
-    public void addUnit(String spaceHolder, String unitID, Integer count) {
+    public void addUnit(String spaceHolder, UnitKey unitID, Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.addUnit(unitID, count);
         }
     }
 
-     public void addUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
+    public void addUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
-            HashMap<String, Integer> units = unitHolder.getUnits();
+            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
             Integer unitCount = units.get(unitID);
             if (unitCount != null) {
-                if (unitCount < count){
+                if (unitCount < count) {
                     count = unitCount;
                 }
                 unitHolder.addUnitDamage(unitID, count);
@@ -132,6 +134,7 @@ public class Tile {
             unitHolder.addControl(ccID);
         }
     }
+
     public void removeControl(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -145,6 +148,7 @@ public class Tile {
             unitHolder.addToken(tokenID);
         }
     }
+
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -168,15 +172,14 @@ public class Tile {
         }
     }
 
-    public void removeUnit(String spaceHolder, String unitID, Integer count) {
-        
+    public void removeUnit(String spaceHolder, UnitKey unitID, Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
         }
     }
 
-    public void removeUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
+    public void removeUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
             unitHolder.removeUnitDamage(unitID, count);
@@ -196,7 +199,7 @@ public class Tile {
         }
     }
 
-    public void addUnit(String spaceHolder, String unitID, String count) {
+    public void addUnit(String spaceHolder, UnitKey unitID, String count) {
         try {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
@@ -205,7 +208,7 @@ public class Tile {
         }
     }
 
-    public void addUnitDamage(String spaceHolder, String unitID, String count) {
+    public void addUnitDamage(String spaceHolder, UnitKey unitID, String count) {
         try {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
@@ -299,26 +302,23 @@ public class Tile {
         }
         return null;
     }
-    
+
     @JsonIgnore
     public String getRepresentationForButtons(Game activeGame, Player player) {
         try {
-            if(activeGame.isFoWMode())
-            {
+            if (activeGame.isFoWMode()) {
+                if (player == null) return getPosition();
+
                 Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeGame, player);
-                if(tilesToShow.contains(getPosition()))
-                {
+                if (tilesToShow.contains(getPosition())) {
                     return getPosition() + " (" + getRepresentation() + ")";
-                }
-                else
-                {
+                } else {
                     return getPosition();
                 }
-            }
-            else {
+            } else {
                 return getPosition() + " (" + getRepresentation() + ")";
             }
-            
+
         } catch (Exception e) {
             return getTileID();
         }
@@ -378,8 +378,8 @@ public class Tile {
             if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
                 return true;
             }
-            for (String unit : unitHolder.getUnits().keySet()) {
-                if (unit.contains("csd.png")) {
+            for (UnitKey unit : unitHolder.getUnits().keySet()) {
+                if (unit.getUnitType().equals(UnitType.CabalSpacedock)) {
                     return true;
                 }
             }

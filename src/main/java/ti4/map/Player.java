@@ -15,6 +15,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.draft.DraftBag;
@@ -57,9 +58,11 @@ public class Player {
     @Setter
     private String playerStatsAnchorPosition;
     private String allianceMembers = "";
+    private String hoursThatPlayerIsAFK = "";
     private String color;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String decalSet;
     private String autoCompleteRepresentation;
 
@@ -548,8 +551,8 @@ public class Player {
         if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
             score += 2;
         if (unitHolder != null
-                && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
-                        || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
+            && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
+                || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
 
         return score;
@@ -976,9 +979,28 @@ public class Player {
         return leader;
     }
 
+    public boolean isAFK() {
+        if (getHoursThatPlayerIsAFK().length() < 1) {
+            return false;
+        }
+        String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
+        int currentHour = Helper.getCurrentHour();
+        for (String hour : hoursAFK) {
+            int h = Integer.parseInt(hour);
+            if (h == currentHour) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasUnexhaustedLeader(String leaderId) {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
+        } else {
+            if (hasExternalAccessToLeader(leaderId) && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true)) {
+                return true;
+            }
         }
         return false;
     }
@@ -1022,7 +1044,7 @@ public class Player {
      * @return whether a player has access to this leader, typically by way of Yssaril Agent
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
-        if (!hasLeader(leaderID) && getLeaderIDs().contains("yssarilagent")) {
+        if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
         }
         return false;
@@ -1085,6 +1107,22 @@ public class Player {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers + color;
         }
+    }
+
+    public void addHourThatIsAFK(String hour) {
+        if (hoursThatPlayerIsAFK.length() < 1) {
+            hoursThatPlayerIsAFK = hour;
+        } else {
+            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";" + hour;
+        }
+    }
+
+    public void setHoursThatPlayerIsAFK(String hours) {
+        hoursThatPlayerIsAFK = hours;
+    }
+
+    public String getHoursThatPlayerIsAFK() {
+        return hoursThatPlayerIsAFK;
     }
 
     public void setAllianceMembers(String color) {
@@ -1172,7 +1210,7 @@ public class Player {
                     if (po != null) {//IS A PO
                         vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
-                        if(countCustoms){
+                        if (countCustoms) {
                             int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
                             int poValue = activeGame.getCustomPublicVP().getOrDefault(poID, 0);
                             vpCount += poValue * frequency;
@@ -1216,7 +1254,6 @@ public class Player {
     public void setTg(int tg) {
         this.tg = tg;
     }
-    
 
     public void setFollowedSCs(Set<Integer> followedSCs) {
         this.followedSCs = followedSCs;
@@ -1296,7 +1333,7 @@ public class Player {
     }
 
     public void setCommodities(int comms) {
-        if(comms > commoditiesTotal && commoditiesTotal > 0){
+        if (comms > commoditiesTotal && commoditiesTotal > 0) {
             comms = commoditiesTotal;
         }
         commodities = comms;
@@ -1360,7 +1397,7 @@ public class Player {
 
     public void loadDraftHand(List<String> saveString) {
         DraftBag newBag = new DraftBag();
-        for(String item : saveString){
+        for (String item : saveString) {
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
         this.draftHand = newBag;
@@ -1368,7 +1405,7 @@ public class Player {
 
     public void loadCurrentDraftBag(List<String> saveString) {
         DraftBag newBag = new DraftBag();
-        for(String item : saveString){
+        for (String item : saveString) {
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
         this.currentDraftBag = newBag;
@@ -1376,7 +1413,7 @@ public class Player {
 
     public void loadItemsToDraft(List<String> saveString) {
         List<DraftItem> items = new ArrayList<>();
-        for(String item : saveString){
+        for (String item : saveString) {
             items.add(DraftItem.GenerateFromAlias(item));
         }
         this.draftItemQueue.Contents = items;
@@ -1602,6 +1639,7 @@ public class Player {
     public int getAutoSaboPassMedian() {
         return autoSaboPassMedian;
     }
+
     public void setAutoSaboPassMedian(int median) {
         autoSaboPassMedian = median;
     }
@@ -1948,15 +1986,25 @@ public class Player {
         return getNeighbouringPlayers().size();
     }
 
+    @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
         String asyncID = StringUtils.substringBetween(imageName, "_", ".png");
         return getUnitFromAsyncID(asyncID);
+    }
+
+    public UnitModel getUnitFromUnitKey(UnitKey unit) {
+        return getUnitFromAsyncID(unit.asyncID());
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
         return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Sort to grab "best" unit if exists
     }
 
+    public boolean unitBelongsToPlayer(UnitKey unit) {
+        return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
+    }
+
+    @Deprecated
     public boolean colourMatchesUnitImageName(String imageName) {
         return getColor().equals(AliasHandler.resolveColor(StringUtils.substringBefore(imageName, "_")));
     }

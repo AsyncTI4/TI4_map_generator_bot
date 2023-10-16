@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
+import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +40,9 @@ import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.game.SetOrder;
 import ti4.commands.leaders.UnlockLeader;
+import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.milty.MiltyDraftTile;
+import ti4.commands.milty.StartMilty;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -64,6 +67,16 @@ public class Helper {
     @Nullable
     public static Player getGamePlayer(Game activeGame, Player initialPlayer, GenericInteractionCreateEvent event, String userID) {
         return getGamePlayer(activeGame, initialPlayer, event.getMember(), userID);
+    }
+
+
+
+    public static int getCurrentHour(){
+        long currentTime = new Date().getTime();
+        currentTime = currentTime /1000;
+        currentTime = currentTime % (60*60*24);
+        currentTime = currentTime / (60*60);
+        return (int) currentTime;
     }
 
     @Nullable
@@ -163,14 +176,47 @@ public class Helper {
         }
         return player;
     }
+    public static void getRandomBlueTile(Game activeGame, GenericInteractionCreateEvent event){
+         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
+        new StartMilty().initDraftTiles(draftManager);
+        List<MiltyDraftTile> allTiles;
+        allTiles = draftManager.getHigh();
+        allTiles.addAll(draftManager.getMid());
+        allTiles.addAll(draftManager.getLow());
+        boolean inMap = true;
+        int counter = 1;
+        while(inMap && counter < 1000){
+            int result = ThreadLocalRandom.current().nextInt(1,allTiles.size());
+
+            MiltyDraftTile tile = allTiles.get(result);
+            tile.getTile().getTileID();
+            boolean foundInMap = false;
+            for(Tile mapTile : activeGame.getTileMap().values())
+            {
+                if(mapTile.getTileID().equalsIgnoreCase(tile.getTile().getTileID())){
+                    foundInMap = true;
+                    break;
+                }
+            }
+            if(!foundInMap){
+                inMap = false;
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: "+tile.getTile().getRepresentation());
+            }
+            counter++;
+             
+        }
+    }
     public static boolean shouldPlayerLeaveAReact(Player player, Game activeGame, String messageID){
         if(player.getAutoSaboPassMedian() == 0){
+            return false;
+        }
+        if(player.isAFK()){
             return false;
         }
         if(player.hasTechReady("it") && player.getStrategicCC() > 0){
             return false;
         }
-        if(player.getActionCards().keySet().contains("sabo1") || player.getActionCards().keySet().contains("sabo2") ||
+        if(player.getActionCards().keySet().contains("sabo1") || player.getActionCards().keySet().contains("sabotage_ds") || player.getActionCards().keySet().contains("sabo2") ||
             player.getActionCards().keySet().contains("sabo3") || player.getActionCards().keySet().contains("sabo4") || (activeGame.getActionCardDeckSize()+activeGame.getDiscardActionCards().size()) > 180){
             return false;
         }
@@ -180,28 +226,40 @@ public class Helper {
         if(ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)){
             return false;
         }
-        int highNum = player.getAutoSaboPassMedian()*6*3/2;
-        int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
-        System.out.println(result + " "+highNum);
-        if(result == highNum){
-            return true;
-        }else{
-            return false;
-        }
+        // int highNum = player.getAutoSaboPassMedian()*6*3/2;
+        // int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
+        // if(result == highNum){
+        //     return true;
+        // }else{
+        //     return false;
+        // }
+        return true;
     }
 
     public static void checkAllSaboWindows(Game activeGame){
         List<String> messageIDs = new ArrayList<>();
         messageIDs.addAll(activeGame.getMessageIDsForSabo());
-        for(String messageID : messageIDs){
-            for(Player player : activeGame.getRealPlayers()){
-                if(shouldPlayerLeaveAReact(player, activeGame, messageID)){
-                    String message = activeGame.isFoWMode() ? "No sabotage" : null;
-                    ButtonHelper.addReaction(player, false, false, message, null, messageID, activeGame);
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.getAutoSaboPassMedian()== 0){
+                continue;
+            }
+            int highNum = player.getAutoSaboPassMedian()*6*3/2;
+            int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
+            boolean shouldDoIt = false;
+            if(result == highNum){
+                shouldDoIt =  true;
+            }
+            if(shouldDoIt){
+                for(String messageID : messageIDs){
+                    if(shouldPlayerLeaveAReact(player, activeGame, messageID)){
+                        String message = activeGame.isFoWMode() ? "No sabotage" : null;
+                        ButtonHelper.addReaction(player, false, false, message, null, messageID, activeGame);
+                    }
                 }
             }
-            
         }
+            
+        
     }
 
     public static Player getPlayerFromUnlockedLeader(Game activeGame, String leader) {

@@ -1969,7 +1969,6 @@
         "faction": "Mykomentori",
         "productionValue": "+2",
         "capacityValue": 3,
-        "deepSpaceCannon": true,
         "isStructure": true,
         "ability": "DEPLOY: When you gain control of a planet, you may replace 4 infantry on that planet with 1 space dock."
     },
@@ -1983,7 +1982,6 @@
         "source": "ds",
         "faction": "Mykomentori",
         "productionValue": "+5",
-        "deepSpaceCannon": true,
         "isStructure": true,
         "ability": "DEPLOY: When you gain control of a planet, you may replace 3 infantry on that planet with 1 space dock."
     },

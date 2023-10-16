@@ -45,14 +45,14 @@ public class FlagshipDraftItem extends DraftItem {
         sb.append(" Capacity: ");
         sb.append(unit.getCapacityValue());
         sb.append(" ");
-        if (unit.getSustainDamage()) {
+        if (unit.getSustainDamage() != null && unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x").append(unit.getAfbDieCount())
-                    .append(" ");
+                .append(unit.getAfbHitsOn())
+                .append("x").append(unit.getAfbDieCount())
+                .append(" ");
         }
         sb.append(unit.getAbility());
         return sb.toString();
