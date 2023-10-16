@@ -510,7 +510,7 @@ public class Player {
             .toList();
     }
 
-    public UnitModel getUnitByType(String unitType) {
+    public UnitModel getUnitByBaseType(String unitType) {
         return getUnitsOwned().stream()
             .map(Mapper::getUnit)
             .filter(Objects::nonNull)

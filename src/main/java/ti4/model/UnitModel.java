@@ -55,6 +55,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && !id.isEmpty()
+            && baseType != null
+            && asyncId != null
+            && source != null
             && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
@@ -97,7 +100,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = getName() == null ? "" : getName();
-        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
+        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
@@ -107,6 +110,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
         return eb.build();
+    }
+
+    public String getSourceEmoji() {
+        return switch (getSource()) {
+            case "absol" -> Emojis.Absol;
+            case "ds" -> Emojis.DiscordantStars;
+            default -> "";
+        };
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType) {
@@ -127,10 +138,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
             default -> getCombatHitsOn();
         };
-    }
-
-    public boolean getIsGroundForce() {
-        return Optional.ofNullable(isGroundForce).orElse(false);
     }
 
     private String getAsyncIDAliases() {
@@ -215,20 +222,20 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getSpaceCannonText() {
         if (getSpaceCannonDieCount() > 0) {
-            return ((getDeepSpaceCannon() != null && getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+            return ((getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
     }
 
     private String getPlanetaryShieldText() {
-        if (getPlanetaryShield() != null && getPlanetaryShield()) {
+        if (getPlanetaryShield()) {
             return "Planetary Shield\n";
         }
         return "";
     }
 
     private String getSustainDamageText() {
-        if (getSustainDamage() != null && getSustainDamage()) {
+        if (getSustainDamage()) {
             return "Sustain Damage\n";
         }
         return "";
@@ -248,5 +255,37 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (getFaction() != null) sb.append(getFaction()).append(" ");
         sb.append(getBaseType()).append(")");
         return sb.toString();
+    }
+
+    public boolean getDeepSpaceCannon() {
+        return Optional.ofNullable(deepSpaceCannon).orElse(false);
+    }
+    
+    public boolean getPlanetaryShield() {
+        return Optional.ofNullable(planetaryShield).orElse(false);
+    }
+
+    public boolean getSustainDamage() {
+        return Optional.ofNullable(sustainDamage).orElse(false);
+    }
+
+    public boolean getDisablesPlanetaryShield() {
+        return Optional.ofNullable(disablesPlanetaryShield).orElse(false);
+    }
+
+    public boolean getCanBeDirectHit() {
+        return Optional.ofNullable(canBeDirectHit).orElse(false);
+    }
+
+    public boolean getIsStructure() {
+        return Optional.ofNullable(isStructure).orElse(false);
+    }
+
+    public boolean getIsGroundForce() {
+        return Optional.ofNullable(isGroundForce).orElse(false);
+    }
+
+    public boolean getIsShip() {
+        return Optional.ofNullable(isShip).orElse(false);
     }
 }
