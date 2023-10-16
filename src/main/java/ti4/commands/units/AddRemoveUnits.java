@@ -11,6 +11,7 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -200,9 +201,9 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
 
-        System.out.println(getActionDescription());
+        
         if (getActionDescription().toLowerCase().contains("add units")) {
-            // ButtonHelper.checkFleetAndCapacity(Helper.getPlayerFromColorOrFaction(activeMap, color), activeMap, tile, event);
+            ButtonHelper.checkFleetAndCapacity(activeGame.getPlayerFromColorOrFaction(color), activeGame, tile, event);
         }
     }
 
