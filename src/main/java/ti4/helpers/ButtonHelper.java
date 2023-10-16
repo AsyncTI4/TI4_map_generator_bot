@@ -438,7 +438,7 @@ public class ButtonHelper {
             for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                 if (unitEntry.getValue() > 0 && player.unitBelongsToPlayer(unitEntry.getKey())) {
                     UnitModel model = player.getUnitFromUnitKey(unitEntry.getKey());
-                    if (model.getProductionValue() > 0) return true;
+                    if (model != null && model.getProductionValue() > 0) return true;
                 }
             }
         }
@@ -1640,7 +1640,7 @@ public class ButtonHelper {
                 }
 
             } else {
-                if ((unit.getIsShip() != null && unit.getIsShip())) {
+                if (unit.getIsShip()) {
                     if (player.hasAbility("capital_fleet") && unit.getBaseType().contains("destroyer")) {
                         numOfCapitalShips += unitsByQuantity.get(unit);
                     } else {
@@ -2863,7 +2863,7 @@ public class ButtonHelper {
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
 
-                        if (unitModel.getSustainDamage() != null && unitModel.getSustainDamage()) {
+                        if (unitModel.getSustainDamage()) {
                             buttonID = finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
                             buttonText = "Sustain " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame);
                             Button validTile3 = Button.secondary(buttonID, buttonText);
@@ -3041,7 +3041,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && model.getDeepSpaceCannon() != null && model.getDeepSpaceCannon()) {
+                    if (model != null && model.getDeepSpaceCannon()) {
                         playersWithPds2.add(owningPlayer);
                     }
                 }

@@ -55,7 +55,7 @@ public class CombatModifierModel implements ModelInterface {
                 isInScope = sortedAllUnits.get(0).getAsyncId() == unit.getAsyncId();
             }
             if ("_ship_".equals(scope)) {
-                isInScope = unit.getIsShip() != null && unit.getIsShip();
+                isInScope = unit.getIsShip();
             }
         }
         return isInScope;

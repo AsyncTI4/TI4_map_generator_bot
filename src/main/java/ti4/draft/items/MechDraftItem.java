@@ -34,7 +34,7 @@ public class MechDraftItem extends DraftItem {
             sb.append("x").append(unit.getCombatDieCount());
         }
         sb.append(" ");
-        if (unit.getSustainDamage() != null && unit.getSustainDamage()) {
+        if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
         if (unit.getAfbDieCount() > 0) {
