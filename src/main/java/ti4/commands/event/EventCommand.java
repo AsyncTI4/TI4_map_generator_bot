@@ -16,7 +16,6 @@ import ti4.message.MessageHelper;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class EventCommand implements Command {
 
@@ -30,30 +29,6 @@ public class EventCommand implements Command {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ACCardsCommand.acceptEvent(event, getActionID());
-    }
-
-    @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
     }
 
     @Override
@@ -97,7 +72,6 @@ public class EventCommand implements Command {
         subcommands.add(new RemoveEvent());
         subcommands.add(new ReviseEvent());
         subcommands.add(new ShowDiscardedEvents());
-        subcommands.add(new ListVoteCount());
         subcommands.add(new ShuffleEvents());
         subcommands.add(new ResetEvents());
         subcommands.add(new ResetDrawStateEvents());
