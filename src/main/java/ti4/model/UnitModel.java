@@ -55,6 +55,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && !id.isEmpty()
+            && baseType != null
+            && asyncId != null
+            && source != null
             && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament").contains(getAsyncId())
             && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
     }
@@ -97,7 +100,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = getName() == null ? "" : getName();
-        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
+        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
@@ -107,6 +110,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
         return eb.build();
+    }
+
+    public String getSourceEmoji() {
+        return switch (getSource()) {
+            case "absol" -> Emojis.Absol;
+            case "ds" -> Emojis.DiscordantStars;
+            default -> "";
+        };
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType) {

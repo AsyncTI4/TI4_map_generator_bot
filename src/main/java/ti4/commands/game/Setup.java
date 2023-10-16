@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,6 +13,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 public class Setup extends GameSubcommandData {
     public Setup() {
@@ -122,6 +124,7 @@ public class Setup extends GameSubcommandData {
 
             for (Player player : activeGame.getPlayers().values()) {
                 player.setLeaders(new ArrayList<>());
+                if (player.getUnitByBaseType("mech") != null) player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
             }
 
             activeGame.setScSetID("base_game");
@@ -144,10 +147,11 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds_absol");
-            // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
+            // SOMEHOW HANDLE STARTING/FACTION TECHS
             activeGame.setAbsolMode(absolMode);
             activeGame.setDiscordantStarsMode(discordantStarsMode);
             activeGame.setBaseGameMode(false);
+            activeGame.swapInVariantUnits("absol");
             return true;
         }
     
@@ -176,7 +180,8 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
             activeGame.setTechnologyDeckID("techs_absol");
             activeGame.setDiscordantStarsMode(false);
-            // SOMEHOW HANDLE MECHS AND STARTING/FACTION TECHS
+            activeGame.swapInVariantUnits("absol");
+            // SOMEHOW STARTING/FACTION TECHS
         }
         activeGame.setAbsolMode(absolMode);
         
@@ -193,6 +198,7 @@ public class Setup extends GameSubcommandData {
             activeGame.setBaseGameMode(false);
             activeGame.setAbsolMode(false);
             activeGame.setDiscordantStarsMode(false);
+            activeGame.swapInVariantUnits("pok");
         }
 
         return true;
