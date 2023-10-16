@@ -45,7 +45,7 @@ public class FlagshipDraftItem extends DraftItem {
         sb.append(" Capacity: ");
         sb.append(unit.getCapacityValue());
         sb.append(" ");
-        if (unit.getSustainDamage() != null && unit.getSustainDamage()) {
+        if (unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
         if (unit.getAfbDieCount() > 0) {
