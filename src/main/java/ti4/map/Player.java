@@ -16,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.draft.DraftBag;
@@ -1919,11 +1920,9 @@ public class Player {
     public boolean hasMechInSystem(Tile tile) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String colorID = Mapper.getColorID(getColor());
-        String mechKey = colorID + "_mf.png";
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
+            if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
                 return true;
             }
         }
@@ -1933,26 +1932,21 @@ public class Player {
     public boolean hasProductionUnitInSystem(Tile tile) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String colorID = Mapper.getColorID(getColor());
-        String mechKey;
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
-            mechKey = colorID + "_sd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
+            if (unitHolder.getUnitCount(UnitType.Spacedock, colorID) > 0) {
                 return true;
             }
-            mechKey = colorID + "_csd.png";
-            if (unitHolder.getUnits().get(mechKey) != null) {
+            if (unitHolder.getUnitCount(UnitType.CabalSpacedock, colorID) > 0) {
                 return true;
             }
             if (hasUnit("arborec_mech")) {
-                mechKey = colorID + "_mf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
+                if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
                     return true;
                 }
             }
             if (hasUnit("arborec_infantry") || hasTech("lw2")) {
-                mechKey = colorID + "_gf.png";
-                if (unitHolder.getUnits().get(mechKey) != null) {
+                if (unitHolder.getUnitCount(UnitType.Infantry, colorID) > 0) {
                     return true;
                 }
             }
