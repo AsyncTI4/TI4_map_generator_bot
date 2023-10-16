@@ -94,6 +94,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+    private boolean temporaryPingDisable = false;
+    @ExportableField
     private boolean dominusOrb;
     @ExportableField
     private boolean componentAction;
@@ -835,6 +837,9 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+    public boolean getTemporaryPingDisable() {
+        return temporaryPingDisable;
+    }
 
     public boolean getDominusOrbStatus() {
         return dominusOrb;
@@ -846,6 +851,9 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setTemporaryPingDisable(boolean onStatus) {
+        temporaryPingDisable = onStatus;
     }
 
     public void setDominusOrb(boolean onStatus) {

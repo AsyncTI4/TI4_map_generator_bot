@@ -57,6 +57,7 @@ public class Player {
     @Setter
     private String playerStatsAnchorPosition;
     private String allianceMembers = "";
+    private String hoursThatPlayerIsAFK = "";
     private String color;
 
     @Getter @Setter
@@ -976,9 +977,28 @@ public class Player {
         return leader;
     }
 
+    public boolean isAFK(){
+        if(getHoursThatPlayerIsAFK().length() < 1){
+            return false;
+        }
+        String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
+        int currentHour = Helper.getCurrentHour();
+        for(String hour : hoursAFK){
+            int h = Integer.parseInt(hour);
+            if(h == currentHour){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasUnexhaustedLeader(String leaderId) {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
+        }else{
+            if (hasExternalAccessToLeader(leaderId) && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true)){
+                return true;
+            }
         }
         return false;
     }
@@ -1022,7 +1042,7 @@ public class Player {
      * @return whether a player has access to this leader, typically by way of Yssaril Agent
      */
     public boolean hasExternalAccessToLeader(String leaderID) {
-        if (!hasLeader(leaderID) && getLeaderIDs().contains("yssarilagent")) {
+        if (!hasLeader(leaderID) && leaderID.contains("agent") && getLeaderIDs().contains("yssarilagent")) {
             return getGame().isLeaderInGame(leaderID);
         }
         return false;
@@ -1085,6 +1105,20 @@ public class Player {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers + color;
         }
+    }
+
+    public void addHourThatIsAFK(String hour) {
+        if(hoursThatPlayerIsAFK.length() < 1){
+            hoursThatPlayerIsAFK = hour;
+        }else{
+            hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";"+hour;
+        }
+    }
+    public void setHoursThatPlayerIsAFK(String hours) {
+        hoursThatPlayerIsAFK = hours;
+    }
+    public String getHoursThatPlayerIsAFK(){
+        return hoursThatPlayerIsAFK;
     }
 
     public void setAllianceMembers(String color) {
