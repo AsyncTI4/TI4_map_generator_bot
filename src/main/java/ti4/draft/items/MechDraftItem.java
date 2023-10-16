@@ -34,14 +34,14 @@ public class MechDraftItem extends DraftItem {
             sb.append("x").append(unit.getCombatDieCount());
         }
         sb.append(" ");
-        if (unit.getSustainDamage()) {
+        if (unit.getSustainDamage() != null && unit.getSustainDamage()) {
             sb.append("SUSTAIN DAMAGE ");
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                    .append(unit.getAfbHitsOn())
-                    .append("x").append(unit.getAfbDieCount())
-                    .append(" ");
+                .append(unit.getAfbHitsOn())
+                .append("x").append(unit.getAfbDieCount())
+                .append(" ");
         }
         sb.append(unit.getAbility());
         return sb.toString();

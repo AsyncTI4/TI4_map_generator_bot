@@ -109,7 +109,7 @@ public class CustomCommand implements Command {
         subcommands.add(new SCRemoveFromGame());
         subcommands.add(new PoRemoveFromGame());
         subcommands.add(new DiscardSpecificAgenda());
-        subcommands.add(new FixSODeck());
+        //subcommands.add(new FixSODeck());
         subcommands.add(new SetThreadName());
         subcommands.add(new PeakAtStage1());
         subcommands.add(new PeakAtStage2());
@@ -120,6 +120,7 @@ public class CustomCommand implements Command {
         subcommands.add(new RevealSpecificStage2());
         subcommands.add(new SpinTilesInFirstThreeRings());
         subcommands.add(new OfferAutoPassOptions());
+        subcommands.add(new OfferAFKTimeOptions());
         subcommands.add(new ChangeToBaseGame());
         subcommands.add(new CustomizationOptions());
         return subcommands;

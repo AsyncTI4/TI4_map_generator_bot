@@ -32,6 +32,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -57,14 +58,15 @@ public class Game {
     private String ownerID;
     private String ownerName = "";
     private String name;
-    
+
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
     private String latestAfterMsg = "";
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
-    @Getter @Setter
+    @Getter
+    @Setter
     private int mapImageGenerationCount;
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
@@ -94,6 +96,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+    private boolean temporaryPingDisable = false;
+    @ExportableField
     private boolean dominusOrb;
     @ExportableField
     private boolean componentAction;
@@ -105,11 +109,14 @@ public class Game {
     private boolean homebrewSCMode;
     @ExportableField
     private boolean stratPings = true;
-    @ExportableField @Getter @Setter
+    @ExportableField
+    @Getter
+    @Setter
     private String textSize = "medium";
     @ExportableField
     private boolean absolMode = false;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean showUnitTags = false;
     @Getter
     @Setter
@@ -247,7 +254,7 @@ public class Game {
     }
 
     public void newGameSetup() {
-        
+
         secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         actionCards = Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck();
         explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
@@ -262,7 +269,6 @@ public class Game {
             scTradeGoods.put(i + 1, 0);
         }
     }
-
 
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
@@ -415,8 +421,13 @@ public class Game {
         this.purgedPN.remove(purgedPN);
     }
 
-    public BagDraft getActiveBagDraft() { return activeDraft; }
-    public void setBagDraft(BagDraft draft) { activeDraft = draft; }
+    public BagDraft getActiveBagDraft() {
+        return activeDraft;
+    }
+
+    public void setBagDraft(BagDraft draft) {
+        activeDraft = draft;
+    }
 
     public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
@@ -447,22 +458,29 @@ public class Game {
     public int getRound() {
         return round;
     }
+
     public int getButtonPressCount() {
         return buttonPress;
     }
+
     public void increaseButtonPressCount() {
-       buttonPress++;
+        buttonPress++;
     }
+
     public void setButtonPressCount(int count) {
-       buttonPress = count;
+        buttonPress = count;
     }
+
     public void setSlashCommandsRun(int count) {
-       slashCommandsRun = count;
+        slashCommandsRun = count;
     }
+
     public void increaseSlashCommandsRun() {
-       slashCommandsRun++;;
+        slashCommandsRun++;
+        ;
     }
-    public int getSlashCommandsRunCount(){
+
+    public int getSlashCommandsRunCount() {
         return slashCommandsRun;
     }
 
@@ -682,6 +700,7 @@ public class Game {
         }
         return null;
     }
+
     @JsonIgnore
     public TextChannel getSavedChannel() {
         try {
@@ -696,8 +715,9 @@ public class Game {
     }
 
     public void setSavedChannelID(String channelID) {
-        savedChannelID= channelID;
+        savedChannelID = channelID;
     }
+
     public void setSavedMessage(String msg) {
         savedMessage = msg;
     }
@@ -705,9 +725,11 @@ public class Game {
     public String getMainGameChannelID() {
         return mainChannelID;
     }
+
     public String getSavedChannelID() {
         return savedChannelID;
     }
+
     public String getSavedMessage() {
         return savedMessage;
     }
@@ -835,6 +857,9 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+    public boolean getTemporaryPingDisable() {
+        return temporaryPingDisable;
+    }
 
     public boolean getDominusOrbStatus() {
         return dominusOrb;
@@ -846,6 +871,9 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setTemporaryPingDisable(boolean onStatus) {
+        temporaryPingDisable = onStatus;
     }
 
     public void setDominusOrb(boolean onStatus) {
@@ -875,6 +903,7 @@ public class Game {
     public String getSpeaker() {
         return speaker;
     }
+
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
     }
@@ -890,6 +919,7 @@ public class Game {
     public boolean getHackElectionStatus() {
         return hasHackElectionBeenPlayed;
     }
+
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
         if (playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0) {
             playersWhoHitPersistentNoAfter = playersWhoHitPersistentNoAfter + "_" + faction;
@@ -897,6 +927,7 @@ public class Game {
             playersWhoHitPersistentNoAfter = faction;
         }
     }
+
     public void addPlayersWhoHitPersistentNoWhen(String faction) {
         if (playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0) {
             playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_" + faction;
@@ -904,21 +935,27 @@ public class Game {
             playersWhoHitPersistentNoWhen = faction;
         }
     }
+
     public void setPlayersWhoHitPersistentNoAfter(String persistent) {
         playersWhoHitPersistentNoAfter = persistent;
     }
+
     public void setPlayersWhoHitPersistentNoWhen(String persistent) {
         playersWhoHitPersistentNoWhen = persistent;
     }
+
     public void setHackElectionStatus(boolean hack) {
         hasHackElectionBeenPlayed = hack;
     }
+
     public String getActivePlayer() {
         return activePlayer;
     }
+
     public String getActiveSystem() {
         return activeSystem;
     }
+
     public void setActiveSystem(String system) {
         activeSystem = system;
     }
@@ -926,6 +963,7 @@ public class Game {
     public HashMap<String, Integer> getCurrentMovedUnitsFrom1System() {
         return displacedUnitsFrom1System;
     }
+
     public HashMap<String, Integer> getAllSlashCommandsUsed() {
         return slashCommandsUsed;
     }
@@ -937,6 +975,7 @@ public class Game {
     public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
         displacedUnitsFrom1System.put(unit, count);
     }
+
     public void setSpecificSlashCommandCount(String command, int count) {
         slashCommandsUsed.put(command, count);
     }
@@ -944,7 +983,8 @@ public class Game {
     public void setCurrentMovedUnitsFrom1System(HashMap<String, Integer> displacedUnits) {
         displacedUnitsFrom1System = displacedUnits;
     }
-     public void setSlashCommandsUsed(HashMap<String, Integer> commands) {
+
+    public void setSlashCommandsUsed(HashMap<String, Integer> commands) {
         slashCommandsUsed = commands;
     }
 
@@ -1122,6 +1162,7 @@ public class Game {
     public List<Integer> getSCList() {
         return (new ArrayList<>(getScTradeGoods().keySet()));
     }
+
     public LinkedHashMap<String, Integer> getRevealedPublicObjectives() {
         return revealedPublicObjectives;
     }
@@ -1130,13 +1171,15 @@ public class Game {
         return publicObjectives1;
     }
 
-    public List<String> getSavedButtons(){
+    public List<String> getSavedButtons() {
         return savedButtons;
     }
-    public void saveButton(String button){
+
+    public void saveButton(String button) {
         savedButtons.add(button);
     }
-    public void setSavedButtons(List<String> savedButtonsPassed){
+
+    public void setSavedButtons(List<String> savedButtonsPassed) {
         savedButtons = savedButtonsPassed;
     }
 
@@ -1169,7 +1212,7 @@ public class Game {
     }
 
     public void setUpPeakableObjectives(int num) {
-        if(publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num-1 ){
+        if (publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num - 1) {
             for (int x = 0; x < num; x++) {
                 if (!publicObjectives1.isEmpty()) {
                     Collections.shuffle(publicObjectives1);
@@ -1321,8 +1364,8 @@ public class Game {
             }
         }
 
-        if(round > 1 && discardAgendas.size() > 1){
-             custodiansTaken = true;
+        if (round > 1 && discardAgendas.size() > 1) {
+            custodiansTaken = true;
         }
         return custodiansTaken;
     }
@@ -1346,6 +1389,7 @@ public class Game {
         }
         return false;
     }
+
     public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -1378,7 +1422,7 @@ public class Game {
         return false;
     }
 
-    public boolean unscorePublicObjective(String userID, String id) {    
+    public boolean unscorePublicObjective(String userID, String id) {
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
             return scoredPlayerList.remove(userID);
@@ -1744,6 +1788,7 @@ public class Game {
         }
         return false;
     }
+
     public boolean putAgendaBackIntoDeckOnTop(String id) {
         if (!id.isEmpty()) {
             discardAgendas.remove(id);
@@ -2543,6 +2588,7 @@ public class Game {
     public void setCCNPlasticLimit(boolean limit) {
         ccNPlasticLimit = limit;
     }
+
     public void setBotFactionReactions(boolean limit) {
         botFactionReacts = limit;
     }
@@ -2554,9 +2600,11 @@ public class Game {
     public boolean getCCNPlasticLimit() {
         return ccNPlasticLimit;
     }
+
     public boolean getBotFactionReacts() {
         return botFactionReacts;
     }
+
     public boolean getBotShushing() {
         return botShushing;
     }
@@ -2982,7 +3030,7 @@ public class Game {
     @JsonIgnore
     public List<String> getAllPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
-        for(Tile tile : getTileMap().values()){
+        for (Tile tile : getTileMap().values()) {
             planetsWithSleepers.addAll(tile.getPlanetsWithSleeperTokens());
         }
         return planetsWithSleepers;
@@ -2995,8 +3043,8 @@ public class Game {
 
     public Optional<Player> getPlayerByColorID(String color) {
         return getRealPlayers().stream()
-                    .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
-                    .findFirst();
+            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
+            .findFirst();
     }
 
     public boolean isLeaderInGame(String leaderID) {
@@ -3050,12 +3098,21 @@ public class Game {
         return player;
     }
 
+    @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
         String colourID = StringUtils.substringBefore(imageName, "_");
         Player player = getPlayerFromColorOrFaction(colourID);
+        if (player == null) return null;
         return player.getUnitFromImageName(imageName);
     }
 
+    public UnitModel getUnitFromUnitKey(UnitKey unitKey) {
+        Player player = getPlayerFromColorOrFaction(unitKey.getColorID());
+        if (player == null) return null;
+        return player.getUnitFromUnitKey(unitKey);
+    }
+
+    @Deprecated
     public String getUnitNameFromImageName(String imageName) {
         String colourID = StringUtils.substringBefore(imageName, "_");
         String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);

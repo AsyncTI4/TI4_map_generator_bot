@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.*;
@@ -322,8 +324,13 @@ public class Mapper {
         return cards;
     }
 
-    public static String getUnitID(String unitID, String color) {
-        return colors.getProperty(color) + "_" + unitID + ".png";
+    // public static String getUnitID(String unitID, String color) {
+    //     return colors.getProperty(color) + "_" + unitID + ".png";
+    // }
+
+    public static UnitKey getUnitKey(String unitID, String color) {
+        String colorID = getColorID(color) == null ? color : getColorID(color);
+        return Units.getUnitKey(unitID, colorID);
     }
 
     public static Set<String> getUnitIDList() {

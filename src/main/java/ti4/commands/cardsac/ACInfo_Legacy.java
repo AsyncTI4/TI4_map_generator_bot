@@ -1,7 +1,7 @@
 package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;

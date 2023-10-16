@@ -29,6 +29,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -38,64 +39,70 @@ import ti4.message.BotLogger;
 
 public class ConvertTTPGtoAsync {
 
-    private static final List<String> validColours = new ArrayList<>() {{
-        add("W"); //White
-        add("B"); //Blue
-        add("P"); //Purple
-        add("Y"); //Yellow
-        add("R"); //Red
-        add("G"); //Green
-        add("E"); //Orange
-        add("K"); //Pink
-    }};
+    private static final List<String> validColours = new ArrayList<>() {
+        {
+            add("W"); //White
+            add("B"); //Blue
+            add("P"); //Purple
+            add("Y"); //Yellow
+            add("R"); //Red
+            add("G"); //Green
+            add("E"); //Orange
+            add("K"); //Pink
+        }
+    };
 
-    private static final List<String> validUnits = new ArrayList<>() {{
-        add("c"); //carrier
-        add("d"); //dreadnought
-        add("f"); //fighter
-        add("h"); //flagship
-        add("i"); //infantry
-        add("m"); //mech
-        add("o"); //control_token
-        add("p"); //pds
-        add("r"); //cruiser
-        add("s"); //space_dock
-        add("t"); //command_token
-        add("w"); //war_sun
-        add("y"); //destroyer
-    }};
+    private static final List<String> validUnits = new ArrayList<>() {
+        {
+            add("c"); //carrier
+            add("d"); //dreadnought
+            add("f"); //fighter
+            add("h"); //flagship
+            add("i"); //infantry
+            add("m"); //mech
+            add("o"); //control_token
+            add("p"); //pds
+            add("r"); //cruiser
+            add("s"); //space_dock
+            add("t"); //command_token
+            add("w"); //war_sun
+            add("y"); //destroyer
+        }
+    };
 
-    private static final List<String> validAttachments = new ArrayList<>() {{
-        add("C"); //cybernetic_research_facility_face
-        add("I"); //biotic_research_facility_face
-        add("O"); //propulsion_research_facility_face
-        add("W"); //warfare_research_facility_face
-        add("a"); //alpha_wormhole
-        add("b"); //beta_wormhole
-        add("c"); //cybernetic_Research_Facility_back
-        add("d"); //dyson_sphere
-        add("e"); //frontier
-        add("f"); //nano_forge
-        add("g"); //gamma_wormhole
-        add("h"); //grav_tear
-        add("i"); //biotic_research_facility_back
-        add("j"); //tomb_of_emphidia
-        add("k"); //mirage
-        add("l"); //stellar_converter
-        add("m"); //mining_world
-        add("n"); //ion_storm
-        add("o"); //propulsion_research_facility_back
-        add("p"); //paradise_world
-        add("q"); //ul_sleeper
-        add("r"); //rich_world
-        add("t"); //ul_terraform
-        add("u"); //ul_geoform
-        add("w"); //warfare_research_facility_back
-        add("x"); //lazax_survivors
-        add("z"); //dmz
-    }};
+    private static final List<String> validAttachments = new ArrayList<>() {
+        {
+            add("C"); //cybernetic_research_facility_face
+            add("I"); //biotic_research_facility_face
+            add("O"); //propulsion_research_facility_face
+            add("W"); //warfare_research_facility_face
+            add("a"); //alpha_wormhole
+            add("b"); //beta_wormhole
+            add("c"); //cybernetic_Research_Facility_back
+            add("d"); //dyson_sphere
+            add("e"); //frontier
+            add("f"); //nano_forge
+            add("g"); //gamma_wormhole
+            add("h"); //grav_tear
+            add("i"); //biotic_research_facility_back
+            add("j"); //tomb_of_emphidia
+            add("k"); //mirage
+            add("l"); //stellar_converter
+            add("m"); //mining_world
+            add("n"); //ion_storm
+            add("o"); //propulsion_research_facility_back
+            add("p"); //paradise_world
+            add("q"); //ul_sleeper
+            add("r"); //rich_world
+            add("t"); //ul_terraform
+            add("u"); //ul_geoform
+            add("w"); //warfare_research_facility_back
+            add("x"); //lazax_survivors
+            add("z"); //dmz
+        }
+    };
 
-    public static final Map<String,String> fakePlayers = new HashMap<>() {
+    public static final Map<String, String> fakePlayers = new HashMap<>() {
         {
             put("481860200169472030", "PrisonerOne");
             put("150809002974904321", "Holytispoon");
@@ -199,7 +206,7 @@ public class ConvertTTPGtoAsync {
 
         //PLAYERS
         int index = ttpgMap.getPlayers().size() - 2;
-        for (Entry<String,String> fakePlayer : fakePlayers.entrySet()) {
+        for (Entry<String, String> fakePlayer : fakePlayers.entrySet()) {
             asyncGame.addPlayer(fakePlayer.getKey(), fakePlayer.getValue());
             Player asyncPlayer = asyncGame.getPlayer(fakePlayer.getKey());
             TTPGPlayer ttpgPlayer = ttpgMap.getPlayers().get(index);
@@ -229,7 +236,7 @@ public class ConvertTTPGtoAsync {
                 String asyncScoredObjective = AliasHandler.resolveObjective(ttpgScoredObjective);
                 if (asyncGame.getSecretObjectives().contains(asyncScoredObjective)) {
                     asyncPlayer.setSecret(asyncScoredObjective);
-                    for (Entry<String,Integer> secretObjective : asyncPlayer.getSecrets().entrySet()) {
+                    for (Entry<String, Integer> secretObjective : asyncPlayer.getSecrets().entrySet()) {
                         if (secretObjective.getKey().equalsIgnoreCase(asyncScoredObjective)) {
                             asyncPlayer.setSecretScored(asyncScoredObjective, secretObjective.getValue());
                             asyncPlayer.removeSecret(secretObjective.getValue());
@@ -239,13 +246,13 @@ public class ConvertTTPGtoAsync {
                 } else if (asyncGame.getRevealedPublicObjectives().containsKey(asyncScoredObjective)) {
                     for (Entry<String, Integer> revealedObjective : asyncGame.getRevealedPublicObjectives().entrySet()) {
                         if (asyncScoredObjective.equalsIgnoreCase(revealedObjective.getKey())) {
-                            asyncGame.scorePublicObjective(asyncPlayer.getUserID(),revealedObjective.getValue());
+                            asyncGame.scorePublicObjective(asyncPlayer.getUserID(), revealedObjective.getValue());
                         }
                     }
                 } else if (asyncGame.getCustomPublicVP().containsKey(ttpgScoredObjective)) {
                     for (Entry<String, Integer> customObjective : asyncGame.getCustomPublicVP().entrySet()) {
                         if (ttpgScoredObjective.equalsIgnoreCase(customObjective.getKey())) {
-                            asyncGame.scorePublicObjective(asyncPlayer.getUserID(),customObjective.getValue());
+                            asyncGame.scorePublicObjective(asyncPlayer.getUserID(), customObjective.getValue());
                         }
                     }
                 }
@@ -330,10 +337,12 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.clearPromissoryNotes();
 
             //PLAYER HANDCARDS and TABLECARDS
-            List<String> handAndTableCards = new ArrayList<>(){{
-                addAll(ttpgPlayer.getHandCards());
-                addAll(ttpgPlayer.getTableCards());
-            }};
+            List<String> handAndTableCards = new ArrayList<>() {
+                {
+                    addAll(ttpgPlayer.getHandCards());
+                    addAll(ttpgPlayer.getTableCards());
+                }
+            };
             for (String card : handAndTableCards) {
                 switch (determineCardType(card)) {
                     case "promissory" -> asyncPlayer.setPromissoryNote(AliasHandler.resolvePromissory(card));
@@ -351,7 +360,10 @@ public class ConvertTTPGtoAsync {
             }
 
             //INDEX
-            if (index == ttpgMap.getPlayers().size() - 1) index = 0; else index++; //shift ttpgPlayer array to match Async array
+            if (index == ttpgMap.getPlayers().size() - 1)
+                index = 0;
+            else
+                index++; //shift ttpgPlayer array to match Async array
             if (asyncGame.getPlayers().size() == asyncGame.getPlayerCountForMap()) break;
         }
 
@@ -386,37 +398,45 @@ public class ConvertTTPGtoAsync {
         }
 
         // ACTION CARD DECK
-        List<String> actionCards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardAction().getDeck());
-            replaceAll(AliasHandler::resolveActionCard);
-        }};
+        List<String> actionCards = new ArrayList<>() {
+            {
+                addAll(ttpgMap.getDecks().getCardAction().getDeck());
+                replaceAll(AliasHandler::resolveActionCard);
+            }
+        };
         Collections.shuffle(actionCards);
         asyncGame.setActionCards(actionCards);
 
         // ACTION CARD DISCARD
         List<String> ttpgActionDiscards = ttpgMap.getDecks().getCardAction().getDiscard();
-        List<String> actionDiscards = new ArrayList<>() {{
-            if (Objects.nonNull(ttpgActionDiscards)) addAll(ttpgActionDiscards);
-            replaceAll(AliasHandler::resolveActionCard);
-        }};
+        List<String> actionDiscards = new ArrayList<>() {
+            {
+                if (Objects.nonNull(ttpgActionDiscards)) addAll(ttpgActionDiscards);
+                replaceAll(AliasHandler::resolveActionCard);
+            }
+        };
         asyncGame.setDiscardActionCards(actionDiscards);
 
         // AGENDA DECK
-        List<String> agendaCards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardAgenda().getDeck());
-            replaceAll(AliasHandler::resolveAgenda);
-        }};
+        List<String> agendaCards = new ArrayList<>() {
+            {
+                addAll(ttpgMap.getDecks().getCardAgenda().getDeck());
+                replaceAll(AliasHandler::resolveAgenda);
+            }
+        };
         Collections.reverse(agendaCards);
         asyncGame.setAgendas(agendaCards);
 
         // AGENDA DISCARD
         List<String> ttpgAgendaDiscards = ttpgMap.getDecks().getCardAgenda().getDiscard();
         List<String> ttpgLawsInPlay = ttpgMap.getLaws();
-        List<String> agendaDiscards = new ArrayList<>() {{
-            if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
-            if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
-            replaceAll(AliasHandler::resolveAgenda);
-        }};
+        List<String> agendaDiscards = new ArrayList<>() {
+            {
+                if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
+                if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
+                replaceAll(AliasHandler::resolveAgenda);
+            }
+        };
         asyncGame.setDiscardAgendas(agendaDiscards);
 
         //ADD LAWS
@@ -431,13 +451,15 @@ public class ConvertTTPGtoAsync {
         List<String> ttpgExploreHazardousCards = ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
         List<String> ttpgExploreIndustrialCards = ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
         List<String> ttpgExploreFrontierCards = ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
-        List<String> exploreCards = new ArrayList<>() {{
-            if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
-            if (Objects.nonNull(ttpgExploreHazardousCards)) addAll(ttpgExploreHazardousCards);
-            if (Objects.nonNull(ttpgExploreIndustrialCards)) addAll(ttpgExploreIndustrialCards);
-            if (Objects.nonNull(ttpgExploreFrontierCards)) addAll(ttpgExploreFrontierCards);
-            replaceAll(AliasHandler::resolveExploration);
-        }};
+        List<String> exploreCards = new ArrayList<>() {
+            {
+                if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
+                if (Objects.nonNull(ttpgExploreHazardousCards)) addAll(ttpgExploreHazardousCards);
+                if (Objects.nonNull(ttpgExploreIndustrialCards)) addAll(ttpgExploreIndustrialCards);
+                if (Objects.nonNull(ttpgExploreFrontierCards)) addAll(ttpgExploreFrontierCards);
+                replaceAll(AliasHandler::resolveExploration);
+            }
+        };
         Collections.shuffle(exploreCards);
         asyncGame.setExploreDeck(exploreCards);
 
@@ -446,43 +468,53 @@ public class ConvertTTPGtoAsync {
         List<String> ttpgExploreHazardousDiscards = ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
         List<String> ttpgExploreIndustrialDiscards = ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
         List<String> ttpgExploreFrontierDiscards = ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
-        ArrayList<String> exploreDiscards = new ArrayList<>() {{
-            if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
-            if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
-            if (Objects.nonNull(ttpgExploreIndustrialDiscards)) addAll(ttpgExploreIndustrialDiscards);
-            if (Objects.nonNull(ttpgExploreFrontierDiscards)) addAll(ttpgExploreFrontierDiscards);
-            replaceAll(AliasHandler::resolveExploration);
-        }};
+        ArrayList<String> exploreDiscards = new ArrayList<>() {
+            {
+                if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
+                if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
+                if (Objects.nonNull(ttpgExploreIndustrialDiscards)) addAll(ttpgExploreIndustrialDiscards);
+                if (Objects.nonNull(ttpgExploreFrontierDiscards)) addAll(ttpgExploreFrontierDiscards);
+                replaceAll(AliasHandler::resolveExploration);
+            }
+        };
         asyncGame.setExploreDiscard(exploreDiscards);
 
         // RELIC DECK
         List<String> ttpgRelicCards = ttpgMap.getDecks().getCardRelic().getDeck();
-        List<String> relicCards = new ArrayList<>() {{
-            if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
-            replaceAll(AliasHandler::resolveRelic);
-        }};
+        List<String> relicCards = new ArrayList<>() {
+            {
+                if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
+                replaceAll(AliasHandler::resolveRelic);
+            }
+        };
         Collections.shuffle(relicCards);
         asyncGame.setRelics(relicCards);
 
         // STAGE 1 PUBLIC OBJECTIVE DECK
-        List<String> publicCardsStage1 = new ArrayList<>() {{
-            addAll(ttpgMap.getObjectives().getPublicObjectivesII());
-            replaceAll(AliasHandler::resolveObjective);
-        }};
+        List<String> publicCardsStage1 = new ArrayList<>() {
+            {
+                addAll(ttpgMap.getObjectives().getPublicObjectivesII());
+                replaceAll(AliasHandler::resolveObjective);
+            }
+        };
         asyncGame.getPublicObjectives1().removeAll(publicCardsStage1);
 
         // STAGE 2 PUBLIC OBJECTIVE DECK
-        List<String> publicCardsStage2 = new ArrayList<>() {{
-            addAll(ttpgMap.getObjectives().getPublicObjectivesII());
-            replaceAll(AliasHandler::resolveObjective);
-        }};
+        List<String> publicCardsStage2 = new ArrayList<>() {
+            {
+                addAll(ttpgMap.getObjectives().getPublicObjectivesII());
+                replaceAll(AliasHandler::resolveObjective);
+            }
+        };
         asyncGame.getPublicObjectives2().removeAll(publicCardsStage2);
 
         // SECRET OBJECTIVE DECK
-        List<String> secretCards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardObjectiveSecret().getDeck());
-            replaceAll(AliasHandler::resolveObjective);
-        }};
+        List<String> secretCards = new ArrayList<>() {
+            {
+                addAll(ttpgMap.getDecks().getCardObjectiveSecret().getDeck());
+                replaceAll(AliasHandler::resolveObjective);
+            }
+        };
         Collections.shuffle(secretCards);
         asyncGame.setSecretObjectives(secretCards);
 
@@ -518,8 +550,7 @@ public class ConvertTTPGtoAsync {
         }
     }
 
-
-    public static Tile ConvertTTPGHexToAsyncTile (Game asyncGame, String ttpgHex) {
+    public static Tile ConvertTTPGHexToAsyncTile(Game asyncGame, String ttpgHex) {
         // System.out.println(" Examining hex summary:  " + ttpgHex);
 
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
@@ -547,7 +578,6 @@ public class ConvertTTPGtoAsync {
         String ttpgPosition = ttpgXPosition + ttpgYPosition;
 
         String asyncPosition = AliasHandler.resolveTTPGPosition(ttpgPosition);
-
 
         //Handle special cases, tiles to go in TL/TR/BL/BR
         switch (tileID) {
@@ -654,7 +684,7 @@ public class ConvertTTPGtoAsync {
                     regionCount = Integer.valueOf(str);
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
-                    if (!"".equals(colour)){ //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
+                    if (!"".equals(colour)) { //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if ("t".equals(str)) { //CC
                             tile.addCC(Mapper.getCCID(colour));
                         } else if ("o".equals(str)) { //control_token
@@ -663,8 +693,7 @@ public class ConvertTTPGtoAsync {
                             System.out.println("                unit:  " + AliasHandler.resolveTTPGUnit(str));
                             String unit = AliasHandler.resolveTTPGUnit(str);
 
-
-                            String unitID = Mapper.getUnitID(unit, colour);
+                            UnitKey unitID = Mapper.getUnitKey(unit, colour);
                             String unitCount = String.valueOf(regionCount);
 
                             if (regionIsSpace) {
@@ -694,7 +723,7 @@ public class ConvertTTPGtoAsync {
     }
 
     public static String currentDateTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern( "uuuuMMddHHmmss" ));
+        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuuMMddHHmmss"));
     }
 
     public static TTPGMap getTTPGMapFromJsonFile(String filePath) throws Exception {
@@ -715,13 +744,11 @@ public class ConvertTTPGtoAsync {
         return null;
     }
 
-    public static String readFileAsString(String filepath)throws Exception
-    {
+    public static String readFileAsString(String filepath) throws Exception {
         return new String(Files.readAllBytes(Paths.get(filepath)));
     }
 
-    public static String readFileAsString(File file)throws Exception
-    {
+    public static String readFileAsString(File file) throws Exception {
         return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
     }
 
@@ -740,7 +767,7 @@ public class ConvertTTPGtoAsync {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static ObjectMapper getDefaultObjectMapper(){
+    private static ObjectMapper getDefaultObjectMapper() {
 
         ObjectMapper defaultObjectMapper = new ObjectMapper();
         //CONFIGS
