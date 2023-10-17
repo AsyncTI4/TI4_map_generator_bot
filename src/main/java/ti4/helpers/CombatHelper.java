@@ -35,21 +35,29 @@ public class CombatHelper {
         output = new HashMap<>(unitsInCombat.entrySet().stream()
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
-        Set<String> duplicates = new HashSet<>();
-        List<String> dupes = output.keySet().stream()
-            .filter(unit -> !duplicates.add(unit.getAsyncId()))
-            .map(UnitModel::getBaseType)
-            .toList();
-        for (int x = 1; x < dupes.size(); x++) {
-            String dupe = dupes.get(x);
-            for (UnitModel mod : output.keySet()) {
-                if (mod.getBaseType().equalsIgnoreCase(dupe)) {
-                    output.put(mod, 0);
-                    break;
-                }
-            }
+         Set<String> duplicates = new HashSet<>();
+        // List<String> dupes = output.keySet().stream()
+        //     .filter(unit -> !duplicates.add(unit.getAsyncId()))
+        //     .map(UnitModel::getBaseType)
+        //     .collect(Collectors.toList());
+        // List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
+        //     .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
+        //     .collect(Collectors.toList());
 
-        }
+        
+        // // List<String> dupes = output.keySet().stream()
+        // //     .filter(unit -> !duplicates.add(unit.getAsyncId()))
+        // //     .map(UnitModel::getBaseType)
+        // //     .toList();
+        // for (int x = 1; x < dupes.size(); x++) {
+        //     String dupe = dupes.get(x);
+        //     for (UnitModel mod : output.keySet()) {
+        //         if (mod.getBaseType().equalsIgnoreCase(dupe)) {
+        //             output.put(mod, 0);
+        //             break;
+        //         }
+        //     }
+        // }
         return output;
     }
 
@@ -91,7 +99,7 @@ public class CombatHelper {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getIsGroundForce())
+                .filter(entry -> entry.getKey() != null && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
         Set<String> duplicates = new HashSet<>();

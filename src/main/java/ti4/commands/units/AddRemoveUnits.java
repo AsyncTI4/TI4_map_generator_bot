@@ -203,7 +203,17 @@ abstract public class AddRemoveUnits implements Command {
 
         
         if (getActionDescription().toLowerCase().contains("add units")) {
-            ButtonHelper.checkFleetAndCapacity(activeGame.getPlayerFromColorOrFaction(color), activeGame, tile, event);
+            Player player = activeGame.getPlayerFromColorOrFaction(color);
+            if(player == null){
+                return;
+            }
+            ButtonHelper.checkFleetAndCapacity(player, activeGame, tile, event);
+            if (player.getLeaderIDs().contains("naalucommander") && !player.hasLeaderUnlocked("naalucommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "naalu", event);
+            }
+            if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "cabal", event);
+            }
         }
     }
 

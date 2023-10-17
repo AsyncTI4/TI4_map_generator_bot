@@ -2,6 +2,7 @@ package ti4.map;
 
 import java.util.List;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 
@@ -164,8 +165,13 @@ abstract public class UnitHolder {
     @NotNull
     public Integer getUnitCount(UnitType unitType, String color) {
         if (units == null || unitType == null || color == null) return 0;
+        String colorIDofUnit = Mapper.getColorID(color);
+        if(colorIDofUnit == null){
+            colorIDofUnit = color;
+        }
+        final String effinColor = colorIDofUnit;
         Integer value = units.entrySet().stream()
-            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(color))
+            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
         return value == null ? 0 : value;
     }

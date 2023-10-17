@@ -257,7 +257,7 @@ public class MessageListener extends ListenerAdapter {
                                     if(pingNumber > 15){
                                          ping = realIdentity + " Your name is goin be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you dont wanna join em ";
                                     }
-                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*16) && milliSinceLastTurnChange < (60*60*multiplier* activeGame.getAutoPingSpacer()*17) && !activeGame.isFoWMode()){
+                                    if( pingNumber == 17 && !activeGame.isFoWMode()){
                                         ping = realIdentity + " this is your final reminder. Stopping pinging now so we dont come back in 2 months and find 600+ messages";
                                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
                                     }
