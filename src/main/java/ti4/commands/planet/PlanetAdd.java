@@ -97,6 +97,7 @@ public class PlanetAdd extends PlanetAddRemove {
                         int shardID = activeGame.getRevealedPublicObjectives().get("Shard of the Throne");
                         activeGame.unscorePublicObjective(player_.getUserID(), shardID);
                         activeGame.scorePublicObjective(player.getUserID(), shardID);
+                        Helper.checkEndGame(activeGame, player);
                     }
                     String msg = Helper.getPlayerRepresentation(player_, activeGame) + " has a window to play reparations for the taking of the planet " + planet
                         + " (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";

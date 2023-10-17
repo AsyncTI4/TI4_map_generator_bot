@@ -1174,7 +1174,7 @@ public class GenerateMap {
                     }
                 } else {
                     if (remainingReinforcements < 0 && !activeGame.isDiscordantStarsMode() && activeGame.getCCNPlasticLimit()) {
-                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits";
+                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "+Mapper.getUnit(unitID);
                         if (activeGame.isFoWMode()) {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
                         } else {

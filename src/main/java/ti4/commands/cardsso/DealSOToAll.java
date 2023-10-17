@@ -55,7 +55,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Button.success("setOrder" , "Set Speaker Order"));
             buttons2.add(Button.danger("deleteButtons" , "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)+ " if your map is not weird (i.e. all players HS are in the same ring on a non-weird map), you can set speaker order using this button", buttons2);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)+ " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
         }
     }
 }
