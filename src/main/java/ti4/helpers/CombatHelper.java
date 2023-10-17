@@ -36,28 +36,28 @@ public class CombatHelper {
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
          Set<String> duplicates = new HashSet<>();
-        // List<String> dupes = output.keySet().stream()
-        //     .filter(unit -> !duplicates.add(unit.getAsyncId()))
-        //     .map(UnitModel::getBaseType)
-        //     .collect(Collectors.toList());
+        List<String> dupes = output.keySet().stream()
+            .filter(unit -> !duplicates.add(unit.getAsyncId()))
+            .map(UnitModel::getBaseType)
+            .collect(Collectors.toList());
         // List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
         //     .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
         //     .collect(Collectors.toList());
 
         
-        // // List<String> dupes = output.keySet().stream()
-        // //     .filter(unit -> !duplicates.add(unit.getAsyncId()))
-        // //     .map(UnitModel::getBaseType)
-        // //     .toList();
-        // for (int x = 1; x < dupes.size(); x++) {
-        //     String dupe = dupes.get(x);
-        //     for (UnitModel mod : output.keySet()) {
-        //         if (mod.getBaseType().equalsIgnoreCase(dupe)) {
-        //             output.put(mod, 0);
-        //             break;
-        //         }
-        //     }
-        // }
+        // List<String> dupes = output.keySet().stream()
+        //     .filter(unit -> !duplicates.add(unit.getAsyncId()))
+        //     .map(UnitModel::getBaseType)
+        //     .toList();
+        for (int x = 0; x < dupes.size(); x++) {
+            String dupe = dupes.get(x);
+            for (UnitModel mod : output.keySet()) {
+                if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
+                    output.put(mod, 0);
+                    break;
+                }
+            }
+        }
         return output;
     }
 
