@@ -5,28 +5,25 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.EventModel;
 
 public class LookAtBottomEvent extends EventSubcommandData {
     public LookAtBottomEvent() {
-        super(Constants.LOOK_AT_BOTTOM, "Look at bottom Agenda from deck");
-        addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
+        super(Constants.LOOK_AT_BOTTOM, "Look at bottom Event from deck");
+        addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
-        int count = 1;
-        OptionMapping countOption = event.getOption(Constants.COUNT);
-        if (countOption != null) {
-            int providedCount = countOption.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
@@ -34,18 +31,15 @@ public class LookAtBottomEvent extends EventSubcommandData {
         sb.append(event.getUser().getAsMention()).append("\n");
         sb.append("`").append(event.getCommandString()).append("`").append("\n");
         if (count > 1) {
-            sb.append("__**Bottom ").append(count).append(" agendas:**__\n");
+            sb.append("__**Bottom ").append(count).append(" events:**__\n");
         } else {
-            sb.append("__**Bottom agenda:**__\n");
+            sb.append("__**Bottom event:**__\n");
         }
         for (int i = 0; i < count; i++) {
-            String agendaID = activeGame.lookAtBottomAgenda(i);
+            String eventID = activeGame.lookAtBottomEvent(i);
             sb.append(i + 1).append(": ");
-            if (activeGame.getSentAgendas().get(agendaID) != null) {
-                sb.append("This agenda is currently in somebody's hand.");
-            } else {
-                sb.append(Helper.getAgendaRepresentation(agendaID));
-            }
+            EventModel eventModel = Mapper.getEvent(eventID);
+            sb.append(eventModel.getRepresentation());
             sb.append("\n");
         }
         sb.append("-----------\n");
