@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,9 +37,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             && name != null
             && text != null
             && source != null
-            && baseUpgrade != null
-            && faction != null
-            && requirements != null
+            && getBaseUpgrade() != null
+            && getFaction() != null
+            && getRequirements() != null
             && type != null;
     }
 
@@ -64,6 +65,18 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public static int sortFactionTechsLast(TechnologyModel t1, TechnologyModel t2) {
         return sortFactionTechsFirst(t1, t2) * -1;
+    }
+
+    public String getBaseUpgrade() {
+        return Optional.ofNullable(baseUpgrade).orElse("");
+    }
+
+    public String getFaction() {
+        return Optional.ofNullable(faction).orElse("");
+    }
+
+    public String getRequirements() {
+        return Optional.ofNullable(requirements).orElse("");
     }
 
     public MessageEmbed getRepresentationEmbed() {
