@@ -2417,7 +2417,7 @@ public class ButtonHelperFactionSpecific {
         if(p2 != player){
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+ " the TCS tech was exhausted by "+player.getColor()+" to ready your "+agent);
         }
-
+        event.getMessage().delete().queue();
     }
 
     public static void yinAgent(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
