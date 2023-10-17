@@ -27,13 +27,13 @@ public class ListRelics extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         
         if (Mapper.isValidRelic(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
         for (RelicModel model : Mapper.getRelics().values().stream().sorted(Comparator.comparing(RelicModel::getName)).toList()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
