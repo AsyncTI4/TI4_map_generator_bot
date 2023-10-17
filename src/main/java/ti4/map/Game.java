@@ -2001,6 +2001,14 @@ public class Game {
         return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
+    public String lookAtTopEvent(int index) {
+        return events.get(index);
+    }
+
+    public String lookAtBottomEvent(int indexFromEnd) {
+        return events.get(events.size() - 1 - indexFromEnd);
+    }
+
     public String revealEvent(boolean revealFromBottom) {
         int index = revealFromBottom ? events.size() - 1 : 0;
         String id = events.remove(index);
