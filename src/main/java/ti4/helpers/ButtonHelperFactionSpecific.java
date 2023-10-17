@@ -303,7 +303,7 @@ public class ButtonHelperFactionSpecific {
                 Button getTech = Button.success("acquireATech", "Get a tech");
                 List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(getTech);
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName() + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r", buttons2);
             }
         }
@@ -1708,7 +1708,7 @@ public class ButtonHelperFactionSpecific {
             .stream().map(UnitType::getValue).toList();
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         for (UnitModel ownedUnit : player.getUnitModels()) {
-            if (ownedUnit.getCost() < removedUnit.getCost() + 2) {
+            if (ownedUnit.getCost() < removedUnit.getCost() + 3) {
                 if (allowedUnits.contains(ownedUnit.getAsyncId())) {
                     String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getAsyncId() + "_" + tile.getPosition();
                     String buttonText = "Place " + ownedUnit.getName();
