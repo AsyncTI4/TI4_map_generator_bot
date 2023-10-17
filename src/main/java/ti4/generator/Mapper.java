@@ -44,6 +44,7 @@ public class Mapper {
     private static final Map<String, ExploreModel> explore = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
+    private static final HashMap<String, EventModel> events = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
     private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
@@ -78,6 +79,7 @@ public class Mapper {
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
+        importJsonObjectsFromFolder("events", events, EventModel.class, "Could not read events file");
         importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
         importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
         importJsonObjectsFromFolder("relics", relics, RelicModel.class, "Could not read relic file");
@@ -474,6 +476,10 @@ public class Mapper {
         return agendas.get(id);
     }
 
+    public static EventModel getEvent(String id) {
+        return events.get(id);
+    }
+
     public static String getExploreRepresentation(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -741,6 +747,14 @@ public class Mapper {
 
     public static boolean isValidAgenda(String agendaID) {
         return getAgendas().containsKey(agendaID);
+    }
+
+    public static HashMap<String, EventModel> getEvents() {
+        return new HashMap<>(events);
+    }
+
+    public static boolean isValidEvent(String eventID) {
+        return getEvents().containsKey(eventID);
     }
 
     public static HashMap<String, DeckModel> getDecks() {
