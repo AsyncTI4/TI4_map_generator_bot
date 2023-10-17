@@ -1278,13 +1278,24 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Keleres Rider")) {
-                            int cTG = winningR.getTg();
-                            winningR.setTg(cTG + 2);
+                            int currentTG = winningR.getTg();
+                            winningR.setTg(currentTG + 2);
                             activeGame.drawActionCard(winningR.getUserID());
+                            boolean scheming = winningR.hasAbility("scheming");
+                            if (scheming) {
+                                activeGame.drawActionCard(winningR.getUserID());
+                            }
                             ButtonHelper.checkACLimit(activeGame, event, winningR);
                             ACInfo.sendActionCardInfo(activeGame, winningR, event);
-                            String msg = identity + " due to having a winning Keleres Rider, you have been given an AC and 2 tg (" + cTG + "->" + winningR.getTg() + ")";
-                            MessageHelper.sendMessageToChannel(channel, msg);
+                            StringBuilder sb = new StringBuilder(identity);
+                            sb.append("due to having a winning **Keleres Rider**, you have been given");
+                            if (scheming) {
+                                sb.append(" two ").append(Emojis.ActionCard).append(Emojis.ActionCard).append(" Action Cards (Due to your **Scheming** ability)");
+                            } else { 
+                                sb.append(" an ").append(Emojis.ActionCard).append(" Action Card");
+                            }
+                            sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
+                            MessageHelper.sendMessageToChannel(channel, sb.toString());
                             ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
                             ButtonHelperFactionSpecific.resolveArtunoCheck(winningR, activeGame, 2);
                         }
@@ -1300,7 +1311,7 @@ public class AgendaHelper {
                             ButtonHelper.checkACLimit(activeGame, event, winningR);
                             ACInfo.sendActionCardInfo(activeGame, winningR, event);
                             activeGame.setSpeaker(winningR.getUserID());
-                            MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning Politics Rider, you have been given " + amount + " AC and the speaker token");
+                            MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning **Politics Rider**, you have been given " + amount + " AC and the speaker token");
                         }
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity + " You have a diplo rider to resolve. Click the name of the planet who's system you wish to diplo";
