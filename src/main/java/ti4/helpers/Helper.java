@@ -221,7 +221,7 @@ public class Helper {
             player.getActionCards().keySet().contains("sabo3") || player.getActionCards().keySet().contains("sabo4") || (activeGame.getActionCardDeckSize()+activeGame.getDiscardActionCards().size()) > 180){
             return false;
         }
-        if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "mech").size() > 0){
+        if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Mech).size() > 0){
             return false;
         }
         if(ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)){
@@ -894,15 +894,7 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                String colorID = Mapper.getColorID(player.getColor());
-                String sdKey = colorID + "_sd.png";
-                String csdKey = colorID + "_csd.png";
-                if ("cabal".equalsIgnoreCase(player.getFaction())) {
-                    sdKey = csdKey;
-                }
-
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
-
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1 && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
                         continue;
                     }
@@ -2086,20 +2078,7 @@ public class Helper {
     public static boolean mechCheck(String planetName, Game activeGame, Player player) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-
-        String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
-
-        if (unitHolder.getUnits() != null) {
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
-            }
-
-        }
-        return numMechs > 0;
-
+        return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 
     /**
