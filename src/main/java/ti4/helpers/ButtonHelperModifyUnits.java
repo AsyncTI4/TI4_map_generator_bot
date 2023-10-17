@@ -317,7 +317,8 @@ public class ButtonHelperModifyUnits {
                     "Place A CC From Reinforcements In The System.");
                 Button placeConstructionCCInSystem = Button.secondary(
                     finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
-                    "Place A CC From The Construction Holder's Reinforcements In The System.");
+
+                    "Place A CC From The Construction Holder's Reinforcements by using Mahact Agent");
                 Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
                     "Don't Place A CC In The System.");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);

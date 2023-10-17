@@ -95,7 +95,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip() != null && entry.getKey().getIsShip())
+                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip())
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
@@ -378,7 +378,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
             .filter(entry -> entry.getKey() != null
                 && entry.getKey().getSpaceCannonDieCount() > 0
-                && entry.getKey().getDeepSpaceCannon() != null && entry.getKey().getDeepSpaceCannon())
+                && entry.getKey().getDeepSpaceCannon())
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (var entry : adjacentOutput.entrySet()) {
