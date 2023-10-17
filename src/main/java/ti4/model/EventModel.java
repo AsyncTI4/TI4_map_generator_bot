@@ -83,7 +83,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getMapText() {
-        return Optional.ofNullable(mapText).orElse("");
+        return Optional.ofNullable(mapText).orElse(getText1());
     }
 
     public String getSource() {
