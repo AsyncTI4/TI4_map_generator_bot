@@ -7,7 +7,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-import java.util.List;
+import java.util.Map.Entry;
 
 public class ShowDiscardedEvents extends EventSubcommandData {
     public ShowDiscardedEvents() {
@@ -19,12 +19,11 @@ public class ShowDiscardedEvents extends EventSubcommandData {
         Game activeGame = getActiveGame();
         StringBuilder sb = new StringBuilder();
         sb.append("__**Discarded Events:**__\n");
-        List<String> discardEvents = activeGame.getDiscardedEvents();
         int index = 1;
-        for (String eventID : discardEvents) {
-            EventModel eventModel = Mapper.getEvent(eventID);
+        for (Entry<String, Integer> eventEntry : activeGame.getDiscardedEvents().entrySet()) {
+            EventModel eventModel = Mapper.getEvent(eventEntry.getKey());
             if (eventModel == null) continue;
-            sb.append(index).append(". ").append(eventModel.getRepresentation());
+            sb.append(index).append(". ").append(eventModel.getRepresentation(eventEntry.getValue()));
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

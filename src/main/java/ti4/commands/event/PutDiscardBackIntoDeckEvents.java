@@ -10,38 +10,32 @@ import ti4.message.MessageHelper;
 
 public class PutDiscardBackIntoDeckEvents extends EventSubcommandData {
     public PutDiscardBackIntoDeckEvents() {
-        super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SHUFFLE_AGENDAS, "Enter YES to shuffle, otherwise NO to put on top").setRequired(true));
-
+        super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put Event back into deck from discard");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EVENT_ID, "Event ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHUFFLE_EVENTS, "Enter True to shuffle, otherwise False to put on top (Defualt is True)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        OptionMapping option = event.getOption(Constants.AGENDA_ID);
+        OptionMapping option = event.getOption(Constants.EVENT_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No EVENT ID defined");
             return;
         }
-        OptionMapping option2 = event.getOption(Constants.SHUFFLE_AGENDAS);
-        boolean success = false;
-        if (option2 != null) {
-            if("YES".equalsIgnoreCase(option2.getAsString()))
-            {
-                success = activeGame.shuffleAgendaBackIntoDeck(option.getAsInt());
-            }
-            else
-            {
-                success = activeGame.putAgendaBackIntoDeckOnTop(option.getAsInt());
-            }
-        }
 
-        
-        if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda put back into deck");
+        boolean shuffleEvents = event.getOption(Constants.SHUFFLE_EVENTS, true, OptionMapping::getAsBoolean);
+        boolean success = false;
+        if (shuffleEvents) {
+            success = activeGame.shuffleEventBackIntoDeck(option.getAsInt());
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda found");
+            success = activeGame.putEventBackIntoDeckOnTop(option.getAsInt());
+        }
+                
+        if (success) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Event put back into deck");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No Event found");
         }
     }
 }

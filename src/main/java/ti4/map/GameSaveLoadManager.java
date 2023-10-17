@@ -375,8 +375,7 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.EVENTS + " " + String.join(",", activeGame.getEvents()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.DISCARDED_EVENTS + " " + String.join(",", activeGame.getDiscardedEvents()));
-        writer.write(System.lineSeparator());
+        writeCards(activeGame.getDiscardedEvents(), writer, Constants.DISCARDED_EVENTS);
 
         sb = new StringBuilder();
         for (Map.Entry<String, String> entry : activeGame.getLawsInfo().entrySet()) {
@@ -1226,7 +1225,7 @@ public class GameSaveLoadManager {
                 case Constants.LAW -> activeGame.setLaws(getParsedCards(info));
                 case Constants.EVENTS -> activeGame.setEvents(getCardList(info));
                 case Constants.EVENTS_IN_EFFECT -> activeGame.setEventsInEffect(getParsedCards(info));
-                case Constants.DISCARDED_EVENTS -> activeGame.setDiscardedEvents(getCardList(info));
+                case Constants.DISCARDED_EVENTS -> activeGame.setDiscardedEvents(getParsedCards(info));
                 case Constants.EXPLORE -> activeGame.setExploreDeck(getCardList(info));
                 case Constants.RELICS -> activeGame.setRelics(getCardList(info));
                 case Constants.DISCARDED_EXPLORES -> activeGame.setExploreDiscard(getCardList(info));

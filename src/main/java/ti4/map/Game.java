@@ -214,7 +214,7 @@ public class Game {
     @Getter
     private List<String> events = new ArrayList<>();
     @Getter
-    private List<String> discardedEvents = new ArrayList<>();
+    private LinkedHashMap<String, Integer> discardedEvents = new LinkedHashMap<>();
     @Getter @Setter
     private LinkedHashMap<String, Integer> eventsInEffect = new LinkedHashMap<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
@@ -1104,8 +1104,14 @@ public class Game {
         return identifier;
     }
 
-    public void discardEvent(String eventID) {
-        discardedEvents.add(eventID);
+    public int discardEvent(String eventID) {
+        Collection<Integer> values = discardAgendas.values();
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        discardedEvents.put(eventID, identifier);
+        return identifier;
     }
 
     public void addMessageIDForSabo(String messageID) {
@@ -1643,7 +1649,7 @@ public class Game {
         } else {
             events = eventDeckModel.getNewShuffledDeck();
         }
-        discardedEvents = new ArrayList<>();
+        discardedEvents = new LinkedHashMap<>();
     }
 
     public void resetDrawStateAgendas() {
@@ -1655,7 +1661,7 @@ public class Game {
         this.discardAgendas = discardAgendas;
     }
 
-    public void setDiscardedEvents(List<String> discardedEvents) {
+    public void setDiscardedEvents(LinkedHashMap<String, Integer> discardedEvents) {
         this.discardedEvents = discardedEvents;
     }
 
@@ -1779,6 +1785,23 @@ public class Game {
         return false;
     }
 
+    public boolean shuffleEventBackIntoDeck(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardedEvents.remove(id);
+            events.add(id);
+            shuffleEvents();
+            return true;
+        }
+        return false;
+    }
+
     public boolean shuffleAgendaBackIntoDeck(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -1791,6 +1814,22 @@ public class Game {
             discardAgendas.remove(id);
             agendas.add(id);
             shuffleAgendas();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putEventBackIntoDeckOnTop(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardedEvents.remove(id);
+            events.add(0, id);
             return true;
         }
         return false;
@@ -2042,10 +2081,10 @@ public class Game {
                 return player.getActionCards();
             }
         } else {
-            events.addAll(discardedEvents);
+            events.addAll(discardedEvents.keySet());
             discardedEvents.clear();
             Collections.shuffle(events);
-            return drawActionCard(userID);
+            return drawEvent(userID);
         }
         return null;
     }
