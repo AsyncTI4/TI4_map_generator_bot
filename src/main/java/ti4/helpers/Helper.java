@@ -221,7 +221,7 @@ public class Helper {
             || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) {
             return false;
         }
-        if (player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, "mech").size() > 0) {
+        if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Mech).size() > 0){
             return false;
         }
         if (ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)) {
@@ -892,10 +892,8 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                String colorID = Mapper.getColorID(player.getColor());
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
-                    if (unitHolder.getUnitCount(UnitType.Spacedock, colorID) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, colorID) < 1
-                        && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
+                    if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1 && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
                         continue;
                     }
                 }
@@ -2080,12 +2078,7 @@ public class Helper {
     public static boolean mechCheck(String planetName, Game activeGame, Player player) {
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-        String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder.getUnits() != null) {
-            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
-        }
-        return numMechs > 0;
+        return unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0;
     }
 
     /**

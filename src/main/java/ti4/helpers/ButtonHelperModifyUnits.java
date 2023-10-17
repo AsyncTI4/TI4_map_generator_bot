@@ -89,6 +89,52 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    public static void finishLanding(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        if (!event.getMessage().getContentRaw().contains("Moved all units to the space area.")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+        }
+
+        String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if ("space".equalsIgnoreCase(unitHolder.getName())) {
+                continue;
+            }
+            List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
+            if (players.size() > 1 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && !player.getAllianceMembers().contains(players.get(1).getFaction())) {
+                Player player2 = players.get(0);
+                if (player2 == player) {
+                    player2 = players.get(1);
+                }
+                String threadName = ButtonHelper.combatThreadName(activeGame, player, player2, tile);
+                if (!activeGame.isFoWMode()) {
+                    ButtonHelper.makeACombatThread(activeGame, activeGame.getActionsChannel(), player, player2, threadName, tile, event, "ground");
+                } else {
+                    ButtonHelper.makeACombatThread(activeGame, player.getPrivateChannel(), player, player2, threadName, tile, event, "ground");
+                    ButtonHelper.makeACombatThread(activeGame, player2.getPrivateChannel(), player2, player, threadName, tile, event, "ground");
+                    for (Player player3 : activeGame.getRealPlayers()) {
+                        if (player3 == player2 || player3 == player) {
+                            continue;
+                        }
+                        if (!tile.getRepresentationForButtons(activeGame, player3).contains("(")) {
+                            continue;
+                        }
+                        ButtonHelper.makeACombatThread(activeGame, player3.getPrivateChannel(), player3, player3, threadName, tile, event, "ground");
+                    }
+                }
+            }
+            if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 1){
+                List<Button> b2s = new ArrayList<Button>();
+                b2s.add(Button.success("returnFFToSpace_"+tile.getPosition(), "Return Fighters to Space"));
+                b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+ " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.");
+            }
+        }
+        List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        event.getMessage().delete().queue();
+    }
+
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
         String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");
         String pos1 = rest.substring(0, rest.indexOf("_"));
@@ -271,6 +317,7 @@ public class ButtonHelperModifyUnits {
                     "Place A CC From Reinforcements In The System.");
                 Button placeConstructionCCInSystem = Button.secondary(
                     finsFactionCheckerPrefix + "placeHolderOfConInSystem_" + planetName,
+
                     "Place A CC From The Construction Holder's Reinforcements by using Mahact Agent");
                 Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
                     "Don't Place A CC In The System.");

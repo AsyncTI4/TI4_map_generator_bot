@@ -250,7 +250,7 @@ public class Player {
 
     @JsonIgnore
     public boolean hasWarsunTech() {
-        return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws") || "muaat".equalsIgnoreCase(getFaction());
+        return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws") || hasUnit("muaat_warsun") || hasUnit("rohdhna_warsun");
     }
 
     @JsonIgnore

@@ -223,7 +223,15 @@ public class PlayAC extends ACCardsSubcommandData {
                 if (activeGame.isFoWMode()) {
                     channel2 = player.getPrivateChannel();
                 }
+                
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
+                    String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
+                    List<Button> buttons2 = new ArrayList<Button>();
+                    buttons2.add(Button.success("pay1tgforKeleres", "Pay 1tg to unlock Commander"));
+                    buttons2.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
+                }
                 for(Player p2 : activeGame.getRealPlayers()){
                     if(p2 == player){
                         continue;

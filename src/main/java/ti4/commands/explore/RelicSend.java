@@ -93,6 +93,7 @@ public class RelicSend extends GenericRelicAction {
         if (shardCustomPOName != null && shardPublicObjectiveID != null && activeGame.getCustomPublicVP().containsKey(shardCustomPOName) && activeGame.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
             activeGame.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
             activeGame.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+            Helper.checkEndGame(activeGame, player2);
         }
 
         if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {

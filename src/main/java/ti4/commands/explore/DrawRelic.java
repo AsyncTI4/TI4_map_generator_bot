@@ -62,6 +62,7 @@ public class DrawRelic extends GenericRelicAction {
             case "shard" -> {
                 Integer poIndex = activeGame.addCustomPO("Shard of the Throne", 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
+                Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
                        .append(Helper.getPlayerRepresentation(player, activeGame)).append(" scored 'Shard of the Throne'");
             }
@@ -70,6 +71,7 @@ public class DrawRelic extends GenericRelicAction {
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = activeGame.addCustomPO(customPOName, 1);
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
+                Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO '").append(customPOName).append("' has been added.\n")
                     .append(Helper.getPlayerRepresentation(player, activeGame)).append(" scored '").append(customPOName).append("'");
             }
