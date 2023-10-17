@@ -4064,7 +4064,7 @@ public class ButtonHelper {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
         }
 
-        if (!additionalMessage.isEmpty()) {
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeGame) + " " + additionalMessage;
         }
 
@@ -4117,7 +4117,7 @@ public class ButtonHelper {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
         }
 
-        if (!additionalMessage.isEmpty()) {
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
             text += Helper.getGamePing(guild, activeGame) + " " + additionalMessage;
         }
 
