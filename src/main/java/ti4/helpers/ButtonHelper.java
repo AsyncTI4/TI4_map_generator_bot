@@ -1940,8 +1940,10 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = activeGame.getTileByPosition("000");
-        Button rex = Button.success(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(activeGame, player));
-        ringButtons.add(rex);
+        if (centerTile != null) {
+            Button rex = Button.success(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(activeGame, player));
+            ringButtons.add(rex);
+        }
         int rings = activeGame.getRingCount();
         for (int x = 1; x < rings + 1; x++) {
             Button ringX = Button.success(finChecker + "ring_" + x, "Ring #" + x);
