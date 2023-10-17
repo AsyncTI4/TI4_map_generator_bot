@@ -3,6 +3,7 @@ package ti4.helpers;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -26,13 +27,14 @@ public class DiscordantStarsHelper {
                                 }
                             } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                                 planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                            } 
+                            }
                         }
                     }
                 }
             }
         }
     }
+
     public static void checkSigil(Game activeGame) { //Edyn Mech adds Sigil tokens under them
         for (Player player : activeGame.getPlayers().values()) {
             if (player.ownsUnit("edyn_mech")) {
@@ -62,8 +64,9 @@ public class DiscordantStarsHelper {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                     if (unitHolder != null && unitHolder instanceof Planet) {
                         Planet planet = (Planet) unitHolder;
-                        if (planet != null && player.getPlanets().contains(planet.getName())) {                   
-                            if (!oneMechCheck(planet.getName(), activeMap, player) && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
+                        if (planet != null && player.getPlanets().contains(planet.getName())) {
+                            if (!oneMechCheck(planet.getName(), activeMap, player)
+                                && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
                                 planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
                                 planet.removeToken(Constants.OLRADIN_MECH_RES_PNG);
                             } else if (oneMechCheck(planet.getName(), activeMap, player)) {
@@ -83,12 +86,8 @@ public class DiscordantStarsHelper {
         int numMechs = 0;
 
         String colorID = Mapper.getColorID(player.getColor());
-        String mechKey = colorID + "_mf.png";
-
         if (unitHolder.getUnits() != null) {
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
-            }
+            numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
         }
         return numMechs == 1;
     }
@@ -105,7 +104,8 @@ public class DiscordantStarsHelper {
             resolveEconomyEmpowerAbility(player, sb);
             resolvePeopleConnectAbility(player, planetModel, sb);
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-            sb.append("Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
+            sb.append(
+                "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
             return;
         }
 
@@ -127,7 +127,8 @@ public class DiscordantStarsHelper {
                 return;
             }
         }
-        sb.append("Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
+        sb.append(
+            "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
     }
 
@@ -157,7 +158,8 @@ public class DiscordantStarsHelper {
             player.setHasUsedEnvironmentPreserveAbility(true);
             String planetType = planetModel.getPlanetType().toString();
             String fragmentType = Helper.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
-            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the " + Helper.getEmojiFromDiscord(planetType) + planetType + " deck; if it is a " + fragmentType + " relic fragment, gain it, otherwise discard that card.\n");
+            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the " + Helper.getEmojiFromDiscord(planetType) + planetType + " deck; if it is a " + fragmentType
+                + " relic fragment, gain it, otherwise discard that card.\n");
         }
     }
 }
