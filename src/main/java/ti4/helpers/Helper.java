@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.Date;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -685,6 +685,60 @@ public class Helper {
 
 
             default -> Emojis.SemLore;
+        };
+    }
+
+    public static String getColourEmojis(String colour) {
+        return switch (colour) {
+            case "gray" -> "";
+            case "black" -> "";
+            case "blue" -> "";
+            case "green" -> "";
+            case "orange" -> "";
+            case "pink" -> "";
+            case "purple" -> "";
+            case "red" -> "";
+            case "yellow" -> "";
+            case "petrol" -> "";
+            case "brown" -> "";
+            case "tan" -> "";
+            case "forest" -> "";
+            case "chrome" -> "";
+            case "sunset" -> "";
+            case "turquoise" -> "";
+            case "gold" -> "";
+            case "lightgray" -> "";
+            case "teal" -> "";
+            case "bloodred" -> "";
+            case "emerald" -> "";
+            case "navy" -> "";
+            case "rose" -> "";
+            case "lime" -> "";
+            case "lavender" -> "";
+            case "spring" -> "";
+            case "chocolate" -> "";
+            case "rainbow" -> "";
+            case "ethereal" -> "";
+            case "orca" -> "";
+            case "splitred" -> "";
+            case "splitblue" -> "";
+            case "splitgreen" -> "";
+            case "splitpurple" -> "";
+            case "splitorange" -> "";
+            case "splityellow" -> "";
+            case "splitpink" -> "";
+            case "splitgold" -> "";
+            case "splitlime" -> "";
+            case "splittan" -> "";
+            case "splitteal" -> "";
+            case "splitturquoise" -> "";
+            case "splitbloodred" -> "";
+            case "splitchocolate" -> "";
+            case "splitemerald" -> "";
+            case "splitnavy" -> "";
+            case "splitpetrol" -> "";
+            case "splitrainbow" -> "";
+            default -> "";
         };
     }
 
