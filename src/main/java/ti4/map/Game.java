@@ -1704,20 +1704,19 @@ public class Game {
 
     public boolean addEventInEffect(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
-            if (agendas.getValue().equals(idNumber)) {
-                id = agendas.getKey();
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
                 break;
             }
         }
         if (!id.isEmpty()) {
-
             Collection<Integer> values = eventsInEffect.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
                 identifier = ThreadLocalRandom.current().nextInt(1000);
             }
-            discardAgendas.remove(id);
+            discardedEvents.remove(id);
             eventsInEffect.put(id, identifier);
             return true;
         }
