@@ -2,7 +2,6 @@ package ti4.map;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -1822,6 +1821,22 @@ public class Game {
         return false;
     }
 
+    public boolean removeEventInEffect(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : eventsInEffect.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            eventsInEffect.remove(id);
+            discardEvent(id);
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeLaw(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> ac : laws.entrySet()) {
@@ -1845,6 +1860,42 @@ public class Game {
             lawsInfo.remove(id);
             addDiscardAgenda(id);
             return true;
+        }
+        return false;
+    }
+
+    public boolean putEventTop(Integer idNumber, Player player) {
+        if (player.getEvents().containsValue(idNumber)) {
+            String id = "";
+            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+                if (event.getValue().equals(idNumber)) {
+                    id = event.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                events.add(0, id);
+                player.removeEvent(id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean putEventBottom(Integer idNumber, Player player) {
+        if (player.getEvents().containsValue(idNumber)) {
+            String id = "";
+            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+                if (event.getValue().equals(idNumber)) {
+                    id = event.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                events.add(id);
+                player.removeEvent(id);
+                return true;
+            }
         }
         return false;
     }

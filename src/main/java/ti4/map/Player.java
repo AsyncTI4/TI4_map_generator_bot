@@ -660,6 +660,10 @@ public class Player {
         events.put(id, identifier);
     }
 
+    public void removeEvent(String eventID) {
+        events.remove(eventID);
+    }
+
     public void setTrapCard(String id, Integer identifier) {
         trapCards.put(id, identifier);
     }
