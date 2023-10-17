@@ -81,7 +81,8 @@ public class StellarConverter extends SpecialSubcommandData {
             }
         }
         activeGame.removePlanet(unitHolder);
-        tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
+        unitHolder.removeAllTokens();
+        unitHolder.addToken(Constants.WORLD_DESTROYED_PNG);
         if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()){
             TextChannel watchPary= AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).get(0);
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 0, tile.getPosition(), event);
