@@ -1159,8 +1159,11 @@ public class ButtonHelper {
         String msg = ident + " removed CC from " + tileRep;
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
-            msg = getTrueIdentity(player, activeGame) + " " + msg + " using Mahact agent";
+            if(player != null){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+            }
             player = activeGame.getPlayerFromColorOrFaction(faction);
+            msg = getTrueIdentity(player, activeGame) + " " + msg + " using Mahact agent";
         }
 
         if (player == null) return;
@@ -3091,16 +3094,19 @@ public class ButtonHelper {
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game activeGame){
         int num = 0;
         for(Tile tile : activeGame.getTileMap().values()){
-            if(tile.isGravityRift()){
-                num = num+1;
-            }else{
-                for(UnitHolder unitHolder : tile.getUnitHolders().values()){
-                    if(unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0){
-                        num = num+1;
-                        break;
+            if(FoWHelper.playerHasUnitsInSystem(player, tile) ){
+                if(tile.isGravityRift()){
+                    num = num+1;
+                }else{
+                    for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                        if(unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0){
+                            num = num+1;
+                            break;
+                        }
                     }
                 }
             }
+            
         }
         return num;
     }
@@ -4055,7 +4061,7 @@ public class ButtonHelper {
         }
         //PNs
         for (String pn : p1.getPromissoryNotes().keySet()) {
-            if (Mapper.getPromissoryNoteOwner(pn) != null && !Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn)) {
+            if (pn != null && Mapper.getPromissoryNoteOwner(pn) != null && !Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn) && Mapper.getPromissoryNote(pn, true) != null) {
                 String pnText = Mapper.getPromissoryNote(pn, true);
                 if (pnText.contains("Action:") && !"bmf".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
@@ -4063,6 +4069,10 @@ public class ButtonHelper {
                     Button pnButton = Button.danger(finChecker + prefix + "pn_" + pn, "Use " + pnName);
                     compButtons.add(pnButton);
                 }
+            }
+            if(Mapper.getPromissoryNote(pn, true) == null){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), ButtonHelper.getTrueIdentity(p1, activeGame) + " you have a null PN. Please use /pn purge after reporting it "+pn);
+                PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
             }
         }
         //Abilities
