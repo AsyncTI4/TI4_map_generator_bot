@@ -466,7 +466,7 @@ public class ButtonHelperFactionSpecific {
                         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg2, buttons2);
         } {     
 
-        if (Helper.getPlayerFromColorOrFaction(activeGame, Mapper.getPromissoryNoteOwner("dspnkoll")) == player) {
+        if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("dspnkoll")) == player) {
             for (Player p2 : activeGame.getRealPlayers()) {
                 if (p2 == player) {                    
                     continue;                    
@@ -477,7 +477,7 @@ public class ButtonHelperFactionSpecific {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), msg, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                     }
                 }
             }
