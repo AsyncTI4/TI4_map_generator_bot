@@ -1,12 +1,12 @@
 package ti4.commands.uncategorized;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import java.util.HashMap;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
@@ -23,10 +23,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class ShowDistances implements Command {
 
     @Override
@@ -39,9 +35,9 @@ public class ShowDistances implements Command {
         if (!event.getName().equals(getActionID())) {
             return false;
         }
-        
+
         Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-        if (userActiveGame == null){
+        if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
         }
@@ -71,7 +67,7 @@ public class ShowDistances implements Command {
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
+        if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
@@ -96,8 +92,8 @@ public class ShowDistances implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Shows map with distances to each tile from specified tile")
-                    .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                    .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
+            Commands.slash(getActionID(), "Shows map with distances to each tile from specified tile")
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
     }
 }

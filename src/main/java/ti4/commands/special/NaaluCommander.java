@@ -1,7 +1,5 @@
 package ti4.commands.special;
 
-import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardspn.PNInfo;
@@ -30,7 +28,8 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
         secondHalfOfNaaluCommander(event, activeGame, player);
     }
-    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player){
+
+    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player) {
 
         if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) { //TODO: switch logic from isNaalu to hasNaaluCommander
             sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
@@ -44,8 +43,10 @@ public class NaaluCommander extends SpecialSubcommandData {
         sb.append("1: ");
         if (activeGame.getSentAgendas().get(agendaID) != null) {
             sb.append("This agenda is currently in somebody's hand.");
-        } else {
+        } else if (agendaID != null) {
             sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
         }
         sb.append("\n\n");
         sb.append("__**Bottom Agenda:**__\n");
@@ -53,8 +54,10 @@ public class NaaluCommander extends SpecialSubcommandData {
         sb.append("1: ");
         if (activeGame.getSentAgendas().get(agendaID) != null) {
             sb.append("This agenda is currently in somebody's hand.");
-        } else {
+        } else if (agendaID != null) {
             sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
         }
         sb.append("\n\n");
 
@@ -66,7 +69,8 @@ public class NaaluCommander extends SpecialSubcommandData {
             sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false));
         }
 
-        if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getPlayerRepresentation(player, activeGame) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+            Helper.getPlayerRepresentation(player, activeGame) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
     }
 }

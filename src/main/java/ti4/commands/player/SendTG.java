@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -53,11 +52,11 @@ public class SendTG extends PlayerSubcommandData {
 
 		String p1 = Helper.getPlayerRepresentation(player, activeGame);
 		String p2 = Helper.getPlayerRepresentation(player_, activeGame);
-		if(player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")){
+		if (player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")) {
 			ButtonHelper.commanderUnlockCheck(player_, activeGame, "hacan", event);
 		}
 		String tgString = sendTG + " " + Emojis.tg + " trade goods";
-		String message =  p1 + " sent " + tgString + " to " + p2;
+		String message = p1 + " sent " + tgString + " to " + p2;
 		sendMessage(message);
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
@@ -73,6 +72,6 @@ public class SendTG extends PlayerSubcommandData {
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, tgString, null);
 		}
-		
+
 	}
 }

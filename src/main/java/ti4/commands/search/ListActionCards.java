@@ -1,7 +1,6 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;

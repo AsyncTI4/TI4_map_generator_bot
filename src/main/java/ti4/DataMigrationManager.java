@@ -9,15 +9,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -28,8 +27,8 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 
 public class DataMigrationManager {
 
@@ -522,7 +521,6 @@ public class DataMigrationManager {
                 game.setExploreDiscard(new ArrayList<>(replacementDiscard));
                 mapNeededMigrating = true;
             }
-            boolean x = false;
         }
         return mapNeededMigrating;
     }

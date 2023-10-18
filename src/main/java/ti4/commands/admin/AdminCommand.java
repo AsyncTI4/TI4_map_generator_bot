@@ -1,6 +1,11 @@
 package ti4.commands.admin;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -10,17 +15,10 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
-import ti4.commands.developer.RunManualDataMigration;
-import ti4.commands.developer.SetGlobalSetting;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class AdminCommand implements Command {
 
@@ -59,7 +57,7 @@ public class AdminCommand implements Command {
             activeGame = "Active map: " + userActiveGame.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -85,7 +83,6 @@ public class AdminCommand implements Command {
         }
     }
 
-
     protected String getActionDescription() {
         return "Admin";
     }
@@ -107,7 +104,7 @@ public class AdminCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

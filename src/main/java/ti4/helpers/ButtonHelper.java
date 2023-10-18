@@ -3213,7 +3213,7 @@ public class ButtonHelper {
             if (activeGame.isFoWMode()) {
                 FoWHelper.pingAllPlayersWithFullStats(activeGame, event, nextPlayer, "started turn");
             }
-            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);                 
+            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(nextPlayer, activeGame);
 
             activeGame.setCurrentPhase("action");

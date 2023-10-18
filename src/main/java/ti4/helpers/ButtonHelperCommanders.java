@@ -1,25 +1,19 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
-import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
@@ -29,11 +23,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperCommanders {
-
 
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         int cTG = player.getTg();
@@ -72,6 +63,7 @@ public class ButtonHelperCommanders {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
     }
+
     public static void resolveGhostCommanderPlacement(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
@@ -172,13 +164,14 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
-    public static void pay1tgToUnlockKeleres(Player player, Game activeGame, ButtonInteractionEvent event){
+    public static void pay1tgToUnlockKeleres(Player player, Game activeGame, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
-        if(player.getTg() > 0){
-            player.setTg(oldTg-1);
+        if (player.getTg() > 0) {
+            player.setTg(oldTg - 1);
         }
         ButtonHelper.commanderUnlockCheck(player, activeGame, "keleres", event);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to unlock commander "+ "(" + oldTg + "->" + player.getTg() + ")");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            ButtonHelper.getIdentOrColor(player, activeGame) + " paid 1tg to unlock commander " + "(" + oldTg + "->" + player.getTg() + ")");
         event.getMessage().delete().queue();
     }
 

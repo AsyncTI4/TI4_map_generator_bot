@@ -1,6 +1,5 @@
 package ti4.commands.game;
 
-import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +29,8 @@ import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
     public GameEnd() {
-            super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
-            addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
+        super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -56,7 +55,7 @@ public class GameEnd extends GameSubcommandData {
         secondHalfOfGameEnd(event, activeGame);
     }
 
-    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame){
+    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame) {
         String gameName = activeGame.getName();
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
@@ -89,7 +88,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         activeGame.setAutoPing(false);
         activeGame.setAutoPingSpacer(0);
-        
+
         //SEND THE MAP IMAGE
         FileUpload fileUpload = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
         MessageHelper.replyToMessage(event, fileUpload);
@@ -110,8 +109,8 @@ public class GameEnd extends GameSubcommandData {
         String bothelperMention = Helper.getRoleMentionByName(AsyncTI4DiscordBot.guildPrimary, "bothelper");
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-        
-        if(!activeGame.isFoWMode()) {
+
+        if (!activeGame.isFoWMode()) {
             //INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                 m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
@@ -134,10 +133,12 @@ public class GameEnd extends GameSubcommandData {
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (inLimboCategory != null) {
             if (inLimboCategory.getChannels().size() > 38) {
-                MessageHelper.sendMessageToChannel(bothelperLoungeChannel, inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " is almost full. " + bothelperMention + " - please make room soon!");
+                MessageHelper.sendMessageToChannel(bothelperLoungeChannel,
+                    inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " is almost full. " + bothelperMention + " - please make room soon!");
             }
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
             } else {
                 String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
                 if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
@@ -173,7 +174,7 @@ public class GameEnd extends GameSubcommandData {
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_,
-                "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
+                    "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
             }
         }
     }
@@ -189,7 +190,7 @@ public class GameEnd extends GameSubcommandData {
         int index = 1;
         for (Player player : players.values()) {
             if (player.getFaction() == null || player.isDummy()) continue;
-            
+
             int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
