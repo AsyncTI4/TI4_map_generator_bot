@@ -166,12 +166,12 @@ abstract public class UnitHolder {
     public Integer getUnitCount(UnitType unitType, String color) {
         if (units == null || unitType == null || color == null) return 0;
         String colorIDofUnit = Mapper.getColorID(color);
-        if(colorIDofUnit == null){
+        if (colorIDofUnit == null) {
             colorIDofUnit = color;
         }
         final String effinColor = colorIDofUnit;
         Integer value = units.entrySet().stream()
-            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(effinColor))
+            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
         return value == null ? 0 : value;
     }
@@ -189,7 +189,7 @@ abstract public class UnitHolder {
     public Integer getUnitDamageCount(UnitType unitType, String color) {
         if (unitsDamage == null) return 0;
         Integer value = unitsDamage.entrySet().stream()
-            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(color))
+            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(color))
             .findFirst().map(Entry::getValue).orElse(0);
         return value == null ? 0 : value;
     }

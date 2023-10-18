@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -144,7 +145,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if(currentStrat+ currentTact > 2){
 				if(currentStrat > 2){
 					for(int x = 0; x < 3; x++){
-						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
 					}
 					player.setStrategicCC(currentStrat-3);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 3 strat cc ("+currentStrat+"->"+player.getStrategicCC()+")");
@@ -152,7 +153,7 @@ public class ScorePublic extends StatusSubcommandData {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 3 - currentStrat;
 					for(int x = 0; x < currentStrat; x++){
-						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact-subtract);
@@ -168,7 +169,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if(currentStrat+ currentTact > 5){
 				if(currentStrat > 5){
 					for(int x = 0; x < 6; x++){
-						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
 					}
 					player.setStrategicCC(currentStrat-6);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 6 strat cc ("+currentStrat+"->"+player.getStrategicCC()+")");
@@ -176,7 +177,7 @@ public class ScorePublic extends StatusSubcommandData {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 6 - currentStrat;
 					for(int x = 0; x < currentStrat; x++){
-						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeGame, event);
+						ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
 					}
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact-subtract);

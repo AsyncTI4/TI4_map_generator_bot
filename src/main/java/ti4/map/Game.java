@@ -2,7 +2,6 @@ package ti4.map;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -213,9 +212,11 @@ public class Game {
     private boolean hasHackElectionBeenPlayed;
     private List<String> agendas;
     @Getter
-    private List<String> events;
+    private List<String> events = new ArrayList<>();
     @Getter
-    private List<String> discardedEvents = new ArrayList<>();
+    private LinkedHashMap<String, Integer> discardedEvents = new LinkedHashMap<>();
+    @Getter @Setter
+    private LinkedHashMap<String, Integer> eventsInEffect = new LinkedHashMap<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
@@ -1103,8 +1104,14 @@ public class Game {
         return identifier;
     }
 
-    public void discardEvent(String eventID) {
-        discardedEvents.add(eventID);
+    public int discardEvent(String eventID) {
+        Collection<Integer> values = discardAgendas.values();
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        discardedEvents.put(eventID, identifier);
+        return identifier;
     }
 
     public void addMessageIDForSabo(String messageID) {
@@ -1642,7 +1649,7 @@ public class Game {
         } else {
             events = eventDeckModel.getNewShuffledDeck();
         }
-        discardedEvents = new ArrayList<>();
+        discardedEvents = new LinkedHashMap<>();
     }
 
     public void resetDrawStateAgendas() {
@@ -1654,7 +1661,7 @@ public class Game {
         this.discardAgendas = discardAgendas;
     }
 
-    public void setDiscardedEvents(List<String> discardedEvents) {
+    public void setDiscardedEvents(LinkedHashMap<String, Integer> discardedEvents) {
         this.discardedEvents = discardedEvents;
     }
 
@@ -1695,6 +1702,27 @@ public class Game {
         return discardAgendas;
     }
 
+    public boolean addEventInEffect(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            Collection<Integer> values = eventsInEffect.values();
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = ThreadLocalRandom.current().nextInt(1000);
+            }
+            discardedEvents.remove(id);
+            eventsInEffect.put(id, identifier);
+            return true;
+        }
+        return false;
+    }
+    
     public boolean addLaw(Integer idNumber, String optionalText) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -1756,6 +1784,23 @@ public class Game {
         return false;
     }
 
+    public boolean shuffleEventBackIntoDeck(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardedEvents.remove(id);
+            events.add(id);
+            shuffleEvents();
+            return true;
+        }
+        return false;
+    }
+
     public boolean shuffleAgendaBackIntoDeck(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -1768,6 +1813,22 @@ public class Game {
             discardAgendas.remove(id);
             agendas.add(id);
             shuffleAgendas();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putEventBackIntoDeckOnTop(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardedEvents.remove(id);
+            events.add(0, id);
             return true;
         }
         return false;
@@ -1798,6 +1859,22 @@ public class Game {
         return false;
     }
 
+    public boolean removeEventInEffect(Integer idNumber) {
+        String id = "";
+        for (Map.Entry<String, Integer> event : eventsInEffect.entrySet()) {
+            if (event.getValue().equals(idNumber)) {
+                id = event.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            eventsInEffect.remove(id);
+            discardEvent(id);
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeLaw(Integer idNumber) {
         String id = "";
         for (Map.Entry<String, Integer> ac : laws.entrySet()) {
@@ -1821,6 +1898,42 @@ public class Game {
             lawsInfo.remove(id);
             addDiscardAgenda(id);
             return true;
+        }
+        return false;
+    }
+
+    public boolean putEventTop(Integer idNumber, Player player) {
+        if (player.getEvents().containsValue(idNumber)) {
+            String id = "";
+            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+                if (event.getValue().equals(idNumber)) {
+                    id = event.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                events.add(0, id);
+                player.removeEvent(id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean putEventBottom(Integer idNumber, Player player) {
+        if (player.getEvents().containsValue(idNumber)) {
+            String id = "";
+            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+                if (event.getValue().equals(idNumber)) {
+                    id = event.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                events.add(id);
+                player.removeEvent(id);
+                return true;
+            }
         }
         return false;
     }
@@ -1888,6 +2001,29 @@ public class Game {
         return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
+    public String lookAtTopEvent(int index) {
+        return events.get(index);
+    }
+
+    public String lookAtBottomEvent(int indexFromEnd) {
+        return events.get(events.size() - 1 - indexFromEnd);
+    }
+
+    public String revealEvent(boolean revealFromBottom) {
+        int index = revealFromBottom ? events.size() - 1 : 0;
+        String id = events.remove(index);
+        discardEvent(id);
+        return id;
+    }
+
+    public boolean revealEvent(String eventID, boolean force) {
+        if (events.remove(eventID) || force) {
+            discardEvent(eventID);
+            return true;
+        }
+        return false;
+    }
+
     public String revealAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? agendas.size() - 1 : 0;
         String id = agendas.remove(index);
@@ -1937,6 +2073,25 @@ public class Game {
             discardActionCards.clear();
             Collections.shuffle(actionCards);
             return drawActionCard(userID);
+        }
+        return null;
+    }
+
+    @Nullable
+    public LinkedHashMap<String, Integer> drawEvent(String userID) {
+        if (!events.isEmpty()) {
+            String id = events.get(0);
+            Player player = getPlayer(userID);
+            if (player != null) {
+                events.remove(id);
+                player.setEvent(id);
+                return player.getActionCards();
+            }
+        } else {
+            events.addAll(discardedEvents.keySet());
+            discardedEvents.clear();
+            Collections.shuffle(events);
+            return drawEvent(userID);
         }
         return null;
     }
