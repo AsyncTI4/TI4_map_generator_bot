@@ -836,8 +836,7 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
-                        drawPAImage(x + deltaX, y, pnFactionIcon);
+                        graphics.drawImage(getPlayerFactionIconImageScaled(promissoryNoteOwner, 42, 42), x + deltaX - 1, y + 108, null);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
