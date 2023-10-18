@@ -362,7 +362,7 @@ public class FoWHelper {
 			}
 
 			// explore that tile now!
-			int direcetionFrom = naturalMapOnly ? -1 : (i + 3) % 6;
+			int direcetionFrom = naturalMapOnly ? -2 : (i + 3) % 6;
 			Set<String> newTiles = traverseAdjacencies(activeGame, naturalMapOnly, position_, direcetionFrom, exploredSet, position + sourceDirection);
 			tiles.addAll(newTiles);
 		}
