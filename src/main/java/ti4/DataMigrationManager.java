@@ -61,6 +61,7 @@ public class DataMigrationManager {
             runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
             runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
             runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
+            runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -76,6 +77,21 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Add faction techs to games that were created before faction techs added
+    public static Boolean migrateInitializeFactionTechs_181023(Game game) {
+        boolean mapNeededMigrating = false;
+        for (Player player : game.getRealPlayers()) {
+            if (player.getFactionTechs().isEmpty()) {
+                if (player.getFactionSetupInfo() == null) continue;
+                mapNeededMigrating = true;
+                for (String techID : player.getFactionSetupInfo().getFactionTech()) {
+                    player.addFactionTech(techID);
+                }
+            }
+        }
         return mapNeededMigrating;
     }
 
