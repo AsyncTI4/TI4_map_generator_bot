@@ -22,7 +22,6 @@ public class GameCreate extends GameSubcommandData {
     public GameCreate() {
         super(Constants.CREATE_GAME, "Create a new game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
-
     }
 
     @Override
