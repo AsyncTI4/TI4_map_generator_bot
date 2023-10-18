@@ -958,4 +958,7 @@ public class Constants {
     public static final String CHECK_DISTANCE = "check_distance";
     public static final String MAX_DISTANCE = "max_distance";
     public static final String SHOW_DISTANCES = "show_distances";
+    public static final String FACTION_TECH = "faction_tech";
+    public static final String FACTION_TECH_ADD = "faction_tech_add";
+    public static final String FACTION_TECH_REMOVE = "faction_tech_remove";
 }

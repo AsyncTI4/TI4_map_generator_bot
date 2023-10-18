@@ -141,6 +141,13 @@ public class Setup extends PlayerSubcommandData {
             player.addTech(tech);
         }
 
+        for (String tech : setupInfo.getFactionTech()) {
+            if (tech.trim().isEmpty()) {
+                continue;
+            }
+            player.addFactionTech(tech);
+        }
+
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
         if (setSpeaker) {

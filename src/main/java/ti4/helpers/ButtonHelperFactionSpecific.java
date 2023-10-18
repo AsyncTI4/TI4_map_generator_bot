@@ -414,7 +414,7 @@ public class ButtonHelperFactionSpecific {
                     }
                     if (p2.getPromissoryNotes().containsKey("ra") && !p2.getTechs().contains(tech)) {
                         String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " the RA owner has researched the tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech))
-                            + "Use the below button if you want to play RA to get it.";
+                            + "\nUse the below button if you want to play RA to get it.";
                         Button transact = Button.success("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech), "Acquire " + tech);
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(transact);
