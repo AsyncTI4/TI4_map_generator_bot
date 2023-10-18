@@ -105,7 +105,10 @@ public class PlayPN extends PNCardsSubcommandData {
         if ("terraform".equalsIgnoreCase(pnID)) {
             sb.append("`/add_token token:titanspn`\n");
         }
-
+        
+        if ("dspnkoll".equalsIgnoreCase(pnID)) {
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(player, activeGame, event);
+        }
         //Fog of war ping
 		if (activeGame.isFoWMode()) {
             // Add extra message for visibility
