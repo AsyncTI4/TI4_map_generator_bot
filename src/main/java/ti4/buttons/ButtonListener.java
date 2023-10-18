@@ -95,6 +95,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.model.RelicModel;
 
 public class ButtonListener extends ListenerAdapter {
     public static final HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
@@ -648,6 +649,89 @@ public class ButtonListener extends ListenerAdapter {
             String[] info = bID.split("_");
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false, activeGame, 1, false);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("resolveExp_Look_")) {
+            String bID = buttonID.replace("resolveExp_Look_", "");
+            String trait = bID;
+            ArrayList<String> deck = activeGame.getExploreDeck(trait);
+            ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
+            ButtonHelper.addReaction(event, true, false, "Looked at top of the " + trait + " deck.", "");
+            event.getMessage().delete().queue();
+            String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+            String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            if (deck.isEmpty() && discardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+    
+            StringBuilder sb = new StringBuilder();
+            sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String topCard = deck.get(0);
+            sb.append(new ExpPlanet().displayExplore(topCard));
+    
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+                    + " Cards info thread.");            
+        } else if (buttonID.startsWith("relic_look_top")) {
+            List<String> relicDeck = activeGame.getAllRelics();
+            if (relicDeck.isEmpty()) {
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "Relic deck is empty");
+                return;
+            }
+            String relicID = relicDeck.get(0);
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            String rsb = "**Relic - Look at Top**\n" + Helper.getPlayerRepresentation(player, activeGame) + "\n" + relicModel.getSimpleRepresentation();
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, rsb);
+            ButtonHelper.addReaction(event, true, false, "Looked at top of the Relic deck.", "");
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("explore_look_All")) {
+            ArrayList<String> cdeck = activeGame.getExploreDeck("cultural");
+            ArrayList<String> hdeck = activeGame.getExploreDeck("hazardous");
+            ArrayList<String> ideck = activeGame.getExploreDeck("industrial");
+            ArrayList<String> cdiscardPile = activeGame.getExploreDiscard("cultural");
+            ArrayList<String> hdiscardPile = activeGame.getExploreDiscard("hazardous");
+            ArrayList<String> idiscardPile = activeGame.getExploreDiscard("industrial");
+            String trait = "cultural";
+            String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+            String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            if (cdeck.isEmpty() && cdiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+
+            StringBuilder csb = new StringBuilder();
+            csb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String ctopCard = cdeck.get(0);
+            csb.append(new ExpPlanet().displayExplore(ctopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, csb.toString());
+            trait = "hazardous";
+            traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            if (hdeck.isEmpty() && hdiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+
+            StringBuilder hsb = new StringBuilder();
+            hsb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String htopCard = hdeck.get(0);
+            hsb.append(new ExpPlanet().displayExplore(htopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, hsb.toString());
+            trait = "industrial";
+            traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            if (ideck.isEmpty() && idiscardPile.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            }
+
+            StringBuilder isb = new StringBuilder();
+            isb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            String itopCard = ideck.get(0);
+            isb.append(new ExpPlanet().displayExplore(itopCard));
+
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, isb.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"top of Hazardous, Cultural and Industrial explore decks has been set to " + playerFactionNameWithEmoji
+                    + " Cards info thread.");     
+            ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.", "");
+            event.getMessage().delete().queue();    
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
