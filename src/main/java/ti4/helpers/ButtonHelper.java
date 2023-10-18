@@ -2030,8 +2030,10 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = activeGame.getTileByPosition("000");
-        Button rex = Button.success(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(activeGame, player));
-        ringButtons.add(rex);
+        if (centerTile != null) {
+            Button rex = Button.success(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(activeGame, player));
+            ringButtons.add(rex);
+        }
         int rings = activeGame.getRingCount();
         for (int x = 1; x < rings + 1; x++) {
             Button ringX = Button.success(finChecker + "ring_" + x, "Ring #" + x);
@@ -4194,14 +4196,16 @@ public class ButtonHelper {
             }
         }
 
-        String text = Helper.getPlayerRepresentation(player, activeGame) + " " + message;
+        String text = Helper.getPlayerRepresentation(player, activeGame);
+        if ("Not Following".equalsIgnoreCase(message)) text = player.getRepresentationShort();
+        text = text + " " + message;
         if (activeGame.isFoWMode() && sendPublic) {
             text = message;
         } else if (activeGame.isFoWMode() && !sendPublic) {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
         }
 
-        if (!additionalMessage.isEmpty()) {
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeGame) + " " + additionalMessage;
         }
 
@@ -4254,7 +4258,7 @@ public class ButtonHelper {
             text = "(You) " + emojiToUse.getFormatted() + " " + message;
         }
 
-        if (!additionalMessage.isEmpty()) {
+        if (additionalMessage != null && !additionalMessage.isEmpty()) {
             text += Helper.getGamePing(guild, activeGame) + " " + additionalMessage;
         }
 

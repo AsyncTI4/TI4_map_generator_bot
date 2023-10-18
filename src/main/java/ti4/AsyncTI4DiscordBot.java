@@ -35,6 +35,7 @@ import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.developer.DeveloperCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
+import ti4.commands.event.EventCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
 import ti4.commands.franken.FrankenCommand;
@@ -204,6 +205,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
+        commandManager.addCommand(new EventCommand());
 
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());

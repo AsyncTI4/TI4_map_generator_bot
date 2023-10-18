@@ -71,6 +71,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
@@ -496,6 +497,7 @@ public class GenerateMap {
         userVPs = new HashMap<>();
         y = objectives(activeGame, y + 180, graphics, userVPs, false);
         y = laws(activeGame, y);
+        y = events(activeGame, y);
         tempY = scoreTrack(activeGame, tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(activeGame);
@@ -2484,8 +2486,72 @@ public class GenerateMap {
         return secondColumn ? y + 115 : y + 3;
     }
 
+    private int events(Game activeGame, int y) {
+        int x = 5;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(3));
+
+        LinkedHashMap<String, Integer> events = activeGame.getEventsInEffect();
+        boolean secondColumn = false;
+        for (Map.Entry<String, Integer> event : events.entrySet()) {
+            String eventID = event.getKey();
+            String eventNumberID = "(" + event.getValue() + ") ";
+
+            graphics.setFont(Storage.getFont35());
+            graphics.setColor(Color.BLUE);
+            graphics.drawRect(x, y, 1178, 110);
+
+            EventModel eventModel = Mapper.getEvent(eventID);
+
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(eventModel.getName(), x + 95, y + 30);
+            graphics.setFont(Storage.getFont26());
+
+            String eventText = eventModel.getMapText();
+            eventText = eventNumberID + eventText;
+            int width = g2.getFontMetrics().stringWidth(eventText);
+
+            int index = 0;
+            int textLength = eventText.length();
+            while (width > 1076) {
+                index++;
+                String substringText = eventText.substring(0, textLength - index);
+                width = g2.getFontMetrics().stringWidth(substringText);
+            }
+            if (index > 0) {
+                graphics.drawString(eventText.substring(0, textLength - index), x + 95, y + 70);
+                graphics.drawString(eventText.substring(textLength - index), x + 95, y + 96);
+            } else {
+                graphics.drawString(eventText, x + 95, y + 70);
+            }
+            try {
+                paintEventIcon(y, x);
+            } catch (Exception e) {
+                BotLogger.log("Could not paint event icon", e);
+            }
+
+            if (!secondColumn) {
+                secondColumn = true;
+                x += 1178 + 8;
+            } else {
+                secondColumn = false;
+                y += 112;
+                x = 5;
+            }
+        }
+        return secondColumn ? y + 115 : y + 3;
+    }
+
     private void paintAgendaIcon(int y, int x) {
         String factionFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+        if (factionFile != null) {
+            BufferedImage bufferedImage = ImageHelper.read(factionFile);
+            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
+        }
+    }
+
+    private void paintEventIcon(int y, int x) {
+        String factionFile = ResourceHelper.getInstance().getFactionFile("event.png");
         if (factionFile != null) {
             BufferedImage bufferedImage = ImageHelper.read(factionFile);
             graphics.drawImage(bufferedImage, x + 2, y + 2, null);
