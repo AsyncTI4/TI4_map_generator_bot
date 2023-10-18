@@ -80,6 +80,7 @@ public class Player {
     private Set<Integer> followedSCs = new HashSet<>();
 
     private final LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> events = new LinkedHashMap<>();
     private final LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
     private final LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
     private final LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
@@ -443,6 +444,10 @@ public class Player {
         return actionCards;
     }
 
+    public LinkedHashMap<String, Integer> getEvents() {
+        return events;
+    }
+
     public LinkedHashMap<String, Integer> getTrapCards() {
         return trapCards;
     }
@@ -594,6 +599,15 @@ public class Player {
         actionCards.put(id, identifier);
     }
 
+    public void setEvent(String id) {
+        Collection<Integer> values = events.values();
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        events.put(id, identifier);
+    }
+
     public void setTrapCard(String id) {
         Collection<Integer> values = trapCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -641,6 +655,14 @@ public class Player {
 
     public void setActionCard(String id, Integer identifier) {
         actionCards.put(id, identifier);
+    }
+
+    public void setEvent(String id, Integer identifier) {
+        events.put(id, identifier);
+    }
+
+    public void removeEvent(String eventID) {
+        events.remove(eventID);
     }
 
     public void setTrapCard(String id, Integer identifier) {

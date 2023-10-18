@@ -944,4 +944,15 @@ public class Constants {
     public static final String FRANKEN_MODE = "franken_mode";
     public static final String SHOW_UNIT_TAGS = "show_unit_tags";
     public static final String UNIT_SOURCE = "unit_source";
+    public static final String EVENT = "event";
+    public static final String ADD_EVENT = "add_event";
+    public static final String EVENT_ID = "event_id";
+    public static final String SHUFFLE_EVENTS = "shuffle_events";
+    public static final String EVENT_DECK = "event_deck";
+    public static final String EVENTS = "events";
+    public static final String DISCARDED_EVENTS = "discarded_events";
+    public static final String EVENT_DECK_ID = "event_deck_id";
+    public static final String RESET_EVENTS = "reset_events";
+    public static final String REMOVE_EVENT = "remove_event";
+    public static final String EVENTS_IN_EFFECT = "events_in_effect";
 }
