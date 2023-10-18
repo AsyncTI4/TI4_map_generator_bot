@@ -416,6 +416,7 @@ public class Tile {
             .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
             .map(Map.Entry::getKey)
             .map(key -> p.getUnitFromUnitKey(key))
+            .filter(unit -> unit != null)
             .anyMatch(condition);
     }
 
