@@ -42,13 +42,8 @@ public class ButtonHelperHeroes {
         List<Tile> tiles = new ArrayList<>();
         activeGame.getRealPlayers().stream()
             .filter(p -> p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2"))
-            .map(null);
-        for (Player p : activeGame.getRealPlayers()) {
-            if (p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2")) {
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock));
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.Spacedock));
-            }
-        }
+            .forEach(p -> tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock, UnitType.Spacedock)));
+
         List<Tile> adjTiles = new ArrayList<>();
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
