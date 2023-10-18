@@ -1993,20 +1993,12 @@ public class Helper {
 
     public static List<TechnologyModel> getAllTechOfAType(Game activeGame, String techType, String playerfaction, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyModel tech : Mapper.getTechs().values().stream().filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias())).toList()) {
-            String faction = tech.getFaction();
-            if (tech.getType().toString().equalsIgnoreCase(techType)) {
-                if (!player.hasTech(tech.getAlias())) {
-                    if (!faction.isEmpty()) {
-                        if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && "Keleres".equalsIgnoreCase(faction))) {
-                            techs.add(tech);
-                        }
-                    } else {
-                        techs.add(tech);
-                    }
-                }
-            }
-        }
+        Mapper.getTechs().values().stream()
+                .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
+                .filter(tech -> !player.hasTech(tech.getAlias()))
+                .filter(tech -> tech.getFaction().isEmpty() || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+                .forEach(tech -> techs.add(tech));
         return techs;
     }
 
