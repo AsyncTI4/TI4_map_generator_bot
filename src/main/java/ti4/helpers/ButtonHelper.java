@@ -4309,11 +4309,10 @@ public class ButtonHelper {
     }
 
     public static int getNumberOfUnitsOnTheBoard(Game activeGame, UnitKey unitKey) {
-        List<UnitHolder> nomboxes = activeGame.getRealPlayers().stream()
-            .flatMap(p -> p.getNomboxTile().getUnitHolders().values().stream()).toList();
-        List<UnitHolder> unitHolders = activeGame.getTileMap().values().stream()
-            .flatMap(t -> t.getUnitHolders().values().stream()).toList();
-        unitHolders.addAll(nomboxes);
+        List<UnitHolder> unitHolders = new ArrayList<>(activeGame.getTileMap().values().stream()
+            .flatMap(t -> t.getUnitHolders().values().stream()).toList());
+        unitHolders.addAll(activeGame.getRealPlayers().stream()
+            .flatMap(p -> p.getNomboxTile().getUnitHolders().values().stream()).toList());
 
         return unitHolders.stream()
             .flatMap(uh -> uh.getUnits().entrySet().stream())
@@ -4517,7 +4516,8 @@ public class ButtonHelper {
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to explore empties", ButtonHelperHeroes.getEmpyHeroButtons(p1, activeGame));
                         }
                         if ("cabalhero".equals(playerLeader.getId())) {
-                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to capture people", ButtonHelperHeroes.getCabalHeroButtons(p1, activeGame));
+                            List<Button> buttons = ButtonHelperHeroes.getCabalHeroButtons(p1, activeGame);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to capture people", buttons);
                         }
                         if ("yssarilhero".equals(playerLeader.getId())) {
                             for (Player p2 : activeGame.getRealPlayers()) {
