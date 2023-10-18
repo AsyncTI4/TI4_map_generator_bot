@@ -1,13 +1,13 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -20,7 +20,7 @@ import ti4.model.PromissoryNoteModel;
 public class SendPN extends PNCardsSubcommandData {
 	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player");
-		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID,"Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 	}
 
@@ -86,7 +86,7 @@ public class SendPN extends PNCardsSubcommandData {
 		}
 
 		Player pnOwner = activeGame.getPNOwner(id);
-		if (player.getPromissoryNotesInPlayArea().contains(id) ) {
+		if (player.getPromissoryNotesInPlayArea().contains(id)) {
 			if (!targetPlayer.equals(pnOwner)) {
 				sendMessage("Promissory Notes in Play Area can only be sent to the owner of the PN");
 				return;
@@ -98,7 +98,7 @@ public class SendPN extends PNCardsSubcommandData {
 		targetPlayer.setPromissoryNote(id);
 
 		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
-		if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner)&& !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
+		if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner) && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
 			targetPlayer.setPromissoryNotesInPlayArea(id);
 		}
 

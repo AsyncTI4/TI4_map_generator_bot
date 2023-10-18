@@ -1,22 +1,17 @@
 package ti4.model;
 
-import lombok.Getter;
-import ti4.ResourceHelper;
-
-import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import ti4.ResourceHelper;
+
 public class BorderAnomalyModel {
 
     public enum BorderAnomalyType {
-        ASTEROID("Asteroid Field", "asteroid_border.png"),
-        GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"),
-        NEBULA("Nebula", "nebula_border.png"),
-        MINEFIELD("Minefield", "minefield_border.png"),
-        ARROW("Arrow", "adjacency_arrow.png"),
-        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png");
+        ASTEROID("Asteroid Field", "asteroid_border.png"), GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"), NEBULA("Nebula", "nebula_border.png"), MINEFIELD("Minefield",
+            "minefield_border.png"), ARROW("Arrow", "adjacency_arrow.png"), SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png");
 
         @Getter
         private final String name;
@@ -35,7 +30,7 @@ public class BorderAnomalyModel {
         }
 
         public String toSearchString() {
-            return toString().toLowerCase().replace("_","");
+            return toString().toLowerCase().replace("_", "");
         }
     }
 
@@ -44,12 +39,10 @@ public class BorderAnomalyModel {
             return null;
         }
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
-                .collect(
-                        Collectors.toMap(
-                                BorderAnomalyType::toSearchString,
-                                (t -> t)
-                        )
-                );
+            .collect(
+                Collectors.toMap(
+                    BorderAnomalyType::toSearchString,
+                    (t -> t)));
         if (allTypes.containsKey(type.toLowerCase()))
             return allTypes.get(type.toLowerCase());
         return null;

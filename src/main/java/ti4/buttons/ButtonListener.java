@@ -659,17 +659,17 @@ public class ButtonListener extends ListenerAdapter {
             String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
             String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
             if (deck.isEmpty() && discardPile.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
-    
+
             StringBuilder sb = new StringBuilder();
             sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
             String topCard = deck.get(0);
             sb.append(new ExpPlanet().displayExplore(topCard));
-    
+
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
-                    + " Cards info thread.");            
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+                + " Cards info thread.");
         } else if (buttonID.startsWith("relic_look_top")) {
             List<String> relicDeck = activeGame.getAllRelics();
             if (relicDeck.isEmpty()) {
@@ -693,7 +693,7 @@ public class ButtonListener extends ListenerAdapter {
             String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
             String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
             if (cdeck.isEmpty() && cdiscardPile.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
 
             StringBuilder csb = new StringBuilder();
@@ -706,7 +706,7 @@ public class ButtonListener extends ListenerAdapter {
             traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
             playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
             if (hdeck.isEmpty() && hdiscardPile.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
 
             StringBuilder hsb = new StringBuilder();
@@ -719,7 +719,7 @@ public class ButtonListener extends ListenerAdapter {
             traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
             playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
             if (ideck.isEmpty() && idiscardPile.isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
 
             StringBuilder isb = new StringBuilder();
@@ -728,10 +728,10 @@ public class ButtonListener extends ListenerAdapter {
             isb.append(new ExpPlanet().displayExplore(itopCard));
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, isb.toString());
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"top of Hazardous, Cultural and Industrial explore decks has been set to " + playerFactionNameWithEmoji
-                    + " Cards info thread.");     
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "top of Hazardous, Cultural and Industrial explore decks has been set to " + playerFactionNameWithEmoji
+                + " Cards info thread.");
             ButtonHelper.addReaction(event, true, false, "Looked at top of Hazardous, Cultural and Industrial decks.", "");
-            event.getMessage().delete().queue();    
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperAbilities.distantSuns(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
@@ -1654,7 +1654,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("spaceUnits_")) {
             ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("reinforcements_cc_placement_")) {
-            String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+            //String playerRep = Helper.getPlayerRepresentation(player, activeGame);
             String planet = buttonID.replace("reinforcements_cc_placement_", "");
             String tileID = AliasHandler.resolveTile(planet.toLowerCase());
             Tile tile = activeGame.getTile(tileID);
@@ -1669,11 +1669,11 @@ public class ButtonListener extends ListenerAdapter {
             if (Mapper.isColorValid(color)) {
                 AddCC.addCC(event, color, tile);
             }
-            String message = playerRep + " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
+            //String message = playerRep + " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("placeHolderOfConInSystem_")) {
-            String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+            //String playerRep = Helper.getPlayerRepresentation(player, activeGame);
             String planet = buttonID.replace("placeHolderOfConInSystem_", "");
             String tileID = AliasHandler.resolveTile(planet.toLowerCase());
             Tile tile = activeGame.getTile(tileID);
@@ -1694,7 +1694,7 @@ public class ButtonListener extends ListenerAdapter {
             if (Mapper.isColorValid(color)) {
                 AddCC.addCC(event, color, tile);
             }
-            String message = playerRep + " Placed A " + StringUtils.capitalize(color) + " CC  In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
+            //String message = playerRep + " Placed A " + StringUtils.capitalize(color) + " CC  In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("transactWith_")) {

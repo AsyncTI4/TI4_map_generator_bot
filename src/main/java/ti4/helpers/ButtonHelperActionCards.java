@@ -1,29 +1,18 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreAndDiscard;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperActionCards {
 
@@ -64,37 +53,37 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getPlagiarizeButtons(Game activeGame, Player player){
+    public static List<Button> getPlagiarizeButtons(Game activeGame, Player player) {
         List<String> techToGain = new ArrayList<>();
-        for(Player p2 : player.getNeighbouringPlayers()){
+        for (Player p2 : player.getNeighbouringPlayers()) {
             techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, activeGame);
         }
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction())){
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction())) {
                 techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
-            } 
+            }
         }
         return techs;
     }
 
-    public static void resolveReverse(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+    public static void resolveReverse(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.split("_")[1];
         List<String> acStrings = new ArrayList<String>();
         acStrings.addAll(activeGame.getDiscardActionCards().keySet());
-        for(String acStringID: acStrings){
+        for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
-            if(acName.equalsIgnoreCase(actionCardTitle)){
-                 boolean picked = activeGame.pickActionCard(player.getUserID(), activeGame.getDiscardActionCards().get(acStringID));
+            if (acName.equalsIgnoreCase(actionCardTitle)) {
+                boolean picked = activeGame.pickActionCard(player.getUserID(), activeGame.getDiscardActionCards().get(acStringID));
                 if (!picked) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
                     return;
                 }
                 String sb = "Game: " + activeGame.getName() + " " +
-                "Player: " + player.getUserName() + "\n" +
-                "Picked card from Discards: " +
-                Mapper.getActionCard(acStringID).getRepresentation() + "\n";
+                    "Player: " + player.getUserName() + "\n" +
+                    "Picked card from Discards: " +
+                    Mapper.getActionCard(acStringID).getRepresentation() + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
                 ACInfo.sendActionCardInfo(activeGame, player);

@@ -12,9 +12,6 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-
 public class RevealSpecificEvent extends EventSubcommandData {
     public RevealSpecificEvent() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck");
@@ -37,10 +34,9 @@ public class RevealSpecificEvent extends EventSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event not found in deck, please retry");
             return;
         }
-        
+
         revealEvent(event, activeGame, event.getChannel(), eventID);
     }
-
 
     public void revealEvent(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);

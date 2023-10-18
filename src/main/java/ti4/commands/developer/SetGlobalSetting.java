@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.admin.AdminSubcommandData;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.message.MessageHelper;
@@ -36,7 +35,7 @@ public class SetGlobalSetting extends DeveloperSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad Command!");
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Setting `"  + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Setting `" + "(" + type.getAsString() + ") " + setting.getAsString() + "` set to `" + value.getAsString() + "`");
         MessageHelper.sendMessageToChannel(event.getChannel(), GlobalSettings.getSettingsRepresentation());
     }
 }

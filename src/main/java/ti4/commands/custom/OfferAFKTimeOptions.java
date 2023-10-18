@@ -1,20 +1,11 @@
 package ti4.commands.custom;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class OfferAFKTimeOptions extends CustomSubcommandData {
@@ -29,10 +20,10 @@ public class OfferAFKTimeOptions extends CustomSubcommandData {
         mainPlayer = Helper.getGamePlayer(activeGame, mainPlayer, event, null);
         mainPlayer = Helper.getPlayer(activeGame, mainPlayer, event);
         if (mainPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player/Faction/Color could not be found in map:" + activeGame.getName());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player/Faction/Color could not be found in map:" + activeGame.getName());
             return;
         }
         ButtonHelper.offerAFKTimeOptions(activeGame, mainPlayer);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to "+ButtonHelper.getIdent(mainPlayer));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + ButtonHelper.getIdent(mainPlayer));
     }
 }

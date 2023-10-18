@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -9,15 +8,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,8 +30,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
@@ -248,11 +245,11 @@ public class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
-            if("constitution".equalsIgnoreCase(agID)){
+            if ("constitution".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     List<String> laws = new ArrayList<String>();
                     laws.addAll(activeGame.getLaws().keySet());
-                    for(String law : laws){
+                    for (String law : laws) {
                         activeGame.removeLaw(agID);
                     }
                     activeGame.setNaaluAgent(true);
@@ -324,11 +321,12 @@ public class AgendaHelper {
                         if (playerWL.hasAbility("scheming")) {
                             activeGame.drawActionCard(playerWL.getUserID());
                             ACInfo.sendActionCardInfo(activeGame, playerWL, event);
-                            MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), ButtonHelper.getTrueIdentity(playerWL, activeGame) + " use buttons to discard", ACInfo.getDiscardActionCardButtons(activeGame, playerWL, false));
-                        }else{
+                            MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), ButtonHelper.getTrueIdentity(playerWL, activeGame) + " use buttons to discard",
+                                ACInfo.getDiscardActionCardButtons(activeGame, playerWL, false));
+                        } else {
                             ACInfo.sendActionCardInfo(activeGame, playerWL, event);
                         }
-                        
+
                         if (playerWL.getLeaderIDs().contains("yssarilcommander") && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
                             ButtonHelper.commanderUnlockCheck(playerWL, activeGame, "yssaril", event);
                         }
@@ -552,7 +550,7 @@ public class AgendaHelper {
             voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                 + ". You have more votes than discord has buttons. Please further specify your desired vote count by clicking the button which contains your desired vote amount (or largest button).";
         }
-        voteMessage = voteMessage + "\n"+ ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        voteMessage = voteMessage + "\n" + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
         List<Button> voteActionRow = getVoteButtons(minVotes, maxVotes);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
         event.getMessage().delete().queue();
@@ -1258,7 +1256,7 @@ public class AgendaHelper {
                                 potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(winningR, techGiver, potentialTech, activeGame);
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Galactic Threat Rider using the buttons",
-                            ButtonHelperAbilities.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeGame));
+                                ButtonHelperAbilities.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeGame));
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")) {
                             activeGame.setComponentAction(true);
@@ -1292,7 +1290,7 @@ public class AgendaHelper {
                             sb.append("due to having a winning **Keleres Rider**, you have been given");
                             if (scheming) {
                                 sb.append(" two ").append(Emojis.ActionCard).append(Emojis.ActionCard).append(" Action Cards (Due to your **Scheming** ability)");
-                            } else { 
+                            } else {
                                 sb.append(" an ").append(Emojis.ActionCard).append(" Action Card");
                             }
                             sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
@@ -1646,17 +1644,18 @@ public class AgendaHelper {
         return planetButtons;
     }
 
-    public static void resolveAbsolAgainstChecksNBalances(Game activeGame){
+    public static void resolveAbsolAgainstChecksNBalances(Game activeGame) {
         StringBuilder message = new StringBuilder();
         //Integer poIndex = activeGame.addCustomPO("Points Scored Prior to Absol C&B Wipe", 1);
         //message.append("Custom PO 'Points Scored Prior to Absol C&B Wipe' has been added and people have scored it. \n");
-            
+
         // activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
-        for(Player player : activeGame.getRealPlayers()){
-            int currentPoints = player.getPublicVictoryPoints(false)+ player.getSecretVictoryPoints();
-            
-            Integer poIndex = activeGame.addCustomPO(StringUtils.capitalize(player.getColor())+" VP Scored Prior to Agenda Wipe", currentPoints);
-            message.append("Custom PO '"+StringUtils.capitalize(player.getColor()+" VP Scored Prior to Agenda Wipe' has been added and scored by that color, worth "+currentPoints+" points. \n"));
+        for (Player player : activeGame.getRealPlayers()) {
+            int currentPoints = player.getPublicVictoryPoints(false) + player.getSecretVictoryPoints();
+
+            Integer poIndex = activeGame.addCustomPO(StringUtils.capitalize(player.getColor()) + " VP Scored Prior to Agenda Wipe", currentPoints);
+            message
+                .append("Custom PO '" + StringUtils.capitalize(player.getColor() + " VP Scored Prior to Agenda Wipe' has been added and scored by that color, worth " + currentPoints + " points. \n"));
             activeGame.scorePublicObjective(player.getUserID(), poIndex);
             HashMap<String, List<String>> playerScoredPublics = activeGame.getScoredPublicObjectives();
             for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
@@ -1668,16 +1667,13 @@ public class AgendaHelper {
             }
             List<Integer> scoredSOs = new ArrayList<>();
             scoredSOs.addAll(player.getSecretsScored().values());
-            for(int soID : scoredSOs){
+            for (int soID : scoredSOs) {
                 boolean scored = activeGame.unscoreAndShuffleSecretObjective(player.getUserID(), soID);
             }
-            
 
-         }
+        }
         message.append("All SOs have been returned to the deck and all POs scored have been cleared. \n");
 
-               
-            
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
     }
 

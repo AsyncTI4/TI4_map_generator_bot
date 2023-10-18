@@ -1,14 +1,9 @@
 package ti4.map;
 
-import java.util.List;
-import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
-
-import java.awt.*;
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -20,6 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
