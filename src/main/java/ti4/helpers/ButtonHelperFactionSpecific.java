@@ -444,6 +444,57 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    public static void resolveKolleccAbilities(Player player, Game activeGame) {
+        if (player.hasAbility("treasure_hunters")) {
+            // resolve treasure hunters
+            String msg = "Kollecc player, please choose which exploration deck to look at the top card of";
+            Button transact1 = Button.success("resolveExp_Look_industrial", "Peek at Industrial deck");
+            Button transact2 = Button.success("resolveExp_Look_hazardous", "Peek at Hazardous deck");
+            Button transact3 = Button.success("resolveExp_Look_cultural", "Peek at Cultural deck");
+            List<Button> buttons1 = new ArrayList<>();
+                        buttons1.add(transact1);
+                        buttons1.add(transact2);
+                        buttons1.add(transact3);
+                        buttons1.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg, buttons1);
+                        
+            Button transact = Button.success("relic_look_top", "Look at top of Relic Deck");
+            String msg2 = "Kollecc may also look at the top card of the relic deck.";
+            List<Button> buttons2 = new ArrayList<>();
+                        buttons2.add(transact);
+                        buttons2.add(Button.danger("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), msg2, buttons2);
+        } {     
+
+        if (Helper.getPlayerFromColorOrFaction(activeGame, Mapper.getPromissoryNoteOwner("dspnkoll")) == player) {
+            for (Player p2 : activeGame.getRealPlayers()) {
+                if (p2 == player) {                    
+                    continue;                    
+                }
+                if (p2.getPromissoryNotes().containsKey("dspnkoll")) {
+                    String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " the Kollecc AI Survey PN owner has started their turn, use the button to play AI Survey if you want";
+                    Button transact = Button.success("resolvePNPlay_dspnkoll", "Play AI Survey");
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(transact);
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeGame), msg, buttons);
+                    }
+                }
+            }
+        }
+    }
+    public static void offerKolleccPNButtons(Player player, Game activeGame, GenericInteractionCreateEvent event) {
+        Button transact1 = Button.success("explore_look_All", "Peek at Industrial/Hazardous/Cultural decks");
+        Button transact2 = Button.success("relic_look_top", "Peek at Relic deck");
+        List<Button> buttons = new ArrayList<>();
+                    buttons.add(transact1);
+                    buttons.add(transact2);
+                    buttons.add(Button.danger("deleteButtons", "Decline"));        
+        String message = "Use buttons to select how to use the Kollecc AI Survey PN";
+        System.out.println(player.getFaction() + " is playing PN KOLLEC");
+        MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message, buttons);
+    }
+    
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         buttonID = buttonID.replace("replacePDSWithFS_", "");
         String planet = buttonID;
