@@ -76,6 +76,7 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class GenerateMap {
 
@@ -720,6 +721,10 @@ public class GenerateMap {
 
                 if (!player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
+                }
+
+                if (!player.getFactionTechs().isEmpty()) {
+                    xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
                 g2.setColor(color);
@@ -1631,6 +1636,21 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
+    private int factionTechInfo(Player player, int x, int y, Game activeGame) {
+        List<String> techs = player.getNotResearchedFactionTechs();
+        if (techs.isEmpty()) {
+            return y;
+        }       
+
+        
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        
+        int deltaX = 20;
+        deltaX = factionTechField(x, y, techs, deltaX);
+        return x + deltaX + 20;
+    }
+
     private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX) {
         if (techs == null) {
             return deltaX;
@@ -1664,11 +1684,50 @@ public class GenerateMap {
             }
 
             if (!techInformation.getFaction().isEmpty()) {
-                String techSpec = "pa_tech_factionicon_" + techInformation.getFaction() + "_rdy.png";
-                drawPAImage(x + deltaX, y, techSpec);
+                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
+            drawPAImage(x + deltaX, y, techName);
+
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            deltaX += 48;
+        }
+        return deltaX;
+    }
+
+    private int factionTechField(int x, int y, List<String> techs, int deltaX) {
+        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        
+        if (techs == null) {
+            return deltaX;
+        }
+
+        for (String tech : techs) {
+            graphics.setColor(Color.DARK_GRAY);
+
+            TechnologyModel techInformation = techInfo.get(tech);
+            if (techInformation.getType() == TechnologyType.UNITUPGRADE) continue;
+
+            String techIcon;
+            switch (techInformation.getType()) {
+                case WARFARE -> techIcon = Constants.WARFARE;
+                case PROPULSION -> techIcon = Constants.PROPULSION;
+                case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
+                case BIOTIC -> techIcon = Constants.BIOTIC;
+                default -> techIcon = "";
+            }
+
+            if (!techIcon.isEmpty()) {
+                String techSpec = "pa_tech_techicons_" + techIcon + "_exh.png";
+                drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            if (!techInformation.getFaction().isEmpty()) {
+                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX + 1, y + 108, null);
+            }
+
+            String techName = "pa_tech_techname_" + tech + "_exh.png";
             drawPAImage(x + deltaX, y, techName);
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
