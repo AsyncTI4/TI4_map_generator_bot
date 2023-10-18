@@ -17,6 +17,7 @@ import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.model.PromissoryNoteModel;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -227,7 +228,7 @@ public class TurnEnd extends PlayerSubcommandData {
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperFactionSpecific.getMitosisOptions(activeGame, arborec));
+            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(activeGame, arborec));
 
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");
