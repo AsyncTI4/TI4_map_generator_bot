@@ -67,7 +67,7 @@ public class ButtonHelperActionCards {
     public static List<Button> getPlagiarizeButtons(Game activeGame, Player player){
         List<String> techToGain = new ArrayList<>();
         for(Player p2 : player.getNeighbouringPlayers()){
-            techToGain = ButtonHelperFactionSpecific.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, activeGame);
+            techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, activeGame);
         }
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {

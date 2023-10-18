@@ -26,6 +26,8 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -279,10 +281,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
                 ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
-                ButtonHelperFactionSpecific.cabalAgentInitiation(activeGame, player);
-                if (player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1) {
+                ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
+                if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+                        ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                 }
             }
             case "mirage" -> {
@@ -306,8 +308,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
                         + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
                     player.setTg(player.getTg() + 1);
-                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
-                    ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
                 }
 
                 final String ministerOfExploration = "minister_exploration";
@@ -317,8 +319,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                         player.setTg(player.getTg() + 1);
-                        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     }
                 }
 
@@ -367,20 +369,20 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     case "minent" -> {
                         player.setTg(player.getTg() + 1);
                         message = "Gained 1" + Emojis.tg + " (" + (player.getTg() - 1) + " -> **" + player.getTg() + "**) ";
-                        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg() + 2);
                         message = "Gained 2" + Emojis.tg + " (" + (player.getTg() - 2) + " -> **" + player.getTg() + "**) ";
-                        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 2);
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 2);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg() + 3);
                         message = "Gained 3" + Emojis.tg + " (" + (player.getTg() - 3) + " -> **" + player.getTg() + "**) ";
-                        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-                        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 3);
+                        ButtonHelperAbilities.pillageCheck(player, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 3);
                     }
                     default -> message = "";
                 }

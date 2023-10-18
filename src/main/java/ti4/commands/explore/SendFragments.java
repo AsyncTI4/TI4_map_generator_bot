@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -48,8 +49,8 @@ public class SendFragments extends ExploreSubcommandData {
         if (countOption != null) {
         	count = countOption.getAsInt();
         }
-		ButtonHelperFactionSpecific.pillageCheck(sender, activeGame);
-		ButtonHelperFactionSpecific.pillageCheck(receiver, activeGame);
+		ButtonHelperAbilities.pillageCheck(sender, activeGame);
+		ButtonHelperAbilities.pillageCheck(receiver, activeGame);
 		sendFrags(event, sender, receiver, trait, count, activeGame);
 
 	}

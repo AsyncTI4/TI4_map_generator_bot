@@ -342,8 +342,8 @@ public class AgendaHelper {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player playerB : activeGame.getRealPlayers()) {
                         playerB.setTg(5);
-                        ButtonHelperFactionSpecific.resolveArtunoCheck(playerB, activeGame, 5);
-                        ButtonHelperFactionSpecific.pillageCheck(playerB, activeGame);
+                        ButtonHelperAgents.resolveArtunoCheck(playerB, activeGame, 5);
+                        ButtonHelperAbilities.pillageCheck(playerB, activeGame);
                     }
                     tg = 5;
                 } else {
@@ -376,8 +376,8 @@ public class AgendaHelper {
                         + "You have a rider to resolve or you voted for the correct outcome. Either way a tg has been added to your total due to your future sight ability. ("
                         + rid.getTg() + "-->" + (rid.getTg() + 1) + ")";
                     rid.setTg(rid.getTg() + 1);
-                    ButtonHelperFactionSpecific.resolveArtunoCheck(rid, activeGame, 1);
-                    ButtonHelperFactionSpecific.pillageCheck(rid, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(rid, activeGame, 1);
+                    ButtonHelperAbilities.pillageCheck(rid, activeGame);
                 } else {
                     message = rep + "You have a rider to resolve";
                 }
@@ -1255,10 +1255,10 @@ public class AgendaHelper {
                             List<Player> voters = getWinningVoters(winner, activeGame);
                             List<String> potentialTech = new ArrayList<>();
                             for (Player techGiver : voters) {
-                                potentialTech = ButtonHelperFactionSpecific.getPossibleTechForNekroToGainFromPlayer(winningR, techGiver, potentialTech, activeGame);
+                                potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(winningR, techGiver, potentialTech, activeGame);
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Galactic Threat Rider using the buttons",
-                                ButtonHelperFactionSpecific.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeGame));
+                            ButtonHelperAbilities.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeGame));
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")) {
                             activeGame.setComponentAction(true);
@@ -1287,6 +1287,7 @@ public class AgendaHelper {
                             }
                             ButtonHelper.checkACLimit(activeGame, event, winningR);
                             ACInfo.sendActionCardInfo(activeGame, winningR, event);
+
                             StringBuilder sb = new StringBuilder(identity);
                             sb.append("due to having a winning **Keleres Rider**, you have been given");
                             if (scheming) {
@@ -1296,8 +1297,8 @@ public class AgendaHelper {
                             }
                             sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
-                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
-                            ButtonHelperFactionSpecific.resolveArtunoCheck(winningR, activeGame, 2);
+                            ButtonHelperAbilities.pillageCheck(winningR, activeGame);
+                            ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 2);
                         }
                         if (specificVote.contains("Politics Rider")) {
                             int amount = 3;
@@ -1332,8 +1333,8 @@ public class AgendaHelper {
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG + 5);
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning Trade Rider, you have been given 5 tg (" + cTG + "->" + winningR.getTg() + ")");
-                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeGame);
-                            ButtonHelperFactionSpecific.resolveArtunoCheck(winningR, activeGame, 5);
+                            ButtonHelperAbilities.pillageCheck(winningR, activeGame);
+                            ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 5);
                         }
                         if (specificVote.contains("Imperial Rider")) {
                             String msg = identity + " due to having a winning Imperial Rider, you have scored a pt\n";

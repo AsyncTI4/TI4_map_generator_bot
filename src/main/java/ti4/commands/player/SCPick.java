@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -153,7 +154,7 @@ public class SCPick extends PlayerSubcommandData {
 			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
 			}
-			ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+			ButtonHelperAbilities.pillageCheck(player, activeGame);
             activeGame.setScTradeGood(scPicked, 0);
 		}
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " chose which player to give this SC", buttons);
@@ -331,6 +332,8 @@ public class SCPick extends PlayerSubcommandData {
                     if(privatePlayer.getStasisInfantry() > 0){
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
                     }
+                    activeGame.setComponentAction(false);
+                     activeGame.setCurrentPhase("action");
                 }
             }
         }

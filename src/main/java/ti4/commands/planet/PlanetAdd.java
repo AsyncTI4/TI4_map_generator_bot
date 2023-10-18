@@ -9,6 +9,8 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -127,8 +129,8 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
                 + "). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring.");
             player.setTg(player.getTg() + 1);
-            ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-            ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+            ButtonHelperAbilities.pillageCheck(player, activeGame);
+            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
         for (String law : activeGame.getLaws().keySet()) {
             if ("minister_exploration".equalsIgnoreCase(law)) {
@@ -137,8 +139,8 @@ public class PlanetAdd extends PlanetAddRemove {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
                     player.setTg(player.getTg() + 1);
-                    ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
-                    ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, 1);
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                    ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                 }
             }
         }
