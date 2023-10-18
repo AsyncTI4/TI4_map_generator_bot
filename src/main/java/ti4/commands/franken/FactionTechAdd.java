@@ -2,10 +2,14 @@ package ti4.commands.franken;
 
 import java.util.List;
 
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 
 import ti4.map.Player;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class FactionTechAdd extends FactionTechAddRemove {
     public FactionTechAdd() {
@@ -23,6 +27,18 @@ public class FactionTechAdd extends FactionTechAddRemove {
             }
             sb.append("\n");
             player.addFactionTech(techID);
+
+            // ADD BASE UNIT IF ADDING UNIT UPGRADE TECH
+            TechnologyModel techModel = Mapper.getTech(techID);
+            if (techModel == null) continue;
+            if (techModel.getType().equals(TechnologyType.UNITUPGRADE)) {
+                UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
+                String upgradesFromUnitId = unitModel.getUpgradesFromUnitId();
+                if (upgradesFromUnitId != null) {
+                    player.removeOwnedUnitByID(unitModel.getBaseType());
+                    player.addOwnedUnitByID(upgradesFromUnitId);
+                }
+            }
         }
         sendMessage(sb.toString());
     }
