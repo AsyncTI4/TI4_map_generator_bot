@@ -200,23 +200,23 @@ public class MoveUnits extends AddRemoveUnits {
             // Check for space unit holder when only single stack of unit is present anywhere on the tile
             // This allows for removes like "2 infantry" when they are the only infantry on a planet
             long nonEmptyUnitHolders = tile.getUnitHolders().values().stream()
-                .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0)
+                .filter(uh -> uh.getUnits().getOrDefault(unitID, 0) + uh.getUnitDamage().getOrDefault(unitID, 0) > 0)
                 .count();
 
             // These calcluations will let us know if we are in a scenario where we can remove all of a particular unit from
             // the hex
             // This allows for moves like "2 infantry" when there's a hex with 0 in space and 1 infantry on each of 2 planets
             long totalUnitsOnHex = tile.getUnitHolders().values().stream()
-                .mapToInt(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0))
+                .mapToInt(uh -> uh.getUnits().getOrDefault(unitID, 0) + uh.getUnitDamage().getOrDefault(unitID, 0))
                 .sum();
 
             boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream()
                 .filter(planetTemp -> !planetTemp.getName().equals(planetName))
-                .anyMatch(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0);
+                .anyMatch(uh -> uh.getUnits().getOrDefault(unitID, 0) + uh.getUnitDamage().getOrDefault(unitID, 0) > 0);
 
             if (nonEmptyUnitHolders == 1) {
                 unitHolder = tile.getUnitHolders().values().stream()
-                    .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0).findFirst().get();
+                    .filter(uh -> uh.getUnits().getOrDefault(unitID, 0) + uh.getUnitDamage().getOrDefault(unitID, 0) > 0).findFirst().get();
 
             }
 

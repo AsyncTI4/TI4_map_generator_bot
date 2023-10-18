@@ -465,13 +465,7 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
             String message = "Use buttons to select which tile to Umbat in";
-            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, p2, UnitType.Warsun);
-            List<Tile> tiles2 = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, p2, UnitType.Flagship);
-            for (Tile tile : tiles2) {
-                if (!tiles.contains(tile)) {
-                    tiles.add(tile);
-                }
-            }
+            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p2, UnitType.Warsun, UnitType.Flagship);
             List<Button> buttons = new ArrayList<>();
             for (Tile tile : tiles) {
                 Button starTile = Button.success("umbatTile_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, p2));
@@ -714,7 +708,7 @@ public class ButtonHelperAgents {
 
     public static List<Button> getJolNarAgentButtons(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
-        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Infantry)) {
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons

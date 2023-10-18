@@ -595,19 +595,7 @@ public class FoWHelper {
 
 	/** Check if the player has units in the system */
 	public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
-		String colorID = Mapper.getColorID(player.getColor());
-		if (colorID == null) return false; // player doesn't have a color
-
-		Map<UnitKey, Integer> units = new HashMap<>();
-		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-			units.putAll(unitHolder.getUnits());
-		}
-		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID)) {
-				return true;
-			}
-		}
-		return false;
+		return tile.containsPlayersUnits(player);
 	}
 
 	public static boolean playerHasShipsInSystem(Player player, Tile tile) {

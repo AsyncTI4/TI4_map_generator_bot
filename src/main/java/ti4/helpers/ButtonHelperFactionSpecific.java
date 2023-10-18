@@ -508,10 +508,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void firstStepOfChaos(Game activeGame, Player p1, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, p1, UnitType.Spacedock);
-        if (tiles.isEmpty()) {
-            tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, p1, UnitType.CabalSpacedock);
-        }
+        Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(p1, activeGame);
         for (Tile tile : tiles) {
             Button tileButton = Button.success("produceOneUnitInTile_" + tile.getPosition() + "_chaosM", tile.getRepresentationForButtons(activeGame, p1));
             buttons.add(tileButton);
@@ -521,10 +518,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isCabalBlockadedByPlayer(Player player, Game activeGame, Player cabal) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, cabal, UnitType.CabalSpacedock);
-        if (tiles.isEmpty()) {
-            tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, cabal, UnitType.Spacedock);
-        }
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, cabal, UnitType.CabalSpacedock, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;
         }
@@ -605,9 +599,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getUnitButtonsForVortex(Player player, Game activeGame, GenericInteractionCreateEvent event) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.CabalSpacedock);
-        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Spacedock));
-
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.CabalSpacedock, UnitType.Spacedock);
         if (tiles.size() == 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldnt find any docks");
             return List.of();
@@ -624,7 +616,8 @@ public class ButtonHelperFactionSpecific {
         Set<UnitKey> availableUnits = adjTiles.stream()
             .map(pos -> activeGame.getTileByPosition(pos))
             .flatMap(tile -> tile.getUnitHolders().values().stream())
-            .flatMap(uh -> uh.getUnits().entrySet().stream().filter(e -> e.getValue() > 0).map(Map.Entry::getKey))
+            .flatMap(uh -> uh.getUnits().entrySet().stream().filter(e -> e.getValue() > 0)
+            .map(Map.Entry::getKey))
             .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID()))
             .collect(Collectors.toSet());
         List<Button> buttons = availableUnits.stream()
@@ -866,12 +859,10 @@ public class ButtonHelperFactionSpecific {
         if (ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction())) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, EmpyPlayer, UnitType.Mech);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, EmpyPlayer, UnitType.Mech);
         for (Tile tile : tiles) {
-
             Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), EmpyPlayer, true);
             for (String adjTile : adjTiles) {
-
                 Tile adjT = activeGame.getTileMap().get(adjTile);
                 if (FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT)) {
                     return true;
