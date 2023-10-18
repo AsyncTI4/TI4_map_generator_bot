@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -76,8 +78,8 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());
-        ButtonHelperFactionSpecific.resolveArtunoCheck(player, activeGame, player.getTg() - oldTg);
-        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, player.getTg() - oldTg);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
 
     }
 

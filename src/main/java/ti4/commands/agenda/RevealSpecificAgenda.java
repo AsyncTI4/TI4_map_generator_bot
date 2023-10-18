@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -160,8 +161,8 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeGame.getGuild(), activeGame)+" the agenda target is "+agendaTarget+". Sent the agenda to the speakers cards info");
         }
         for(Player player : activeGame.getRealPlayers()){
-            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame).size() > 0){
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) +" you have Florzen commander and can thus explore and ready a planet", ButtonHelperFactionSpecific.resolveFlorzenCommander(player, activeGame));
+            if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0){
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) +" you have Florzen commander and can thus explore and ready a planet", ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }
         }
     }

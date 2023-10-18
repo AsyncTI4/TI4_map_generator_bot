@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -43,12 +44,12 @@ public class SendTG extends PlayerSubcommandData {
 		sendTG = Math.min(sendTG, tg);
 		tg -= sendTG;
 		player.setTg(tg);
-		ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+		ButtonHelperAbilities.pillageCheck(player, activeGame);
 
 		int targetTG = player_.getTg();
 		targetTG += sendTG;
 		player_.setTg(targetTG);
-		ButtonHelperFactionSpecific.pillageCheck(player_, activeGame);
+		ButtonHelperAbilities.pillageCheck(player_, activeGame);
 
 		String p1 = Helper.getPlayerRepresentation(player, activeGame);
 		String p2 = Helper.getPlayerRepresentation(player_, activeGame);
