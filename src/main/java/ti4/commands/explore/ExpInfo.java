@@ -70,6 +70,10 @@ public class ExpInfo extends ExploreSubcommandData {
                 .append(discardCount).append(")\n");
             info.append(listNames(discard, false));
 
+            if (types.indexOf(currentType) != types.size() - 1) {
+                info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
+            }
+
             if (player == null || player.getSCs().isEmpty() || over || !activeGame.isFoWMode()) {
                 sendMessage(info.toString());
             }
