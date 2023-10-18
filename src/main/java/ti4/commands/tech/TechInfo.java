@@ -64,7 +64,6 @@ public class TechInfo extends TechSubcommandData {
 
     private static List<MessageEmbed> getTechMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-
         for (TechnologyModel techModel : player.getTechs().stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
             MessageEmbed representationEmbed = techModel.getRepresentationEmbed();
             messageEmbeds.add(representationEmbed);
@@ -74,13 +73,10 @@ public class TechInfo extends TechSubcommandData {
 
     private static List<MessageEmbed> getFactionTechMessageEmbeds(Player player) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
-        FactionModel factionModel = Mapper.getFactionSetup(player.getFaction());
-        if (factionModel != null) {
-            List<String> notResearchedFactionTechs = factionModel.getFactionTech().stream().filter(techID -> !player.getTechs().contains(techID)).toList();
-            for (TechnologyModel techModel : notResearchedFactionTechs.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
-                MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false, true);
-                messageEmbeds.add(representationEmbed);
-            }
+        List<String> notResearchedFactionTechs = player.getNotResearchedFactionTechs();
+        for (TechnologyModel techModel : notResearchedFactionTechs.stream().map(Mapper::getTech).sorted(TechnologyModel.sortByTechRequirements).toList()) {
+            MessageEmbed representationEmbed = techModel.getRepresentationEmbed(false, true);
+            messageEmbeds.add(representationEmbed);
         }
         return messageEmbeds;
     }

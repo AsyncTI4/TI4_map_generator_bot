@@ -1368,6 +1368,10 @@ public class Player {
         return techs;
     }
 
+    public List<String> getNotResearchedFactionTechs() {
+        return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
+    }
+
     public DraftBag getDraftHand() {
         return draftHand;
     }
