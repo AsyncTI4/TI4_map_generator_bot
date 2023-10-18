@@ -32,6 +32,9 @@ public class Storage {
     private static Font TI_FONT_40;
     private static Font TI_FONT_50;
     private static Font TI_FONT_64;
+    private static Font TI_FONT_90;
+    private static Font TI_FONT_100;
+    private static Font TI_FONT_110;
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
@@ -143,14 +146,6 @@ public class Storage {
         return TI_FONT_35;
     }
 
-    public static Font getFont64() {
-        if (TI_FONT_64 != null) {
-            return TI_FONT_64;
-        }
-        TI_FONT_64 = getFont(64f);
-        return TI_FONT_64;
-    }
-
     public static Font getFont40() {
         if (TI_FONT_40 != null) {
             return TI_FONT_40;
@@ -165,6 +160,38 @@ public class Storage {
         }
         TI_FONT_50 = getFont(50f);
         return TI_FONT_50;
+    }
+
+    public static Font getFont64() {
+        if (TI_FONT_64 != null) {
+            return TI_FONT_64;
+        }
+        TI_FONT_64 = getFont(64f);
+        return TI_FONT_64;
+    }
+
+    public static Font getFont90() {
+        if (TI_FONT_90 != null) {
+            return TI_FONT_90;
+        }
+        TI_FONT_90 = getFont(90f);
+        return TI_FONT_90;
+    }
+
+    public static Font getFont100() {
+        if (TI_FONT_100 != null) {
+            return TI_FONT_100;
+        }
+        TI_FONT_100 = getFont(100f);
+        return TI_FONT_100;
+    }
+
+    public static Font getFont110() {
+        if (TI_FONT_110 != null) {
+            return TI_FONT_110;
+        }
+        TI_FONT_110 = getFont(110f);
+        return TI_FONT_110;
     }
 
     private static Font getFont(float size) {

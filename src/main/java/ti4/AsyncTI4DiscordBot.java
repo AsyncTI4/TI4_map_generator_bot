@@ -61,6 +61,7 @@ import ti4.commands.tokens.RemoveToken;
 import ti4.commands.uncategorized.AllInfo;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.DeleteGame;
+import ti4.commands.uncategorized.ShowDistances;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
@@ -177,6 +178,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new AllInfo());
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new ShowGame());
+        commandManager.addCommand(new ShowDistances());
         commandManager.addCommand(new DeleteGame());
         commandManager.addCommand(new AddCC());
         commandManager.addCommand(new RemoveCC());

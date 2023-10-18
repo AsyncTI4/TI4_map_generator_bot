@@ -246,6 +246,8 @@ public class Game {
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
     private BagDraft activeDraft;
+    @JsonIgnore @Getter @Setter
+    private Map<String, Integer> tileDistances = new HashMap<>();
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
