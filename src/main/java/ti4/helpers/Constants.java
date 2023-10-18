@@ -955,4 +955,7 @@ public class Constants {
     public static final String RESET_EVENTS = "reset_events";
     public static final String REMOVE_EVENT = "remove_event";
     public static final String EVENTS_IN_EFFECT = "events_in_effect";
+    public static final String CHECK_DISTANCE = "check_distance";
+    public static final String MAX_DISTANCE = "max_distance";
+    public static final String SHOW_DISTANCES = "show_distances";
 }
