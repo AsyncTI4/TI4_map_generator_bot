@@ -565,6 +565,17 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.EVENT_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.EVENT))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.EXPLORATION_DECKS -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, DeckModel> decks = Mapper.getDecks();
@@ -671,7 +682,7 @@ public class AutoCompleteProvider {
 
     private static void resolveActionCardAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game activeGame) {
         switch (subCommandName) {
-            case Constants.PICK_AC_FROM_DISCARD -> {
+            case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 switch (optionName) {
                     case Constants.ACTION_CARD_ID -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();

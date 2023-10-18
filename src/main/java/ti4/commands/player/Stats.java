@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -27,15 +28,15 @@ public class Stats extends PlayerSubcommandData {
 	public Stats() {
 		super(Constants.STATS, "Player Stats: CC,TG,Commodities");
 		addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
+				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -123,7 +124,7 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
 			if(optionTG.getAsString().contains("+")){
-				ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+				ButtonHelperAbilities.pillageCheck(player, activeGame);
 			}
 			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 
@@ -133,8 +134,8 @@ public class Stats extends PlayerSubcommandData {
 		if (optionC != null) {
 			
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
-			if(player.hasAbility("military_industrial_complex") && ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame).size() > 1){
-				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperFactionSpecific.getBuyableAxisOrders(player, activeGame));
+			if(player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1){
+				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
 			}
 		}
 
@@ -313,7 +314,7 @@ public class Stats extends PlayerSubcommandData {
 			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
 			}
-			ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+			ButtonHelperAbilities.pillageCheck(player, activeGame);
 		}
 		return true;
 	}

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -91,9 +92,9 @@ public class SendPN extends PNCardsSubcommandData {
 				return;
 			}
 		}
-		ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+		ButtonHelperAbilities.pillageCheck(player, activeGame);
 		player.removePromissoryNote(id);
-		ButtonHelperFactionSpecific.pillageCheck(targetPlayer, activeGame);
+		ButtonHelperAbilities.pillageCheck(targetPlayer, activeGame);
 		targetPlayer.setPromissoryNote(id);
 
 		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
