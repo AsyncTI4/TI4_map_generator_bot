@@ -76,6 +76,7 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 public class GenerateMap {
 
@@ -199,7 +200,7 @@ public class GenerateMap {
         return saveImage(activeGame, displayType, event, false);
     }
 
-    private FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
+    public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug) {
             debugStartTime = System.nanoTime();
@@ -314,6 +315,7 @@ public class GenerateMap {
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Tile));
                 tilesWithExtra.forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Units));
+                if (!activeGame.getTileDistances().isEmpty()) tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Distance));
                 if (debug) debugTileTime = System.nanoTime() - debugTime;
             }
             graphics.setFont(Storage.getFont32());
@@ -721,6 +723,10 @@ public class GenerateMap {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
+                if (!player.getFactionTechs().isEmpty()) {
+                    xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
+                }
+
                 g2.setColor(color);
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
@@ -830,8 +836,7 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
-                        drawPAImage(x + deltaX, y, pnFactionIcon);
+                        graphics.drawImage(getPlayerFactionIconImageScaled(promissoryNoteOwner, 42, 42), x + deltaX - 1, y + 108, null);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
@@ -1176,7 +1181,7 @@ public class GenerateMap {
                     }
                 } else {
                     if (remainingReinforcements < 0 && !activeGame.isDiscordantStarsMode() && activeGame.getCCNPlasticLimit()) {
-                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "+Mapper.getUnit(unitID);
+                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + Mapper.getUnit(unitID);
                         if (activeGame.isFoWMode()) {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
                         } else {
@@ -1630,6 +1635,21 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
+    private int factionTechInfo(Player player, int x, int y, Game activeGame) {
+        List<String> techs = player.getNotResearchedFactionTechs();
+        if (techs.isEmpty()) {
+            return y;
+        }       
+
+        
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        
+        int deltaX = 20;
+        deltaX = factionTechField(x, y, techs, deltaX);
+        return x + deltaX + 20;
+    }
+
     private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX) {
         if (techs == null) {
             return deltaX;
@@ -1663,11 +1683,50 @@ public class GenerateMap {
             }
 
             if (!techInformation.getFaction().isEmpty()) {
-                String techSpec = "pa_tech_factionicon_" + techInformation.getFaction() + "_rdy.png";
-                drawPAImage(x + deltaX, y, techSpec);
+                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
+            drawPAImage(x + deltaX, y, techName);
+
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            deltaX += 48;
+        }
+        return deltaX;
+    }
+
+    private int factionTechField(int x, int y, List<String> techs, int deltaX) {
+        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        
+        if (techs == null) {
+            return deltaX;
+        }
+
+        for (String tech : techs) {
+            graphics.setColor(Color.DARK_GRAY);
+
+            TechnologyModel techInformation = techInfo.get(tech);
+            if (techInformation.getType() == TechnologyType.UNITUPGRADE) continue;
+
+            String techIcon;
+            switch (techInformation.getType()) {
+                case WARFARE -> techIcon = Constants.WARFARE;
+                case PROPULSION -> techIcon = Constants.PROPULSION;
+                case CYBERNETIC -> techIcon = Constants.CYBERNETIC;
+                case BIOTIC -> techIcon = Constants.BIOTIC;
+                default -> techIcon = "";
+            }
+
+            if (!techIcon.isEmpty()) {
+                String techSpec = "pa_tech_techicons_" + techIcon + "_exh.png";
+                drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            if (!techInformation.getFaction().isEmpty()) {
+                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX + 1, y + 108, null);
+            }
+
+            String techName = "pa_tech_techname_" + tech + "_exh.png";
             drawPAImage(x + deltaX, y, techName);
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
@@ -1795,10 +1854,11 @@ public class GenerateMap {
             if (unit == null) {
                 System.out.println("error:" + u);
             } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
-                Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                drawFactionIconImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, unit.getFaction().toLowerCase() + ".png", 0.38f, 1.0f);
-                //String factionIcon = "pa_tech_baseunit_" + unit.getFaction() + ".png";
-                //drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
+                // ONLY PAINT FACTION IF IS FRANKEN GAME, OR IS NOT A UNIT THAT UPGRADES OR WAS UPGRADED TO (indicating faction tech)
+                if (activeGame.isFrankenGame() || ((unit.getUpgradesFromUnitId() != null && !unit.getUpgradesFromUnitId().isEmpty()) || (unit.getUpgradesToUnitId() != null && !unit.getUpgradesToUnitId().isEmpty()))) {
+                    Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+                    graphics.drawImage(getFactionIconImageScaled(unit.getFaction().toLowerCase(), 36, 36), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
+                }
             }
         }
         if (techs != null) {
@@ -2866,7 +2926,7 @@ public class GenerateMap {
     }
 
     enum TileStep {
-        Setup, Tile, Extras, Units
+        Setup, Tile, Extras, Units, Distance
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {
@@ -3002,8 +3062,25 @@ public class GenerateMap {
                     addUnits(tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, activeGame, frogPlayer);
                 }
             }
+            case Distance -> {
+                if (activeGame.isFoWMode()) break;
+                Integer distance = activeGame.getTileDistances().get(tile.getPosition());
+                if (distance == null) break;
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null) break;
+
+                BufferedImage distanceColour = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColourFilterForDistance(distance)));
+                tileGraphics.drawImage(distanceColour, TILE_PADDING, TILE_PADDING, null);
+                tileGraphics.setColor(Color.WHITE);
+                drawCenteredString(tileGraphics, distance.toString(), new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()), Storage.getFont100());
+            }
         }
         return tileOutput;
+    }
+
+    public static String getColourFilterForDistance(int distance) {
+        return "Distance" + distance + ".png";
     }
 
     private static Point getTilePosition(Game activeGame, String position, int x, int y) {

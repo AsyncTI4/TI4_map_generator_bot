@@ -249,6 +249,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             || getSearchTags().contains(searchString);
     }
 
+    public static int sortFactionUnitsFirst(UnitModel a, UnitModel b) {
+        boolean fa = a.getFaction() == null || a.getFaction().isEmpty();
+        boolean fb = b.getFaction() == null || b.getFaction().isEmpty();
+        if (fa && fb) return 0;
+        if (!fa && !fb) return 0;
+        if (!fa && fb) return -1;
+        return 1;
+    }
+
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(" (");
@@ -260,7 +269,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public boolean getDeepSpaceCannon() {
         return Optional.ofNullable(deepSpaceCannon).orElse(false);
     }
-    
+
     public boolean getPlanetaryShield() {
         return Optional.ofNullable(planetaryShield).orElse(false);
     }

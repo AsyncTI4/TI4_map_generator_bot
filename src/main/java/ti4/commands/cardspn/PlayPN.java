@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -105,7 +106,10 @@ public class PlayPN extends PNCardsSubcommandData {
         if ("terraform".equalsIgnoreCase(pnID)) {
             sb.append("`/add_token token:titanspn`\n");
         }
-
+        
+        if ("dspnkoll".equalsIgnoreCase(pnID)) {
+            ButtonHelperFactionSpecific.offerKolleccPNButtons(player, activeGame, event);
+        }
         //Fog of war ping
 		if (activeGame.isFoWMode()) {
             // Add extra message for visibility

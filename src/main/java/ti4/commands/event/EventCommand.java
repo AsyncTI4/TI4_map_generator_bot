@@ -1,8 +1,10 @@
 package ti4.commands.event;
 
-import net.dv8tion.jda.api.entities.User;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -12,10 +14,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class EventCommand implements Command {
 
@@ -81,7 +79,7 @@ public class EventCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

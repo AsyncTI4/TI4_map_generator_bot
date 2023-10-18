@@ -330,9 +330,9 @@ public class Mapper {
     //     return colors.getProperty(color) + "_" + unitID + ".png";
     // }
 
-    public static UnitKey getUnitKey(String unitID, String color) {
-        String colorID = getColorID(color) == null ? color : getColorID(color);
-        return Units.getUnitKey(unitID, colorID);
+    public static UnitKey getUnitKey(String unitID, String colorID) {
+        String actuallyColorID = getColorID(colorID) == null ? colorID : getColorID(colorID);
+        return Units.getUnitKey(unitID, actuallyColorID);
     }
 
     public static Set<String> getUnitIDList() {

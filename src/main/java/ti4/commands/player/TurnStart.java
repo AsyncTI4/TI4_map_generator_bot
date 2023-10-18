@@ -45,7 +45,8 @@ public class TurnStart extends PlayerSubcommandData {
         
         activeGame.updateActivePlayer(player);
         activeGame.setCurrentPhase("action");
-        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);
+        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);             
+        ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "started turn");

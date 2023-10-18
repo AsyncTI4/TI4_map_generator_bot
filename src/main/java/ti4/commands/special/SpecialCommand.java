@@ -124,6 +124,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new StasisInfantry());
         subcommands.add(new NaaluCommander());
         subcommands.add(new MoveCreussWormhole());
+        subcommands.add(new CheckDistance());
 
         return subcommands;
     }

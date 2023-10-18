@@ -1,7 +1,6 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -13,7 +12,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.model.UnitModel;
 
 public class Setup extends GameSubcommandData {
     public Setup() {
@@ -69,7 +67,7 @@ public class Setup extends GameSubcommandData {
                 activeGame.setAutoPingSpacer(pingHours);
             } else {
                 activeGame.setAutoPing(true);
-                if (pingHours < 1){
+                if (pingHours < 1) {
                     pingHours = 1;
                 }
                 activeGame.setAutoPingSpacer(pingHours);
@@ -90,7 +88,8 @@ public class Setup extends GameSubcommandData {
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
-        if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null && event.getOption(Constants.BASE_GAME_MODE) == null) {
+        if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
+            && event.getOption(Constants.BASE_GAME_MODE) == null) {
             return true; //no changes were made
         }
         boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, activeGame.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
@@ -102,7 +101,8 @@ public class Setup extends GameSubcommandData {
 
     public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean discordantStarsMode, boolean isTIGLGame) {
 
-        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
+        if (isTIGLGame
+            && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
@@ -136,7 +136,7 @@ public class Setup extends GameSubcommandData {
             return true;
         }
         activeGame.setBaseGameMode(baseGameMode);
-        
+
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (absolMode && discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
@@ -154,7 +154,7 @@ public class Setup extends GameSubcommandData {
             activeGame.swapInVariantUnits("absol");
             return true;
         }
-    
+
         // JUST DS
         if (discordantStarsMode && !absolMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
@@ -184,7 +184,7 @@ public class Setup extends GameSubcommandData {
             // SOMEHOW STARTING/FACTION TECHS
         }
         activeGame.setAbsolMode(absolMode);
-        
+
         // JUST PoK
         if (!absolMode && !discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
@@ -204,4 +204,3 @@ public class Setup extends GameSubcommandData {
         return true;
     }
 }
-
