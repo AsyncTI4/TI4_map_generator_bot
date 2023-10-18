@@ -50,13 +50,19 @@ public class AutoCompleteProvider {
             player = Helper.getGamePlayer(activeGame, player, event, null);
         }
 
+        // VERY SPECIFIC HANDLING OF OPTIONS
         switch (commandName) {
             case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
             case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
             case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
+            case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName, activeGame);
         }
 
+        // DON'T APPLY GENERIC HANDLING IF SPECIFIC HANDLING WAS APPLIED
+        if (event.isAcknowledged()) return;
+
+        // GENERIC HANDLING OF OPTIONS
         switch (optionName) {
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
@@ -938,6 +944,26 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>(Mapper.getPromissoryNotes());
                         List<Command.Choice> options = promissoryNotes.entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void resolveFrankenAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game activeGame) {
+        switch (subCommandName) {
+            case Constants.FACTION_TECH_ADD, Constants.FACTION_TECH_REMOVE -> {
+                switch (optionName) {
+                    case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
+                        List<Command.Choice> options = techs.entrySet().stream()
+                            .filter(entry -> entry.getValue().getFaction() != null)
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
