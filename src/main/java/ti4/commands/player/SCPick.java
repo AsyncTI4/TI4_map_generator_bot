@@ -282,7 +282,8 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeGame.updateActivePlayer(nextPlayer);
-                ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);
+                ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);                     
+                ButtonHelperFactionSpecific.resolveKolleccAbilities(nextPlayer, activeGame);
                 if(activeGame.isFoWMode()){
                     FoWHelper.pingAllPlayersWithFullStats(activeGame, event, nextPlayer, "started turn");
                 }
