@@ -133,21 +133,23 @@ public class ChangeColor extends PlayerSubcommandData {
         Map<UnitKey, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
         for (Map.Entry<UnitKey, Integer> unitDmg : unitDamage.entrySet()) {
             UnitKey unitKey = unitDmg.getKey();
-            if (unitKey.getColorID().equals(oldColorID)) continue;
-            Integer value = unitDmg.getValue();
-            UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
-            unitHolder.removeUnitDamage(unitKey, value);
-            unitHolder.addUnitDamage(replacedKey, value);
+            if (unitKey.getColorID().equals(oldColorID)) {
+                Integer value = unitDmg.getValue();
+                UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
+                unitHolder.removeUnitDamage(unitKey, value);
+                unitHolder.addUnitDamage(replacedKey, value);
+            }
         }
 
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         for (Map.Entry<UnitKey, Integer> unit : units.entrySet()) {
             UnitKey unitKey = unit.getKey();
-            if (unitKey.getColorID().equals(oldColorID)) continue;
-            Integer value = unit.getValue();
-            UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
-            unitHolder.removeUnit(unitKey, value);
-            unitHolder.addUnit(replacedKey, value);
+            if (unitKey.getColorID().equals(oldColorID)) {
+                Integer value = unit.getValue();
+                UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
+                unitHolder.removeUnit(unitKey, value);
+                unitHolder.addUnit(replacedKey, value);
+            }
         }
 
         Set<String> controlList = new HashSet<>(unitHolder.getControlList());
