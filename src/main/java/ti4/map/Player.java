@@ -357,6 +357,7 @@ public class Player {
         }
         ThreadChannel threadChannel = threadAction.complete();
         setCardsInfoThreadID(threadChannel.getId());
+        Helper.checkThreadLimitAndArchive(activeGame.getGuild());
         return threadChannel;
     }
 
