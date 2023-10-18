@@ -199,7 +199,7 @@ public class GenerateMap {
         return saveImage(activeGame, displayType, event, false);
     }
 
-    private FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
+    public FileUpload saveImage(Game activeGame, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean skipDiscordFileUpload) {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug) {
             debugStartTime = System.nanoTime();
@@ -314,6 +314,7 @@ public class GenerateMap {
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Tile));
                 tilesWithExtra.forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Extras));
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Units));
+                if (!activeGame.getTileDistances().isEmpty()) tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeGame, TileStep.Distance));
                 if (debug) debugTileTime = System.nanoTime() - debugTime;
             }
             graphics.setFont(Storage.getFont32());
@@ -2866,7 +2867,7 @@ public class GenerateMap {
     }
 
     enum TileStep {
-        Setup, Tile, Extras, Units
+        Setup, Tile, Extras, Units, Distance
     }
 
     private void addTile(Tile tile, Game activeGame, TileStep step) {
@@ -3002,8 +3003,26 @@ public class GenerateMap {
                     addUnits(tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, activeGame, frogPlayer);
                 }
             }
+            case Distance -> {
+                if (activeGame.isFoWMode()) break;
+                Integer distance = activeGame.getTileDistances().get(tile.getPosition());
+                if (distance == null) break;
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null) break;
+
+                BufferedImage distanceColour = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColourFilterForDistance(distance)));
+                tileGraphics.drawImage(distanceColour, TILE_PADDING, TILE_PADDING, null);
+                tileGraphics.setColor(Color.WHITE);
+                drawCenteredString(tileGraphics, distance.toString(), new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()), Storage.getFont100());
+                
+            }
         }
         return tileOutput;
+    }
+
+    public static String getColourFilterForDistance(int distance) {
+        return "Distance" + distance + ".png";
     }
 
     private static Point getTilePosition(Game activeGame, String position, int x, int y) {
