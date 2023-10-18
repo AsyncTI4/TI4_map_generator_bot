@@ -53,9 +53,6 @@ public class ChangeColor extends PlayerSubcommandData {
         String oldColorID = Mapper.getColorID(oldColor);
         String newColorID = Mapper.getColorID(newColor);
 
-        String oldColorSuffix = "_" + oldColorID + ".";
-        String newColorSuffix = "_" + newColorID + ".";
-
         for (Player playerInfo : players.values()) {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
 

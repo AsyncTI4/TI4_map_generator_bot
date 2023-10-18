@@ -49,9 +49,9 @@ public class Units {
             return String.format("%s%s%s", colorID, emdash, asyncID());
         }
 
-        UnitKey(UnitType u, String c) {
-            unitType = u;
-            colorID = c;
+        UnitKey(UnitType unitType, String colorID) {
+            this.unitType = unitType;
+            this.colorID = colorID;
         }
     }
 
@@ -137,10 +137,10 @@ public class Units {
         return null;
     }
 
-    public static UnitKey getUnitKey(String unitType, String color) {
+    public static UnitKey getUnitKey(String unitType, String colorID) {
         UnitType u = findUnitType(unitType);
-        if (color == null || u == null) return null;
-        return new UnitKey(u, color);
+        if (colorID == null || u == null) return null;
+        return new UnitKey(u, colorID);
     }
 
     public static UnitKey parseID(String id) {
@@ -148,8 +148,8 @@ public class Units {
             id = id.replace(".png", "").replace("_", emdash);
         }
         String[] parts = id.split(emdash);
-        String color = parts[0];
+        String colorID = parts[0];
         String unitType = parts[1];
-        return getUnitKey(unitType, color);
+        return getUnitKey(unitType, colorID);
     }
 }

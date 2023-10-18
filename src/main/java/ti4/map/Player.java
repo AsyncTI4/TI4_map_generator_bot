@@ -2013,7 +2013,9 @@ public class Player {
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
-        return getUnitsByAsyncID(asyncID).stream().findFirst().orElse(null); //TODO: Sort to grab "best" unit if exists
+        return getUnitsByAsyncID(asyncID).stream()
+            .sorted(UnitModel::sortFactionUnitsFirst) //TODO: Maybe this sort can be better, idk
+            .findFirst().orElse(null);
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {

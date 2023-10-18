@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -11,13 +10,8 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.explore.ExploreAndDiscard;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
@@ -29,7 +23,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperAgents {
@@ -111,7 +104,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-     public static void resolveCabalAgentCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event) {
+    public static void resolveCabalAgentCapture(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event) {
         String unit = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
@@ -191,21 +184,21 @@ public class ButtonHelperAgents {
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
-        List<String> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun)
+        List<String> allowedUnits = List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun)
             .stream().map(UnitType::getValue).toList();
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
-        for (UnitModel ownedUnit : player.getUnitModels()) {
-            if (ownedUnit.getCost() < removedUnit.getCost() + 3) {
-                if (allowedUnits.contains(ownedUnit.getAsyncId())) {
-                    String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getAsyncId() + "_" + tile.getPosition();
-                    String buttonText = "Place " + ownedUnit.getName();
-                    buttons.add(Button.danger(buttonID, buttonText).withEmoji(Emoji.fromFormatted(ownedUnit.getUnitEmoji())));
-                }
+        for (String asyncID : allowedUnits) {
+            UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
+            if (ownedUnit.getCost() <= removedUnit.getCost() + 2) {
+                String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getAsyncId() + "_" + tile.getPosition();
+                String buttonText = "Place " + ownedUnit.getName();
+                buttons.add(Button.danger(buttonID, buttonText).withEmoji(Emoji.fromFormatted(ownedUnit.getUnitEmoji())));
             }
         }
 
         return buttons;
     }
+
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String pos = buttonID.replace("umbatTile_", "");
         List<Button> buttons;
@@ -315,7 +308,7 @@ public class ButtonHelperAgents {
             ButtonHelperAgents.startCabalAgent(player, activeGame, rest.replace("cabalagent_", ""), event);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
-            String msg = ButtonHelper.getTrueIdentity(player, activeGame)+ " you can use the buttons to remove infantry.";
+            String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the buttons to remove infantry.";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, ButtonHelperAgents.getJolNarAgentButtons(player, activeGame));
         }
 
@@ -545,12 +538,12 @@ public class ButtonHelperAgents {
         } else {
             event.getMessage().delete().queue();
         }
-        for(Player p2 : activeGame.getRealPlayers()){
-            if(p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")){
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                 List<Button> buttons2 = new ArrayList<Button>();
-                buttons2.add(Button.success("exhaustTCS_"+agent+"_"+player.getFaction(), "Exhaust TCS to Ready "+agent));
+                buttons2.add(Button.success("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust TCS to Ready " + agent));
                 buttons2.add(Button.danger("deleteButtons", "Decline"));
-                String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to exhaust your TCS tech to ready "+agent + " and potentially resolve a transaction.";
+                String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to exhaust your TCS tech to ready " + agent + " and potentially resolve a transaction.";
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg, buttons2);
             }
         }
@@ -719,12 +712,13 @@ public class ButtonHelperAgents {
         event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
     }
 
-    public static List<Button> getJolNarAgentButtons(Player player, Game activeGame){
+    public static List<Button> getJolNarAgentButtons(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
-        for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Infantry)){
-            for(UnitHolder unitHolder : tile.getUnitHolders().values()){
-                if(unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0){
-                    buttons.add(Button.success("jolNarAgentRemoval_"+tile.getPosition()+"_"+unitHolder.getName(), "Remove Inf from "+ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Infantry)) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                    buttons
+                        .add(Button.success("jolNarAgentRemoval_" + tile.getPosition() + "_" + unitHolder.getName(), "Remove Inf from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
                 }
             }
         }
@@ -732,17 +726,18 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static void resolveJolNarAgentRemoval(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+    public static void resolveJolNarAgentRemoval(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHName = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(pos);
         UnitHolder unitHolder = tile.getUnitHolders().get(unitHName);
-        if(unitHName.equalsIgnoreCase("space")){
+        if (unitHName.equalsIgnoreCase("space")) {
             unitHName = "";
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+" removed 1 infantry from "+ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Jol Nar agent");
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry "+unitHName, activeGame);
-        if(unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1){
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            ButtonHelper.getIdent(player) + " removed 1 infantry from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Jol Nar agent");
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, activeGame);
+        if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }
     }

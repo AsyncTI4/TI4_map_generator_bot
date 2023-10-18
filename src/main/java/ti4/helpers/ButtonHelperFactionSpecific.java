@@ -1,18 +1,11 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.*;
@@ -22,36 +15,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ShowAllAC;
-import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.ShowAllPN;
-import ti4.commands.cardsso.ShowAllSO;
-import ti4.commands.custom.PeakAtStage1;
-import ti4.commands.custom.PeakAtStage2;
-import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.player.SCPlay;
 import ti4.commands.player.SendDebt;
-import ti4.commands.special.SleeperToken;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.PromissoryNoteModel;
-import ti4.model.PublicObjectiveModel;
-import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
 
@@ -66,22 +43,21 @@ public class ButtonHelperFactionSpecific {
         return somebodyHasIt;
     }
 
-    public static void returnFightersToSpace(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+    public static void returnFightersToSpace(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
-        for(UnitHolder unitHolder : tile.getUnitHolders().values()){
-            if(unitHolder instanceof Planet){
-                if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0){
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet) {
+                if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                     int numff = unitHolder.getUnitCount(UnitType.Fighter, player.getColor());
                     new AddUnits().unitParsing(event, player.getColor(), tile, numff + " ff", activeGame);
-                    new RemoveUnits().unitParsing(event,  player.getColor(), tile, numff + " ff "+unitHolder.getName(), activeGame);
+                    new RemoveUnits().unitParsing(event, player.getColor(), tile, numff + " ff " + unitHolder.getName(), activeGame);
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " put all fighters in tile "+pos +" back into space"); 
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " put all fighters in tile " + pos + " back into space");
         event.getMessage().delete().queue();
     }
-
 
     public static List<Button> getTradePlanetsWithHacanMechButtons(Player hacan, Player receiver, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
@@ -113,8 +89,6 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(hacan, activeGame) + "Choose which planet to relocate your units to", buttons);
         event.getMessage().delete().queue();
     }
-
-    
 
     public static void resolveProductionBiomesStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -218,8 +192,6 @@ public class ButtonHelperFactionSpecific {
         }
         return buttons;
     }
-
-    
 
     public static void resolveSelectedBeforeSwapSC(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String type = buttonID.split("_")[2];
@@ -366,15 +338,6 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-
-    
-
-    
-
-    
-
-   
-
     public static void resolveVadenSCDebt(Player player, int sc, Game activeGame) {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
@@ -442,7 +405,6 @@ public class ButtonHelperFactionSpecific {
 
     }
 
-
     public static void resolveResearchAgreementCheck(Player player, String tech, Game activeGame) {
         if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("ra")) == player) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction())) {
@@ -482,9 +444,6 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-
-   
-
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         buttonID = buttonID.replace("replacePDSWithFS_", "");
         String planet = buttonID;
@@ -510,9 +469,6 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
     }
 
-    
-
-    
     public static boolean isCabalBlockadedByPlayer(Player player, Game activeGame, Player cabal) {
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, cabal, UnitType.CabalSpacedock);
         if (tiles.isEmpty()) {
@@ -539,12 +495,12 @@ public class ButtonHelperFactionSpecific {
         if (!isCabalBlockadedByPlayer(player, activeGame, cabal)) {
             msg = cabal.getFactionEmoji() + " has devoured " + amount + " of the " + unit + "s owned by " + player.getColor() + ". Chomp chomp.";
             String color = player.getColor();
-            
+
             if (unitP.contains("ff") || unitP.contains("gf")) {
                 color = cabal.getColor();
             }
             msg = msg.replace("Infantrys", "infantry");
-            
+
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount + " " + unit, activeGame);
         }
         if (activeGame.isFoWMode()) {
@@ -568,10 +524,6 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " pay 2r for it please", options);
         event.getMessage().delete().queue();
     }
-
-    
-
-    
 
     public static void resolveDarkPactCheck(Game activeGame, Player sender, Player receiver, int numOfComms, GenericInteractionCreateEvent event) {
         for (String pn : sender.getPromissoryNotesInPlayArea()) {
@@ -600,10 +552,11 @@ public class ButtonHelperFactionSpecific {
             }
         }
     }
-   
+
     public static List<Button> getUnitButtonsForVortex(Player player, Game activeGame, GenericInteractionCreateEvent event) {
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.CabalSpacedock);
         tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Spacedock));
+
         if (tiles.size() == 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldnt find any docks");
             return List.of();
@@ -631,7 +584,17 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean vortexButtonAvailable(Game activeGame, UnitKey unitKey) {
-        int unitCap = activeGame.getPlayerByColorID(unitKey.getColorID()).map(p -> p.getUnitCap(unitKey.asyncID())).orElse(0);
+        int baseUnitCap = switch (unitKey.getUnitType()) {
+            case Infantry, Fighter -> 10000;
+            case Destroyer, Cruiser -> 8;
+            case Mech, Carrier -> 4;
+            case Warsun -> 2;
+            case Flagship -> 1;
+            default -> 0; // everything else that can't be captured
+        };
+        int unitCap = activeGame.getPlayerByColorID(unitKey.getColorID())
+            .map(p -> p.getUnitCap(unitKey.asyncID()) == 0 ? baseUnitCap : p.getUnitCap(unitKey.asyncID()))
+            .orElse(baseUnitCap);
         return ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, unitKey) < unitCap;
     }
 
@@ -680,8 +643,6 @@ public class ButtonHelperFactionSpecific {
         return takeACs;
     }
 
-   
-
     public static void mageon(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
         buttonID = buttonID.replace("takeAC_", "");
         int acNum = Integer.parseInt(buttonID.split("_")[0]);
@@ -724,7 +685,6 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-
     public static void terraformPlanet(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String planet = buttonID.replace("terraformPlanet_", "");
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
@@ -733,7 +693,6 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
-
 
     public static List<Button> getCreusIFFTypeOptions(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
@@ -828,13 +787,11 @@ public class ButtonHelperFactionSpecific {
         return true;
     }
 
-    
-    
-
-    public static void resolveTCSExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+    public static void resolveTCSExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         String agent = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) return;
         player.exhaustTech("tcs");
         Leader playerLeader = p2.getLeader(agent).orElse(null);
         if (playerLeader == null) {
@@ -842,10 +799,11 @@ public class ButtonHelperFactionSpecific {
         }
         playerLeader.setExhausted(false);
 
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted TCS tech to ready "+agent + ", owned by "+p2.getColor());
-        
-        if(p2 != player){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+ " the TCS tech was exhausted by "+player.getColor()+" to ready your "+agent);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted TCS tech to ready " + agent + ", owned by " + p2.getColor());
+
+        if (p2 != player) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                ButtonHelper.getTrueIdentity(p2, activeGame) + " the TCS tech was exhausted by " + player.getColor() + " to ready your " + agent);
         }
         event.getMessage().delete().queue();
     }
@@ -871,6 +829,5 @@ public class ButtonHelperFactionSpecific {
         }
         return false;
     }
-
 
 }
