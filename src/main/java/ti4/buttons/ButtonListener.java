@@ -781,15 +781,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("swapTechs_")) {
             ButtonHelperHeroes.resolveAJolNarSwapStep2(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("jnHeroSwapOut_")) {
-<<<<<<< HEAD
             ButtonHelperHeroes.resolveAJolNarSwapStep1(player, activeGame, buttonID, event);
-         } else if (buttonID.startsWith("jolNarAgentRemoval_")) {
-            ButtonHelperAgents.resolveJolNarAgentRemoval(player, activeGame, buttonID, event);
-=======
-            ButtonHelperFactionSpecific.resolveAJolNarSwapStep1(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("jolNarAgentRemoval_")) {
-            ButtonHelperFactionSpecific.resolveJolNarAgentRemoval(player, activeGame, buttonID, event);
->>>>>>> Fix vortex
+            ButtonHelperAgents.resolveJolNarAgentRemoval(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("biostimsReady_")) {
             ButtonHelper.bioStimsReady(activeGame, event, player, buttonID);
             event.getMessage().delete().queue();
