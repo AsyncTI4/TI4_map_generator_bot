@@ -166,6 +166,8 @@ abstract public class AddRemoveUnits implements Command {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String planetToken = unitInfoTokenizer.nextToken();
                 planetName = AliasHandler.resolvePlanet(planetToken);
+            } else {
+                planetName = Constants.SPACE;
             }
 
             planetName = getPlanet(event, tile, planetName);
@@ -201,10 +203,9 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
 
-        
         if (getActionDescription().toLowerCase().contains("add units")) {
             Player player = activeGame.getPlayerFromColorOrFaction(color);
-            if(player == null){
+            if (player == null) {
                 return;
             }
             ButtonHelper.checkFleetAndCapacity(player, activeGame, tile, event);
