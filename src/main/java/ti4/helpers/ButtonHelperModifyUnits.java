@@ -1028,7 +1028,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
         for (int x = 0; x < amount; x++) {
-            ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeGame, event);
+            ButtonHelperCommanders.resolveLetnevCommanderCheck(player, activeGame, event);
         }
     }
 

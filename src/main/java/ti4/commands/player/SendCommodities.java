@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -66,8 +67,8 @@ public class SendCommodities extends PlayerSubcommandData {
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
         String message =  p1 + " sent " + commString + " to " + p2;
         sendMessage(message);
-        ButtonHelperFactionSpecific.pillageCheck(player_, activeGame);
-        ButtonHelperFactionSpecific.pillageCheck(player, activeGame);
+        ButtonHelperAbilities.pillageCheck(player_, activeGame);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities, event);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
