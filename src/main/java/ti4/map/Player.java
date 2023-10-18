@@ -92,6 +92,8 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    @Getter @Setter
+    private List<String> factionTechs = new ArrayList<>();
     private DraftBag draftHand = new DraftBag();
     private DraftBag currentDraftBag = new DraftBag();
     private DraftBag draftItemQueue = new DraftBag();
@@ -1514,6 +1516,15 @@ public class Player {
 
     public void setExhaustedTechs(List<String> exhaustedTechs) {
         this.exhaustedTechs = exhaustedTechs;
+    }
+
+    public void addFactionTech(String techID) {
+        if (factionTechs.contains(techID)) return;
+        factionTechs.add(techID);
+    }
+
+    public boolean removeFactionTech(String techID) {
+        return factionTechs.remove(techID);
     }
 
     public void addTech(String techID) {
