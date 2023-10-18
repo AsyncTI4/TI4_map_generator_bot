@@ -22,9 +22,7 @@ public class AddUnits extends AddRemoveUnits {
 
     @Override
     protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame) {
-
         tile.addUnit(planetName, unitID, count);
-
     }
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Game activeGame) {
@@ -69,7 +67,6 @@ public class AddUnits extends AddRemoveUnits {
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeGame);
         }
-
     }
 
     @Override

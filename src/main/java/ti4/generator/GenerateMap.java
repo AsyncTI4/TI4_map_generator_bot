@@ -1177,7 +1177,7 @@ public class GenerateMap {
                     }
                 } else {
                     if (remainingReinforcements < 0 && !activeGame.isDiscordantStarsMode() && activeGame.getCCNPlasticLimit()) {
-                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for "+Mapper.getUnit(unitID);
+                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + Mapper.getUnit(unitID);
                         if (activeGame.isFoWMode()) {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
                         } else {
@@ -3015,7 +3015,6 @@ public class GenerateMap {
                 tileGraphics.drawImage(distanceColour, TILE_PADDING, TILE_PADDING, null);
                 tileGraphics.setColor(Color.WHITE);
                 drawCenteredString(tileGraphics, distance.toString(), new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()), Storage.getFont100());
-                
             }
         }
         return tileOutput;
