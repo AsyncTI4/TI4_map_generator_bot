@@ -1,6 +1,5 @@
 package ti4.buttons;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -85,7 +84,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -783,9 +781,15 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("swapTechs_")) {
             ButtonHelperHeroes.resolveAJolNarSwapStep2(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("jnHeroSwapOut_")) {
+<<<<<<< HEAD
             ButtonHelperHeroes.resolveAJolNarSwapStep1(player, activeGame, buttonID, event);
          } else if (buttonID.startsWith("jolNarAgentRemoval_")) {
             ButtonHelperAgents.resolveJolNarAgentRemoval(player, activeGame, buttonID, event);
+=======
+            ButtonHelperFactionSpecific.resolveAJolNarSwapStep1(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("jolNarAgentRemoval_")) {
+            ButtonHelperFactionSpecific.resolveJolNarAgentRemoval(player, activeGame, buttonID, event);
+>>>>>>> Fix vortex
         } else if (buttonID.startsWith("biostimsReady_")) {
             ButtonHelper.bioStimsReady(activeGame, event, player, buttonID);
             event.getMessage().delete().queue();
@@ -1344,7 +1348,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "mahact", event);
             }
-        } else if (buttonID.startsWith("returnFFToSpace_")) { 
+        } else if (buttonID.startsWith("returnFFToSpace_")) {
             ButtonHelperFactionSpecific.returnFightersToSpace(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
@@ -3008,7 +3012,7 @@ public class ButtonListener extends ListenerAdapter {
                             if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])) {
                                 MessageHelper.sendMessageToChannel(event.getChannel(),
                                     "You were not the player who pressed the latest button. Use /game undo if you truly want to undo " + activeGame.getLatestCommand());
-                                    return;
+                                return;
                             }
                         }
                     }

@@ -1,25 +1,18 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExpPlanet;
-import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.special.SleeperToken;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
@@ -30,8 +23,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperAbilities {
 
@@ -349,7 +340,7 @@ public class ButtonHelperAbilities {
     public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game activeGame) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
-            techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getName()+"_noPay", Mapper.getTech(tech).getName()));
+            techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
         }
         return techToGain;
     }
