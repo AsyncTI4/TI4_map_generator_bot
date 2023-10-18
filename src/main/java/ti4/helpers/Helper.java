@@ -1911,7 +1911,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
         String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-        return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
+        return techEmoji + "**" + techName + "**" + factionEmoji;
     }
 
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
