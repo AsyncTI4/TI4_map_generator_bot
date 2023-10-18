@@ -47,7 +47,7 @@ public class SystemInfo extends SpecialSubcommandData {
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
         if (ringsMapping != null) {
             context = ringsMapping.getAsInt();
-            int newContext = 0;
+            int newContext = context;
             if (context > 2) newContext = 2;
             if (context < 0) newContext = 0;
             if (context == 333) newContext = 3;

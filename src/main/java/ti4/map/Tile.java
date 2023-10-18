@@ -426,6 +426,7 @@ public class Tile {
             .flatMap(uh -> uh.getUnits().entrySet().stream())
             .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
             .map(Map.Entry::getKey)
+            .filter(x -> x != null)
             .anyMatch(condition);
     }
 }
