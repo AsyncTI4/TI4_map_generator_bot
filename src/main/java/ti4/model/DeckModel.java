@@ -62,7 +62,8 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     private boolean validateCardIDs() {
         return switch (getType()) {
             case "technology" -> validateTechDeck();
-            case "agenda", "event" -> validateAgendaDeck();
+            case "agenda" -> validateAgendaDeck();
+            case "event" -> validateEventDeck();
             case "action_card" -> validateActionCardDeck();
             case "secret_objective" -> validateSecretObjectiveDeck();
             case "public_stage_1_objective", "public_stage_2_objective" -> validatePublicObjectiveDecks();
@@ -91,6 +92,18 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         List<String> missingCardIDs = new ArrayList<>();
         for (String cardID : cardIDs) {
             if (!Mapper.getAgendas().containsKey(cardID))
+                missingCardIDs.add(cardID);
+        }
+        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        return false;
+    }
+
+    private boolean validateEventDeck() {
+        if (Mapper.getEvents().keySet().containsAll(cardIDs))
+            return true;
+        List<String> missingCardIDs = new ArrayList<>();
+        for (String cardID : cardIDs) {
+            if (!Mapper.getEvents().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
         BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
