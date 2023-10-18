@@ -11,8 +11,8 @@ public class Units {
 
     @Data
     public static class UnitKey {
-        public UnitType unitType;
-        public String colorID;
+        private UnitType unitType;
+        private String colorID;
 
         public String getColor() {
             return AliasHandler.resolveColor(colorID);
