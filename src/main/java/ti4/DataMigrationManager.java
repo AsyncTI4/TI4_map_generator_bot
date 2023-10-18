@@ -9,15 +9,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -28,8 +27,8 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 
 public class DataMigrationManager {
 
@@ -62,6 +61,7 @@ public class DataMigrationManager {
             runMigration("migratePlayerStatsBlockPositions_300823", DataMigrationManager::migratePlayerStatsBlockPositions_300823);
             runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
             runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
+            runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -77,6 +77,21 @@ public class DataMigrationManager {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+        return mapNeededMigrating;
+    }
+
+    /// MIGRATION: Add faction techs to games that were created before faction techs added
+    public static Boolean migrateInitializeFactionTechs_181023(Game game) {
+        boolean mapNeededMigrating = false;
+        for (Player player : game.getRealPlayers()) {
+            if (player.getFactionTechs().isEmpty()) {
+                if (player.getFactionSetupInfo() == null) continue;
+                mapNeededMigrating = true;
+                for (String techID : player.getFactionSetupInfo().getFactionTech()) {
+                    player.addFactionTech(techID);
+                }
+            }
+        }
         return mapNeededMigrating;
     }
 
@@ -522,7 +537,6 @@ public class DataMigrationManager {
                 game.setExploreDiscard(new ArrayList<>(replacementDiscard));
                 mapNeededMigrating = true;
             }
-            boolean x = false;
         }
         return mapNeededMigrating;
     }

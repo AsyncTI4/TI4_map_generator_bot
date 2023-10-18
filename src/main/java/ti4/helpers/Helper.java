@@ -221,7 +221,7 @@ public class Helper {
             || (activeGame.getActionCardDeckSize() + activeGame.getDiscardActionCards().size()) > 180) {
             return false;
         }
-        if(player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.Mech).size() > 0){
+        if (player.hasUnit("empyrean_mech") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech).size() > 0) {
             return false;
         }
         if (ButtonListener.checkForASpecificPlayerReact(messageID, player, activeGame)) {
@@ -947,7 +947,8 @@ public class Helper {
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
-                    if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1 && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
+                    if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
+                        && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
                         continue;
                     }
                 }
@@ -1789,6 +1790,7 @@ public class Helper {
     }
 
     public static void checkThreadLimitAndArchive(Guild guild) {
+        if (guild == null) return;
         long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
         int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 20);
         int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
@@ -1909,7 +1911,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
         String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-        return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
+        return techEmoji + "**" + techName + "**" + factionEmoji;
     }
 
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
@@ -1991,20 +1993,12 @@ public class Helper {
 
     public static List<TechnologyModel> getAllTechOfAType(Game activeGame, String techType, String playerfaction, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
-        for (TechnologyModel tech : Mapper.getTechs().values().stream().filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias())).toList()) {
-            String faction = tech.getFaction();
-            if (tech.getType().toString().equalsIgnoreCase(techType)) {
-                if (!player.hasTech(tech.getAlias())) {
-                    if (!faction.isEmpty()) {
-                        if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && "Keleres".equalsIgnoreCase(faction))) {
-                            techs.add(tech);
-                        }
-                    } else {
-                        techs.add(tech);
-                    }
-                }
-            }
-        }
+        Mapper.getTechs().values().stream()
+                .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
+                .filter(tech -> !player.hasTech(tech.getAlias()))
+                .filter(tech -> tech.getFaction().isEmpty() || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+                .forEach(tech -> techs.add(tech));
         return techs;
     }
 

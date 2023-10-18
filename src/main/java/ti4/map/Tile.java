@@ -17,10 +17,12 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
+import ti4.model.UnitModel;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class Tile {
     private final String tileID;
@@ -398,5 +400,33 @@ public class Tile {
             }
         }
         return false;
+    }
+
+    @JsonIgnore
+    public boolean containsPlayersUnits(Player p) {
+        return getUnitHolders().values().stream()
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .anyMatch(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()));
+    }
+
+    @JsonIgnore
+    public boolean containsPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
+        return getUnitHolders().values().stream()
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
+            .map(Map.Entry::getKey)
+            .map(key -> p.getUnitFromUnitKey(key))
+            .filter(unit -> unit != null)
+            .anyMatch(condition);
+    }
+
+    @JsonIgnore
+    public boolean containsPlayersUnitsWithKeyCondition(Player p, Predicate<? super UnitKey> condition) {
+        return getUnitHolders().values().stream()
+            .flatMap(uh -> uh.getUnits().entrySet().stream())
+            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
+            .map(Map.Entry::getKey)
+            .filter(x -> x != null)
+            .anyMatch(condition);
     }
 }

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -49,7 +47,7 @@ public class SystemInfo extends SpecialSubcommandData {
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
         if (ringsMapping != null) {
             context = ringsMapping.getAsInt();
-            int newContext = 0;
+            int newContext = context;
             if (context > 2) newContext = 2;
             if (context < 0) newContext = 0;
             if (context == 333) newContext = 3;

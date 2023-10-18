@@ -1,14 +1,9 @@
 package ti4.map;
 
-import java.util.List;
-import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
-
-import java.awt.*;
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -20,6 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
@@ -166,12 +165,12 @@ abstract public class UnitHolder {
     public Integer getUnitCount(UnitType unitType, String color) {
         if (units == null || unitType == null || color == null) return 0;
         String colorIDofUnit = Mapper.getColorID(color);
-        if(colorIDofUnit == null){
+        if (colorIDofUnit == null) {
             colorIDofUnit = color;
         }
         final String effinColor = colorIDofUnit;
         Integer value = units.entrySet().stream()
-            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(effinColor))
+            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
         return value == null ? 0 : value;
     }
@@ -189,7 +188,7 @@ abstract public class UnitHolder {
     public Integer getUnitDamageCount(UnitType unitType, String color) {
         if (unitsDamage == null) return 0;
         Integer value = unitsDamage.entrySet().stream()
-            .filter(e -> e.getKey().unitType.equals(unitType) && e.getKey().colorID.equals(color))
+            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(color))
             .findFirst().map(Entry::getValue).orElse(0);
         return value == null ? 0 : value;
     }

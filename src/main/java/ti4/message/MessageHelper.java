@@ -24,7 +24,6 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

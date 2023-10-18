@@ -35,12 +35,12 @@ public class AddLaw extends AgendaSubcommandData {
 
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
-        if (playerWasElected) {
+        if (playerWasElected && player != null) {
             optionText = player.getFaction();
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
-        
+
         Player electedPlayer = activeGame.getPlayerFromColorOrFaction(optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();

@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -12,17 +11,11 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
-
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
-import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.player.SCPlay;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -36,33 +29,37 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
-   
     public static List<Button> getCabalHeroButtons(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeGame, player, UnitType.CabalSpacedock);
-        List<Tile> adjtiles = new ArrayList<>();
+
+        List<Tile> tiles = new ArrayList<>();
+        activeGame.getRealPlayers().stream()
+            .filter(p -> p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2"))
+            .forEach(p -> tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock, UnitType.Spacedock)));
+
+        List<Tile> adjTiles = new ArrayList<>();
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
                 Tile tileToAdd = activeGame.getTileByPosition(pos);
-                if (!adjtiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
-                    adjtiles.add(tileToAdd);
+                if (!adjTiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
+                    adjTiles.add(tileToAdd);
                 }
             }
         }
-        for (Tile tile : adjtiles) {
+
+        for (Tile tile : adjTiles) {
             empties.add(Button.primary(finChecker + "cabalHeroTile_" + tile.getPosition(), "Roll for units in " + tile.getRepresentationForButtons(activeGame, player)));
         }
         return empties;
     }
+
     public static void executeCabalHero(String buttonID, Player player, Game activeGame, ButtonInteractionEvent event) {
         String pos = buttonID.replace("cabalHeroTile_", "");
         Tile tile = activeGame.getTileByPosition(pos);
@@ -80,6 +77,7 @@ public class ButtonHelperHeroes {
             }
         }
     }
+
     public static List<Button> getEmpyHeroButtons(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
@@ -92,9 +90,7 @@ public class ButtonHelperHeroes {
         return empties;
     }
 
-    
     public static void resolveNaaluHeroSend(Player p1, Game activeGame, String buttonID, ButtonInteractionEvent event) {
-
         buttonID = buttonID.replace("naaluHeroSend_", "");
         String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
         String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
@@ -181,7 +177,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to resolve", buttons);
     }
 
-     public static void resolveNaaluHeroInitiation(Player player, Game activeGame, ButtonInteractionEvent event) {
+    public static void resolveNaaluHeroInitiation(Player player, Game activeGame, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("naaluhero");
         StringBuilder message2 = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
@@ -465,6 +461,7 @@ public class ButtonHelperHeroes {
             ButtonHelper.getTrueIdentity(player, activeGame) + " Chose the tile you want to swap places with " + tile1.getRepresentationForButtons(activeGame, player), buttons);
         event.getMessage().delete().queue();
     }
+
     public static void killShipsSardakkHero(Player player, Game activeGame, ButtonInteractionEvent event) {
         String pos1 = activeGame.getActiveSystem();
         Tile tile1 = activeGame.getTileByPosition(pos1);
@@ -483,7 +480,8 @@ public class ButtonHelperHeroes {
             }
         }
     }
-     public static void resolveWinnuHeroSC(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+
+    public static void resolveWinnuHeroSC(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, activeGame, activeGame.getMainGameChannel(), player, true);
         event.getMessage().delete().queue();

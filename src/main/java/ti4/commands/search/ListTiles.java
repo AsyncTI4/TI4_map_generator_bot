@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -47,15 +46,15 @@ public class ListTiles extends SearchSubcommandData {
         //     return;
         // }
 
-        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> TileHelper.isValidTile(searchString) ? searchString.equals(tile.getId()) : true).sorted(Comparator.comparing(TileModel::getId)).toList();
+        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> TileHelper.isValidTile(searchString) ? searchString.equals(tile.getId()) : true)
+            .sorted(Comparator.comparing(TileModel::getId)).toList();
         MessageChannel channel = event.getMessageChannel();
-        
-        
+
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
-        
+
         for (TileModel tile : tiles) {
             MessageEmbed tileEmbed = tile.getHelpMessageEmbed(includeAliases);
-            if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed)); 
+            if (Helper.embedContainsSearchTerm(tileEmbed, searchString)) tileEmbeds.add(Map.entry(tile, tileEmbed));
         }
 
         //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link

@@ -1,9 +1,5 @@
 package ti4.commands.agenda;
 
-import java.awt.Button;
-import java.util.List;
-
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,7 +16,6 @@ public class PutAgendaTop extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
-
     public void putTop(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
         boolean success = activeGame.putAgendaTop(agendaID);
         if (success && !activeGame.isFoWMode()) {
@@ -34,6 +29,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
 
         }
     }
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();

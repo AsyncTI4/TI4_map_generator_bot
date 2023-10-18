@@ -185,10 +185,14 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().contains(searchString) || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        StringBuilder sb = new StringBuilder(getName());
+        sb.append(" (");
+        if (!getFaction().isBlank()) sb.append(getFaction()).append(") (");
+        sb.append(getSource()).append(")");
+        return sb.toString();
     }
 }
