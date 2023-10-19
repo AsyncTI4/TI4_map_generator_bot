@@ -361,7 +361,7 @@ public class Helper {
 
     public static String getRoleMentionByName(Guild guild, String roleName) {
         if (roleName == null) {
-            return "@Oopsidoops no name";
+            return "[@Oopsidoops no name]";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
         if (!roles.isEmpty()) {
@@ -379,48 +379,38 @@ public class Helper {
         return getRoleMentionByName(guild, colour);
     }
 
-    public static String getSCAsMention(int sc) {
-        return switch (sc) {
-            case 1 -> "<@&947965021168762890>";
-            case 2 -> "<@&947965277633650699>";
-            case 3 -> "<@&947965381488807956>";
-            case 4 -> "<@&947965493376061441>";
-            case 5 -> "<@&947965546660495381>";
-            case 6 -> "<@&947965592013525022>";
-            case 7 -> "<@&947965632933146634>";
-            case 8 -> "<@&947965671394906172>";
-            default -> "**" + sc + "**";
-        };
-    }
-
-    public static String getSCAsMention(Guild guild, int sc, Game activeGame) {
-        if (!getRoleMentionByName(guild, getSCName(sc, activeGame)).isEmpty()) {
-            return getRoleMentionByName(guild, getSCName(sc, activeGame));
-        } else {
-            return "@SC #" + sc;
+    public static String getSCAsMention(int sc, Game activeGame) {
+        if (activeGame.isHomeBrewSCMode()) {
+            return getSCName(sc, activeGame);
         }
-
-    }
-
-    public static String getSCAsMention(Guild guild, String scname) {
-        return getRoleMentionByName(guild, scname);
+        return switch (sc) {
+            case 1 -> Emojis.SC1Mention;
+            case 2 -> Emojis.SC2Mention;
+            case 3 -> Emojis.SC3Mention;
+            case 4 -> Emojis.SC4Mention;
+            case 5 -> Emojis.SC5Mention;
+            case 6 -> Emojis.SC6Mention;
+            case 7 -> Emojis.SC7Mention;
+            case 8 -> Emojis.SC8Mention;
+            default -> "**SC" + sc + "**";
+        };
     }
 
     public static String getSCFrontRepresentation(Game activeGame, int sc) {
         if (activeGame.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeGame);
-        return getSCEmojiFromInteger(sc) + getSCAsMention(activeGame.getGuild(), sc, activeGame);
+        return getSCEmojiFromInteger(sc) + getSCAsMention(sc, activeGame);
     }
 
     public static String getSCBackRepresentation(Game activeGame, int sc) {
         if (activeGame.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeGame) + " (Played)";
-        return getSCBackEmojiFromInteger(sc) + getSCAsMention(activeGame.getGuild(), sc, activeGame);
+        return getSCBackEmojiFromInteger(sc) + getSCAsMention(sc, activeGame);
     }
 
     public static String getSCName(int sc, Game activeGame) {
         if (Optional.ofNullable(activeGame.getScSetID()).isPresent() && !"null".equals(activeGame.getScSetID())) {
             return Mapper.getStrategyCardSets().get(activeGame.getScSetID()).getCardValues().get(sc);
         }
-        return "" + sc;
+        return "**SC" + sc + "**";
     }
 
     public static Integer getSCNumber(String sc) {
