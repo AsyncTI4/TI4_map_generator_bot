@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
 import ti4.commands.units.AddUnits;
@@ -841,7 +842,7 @@ public class ButtonHelperFactionSpecific {
         if (playerLeader == null) {
             return;
         }
-        playerLeader.setExhausted(false);
+        RefreshLeader.refreshLeader(p2, playerLeader, activeGame);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted TCS tech to ready " + agent + ", owned by " + p2.getColor());
 

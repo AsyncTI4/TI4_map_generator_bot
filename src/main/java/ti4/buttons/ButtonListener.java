@@ -186,10 +186,12 @@ public class ButtonListener extends ListenerAdapter {
         String ident = player.getFactionEmoji();
         if (!buttonID.equalsIgnoreCase("ultimateundo")) {
             ButtonHelper.saveButtons(event, activeGame, player);
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
         if (activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
+        
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             MessageChannel channel;
@@ -3094,8 +3096,9 @@ public class ButtonListener extends ListenerAdapter {
                             }
                         }
                     }
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());
+                    
                     GameSaveLoadManager.undo(activeGame);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());
                     if (activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
                         event.getMessage().delete().queue();
                     }
@@ -3177,7 +3180,7 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        
     }
 
     private void deleteButtons(ButtonInteractionEvent event, String buttonID, String buttonLabel, Game activeGame, Player player, MessageChannel actionsChannel, String trueIdentity) {
