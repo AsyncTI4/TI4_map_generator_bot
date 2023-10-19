@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -190,9 +192,24 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         description.append(getDescription());
         eb.setDescription(description.toString());
 
-        // FIELDS
-        eb.addField("Card IDs:", getNewDeck().stream().collect(Collectors.joining("\n")), true);
+        // // FIELDS
+        // String cardList = getNewDeck().stream().collect(Collectors.joining("\n"));
+        // if (cardList.length() <= 1024) {
+        //     eb.addField("Card IDs:", cardList, true);
+        // } else {
+        //     while (true) {
+        //         if (cardList.length() > 1024) {
+        //             String firstCardList = StringUtils.left(StringUtils.substringBeforeLast(cardList, "\n"), 1024);
+        //             eb.addField("Card IDs:", firstCardList, true);
+        //             cardList = cardList.replace(firstCardList, "");
+        //         } else {
+        //             eb.addField("Card IDs:", cardList, true);
+        //             break;
+        //         }
+        //     }
+        // }
 
+        
         //FOOTER
         StringBuilder footer = new StringBuilder();
         footer.append("ID: ").append(getAlias());
@@ -209,7 +226,9 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        return getName() + " (" + getType() + ") " + getDescription();
+        StringBuilder sb = new StringBuilder();
+        sb.append("[").append(getType()).append("] ").append(getName()).append(" --> ").append(getDescription());
+        return StringUtils.left(StringUtils.substringBefore(sb.toString(), "\n"), 100);
     }
 
     private String getTypeEmoji() {
@@ -222,7 +241,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
             case "public_stage_2_objective" -> Emojis.Public2;
             case "secret_objective" -> Emojis.SecretObjective;
             case "relic" -> Emojis.RelicCard;
-            case "explore" -> Emojis.Frontier;
+            case "explore" -> Emojis.FrontierCard + Emojis.CulturalCard + Emojis.IndustrialCard + Emojis.HazardousCard;
             default -> "";
         };
     }

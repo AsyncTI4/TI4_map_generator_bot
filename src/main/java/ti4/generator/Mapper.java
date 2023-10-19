@@ -765,6 +765,10 @@ public class Mapper {
         return getDecks().get(deckID);
     }
 
+    public static boolean isValidDeck(String deckID) {
+        return getDecks().containsKey(deckID);
+    }
+
     public static HashMap<String, CombatModifierModel> getCombatModifiers() {
         return new HashMap<>(combatModifiers);
     }
