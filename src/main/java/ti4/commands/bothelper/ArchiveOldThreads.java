@@ -40,6 +40,9 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             .toList();
 
         for (ThreadChannel threadChannel : threadChannels) {
+            if(threadChannel.getName().contains("bot-map-updates")){
+                continue;
+            }
             threadChannel.getManager().setArchived(true)
                 .onErrorMap((e) -> {
                         LoggerHandler.logError("Error map error:");

@@ -359,6 +359,21 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
+    public static int getDateDifference(String date1, String date2){
+        if(date1 == null || date1.length() == 0){
+            return 1000;
+        }
+        date1 = date1.replace(".","_");
+        date2 = date2.replace(".","_");
+        int year1 = Integer.parseInt(date1.split("_")[0]);
+        int year2 = Integer.parseInt(date2.split("_")[0]);
+        int month1 = Integer.parseInt(date1.split("_")[1]);
+        int month2 = Integer.parseInt(date2.split("_")[1]);
+        int day1 = Integer.parseInt(date1.split("_")[2]);
+        int day2 = Integer.parseInt(date2.split("_")[2]);
+        return (year2-year1)*365 + (month2-month1)*30 + (day2-day1);
+    }
+
     public static String getRoleMentionByName(Guild guild, String roleName) {
         if (roleName == null) {
             return "[@Oopsidoops no name]";

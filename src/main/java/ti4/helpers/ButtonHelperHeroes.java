@@ -32,6 +32,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
@@ -141,6 +142,30 @@ public class ButtonHelperHeroes {
 
     }
 
+    public static void resolveNivynHeroSustainEverything(Game activeGame){
+        for(Tile tile : activeGame.getTileMap().values()){
+            for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+                for(Player player : activeGame.getRealPlayers()){
+                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                        if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
+                        UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                        if (unitModel == null) continue;
+                        UnitKey unitKey = unitEntry.getKey();
+                        int damagedUnits = 0;
+                        if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                            damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                        }
+                        int totalUnits = unitEntry.getValue() - damagedUnits;
+                        if(totalUnits > 0 && unitModel.getSustainDamage() && (!player.hasUnit("nivyn_mech") || !unitModel.getBaseType().equalsIgnoreCase("mech"))){
+                            tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void augersHeroSwap(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         int num = Integer.parseInt(buttonID.split("_")[2]);
         if (buttonID.split("_")[1].equalsIgnoreCase("1")) {
@@ -150,7 +175,7 @@ public class ButtonHelperHeroes {
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             ButtonHelper.getTrueIdentity(player, activeGame) + " put the objective at location " + num + " as next up. Feel free to peek at it to confirm it worked");
-        GameSaveLoadManager.saveMap(activeGame, event);
+       // GameSaveLoadManager.saveMap(activeGame, event);
         event.getMessage().delete().queue();
     }
 
