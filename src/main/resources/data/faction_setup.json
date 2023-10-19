@@ -413,6 +413,7 @@
   {
     "alias": "titans",
     "factionName": "The Titans of Ul",
+    "shortTag": "UL",
     "homeSystem": "55",
     "startingFleet": "dn,2 cr,2 ff,3 inf elysium,sd elysium",
     "commodities": 2,
