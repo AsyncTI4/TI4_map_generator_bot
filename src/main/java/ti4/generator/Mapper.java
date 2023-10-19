@@ -492,7 +492,7 @@ public class Mapper {
             return (String) explore.get(id).getRepresentation();
         } else {
             BotLogger.log("Cannot find explore with ID: " + id);
-            throw new NullPointerException();
+            return null;
         }
     }
 
