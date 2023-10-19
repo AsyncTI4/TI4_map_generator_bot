@@ -361,7 +361,7 @@ public class Helper {
 
     public static String getRoleMentionByName(Guild guild, String roleName) {
         if (roleName == null) {
-            return "@Oopsidoops no name";
+            return "[@Oopsidoops no name]";
         }
         List<Role> roles = guild.getRolesByName(roleName, true);
         if (!roles.isEmpty()) {
@@ -392,22 +392,9 @@ public class Helper {
             case 6 -> Emojis.SC6Mention;
             case 7 -> Emojis.SC7Mention;
             case 8 -> Emojis.SC8Mention;
-            default -> "***SC" + sc + "***";
+            default -> "**SC" + sc + "**";
         };
     }
-
-    // public static String getSCAsMention(Guild guild, int sc, Game activeGame) {
-    //     if (!getRoleMentionByName(guild, getSCName(sc, activeGame)).isEmpty()) {
-    //         return getRoleMentionByName(guild, getSCName(sc, activeGame));
-    //     } else {
-    //         return "@SC #" + sc;
-    //     }
-
-    // }
-
-    // public static String getSCAsMention(Guild guild, String scname) {
-    //     return getRoleMentionByName(guild, scname);
-    // }
 
     public static String getSCFrontRepresentation(Game activeGame, int sc) {
         if (activeGame.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeGame);
@@ -423,7 +410,7 @@ public class Helper {
         if (Optional.ofNullable(activeGame.getScSetID()).isPresent() && !"null".equals(activeGame.getScSetID())) {
             return Mapper.getStrategyCardSets().get(activeGame.getScSetID()).getCardValues().get(sc);
         }
-        return "***SC" + sc + "***";
+        return "**SC" + sc + "**";
     }
 
     public static Integer getSCNumber(String sc) {
