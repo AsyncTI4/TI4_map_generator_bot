@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.player.TurnEnd;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
 
 import ti4.map.Game;
@@ -32,6 +33,7 @@ public class StartPhase extends GameSubcommandData {
             case "voting" -> AgendaHelper.startTheVoting(activeGame, event);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(activeGame);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
+            case "finSpecialNivyn" -> ButtonHelperHeroes.resolveNivynHeroSustainEverything(activeGame);
             case "statusScoring" -> {
                 TurnEnd.showPublicObjectivesWhenAllPassed(event, activeGame, activeGame.getMainGameChannel());
                 activeGame.updateActivePlayer(null);

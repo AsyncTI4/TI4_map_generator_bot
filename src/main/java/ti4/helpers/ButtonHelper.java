@@ -1291,7 +1291,7 @@ public class ButtonHelper {
 
     public static void makeACombatThread(Game activeGame, MessageChannel channel, Player p1, Player p2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         TextChannel textChannel = (TextChannel) channel;
-
+        Helper.checkThreadLimitAndArchive(event.getGuild());
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent("Resolve combat");
         channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             boolean foundThread = false;
@@ -1761,7 +1761,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (numOfCapitalShips > 4 && !fleetSupplyViolated) {
+        if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
             if (player.getLeaderIDs().contains("letnevcommander") && !player.hasLeaderUnlocked("letnevcommander")) {
                 commanderUnlockCheck(player, activeGame, "letnev", event);
             }
@@ -3100,7 +3100,7 @@ public class ButtonHelper {
     }
 
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game activeGame) {
-        return (int) activeGame.getTileMap().values().stream().filter(Tile::isGravityRift).count();
+        return (int) activeGame.getTileMap().values().stream().filter(tile -> tile.isGravityRift() && tile.containsPlayersUnits(player)).count();
     }
 
     public static List<Button> getButtonsForRepairingUnitsInASystem(Player player, Game activeGame, Tile tile) {
@@ -3929,7 +3929,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
+        //GameSaveLoadManager.saveMap(activeGame, event);
 
     }
 
