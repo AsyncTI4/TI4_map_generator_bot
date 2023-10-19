@@ -1,11 +1,9 @@
 package ti4.commands.bothelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,7 +36,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         HashMap<String, Integer> slashCommands = new HashMap<String, Integer>();
         for (Game activeGame : mapList.values()) {
-            if(useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30){
+            if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
             }
             buttonsPressed = activeGame.getButtonPressCount() + buttonsPressed;
@@ -57,23 +55,23 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         // List<String> keys = new ArrayList<String>();
         // keys.addAll(slashCommands.keySet());
         // Collections.sort(keys);
-        
+
         Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
-         for (String command : sortedMapAsc.keySet()) {
+        for (String command : sortedMapAsc.keySet()) {
             longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";
-         }
-        
+        }
+
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg);
     }
 
-    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, final boolean order)
-    {
-        List<Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
+    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, final boolean order) {
+        List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
         // Sorting the list based on values
         list.sort((o1, o2) -> order ? o1.getValue().compareTo(o2.getValue()) == 0
-                ? o1.getKey().compareTo(o2.getKey())
-                : o1.getValue().compareTo(o2.getValue()) : o2.getValue().compareTo(o1.getValue()) == 0
+            ? o1.getKey().compareTo(o2.getKey())
+            : o1.getValue().compareTo(o2.getValue())
+            : o2.getValue().compareTo(o1.getValue()) == 0
                 ? o2.getKey().compareTo(o1.getKey())
                 : o2.getValue().compareTo(o1.getValue()));
         return list.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
