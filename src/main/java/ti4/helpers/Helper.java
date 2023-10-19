@@ -411,14 +411,9 @@ public class Helper {
         };
     }
 
-    public static String getSCFrontRepresentation(Game activeGame, int sc) {
+    public static String getSCRepresentation(Game activeGame, int sc) {
         if (activeGame.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeGame);
-        return getSCEmojiFromInteger(sc) + getSCAsMention(sc, activeGame);
-    }
-
-    public static String getSCBackRepresentation(Game activeGame, int sc) {
-        if (activeGame.isHomeBrewSCMode()) return "SC #" + sc + " " + getSCName(sc, activeGame) + " (Played)";
-        return getSCBackEmojiFromInteger(sc) + getSCAsMention(sc, activeGame);
+        return getSCAsMention(sc, activeGame);
     }
 
     public static String getSCName(int sc, Game activeGame) {

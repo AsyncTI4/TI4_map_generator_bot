@@ -85,18 +85,20 @@ public class TurnStart extends PlayerSubcommandData {
         if (!activeGame.isStratPings()) return null;
         boolean sendReminder = false;
 
-        StringBuilder sb = new StringBuilder("> " + Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Please react to ");
+        StringBuilder sb = new StringBuilder();
+        sb.append(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
+        sb.append(" Please react to the following strategy cards before doing anything else:\n");
         int count = 0;
         for (int sc : activeGame.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
-                sb.append(Helper.getSCBackRepresentation(activeGame, sc));
+                sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc)).append("\n");
                 sendReminder = true;
                 count++;
             }
         }
-        sb.append(" above before doing anything else. You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
         if (count > 1) {
-            sb.append(" Make sure to resolve the strategy cards in the order they were played.");
+            sb.append("\nMake sure to resolve the strategy cards in the order they were played.");
         }
         return sendReminder ? sb.toString() : null;
     }
