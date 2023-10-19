@@ -962,4 +962,5 @@ public class Constants {
     public static final String FACTION_TECH = "faction_tech";
     public static final String FACTION_TECH_ADD = "faction_tech_add";
     public static final String FACTION_TECH_REMOVE = "faction_tech_remove";
+    public static final String SEARCH_DECKS = "decks";
 }
