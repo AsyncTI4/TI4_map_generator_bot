@@ -15,7 +15,7 @@
         "faction": "bentor",
         "type": "agent",
         "name": "C.O.O. Mgur",
-        "title": "Daft Tradesman",
+        "title": "Deft Tradesman",
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card and choose 1 player. For each Fragment token on your faction sheet, that player gains 1 commodity. For each commodity they would gain in excess of their commodity value, they gain 1 trade good instead.",
         "unlockCondition": "Always Unlocked",

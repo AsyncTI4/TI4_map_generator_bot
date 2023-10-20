@@ -492,7 +492,7 @@ public class Mapper {
             return (String) explore.get(id).getRepresentation();
         } else {
             BotLogger.log("Cannot find explore with ID: " + id);
-            throw new NullPointerException();
+            return null;
         }
     }
 
@@ -763,6 +763,10 @@ public class Mapper {
 
     public static DeckModel getDeck(String deckID) {
         return getDecks().get(deckID);
+    }
+
+    public static boolean isValidDeck(String deckID) {
+        return getDecks().containsKey(deckID);
     }
 
     public static HashMap<String, CombatModifierModel> getCombatModifiers() {

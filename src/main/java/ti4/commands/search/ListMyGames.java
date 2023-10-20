@@ -68,7 +68,7 @@ public class ListMyGames extends SearchSubcommandData {
             List<String> secondaries = new ArrayList<>();
             for (int sc : playerGame.getPlayedSCs()) {
                 if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
-                    secondaries.add(Helper.getSCBackRepresentation(playerGame, sc));
+                    secondaries.add(Helper.getSCBackEmojiFromInteger(sc));
                 }
             }
             if (!secondaries.isEmpty()) {
