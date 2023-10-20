@@ -778,8 +778,7 @@
         "name": "Suspicious Wreckage",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Choose 2 other players",
-        "attachmentId": "each of those players must give you 1 promissory note from their hand.",
+        "text": "Choose 2 other players, each of those players must give you 1 promissory note from their hand.",
         "source": "ds"
     },
     {
@@ -787,8 +786,7 @@
         "name": "Dark Visions",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Look at the top card of each exploration deck",
-        "attachmentId": "discard any number of those cards and explore up to 1 planet you control. Then, shuffle each exploration deck.",
+        "text": "Look at the top card of each exploration deck, discard any number of those cards and explore up to 1 planet you control. Then, shuffle each exploration deck.",
         "source": "ds"
     },
     {

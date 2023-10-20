@@ -357,6 +357,14 @@ public class GameSaveLoadManager {
         writer.write(Constants.SLASH_COMMAND_STRING + " " + sb10);
         writer.write(System.lineSeparator());
 
+        HashMap<String, Integer> acSabod = activeGame.getAllActionCardsSabod();
+        StringBuilder sb11 = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : acSabod.entrySet()) {
+            sb11.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+        }
+        writer.write(Constants.ACS_SABOD + " " + sb11);
+        writer.write(System.lineSeparator());
+
         HashMap<String, Integer> displacedActivation = activeGame.getMovedUnitsFromCurrentActivation();
         StringBuilder sb4 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
@@ -1395,6 +1403,21 @@ public class GameSaveLoadManager {
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
                             activeGame.setSpecificSlashCommandCount(outcome, Integer.parseInt(voteInfo));
+                        }
+                    }
+                }
+                case Constants.ACS_SABOD -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeGame.setSpecificActionCardSaboCount(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }

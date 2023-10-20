@@ -35,7 +35,7 @@ public class PlanetAdd extends PlanetAddRemove {
     }
 
     public void doAction(Player player, String planet, Game activeGame, GenericInteractionCreateEvent event) {
-        boolean doubleCheck = Helper.isAllianceModeAndPreviouslyOwnedCheck(activeGame, planet);
+        boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(activeGame, planet, player);
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if ("mirage".equals(planet)) {
@@ -88,7 +88,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_)) {
+                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_)&& !doubleCheck) {
                         String msg2 = Helper.getPlayerRepresentation(player_, activeGame) + " lost shard and lost a victory point. " + Helper.getPlayerRepresentation(player, activeGame)
                             + " gained shard and a victory point.";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
@@ -112,7 +112,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-        if ((alreadyOwned || player.hasAbility("contagion_blex")) && player.hasTech("dxa")) {
+        if ((alreadyOwned || player.hasAbility("contagion_blex")) && player.hasTech("dxa")&& !doubleCheck) {
             String msg10 = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have an opportunity to use Dacxive Animators on " + Helper.getPlanetRepresentation(planet, activeGame)
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg10, ButtonHelper.getDacxiveButtons(activeGame, player, planet));
@@ -121,7 +121,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
             alreadyOwned = false;
         }
-        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && event != null) {
+        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck&& event != null) {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
@@ -131,7 +131,7 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
         for (String law : activeGame.getLaws().keySet()) {
-            if ("minister_exploration".equalsIgnoreCase(law)) {
+            if ("minister_exploration".equalsIgnoreCase(law)&& !doubleCheck) {
                 if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -147,7 +147,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (unitHolder != null && unitHolder.getUnits() != null) {
             numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
         }
-        if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")) {
+        if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")&& !doubleCheck) {
 
             Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
             sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));

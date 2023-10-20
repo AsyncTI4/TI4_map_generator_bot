@@ -190,7 +190,7 @@ public class ButtonHelperAgents {
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
             if (ownedUnit.getCost() <= removedUnit.getCost() + 2) {
-                String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getAsyncId() + "_" + tile.getPosition();
+                String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getBaseType()+ "_" + tile.getPosition();
                 String buttonText = "Place " + ownedUnit.getName();
                 buttons.add(Button.danger(buttonID, buttonText).withEmoji(Emoji.fromFormatted(ownedUnit.getUnitEmoji())));
             }
