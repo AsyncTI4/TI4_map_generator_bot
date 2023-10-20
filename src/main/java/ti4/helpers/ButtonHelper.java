@@ -2172,7 +2172,13 @@ public class ButtonHelper {
                 startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
             }
             startButtons.add(Button.danger(finChecker + "turnEnd", "End Turn"));
-            startButtons.add(Button.secondary(finChecker+"ministerOfWar", "Use Minister of War"));
+           for (String law : activeGame.getLaws().keySet()) {
+                if ("minister_war".equalsIgnoreCase(law) ) {
+                    if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
+                        startButtons.add(Button.secondary(finChecker+"ministerOfWar", "Use Minister of War"));
+                    }
+                }
+            }
         } else {
             if (player.getTechs().contains("cm")) {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
