@@ -118,6 +118,11 @@ public class AgendaHelper {
 
                     }
                 }
+                if ("absol_checks".equalsIgnoreCase(agID)) {
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
+                    } 
+                }
                 if ("conventions".equalsIgnoreCase(agID)) {
                     List<Player> winOrLose;
                     if (!"for".equalsIgnoreCase(winner)) {
@@ -1841,6 +1846,19 @@ public class AgendaHelper {
             summary = summaryBuilder.toString();
         }
         return summary;
+    }
+
+    public static void resolveMinisterOfWar(Game activeGame, Player player, ButtonInteractionEvent event){
+        ButtonHelper.deleteTheOneButton(event);
+        boolean success = activeGame.removeLaw(activeGame.getLaws().get("minister_war"));
+        if (success) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Minister of War Law removed");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
+        }
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "ministerOfWar");
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
     }
 
     public static String getPlayerVoteText(Game activeGame, Player player) {

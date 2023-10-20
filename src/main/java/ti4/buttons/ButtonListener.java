@@ -360,6 +360,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanMechTradeStepTwo_")) {
             ButtonHelperFactionSpecific.resolveHacanMechTradeStepTwo(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("resolveDMZTrade_")) {
+            ButtonHelper.resolveDMZTrade(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("resolveAlliancePlanetTrade_")) {
+            ButtonHelper.resolveAllianceMemberPlanetTrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("augersHeroStart_")) {
             ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("augersPeak_")) {
@@ -822,6 +826,8 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("assignHits_")) {
+            ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
+        } else if (buttonID.startsWith("seedySpace_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("prophetsTears_")) {
             player.addExhaustedRelic("prophetstears");
@@ -837,11 +843,12 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     activeGame.drawActionCard(player.getUserID());
                     message = ButtonHelper.getIdent(player) + " Drew 1 AC";
+                    ACInfo.sendActionCardInfo(activeGame, player, event);
                 }
                 if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
                 }
-                ACInfo.sendActionCardInfo(activeGame, player, event);
+                
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                 ButtonHelper.checkACLimit(activeGame, event, player);
                 ButtonHelper.deleteTheOneButton(event);
@@ -943,6 +950,12 @@ public class ButtonListener extends ListenerAdapter {
             String type = typeNName.substring(0, typeNName.indexOf("_"));
             String acName = typeNName.replace(type + "_", "");
             String message = "Cancelling the AC \"" + acName + "\" using ";
+            Integer count = activeGame.getAllActionCardsSabod().get(acName);
+            if(count == null){
+                activeGame.setSpecificActionCardSaboCount(acName, 1);
+            }else{
+                activeGame.setSpecificActionCardSaboCount(acName, 1+count);
+            }
             if (activeGame.getMessageIDsForSabo().contains(event.getMessageId())) {
                 activeGame.removeMessageIDForSabo(event.getMessageId());
             }
@@ -1346,6 +1359,8 @@ public class ButtonListener extends ListenerAdapter {
             String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " Use buttons to decide what structure to build";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg, buttons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("ruins_")) {
+            ButtonHelper.resolveWarForgeRuins(activeGame, buttonID, player, event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
             String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
             Player notYssaril = activeGame.getPlayerFromColorOrFaction(playerFaction);
@@ -1839,10 +1854,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put " + agendaNumID + " on the top of the agenda deck.");
         } else if (buttonID.startsWith("primaryOfWarfare")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "warfare");
-            MessageChannel channel = event.getMessageChannel();
-            if (activeGame.isFoWMode()) {
-                channel = player.getPrivateChannel();
-            }
+            MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
         } else if (buttonID.startsWith("mahactCommander")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "mahactCommander");
@@ -2242,6 +2254,14 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(tg + commoditiesTotal);
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     player.setCommodities(0);
+                    for(Player p2: activeGame.getRealPlayers()){
+                        if(p2.getSCs().contains(5) && p2.getCommodities() > 0){
+                            p2.setTg(p2.getTg()+p2.getCommodities());
+                            p2.setCommodities(0);
+                            ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+ " your commodities got washed in the process of washing "+ButtonHelper.getIdentOrColor(player, activeGame));
+                        }
+                    }
                     if (!player.getFollowedSCs().contains(5)) {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, activeGame);
                     }
@@ -2873,6 +2893,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
+                case "ministerOfWar"-> {AgendaHelper.resolveMinisterOfWar(activeGame, player, event);}
                 case "concludeMove" -> {
                     String message = "Moved all units to the space area.";
                     Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
