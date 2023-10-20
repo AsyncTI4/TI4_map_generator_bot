@@ -55,40 +55,38 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         String drawColor = planet.getPlanetType().toString();
         OptionMapping traitOption = event.getOption(Constants.TRAIT);
-        if (traitOption != null){
+        if (traitOption != null) {
             drawColor = traitOption.getAsString();
         }
         boolean over = false;
         OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);
-        if(overRider != null && "YES".equalsIgnoreCase(overRider.getAsString()))
-        {
+        if (overRider != null && "YES".equalsIgnoreCase(overRider.getAsString())) {
             over = true;
         }
         Player player = activeGame.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         player = Helper.getPlayer(activeGame, player, event);
 
-
         explorePlanet(event, tile, planetName, drawColor, player, false, activeGame, 1, over);
     }
 
-    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game activeGame, int numExplores, boolean ownerShipOverride) {
+    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game activeGame, int numExplores,
+        boolean ownerShipOverride) {
         if (!player.getPlanets().contains(planetName) && !activeGame.isAllianceMode() && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
-
 
         if (player.hasAbility("distant_suns")) {
             if (Helper.mechCheck(planetName, activeGame, player)) {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
                         new PlanetRefresh().doAction(player, planetName, activeGame);
-                        MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
                     }
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
-                    Button resolveExplore1  = Button.success("distant_suns_accept_"+planetName+"_"+drawColor, "Choose to Explore Twice");
-                    Button resolveExplore2 = Button.success("distant_suns_decline_"+planetName+"_"+drawColor, "Decline Distant Suns");
+                    Button resolveExplore1 = Button.success("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
+                    Button resolveExplore2 = Button.success("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
@@ -108,29 +106,25 @@ public class ExpPlanet extends ExploreSubcommandData {
                         String[] cardInfo2 = card2.split(";");
                         String name2 = cardInfo2[0];
 
-                        Button resolveExplore1  = Button.success("resolve_explore_"+cardID+"_"+planetName, "Choose "+name1);
-                        Button resolveExplore2 = Button.success("resolve_explore_"+cardID2+"_"+planetName, "Choose "+name2);
+                        Button resolveExplore1 = Button.success("resolve_explore_" + cardID + "_" + planetName, "Choose " + name1);
+                        Button resolveExplore2 = Button.success("resolve_explore_" + cardID2 + "_" + planetName, "Choose " + name2);
                         List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                         //code to draw 2 explores and get their names
                         //Send Buttons to decide which one to explore
                         String message = "Please decide which card to resolve.";
 
                         if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
-                            
+
                             String pF = player.getFactionEmoji();
-                            
-                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Using Distant Suns,  " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeGame));
-                            
-                        }
-                        else
-                        {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeGame));
+
+                            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
+                                "Using Distant Suns,  " + pF + " found a " + name1 + " and a " + name2 + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
+
+                        } else {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and a " + name2 + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
                         }
 
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-
-
-
 
                         return;
                     }
@@ -150,11 +144,11 @@ public class ExpPlanet extends ExploreSubcommandData {
         resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeGame);
-            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
         }
-        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")){
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
             new PlanetRefresh().doAction(player, planetName, activeGame);
-            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
             ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
         }
     }

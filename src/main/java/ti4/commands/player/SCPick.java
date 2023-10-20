@@ -214,7 +214,7 @@ public class SCPick extends PlayerSubcommandData {
         }
 
         String sb = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) +
-            " Picked: " + Helper.getSCFrontRepresentation(activeGame, scPicked);
+            "\n> Picked: " + Helper.getSCRepresentation(activeGame, scPicked);
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
