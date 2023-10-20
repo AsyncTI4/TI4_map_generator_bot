@@ -957,9 +957,21 @@ public class GenerateMap {
             }
 
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
-            if (Constants.ENVOY.equals(leader.getType()))
-                leaderInfoFileName = "pa_leaders_envoy" + status + ".png";
-            drawPAImage(x + deltaX, y, leaderInfoFileName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
+            BufferedImage resourceBufferedImage;
+            try {
+                resourceBufferedImage = ImageHelper.read(resourcePath);
+                if (resourceBufferedImage == null) {
+                    leaderInfoFileName = "pa_leaders_generic_" + leader.getType() + status + ".png";
+                    resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
+                    resourceBufferedImage = ImageHelper.read(resourcePath);
+                    //TODO: DRAW LEADER NAME VERTICALLY
+                }
+                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+            } catch (Exception e) {
+                System.out.println("Bad file: " + leaderInfoFileName);
+            }
+
             deltaX += 48;
         }
         if (player.hasAbility("imperia")) {

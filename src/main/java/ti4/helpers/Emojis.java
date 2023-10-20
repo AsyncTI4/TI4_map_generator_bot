@@ -416,6 +416,61 @@ public class Emojis {
     // LIST OF SEM-LORES
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor, SemLore);
 
+    // EMOJI FARM 9 - SC COLOURS
+    public static final String sc_1_1 = "<:sc_1_1:1164316518390190140>";
+    public static final String sc_1_2 = "<:sc_1_2:1164316520986464267>";
+    public static final String sc_1_3 = "<:sc_1_3:1164316522689339392>";
+    public static final String sc_1_4 = "<:sc_1_4:1164316525021380729>";
+    public static final String sc_1_5 = "<:sc_1_5:1164316526501965864>";
+    public static final String sc_1_6 = "<:sc_1_6:1164316528024494130>";
+    public static final String SC1Mention = sc_1_1 + sc_1_2 + sc_1_3 + sc_1_4 + sc_1_5 + sc_1_6;
+    public static final String sc_2_1 = "<:sc_2_1:1164316530025177108>";
+    public static final String sc_2_2 = "<:sc_2_2:1164316530926948383>";
+    public static final String sc_2_3 = "<:sc_2_3:1164316532533366935>";
+    public static final String sc_2_4 = "<:sc_2_4:1164316534982840422>";
+    public static final String sc_2_5 = "<:sc_2_5:1164316536266309684>";
+    public static final String sc_2_6 = "<:sc_2_6:1164316539789529108>";
+    public static final String SC2Mention = sc_2_1 + sc_2_2 + sc_2_3 + sc_2_4 + sc_2_5 + sc_2_6;
+    public static final String sc_3_1 = "<:sc_3_1:1164316650233942037>";
+    public static final String sc_3_2 = "<:sc_3_2:1164316651823579177>";
+    public static final String sc_3_3 = "<:sc_3_3:1164316653748764703>";
+    public static final String sc_3_4 = "<:sc_3_4:1164316654948323378>";
+    public static final String sc_3_5 = "<:sc_3_5:1164316657783689297>";
+    public static final String SC3Mention = sc_3_1 + sc_3_2 + sc_3_3 + sc_3_4 + sc_3_5;
+    public static final String sc_4_1 = "<:sc_4_1:1164316658970660998>";
+    public static final String sc_4_2 = "<:sc_4_2:1164316660358991893>";
+    public static final String sc_4_3 = "<:sc_4_3:1164316662510661715>";
+    public static final String sc_4_4 = "<:sc_4_4:1164316663857021039>";
+    public static final String sc_4_5 = "<:sc_4_5:1164335083440836708>";
+    public static final String sc_4_6 = "<:sc_4_6:1164335085902909440>";
+    public static final String sc_4_7 = "<:sc_4_7:1164316057448742995>";
+    public static final String SC4Mention = sc_4_1 + sc_4_2 + sc_4_3 + sc_4_4 + sc_4_5 + sc_4_6 + sc_4_7;
+    public static final String sc_5_1 = "<:sc_5_1:1164335087068926122>";
+    public static final String sc_5_2 = "<:sc_5_2:1164335088348168232>";
+    public static final String sc_5_3 = "<:sc_5_3:1164335090021716060>";
+    public static final String sc_5_4 = "<:sc_5_4:1164335091682648074>";
+    public static final String SC5Mention = sc_5_1 + sc_5_2 + sc_5_3 + sc_5_4;
+    public static final String sc_6_1 = "<:sc_6_1:1164335092739604632>";
+    public static final String sc_6_2 = "<:sc_6_2:1164335095352655882>";
+    public static final String sc_6_3 = "<:sc_6_3:1164335097307201617>";
+    public static final String sc_6_4 = "<:sc_6_4:1164335101111451648>";
+    public static final String sc_6_5 = "<:sc_6_5:1164335103191818300>";
+    public static final String SC6Mention = sc_6_1 + sc_6_2 + sc_6_3 + sc_6_4 + sc_6_5;
+    public static final String sc_7_1 = "<:sc_7_1:1164335106073296956>";
+    public static final String sc_7_2 = "<:sc_7_2:1164335107922989086>";
+    public static final String sc_7_3 = "<:sc_7_3:1164335364824113164>";
+    public static final String sc_7_4 = "<:sc_7_4:1164335111832096889>";
+    public static final String sc_7_5 = "<:sc_7_5:1164335367500071062>";
+    public static final String sc_7_6 = "<:sc_7_6:1164335116970098759>";
+    public static final String SC7Mention = sc_7_1 + sc_7_2 + sc_7_3 + sc_7_4 + sc_7_5 + sc_7_6;
+    public static final String sc_8_1 = "<:sc_8_1:1164335119046299748>";
+    public static final String sc_8_2 = "<:sc_8_2:1164335243688423454>";
+    public static final String sc_8_3 = "<:sc_8_3:1164335245210947644>";
+    public static final String sc_8_4 = "<:sc_8_4:1164335122355597402>";
+    public static final String sc_8_5 = "<:sc_8_5:1164335247429730365>";
+    public static final String SC8Mention = sc_8_1 + sc_8_2 + sc_8_3 + sc_8_4 + sc_8_5;
+    // END EMOJI FARM 9
+
     // ANOMOLIES
     public static final String Supernova = "<:supernova:1137029705946640445>";
     public static final String Asteroid = "<:asteroidbelt:1137029604050210846>";
