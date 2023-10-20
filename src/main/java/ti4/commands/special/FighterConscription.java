@@ -1,6 +1,8 @@
 package ti4.commands.special;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -34,7 +36,10 @@ public class FighterConscription extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
+        doFfCon(event, player, activeGame);
+    }
 
+    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game activeGame){
         String colorID = Mapper.getColorID(player.getColor());
 
         List<Tile> tilesAffected = new ArrayList<>();

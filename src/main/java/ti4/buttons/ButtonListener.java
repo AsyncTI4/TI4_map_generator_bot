@@ -58,8 +58,10 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
+import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -873,6 +875,8 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("biostimsReady_")) {
             ButtonHelper.bioStimsReady(activeGame, event, player, buttonID);
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("nekroHeroStep2_")) {
+            ButtonHelperHeroes.resolveNekroHeroStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("refreshVotes_")) {
             String votes = buttonID.replace("refreshVotes_", "");
             List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, activeGame);
@@ -2185,6 +2189,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                             ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                     }
+                    ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
@@ -2720,6 +2725,23 @@ public class ButtonListener extends ListenerAdapter {
                     activeGame.setTemporaryPingDisable(true);
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Disabled autopings for this turn");
                     event.getMessage().delete().queue();
+                }
+                case "riseOfAMessiah" -> {
+                    new RiseOfMessiah().doRise(player, event, activeGame);
+                    event.getMessage().delete().queue();
+                }
+                case "fighterConscription" -> {
+                    new FighterConscription().doFfCon(event, player, activeGame);
+                    event.getMessage().delete().queue();
+                }
+                case "miningInitiative" -> {
+                    ButtonHelperActionCards.miningInitiative(player, activeGame, event);
+                }
+                case "economicInitiative" -> {
+                    ButtonHelperActionCards.economicInitiative(player, activeGame, event);
+                }
+                case "industrialInitiative" -> {
+                    ButtonHelperActionCards.industrialInitiative(player, activeGame, event);
                 }
                 case "confirm_cc" -> {
                     if (player.getMahactCC().size() > 0) {
