@@ -204,6 +204,7 @@ public class Game {
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private HashMap<String, Integer> slashCommandsUsed = new HashMap<>();
+    private HashMap<String, Integer> actionCardsSabotaged = new HashMap<>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     @ExportableField
     private String phaseOfGame = "";
@@ -971,6 +972,10 @@ public class Game {
         return slashCommandsUsed;
     }
 
+    public HashMap<String, Integer> getAllActionCardsSabod() {
+        return actionCardsSabotaged;
+    }
+
     public HashMap<String, Integer> getMovedUnitsFromCurrentActivation() {
         return displacedUnitsFromEntireTacticalAction;
     }
@@ -983,12 +988,20 @@ public class Game {
         slashCommandsUsed.put(command, count);
     }
 
+    public void setSpecificActionCardSaboCount(String acName, int count) {
+        actionCardsSabotaged.put(acName, count);
+    }
+
     public void setCurrentMovedUnitsFrom1System(HashMap<String, Integer> displacedUnits) {
         displacedUnitsFrom1System = displacedUnits;
     }
 
     public void setSlashCommandsUsed(HashMap<String, Integer> commands) {
         slashCommandsUsed = commands;
+    }
+
+    public void setACSabod(HashMap<String, Integer> acs) {
+        actionCardsSabotaged = acs;
     }
 
     public void setSpecificCurrentMovedUnitsFrom1TacticalAction(String unit, int count) {
