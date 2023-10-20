@@ -952,6 +952,20 @@ public class AutoCompleteProvider {
                     }
                 }
             }
+            case Constants.SEARCH_DECKS -> {
+                switch (optionName) {
+                    case Constants.SEARCH -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, DeckModel> decks = new HashMap<>(Mapper.getDecks());
+                        List<Command.Choice> options = decks.entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
+            }
         }
     }
 

@@ -68,6 +68,7 @@ public class SearchCommand implements Command {
         subcommands.add(new ListLeaders());
         subcommands.add(new ListPromissoryNotes());
         subcommands.add(new ListExplores());
+        subcommands.add(new ListDecks());
 
         return subcommands;
     }
