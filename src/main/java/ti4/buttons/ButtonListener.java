@@ -826,9 +826,9 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("assignHits_")) {
-            ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
-        } else if (buttonID.startsWith("seedySpace_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("seedySpace_")) {
+            ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
         } else if (buttonID.startsWith("prophetsTears_")) {
             player.addExhaustedRelic("prophetstears");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " Chose to exhaust The Prophets Tears");
