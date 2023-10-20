@@ -36,6 +36,58 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+    public static List<Button> getNekroHeroButtons(Player player, Game activeGame){
+        List<Button> techPlanets = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.containsPlayersUnits(player)){
+                for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                    if(unitHolder instanceof Planet planetHolder){
+                        String planet = planetHolder.getName();
+                        if((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || ButtonHelper.checkForTechSkipAttachments(activeGame, planet)){
+                            techPlanets.add(Button.secondary("nekroHeroStep2_"+planet, Mapper.getPlanet(planet).getName()));
+                        }
+                    }
+                }
+            }
+        }
+        return techPlanets;
+    }
+
+    public static void resolveNekroHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        String techType = "none";
+        if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
+            techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
+        }else{
+            techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
+        }
+        if(techType.equalsIgnoreCase("none")){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "No tech skips found");
+            return;
+        }
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2 == player){
+                continue;
+            }
+            String color = p2.getColor();
+            unitHolder.removeAllUnits(color);
+            unitHolder.removeAllUnitDamage(color);
+        }
+        Planet planetHolder = (Planet) unitHolder;
+        int oldTg = player.getTg();
+        int count = planetHolder.getResources()+planetHolder.getInfluence();
+        player.setTg(oldTg+count);
+        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " gained "+count+ " tgs ("+oldTg +"->"+player.getTg()+")");
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        
+        List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player.getFaction(), player);
+        List<Button> buttons = Helper.getTechButtons(techs, techType, player, "nekro");
+        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to get the tech you want";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
     public static List<Button> getCabalHeroButtons(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
@@ -142,7 +194,7 @@ public class ButtonHelperHeroes {
 
     }
 
-    public static void resolveNivynHeroSustainEverything(Game activeGame){
+    public static void resolveNivynHeroSustainEverything(Game activeGame, Player nivyn){
         for(Tile tile : activeGame.getTileMap().values()){
             for(UnitHolder unitHolder : tile.getUnitHolders().values()){
                 HashMap<UnitKey, Integer> units = unitHolder.getUnits();
@@ -157,7 +209,7 @@ public class ButtonHelperHeroes {
                             damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                         }
                         int totalUnits = unitEntry.getValue() - damagedUnits;
-                        if(totalUnits > 0 && unitModel.getSustainDamage() && (!player.hasUnit("nivyn_mech") || !unitModel.getBaseType().equalsIgnoreCase("mech"))){
+                        if(totalUnits > 0 && unitModel.getSustainDamage() && (player != nivyn || !unitModel.getBaseType().equalsIgnoreCase("mech"))){
                             tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
                         }
                     }

@@ -759,6 +759,31 @@ public class ButtonHelper {
         return techPresent;
     }
 
+    public static String getTechSkipAttachments(Game activeGame, String planetName) {
+        Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        Set<String> tokenList = unitHolder.getTokenList();
+        if (CollectionUtils.containsAny(tokenList, "attachment_warfare.png", "attachment_cybernetic.png", "attachment_biotic.png", "attachment_propulsion.png")) {
+            String type = "warfare";
+            if(tokenList.contains("attachment_"+type+".png")){
+                return type;
+            }
+            type = "cybernetic";
+            if(tokenList.contains("attachment_"+type+".png")){
+                return type;
+            }
+            type = "propulsion";
+            if(tokenList.contains("attachment_"+type+".png")){
+                return type;
+            }
+            type = "biotic";
+            if(tokenList.contains("attachment_"+type+".png")){
+                return type;
+            }
+        }
+        return "none";
+    }
+
     public static List<Button> getXxchaAgentReadyButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
@@ -4472,6 +4497,16 @@ public class ButtonHelper {
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
                                 + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
                                 buttons);
+                        }
+                        if ("nekrohero".equals(playerLeader.getId())) {
+                            List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(p1, activeGame);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
+                                + " use the button to pick which planet youd like to get a tech and tgs from (and kill any opponent units)",
+                                buttons);
+                        }
+                        if ("nivynhero".equals(playerLeader.getId())) {
+                            ButtonHelperHeroes.resolveNivynHeroSustainEverything(activeGame, p1);
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(p1)+ " sustained all units except their mechs");
                         }
                         if ("jolnarhero".equals(playerLeader.getId())) {
                             List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(p1, activeGame);
