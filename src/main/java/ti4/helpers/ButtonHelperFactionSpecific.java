@@ -65,18 +65,18 @@ public class ButtonHelperFactionSpecific {
         if (!hacan.hasUnit("hacan_mech")) {
             return buttons;
         }
-        String colorID = Mapper.getColorID(hacan.getColor());
-        UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
         for (String planet : hacan.getPlanetsAllianceMode()) {
             if (planet.contains("custodia")) {
                 continue;
             }
-            if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getUnits().containsKey(mechKey)) {
+            if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getUnitCount(UnitType.Mech, hacan.getColor()) > 0) {
                 buttons.add(Button.secondary("hacanMechTradeStepOne_" + planet + "_" + receiver.getFaction(), Helper.getPlanetRepresentation(planet, activeGame)));
             }
         }
         return buttons;
     }
+
+
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];

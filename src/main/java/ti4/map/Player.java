@@ -1123,6 +1123,10 @@ public class Player {
         return color != null ? color : "null";
     }
 
+    public String getColorID(){
+        return color != null ? Mapper.getColorID(color) : "null";
+    }
+
     public void setColor(String color) {
         if (!"null".equals(color)) {
             this.color = AliasHandler.resolveColor(color);

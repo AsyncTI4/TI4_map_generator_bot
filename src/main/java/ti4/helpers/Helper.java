@@ -126,9 +126,7 @@ public class Helper {
         return player;
     }
 
-    public static boolean isAllianceModeAndPreviouslyOwnedCheck(Game activeGame, String planet) {
-        return (activeGame.isAllianceMode() && doesAnyoneOwnPlanet(activeGame, planet));
-    }
+
 
     public static boolean isSaboAllowed(Game activeGame, Player player) {
 
@@ -157,6 +155,15 @@ public class Helper {
     public static boolean doesAnyoneOwnPlanet(Game activeGame, String planet) {
         for (Player player : activeGame.getRealPlayers()) {
             if (player.getPlanets().contains(planet)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean doesAllianceMemberOwnPlanet(Game activeGame, String planet, Player p1) {
+        for (Player player : activeGame.getRealPlayers()) {
+            if (player.getPlanets().contains(planet) && p1.getAllianceMembers().contains(player.getFaction())) {
                 return true;
             }
         }

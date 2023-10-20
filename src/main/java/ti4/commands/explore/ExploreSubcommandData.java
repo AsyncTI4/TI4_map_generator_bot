@@ -22,6 +22,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -36,6 +37,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -124,7 +126,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         String card = Mapper.getExploreRepresentation(cardID);
         String[] cardInfo = card.split(";");
-
+        if(tile == null){
+            tile = activeGame.getTileFromPlanet(planetName);
+        }
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
             return;
@@ -429,6 +433,53 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+            }
+            case "warforgeruins"->{
+                message = "Resolve explore using the buttons.";
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
+                Button ruinsInf = Button.success("ruins_"+planetName+"_2inf", "Remove Inf Or Have Mech To Place 2 Infantry on " + Mapper.getPlanet(planetName).getName());
+                Button ruinsMech = Button.success("ruins_"+planetName+"_mech", "Remove Inf Or Have Mech To Place Mech on " + Mapper.getPlanet(planetName).getName());
+                Button Decline = Button.danger("decline_explore", "Decline Explore");
+                List<Button> buttons = List.of(ruinsInf, ruinsMech, Decline);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+            }
+            case "seedyspaceport"->{
+                List<Button> buttons = new ArrayList<Button>();
+                message = "Resolve explore using the buttons.";
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
+                for(Leader leader : player.getLeaders()){
+                    if(leader.isExhausted()&& leader.getId().contains("agent")){
+                        buttons.add(Button.success("seedySpace_"+leader.getId()+"_"+planetName, "Remove Inf Or Have Mech To Refresh " + Mapper.getLeader(leader.getId()).getName()));
+                    }
+                }
+                buttons.add(Button.primary("seedySpace_AC_"+planetName, "Remove Inf Or Have Mech Draw AC "));
+                buttons.add(Button.danger("decline_explore", "Decline Explore"));
+                
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+            }
+            case "hiddenlaboratory"->{
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Exploring frontier in this system.");
+                AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
+                new ExpFrontier().expFront(event, tile, activeGame, player);
+            }
+            case "ancientshipyard"->{
+                List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
+                if(colors.size() == 0 || colors.contains(player.getColorID())){
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Cruiser added to the system automatically.");
+                }else{
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Someone else's ships were in the system, no cruiser added");
+                }
+                
+            }
+            case "forgottentradestation"->{
+                int tgGain = tile.getUnitHolders().size()-1;
+                int oldTg = player.getTg();
+                player.setTg(oldTg + tgGain);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                    ButtonHelper.getIdentOrColor(player, activeGame) + " gained "+tgGain+"tg due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
+                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
                 player.addRelic(cardID);

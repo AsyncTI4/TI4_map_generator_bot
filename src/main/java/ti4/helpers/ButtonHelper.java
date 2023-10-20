@@ -42,7 +42,9 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.SendFragments;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
+import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.special.CombatRoll;
 import ti4.commands.special.KeleresHeroMentak;
@@ -368,6 +370,10 @@ public class ButtonHelper {
             Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("cabal")));
             buttons.add(release);
         }
+        if (player.hasUnexhaustedLeader("khraskagent") && event.getId().contains("leadership")) {
+            Button release = Button.secondary("exhaustAgent_khraskagent", "Exhaust Khrask Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("khrask")));
+            buttons.add(release);
+        }
 
         return buttons;
     }
@@ -423,6 +429,102 @@ public class ButtonHelper {
             }
         }
         return playersWhoAreMissed;
+    }
+
+    public static String playerHasDMZPlanet(Player player, Game activeGame){
+        String dmzPlanet = "no";
+        for(String planet : player.getPlanets()){
+            if(planet.contains("custodia")){
+                continue;
+            }
+            UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            Set<String> tokenList = unitHolder.getTokenList();
+            if (tokenList.stream().anyMatch(token -> token.contains("dmz_large") || token.contains("dmz") )) {
+                dmzPlanet = planet;
+                break;
+            }
+        }
+        return dmzPlanet;
+    }
+
+    public static List<Button> getTradePlanetsWithAlliancePartnerButtons(Player p1, Player receiver, Game activeGame) {
+        List<Button> buttons = new ArrayList<Button>();
+        if (!p1.getAllianceMembers().contains(receiver.getFaction())) {
+            return buttons;
+        }
+        for (String planet : p1.getPlanets()) {
+            if (planet.contains("custodia")) {
+                continue;
+            }
+            if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getUnitColorsOnHolder().contains(receiver.getColorID())) {
+                String refreshed = "refreshed";
+                if(p1.getExhaustedPlanets().contains(planet)){
+                    refreshed="exhausted";
+                }
+                buttons.add(Button.secondary("resolveAlliancePlanetTrade_" + planet + "_" + receiver.getFaction()+"_"+refreshed, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        return buttons;
+    }
+
+    public static void resolveAllianceMemberPlanetTrade(Player p1, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String dmzPlanet = buttonID.split("_")[1];
+        String receiverFaction = buttonID.split("_")[2];
+        String exhausted = buttonID.split("_")[3];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(receiverFaction);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), "Could not resolve second player, please resolve manually.");
+            return;
+        }
+        UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(dmzPlanet, activeGame);
+        new PlanetAdd().doAction(p2, dmzPlanet, activeGame, event);
+        if(!exhausted.equalsIgnoreCase("exhausted")){
+            p2.refreshPlanet(dmzPlanet);
+        }
+        List<Button> goAgainButtons = new ArrayList<Button>();
+        Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
+        Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
+        String ident = ButtonHelper.getIdentOrColor(p1, activeGame);
+        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, activeGame) + " to " + ButtonHelper.getIdentOrColor(p2, activeGame);
+        goAgainButtons.add(button);
+        goAgainButtons.add(done);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+        } else {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+        }
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveDMZTrade(Player p1, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String dmzPlanet = buttonID.split("_")[1];
+        String receiverFaction = buttonID.split("_")[2];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(receiverFaction);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), "Could not resolve second player, please resolve manually.");
+            return;
+        }
+        UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(dmzPlanet, activeGame);
+        new PlanetAdd().doAction(p2, dmzPlanet, activeGame, event);
+        List<Button> goAgainButtons = new ArrayList<Button>();
+        Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
+        Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
+        String ident = ButtonHelper.getIdentOrColor(p1, activeGame);
+        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, activeGame) + " to " + ButtonHelper.getIdentOrColor(p2, activeGame);
+        goAgainButtons.add(button);
+        goAgainButtons.add(done);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+        } else {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+        }
+        event.getMessage().delete().queue();
     }
 
     public static boolean canIBuildGFInSpace(Game activeGame, Player player, Tile tile, String kindOfBuild) {
@@ -1507,6 +1609,64 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static void resolveWarForgeRuins(Game activeGame, String buttonID, Player player, ButtonInteractionEvent event){
+        String planet = buttonID.split("_")[1];
+        String mech = buttonID.split("_")[1];
+        String message = "";
+        boolean failed = false;
+        message = message + ButtonHelper.mechOrInfCheck(planet, activeGame, player);
+        failed = message.contains("Please try again.");
+        if (!failed) {
+            if(mech.equalsIgnoreCase("mech")){
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "mech "+planet, activeGame);
+                message = message + "Placed mech on" + Mapper.getPlanet(planet).getName();
+            }else{
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "2 infantry "+planet, activeGame);
+                message = message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+            }
+            ButtonHelper.addReaction(event, false, false, message, "");
+            event.getMessage().delete().queue();
+        } else {
+            ButtonHelper.addReaction(event, false, false, message, "");
+        }
+    }
+    public static void resolveSeedySpace(Game activeGame, String buttonID, Player player, ButtonInteractionEvent event){
+        String planet = buttonID.split("_")[2];
+        String acOrAgent = buttonID.split("_")[1];
+        String message = "";
+        boolean failed = false;
+        message = message + ButtonHelper.mechOrInfCheck(planet, activeGame, player);
+        failed = message.contains("Please try again.");
+        if (!failed) {
+            if(acOrAgent.equalsIgnoreCase("ac")){
+                if (player.hasAbility("scheming")) {
+                    activeGame.drawActionCard(player.getUserID());
+                    activeGame.drawActionCard(player.getUserID());
+                    message = ButtonHelper.getIdent(player) + " Drew 2 AC With Scheming. Please Discard An AC with the blue buttons";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
+                        ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+                } else {
+                    activeGame.drawActionCard(player.getUserID());
+                    message = ButtonHelper.getIdent(player) + " Drew 1 AC";
+                    ACInfo.sendActionCardInfo(activeGame, player, event);
+                }
+                if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                    ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                }
+            }else{
+                Leader playerLeader = player.getLeader(acOrAgent).orElse(null);
+                if (playerLeader == null) {
+                    return;
+                }
+                RefreshLeader.refreshLeader(player, playerLeader, activeGame);
+                message = message + " Refreshed " + Mapper.getLeader(acOrAgent).getName();
+            }
+            ButtonHelper.addReaction(event, false, false, message, "");
+            event.getMessage().delete().queue();
+        } else {
+            ButtonHelper.addReaction(event, false, false, message, "");
+        }
+    }
 
     public static List<Button> getButtonsForPictureCombats(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = activeGame.getTileByPosition(pos);
@@ -2011,8 +2171,8 @@ public class ButtonHelper {
             if (getEndOfTurnAbilities(player, activeGame).size() > 1) {
                 startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
             }
-            Button pass = Button.danger(finChecker + "turnEnd", "End Turn");
-            startButtons.add(pass);
+            startButtons.add(Button.danger(finChecker + "turnEnd", "End Turn"));
+            startButtons.add(Button.secondary(finChecker+"ministerOfWar", "Use Minister of War"));
         } else {
             if (player.getTechs().contains("cm")) {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
@@ -3663,6 +3823,11 @@ public class ButtonHelper {
             Button transact = Button.success(finChecker + "transact_Comms_" + p2.getFaction(), "Commodities");
             stuffToTransButtons.add(transact);
         }
+
+        if ((p1.getCommodities() > 0 || p2.getCommodities() > 0)&& !p1.hasAbility("military_industrial_complex") && !p1.getAllianceMembers().contains(p2.getFaction())) {
+            Button transact = Button.secondary(finChecker + "send_WashComms_" + p2.getFaction()+ "_0", "Wash Both Players Comms");
+            stuffToTransButtons.add(transact);
+        }
         if (ButtonHelper.getPlayersShipOrders(p1).size() > 0) {
             Button transact = Button.secondary(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
             stuffToTransButtons.add(transact);
@@ -3681,6 +3846,14 @@ public class ButtonHelper {
         }
         if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, activeGame).size() > 0) {
             Button transact = Button.success(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            stuffToTransButtons.add(transact);
+        }
+        if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, activeGame).size() > 0) {
+            Button transact = Button.success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(p2.getFaction())));
+            stuffToTransButtons.add(transact);
+        }
+        if (activeGame.getCurrentPhase().toLowerCase().contains("agenda")&& !ButtonHelper.playerHasDMZPlanet(p1, activeGame).equalsIgnoreCase("no")) {
+            Button transact = Button.secondary(finChecker + "resolveDMZTrade_"+ButtonHelper.playerHasDMZPlanet(p1, activeGame)+"_" + p2.getFaction(), "Trade "+Mapper.getPlanet(ButtonHelper.playerHasDMZPlanet(p1, activeGame)).getName() + " (DMZ)");
             stuffToTransButtons.add(transact);
         }
         return stuffToTransButtons;
@@ -3753,6 +3926,10 @@ public class ButtonHelper {
             case "Planets" -> {
                 String message = "Click the planet you would like to send";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, activeGame));
+            }
+            case "AlliancePlanets" -> {
+                String message = "Click the planet you would like to send";
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, activeGame));
             }
             case "ACs" -> {
                 String message = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true) + " Click the GREEN button that indicates the AC you would like to send";
@@ -3868,6 +4045,23 @@ public class ButtonHelper {
                 ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, tgAmount, event);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
+            }
+            case "WashComms" -> {
+                int tgAmount = Integer.parseInt(amountToTrans);
+                int oldP1Comms = p1.getCommodities();
+                int oldP2Comms = p2.getCommodities();
+                p1.setCommodities(0);
+                p2.setCommodities(0);
+                p1.setTg(p1.getTg()+oldP1Comms);
+                p2.setTg(p2.getTg()+oldP2Comms);
+                if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
+                    commanderUnlockCheck(p2, activeGame, "hacan", event);
+                }
+                //ButtonHelperAbilities.pillageCheck(p1, activeGame);
+                //ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms, event);
+                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
+                message2 = ident + " washed their " + oldP1Comms + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + oldP2Comms + " Commodities with " + ident;
             }
             case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;

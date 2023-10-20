@@ -39,6 +39,7 @@ public class Constants {
     public static final String BUTTON_PRESS_COUNT = "button_press_count";
     public static final String SLASH_COMMAND_COUNT = "slash_command_count";
     public static final String SLASH_COMMAND_STRING = "slash_command_string";
+    public static final String ACS_SABOD = "acs_sabod";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
