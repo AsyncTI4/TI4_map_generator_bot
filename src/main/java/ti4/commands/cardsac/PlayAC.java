@@ -159,8 +159,8 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannel(mainGameChannel,
                     "Either all sabos were in the discard or active player had Transparasteel Plating and everyone was passed. Instinct training and watcher mechs may still be viable, who knows. ");
             }
+            MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
             if (actionCardTitle.contains("Manipulate Investments")) {
-                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc = 1; sc < 9; sc++) {
                     Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
@@ -177,18 +177,48 @@ public class PlayAC extends ACCardsSubcommandData {
                     scButtons);
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
-                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
                 List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
             }
-            if (actionCardTitle.contains("Plagiarize")) {
-                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeGame);
-                List<Button> scButtons = new ArrayList<Button>();
-                scButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2,
-                    Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to resolve plagiarize", scButtons);
+            String codedName = "Plagiarize";
+            String codedMessage = Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to resolve ";
+            List<Button> codedButtons = new ArrayList<Button>();
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+
+            codedName = "Mining Initiative";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("miningInitiative", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Economic Initiative";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("economicInitiative", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Industrial Initiative";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("industrialInitiative", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Rise of a Messiah";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("riseOfAMessiah", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Fighter Conscription";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("fighterConscription", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
 
@@ -218,12 +248,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
-                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                MessageChannel channel2 = activeGame.getMainGameChannel();
-                if (activeGame.isFoWMode()) {
-                    channel2 = player.getPrivateChannel();
-                }
-                
+                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);            
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";

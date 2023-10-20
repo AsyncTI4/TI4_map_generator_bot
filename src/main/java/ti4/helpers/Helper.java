@@ -1942,7 +1942,11 @@ public class Helper {
             String techName = tech.getName();
             String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
             if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
-                buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
+                if(jolNarHeroTech.equalsIgnoreCase("nekro")){
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName+"_nopay";
+                }else{
+                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
+                }
             }
             Button techB;
             //String requirementsEmoji = tech.getRequirementsEmoji();
