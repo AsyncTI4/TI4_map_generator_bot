@@ -112,7 +112,7 @@ public class FrankenDraft extends BagDraft {
         for (var factionId : allFactions) {
             FactionModel faction  = Mapper.getFactionSetup(factionId);
             if(faction != null){
-                    for (var ability : faction.getAbilities()) {
+                for (var ability : faction.getAbilities()) {
                     allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY,ability));
                 }
             }else{
