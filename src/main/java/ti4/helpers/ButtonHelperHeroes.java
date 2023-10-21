@@ -36,6 +36,55 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
+    public static List<Button> getArboHeroButtons(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : ButtonHelper.getAllTilesWithProduction(activeGame, player, event)){
+            buttons.add(Button.success("arboHeroBuild_"+tile.getPosition(),tile.getRepresentationForButtons(activeGame, player)));
+        }
+        buttons.add(Button.danger("deleteButtons", "Done"));
+        return buttons;
+    }
+
+     public static List<Button> getSaarHeroButtons(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tilesUsed = new ArrayList<>();
+        for(Tile tile1 : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock)){
+            for(String tile2Pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile1.getPosition(), player, false)){
+                Tile tile2 = activeGame.getTileByPosition(tile2Pos);
+                if(!tilesUsed.contains(tile2)){
+                    tilesUsed.add(tile2);
+                    buttons.add(Button.success("saarHeroResolution_"+tile2.getPosition(),tile2.getRepresentationForButtons(activeGame, player)));
+                }
+            }
+           
+        }
+        buttons.add(Button.danger("deleteButtons", "Done"));
+        return buttons;
+    }
+
+    public static void resolveSaarHero(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+            for(Player p2 : activeGame.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                String name = unitHolder.getName().replace("space","");
+                new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf "+name, activeGame);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+ " removed all opposing infantry and fighters in "+tile.getRepresentationForButtons(activeGame, player)+" using Saar hero");
+        event.getMessage().delete().queue();
+    }
+    public static void resolveArboHeroBuild(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String pos = buttonID.split("_")[1];
+        List<Button> buttons;
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "arboHeroBuild", "place");
+        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
     public static List<Button> getNekroHeroButtons(Player player, Game activeGame){
         List<Button> techPlanets = new ArrayList<>();
         for(Tile tile : activeGame.getTileMap().values()){

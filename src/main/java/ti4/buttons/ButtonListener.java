@@ -516,12 +516,12 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only the player who played Politics can assign Speaker");
                 return;
             }
-            if (activeGame != null && !activeGame.isFoWMode()) {
+            if (activeGame != null ) {
                 for (Player player_ : activeGame.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
                         activeGame.setSpeaker(player_.getUserID());
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
-                            + Helper.getPlayerRepresentation(player_, activeGame);
+                            + ButtonHelper.getIdentOrColor(player_, activeGame);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     }
                 }
@@ -750,6 +750,11 @@ public class ButtonListener extends ListenerAdapter {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Exhaust stuff to pay the 5 influence", buttons);
             event.getMessage().delete().queue();
+            //"saarHeroResolution_"
+        } else if (buttonID.startsWith("arboHeroBuild_")) {
+            ButtonHelperHeroes.resolveArboHeroBuild(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("saarHeroResolution_")) {
+            ButtonHelperHeroes.resolveSaarHero(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("increaseTGonSC_")) {
             String sc = buttonID.replace("increaseTGonSC_", "");
             int scNum = Integer.parseInt(sc);
@@ -3293,27 +3298,27 @@ public class ButtonListener extends ListenerAdapter {
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
-                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
                     buttons.add(sar);
                 }
-                if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
                     buttons.add(sar2);
                 }
-                if (player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                     buttons.add(aiDEVButton);
                 }
-                if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
                     buttons.add(sarweenButton);
                 }
-                if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(winnuButton);
                 }
-                if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)) {
+                if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
                     buttons.add(hacanButton);
                 }

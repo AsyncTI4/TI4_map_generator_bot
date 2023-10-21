@@ -5,6 +5,7 @@ import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 
@@ -110,9 +111,14 @@ public class FrankenDraft extends BagDraft {
         List<DraftItem> allAbilityItems = new ArrayList<>();
         for (var factionId : allFactions) {
             FactionModel faction  = Mapper.getFactionSetup(factionId);
-            for (var ability : faction.getAbilities()) {
-                allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY,ability));
+            if(faction != null){
+                    for (var ability : faction.getAbilities()) {
+                    allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY,ability));
+                }
+            }else{
+                BotLogger.log("Franken faction returned null on this id"+factionId);
             }
+            
         }
 
         filterUndraftablesAndShuffle(allAbilityItems, DraftItem.Category.ABILITY);
