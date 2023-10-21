@@ -1436,7 +1436,7 @@ public class GenerateMap {
             } else {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
             }
-            drawFactionIconImage(x + deltaX + 75 - 94 / 2, y + 75 - 94 / 2, "xxcha.png", 95, 95, 0.15f);
+            drawFactionIconImage("xxcha", x + deltaX + 75 - 94 / 2, y + 75 - 94 / 2, 95, 95, 0.15f);
             graphics.setColor(Color.WHITE);
             drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX, y + 75 - 35 + 5, 150, 35), Storage.getFont35());
             graphics.setColor(Color.GRAY);
@@ -1903,16 +1903,28 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private void drawFactionIconImage(int x, int y, String resourceName, int width, int height, float opacity) {
+    private void drawFactionIconImage(String faction, int x, int y, int width, int height, float opacity) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, width, height);
+            BufferedImage resourceBufferedImage = getFactionIconImageScaled(faction, width, height);
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
             g2.drawImage(resourceBufferedImage, x, y, null);
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         } catch (Exception e) {
-            BotLogger.log("Could not display planet: " + resourceName, e);
+            BotLogger.log("Could not display faction icon image: " + faction, e);
+        }
+    }
+
+    private void drawPlayerFactionIconImage(Player player, int x, int y, int width, int height, float opacity) {
+        if (player == null) return;
+        try {
+            BufferedImage resourceBufferedImage = getPlayerFactionIconImageScaled(player, width, height);
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        } catch (Exception e) {
+            BotLogger.log("Could not display player's faction icon image", e);
         }
     }
 
