@@ -1865,7 +1865,7 @@ public class ButtonHelper {
             return;
         }
         if (player.hasAbility("armada")) {
-            armadaValue = 1;
+            armadaValue = 2;
         }
         int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
