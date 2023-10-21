@@ -2016,8 +2016,8 @@ public class Helper {
             boolean addTech = true;
             if(tech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")){
                 for(String factionTech : player.getNotResearchedFactionTechs()){
-                    TechnologyModel fTech = Mapper.getTech(playerfaction);
-                    if(!fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().equalsIgnoreCase(tech.getBaseUpgrade())){
+                    TechnologyModel fTech = Mapper.getTech(factionTech);
+                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().equalsIgnoreCase(tech.getBaseUpgrade())){
                         addTech = false;
                     }
                 }
