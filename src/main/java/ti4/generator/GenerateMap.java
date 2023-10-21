@@ -1923,17 +1923,10 @@ public class GenerateMap {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x, y, null);
             } else {
-                Graphics2D g2 = (Graphics2D) graphics;
-                AffineTransform originalTransform = g2.getTransform();
-                g2.rotate(Math.toRadians(-90));
-                g2.setFont(Storage.getFont20());
                 String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).orElse(Mapper.getPlanet(planetName).getName());
-                g2.drawString(name.substring(0, Math.min(name.length(), 10)).toUpperCase(),
-                    (y + 146) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
-                    x + 6 + g2.getFontMetrics().getHeight() / 2);
-                g2.setTransform(originalTransform);
+                String text = StringUtils.left(StringUtils.substringBefore(name, "\n"), 10).toUpperCase();
+                drawTextVertically(graphics, text, x + 6, y + 146, Storage.getFont20());
             }
-
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
         }
@@ -3654,5 +3647,32 @@ public class GenerateMap {
             case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); //Space Dock
             default -> new Point(0, 0);
         };
+    }
+
+    /**
+     * @param graphics
+     * @param text text to draw vertically
+     * @param x left
+     * @param y bottom
+     * @param font
+     */
+    private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        AffineTransform originalTransform = graphics2D.getTransform();
+        graphics2D.rotate(Math.toRadians(-90));
+        graphics2D.setFont(font);
+        graphics2D.drawString(text,
+            (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+            x + graphics2D.getFontMetrics().getHeight() / 2);
+        graphics2D.setTransform(originalTransform);
+    }
+
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font, int offset) {
+        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 10).toUpperCase();
+        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 10).toUpperCase();
+        drawTextVertically(graphics, firstRow, x, y, font);
+        if (StringUtils.isNotBlank(secondRow)) {
+            drawTextVertically(graphics, secondRow, x + offset, y, font);
+        }
     }
 }
