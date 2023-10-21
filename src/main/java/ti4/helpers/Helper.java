@@ -2010,7 +2010,23 @@ public class Helper {
                 .filter(tech -> !player.hasTech(tech.getAlias()))
                 .filter(tech -> tech.getFaction().isEmpty() || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
                 .forEach(tech -> techs.add(tech));
-        return techs;
+
+        List<TechnologyModel> techs2 = new ArrayList<>();
+        for(TechnologyModel tech : techs){
+            boolean addTech = true;
+            if(tech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")){
+                for(String factionTech : player.getNotResearchedFactionTechs()){
+                    TechnologyModel fTech = Mapper.getTech(playerfaction);
+                    if(!fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().equalsIgnoreCase(tech.getBaseUpgrade())){
+                        addTech = false;
+                    }
+                }
+            }
+            if(addTech){
+                techs2.add(tech);
+            }
+        }
+        return techs2;
     }
 
     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
