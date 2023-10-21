@@ -1964,6 +1964,25 @@ public class ButtonHelper {
         }
     }
 
+    public static List<Tile> getAllTilesWithProduction(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Tile> tiles = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            for (UnitHolder capChecker : tile.getUnitHolders().values()) {
+                HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
+                for (UnitModel unit : unitsByQuantity.keySet()) {
+                    if(unit.getProductionValue() > 0){
+                        if(!tiles.contains(tile)){
+                            tiles.add(tile);
+                        }
+                    }
+                }
+            }
+        }
+        return tiles;
+    }
+
+   
+
     public static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game activeGame, Player player) {
         List<String> planets = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false)) {
@@ -4696,6 +4715,17 @@ public class ButtonHelper {
                             List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame, p1);
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
                                 + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a cc for resolving it.",
+                                buttons);
+                        }
+                        if ("arborechero".equals(playerLeader.getId())) {
+                            List<Button> buttons = ButtonHelperHeroes.getArboHeroButtons(activeGame, p1, event);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
+                                + " use the buttons to build in a system", buttons);
+                        }
+                        if ("saarhero".equals(playerLeader.getId())) {
+                            List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(activeGame, p1, event);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
+                                + " use the buttons to select the system to remove all opposing ff and inf from",
                                 buttons);
                         }
                         if ("nekrohero".equals(playerLeader.getId())) {
