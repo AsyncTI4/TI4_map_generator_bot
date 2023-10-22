@@ -69,6 +69,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.EventModel;
@@ -722,7 +723,7 @@ public class GenerateMap {
                 }
 
                 if (!player.getAbilities().isEmpty()) {
-                    xDelta = abilityInfo(player, xDelta, yPlayArea);
+                    xDelta = abilityInfo(activeGame, player, xDelta, yPlayArea);
                 }
 
                 g2.setColor(color);
@@ -1070,7 +1071,7 @@ public class GenerateMap {
         graphics.drawImage(factionImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
     }
 
-    private int abilityInfo(Player player, int x, int y) {
+    private int abilityInfo(Game activeGame, Player player, int x, int y) {
         int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -1098,16 +1099,18 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
             }
 
+            
             String status = isExhaustedLocked ? "_exh" : "_rdy";
             abilityFileName = abilityFileName + status + ".png";
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, abilityFileName);
             String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x, y, null);
-            } else {
-                // drawTwoLinesOfTextVertically(g2, abilityName, x, y, Storage.getFont20(), 20);
+                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            } else if (activeGame.isFrankenGame()) {
+                AbilityModel abilityModel = Mapper.getAbility(abilityID);
+                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x, y, Storage.getFont20(), 20);
+                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             }
 
             deltaX += 48;

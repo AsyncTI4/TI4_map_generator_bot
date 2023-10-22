@@ -31,17 +31,17 @@ public class Mapper {
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
-    private static final Properties faction_abilities = new Properties();
     private static final Properties general = new Properties();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
-
+    
     //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final Map<String, ExploreModel> explore = new HashMap<>();
+    private static final HashMap<String, AbilityModel>  abilities = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, EventModel> events = new HashMap<>();
@@ -69,7 +69,6 @@ public class Mapper {
         readData("tokens.properties", tokens, "Could not read token name file");
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
-        readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
@@ -77,6 +76,7 @@ public class Mapper {
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjectsFromFolder("explores", explore, ExploreModel.class, "Could not read explore file");
         importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
+        importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class, "Could not read faction abilities file");
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
         importJsonObjectsFromFolder("events", events, EventModel.class, "Could not read events file");
@@ -773,20 +773,16 @@ public class Mapper {
         return new HashMap<>(combatModifiers);
     }
 
-    public static HashMap<String, String> getFactionAbilities() {
-        HashMap<String, String> factionAbilities = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : faction_abilities.entrySet()) {
-            factionAbilities.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return factionAbilities;
+    public static HashMap<String, AbilityModel> getAbilities() {
+        return new HashMap<>(abilities);
     }
 
     public static boolean isValidAbility(String abilityID) {
-        return faction_abilities.containsKey(abilityID);
+        return abilities.containsKey(abilityID);
     }
 
-    public static String getAbility(String abilityID) {
-        return faction_abilities.getProperty(abilityID);
+    public static AbilityModel getAbility(String abilityID) {
+        return abilities.get(abilityID);
     }
 
     public static List<String> getFactions() {

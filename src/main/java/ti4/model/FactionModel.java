@@ -142,10 +142,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     private boolean validateAbilities() {
-        if (Mapper.getFactionAbilities().keySet().containsAll(getAbilities())) return true;
+        if (Mapper.getAbilities().keySet().containsAll(getAbilities())) return true;
         List<String> invalidAbilityIDs = new ArrayList<>();
         for (String abilityID : getAbilities()) {
-            if (!Mapper.getFactionAbilities().containsKey(abilityID)) invalidAbilityIDs.add(abilityID);
+            if (!Mapper.getAbilities().containsKey(abilityID)) invalidAbilityIDs.add(abilityID);
         }
 
         BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid ability IDs: `" + invalidAbilityIDs + "`");
