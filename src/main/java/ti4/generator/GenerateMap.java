@@ -1089,8 +1089,6 @@ public class GenerateMap {
                 case "policy_the_economy_empower" -> abilityFileName = "pa_ds_olra_policy_ipos";
                 case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
-            if (abilityFileName == null)
-                continue;
 
             boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
             if (isExhaustedLocked) {
@@ -1098,7 +1096,6 @@ public class GenerateMap {
             } else {
                 graphics.setColor(Color.WHITE);
             }
-
             
             String status = isExhaustedLocked ? "_exh" : "_rdy";
             abilityFileName = abilityFileName + status + ".png";
@@ -1109,7 +1106,8 @@ public class GenerateMap {
                 graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             } else if (activeGame.isFrankenGame()) {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
-                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x, y, Storage.getFont20(), 20);
+                drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, Storage.getFont16(), 20);
                 graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             }
 
@@ -3695,8 +3693,8 @@ public class GenerateMap {
     }
 
     private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font, int offset) {
-        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 10).toUpperCase();
-        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 10).toUpperCase();
+        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 14).toUpperCase();
+        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 14).toUpperCase();
         drawTextVertically(graphics, firstRow, x, y, font);
         if (StringUtils.isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + offset, y, font);
