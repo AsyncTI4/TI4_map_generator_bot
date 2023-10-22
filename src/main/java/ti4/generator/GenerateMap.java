@@ -827,6 +827,7 @@ public class GenerateMap {
                 BotLogger.log(error);
                 continue;
             }
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();
@@ -835,7 +836,8 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        drawPlayerFactionIconImage(graphics, player, x + deltaX - 1, y + 108, 42, 42);
+                        if (activeGame.isFrankenGame()) drawFactionIconImage(graphics, promissoryNote.getFaction(), x + deltaX - 1, y + 86, 42, 42);
+                        drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
@@ -856,7 +858,6 @@ public class GenerateMap {
 
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
-            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
             if (promissoryNote != null && promissoryNote.getAttachment() != null && !promissoryNote.getAttachment().isBlank()) {
                 String tokenID = promissoryNote.getAttachment();
                 found: for (Tile tile : activeGame.getTileMap().values()) {
@@ -1071,7 +1072,7 @@ public class GenerateMap {
     }
 
     private int abilityInfo(Game activeGame, Player player, int x, int y) {
-        int deltaX = 0;
+        int deltaX = 10;
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
@@ -1541,12 +1542,12 @@ public class GenerateMap {
                             originalPlanetType = "keleres";
                         }
 
-                        // if (Mapper.isFaction(originalPlanetType)) {
-                        //     graphics.drawImage(getFactionIconImageScaled(player, 52, 52), x + deltaX - 1, y -1, null);
-                        // } else {
-                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
-                        // }
+                        if (Mapper.isFaction(originalPlanetType)) {
+                            drawFactionIconImage(graphics, originalPlanetType, x + deltaX - 2, y - 2, 52, 52);
+                        } else {
+                            String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                            drawPlanetImage(x + deltaX + 1, y + 2, planetTypeName, planet);
+                        }
                     }
                 }
 
