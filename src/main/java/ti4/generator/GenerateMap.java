@@ -1706,7 +1706,7 @@ public class GenerateMap {
             String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x, y, null);
+                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
@@ -1753,7 +1753,7 @@ public class GenerateMap {
             String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x, y, null);
+                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
                 TechnologyModel techModel = Mapper.getTech(tech);
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
