@@ -1911,8 +1911,7 @@ public class GenerateMap {
 
                 if (!techInformation.getFaction().isEmpty()) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    String factionIcon = "pa_tech_unitupgrade_" + techInformation.getFaction() + ".png";
-                    drawPAImage(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, factionIcon);
+                    drawFactionIconImage(graphics, techInformation.getFaction(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
                 }
             }
         }
