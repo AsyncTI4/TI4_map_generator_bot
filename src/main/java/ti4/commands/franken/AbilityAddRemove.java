@@ -36,7 +36,7 @@ public abstract class AbilityAddRemove extends FrankenSubcommandData {
         }
 
         abilityIDs.removeIf(StringUtils::isEmpty);
-        abilityIDs.removeIf(a -> !Mapper.getFactionAbilities().containsKey(a));
+        abilityIDs.removeIf(a -> !Mapper.getAbilities().containsKey(a));
 
         Game activeGame = getActiveGame();
         Player player = activeGame.getPlayer(getUser().getId());

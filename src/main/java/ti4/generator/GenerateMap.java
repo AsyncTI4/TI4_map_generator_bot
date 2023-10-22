@@ -69,6 +69,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.EventModel;
@@ -537,10 +538,7 @@ public class GenerateMap {
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
-                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
-                    if (bufferedImage != null) {
-                        graphics.drawImage(bufferedImage, x, y, null);
-                    }
+                    drawPlayerFactionIconImage(graphics, player, x, y, 95, 95);
                 }
                 y += 4;
 
@@ -707,24 +705,25 @@ public class GenerateMap {
                     xDelta = debtInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
-                if (!player.getAbilities().isEmpty()) {
-                    xDelta = abilityInfo(player, xDelta, yPlayArea);
-                }
-
+                
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
-
+                
                 if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
                     xDelta = pnInfo(player, xDelta, yPlayArea, activeGame);
                 }
-
+                
                 if (!player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
                 }
-
+                
                 if (!player.getFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
+                }
+
+                if (!player.getAbilities().isEmpty()) {
+                    xDelta = abilityInfo(activeGame, player, xDelta, yPlayArea);
                 }
 
                 g2.setColor(color);
@@ -836,7 +835,7 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        graphics.drawImage(getPlayerFactionIconImageScaled(promissoryNoteOwner, 42, 42), x + deltaX - 1, y + 108, null);
+                        drawPlayerFactionIconImage(graphics, player, x + deltaX - 1, y + 108, 42, 42);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
@@ -928,7 +927,7 @@ public class GenerateMap {
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                graphics.drawImage(getFactionIconImageScaled(leaderModel.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
+                drawFactionIconImage(graphics, leaderModel.getFaction(), x + deltaX - 1, y + 108, 42, 42);
             }
 
             if (leader.getTgCount() != 0) {
@@ -962,12 +961,11 @@ public class GenerateMap {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    leaderInfoFileName = "pa_leaders_generic_" + leader.getType() + status + ".png";
-                    resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-                    resourceBufferedImage = ImageHelper.read(resourcePath);
-                    //TODO: DRAW LEADER NAME VERTICALLY
+                    LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
-                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } catch (Exception e) {
                 System.out.println("Bad file: " + leaderInfoFileName);
             }
@@ -993,8 +991,7 @@ public class GenerateMap {
                             }
                             imperiaColorFile += ".png";
                             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-                            graphics.drawImage(getPlayerFactionIconImageScaled(player_, 42, 42), x + deltaX - 1, y + 108, null);
-
+                            drawPlayerFactionIconImage(graphics, player, x + deltaX - 1, y + 108, 42, 42);
                             drawPAImage(x + deltaX, y, imperiaColorFile);
                             String status_ = locked ? "_exh" : "_rdy";
                             String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
@@ -1073,7 +1070,7 @@ public class GenerateMap {
         graphics.drawImage(factionImage, x + centreCustomTokenHorizontally, y + centreCustomTokenVertically, null);
     }
 
-    private int abilityInfo(Player player, int x, int y) {
+    private int abilityInfo(Game activeGame, Player player, int x, int y) {
         int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -1091,8 +1088,6 @@ public class GenerateMap {
                 case "policy_the_economy_empower" -> abilityFileName = "pa_ds_olra_policy_ipos";
                 case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
-            if (abilityFileName == null)
-                continue;
 
             boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
             if (isExhaustedLocked) {
@@ -1100,11 +1095,20 @@ public class GenerateMap {
             } else {
                 graphics.setColor(Color.WHITE);
             }
-
+            
             String status = isExhaustedLocked ? "_exh" : "_rdy";
             abilityFileName = abilityFileName + status + ".png";
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            drawPAImage(x + deltaX, y, abilityFileName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            } else if (activeGame.isFrankenGame()) {
+                AbilityModel abilityModel = Mapper.getAbility(abilityID);
+                drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, Storage.getFont16(), 20);
+                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            }
 
             deltaX += 48;
             addedAbilities = true;
@@ -1436,7 +1440,7 @@ public class GenerateMap {
             } else {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
             }
-            drawFactionIconImage(x + deltaX + 75 - 94 / 2, y + 75 - 94 / 2, "xxcha.png", 1f, 0.15f);
+            drawFactionIconImageOpaque(graphics, "xxcha", x + deltaX + 75 - 94 / 2, y + 75 - 94 / 2, 95, 95, 0.15f);
             graphics.setColor(Color.WHITE);
             drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX, y + 75 - 35 + 5, 150, 35), Storage.getFont35());
             graphics.setColor(Color.GRAY);
@@ -1695,11 +1699,18 @@ public class GenerateMap {
             }
 
             if (!techInformation.getFaction().isEmpty()) {
-                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX - 1, y + 108, null);
+                drawFactionIconImage(graphics, techInformation.getFaction(), x + deltaX - 1, y + 108, 42, 42);
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
-            drawPAImage(x + deltaX, y, techName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            } else {
+                TechnologyModel techModel = Mapper.getTech(tech);
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+            }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
@@ -1735,11 +1746,18 @@ public class GenerateMap {
             }
 
             if (!techInformation.getFaction().isEmpty()) {
-                graphics.drawImage(getFactionIconImageScaled(techInformation.getFaction(), 42, 42), x + deltaX + 1, y + 108, null);
+                drawFactionIconImageOpaque(graphics, techInformation.getFaction(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
-            drawPAImage(x + deltaX, y, techName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            } else {
+                TechnologyModel techModel = Mapper.getTech(tech);
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+            }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
@@ -1869,7 +1887,7 @@ public class GenerateMap {
                 // ONLY PAINT FACTION IF IS FRANKEN GAME, OR IS NOT A UNIT THAT UPGRADES OR WAS UPGRADED TO (indicating faction tech)
                 if (activeGame.isFrankenGame() || ((unit.getUpgradesFromUnitId() != null && !unit.getUpgradesFromUnitId().isEmpty()) || (unit.getUpgradesToUnitId() != null && !unit.getUpgradesToUnitId().isEmpty()))) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    graphics.drawImage(getFactionIconImageScaled(unit.getFaction().toLowerCase(), 36, 36), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
+                    drawFactionIconImage(graphics, unit.getFaction().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
         }
@@ -1903,16 +1921,38 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private void drawFactionIconImage(int x, int y, String resourceName, float scale, float opacity) {
+    private void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null);
+    }
+
+    private void drawFactionIconImageOpaque(Graphics graphics, String faction, int x, int y, int width, int height, Float opacity) {
         try {
-            String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
-            BufferedImage resourceBufferedImage = ImageHelper.readScaled(resourcePath, scale);
+            BufferedImage resourceBufferedImage = getFactionIconImageScaled(faction, width, height);
             Graphics2D g2 = (Graphics2D) graphics;
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            boolean setOpacity = opacity != null && !opacity.equals(1.0f);
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
             g2.drawImage(resourceBufferedImage, x, y, null);
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
         } catch (Exception e) {
-            BotLogger.log("Could not display planet: " + resourceName, e);
+            BotLogger.log("Could not display faction icon image: " + faction, e);
+        }
+    }
+
+    private static void drawPlayerFactionIconImage(Graphics graphics, Player player, int x, int y, int width, int height) {
+        drawPlayerFactionIconImageOpaque(graphics, player, x, y, width, height, null);
+    }
+
+    private static void drawPlayerFactionIconImageOpaque(Graphics graphics, Player player, int x, int y, int width, int height, Float opacity) {
+        if (player == null) return;
+        try {
+            BufferedImage resourceBufferedImage = getPlayerFactionIconImageScaled(player, width, height);
+            Graphics2D g2 = (Graphics2D) graphics;
+            boolean setOpacity = opacity != null && !opacity.equals(1.0f);
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            if (setOpacity) g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        } catch (Exception e) {
+            BotLogger.log("Could not display player's faction icon image", e);
         }
     }
 
@@ -1923,17 +1963,10 @@ public class GenerateMap {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x, y, null);
             } else {
-                Graphics2D g2 = (Graphics2D) graphics;
-                AffineTransform originalTransform = g2.getTransform();
-                g2.rotate(Math.toRadians(-90));
-                g2.setFont(Storage.getFont20());
                 String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).orElse(Mapper.getPlanet(planetName).getName());
-                g2.drawString(name.substring(0, Math.min(name.length(), 10)).toUpperCase(),
-                    (y + 146) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
-                    x + 6 + g2.getFontMetrics().getHeight() / 2);
-                g2.setTransform(originalTransform);
+                String text = StringUtils.left(StringUtils.substringBefore(name, "\n"), 10).toUpperCase();
+                drawTextVertically(graphics, text, x + 6, y + 146, Storage.getFont20());
             }
-
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
         }
@@ -2537,8 +2570,7 @@ public class GenerateMap {
                     if (convertToGeneric || electedPlayer == null) {
                         paintAgendaIcon(y, x);
                     } else {
-                        BufferedImage bufferedImage = getPlayerFactionIconImage(electedPlayer);
-                        graphics.drawImage(bufferedImage, x + 2, y + 2, null);
+                        drawPlayerFactionIconImage(graphics, electedPlayer, x + 2, y + 2, 95, 95);
                     }
                 }
 
@@ -3582,8 +3614,7 @@ public class GenerateMap {
                         Point plaquetteOffset = getUnitTagLocation(id);
 
                         tileGraphics.drawImage(plaquette, TILE_PADDING + imageX + plaquetteOffset.x, TILE_PADDING + imageY + plaquetteOffset.y, null);
-                        BufferedImage factionIconForPlaquette = getPlayerFactionIconImageScaled(player, 32, 32);
-                        tileGraphics.drawImage(factionIconForPlaquette, TILE_PADDING + imageX + plaquetteOffset.x, TILE_PADDING + imageY + plaquetteOffset.y, null);
+                        drawPlayerFactionIconImage(tileGraphics, player, TILE_PADDING + imageX + plaquetteOffset.x, TILE_PADDING + imageY + plaquetteOffset.y, 32, 32);
 
                         tileGraphics.setColor(Color.WHITE);
                         drawCenteredString(tileGraphics, factionTag, new Rectangle(TILE_PADDING + imageX + plaquetteOffset.x + 25, TILE_PADDING + imageY + plaquetteOffset.y + 17, 40, 13),
@@ -3655,4 +3686,46 @@ public class GenerateMap {
             default -> new Point(0, 0);
         };
     }
+
+    /**
+     * @param graphics
+     * @param text text to draw vertically
+     * @param x left
+     * @param y bottom
+     * @param font
+     */
+    private static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        AffineTransform originalTransform = graphics2D.getTransform();
+        graphics2D.rotate(Math.toRadians(-90));
+        graphics2D.setFont(font);
+        
+        // DRAW A 1px BLACK BORDER AROUND TEXT
+        Color originalColor = graphics2D.getColor();
+        graphics2D.setColor(Color.BLACK);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+            graphics2D.drawString(text,
+                (y + j) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                x + graphics2D.getFontMetrics().getHeight() / 2 + i);
+            }
+        }
+        graphics2D.setColor(originalColor);
+
+        graphics2D.drawString(text,
+            (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+            x + graphics2D.getFontMetrics().getHeight() / 2);
+        graphics2D.setTransform(originalTransform);
+    }
+
+    private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font, int offset) {
+        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 12).toUpperCase();
+        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 12).toUpperCase();
+        drawTextVertically(graphics, firstRow, x, y, font);
+        if (StringUtils.isNotBlank(secondRow)) {
+            drawTextVertically(graphics, secondRow, x + offset, y, font);
+        }
+    }
+
+
 }

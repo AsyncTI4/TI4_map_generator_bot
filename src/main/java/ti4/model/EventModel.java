@@ -11,6 +11,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
+import ti4.helpers.Emojis;
 
 @Data
 public class EventModel implements ModelInterface, EmbeddableModel {
@@ -86,7 +87,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
     public String getSourceEmoji() {
       return switch (source.toLowerCase()) {
-        case "ignis_aurora" -> "";
+        case "ignis_aurora" -> Emojis.IgnisAurora;
         default -> "";
       };
     }
