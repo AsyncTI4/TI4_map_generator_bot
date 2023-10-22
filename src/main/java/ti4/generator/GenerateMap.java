@@ -704,24 +704,25 @@ public class GenerateMap {
                     xDelta = debtInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
-                if (!player.getAbilities().isEmpty()) {
-                    xDelta = abilityInfo(player, xDelta, yPlayArea);
-                }
-
+                
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
-
+                
                 if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
                     xDelta = pnInfo(player, xDelta, yPlayArea, activeGame);
                 }
-
+                
                 if (!player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
                 }
-
+                
                 if (!player.getFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
+                }
+
+                if (!player.getAbilities().isEmpty()) {
+                    xDelta = abilityInfo(player, xDelta, yPlayArea);
                 }
 
                 g2.setColor(color);
@@ -1101,6 +1102,13 @@ public class GenerateMap {
             abilityFileName = abilityFileName + status + ".png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, abilityFileName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            } else {
+                // drawTwoLinesOfTextVertically(g2, abilityName, x, y, Storage.getFont20(), 20);
+            }
 
             deltaX += 48;
             addedAbilities = true;
