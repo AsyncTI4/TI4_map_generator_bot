@@ -70,7 +70,7 @@ public class Emojis {
 
     // FACTIONS - OTHER
     public static final String AdminsFaction = "<:Admins:1084476380584083527>";
-    public static final String Qulane = "<:Qulane:1154064455580262440>";
+    public static final String Qulane = "<:Qulane:1165445638096420895> ";
 
     // EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
@@ -547,6 +547,7 @@ public class Emojis {
     // HOMEBREW
     public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; //Symbol for Will's Action Deck 2 mod
     public static final String Eronous = "<:eronous:1157307622920290444>"; //Symbol for Eronous' stuff
+    public static final String IgnisAurora = "<:ignis_aurora:1165445236957388800>"; //Symbol for Ignis Aurora's stuff
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols =
