@@ -408,7 +408,7 @@ public class GenerateMap {
 
     @Nullable
     private static String getFactionIconPath(String factionID) {
-        if ("null".equals(factionID)) {
+        if ("null".equals(factionID) || StringUtils.isBlank(factionID)) {
             return null;
         }
         String factionFileName = Mapper.getFactionFileName(factionID);
