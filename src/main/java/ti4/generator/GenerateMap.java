@@ -927,7 +927,7 @@ public class GenerateMap {
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                drawFactionIconImageOpaque(graphics, leaderModel.getFaction(), x + deltaX - 1, y + 108, 42, 42, 1.0f);
+                drawFactionIconImage(graphics, leaderModel.getFaction(), x + deltaX - 1, y + 108, 42, 42);
             }
 
             if (leader.getTgCount() != 0) {
@@ -961,12 +961,11 @@ public class GenerateMap {
             try {
                 resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
-                    leaderInfoFileName = "pa_leaders_generic_" + leader.getType() + status + ".png";
-                    resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-                    resourceBufferedImage = ImageHelper.read(resourcePath);
-                    //TODO: DRAW LEADER NAME VERTICALLY
+                    LeaderModel leaderModel = Mapper.getLeader(leader.getId());
+                    drawTwoLinesOfTextVertically(g2, leaderModel.getShortName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+                } else {
+                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 }
-                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } catch (Exception e) {
                 System.out.println("Bad file: " + leaderInfoFileName);
             }
@@ -3686,6 +3685,19 @@ public class GenerateMap {
         AffineTransform originalTransform = graphics2D.getTransform();
         graphics2D.rotate(Math.toRadians(-90));
         graphics2D.setFont(font);
+        
+        // DRAW A 1px BLACK BORDER AROUND TEXT
+        Color originalColor = graphics2D.getColor();
+        graphics2D.setColor(Color.BLACK);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+            graphics2D.drawString(text,
+                (y + j) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                x + graphics2D.getFontMetrics().getHeight() / 2 + i);
+            }
+        }
+        graphics2D.setColor(originalColor);
+
         graphics2D.drawString(text,
             (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
             x + graphics2D.getFontMetrics().getHeight() / 2);
@@ -3700,4 +3712,6 @@ public class GenerateMap {
             drawTextVertically(graphics, secondRow, x + offset, y, font);
         }
     }
+
+
 }
