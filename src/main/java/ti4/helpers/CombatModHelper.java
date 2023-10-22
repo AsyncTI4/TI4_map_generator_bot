@@ -17,6 +17,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.model.AbilityModel;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
@@ -97,7 +98,8 @@ public class CombatModHelper {
             if (relevantMod.isPresent() 
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
-                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), AbilityInfo.getAbilityRepresentation(ability)));
+                                AbilityModel abilityModel = Mapper.getAbility(ability);
+                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
             }
         }
 

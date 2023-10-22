@@ -426,37 +426,29 @@ public class AutoCompleteProvider {
             case Constants.ABILITY, Constants.ABILITY_1, Constants.ABILITY_2, Constants.ABILITY_3, Constants.ABILITY_4, Constants.ABILITY_5 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
-                HashMap<String, String> abilities = new HashMap<>();
+                HashMap<String, AbilityModel> abilities = new HashMap<>();
                 try {
                     if (player != null && event.getSubcommandName().equals(Constants.ABILITY_REMOVE)) {
                         for (String abilityID : player.getAbilities()) {
-                            abilities.put(abilityID, Mapper.getFactionAbilities().get(abilityID));
+                            abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
                     } else if (player != null && event.getSubcommandName().equals(Constants.ABILITY_ADD)) {
-                        abilities = Mapper.getFactionAbilities();
+                        abilities = Mapper.getAbilities();
                         for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);
                         }
                     } else {
-                        abilities = Mapper.getFactionAbilities();
+                        abilities = Mapper.getAbilities();
                     }
                 } catch (Exception e) {
                     BotLogger.log(event, "Ability Autocomplete Setup Error", e);
-                    abilities = Mapper.getFactionAbilities();
+                    abilities = Mapper.getAbilities();
                 }
 
-                abilities.replaceAll((k, v) -> {
-                    int index = v.indexOf("|");
-                    String abilityName = v.substring(0, index);
-                    String factionName = v.substring(index + 1, StringUtils.ordinalIndexOf(v, "|", 2));
-                    factionName = Mapper.getFactionRepresentations().get(factionName);
-                    return factionName + " - " + abilityName;
-                });
-
                 List<Command.Choice> options = abilities.entrySet().stream()
-                    .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .filter(value -> value.getValue().search(enteredValue))
                     .limit(25)
-                    .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                    .map(value -> new Command.Choice(value.getValue().getAutoCompleteName(), value.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
 
@@ -787,8 +779,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        List<TileModel> tiles = new ArrayList<>(TileHelper.getAllTiles().values());
-                        List<Command.Choice> options = tiles.stream()
+                        List<Command.Choice> options = TileHelper.getAllTiles().values().stream()
                             .filter(value -> value.getName() != null && value.getName().toLowerCase().contains(enteredValue))
                             .limit(25)
                             .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
@@ -801,8 +792,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, LeaderModel> leaders = Mapper.getLeaders();
-                        List<Command.Choice> options = leaders.entrySet().stream()
+                        List<Command.Choice> options =  Mapper.getLeaders().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -815,8 +805,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, UnitModel> units = new HashMap<>(Mapper.getUnits());
-                        List<Command.Choice> options = units.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getUnits().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -829,8 +818,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
-                        List<Command.Choice> options = techs.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getTechs().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -843,12 +831,10 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, String> abilities = new HashMap<>(Mapper.getFactionAbilities());
-                        List<Command.Choice> options = abilities.entrySet().stream()
-                            .filter(value -> value.getKey().toLowerCase().contains(enteredValue) || value.getValue().toLowerCase().contains(enteredValue))
+                        List<Command.Choice> options = Mapper.getAbilities().entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
-                            .map(value -> value.getKey() + "=" + StringUtils.substringBefore(value.getValue(), "|"))
-                            .map(value -> new Command.Choice(value, StringUtils.substringBefore(value, "=")))
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
                             .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -858,8 +844,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, ExploreModel> explores = new HashMap<>(Mapper.getExplores());
-                        List<Command.Choice> options = explores.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getExplores().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -872,8 +857,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, RelicModel> relics = Mapper.getRelics();
-                        List<Command.Choice> options = relics.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getRelics().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -886,8 +870,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, AgendaModel> agendas = new HashMap<>(Mapper.getAgendas());
-                        List<Command.Choice> options = agendas.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -900,8 +883,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, ActionCardModel> actionCards = new HashMap<>(Mapper.getActionCards());
-                        List<Command.Choice> options = actionCards.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getActionCards().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -914,8 +896,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>(Mapper.getSecretObjectives());
-                        List<Command.Choice> options = secretObjectives.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getSecretObjectives().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -928,8 +909,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>(Mapper.getPublicObjectives());
-                        List<Command.Choice> options = publicObjectives.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getPublicObjectives().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -942,8 +922,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>(Mapper.getPromissoryNotes());
-                        List<Command.Choice> options = promissoryNotes.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getPromissoryNotes().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -956,8 +935,7 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.SEARCH -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, DeckModel> decks = new HashMap<>(Mapper.getDecks());
-                        List<Command.Choice> options = decks.entrySet().stream()
+                        List<Command.Choice> options = Mapper.getDecks().entrySet().stream()
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
