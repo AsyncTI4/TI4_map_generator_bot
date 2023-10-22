@@ -94,6 +94,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
       return switch (source.toLowerCase()) {
         case "absol" -> Emojis.Absol;
         case "pok" -> Emojis.Agenda;
+        case "ignis_aurora" -> Emojis.IgnisAurora;
         default -> Emojis.AsyncTI4Logo;
       };
     }
