@@ -1703,7 +1703,14 @@ public class GenerateMap {
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
-            drawPAImage(x + deltaX, y, techName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            } else {
+                TechnologyModel techModel = Mapper.getTech(tech);
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+            }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
@@ -1743,7 +1750,14 @@ public class GenerateMap {
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
-            drawPAImage(x + deltaX, y, techName);
+            String resourcePath = ResourceHelper.getInstance().getPAResource(techName);
+            if (resourcePath != null) {
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            } else {
+                TechnologyModel techModel = Mapper.getTech(tech);
+                drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 10, y + 148, Storage.getFont16(), 16);
+            }
 
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
@@ -3705,8 +3719,8 @@ public class GenerateMap {
     }
 
     private static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, Font font, int offset) {
-        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 14).toUpperCase();
-        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 14).toUpperCase();
+        String firstRow = StringUtils.left(StringUtils.substringBefore(text, "\n"), 12).toUpperCase();
+        String secondRow = StringUtils.left(StringUtils.substringAfter(text, "\n"), 12).toUpperCase();
         drawTextVertically(graphics, firstRow, x, y, font);
         if (StringUtils.isNotBlank(secondRow)) {
             drawTextVertically(graphics, secondRow, x + offset, y, font);
