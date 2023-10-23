@@ -737,7 +737,7 @@ public class Helper {
             case "splitnavy" -> "**Splitnavy**";
             case "splitpetrol" -> "**Splitpetrol**";
             case "splitrainbow" -> "**Splitrainbow**";
-            default -> "missing_colour";
+            default -> colour;
         };
     }
 
@@ -1391,7 +1391,7 @@ public class Helper {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
         if (includePing) sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" _").append(getColourEmojis(player.getColor())).append("_");
+            sb.append(" ").append(getColourEmojis(player.getColor()));
         }
         return sb.toString();
     }
