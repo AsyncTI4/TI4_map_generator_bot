@@ -69,7 +69,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!techM.getType().toString().equalsIgnoreCase("unitupgrade") && (techM.getFaction() == null || techM.getFaction().length() < 1)) {
+            if (!techM.getType().toString().equalsIgnoreCase("unitupgrade") && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
                 buttons.add(Button.secondary(finChecker + "divertFunding@" + tech, techM.getName()));
             }
         }
