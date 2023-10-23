@@ -63,25 +63,13 @@ public class SCPlay extends PlayerSubcommandData {
         Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         playSC(event, scToPlay, activeGame, mainGameChannel, player);
     }
+
     public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player) {
         playSC(event, scToPlay, activeGame, mainGameChannel, player, false);
     }
 
     public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
         Integer scToDisplay = scToPlay;
-        String pbd100group = null;
-        boolean pbd100or500 = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName());
-        if (pbd100or500) {
-            scToDisplay = scToPlay / 10;
-            int groupNum = scToPlay % 10;
-            switch (groupNum) {
-                case 1 -> pbd100group = "A";
-                case 2 -> pbd100group = "B";
-                case 3 -> pbd100group = "C";
-                case 4 -> pbd100group = "D";
-                default -> pbd100group = "Unknown";
-            }
-        }
 
         if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
@@ -96,13 +84,8 @@ public class SCPlay extends PlayerSubcommandData {
         //String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
         StringBuilder scMessageBuilder = new StringBuilder();
         scMessageBuilder.append(Helper.getSCRepresentation(activeGame, scToPlay));
-        if (pbd100or500) {
-            scMessageBuilder
-                    .append(" Group ")
-                    .append(pbd100group);
-        }
-        scMessageBuilder
-                .append(" played");
+
+        scMessageBuilder.append(" played");
         if (!activeGame.isFoWMode()) {
             scMessageBuilder.append(" by ")
                     .append(Helper.getPlayerRepresentation(player, activeGame));
@@ -117,9 +100,9 @@ public class SCPlay extends PlayerSubcommandData {
 
         String scName = Helper.getSCName(scToDisplay, activeGame).toLowerCase();
         if(winnuHero){
-            scName = scName+"WinnuHero";
+            scName = scName + "WinnuHero";
         }
-        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-" + scName + (pbd100or500 ? "-group_" + pbd100group : "");
+        String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-" + scName;
     
         TextChannel textChannel = (TextChannel) mainGameChannel;
 
@@ -134,7 +117,6 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
             MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeGame), true);
-            //MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay, activeMap));
         }
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
 
