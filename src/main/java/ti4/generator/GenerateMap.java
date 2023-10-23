@@ -858,8 +858,8 @@ public class GenerateMap {
 
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
-            if (promissoryNote != null && promissoryNote.getAttachment() != null && !promissoryNote.getAttachment().isBlank()) {
-                String tokenID = promissoryNote.getAttachment();
+            if (promissoryNote != null && promissoryNote.getAttachment().isPresent() && !promissoryNote.getAttachment().get().isBlank()) {
+                String tokenID = promissoryNote.getAttachment().get();
                 found: for (Tile tile : activeGame.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
