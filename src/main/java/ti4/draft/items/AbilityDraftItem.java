@@ -20,8 +20,8 @@ public class AbilityDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         AbilityModel abilityModel = getAbilityModel();
-        if (StringUtils.isNotBlank(abilityModel.getPermanentEffect())) {    
-            return abilityModel.getPermanentEffect();
+        if (StringUtils.isNotBlank(abilityModel.getPermanentEffect().orElse(""))) {    
+            return abilityModel.getPermanentEffect().get();
         }
         else {
             return "*" + abilityModel.getWindow() + ":* " + abilityModel.getWindowEffect();
