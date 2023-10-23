@@ -162,7 +162,7 @@ public class AsyncTI4DiscordBot {
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
-        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
+        bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
