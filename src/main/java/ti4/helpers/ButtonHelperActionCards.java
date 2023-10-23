@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
@@ -14,6 +15,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.TechnologyModel;
 
 public class ButtonHelperActionCards {
 
@@ -54,6 +56,159 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
     }
 
+    public static List<Button> getRepealLawButtons(Game activeGame, Player player) {
+        List<Button> lawButtons = new ArrayList<>();
+        for(String law : activeGame.getLaws().keySet()){
+            lawButtons.add(Button.success("repealLaw_"+activeGame.getLaws().get(law),Mapper.getAgendaTitle(law)));
+        }
+        return lawButtons;
+    }
+
+   public static List<Button> getDivertFundingLoseTechOptions(Player player, Game activeGame) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (String tech : player.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (!techM.getType().toString().equalsIgnoreCase("unitupgrade") && (techM.getFaction() == null || techM.getFaction().length() < 1)) {
+                buttons.add(Button.secondary(finChecker + "divertFunding@" + tech, techM.getName()));
+            }
+        }
+        return buttons;
+    }
+
+    public static void divertFunding(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        String techOut = buttonID.split("@")[1];
+        player.removeTech(techOut);
+        TechnologyModel techM1 = Mapper.getTech(techOut);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " removed the tech "+techM1.getName());
+        resolveFocusedResearch(activeGame, player, buttonID, event);
+        event.getMessage().delete().queue();
+    }
+
+
+    public static void resolveForwardSupplyBaseStep2(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        int oldTg = player.getTg();
+        player.setTg(oldTg + 1);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            ButtonHelper.getIdentOrColor(player, activeGame) + " gained 1tg due to forward supply base (" + oldTg + "->" + player.getTg() + ")");
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(hacan, activeGame), ButtonHelper.getIdentOrColor(player, activeGame) + " gained 1tg due to forward supply base");
+        }
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveForwardSupplyBaseStep1(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = hacan;
+        int oldTg = player.getTg();
+        player.setTg(oldTg + 3);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            ButtonHelper.getIdent(player) + " gained 3tg (" + oldTg + "->" + player.getTg() + ")");
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 3);
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == hacan) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("forwardSupplyBaseStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("forwardSupplyBaseStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who should get 1tg", buttons);
+    }
+
+    public static void resolveReparationsStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Click the names of the planet you wish to ready";
+        buttons = Helper.getPlanetRefreshButtons(event, player, activeGame);
+        Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
+        buttons.add(DoneRefreshing);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("reparationsStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("reparationsStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who took the planet from you", buttons);
+    }
+
+    public static void resolveReparationsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if(p2.getReadiedPlanets().size() == 0){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. This is fine and nothing more needs to be done.");
+            event.getMessage().delete().queue();
+            return;
+        }
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getReadiedPlanets()){
+            buttons.add(Button.secondary("reparationsStep3_" + p2.getFaction()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
+    }
+
+     public static void resolveReparationsStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        p2.exhaustPlanet(planet);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted " + planetRep);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was exhausted.");
+     }
+
+     
+
+
+
+
+
+    public static void resolveFocusedResearch(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        activeGame.setComponentAction(true);
+        Button getTech = Button.success("acquireATech", "Get a tech");
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(getTech);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+            ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your tech", buttons);
+    }
+
+    public static void repealLaw(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        String numID = buttonID.split("_")[1];
+        String name = "";
+        for(String law : activeGame.getLaws().keySet()){
+            if(numID.equalsIgnoreCase(""+activeGame.getLaws().get(law))){
+                name = law;
+            }
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " repealed "+Mapper.getAgendaTitle(name));
+        if(activeGame.isFoWMode()){
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Mapper.getAgendaTitle(name)+ " was repealed");
+        }
+        activeGame.removeLaw(name);
+        event.getMessage().delete().queue();
+    }
     public static List<Button> getPlagiarizeButtons(Game activeGame, Player player) {
         List<String> techToGain = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers()) {

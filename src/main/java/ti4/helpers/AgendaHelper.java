@@ -1892,7 +1892,10 @@ public class AgendaHelper {
             sb.append("  ").append(additionalVotesText);
         } else
             sb.append("**");
-
+        if(activeGame.getLaws().containsKey("rep_govt") || activeGame.getLaws().containsKey("absol_government")){
+            sb = new StringBuilder();
+            sb.append(" vote count (Rep Gov): **"+ " ").append("1");
+        }
         return sb.toString();
     }
 
