@@ -1105,7 +1105,7 @@
         "source": "codexiii",
         "faction": "keleresm",
         "moveValue": 1,
-        "capacityValue": 3,
+        "capacityValue": 6,
         "capacityUsed": 1,
         "cost": 8,
         "combatHitsOn": 7,
