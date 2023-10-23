@@ -35,12 +35,12 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return alias != null
             && name != null
-            && text != null
-            && source != null
-            && getBaseUpgrade() != null
-            && getFaction() != null
+            && type != null
             && getRequirements() != null
-            && type != null;
+            && getFaction() != null
+            && getBaseUpgrade() != null
+            && source != null
+            && text != null;
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = (tech1, tech2) -> {
