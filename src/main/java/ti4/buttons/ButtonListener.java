@@ -3149,8 +3149,8 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     
-                    GameSaveLoadManager.undo(activeGame);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + activeGame.getLatestCommand());
+                    GameSaveLoadManager.undo(activeGame, event);
+                    
                     if (activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
                         event.getMessage().delete().queue();
                     }

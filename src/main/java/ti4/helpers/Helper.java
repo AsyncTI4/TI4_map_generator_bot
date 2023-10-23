@@ -2059,7 +2059,7 @@ public class Helper {
                 .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
                 .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
                 .filter(tech -> !player.hasTech(tech.getAlias()))
-                .filter(tech -> tech.getFaction().isEmpty() || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+                .filter(tech -> tech.getFaction().isEmpty() ||tech.getFaction().get() == null || tech.getFaction().get().equalsIgnoreCase("") ||  player.getNotResearchedFactionTechs().contains(tech.getAlias()))
                 .forEach(tech -> techs.add(tech));
 
         List<TechnologyModel> techs2 = new ArrayList<>();
