@@ -471,6 +471,58 @@ public class Emojis {
     public static final String SC8Mention = sc_8_1 + sc_8_2 + sc_8_3 + sc_8_4 + sc_8_5;
     // END EMOJI FARM 9
 
+    // EMOJI FARM 10 - COLOUR UNITS
+    public static final String black = "<:black:1165031264743600250>";
+    public static final String bloodred = "<:bloodred:1165031267532804277>";
+    public static final String blue = "<:blue:1165031268950482974>";
+    public static final String brown = "<:brown:1165031271253164182>";
+    public static final String chocolate = "<:chocolate:1165031272515645490>";
+    public static final String chrome = "<:chrome:1165031273715212318>";
+    public static final String rainbow = "<:clr_rainbow:1165031518738055298>";
+    public static final String rose = "<:clr_rose:1165031523045621870>";
+    public static final String emerald = "<:emerald:1165031276126937150>";
+    public static final String ethereal = "<:ethereal:1165036998814355497>";
+    public static final String forest = "<:forest:1165031277917909033>";
+    public static final String gold = "<:gold:1165031280577085450>";
+    public static final String gray = "<:gray:1165031281755693136>";
+    public static final String green = "<:green:1165031343227404438>";
+    public static final String lavender = "<:lavender:1165031345479753770>";
+    public static final String lightgray = "<:lightgray:1165031347107143680>";
+    public static final String lime = "<:lime:1165031349493706872>";
+    public static final String navy = "<:navy:1165031350731018311>";
+    public static final String orange = "<:orange:1165031351628611678>";
+    public static final String orca = "<:orca:1165031354430406726>";
+    public static final String petrol = "<:petrol:1165031356074569768>";
+    public static final String pink = "<:pink:1165031358226239570>";
+    public static final String purple = "<:purple:1165031359933321366>";
+    public static final String red = "<:red:1165031520969437224>";
+    public static final String spring = "<:spring:1165031606227050616>";
+    public static final String sunset = "<:sunset:1165031608538120242>";
+    public static final String tan = "<:tan:1165031610308120706>";
+    public static final String teal = "<:teal:1165031612933746800>";
+    public static final String turquoise = "<:turquoise:1165031614779232286>";
+    public static final String yellow = "<:yellow:1165036996557807676>";
+    public static final String splitbloodred = "<:splitbloodred:1165031525927104512>";
+    public static final String splitblue = "<:splitblue:1165031527353168083>";
+    public static final String splitchocolate = "<:splitchocolate:1165031529827807262>";
+    public static final String splitemerald = "<:splitemerald:1165031531346145330>";
+    public static final String splitgold = "<:splitgold:1165031534525419592>";
+    public static final String splitgreen = "<:splitgreen:1165031536526110750>";
+    public static final String splitlime = "<:splitlime:1165031538761674814>";
+    public static final String splitnavy = "<:splitnavy:1165031600795439154>";
+    public static final String splitorange = "<:splitorange:1165031603307819008>";
+    public static final String splitpetrol = "<:splitpetrol:1165037000127160341>";
+    public static final String splitpink = "<:splitpink:1165031604784205935>";
+    public static final String splitpurple = "<:splitpurple:1165037001465155795>";
+    public static final String splitrainbow = "<:splitrainbow:1165037003671351356>";
+    public static final String splitred = "<:splitred:1165037005479096370>";
+    public static final String splittan = "<:splittan:1165037008666775572>";
+    public static final String splitteal = "<:splitteal:1165037010910728242>";
+    public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
+    public static final String splityellow = "<:splityellow:1165037014995963965>";
+    
+    // END EMOJI FARM 10
+
     // ANOMOLIES
     public static final String Supernova = "<:supernova:1137029705946640445>";
     public static final String Asteroid = "<:asteroidbelt:1137029604050210846>";
