@@ -1884,11 +1884,11 @@ public class GenerateMap {
             UnitModel unit = Mapper.getUnit(u);
             if (unit == null) {
                 System.out.println("error:" + u);
-            } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
+            } else if (unit.getFaction().isPresent()) {
                 // ONLY PAINT FACTION IF IS FRANKEN GAME, OR IS NOT A UNIT THAT UPGRADES OR WAS UPGRADED TO (indicating faction tech)
                 if (activeGame.isFrankenGame() || ((unit.getUpgradesFromUnitId() != null && !unit.getUpgradesFromUnitId().isEmpty()) || (unit.getUpgradesToUnitId() != null && !unit.getUpgradesToUnitId().isEmpty()))) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, unit.getFaction().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
         }

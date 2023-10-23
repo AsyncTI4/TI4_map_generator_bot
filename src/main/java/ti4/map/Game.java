@@ -3318,7 +3318,7 @@ public class Game {
             List<UnitModel> playersUnits = new ArrayList<>(player.getUnitModels());
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
-                    if (playerUnit.getFaction() != null && playerUnit.getFaction().equalsIgnoreCase(variantUnit.getFaction()) && playerUnit.getBaseType().equalsIgnoreCase(variantUnit.getBaseType()) && !playerUnit.getSource().equalsIgnoreCase(variantUnit.getSource())) {
+                    if (playerUnit.getFaction().isPresent() && playerUnit.getFaction().get().equalsIgnoreCase(variantUnit.getFaction().orElse("")) && playerUnit.getBaseType().equalsIgnoreCase(variantUnit.getBaseType()) && !playerUnit.getSource().equalsIgnoreCase(variantUnit.getSource())) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
                         break;
