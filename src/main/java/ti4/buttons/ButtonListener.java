@@ -2319,9 +2319,13 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                     player.setCommodities(player.getCommoditiesTotal());
-
-                    ButtonHelper.addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
+                    if(activeGame.getNomadCoin()){
+                        ButtonHelper.addReaction(event, false, false, " gained 3" + Emojis.nomadcoin + " and replenished commodities ("
                         + player.getCommodities() + Emojis.comm + ")", "");
+                    }else{
+                        ButtonHelper.addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
+                        + player.getCommodities() + Emojis.comm + ")", "");
+                    }
                     ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
                     ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
                     if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {

@@ -92,6 +92,7 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> teamMateIDs= new ArrayList<>();
     @Getter @Setter
     private List<String> factionTechs = new ArrayList<>();
     private DraftBag draftHand = new DraftBag();
@@ -1373,6 +1374,13 @@ public class Player {
         return techs;
     }
 
+    public List<String> getTeamMateIDs() {
+        if(!teamMateIDs.contains(getUserID())){
+            teamMateIDs.add(getUserID());
+        }
+        return teamMateIDs;
+    }
+
     public List<String> getNotResearchedFactionTechs() {
         return getFactionTechs().stream().filter(tech -> !hasTech(tech)).toList();
     }
@@ -1487,6 +1495,9 @@ public class Player {
     public void setTechs(List<String> techs) {
         this.techs = techs;
     }
+    public void setTeamMateIDs(List<String> techs) {
+        teamMateIDs = techs;
+    }
 
     public void setRelics(List<String> relics) {
         this.relics = relics;
@@ -1534,6 +1545,9 @@ public class Player {
 
     public boolean removeFactionTech(String techID) {
         return factionTechs.remove(techID);
+    }
+    public void addTeamMateID(String techID) {
+        teamMateIDs.add(techID);
     }
 
     public void addTech(String techID) {

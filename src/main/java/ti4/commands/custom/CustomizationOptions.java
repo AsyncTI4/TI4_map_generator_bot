@@ -18,6 +18,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_SHUSHING, "Bot shush reacts on msgs in actions. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
@@ -68,6 +69,9 @@ public class CustomizationOptions extends CustomSubcommandData{
         
         Boolean showUnitTags = event.getOption(Constants.SHOW_UNIT_TAGS, null, OptionMapping::getAsBoolean);
         if (showUnitTags != null) activeGame.setShowUnitTags(showUnitTags);
+
+        Boolean nomad = event.getOption(Constants.NOMAD_COIN, null, OptionMapping::getAsBoolean);
+        if (nomad != null) activeGame.setNomadCoin(nomad);
         
         String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
         if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeGame.setOutputVerbosity(verbosity);

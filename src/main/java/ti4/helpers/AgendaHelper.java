@@ -258,8 +258,8 @@ public class AgendaHelper {
                         activeGame.removeLaw(agID);
                     }
                     activeGame.setNaaluAgent(true);
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
                 }
-                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
             }
             if ("artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = watchPartyChannel(activeGame);
@@ -1298,7 +1298,12 @@ public class AgendaHelper {
                             } else {
                                 sb.append(" an ").append(Emojis.ActionCard).append(" Action Card");
                             }
-                            sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
+                            if(activeGame.getNomadCoin()){
+                                sb.append(" and 2 " + Emojis.nomadcoin + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
+                            }else{
+                                sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
+                            }
+                            
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
                             ButtonHelperAbilities.pillageCheck(winningR, activeGame);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 2);

@@ -48,6 +48,7 @@ import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -94,6 +95,9 @@ public class Helper {
         List<Role> roles = member.getRoles();
         for (Player player : players) {
             if (roles.contains(player.getRoleForCommunity())) {
+                return player;
+            }
+            if(player.getTeamMateIDs().contains(member.getUser().getId())){
                 return player;
             }
         }
@@ -1378,7 +1382,26 @@ public class Helper {
         if (activeGame != null && activeGame.isCommunityMode()) {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
-                return defaultPlayerRepresentation(player, guild, includePing);
+                if(player.getTeamMateIDs().size() < 1){
+                    return defaultPlayerRepresentation(player, guild, includePing);
+                }else{
+                    StringBuilder sb = new StringBuilder(player.getFactionEmoji());
+                    if (includePing) {
+                        for(String userID : player.getTeamMateIDs()){
+                            User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                            if (userById == null) {
+                                continue;
+                            }
+                            String mention = userById.getAsMention();
+                            sb.append(" ").append(mention);
+                        }
+                    }
+                    if (player.getColor() != null && !"null".equals(player.getColor())) {
+                        sb.append(" ").append(getColourEmojis(player.getColor()));
+                    }
+                    return sb.toString();
+                }
+                
             } else {
                 return player.getFactionEmoji() + getRoleMentionByName(guild, roleForCommunity.getName()) + Helper.getColourEmojis(player.getColor());
             }
@@ -1863,6 +1886,30 @@ public class Helper {
         }
     }
 
+    public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
+        Guild guild = event.getGuild();
+        //long role = 1093925613288562768L;
+        long role = 1166011604488425482L;
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        for (Game activeGame : mapList.values()) {
+            if (!activeGame.isHasEnded()) {
+                TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
+                if (tableTalkChannel != null && activeGame.getGuild() == guild) {
+                    addRolePermissionsToGameChannel(guild, activeGame, tableTalkChannel, role);
+                }
+                TextChannel actionsChannel = activeGame.getMainGameChannel();
+                if (actionsChannel != null && activeGame.getGuild() == guild) {
+                    addRolePermissionsToGameChannel(guild, activeGame, actionsChannel, role);
+                }
+                String gameName = activeGame.getName();
+                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+                for (GuildChannel channel : channels) {
+                    addRolePermissionsToGameChannel(guild, activeGame, channel, role);
+                }
+            }
+        }
+    }
+
     private static void addPlayerPermissionsToGameChannel(Guild guild, Game activeGame, GuildChannel channel) {
         TextChannel textChannel = guild.getTextChannelById(channel.getId());
         if (textChannel != null) {
@@ -1873,6 +1920,17 @@ public class Helper {
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
                 textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
+            textChannelManager.queue();
+            // textChannel.sendMessage("This channel's permissions have been updated.").queue();
+        }
+    }
+
+    private static void addRolePermissionsToGameChannel(Guild guild, Game activeGame, GuildChannel channel, long role) {
+        TextChannel textChannel = guild.getTextChannelById(channel.getId());
+        if (textChannel != null) {
+            TextChannelManager textChannelManager = textChannel.getManager();
+            long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            textChannelManager.putRolePermissionOverride(role, allow, 0);
             textChannelManager.queue();
             // textChannel.sendMessage("This channel's permissions have been updated.").queue();
         }
