@@ -393,7 +393,12 @@ public class ButtonHelperAbilities {
                 channel = player.getPrivateChannel();
             }
             StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
-            sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm).append(" commodities have been replenished and you have gained 1 ").append(Emojis.tg).append(" trade good (").append(player.getTg()).append(" -> ").append((player.getTg() + 1)).append(")");
+            if(activeGame.getNomadCoin()){
+                sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm).append(" commodities have been replenished and you have gained 1 ").append(Emojis.nomadcoin).append(" trade good (").append(player.getTg()).append(" -> ").append((player.getTg() + 1)).append(")");
+
+            }else{
+                sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm).append(" commodities have been replenished and you have gained 1 ").append(Emojis.tg).append(" trade good (").append(player.getTg()).append(" -> ").append((player.getTg() + 1)).append(")");
+            }
             player.setTg(player.getTg() + 1);
             player.setCommodities(player.getCommoditiesTotal());
             MessageHelper.sendMessageToChannel(channel, sb.toString());

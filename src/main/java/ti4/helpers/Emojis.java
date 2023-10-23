@@ -124,6 +124,7 @@ public class Emojis {
 
     // COMPONENTS
     public static final String tg = "<:tg:1053857635570553024>";
+    public static final String nomadcoin = "<:nomadcoin:1107100093791879178>";
     public static final String comm = "<:comm:1053857614028607538>";
     public static final String Sleeper = "<:Sleeper:1047871121451663371>";
     public static final String SleeperB = "<:SleeperB:1047871220831506484>";
