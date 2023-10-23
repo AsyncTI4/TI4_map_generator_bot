@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ti4.commands.player.AbilityInfo;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
