@@ -159,7 +159,7 @@ public class Mapper {
         color = AliasHandler.resolveColor(color);
         if (isColorValid(color) && isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
-                if (pn.getColour().equals(color) || pn.getFaction().equalsIgnoreCase(faction)) {
+                if (pn.getColour().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
                         && !"Absol".equalsIgnoreCase(pn.getSource())) {
                         continue;
