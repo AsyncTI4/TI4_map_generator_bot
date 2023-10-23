@@ -5006,7 +5006,7 @@ public class ButtonHelper {
         String threadName = activeGame.getName() + "-round-" + activeGame.getRound() + "-" + stratName;
         boolean messageSent = false;
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if ((threadChannel_.getName().equals(threadName) || threadChannel_.getName().equals(threadName + "WinnuHero"))
+            if ((threadChannel_.getName().startsWith(threadName) || threadChannel_.getName().equals(threadName + "WinnuHero"))
                 && (!stratName.equalsIgnoreCase("technology") || !activeGame.getComponentAction())) {
                 if (buttons == null) {
                     MessageHelper.sendMessageToChannel(threadChannel_, message);
@@ -5014,6 +5014,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_, message, buttons);
                 }
                 messageSent = true;
+                break;
             }
         }
         if (messageSent) {
