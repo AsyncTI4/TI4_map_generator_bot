@@ -54,7 +54,7 @@ public class Whisper extends FOWSubcommandData {
     public static void sendWhisper(Game activeGame, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message;
         String realIdentity = Helper.getPlayerRepresentation(player_, activeGame, guild, true);
-        String player1 = Helper.getColourAsMention(guild, player.getColor());
+        String player1 = Helper.getColourEmojis(player.getColor());
 
         if (anonY.compareToIgnoreCase("y") == 0) {
                 message =  "[REDACTED] says: " + msg;
@@ -64,7 +64,7 @@ public class Whisper extends FOWSubcommandData {
         if (activeGame.isFoWMode()) {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Helper.getColourAsMention(guild, player_.getColor());
+            String player2 = Helper.getColourEmojis(player_.getColor());
             if (message.startsWith("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {

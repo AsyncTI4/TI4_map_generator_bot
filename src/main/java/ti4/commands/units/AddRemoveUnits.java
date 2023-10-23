@@ -189,7 +189,7 @@ abstract public class AddRemoveUnits implements Command {
                 }
             }
             if (!pingedAlready) {
-                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+                String colorMention = Helper.getColourEmojis(color);
                 String message = colorMention + " has modified units in the system. ";
                 if (getActionDescription().contains("add_units")) {
                     message = message + " Specific units modified include: " + unitList;

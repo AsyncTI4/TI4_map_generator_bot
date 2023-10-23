@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,16 +44,20 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(shortName).orElse(getName());
     }
 
-    public String getPermanentEffect() {
-        return Optional.ofNullable(permanentEffect).orElse("");
+    public Optional<String> getPermanentEffect() {
+        return Optional.ofNullable(permanentEffect);
     }
 
-    public String getWindow() {
-        return Optional.ofNullable(window).orElse("");
+    public Optional<String> getWindow() {
+        return Optional.ofNullable(window);
     }
 
-    public String getWindowEffect() {
-        return Optional.ofNullable(windowEffect).orElse("");
+    public Optional<String> getWindowEffect() {
+        return Optional.ofNullable(windowEffect);
+    }
+
+    public Optional<List<String>> getSearchTags() {
+        return Optional.ofNullable(searchTags);
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -70,10 +75,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title.toString());
 
         //DESCRIPTION
-        if (!getPermanentEffect().isBlank()) eb.setDescription(getPermanentEffect());
+        if (getPermanentEffect().isPresent()) eb.setDescription(getPermanentEffect().get());
 
         //FIELDS
-        if (!getWindow().isBlank()) eb.addField(getWindow(), getWindowEffect(), false);
+        if (getWindow().isPresent()) eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -87,9 +92,9 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     public String getRepresentation() {
         String abilityName = getName();
         String abilitySourceFaction = getFaction();
-        String abilityRawModifier = getPermanentEffect();
-        String abilityWindow = getWindow();
-        String abilityText = getWindowEffect();
+        String abilityRawModifier = getPermanentEffect().orElse("");
+        String abilityWindow = getWindow().orElse("");
+        String abilityText = getWindowEffect().orElse("");
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getFactionIconFromDiscord(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
@@ -105,7 +110,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
                 || getName().toLowerCase().contains(searchString)
                 || getFaction().toLowerCase().contains(searchString)
                 || getSource().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+                || getSearchTags().orElse(new ArrayList<>()).contains(searchString);
     }
 
     @Override
