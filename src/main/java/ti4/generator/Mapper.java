@@ -39,24 +39,24 @@ public class Mapper {
     //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final Map<String, ExploreModel> explore = new HashMap<>();
-    private static final HashMap<String, AbilityModel>  abilities = new HashMap<>();
-    private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
-    private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
-    private static final HashMap<String, EventModel> events = new HashMap<>();
-    private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
-    private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
-    private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
-    private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
-    private static final HashMap<String, RelicModel> relics = new HashMap<>();
-    private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
-    private static final HashMap<String, UnitModel> units = new HashMap<>();
-    private static final HashMap<String, AttachmentModel> attachments = new HashMap<>();
-    private static final HashMap<String, LeaderModel> leaders = new HashMap<>();
+    private static final Map<String, AbilityModel>  abilities = new HashMap<>();
+    private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
+    private static final Map<String, AgendaModel> agendas = new HashMap<>();
+    private static final Map<String, EventModel> events = new HashMap<>();
+    private static final Map<String, FactionModel> factionSetup = new HashMap<>();
+    private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
+    private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
+    private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+    private static final Map<String, RelicModel> relics = new HashMap<>();
+    private static final Map<String, TechnologyModel> technologies = new HashMap<>();
+    private static final Map<String, UnitModel> units = new HashMap<>();
+    private static final Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static final Map<String, LeaderModel> leaders = new HashMap<>();
 
     @Getter
-    private static final HashMap<String, StrategyCardModel> strategyCardSets = new HashMap<>();
-    private static final HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>();
-    private static final HashMap<String, DraftErrataModel> frankenErrata = new HashMap<>();
+    private static final Map<String, StrategyCardModel> strategyCardSets = new HashMap<>();
+    private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
+    private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
@@ -171,7 +171,7 @@ public class Mapper {
         return pnList;
     }
 
-    public static HashMap<String, PromissoryNoteModel> getPromissoryNotes() {
+    public static Map<String, PromissoryNoteModel> getPromissoryNotes() {
         return promissoryNotes;
     }
 
@@ -681,7 +681,7 @@ public class Mapper {
         return technologies.get(id).getType();
     }
 
-    public static HashMap<String, TechnologyModel> getTechs() {
+    public static Map<String, TechnologyModel> getTechs() {
         return technologies;
     }
 
@@ -789,7 +789,7 @@ public class Mapper {
             .collect(Collectors.toList());
     }
 
-    public static HashMap<String, DraftErrataModel> getFrankenErrata() {
+    public static Map<String, DraftErrataModel> getFrankenErrata() {
         return frankenErrata;
     }
 

@@ -233,7 +233,7 @@ public class AutoCompleteProvider {
             }
             case Constants.AC_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> actionCards = Mapper.getACJustNames();
+                Map<String, String> actionCards = Mapper.getACJustNames();
                 List<Command.Choice> options = actionCards.entrySet().stream()
                     .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
@@ -243,7 +243,7 @@ public class AutoCompleteProvider {
             }
             case Constants.PROMISSORY_NOTE_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
+                Map<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
                 List<Command.Choice> options = PNs.values().stream()
                     .filter(pn -> (pn.getAlias() + " " + pn.getName() + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
                     .limit(25)
@@ -600,7 +600,7 @@ public class AutoCompleteProvider {
             }
             case Constants.STRATEGY_CARD_SET -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
+                Map<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
                 List<Command.Choice> options = decks.values().stream()
                     .filter(scSet -> !"template".equals(scSet.getAlias()))
                     .filter(value -> value.getAlias().contains(enteredValue))
