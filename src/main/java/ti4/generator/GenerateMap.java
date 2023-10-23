@@ -836,7 +836,7 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        if (activeGame.isFrankenGame()) drawFactionIconImage(graphics, promissoryNote.getFaction(), x + deltaX - 1, y + 86, 42, 42);
+                        if (activeGame.isFrankenGame()) drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
                         drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
