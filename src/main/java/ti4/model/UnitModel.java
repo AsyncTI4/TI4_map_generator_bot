@@ -63,7 +63,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (Mapper.isFaction(getFaction().orElse("").toLowerCase()));
+            && (!getFaction().isPresent() || Mapper.isFaction(getFaction().orElse("").toLowerCase()));
     }
 
     public String getAlias() {
