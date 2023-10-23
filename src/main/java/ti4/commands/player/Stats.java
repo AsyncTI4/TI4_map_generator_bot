@@ -297,7 +297,7 @@ public class Stats extends PlayerSubcommandData {
 
 		player.addSC(scNumber);
 		if (activeGame.isFoWMode()) {
-			String messageToSend = Helper.getColourAsMention(player.getColor()) + " picked SC #" + scNumber;
+			String messageToSend = Helper.getColourEmojis(player.getColor()) + " picked SC #" + scNumber;
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
@@ -307,7 +307,7 @@ public class Stats extends PlayerSubcommandData {
 			tg += tgCount;
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), Helper.getPlayerRepresentation(player, activeGame) + " gained " + tgCount + " tgs from picking SC #" + scNumber);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Helper.getColourAsMention(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
+				String messageToSend = Helper.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);

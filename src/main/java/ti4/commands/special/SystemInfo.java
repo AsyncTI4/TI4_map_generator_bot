@@ -139,7 +139,7 @@ public class SystemInfo extends SpecialSubcommandData {
                     Player player = activeGame.getPlayerFromColorOrFaction(colour);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourAsMention(colour));
+                    sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourEmojis(colour));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
                         sb.append(Helper.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
