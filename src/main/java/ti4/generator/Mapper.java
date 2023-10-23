@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 public class Mapper {
     private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
-    private static final Properties cc_tokens = new Properties();
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
@@ -63,7 +62,6 @@ public class Mapper {
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
         readData("decals.properties", decals, "Could not read decals name file");
-        readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
         readData("tokens.properties", tokens, "Could not read token name file");
         readData("special_case.properties", special_case, "Could not read token name file");
@@ -342,12 +340,12 @@ public class Mapper {
 
     public static String getCCID(String color) {
         String property = colors.getProperty(color);
-        return cc_tokens.get("cc") + property + ".png";
+        return "command_" + property + ".png";
     }
 
     public static String getFleetCCID(String color) {
         String property = colors.getProperty(color);
-        return cc_tokens.get("fleet") + property + ".png";
+        return "fleet_" + property + ".png";
     }
 
     public static String getAttachmentID(String tokenID) {
@@ -364,12 +362,12 @@ public class Mapper {
 
     public static String getControlID(String color) {
         String property = colors.getProperty(color);
-        return cc_tokens.get("control") + property + ".png";
+        return "control_" + property + ".png";
     }
 
     public static String getSweepID(String color) {
         String property = colors.getProperty(color);
-        return cc_tokens.get("sweep") + property + ".png";
+        return "sweep_" + property + ".png";
     }
 
     public static List<String> getColors() {
