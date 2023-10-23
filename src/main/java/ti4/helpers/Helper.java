@@ -449,11 +449,13 @@ public class Helper {
         if (Optional.ofNullable(activeGame.getScSetID()).isEmpty() || "null".equals(activeGame.getScSetID())) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean pbd100or500 = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         String scAsString = String.valueOf(sc);
-        if (pbd100or500) {
+        if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
             scAsString = String.valueOf(scValue);
+            scSet = scSet.replace("pbd100", "pok");
+            scSet = scSet.replace("pbd1000", "pok");
         }
 
         return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet +
