@@ -3655,7 +3655,7 @@ public class ButtonHelper {
                 }
             }
         }
-        String message2 = "Resolve status homework using the buttons. Only the Ready for [X] button is essential to hit, all others are optional. ";
+        String message2 = "Resolve status homework using the buttons. \n ";
         activeGame.setACDrawStatusInfo("");
         Button draw1AC = Button.success("drawStatusACs", "Draw Status Phase ACs").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
         Button getCCs = Button.success("redistributeCCButtons", "Redistribute, Gain, & Confirm CCs").withEmoji(Emoji.fromFormatted("🔺"));
@@ -3664,17 +3664,17 @@ public class ButtonHelper {
         if (custodiansTaken) {
             passOnAbilities = Button.danger("pass_on_abilities", "Ready For Agenda");
             message2 = message2
-                + " Ready for Agenda means you are done playing/passing on playing political stability, ancient burial sites, maw of worlds, Naalu hero, and crown of emphidia.";
+                + "Ready For Agenda means you are done playing/passing on: \n- Political Stability \n- Ancient Burial Sites\n- Maw of Worlds \n- Naalu hero\n- Crown of Emphidia";
         } else {
             passOnAbilities = Button.danger("pass_on_abilities", "Ready For Strategy Phase");
             message2 = message2
-                + " Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manipulate investments. ";
+                + "Ready For Strategy Phase means you are done playing/passing on: \n- Political Stability \n- Summit \n- Manipulate Investments ";
         }
         List<Button> buttons = new ArrayList<>();
         if (activeGame.isFoWMode()) {
             buttons.add(draw1AC);
             buttons.add(getCCs);
-            message2 = "Resolve status homework using the buttons";
+            message2 = "Please resolve status homework";
             for (Player p1 : activeGame.getPlayers().values()) {
                 if (p1 == null || p1.isDummy() || p1.getFaction() == null || p1.getPrivateChannel() == null) {
                 } else {
@@ -4642,7 +4642,8 @@ public class ButtonHelper {
                 }
                 if ("sr".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = new ArrayList<>();
-                    List<Tile> tiles = getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital);
+                    List<Tile> tiles = new ArrayList<>();
+                    tiles.addAll(getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Spacedock, UnitType.CabalSpacedock, UnitType.PlenaryOrbital));
                     if (p1.hasUnit("ghoti_flagship")) {
                         tiles.addAll(getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Flagship));
                     }

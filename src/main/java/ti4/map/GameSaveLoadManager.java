@@ -164,7 +164,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    public static void undo(Game activeGame) {
+    public static void undo(Game activeGame, GenericInteractionCreateEvent event) {
         File originalMapFile = Storage.getMapImageStorage(activeGame.getName() + Constants.TXT);
         if (originalMapFile != null) {
             File mapUndoDirectory = Storage.getMapUndoDirectory();
@@ -198,6 +198,7 @@ public class GameSaveLoadManager {
                     if (loadedGame != null && loadedGame.getSavedButtons().size() > 0) {
                         MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                     }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -497,6 +498,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
         writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
@@ -686,6 +689,8 @@ public class GameSaveLoadManager {
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
             writer.write(System.lineSeparator());
@@ -1518,6 +1523,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.NOMAD_COIN -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setNomadCoin(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.TEMPORARY_PING_DISABLE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1848,6 +1861,7 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));

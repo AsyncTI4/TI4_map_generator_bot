@@ -95,6 +95,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+    private boolean nomadCoin;
+    @ExportableField
     private boolean temporaryPingDisable = false;
     @ExportableField
     private boolean dominusOrb;
@@ -861,6 +863,9 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+    public boolean getNomadCoin() {
+        return nomadCoin;
+    }
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
     }
@@ -875,6 +880,9 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setNomadCoin(boolean onStatus) {
+        nomadCoin = onStatus;
     }
     public void setTemporaryPingDisable(boolean onStatus) {
         temporaryPingDisable = onStatus;
@@ -2808,6 +2816,15 @@ public class Game {
     @JsonIgnore
     public Set<String> getPlayerIDs() {
         return players.keySet();
+    }
+
+    @JsonIgnore
+    public List<String> getRealPlayerIDs() {
+        List<String> pIDs = new ArrayList<>();
+        for(Player player : getRealPlayers()){
+            pIDs.add(player.getUserID());
+        }
+        return pIDs;
     }
 
     public void removePlayer(String playerID) {
