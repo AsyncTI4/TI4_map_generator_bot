@@ -992,7 +992,7 @@ public class GenerateMap {
                             }
                             imperiaColorFile += ".png";
                             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-                            drawPlayerFactionIconImage(graphics, player, x + deltaX - 1, y + 108, 42, 42);
+                            drawPlayerFactionIconImage(graphics, player_, x + deltaX - 1, y + 108, 42, 42);
                             drawPAImage(x + deltaX, y, imperiaColorFile);
                             String status_ = locked ? "_exh" : "_rdy";
                             String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
