@@ -349,7 +349,7 @@ public class CombatModHelper {
                         // player.getFactionTEchs?
                         scalingCount = opponent.getTechs().stream()
                             .map(Mapper::getTech)
-                            .filter(tech -> StringUtils.isNotBlank(tech.getFaction()))
+                            .filter(tech -> StringUtils.isNotBlank(tech.getFaction().orElse("")))
                             .count();
                     }
                 }

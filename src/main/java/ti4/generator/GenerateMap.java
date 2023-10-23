@@ -1699,8 +1699,8 @@ public class GenerateMap {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (!techInformation.getFaction().isEmpty()) {
-                drawFactionIconImage(graphics, techInformation.getFaction(), x + deltaX - 1, y + 108, 42, 42);
+            if (techInformation.getFaction().isPresent()) {
+                drawFactionIconImage(graphics, techInformation.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
@@ -1746,8 +1746,8 @@ public class GenerateMap {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (!techInformation.getFaction().isEmpty()) {
-                drawFactionIconImageOpaque(graphics, techInformation.getFaction(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+            if (techInformation.getFaction().isPresent()) {
+                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
@@ -1909,9 +1909,9 @@ public class GenerateMap {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
 
-                if (!techInformation.getFaction().isEmpty()) {
+                if (techInformation.getFaction().isPresent()) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, techInformation.getFaction(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
+                    drawFactionIconImage(graphics, techInformation.getFaction().get(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
                 }
             }
         }
