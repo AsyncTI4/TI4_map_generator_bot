@@ -57,6 +57,9 @@ public class SendTG extends PlayerSubcommandData {
 		}
 		String tgString = sendTG + " " + Emojis.tg + " trade goods";
 		String message = p1 + " sent " + tgString + " to " + p2;
+		if(activeGame.getNomadCoin()){
+			message = message.replace(Emojis.tg, Emojis.nomadcoin);
+		}
 		sendMessage(message);
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {

@@ -14,6 +14,7 @@ public class Constants {
     public static final String FOWGM = "fowgm";
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
+    public static final String ADD_TEAMMATE = "add_teammate";
     public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
@@ -48,6 +49,7 @@ public class Constants {
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String NOMAD_COIN = "nomad_coin";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
@@ -454,6 +456,7 @@ public class Constants {
     public static final String PLANET5 = "planet5";
     public static final String PLANET6 = "planet6";
     public static final String TECH = "tech";
+    public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";

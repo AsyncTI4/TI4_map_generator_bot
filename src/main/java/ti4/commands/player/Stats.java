@@ -226,7 +226,11 @@ public class Stats extends PlayerSubcommandData {
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
-		sb.append("      ").append(Emojis.tg).append(player.getTg());
+		if(activeGame.getNomadCoin()){
+			sb.append("      ").append(Emojis.nomadcoin).append(player.getTg());
+		}else{
+			sb.append("      ").append(Emojis.tg).append(player.getTg());
+		}
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
 		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());

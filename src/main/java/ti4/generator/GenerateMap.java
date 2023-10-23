@@ -632,6 +632,7 @@ public class GenerateMap {
                 String soImage = "pa_cardbacks_so.png";
                 String pnImage = "pa_cardbacks_pn.png";
                 String tradeGoodImage = "pa_cardbacks_tradegoods.png";
+                String nomadCoinImage = "pa_cardbacks_nomadcoin.png";
                 String commoditiesImage = "pa_cardbacks_commodities.png";
                 drawPAImage(x + 150, y + yDelta, soImage);
                 graphics.drawString(Integer.toString(player.getSo()), x + 170, y + deltaY + 50);
@@ -644,7 +645,11 @@ public class GenerateMap {
                 drawPAImage(x + 280, y + yDelta, pnImage);
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
-                drawPAImage(x + 345, y + yDelta, tradeGoodImage);
+                if(activeGame.getNomadCoin()){
+                    drawPAImage(x + 345, y + yDelta, nomadCoinImage);
+                }else{
+                    drawPAImage(x + 345, y + yDelta, tradeGoodImage);
+                }
                 graphics.drawString(Integer.toString(player.getTg()), x + 360, y + deltaY + 50);
 
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
