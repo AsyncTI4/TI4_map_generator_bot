@@ -132,13 +132,14 @@ public class MessageHelper {
 			}
 		}
 		FileUpload fileUpload = FileUpload.fromData(file);
-		channel.sendFiles(fileUpload).queue();
+		final MessageChannel finalChannel = channel;
+		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if (fileUpload == null) return;
 		if(channel.getName().contains("-actions")){
-			String threadName = channel.getName().replace("-actions","")  + "-bot-map-updates";
+			String threadName = channel.getName().replace("-actions", "")  + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
 			for (ThreadChannel threadChannel_ : threadChannels) {
 				if (threadChannel_.getName().equals(threadName)) {
@@ -146,17 +147,18 @@ public class MessageHelper {
 				}
 			}
 		}
-		channel.sendFiles(fileUpload).queue();
+		final MessageChannel finalChannel = channel;
+		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload, boolean SCPlay) {
-		channel.sendFiles(fileUpload).queue();
+		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", error)));
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file, boolean SCPlay) {
 		if (file == null) return;
 		FileUpload fileUpload = FileUpload.fromData(file);
-		channel.sendFiles(fileUpload).queue();
+		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", error)));
 	}
 
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {

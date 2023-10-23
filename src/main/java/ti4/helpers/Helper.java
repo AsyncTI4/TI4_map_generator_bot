@@ -392,15 +392,6 @@ public class Helper {
         return "[@" + roleName + "]";
     }
 
-    public static String getColourAsMention(String colour) {
-        return getColourAsMention(null, colour);
-    }
-
-    public static String getColourAsMention(Guild guild, String colour) {
-        if (guild == null) return "@" + colour;
-        return getRoleMentionByName(guild, colour);
-    }
-
     public static String getSCAsMention(int sc, Game activeGame) {
         if (activeGame.isHomeBrewSCMode()) {
             return getSCName(sc, activeGame);
@@ -449,11 +440,13 @@ public class Helper {
         if (Optional.ofNullable(activeGame.getScSetID()).isEmpty() || "null".equals(activeGame.getScSetID())) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean pbd100or500 = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
+        boolean gameWithGroupedSCs = "pbd100".equals(activeGame.getName()) || "pbd500".equals(activeGame.getName()) && !"tribunal".equals(scSet);
         String scAsString = String.valueOf(sc);
-        if (pbd100or500) {
+        if (gameWithGroupedSCs) {
             char scValue = String.valueOf(sc).charAt(0);
             scAsString = String.valueOf(scValue);
+            scSet = scSet.replace("pbd100", "pok");
+            scSet = scSet.replace("pbd1000", "pok");
         }
 
         return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet +
@@ -696,55 +689,55 @@ public class Helper {
 
     public static String getColourEmojis(String colour) {
         return switch (colour) {
-            case "gray" -> "";
-            case "black" -> "";
-            case "blue" -> "";
-            case "green" -> "";
-            case "orange" -> "";
-            case "pink" -> "";
-            case "purple" -> "";
-            case "red" -> "";
-            case "yellow" -> "";
-            case "petrol" -> "";
-            case "brown" -> "";
-            case "tan" -> "";
-            case "forest" -> "";
-            case "chrome" -> "";
-            case "sunset" -> "";
-            case "turquoise" -> "";
-            case "gold" -> "";
-            case "lightgray" -> "";
-            case "teal" -> "";
-            case "bloodred" -> "";
-            case "emerald" -> "";
-            case "navy" -> "";
-            case "rose" -> "";
-            case "lime" -> "";
-            case "lavender" -> "";
-            case "spring" -> "";
-            case "chocolate" -> "";
-            case "rainbow" -> "";
-            case "ethereal" -> "";
-            case "orca" -> "";
-            case "splitred" -> "";
-            case "splitblue" -> "";
-            case "splitgreen" -> "";
-            case "splitpurple" -> "";
-            case "splitorange" -> "";
-            case "splityellow" -> "";
-            case "splitpink" -> "";
-            case "splitgold" -> "";
-            case "splitlime" -> "";
-            case "splittan" -> "";
-            case "splitteal" -> "";
-            case "splitturquoise" -> "";
-            case "splitbloodred" -> "";
-            case "splitchocolate" -> "";
-            case "splitemerald" -> "";
-            case "splitnavy" -> "";
-            case "splitpetrol" -> "";
-            case "splitrainbow" -> "";
-            default -> "";
+            case "gray" -> "**Gray**";
+            case "black" -> "**Black**";
+            case "blue" -> "**Blue**";
+            case "green" -> "**Green**";
+            case "orange" -> Emojis.destroyer + "**Orange**";
+            case "pink" -> "**Pink**";
+            case "purple" -> "**Purple**";
+            case "red" -> "**Red**";
+            case "yellow" -> "**Yellow**";
+            case "petrol" -> "**Petrol**";
+            case "brown" -> "**Brown**";
+            case "tan" -> "**Tan**";
+            case "forest" -> "**Forest**";
+            case "chrome" -> "**Chrome**";
+            case "sunset" -> "**Sunset**";
+            case "turquoise" -> "**Turquoise**";
+            case "gold" -> "**Gold**";
+            case "lightgray" -> "**Lightgray**";
+            case "teal" -> "**Teal**";
+            case "bloodred" -> "**Bloodred**";
+            case "emerald" -> "**Emerald**";
+            case "navy" -> "**Navy**";
+            case "rose" -> "**Rose**";
+            case "lime" -> "**Lime**";
+            case "lavender" -> "**Lavender**";
+            case "spring" -> "**Spring**";
+            case "chocolate" -> "**Chocolate**";
+            case "rainbow" -> "**Rainbow**";
+            case "ethereal" -> "**Ethereal**";
+            case "orca" -> "**Orca**";
+            case "splitred" -> "**Splitred**";
+            case "splitblue" -> "**Splitblue**";
+            case "splitgreen" -> "**Splitgreen**";
+            case "splitpurple" -> "**Splitpurple**";
+            case "splitorange" -> "**Splitorange**";
+            case "splityellow" -> "**Splityellow**";
+            case "splitpink" -> "**Splitpink**";
+            case "splitgold" -> "**Splitgold**";
+            case "splitlime" -> "**Splitlime**";
+            case "splittan" -> "**Splittan**";
+            case "splitteal" -> "**Splitteal**";
+            case "splitturquoise" -> "**Splitturquoise**";
+            case "splitbloodred" -> "**Splitbloodred**";
+            case "splitchocolate" -> "**Splitchocolate**";
+            case "splitemerald" -> "**Splitemerald**";
+            case "splitnavy" -> "**Splitnavy**";
+            case "splitpetrol" -> "**Splitpetrol**";
+            case "splitrainbow" -> "**Splitrainbow**";
+            default -> colour;
         };
     }
 
@@ -1379,7 +1372,7 @@ public class Helper {
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
-            return getColourAsMention(guild, player.getColor());
+            return getColourEmojis(player.getColor());
         }
 
         if (activeGame != null && activeGame.isCommunityMode()) {
@@ -1398,7 +1391,7 @@ public class Helper {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
         if (includePing) sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
+            sb.append(" ").append(getColourEmojis(player.getColor()));
         }
         return sb.toString();
     }

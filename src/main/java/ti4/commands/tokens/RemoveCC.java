@@ -26,7 +26,7 @@ public class RemoveCC extends AddRemoveToken {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
             }
             if (activeGame.isFoWMode()) {
-                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+                String colorMention = Helper.getColourEmojis(color);
                 FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
             }
 
@@ -43,7 +43,7 @@ public class RemoveCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode()) {
-            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            String colorMention = Helper.getColourEmojis(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
         }
         tile.removeCC(ccID);
