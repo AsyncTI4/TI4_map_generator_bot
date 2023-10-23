@@ -2,6 +2,8 @@ package ti4.commands.player;
 
 import java.util.*;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -235,10 +237,16 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private List<Button> getSCButtons(int sc, Game activeGame) {
-
-        if (activeGame.isHomeBrewSCMode()) {
+        boolean isGroupedSCGameWithPoKSCs = "pbd100".equals(activeGame.getName()) || "pbd1000".equals(activeGame.getName());
+        if (activeGame.isHomeBrewSCMode() && !isGroupedSCGameWithPoKSCs) {
             return getGenericButtons(sc);
         }
+
+        if (isGroupedSCGameWithPoKSCs) {
+            String scId = String.valueOf(sc);
+            sc = Integer.parseInt(StringUtils.left(scId, 1));
+        }
+
         return switch (sc) {
             case 1 -> getLeadershipButtons();
             case 2 -> getDiplomacyButtons();
@@ -251,7 +259,6 @@ public class SCPlay extends PlayerSubcommandData {
             default -> getGenericButtons(sc);
         };
     }
-
     
     private List<Button> getLeadershipButtons() {
         Button followButton = Button.success("sc_leadership_follow", "SC Follow");
