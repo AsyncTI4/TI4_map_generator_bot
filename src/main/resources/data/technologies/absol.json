@@ -70,7 +70,7 @@
         },
         {
             "alias": "absol_bs",
-            "name": "Biostims",
+            "name": "Bio-stims",
             "type": "BIOTIC",
             "requirements": "G",
             "source": "absol",

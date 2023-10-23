@@ -274,7 +274,7 @@ public class SCPlay extends PlayerSubcommandData {
     private List<Button> getLeadershipButtons() {
         Button followButton = Button.success("sc_leadership_follow", "SC Follow");
         Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
-        Button exhaust = Button.danger("leadershipExhaust", "Exhaust Planets");
+        Button exhaust = Button.danger("leadershipExhaust", "Spend");
         Button noFollowButton = Button.primary("sc_no_follow_1", "Not Following");
         return List.of(followButton, exhaust,leadershipGenerateCCButtons,noFollowButton);
     }
