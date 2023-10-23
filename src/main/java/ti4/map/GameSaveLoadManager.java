@@ -164,7 +164,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    public static void undo(Game activeGame) {
+    public static void undo(Game activeGame, GenericInteractionCreateEvent event) {
         File originalMapFile = Storage.getMapImageStorage(activeGame.getName() + Constants.TXT);
         if (originalMapFile != null) {
             File mapUndoDirectory = Storage.getMapUndoDirectory();
@@ -198,6 +198,7 @@ public class GameSaveLoadManager {
                     if (loadedGame != null && loadedGame.getSavedButtons().size() > 0) {
                         MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                     }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
