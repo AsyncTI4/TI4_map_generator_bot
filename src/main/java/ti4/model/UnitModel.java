@@ -56,13 +56,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return id != null
             && !id.isEmpty()
             && baseType != null
+            && name != null
             && asyncId != null
             && source != null
             && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament").contains(getAsyncId())
             // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (getFaction() == null || Mapper.isFaction(getFaction().toLowerCase()));
+            && (!getFaction().isPresent() || Mapper.isFaction(getFaction().orElse("").toLowerCase()));
     }
 
     public String getAlias() {
@@ -84,8 +85,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getUnitRepresentation() {
-        String faction = getFaction();
-        String factionEmoji = Helper.getEmojiFromDiscord(faction);
+        String factionEmoji = Helper.getEmojiFromDiscord(getFaction().orElse(""));
         String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
 
         return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
@@ -97,7 +97,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
 
-        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction());
+        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().orElse(""));
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
@@ -108,7 +108,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
-        if (getAbility() != null) eb.addField("Ability:", getAbility(), false);
+        if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -246,7 +246,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
-            || (getFaction() != null && getFaction().toLowerCase().contains(searchString))
+            || getFaction().orElse("").toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
             || getBaseType().toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
@@ -299,5 +299,25 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public boolean getIsShip() {
         return Optional.ofNullable(isShip).orElse(false);
+    }
+
+    public Optional<String> getUpgradesFromUnitId() {
+        return Optional.ofNullable(upgradesFromUnitId);
+    }
+
+    public Optional<String> getUpgradesToUnitId() {
+        return Optional.ofNullable(upgradesToUnitId);
+    }
+
+    public Optional<String> getRequiredTechId() {
+        return Optional.ofNullable(requiredTechId);
+    }
+
+    public Optional<String> getFaction() {
+        return Optional.ofNullable(faction);
+    }
+
+    public Optional<String> getAbility() {
+        return Optional.ofNullable(ability);
     }
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,17 +42,17 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         return name;
     }
     
-    public String getFaction() {
-        return faction;
+    public Optional<String> getFaction() {
+        return Optional.ofNullable(faction);
     }
 
-    public String getColour() {
-        return colour;
+    public Optional<String> getColour() {
+        return Optional.ofNullable(colour);
     }
 
     public String getFactionOrColour() {
-        if (!StringUtils.isBlank(getFaction())) return faction;
-        if (!StringUtils.isBlank(getColour())) return colour;
+        if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
+        if (!StringUtils.isBlank(getColour().orElse(""))) return colour;
         return faction + "_" + colour;
     }
 
@@ -99,9 +100,9 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         //TITLE
         StringBuilder title = new StringBuilder();
         title.append(Emojis.PN);
-        if (!StringUtils.isBlank(getFaction())) title.append(Helper.getFactionIconFromDiscord(getFaction()));
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Helper.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
-        if (!StringUtils.isBlank(getColour())) title.append(" (").append(getColour()).append(")");
+        if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
         title.append(getSourceEmoji());
         eb.setTitle(title.toString());
 

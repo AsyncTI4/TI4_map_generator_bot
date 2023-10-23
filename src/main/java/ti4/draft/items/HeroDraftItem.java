@@ -48,7 +48,7 @@ public class HeroDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return "**" + leader.getAbilityName().replace("\n", "") + "** - " + "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+            return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
         }
         return "";
     }

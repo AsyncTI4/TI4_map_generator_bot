@@ -408,7 +408,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game activeGame) {
         if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("ra")) == player) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction())) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {
                         continue;

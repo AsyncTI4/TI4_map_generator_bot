@@ -300,7 +300,7 @@ public class Tile {
         try {
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
-            // TODO: handle exception
+            // DO NOTHING
         }
         return null;
     }
