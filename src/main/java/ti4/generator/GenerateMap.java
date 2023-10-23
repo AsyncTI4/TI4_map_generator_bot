@@ -1619,7 +1619,7 @@ public class GenerateMap {
             return y;
         }
 
-        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
@@ -1667,7 +1667,7 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX) {
+    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, Map<String, TechnologyModel> techInfo, int deltaX) {
         if (techs == null) {
             return deltaX;
         }
@@ -1720,7 +1720,7 @@ public class GenerateMap {
     }
 
     private int factionTechField(int x, int y, List<String> techs, int deltaX) {
-        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         
         if (techs == null) {
             return deltaX;
@@ -1766,7 +1766,7 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, TechnologyModel> techInfo) {
+    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, Map<String, TechnologyModel> techInfo) {
         int stasisInfantry = player.getStasisInfantry();
         if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs, techInfo) && stasisInfantry == 0) {
             return deltaX;
@@ -1788,7 +1788,7 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private boolean hasInfantryII(List<String> techs, HashMap<String, TechnologyModel> techInfo) {
+    private boolean hasInfantryII(List<String> techs, Map<String, TechnologyModel> techInfo) {
         if (techs == null) {
             return false;
         }
@@ -1875,7 +1875,7 @@ public class GenerateMap {
         }
     }
 
-    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX, Player player, Game activeGame) {
+    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, Map<String, TechnologyModel> techInfo, int deltaX, Player player, Game activeGame) {
         String outline = "pa_tech_unitupgrade_outlines.png";
 
         drawPAImage(x + deltaX, y, outline);

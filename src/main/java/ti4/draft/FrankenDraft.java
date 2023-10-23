@@ -39,7 +39,7 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftItem.Category listCategory) {
-        HashMap<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
+        Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
         Collections.shuffle(items);
