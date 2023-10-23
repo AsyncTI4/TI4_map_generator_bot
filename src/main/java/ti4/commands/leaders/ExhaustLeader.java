@@ -44,6 +44,10 @@ public class ExhaustLeader extends LeaderAction {
 						.append(" total)_\n");
 			}
 		}
-		sendMessage(messageText.toString());
+		String msg = messageText.toString();
+		if(activeGame.getNomadCoin()){
+			msg = msg.replace(Emojis.tg, Emojis.nomadcoin);
+		}
+		sendMessage(msg);
 	}
 }

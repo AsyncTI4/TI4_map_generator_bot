@@ -399,6 +399,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                
+                if(activeGame.getNomadCoin()){
+                    message = message.replace(Emojis.tg, Emojis.nomadcoin);
+                }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }
