@@ -1102,7 +1102,7 @@ public class GenerateMap {
             String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                graphics.drawImage(resourceBufferedImage, x, y, null);
+                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             } else if (activeGame.isFrankenGame()) {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
