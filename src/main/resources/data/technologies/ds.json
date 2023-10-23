@@ -5,7 +5,6 @@
         "type": "PROPULSION",
         "requirements": "B",
         "faction": "axis",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you activate a system, you may exhaust this card to choose 1 ship you control and roll a die. On a result of 1-3, remove that ship from the game board; on a result of 4-10, apply +2 to that ship's move value during this tactical action."
     },
@@ -15,7 +14,6 @@
         "type": "CYBERNETIC",
         "requirements": "YYY",
         "faction": "axis",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "ACTION: Exhaust this card to place or move 1 of your space docks onto a planet you control."
     },
@@ -25,7 +23,6 @@
         "type": "BIOTIC",
         "requirements": "G",
         "faction": "bentor",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Each planet you control that has a technology specialty or an attachment gains the PRODUCTION 1 ability as if it were a unit."
     },
@@ -35,7 +32,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "bentor",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to increase the PRODUCTION value of 1 of those units to match the PRODUCTION value of the unit on the game board with the highest PRODUCTION value, or apply +2 to the total PRODUCTION value of those units."
     },
@@ -45,7 +41,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "blex",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "During each round of combat in systems that contain Blight tokens, 1 of your units may roll 1 additional combat die."
     },
@@ -55,7 +50,6 @@
         "type": "UNITUPGRADE",
         "requirements": "BG",
         "faction": "blex",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "This unit may move without being transported, and through systems that contain other players' ships. Each fighter in excess of your ship's capacity counts against your fleet pool. Cost 1(x2), Combat 8, Move 3"
     },
@@ -65,7 +59,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "celdauri",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the end of your turn, you may exhaust this card and spend 1 token from your strategy pool to remove a command token from a system that contains 1 or more of your space docks."
     },
@@ -95,7 +88,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "cheiran",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After another player activates a system that contains 1 of your structures, you may exhaust this card to produce 1 ship in the active system. For each of your structures in the active system, you may remove that unit from the game board to reduce the cost of the produced ship by 3."
     },
@@ -115,7 +107,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "cymiae",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of your turn, you may exhaust this card to choose 1 non-home system other than Mecatol Rex that contains 1 or more of your units; place 1 other player's command token from their reinforcements in that system."
     },
@@ -135,7 +126,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "dihmohn",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When you explore a planet, you may produce 1 ship in that planet's system. ACTION: Exhaust this card and 1 planet you control to explore that planet."
     },
@@ -145,7 +135,6 @@
         "type": "BIOTIC",
         "requirements": "GGG",
         "faction": "edyn",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Once per agenda phase, after an agenda is revealed, you may predict aloud an outcome of that agenda. If your prediction is correct, you may score 1 public objective if you fulfill its requirements; each other player who voted for that outcome draws 1 secret objective."
     },
@@ -155,7 +144,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "edyn",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "You may exhaust this card to allow a player to exchange 1 of their relics or agendas as part of a transaction. You always vote last during the agenda phase. When an outcome you voted for or predicted is resolved, each player who voted for that outcome gains 1 commodity."
     },
@@ -165,7 +153,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "florzen",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When a player would perform a strategic action, you may exhaust this card and spend 1 token from your strategy pool to end that player's turn; the strategic action is not resolved and the strategy card is not exhausted."
     },
@@ -185,7 +172,6 @@
         "type": "BIOTIC",
         "requirements": "G",
         "faction": "freesystems",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of the agenda phase, you may choose and exhaust 1 cultural, 1 hazardous, and 1 industrial planet. When you cast 1 or more votes, if you exhaust at least 1 cultural, 1 hazardous, and 1 industrial planet to cast votes, you may cast 4 additional votes."
     },
@@ -195,7 +181,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "freesystems",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of a ground combat, you may roll 1 die for each of up to 2 of your ground forces on that planet. For each result equal to or greater than that unit's combat value, produce 1 hit; your opponent must assign it to 1 of their units on that planet."
     },
@@ -215,7 +200,6 @@
         "type": "BIOTIC",
         "requirements": "GGG",
         "faction": "ghemina",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you win a space combat, you may ready 1 planet you control."
     },
@@ -225,7 +209,6 @@
         "type": "BIOTIC",
         "requirements": "G",
         "faction": "ghoti",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Up to 3 ships in your home system do not count against your fleet pool. When you cast 1 or more votes, you may exhaust this card to cast an additional number of votes equal to the number of command tokens in your fleet pool."
     },
@@ -235,7 +218,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "ghoti",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When you produce 1 or more units, you may produce 1 additional unit in a system that contains 1 or more of your ships and 1 of your command tokens."
     },
@@ -245,7 +227,6 @@
         "type": "PROPULSION",
         "requirements": "BBB",
         "faction": "gledge",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "During movement, you may increase the move value of each of your units not transporting fighters or infantry by 1."
     },
@@ -265,7 +246,6 @@
         "type": "BIOTIC",
         "requirements": "GGG",
         "faction": "augers",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "During the status phase, you may score 1 additional public objective instead of a secret objective."
     },
@@ -275,7 +255,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "augers",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of the status phase, you may spend 3 trade goods to research 1 technology."
     },
@@ -285,7 +264,6 @@
         "type": "BIOTIC",
         "requirements": "G",
         "faction": "kjalengard",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you activate a system that contains a Glory token, you may return 3 of your captured units to gain 1 command token. After a player rolls combat dice, you may exhaust this card to allow that player reroll up to 3 of those dice."
     },
@@ -305,7 +283,6 @@
         "type": "PROPULSION",
         "requirements": "B",
         "faction": "kollecc",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of a space combat, you may choose 1 of your ships in the active system that did not begin this action in that system; roll a die. On a result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships."
     },
@@ -315,7 +292,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "kollecc",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "ACTION: Exhaust this card to choose 1 of your neighbors that has 1 or more relic fragments. That player gains 2 trade goods and must give you 1 of those relic fragments of your choice."
     },
@@ -325,7 +301,6 @@
         "type": "BIOTIC",
         "requirements": "BB",
         "faction": "kolume",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card."
     },
@@ -335,7 +310,6 @@
         "type": "WARFARE",
         "requirements": "RRR",
         "faction": "kolume",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships."
     },
@@ -345,7 +319,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "kortali",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you win a combat in a system, you may exhaust this card to remove 1 command token from that system."
     },
@@ -355,7 +328,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "kortali",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships."
     },
@@ -365,7 +337,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "kyro",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "During the agenda phase, after an outcome you voted for is resolved, place 2 infantry from your reinforcements on a planet you control."
     },
@@ -375,7 +346,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "kyro",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of the strategy phase, choose 1 strategy card. During this strategy phase, other players must give you 1 of their promissory notes to choose that strategy card."
     },
@@ -385,7 +355,6 @@
         "type": "PROPULSION",
         "requirements": "BB",
         "faction": "lanefir",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "ACTION: Spend 1 command token from your strategy pool or purge 1 relic fragment to move 1 of your ships to an adjacent system that contains no other player's ships. If you spent a command token, exhaust this card."
     },
@@ -395,7 +364,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "lanefir",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you explore, or purge 1 or more relic fragments, place 1 commodity token on this card. At the start of a round of combat, remove any number of tokens from this card to reroll up to that many of your dice during this round of combat."
     },
@@ -405,7 +373,6 @@
         "type": "PROPULSION",
         "requirements": "BB",
         "faction": "lizho",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you activate a non-home system, you may exhaust this card to choose 1 ship you control; you may treat that ship as adjacent to the active system until the end of this tactical action."
     },
@@ -425,7 +392,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "khrask",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When you would spend a token from your strategy pool, you may exhaust 1 planet you control to spend 1 token from your reinforcements instead."
     },
@@ -445,7 +411,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "mirveda",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of invasion, choose up to 1 unit you control in the active system; that unit gains PLANETARY SHIELD. When a player commits a unit to land on a planet you control, you may exhaust this card to destroy that unit."
     },
@@ -465,7 +430,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "mortheus",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After a unit you control in a system is destroyed, you may exhaust this card to place 1 unit of that type from your reinforcements in the space area of a system adjacent to that system that contains 1 or more of your ships."
     },
@@ -475,7 +439,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "mortheus",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Each system that contains 1 or more of your ships and no planets gains PRODUCTION 2 as if it were a unit you control."
     },
@@ -485,7 +448,6 @@
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "mykomentori",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After your opponent makes a combat roll, you may exhaust this card. If you do, for each of their units that did not produce a hit, you may reroll that unit's combat roll; any hits that roll produces are produced against your opponent's units instead."
     },
@@ -515,7 +477,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "nivyn",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After 1 or more of your units with SUSTAIN DAMAGE makes a combat roll, you may choose 1 of those units to become damaged to reroll its combat roll."
     },
@@ -535,7 +496,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "nokar",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "During the action phase: You may exhaust this card to use the PRODUCTION ability of 1 of your units. Then, place 1 command token from your reinforcements in that unit's system."
     },
@@ -545,7 +505,6 @@
         "type": "PROPULSION",
         "requirements": "B",
         "faction": "olradin",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you activate a system, you may exhaust a planet you control of the same type as a planet in that system to apply +1 to the move value of each of your ships during this tactical action."
     },
@@ -555,7 +514,6 @@
         "type": "WARFARE",
         "requirements": "R",
         "faction": "olradin",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of your turn, you may exhaust this card and 1 planet you control to ready 1 non-home planet other than Mecatol Rex."
     },
@@ -565,7 +523,6 @@
         "type": "PROPULSION",
         "requirements": "BB",
         "faction": "zealots",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Once during your turn, when you exhaust 1 or more planets you control that have a technology specialty, you may produce 1 ship in 1 system that contains 1 of those planets."
     },
@@ -575,7 +532,6 @@
         "type": "CYBERNETIC",
         "requirements": "YYY",
         "faction": "zealots",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When you activate a system, or a system that contains 1 or more of your units is activated, you may choose 1 technology or non-fighter, non-structure unit upgrade technology another player controls; until the end of this tactical action, that card is treated as though it had no ability text."
     },
@@ -595,7 +551,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "rohdhna",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the start of the agenda phase, for each unit upgrade technology you control, you may choose 1 player. Each of those players must produce 1 ship in a system that contains 1 or more of their space docks or war suns."
     },
@@ -615,7 +570,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "tnelis",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After a round of space combat in a system that contains 1 or more of your mechs, you may have 1 of those units become damaged to produce 1 hit and assign it to a cruiser, dreadnought, or destroyer you do not control in that system."
     },
@@ -625,7 +579,6 @@
         "type": "PROPULSION",
         "requirements": "B",
         "faction": "vaden",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After you activate a system, you may exhaust this card and spend any number of trade goods; for each trade good you spent, apply +1 to the move value of 1 non-fighter ship you control."
     },
@@ -635,7 +588,6 @@
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "vaden",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit."
     },
@@ -645,7 +597,6 @@
         "type": "WARFARE",
         "requirements": "R",
         "faction": "vaylerian",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "Once per action, after you win a ground combat, you may draw 1 action card."
     },
@@ -665,7 +616,6 @@
         "type": "WARFARE",
         "requirements": "RR",
         "faction": "veldyr",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "At the end of each round of space combat, you may use the SPACE CANNON of 1 of your units in the active system against your opponent's ships, without rolling additional dice."
     },
@@ -685,7 +635,6 @@
         "type": "WARFARE",
         "requirements": "R",
         "faction": "zelian",
-        "baseUpgrade": "",
         "source": "ds",
         "text": "When 1 or more of your units produce 1 or more hits during a BOMBARDMENT roll against a planet, produce 1 additional hit for that roll."
     },
