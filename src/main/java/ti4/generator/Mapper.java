@@ -305,7 +305,7 @@ public class Mapper {
 
     public static UnitModel getUnitModelByTechUpgrade(String techID) {
         return units.values().stream()
-            .filter(unitModel -> techID.equals(unitModel.getRequiredTechId()))
+            .filter(unitModel -> techID.equals(unitModel.getRequiredTechId().orElse("")))
             .findFirst()
             .orElse(null);
     }
