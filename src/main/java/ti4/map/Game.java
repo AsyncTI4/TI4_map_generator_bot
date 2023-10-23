@@ -2008,6 +2008,24 @@ public class Game {
         return null;
     }
 
+    @Nullable
+    public Map.Entry<String, Integer> drawBottomAgenda() {
+        if (!agendas.isEmpty()) {
+            for (int i = agendas.size() - 1; i >= 0; i--) {
+                String id = agendas.get(i);
+                if (!sentAgendas.containsKey(id)) {
+                    setSentAgenda(id);
+                    for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                        if (entry.getKey().equals(id)) {
+                            return entry;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public String lookAtTopAgenda(int index) {
         return agendas.get(index);
     }
