@@ -168,7 +168,7 @@ public class PNInfo extends PNCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
 
         sb.append(Emojis.PN);
-        if (pnModel.getFaction() != null && !pnModel.getFaction().isEmpty()) sb.append(Helper.getFactionIconFromDiscord(pnModel.getFaction()));
+        if (pnModel.getFaction() != null && !pnModel.getFaction().isEmpty()) sb.append(Helper.getFactionIconFromDiscord(pnModel.getFaction().orElse("")));
         sb.append("__**").append(pnName).append("**__   ");
 
         String pnText = pnModel.getText();
@@ -180,7 +180,7 @@ public class PNInfo extends PNCardsSubcommandData {
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
         }
         
-        if (longFormat || Mapper.isFaction(pnModel.getFaction().toLowerCase()) || "Absol".equalsIgnoreCase(pnModel.getSource())) sb.append("      ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) || "Absol".equalsIgnoreCase(pnModel.getSource())) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }

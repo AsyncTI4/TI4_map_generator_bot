@@ -723,7 +723,7 @@ public class GenerateMap {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
                 }
                 
-                if (!player.getFactionTechs().isEmpty()) {
+                if (!player.getNotResearchedFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
@@ -841,7 +841,7 @@ public class GenerateMap {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
-                        if (activeGame.isFrankenGame()) drawFactionIconImage(graphics, promissoryNote.getFaction(), x + deltaX - 1, y + 86, 42, 42);
+                        if (activeGame.isFrankenGame()) drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
                         drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
@@ -1018,7 +1018,7 @@ public class GenerateMap {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
 
-        String bankImage = "vaden".equalsIgnoreCase(player.getFaction()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png"; // TODO: add generic bank image
+        String bankImage = "vaden".equalsIgnoreCase(player.getFaction()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png";
         drawPAImage(x + deltaX, y, bankImage);
 
         deltaX += 24;
@@ -1624,7 +1624,7 @@ public class GenerateMap {
             return y;
         }
 
-        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech).toString().toLowerCase();
@@ -1672,7 +1672,7 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX) {
+    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, Map<String, TechnologyModel> techInfo, int deltaX) {
         if (techs == null) {
             return deltaX;
         }
@@ -1704,8 +1704,8 @@ public class GenerateMap {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (!techInformation.getFaction().isEmpty()) {
-                drawFactionIconImage(graphics, techInformation.getFaction(), x + deltaX - 1, y + 108, 42, 42);
+            if (techInformation.getFaction().isPresent()) {
+                drawFactionIconImage(graphics, techInformation.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
             }
 
             String techName = "pa_tech_techname_" + tech + techStatus;
@@ -1725,7 +1725,7 @@ public class GenerateMap {
     }
 
     private int factionTechField(int x, int y, List<String> techs, int deltaX) {
-        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
+        Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         
         if (techs == null) {
             return deltaX;
@@ -1751,8 +1751,8 @@ public class GenerateMap {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (!techInformation.getFaction().isEmpty()) {
-                drawFactionIconImageOpaque(graphics, techInformation.getFaction(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+            if (techInformation.getFaction().isPresent()) {
+                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
@@ -1771,7 +1771,7 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, TechnologyModel> techInfo) {
+    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, Map<String, TechnologyModel> techInfo) {
         int stasisInfantry = player.getStasisInfantry();
         if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs, techInfo) && stasisInfantry == 0) {
             return deltaX;
@@ -1793,13 +1793,13 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private boolean hasInfantryII(List<String> techs, HashMap<String, TechnologyModel> techInfo) {
+    private boolean hasInfantryII(List<String> techs, Map<String, TechnologyModel> techInfo) {
         if (techs == null) {
             return false;
         }
         for (String tech : techs) {
             TechnologyModel techInformation = techInfo.get(tech);
-            if ("inf2".equals(techInformation.getBaseUpgrade()) || "inf2".equals(tech)) {
+            if ("inf2".equals(techInformation.getBaseUpgrade().orElse("")) || "inf2".equals(tech)) {
                 return true;
             }
         }
@@ -1880,7 +1880,7 @@ public class GenerateMap {
         }
     }
 
-    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX, Player player, Game activeGame) {
+    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, Map<String, TechnologyModel> techInfo, int deltaX, Player player, Game activeGame) {
         String outline = "pa_tech_unitupgrade_outlines.png";
 
         drawPAImage(x + deltaX, y, outline);
@@ -1889,11 +1889,11 @@ public class GenerateMap {
             UnitModel unit = Mapper.getUnit(u);
             if (unit == null) {
                 System.out.println("error:" + u);
-            } else if (unit.getFaction() != null && !unit.getFaction().isEmpty()) {
+            } else if (unit.getFaction().isPresent()) {
                 // ONLY PAINT FACTION IF IS FRANKEN GAME, OR IS NOT A UNIT THAT UPGRADES OR WAS UPGRADED TO (indicating faction tech)
                 if (activeGame.isFrankenGame() || ((unit.getUpgradesFromUnitId() != null && !unit.getUpgradesFromUnitId().isEmpty()) || (unit.getUpgradesToUnitId() != null && !unit.getUpgradesToUnitId().isEmpty()))) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, unit.getFaction().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+                    drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
         }
@@ -1914,9 +1914,9 @@ public class GenerateMap {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
 
-                if (!techInformation.getFaction().isEmpty()) {
+                if (techInformation.getFaction().isPresent()) {
                     Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
-                    drawFactionIconImage(graphics, techInformation.getFaction(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
+                    drawFactionIconImage(graphics, techInformation.getFaction().get(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 30, 30);
                 }
             }
         }

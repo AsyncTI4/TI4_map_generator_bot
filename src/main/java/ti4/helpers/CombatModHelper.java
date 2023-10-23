@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ti4.commands.player.AbilityInfo;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -240,7 +239,7 @@ public class CombatModHelper {
                     String opponentFaction = opponent.getFaction();
                     meetsCondition = player.getTechs().stream()
                         .map(Mapper::getTech)
-                        .anyMatch(tech -> tech.getFaction().equals(opponentFaction));
+                        .anyMatch(tech -> tech.getFaction().orElse("").equals(opponentFaction));
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
@@ -350,7 +349,7 @@ public class CombatModHelper {
                         // player.getFactionTEchs?
                         scalingCount = opponent.getTechs().stream()
                             .map(Mapper::getTech)
-                            .filter(tech -> StringUtils.isNotBlank(tech.getFaction()))
+                            .filter(tech -> StringUtils.isNotBlank(tech.getFaction().orElse("")))
                             .count();
                     }
                 }

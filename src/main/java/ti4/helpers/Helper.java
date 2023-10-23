@@ -1435,7 +1435,7 @@ public class Helper {
 
         String leaderName = leaderModel.getName();
         String leaderTitle = leaderModel.getTitle();
-        String heroAbilityName = leaderModel.getAbilityName();
+        String heroAbilityName = leaderModel.getAbilityName().orElse("");
         String leaderAbilityWindow = leaderModel.getAbilityWindow();
         String leaderAbilityText = leaderModel.getAbilityText();
         String leaderUnlockCondition = leaderModel.getUnlockCondition();
@@ -1965,7 +1965,7 @@ public class Helper {
 
         String techName = tech.getName();
         TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction();
+        String techFaction = tech.getFaction().orElse("");
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
         String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
@@ -1996,7 +1996,7 @@ public class Helper {
             switch (techType) {
                 case "propulsion" -> {
                     techB = Button.primary(buttonID, techName);
-                    switch (tech.getRequirements()) {
+                    switch (tech.getRequirements().orElse("")) {
                         case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionDisabled));
                         case "B" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
                         case "BB" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Propulsion2));
@@ -2005,7 +2005,7 @@ public class Helper {
                 }
                 case "cybernetic" -> {
                     techB = Button.secondary(buttonID, techName);
-                    switch (tech.getRequirements()) {
+                    switch (tech.getRequirements().orElse("")) {
                         case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticDisabled));
                         case "Y" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                         case "YY" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Cybernetic2));
@@ -2014,7 +2014,7 @@ public class Helper {
                 }
                 case "biotic" -> {
                     techB = Button.success(buttonID, techName);
-                    switch (tech.getRequirements()) {
+                    switch (tech.getRequirements().orElse("")) {
                         case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticDisabled));
                         case "G" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
                         case "GG" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Biotic2));
@@ -2023,7 +2023,7 @@ public class Helper {
                 }
                 case "warfare" -> {
                     techB = Button.danger(buttonID, techName);
-                    switch (tech.getRequirements()) {
+                    switch (tech.getRequirements().orElse("")) {
                         case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareDisabled));
                         case "R" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                         case "RR" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Warfare2));
@@ -2032,7 +2032,7 @@ public class Helper {
                 }
                 case "unitupgrade" -> {
                     techB = Button.secondary(buttonID, techName);
-                    String unitType = tech.getBaseUpgrade().isEmpty() ? tech.getAlias() : tech.getBaseUpgrade();
+                    String unitType = tech.getBaseUpgrade().isEmpty() ? tech.getAlias() : tech.getBaseUpgrade().get();
                     switch (unitType) {
                         case "inf2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                         case "ff2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.fighter));
@@ -2068,7 +2068,7 @@ public class Helper {
             if(tech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")){
                 for(String factionTech : player.getNotResearchedFactionTechs()){
                     TechnologyModel fTech = Mapper.getTech(factionTech);
-                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().equalsIgnoreCase(tech.getBaseUpgrade())){
+                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().orElse("").equalsIgnoreCase(tech.getBaseUpgrade().orElse(""))) {
                         addTech = false;
                     }
                 }
@@ -2083,7 +2083,7 @@ public class Helper {
     public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         for (TechnologyModel tech : Mapper.getTechs().values()) {
-            String faction = tech.getFaction();
+            String faction = tech.getFaction().orElse("");
             if (tech.getType().toString().equalsIgnoreCase("unitupgrade")) {
                 if (player.hasTech(tech.getAlias())) {
                     if (faction.isEmpty()) {
@@ -2100,7 +2100,7 @@ public class Helper {
 
         String techName = tech.getName();
         TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction();
+        String techFaction = tech.getFaction().orElse("");
         String factionEmoji = "";
         if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
         String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");

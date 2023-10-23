@@ -554,11 +554,11 @@ public class Player {
     private Integer GetUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
 
-        if (StringUtils.isNotBlank(unit.getFaction()) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+        if (StringUtils.isNotBlank(unit.getFaction().orElse("")) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
             score += 4;
-        if (StringUtils.isNotBlank(unit.getFaction()))
+        if (StringUtils.isNotBlank(unit.getFaction().orElse("")))
             score += 3;
-        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId()))
+        if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
             score += 2;
         if (unitHolder != null
             && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
@@ -1615,7 +1615,7 @@ public class Player {
 
         if (techModel.getType() == TechnologyType.UNITUPGRADE) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech).filter(tech -> tech.getBaseUpgrade().equals(unitModel.getBaseType())).toList();
+            List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech).filter(tech -> tech.getBaseUpgrade().orElse("").equals(unitModel.getBaseType())).toList();
             removeOwnedUnitByID(unitModel.getId());
 
             // Find another unit model to replace this lost model

@@ -76,8 +76,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return commodities;
     }
 
-    public String getSource() {
-        return source;
+    public Optional<String> getSource() {
+        return Optional.ofNullable(source);
     }
 
     public List<String> getFactionTech() {
