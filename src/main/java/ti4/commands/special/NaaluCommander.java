@@ -31,7 +31,7 @@ public class NaaluCommander extends SpecialSubcommandData {
 
     public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player) {
 
-        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) { //TODO: switch logic from isNaalu to hasNaaluCommander
+        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
             return;
         }

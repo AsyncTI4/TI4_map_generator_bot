@@ -63,12 +63,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(getEmoji()).orElse(Helper.getEmojiFromDiscord(getID()));
     }
 
-    public String getAbilityName() {
-        return Optional.ofNullable(abilityName).orElse("");
+    public Optional<String> getAbilityName() {
+        return Optional.ofNullable(abilityName);
     }
 
-    public String getFlavourText() {
-        return Optional.ofNullable(flavourText).orElse("");
+    public Optional<String> getFlavourText() {
+        return Optional.ofNullable(flavourText);
     }
 
     public String getRepresentation(boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
@@ -118,8 +118,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         eb.setDescription(description.toString());
 
         //FIELDS
-        eb.addField(Optional.ofNullable(getAbilityName()).orElse(" "), "**" + getAbilityWindow() + "**\n> " + getAbilityText(), false);
-        if (includeFlavourText && !StringUtils.isBlank(getFlavourText())) eb.addField(" ", "*" + getFlavourText() + "*", false);
+        eb.addField(getAbilityName().orElse(" "), "**" + getAbilityWindow() + "**\n> " + getAbilityText(), false);
+        if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -134,7 +134,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return switch (getSource()) {
             case "ds" -> Emojis.DiscordantStars;
             case "cryppter" -> "";
-            case "baldrick" -> "";
+            case "baldrick" -> Emojis.IgnisAurora;
             default -> "";
         };
     }
@@ -145,7 +145,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return getID().toLowerCase().contains(searchString)
             || getName().toLowerCase().contains(searchString) 
             || getTitle().toLowerCase().contains(searchString) 
-            || getAbilityName().toLowerCase().contains(searchString) 
+            || getAbilityName().orElse("").toLowerCase().contains(searchString) 
             || getAbilityWindow().toLowerCase().contains(searchString) 
             || getAbilityText().toLowerCase().contains(searchString)
             || getUnlockCondition().toLowerCase().contains(searchString)

@@ -103,7 +103,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game activeGame) {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction()) || !player.hasAbility("technological_singularity")) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("")) || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
                     buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
@@ -117,7 +117,7 @@ public class ButtonHelperCommanders {
                 if (!player.hasAbility("technological_singularity")) {
                     int count = 1;
                     for (String nekroTech : player.getTechs()) {
-                        if ("".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction())) {
+                        if ("".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
                             count = count + 1;
                         }
                     }

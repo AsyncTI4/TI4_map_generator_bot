@@ -520,7 +520,7 @@ public class CombatHelper {
                 }
             }
             String upgradedUnitName = "";
-            if (!StringUtils.isBlank(unit.getUpgradesFromUnitId()) || !StringUtils.isBlank(unit.getFaction())) {
+            if (unit.getUpgradesFromUnitId().isPresent() || unit.getFaction().isPresent()) {
                 upgradedUnitName = String.format(" %s", unit.getName());
             }
 

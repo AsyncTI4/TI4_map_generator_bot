@@ -23,7 +23,8 @@ public class AttachmentModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return id != null;
+        return id != null
+            && imagePath != null;
     }
 
     @Override
@@ -33,5 +34,13 @@ public class AttachmentModel implements ModelInterface {
 
     public boolean isFakeAttachment() {
         return Optional.ofNullable(isFakeAttachment).orElse(false);
+    }
+
+    public boolean isLegendary() {
+        return Optional.ofNullable(isLegendary).orElse(false);
+    }
+
+    public Optional<String> getToken() {
+        return Optional.ofNullable(token);
     }
 }
