@@ -392,10 +392,6 @@ public class Helper {
         return "[@" + roleName + "]";
     }
 
-    public static String getColourAsMention(String colour) {
-        return getColourEmojis(colour);
-    }
-
     public static String getSCAsMention(int sc, Game activeGame) {
         if (activeGame.isHomeBrewSCMode()) {
             return getSCName(sc, activeGame);
@@ -1376,7 +1372,7 @@ public class Helper {
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
-            return getColourAsMention(player.getColor());
+            return getColourEmojis(player.getColor());
         }
 
         if (activeGame != null && activeGame.isCommunityMode()) {
@@ -1395,7 +1391,7 @@ public class Helper {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
         if (includePing) sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" _").append(getColourAsMention(player.getColor())).append("_");
+            sb.append(" _").append(getColourEmojis(player.getColor())).append("_");
         }
         return sb.toString();
     }

@@ -926,7 +926,7 @@ public class Player {
 
     public String getFactionEmojiOrColour() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
-            return Helper.getColourAsMention(getColor());
+            return Helper.getColourEmojis(getColor());
         }
         return getFactionEmoji();
     }
