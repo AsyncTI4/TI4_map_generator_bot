@@ -126,8 +126,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         String card = Mapper.getExploreRepresentation(cardID);
         String[] cardInfo = card.split(";");
-        if(tile == null){
+        if (tile == null){
             tile = activeGame.getTileFromPlanet(planetName);
+            // if (tile == null) {
+            //     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Tile could not be found");
+            //     return;
+            // }
         }
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
@@ -152,7 +156,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
             if (tokenFilename != null && tile != null && planetName != null) {
-
                 PlanetModel planetInfo = Mapper.getPlanet(planetName);
                 if (Optional.ofNullable(planetInfo).isPresent()) {
                     if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetName)) {
