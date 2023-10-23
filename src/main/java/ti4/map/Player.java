@@ -1601,7 +1601,7 @@ public class Player {
 
         if (techModel.getType() == TechnologyType.UNITUPGRADE) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech).filter(tech -> tech.getBaseUpgrade().equals(unitModel.getBaseType())).toList();
+            List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech).filter(tech -> tech.getBaseUpgrade().orElse("").equals(unitModel.getBaseType())).toList();
             removeOwnedUnitByID(unitModel.getId());
 
             // Find another unit model to replace this lost model

@@ -239,7 +239,7 @@ public class CombatModHelper {
                     String opponentFaction = opponent.getFaction();
                     meetsCondition = player.getTechs().stream()
                         .map(Mapper::getTech)
-                        .anyMatch(tech -> tech.getFaction().equals(opponentFaction));
+                        .anyMatch(tech -> tech.getFaction().orElse("").equals(opponentFaction));
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {

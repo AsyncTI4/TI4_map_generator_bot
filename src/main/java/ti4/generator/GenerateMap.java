@@ -1794,7 +1794,7 @@ public class GenerateMap {
         }
         for (String tech : techs) {
             TechnologyModel techInformation = techInfo.get(tech);
-            if ("inf2".equals(techInformation.getBaseUpgrade()) || "inf2".equals(tech)) {
+            if ("inf2".equals(techInformation.getBaseUpgrade().orElse("")) || "inf2".equals(tech)) {
                 return true;
             }
         }
