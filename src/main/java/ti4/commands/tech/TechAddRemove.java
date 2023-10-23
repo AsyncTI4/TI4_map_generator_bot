@@ -65,7 +65,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
             if (Mapper.isValidTech(techID)) {
                 doAction(player, techID, event);
             } else {
-                HashMap<String, TechnologyModel> techs = Mapper.getTechs();
+                Map<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                         .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()){

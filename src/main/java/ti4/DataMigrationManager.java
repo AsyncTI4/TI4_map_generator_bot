@@ -400,8 +400,8 @@ public class DataMigrationManager {
                 for (TechnologyModel technologyModel : playerTechs) {
                     UnitModel upgradedUnit = Mapper.getUnitModelByTechUpgrade(technologyModel.getAlias());
                     if (upgradedUnit != null) {
-                        if (StringUtils.isNotBlank(upgradedUnit.getUpgradesFromUnitId())) {
-                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId());
+                        if (upgradedUnit.getUpgradesFromUnitId().isPresent()) {
+                            int upgradesFromUnitIndex = ownedUnitIDs.indexOf(upgradedUnit.getUpgradesFromUnitId().get());
                             if (upgradesFromUnitIndex >= 0) {
                                 ownedUnitIDs.set(upgradesFromUnitIndex, upgradedUnit.getId());
                             }

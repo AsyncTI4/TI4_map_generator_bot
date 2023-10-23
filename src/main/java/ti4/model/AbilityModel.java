@@ -22,7 +22,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String window;
     private String windowEffect;
     private String source;
-    private List<String> searchTags;
+    private List<String> searchTags = new ArrayList<>();
 
     @Override
     public boolean isValid() {
@@ -54,10 +54,6 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getWindowEffect() {
         return Optional.ofNullable(windowEffect);
-    }
-
-    public Optional<List<String>> getSearchTags() {
-        return Optional.ofNullable(searchTags);
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -110,7 +106,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
                 || getName().toLowerCase().contains(searchString)
                 || getFaction().toLowerCase().contains(searchString)
                 || getSource().toLowerCase().contains(searchString)
-                || getSearchTags().orElse(new ArrayList<>()).contains(searchString);
+                || getSearchTags().contains(searchString);
     }
 
     @Override

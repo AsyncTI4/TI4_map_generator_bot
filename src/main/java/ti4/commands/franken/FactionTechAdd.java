@@ -33,11 +33,10 @@ public class FactionTechAdd extends FactionTechAddRemove {
             if (techModel == null) continue;
             if (techModel.getType().equals(TechnologyType.UNITUPGRADE)) {
                 UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-                String upgradesFromUnitId = unitModel.getUpgradesFromUnitId();
-                if (upgradesFromUnitId != null) {
+                unitModel.getUpgradesFromUnitId().ifPresent(upgradesFromUnitId -> {
                     player.removeOwnedUnitByID(unitModel.getBaseType());
                     player.addOwnedUnitByID(upgradesFromUnitId);
-                }
+                });
             }
         }
         sendMessage(sb.toString());
