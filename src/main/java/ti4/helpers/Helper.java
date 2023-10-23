@@ -1380,7 +1380,7 @@ public class Helper {
             if (roleForCommunity == null) {
                 return defaultPlayerRepresentation(player, guild, includePing);
             } else {
-                return getRoleMentionByName(guild, roleForCommunity.getName());
+                return player.getFactionEmoji() + getRoleMentionByName(guild, roleForCommunity.getName()) + Helper.getColourEmojis(player.getColor());
             }
         }
 
