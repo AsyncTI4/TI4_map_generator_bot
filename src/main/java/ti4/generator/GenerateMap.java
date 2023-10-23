@@ -718,7 +718,7 @@ public class GenerateMap {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
                 }
                 
-                if (!player.getFactionTechs().isEmpty()) {
+                if (!player.getNotResearchedFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
