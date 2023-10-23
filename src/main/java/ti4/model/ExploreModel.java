@@ -38,8 +38,8 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return  getId();
     }
 
-    public String getAttachmentId() {
-        return Optional.ofNullable(attachmentId).orElse("");
+    public Optional<String> getAttachmentId() {
+        return Optional.ofNullable(attachmentId);
     }
 
     public String getRepresentation() {
