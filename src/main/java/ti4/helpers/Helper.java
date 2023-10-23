@@ -1412,7 +1412,7 @@ public class Helper {
 
         String leaderName = leaderModel.getName();
         String leaderTitle = leaderModel.getTitle();
-        String heroAbilityName = leaderModel.getAbilityName();
+        String heroAbilityName = leaderModel.getAbilityName().orElse("");
         String leaderAbilityWindow = leaderModel.getAbilityWindow();
         String leaderAbilityText = leaderModel.getAbilityText();
         String leaderUnlockCondition = leaderModel.getUnlockCondition();
