@@ -2,7 +2,7 @@ package ti4.commands.game;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -108,7 +109,7 @@ public class GameEnd extends GameSubcommandData {
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
         //CREATE POST IN #THE-PBD-CHRONICLES
-        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0){
+        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0){
             TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
             String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
             if (pbdChroniclesChannel == null) {
@@ -116,14 +117,14 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             if (!activeGame.isFoWMode()) {
-            //INFORM PLAYERS
-            pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-                m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
-                String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            });
-        }
+                //INFORM PLAYERS
+                pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
+                    String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                });
+            }
         }
 
         
