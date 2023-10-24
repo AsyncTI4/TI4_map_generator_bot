@@ -449,8 +449,6 @@ public class Helper {
             "_" + scAsString + ".png", "Could not find SC image!"));
     }
 
-    //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
-
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
         Emoji emojiToUse;
         emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
@@ -767,29 +765,28 @@ public class Helper {
         }
     }
 
+    /**
+     * Deprecated - use game.getPing() instead
+     */
+    @Deprecated
     public static String getGamePing(SlashCommandInteractionEvent event, Game activeGame) {
         return getGamePing(event.getGuild(), activeGame);
     }
 
+    /**
+     * Deprecated - use game.getPing() instead
+     */
+    @Deprecated
     public static String getGamePing(GenericInteractionCreateEvent event, Game activeGame) {
         return getGamePing(activeGame.getGuild(), activeGame);
     }
 
+    /**
+     * Deprecated - use game.getPing() instead
+     */
+    @Deprecated
     public static String getGamePing(Guild guild, Game activeGame) {
-        if (guild != null) {
-            for (Role role : guild.getRoles()) {
-                if (activeGame.getName().equals(role.getName().toLowerCase())) {
-                    return role.getAsMention();
-                }
-            }
-            StringBuilder sb = new StringBuilder(activeGame.getName()).append(" ");
-            for (String playerID : activeGame.getPlayerIDs()) {
-                Member member = guild.getMemberById(playerID);
-                if (member != null) sb.append(guild.getMemberById(playerID).getAsMention()).append(" ");
-            }
-            return sb.toString();
-        }
-        return "";
+        return activeGame.getPing();
     }
 
     /**
