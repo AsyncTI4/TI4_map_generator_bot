@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -33,7 +32,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
@@ -130,10 +128,7 @@ public class Helper {
         return player;
     }
 
-
-
     public static boolean isSaboAllowed(Game activeGame, Player player) {
-
         if ("pbd100".equalsIgnoreCase(activeGame.getName())) {
             return true;
         }
@@ -153,7 +148,6 @@ public class Helper {
             return false;
         }
         return true;
-
     }
 
     public static boolean doesAnyoneOwnPlanet(Game activeGame, String planet) {
@@ -213,7 +207,6 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getTile().getRepresentation());
             }
             counter++;
-
         }
     }
 
@@ -270,7 +263,6 @@ public class Helper {
                 }
             }
         }
-
     }
 
     public static Player getPlayerFromUnlockedLeader(Game activeGame, String leader) {
@@ -370,19 +362,19 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
-    public static int getDateDifference(String date1, String date2){
-        if(date1 == null || date1.length() == 0){
+    public static int getDateDifference(String date1, String date2) {
+        if (date1 == null || date1.length() == 0) {
             return 1000;
         }
-        date1 = date1.replace(".","_");
-        date2 = date2.replace(".","_");
+        date1 = date1.replace(".", "_");
+        date2 = date2.replace(".", "_");
         int year1 = Integer.parseInt(date1.split("_")[0]);
         int year2 = Integer.parseInt(date2.split("_")[0]);
         int month1 = Integer.parseInt(date1.split("_")[1]);
         int month2 = Integer.parseInt(date2.split("_")[1]);
         int day1 = Integer.parseInt(date1.split("_")[2]);
         int day2 = Integer.parseInt(date2.split("_")[2]);
-        return (year2-year1)*365 + (month2-month1)*30 + (day2-day1);
+        return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
     }
 
     public static String getRoleMentionByName(Guild guild, String roleName) {
