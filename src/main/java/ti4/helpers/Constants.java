@@ -48,6 +48,7 @@ public class Constants {
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
+    public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String DOMINUS_ORB = "dominus_orb";
