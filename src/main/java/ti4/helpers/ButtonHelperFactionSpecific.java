@@ -632,6 +632,7 @@ public class ButtonHelperFactionSpecific {
         int baseUnitCap = switch (unitKey.getUnitType()) {
             case Infantry, Fighter -> 10000;
             case Destroyer, Cruiser -> 8;
+            case Dreadnought -> 5;
             case Mech, Carrier -> 4;
             case Warsun -> 2;
             case Flagship -> 1;

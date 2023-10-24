@@ -3056,7 +3056,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeGame, event);
                 }
                 case "gameEnd" -> {
-                    GameEnd.secondHalfOfGameEnd(event, activeGame);
+                    GameEnd.secondHalfOfGameEnd(event, activeGame, true);
                     event.getMessage().delete().queue();
                 }
                 case "purgeHacanHero" -> {
