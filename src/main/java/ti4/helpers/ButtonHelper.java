@@ -3617,7 +3617,7 @@ public class ButtonHelper {
                         continue;
                     }
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                    if (unitHolder.getTokenList() != null
+                    if (unitHolder != null && unitHolder.getTokenList() != null
                         && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
                             Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
