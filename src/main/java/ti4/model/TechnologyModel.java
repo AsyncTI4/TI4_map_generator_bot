@@ -9,8 +9,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -77,6 +77,19 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getRequirements() {
         return Optional.ofNullable(requirements);
+    }
+
+    public String getRepresentation(boolean includeCardText) {
+        String techName = getName();
+        TechnologyType techType = getType();
+        String techFaction = getFaction().orElse("");
+        String factionEmoji = "";
+        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+        StringBuilder sb = new StringBuilder();
+        sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji);
+        if (includeCardText) sb.append("\n").append("> ").append(getText()).append("\n");
+        return sb.toString();
     }
 
     public MessageEmbed getRepresentationEmbed() {
