@@ -2719,6 +2719,7 @@ public class Game {
         return name;
     }
 
+    @JsonIgnore
     public String getPing() {
         Guild guild = getGuild();
         if (guild != null) {
