@@ -1324,18 +1324,6 @@ public class Helper {
         }
     }
 
-    public static String getTechRepresentation(String techID) {
-        TechnologyModel tech = Mapper.getTechs().get(techID);
-
-        String techName = tech.getName();
-        TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction().orElse("");
-        String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-        return techEmoji + "**" + techName + "**" + factionEmoji;
-    }
-
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
         return getTechButtons(techs, techType, player, "nope");
     }
@@ -1459,25 +1447,33 @@ public class Helper {
         return techs;
     }
 
-    public static String getTechRepresentationLong(String techID) {
+    /**
+     * DEPRECATED - Use TechnologyModel.getRepresentation() instead
+     */
+    @Deprecated
+    public static String getTechRepresentation(String techID) {
         TechnologyModel tech = Mapper.getTechs().get(techID);
-
-        String techName = tech.getName();
-        TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction().orElse("");
-        String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-
-        String techText = tech.getText();
-        return techEmoji + "**" + techName + "**" + factionEmoji + "\n" +
-            "> " + techText + "\n";
+        return tech.getRepresentation(false);
     }
 
+    /**
+     * DEPRECATED - Use TechnologyModel.getRepresentation(true) instead
+     */
+    @Deprecated
+    public static String getTechRepresentationLong(String techID) {
+        TechnologyModel tech = Mapper.getTechs().get(techID);
+        return tech.getRepresentation(true);
+    }
+
+    /**
+     * DEPRECATED - Use AgendaModel.getRepresentation() instead
+     */
+    @Deprecated
     public static String getAgendaRepresentation(@NotNull String agendaID) {
         return getAgendaRepresentation(agendaID, null);
     }
 
+    @Deprecated
     public static String getAgendaRepresentation(@NotNull String agendaID, @Nullable Integer uniqueID) {
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
         return agendaDetails.getRepresentation(uniqueID);
