@@ -89,8 +89,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         //TITLE
         String factionEmoji = "";
         String techFaction = getFaction().orElse("");
-        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
         eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
 
         //DESCRIPTION

@@ -664,8 +664,8 @@ public class ButtonListener extends ListenerAdapter {
             ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
             ButtonHelper.addReaction(event, true, false, "Looked at top of the " + trait + " deck.", "");
             event.getMessage().delete().queue();
-            String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
-            String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
             if (deck.isEmpty() && discardPile.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
@@ -698,8 +698,8 @@ public class ButtonListener extends ListenerAdapter {
             ArrayList<String> hdiscardPile = activeGame.getExploreDiscard("hazardous");
             ArrayList<String> idiscardPile = activeGame.getExploreDiscard("industrial");
             String trait = "cultural";
-            String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
-            String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
             if (cdeck.isEmpty() && cdiscardPile.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
@@ -711,8 +711,8 @@ public class ButtonListener extends ListenerAdapter {
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, csb.toString());
             trait = "hazardous";
-            traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
-            playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
             if (hdeck.isEmpty() && hdiscardPile.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
@@ -724,8 +724,8 @@ public class ButtonListener extends ListenerAdapter {
 
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, hsb.toString());
             trait = "industrial";
-            traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
-            playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+            traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
             if (ideck.isEmpty() && idiscardPile.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
             }
@@ -3454,7 +3454,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     index++;
                 }
-                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, event.getMessageId()));
+                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, event.getMessageId()));
             }
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
             if (reaction != null)
@@ -3491,7 +3491,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     index++;
                 }
-                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
             }
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
             if (reaction != null)
@@ -3523,7 +3523,7 @@ public class ButtonListener extends ListenerAdapter {
                     break;
                 index++;
             }
-            reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
         }
         MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
         if (reaction != null) {

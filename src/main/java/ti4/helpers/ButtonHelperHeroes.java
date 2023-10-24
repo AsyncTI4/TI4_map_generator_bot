@@ -616,7 +616,7 @@ public class ButtonHelperHeroes {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
-            Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
+            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {

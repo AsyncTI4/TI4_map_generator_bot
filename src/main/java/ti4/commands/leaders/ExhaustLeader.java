@@ -31,7 +31,7 @@ public class ExhaustLeader extends LeaderAction {
 		}
 
 		playerLeader.setExhausted(true);
-		sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
+		sendMessage(Emojis.getFactionLeaderEmoji(playerLeader));
 		StringBuilder messageText = new StringBuilder(player.getRepresentation())
 				.append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
 		OptionMapping optionTG = event.getOption(Constants.TG);

@@ -273,13 +273,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit + " " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in space.";
                     }
 
                 }
@@ -297,7 +297,7 @@ public class ButtonHelperModifyUnits {
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         unit, activeGame);
-                    successMessage = "Produced a " + Helper.getEmojiFromDiscord(unitLong) + " in tile "
+                    successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
                 }
 
@@ -454,13 +454,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit + " " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in space.";
                     }
 
                 }
@@ -473,7 +473,7 @@ public class ButtonHelperModifyUnits {
                     successMessage = producedOrPlaced + " 2 " + Emojis.destroyer + " in tile " + AliasHandler.resolveTile(planetName) + ".";
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName), unit, activeGame);
-                    successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in tile " + AliasHandler.resolveTile(planetName) + ".";
+                    successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile " + AliasHandler.resolveTile(planetName) + ".";
                 }
 
             }

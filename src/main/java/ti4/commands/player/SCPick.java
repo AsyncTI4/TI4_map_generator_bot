@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -147,7 +148,7 @@ public class SCPick extends PlayerSubcommandData {
 			tg += tgCount;
 			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),player.getRepresentation()+" gained "+tgCount +" tgs from picking SC #"+scPicked);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Helper.getColourEmojis(player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
+				String messageToSend = Emojis.getColourEmojis(player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);

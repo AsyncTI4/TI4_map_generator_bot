@@ -49,7 +49,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
                 boolean isPlayed = found != null ? found : false;
-                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
+                String scEmoji = isPlayed ? Emojis.getSCBackEmojiFromInteger(sc_) : Emojis.getSCEmojiFromInteger(sc_);
                 if (isPlayed) {
                     textBuilder.append("~~");
                 }

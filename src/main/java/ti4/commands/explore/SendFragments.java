@@ -12,6 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -83,7 +84,7 @@ public class SendFragments extends ExploreSubcommandData {
 
 		String p1 = sender.getRepresentation();
 		String p2 = receiver.getRepresentation();
-		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
+		String fragString = count + " " + trait + " " + Emojis.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message = p1 + " sent " + fragString + " to " + p2;
 		MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
 

@@ -163,7 +163,7 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc = 1; sc < 9; sc++) {
-                    Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
+                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                     Button button;
                     if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                         button = Button.secondary("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);

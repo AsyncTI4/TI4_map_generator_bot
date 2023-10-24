@@ -232,8 +232,8 @@ public class ButtonHelperFactionSpecific {
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
         String sb = player1.getRepresentation() + " swapped SC with " + player2.getRepresentation() + "\n" +
-            "> " + player2.getRepresentation() + Helper.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player1SC) + "\n" +
-            "> " + player1.getRepresentation() + Helper.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player2SC) + "\n";
+            "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
+            "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
     }
 
@@ -779,7 +779,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-            sb.append(" moved ").append(Helper.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentationForButtons(activeGame, player));
+            sb.append(" moved ").append(Emojis.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentationForButtons(activeGame, player));
             for (Tile tile_ : activeGame.getTileMap().values()) {
                 if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                     sb.append(" (from ").append(tile_.getRepresentationForButtons(activeGame, player)).append(")");

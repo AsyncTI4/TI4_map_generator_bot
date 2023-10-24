@@ -923,7 +923,7 @@ public class Player {
         Game activeGame = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
-            return Helper.getColourEmojis(getColor());
+            return Emojis.getColourEmojis(getColor());
         }
 
         if (activeGame != null && activeGame.isCommunityMode()) {
@@ -941,11 +941,11 @@ public class Player {
                     }
                 }
                 if (getColor() != null && !"null".equals(getColor())) {
-                    sb.append(" ").append(Helper.getColourEmojis(getColor()));
+                    sb.append(" ").append(Emojis.getColourEmojis(getColor()));
                 }
                 return sb.toString();
             } else {
-                return getFactionEmoji() + roleForCommunity.getAsMention() + Helper.getColourEmojis(getColor());
+                return getFactionEmoji() + roleForCommunity.getAsMention() + Emojis.getColourEmojis(getColor());
             }
         }
 
@@ -953,7 +953,7 @@ public class Player {
         StringBuilder sb = new StringBuilder(getFactionEmoji());
         if (includePing) sb.append(getPing());
         if (getColor() != null && !"null".equals(getColor())) {
-            sb.append(" ").append(Helper.getColourEmojis(getColor()));
+            sb.append(" ").append(Emojis.getColourEmojis(getColor()));
         }
         return sb.toString();
     }
@@ -977,12 +977,12 @@ public class Player {
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             return factionEmoji;
         }
-        return Helper.getFactionIconFromDiscord(getFaction());
+        return Emojis.getFactionIconFromDiscord(getFaction());
     }
 
     public String getFactionEmojiOrColour() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
-            return Helper.getColourEmojis(getColor());
+            return Emojis.getColourEmojis(getColor());
         }
         return getFactionEmoji();
     }
@@ -992,7 +992,7 @@ public class Player {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
+        return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Emojis.getFactionIconFromDiscord(getFaction()));
     }
 
     private void initAbilities() {

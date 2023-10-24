@@ -331,7 +331,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
 
                 String exploredMessage = player.getRepresentation() + " explored " +
-                    Helper.getEmojiFromDiscord(planetTrait) +
+                    Emojis.getEmojiFromDiscord(planetTrait) +
                     "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) + " *(tile " + tile.getPosition() + ")*" + ":\n" +
                     displayExplore(exploreID);
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
@@ -357,7 +357,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (tile != null && planetName != null) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeGame, planetName);
                 }
-                message = Helper.getColourEmojis(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
+                message = Emojis.getColourEmojis(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
                     + ". This placement is optional though.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
             }

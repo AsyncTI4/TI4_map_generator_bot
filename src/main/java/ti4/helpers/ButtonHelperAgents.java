@@ -74,31 +74,31 @@ public class ButtonHelperAgents {
         Button unitButton2;
         unit2 = "destroyer";
         if (maxComms > 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 8) {
-            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
 
         unit2 = "cruiser";
         if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 8) {
-            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "carrier";
         if (maxComms > 2 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 4) {
 
-            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "dreadnought";
         if (maxComms > 3 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 5) {
 
-            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "flagship";
         if (maxComms > 7 && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p2, unit2) < 1) {
 
-            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unit2)));
+            unitButton2 = Button.danger("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         return buttons;
@@ -180,7 +180,7 @@ public class ButtonHelperAgents {
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, activeGame);
-        String msg = (damaged ? "A damaged " : "") + Helper.getEmojiFromDiscord(unit.toLowerCase()) + " was removed via Arborec agent by " + ButtonHelper.getIdent(player);
+        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " was removed via Arborec agent by " + ButtonHelper.getIdent(player);
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
@@ -292,7 +292,7 @@ public class ButtonHelperAgents {
         }
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getFactionLeaderEmoji(playerLeader));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
         String messageText = player.getRepresentation() +
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
