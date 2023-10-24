@@ -113,7 +113,7 @@ public class PlayAC extends ACCardsSubcommandData {
         if (activeGame.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
-            sb.append(Helper.getPlayerRepresentation(player, activeGame)).append(" played an Action Card:\n");
+            sb.append(player.getRepresentation()).append(" played an Action Card:\n");
         }
         sb.append(actionCard.getRepresentation());
         List<Button> buttons = new ArrayList<>();
@@ -163,7 +163,7 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc = 1; sc < 9; sc++) {
-                    Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
+                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                     Button button;
                     if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                         button = Button.secondary("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
@@ -280,7 +280,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
         //Fog of war ping
         if (activeGame.isFoWMode()) {
-            String fowMessage = Helper.getPlayerRepresentation(player, activeGame) + " played an Action Card: " + actionCardTitle;
+            String fowMessage = player.getRepresentation() + " played an Action Card: " + actionCardTitle;
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, activeGame, "Played action card: " + actionCardTitle);
         }

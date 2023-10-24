@@ -43,7 +43,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getRepresentation() {
-        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType(), -1, getResolution(), getText(), getAttachmentId(), getSource());
+        return String.format("%s;%s;%s;%s;%s;%s;%s", getName(), getType(), -1, getResolution(), getText(), getAttachmentId().orElse(""), getSource());
     }
 
     public boolean search(String searchString) {
@@ -67,7 +67,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
         if (includeID) {
             StringBuilder sb = new StringBuilder();
-            if (getAttachmentId() != null) sb.append("Attachment: ").append(getAttachmentId()).append("\n");
+            if (getAttachmentId().isPresent()) sb.append("Attachment: ").append(getAttachmentId().get()).append("\n");
             sb.append("ID: ").append(getId()).append("  Source: ").append(getSource());
             eb.setFooter(sb.toString());
         }

@@ -50,8 +50,8 @@ public class SendTG extends PlayerSubcommandData {
 		player_.setTg(targetTG);
 		ButtonHelperAbilities.pillageCheck(player_, activeGame);
 
-		String p1 = Helper.getPlayerRepresentation(player, activeGame);
-		String p2 = Helper.getPlayerRepresentation(player_, activeGame);
+		String p1 = player.getRepresentation();
+		String p2 = player_.getRepresentation();
 		if (player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")) {
 			ButtonHelper.commanderUnlockCheck(player_, activeGame, "hacan", event);
 		}
@@ -64,7 +64,7 @@ public class SendTG extends PlayerSubcommandData {
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
 			ClearDebt.clearDebt(player_, player, sendTG);
-			sendMessage(Helper.getPlayerRepresentation(player_, activeGame) + " cleared " + sendTG + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeGame));
+			sendMessage(player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
 		}
 
 		if (activeGame.isFoWMode()) {

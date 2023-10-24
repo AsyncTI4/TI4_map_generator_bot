@@ -16,7 +16,7 @@ public class TechAdd extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         player.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, getActiveGame());
-        String message = Helper.getPlayerRepresentation(player, getActiveGame()) + " added tech: " + Helper.getTechRepresentation(techID);
+        String message = player.getRepresentation() + " added tech: " + Helper.getTechRepresentation(techID);
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message = message + "\n Automatically added the Custodia Vigilia planet";
         }

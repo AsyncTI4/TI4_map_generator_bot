@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
@@ -33,7 +32,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
@@ -130,10 +128,7 @@ public class Helper {
         return player;
     }
 
-
-
     public static boolean isSaboAllowed(Game activeGame, Player player) {
-
         if ("pbd100".equalsIgnoreCase(activeGame.getName())) {
             return true;
         }
@@ -153,7 +148,6 @@ public class Helper {
             return false;
         }
         return true;
-
     }
 
     public static boolean doesAnyoneOwnPlanet(Game activeGame, String planet) {
@@ -213,7 +207,6 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getTile().getRepresentation());
             }
             counter++;
-
         }
     }
 
@@ -270,7 +263,6 @@ public class Helper {
                 }
             }
         }
-
     }
 
     public static Player getPlayerFromUnlockedLeader(Game activeGame, String leader) {
@@ -370,19 +362,19 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
-    public static int getDateDifference(String date1, String date2){
-        if(date1 == null || date1.length() == 0){
+    public static int getDateDifference(String date1, String date2) {
+        if (date1 == null || date1.length() == 0) {
             return 1000;
         }
-        date1 = date1.replace(".","_");
-        date2 = date2.replace(".","_");
+        date1 = date1.replace(".", "_");
+        date2 = date2.replace(".", "_");
         int year1 = Integer.parseInt(date1.split("_")[0]);
         int year2 = Integer.parseInt(date2.split("_")[0]);
         int month1 = Integer.parseInt(date1.split("_")[1]);
         int month2 = Integer.parseInt(date2.split("_")[1]);
         int day1 = Integer.parseInt(date1.split("_")[2]);
         int day2 = Integer.parseInt(date2.split("_")[2]);
-        return (year2-year1)*365 + (month2-month1)*30 + (day2-day1);
+        return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
     }
 
     public static String getRoleMentionByName(Guild guild, String roleName) {
@@ -457,8 +449,6 @@ public class Helper {
             "_" + scAsString + ".png", "Could not find SC image!"));
     }
 
-    //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
-
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {
         Emoji emojiToUse;
         emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
@@ -470,284 +460,15 @@ public class Helper {
                 if (player_ == player) break;
                 index++;
             }
-            emojiToUse = Emoji.fromFormatted(getRandomizedEmoji(index, messageId));
+            emojiToUse = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
         }
 
         return emojiToUse;
     }
 
-    @NotNull
-    public static String getRandomizedEmoji(int value, String messageID) {
-        List<String> symbols = new ArrayList<>(Emojis.symbols);
-        //symbols = new ArrayList<>(testingEmoji);
-        Random seed = messageID == null ? ThreadLocalRandom.current() : new Random(messageID.hashCode());
-        Collections.shuffle(symbols, seed);
-        value = value % symbols.size();
-        return symbols.get(value);
-    }
-
-    public static String getRandomSemLore() {
-        List<String> semLores = new ArrayList<>(Emojis.SemLores);
-        Random seed = ThreadLocalRandom.current();
-        Collections.shuffle(semLores, seed);
-        return semLores.get(0);
-    }
-
-    public static String getRandomGoodDog() {
-        List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
-        Random seed = ThreadLocalRandom.current();
-        Collections.shuffle(goodDogs, seed);
-        return goodDogs.get(0);
-    }
-
-    @NotNull
-    public static String getFactionIconFromDiscord(String faction) {
-        if (faction == null) {
-            return getRandomizedEmoji(0, null);
-        }
-        return switch (faction.toLowerCase()) {
-            case "arborec" -> Emojis.Arborec;
-            case "argent" -> Emojis.Argent;
-            case "cabal" -> Emojis.Cabal;
-            case "empyrean" -> Emojis.Empyrean;
-            case "ghost", "creuss" -> Emojis.Ghost;
-            case "hacan" -> Emojis.Hacan;
-            case "jolnar" -> Emojis.Jolnar;
-            case "l1z1x" -> Emojis.L1Z1X;
-            case "letnev" -> Emojis.Letnev;
-            case "yssaril" -> Emojis.Yssaril;
-            case "mahact" -> Emojis.Mahact;
-            case "mentak" -> Emojis.Mentak;
-            case "muaat" -> Emojis.Muaat;
-            case "naalu" -> Emojis.Naalu;
-            case "naaz" -> Emojis.Naaz;
-            case "nekro" -> Emojis.Nekro;
-            case "nomad" -> Emojis.Nomad;
-            case "saar" -> Emojis.Saar;
-            case "sardakk" -> Emojis.Sardakk;
-            case "sol" -> Emojis.Sol;
-            case "titans" -> Emojis.Titans;
-            case "winnu" -> Emojis.Winnu;
-            case "xxcha" -> Emojis.Xxcha;
-            case "yin" -> Emojis.Yin;
-
-            case "lazax" -> Emojis.Lazax;
-
-            case "keleres", "keleresx", "keleresm", "keleresa" -> Emojis.Keleres;
-
-            case "augers" -> Emojis.augers;
-            case "axis" -> Emojis.axis;
-            case "bentor" -> Emojis.bentor;
-            case "blex", "kyro" -> Emojis.blex;
-            case "celdauri" -> Emojis.celdauri;
-            case "cheiran" -> Emojis.cheiran;
-            case "cymiae" -> Emojis.cymiae;
-            case "dihmohn" -> Emojis.dihmohn;
-            case "edyn" -> Emojis.edyn;
-            case "florzen" -> Emojis.florzen;
-            case "freesystems" -> Emojis.freesystems;
-            case "ghemina" -> Emojis.ghemina;
-            case "ghoti" -> Emojis.ghoti;
-            case "gledge" -> Emojis.gledge;
-            case "khrask" -> Emojis.khrask;
-            case "kjalengard" -> Emojis.kjalengard;
-            case "kollecc" -> Emojis.kollecc;
-            case "kolume" -> Emojis.kolume;
-            case "kortali" -> Emojis.kortali;
-            case "lanefir" -> Emojis.lanefir;
-            case "lizho" -> Emojis.lizho;
-            case "mirveda" -> Emojis.mirveda;
-            case "mortheus" -> Emojis.mortheus;
-            case "mykomentori" -> Emojis.mykomentori;
-            case "nivyn" -> Emojis.nivyn;
-            case "nokar" -> Emojis.nokar;
-            case "olradin" -> Emojis.olradin;
-            case "rohdhna" -> Emojis.rohdhna;
-            case "tnelis" -> Emojis.tnelis;
-            case "vaden" -> Emojis.vaden;
-            case "vaylerian" -> Emojis.vaylerian;
-            case "veldyr" -> Emojis.veldyr;
-            case "zealots" -> Emojis.zealots;
-            case "zelian" -> Emojis.zelian;
-
-            case "admins" -> Emojis.AdminsFaction;
-            case "qulane" -> Emojis.Qulane;
-
-            case "franken1" -> Emojis.OneToe;
-            case "franken2" -> Emojis.TwoToes;
-            case "franken3" -> Emojis.ThreeToes;
-            case "franken4" -> Emojis.FourToes;
-            case "franken5" -> Emojis.FiveToes;
-            case "franken6" -> Emojis.SixToes;
-            case "franken7" -> Emojis.SevenToes;
-            case "franken8" -> Emojis.EightToes;
-
-            default -> getRandomizedEmoji(0, null);
-        };
-    }
-
-    public static String getPlanetEmoji(String planet) {
-        return switch (planet.toLowerCase()) {
-            case "0.0.0" -> Emojis.Planet000;
-            case "abaddon" -> Emojis.Abaddon;
-            case "abyz" -> Emojis.Abyz;
-            case "accoen" -> Emojis.Accoen;
-            case "acheron" -> Emojis.Acheron;
-            case "alioprima" -> Emojis.AlioPrima;
-            case "ang" -> Emojis.Ang;
-            case "arcprime" -> Emojis.ArcPrime;
-            case "archonren", "archonrenk" -> Emojis.ArchonRen;
-            case "archontau", "archontauk" -> Emojis.ArchonTau;
-            case "archonvail" -> Emojis.ArchonVail;
-            case "arcturus" -> Emojis.Arcturus;
-            case "arinam" -> Emojis.Arinam;
-            case "arnor" -> Emojis.Arnor;
-            case "arretze" -> Emojis.Arretze;
-            case "ashtroth" -> Emojis.Ashtroth;
-            case "atlas" -> Emojis.Atlas;
-            case "avar", "avark" -> Emojis.Avar;
-            case "bakal" -> Emojis.Bakal;
-            case "bereg" -> Emojis.Bereg;
-            case "cealdri" -> Emojis.Cealdri;
-            case "centauri" -> Emojis.Centauri;
-            case "cormund" -> Emojis.Cormund;
-            case "corneeq" -> Emojis.Corneeq;
-            case "creuss" -> Emojis.Creuss;
-            case "dalbootha" -> Emojis.DalBootha;
-            case "darien" -> Emojis.Darien;
-            case "druaa" -> Emojis.Druaa;
-            case "elysium" -> Emojis.Elysium;
-            case "everra" -> Emojis.Everra;
-            case "fria" -> Emojis.Fria;
-            case "gral" -> Emojis.Gral;
-            case "hercant" -> Emojis.Hercant;
-            case "hopesend" -> Emojis.HopesEnd;
-            case "ixth" -> Emojis.Ixth;
-            case "jeolir" -> Emojis.JeolIr;
-            case "jol" -> Emojis.Jol;
-            case "jord" -> Emojis.Jord;
-            case "kamdorn" -> Emojis.Kamdorn;
-            case "kraag" -> Emojis.Kraag;
-            case "lazar" -> Emojis.Lazar;
-            case "lirtaiv" -> Emojis.LirtaIV;
-            case "lisis" -> Emojis.Lisis;
-            case "lisisii" -> Emojis.LisisII;
-            case "lodor" -> Emojis.Lodor;
-            case "loki" -> Emojis.Loki;
-            case "lor" -> Emojis.Lor;
-            case "maaluuk" -> Emojis.Maaluuk;
-            case "mallice" -> Emojis.Mallice;
-            case "mr" -> Emojis.Mecatol;
-            case "meer" -> Emojis.Meer;
-            case "meharxull" -> Emojis.MeharXull;
-            case "mellon" -> Emojis.Mellon;
-            case "mollprimus", "mollprimusk" -> Emojis.MollPrimus;
-            case "mordai" -> Emojis.Mordai;
-            case "muaat" -> Emojis.PlanetMuaat;
-            case "naazir" -> Emojis.Naazir;
-            case "nar" -> Emojis.Nar;
-            case "nestphar" -> Emojis.Nestphar;
-            case "newalbion" -> Emojis.NewAlbion;
-            case "perimeter" -> Emojis.Perimeter;
-            case "primor" -> Emojis.Primor;
-            case "quann" -> Emojis.Quann;
-            case "qucenn" -> Emojis.Qucenn;
-            case "quinarra" -> Emojis.Quinarra;
-            case "rahg" -> Emojis.Rahg;
-            case "rarron" -> Emojis.Rarron;
-            case "resculon" -> Emojis.Resculon;
-            case "retillon" -> Emojis.Retillon;
-            case "rigeli" -> Emojis.RigelI;
-            case "rigelii" -> Emojis.RigelII;
-            case "rigeliii" -> Emojis.RigelIII;
-            case "rokha" -> Emojis.Rokha;
-            case "sakulag" -> Emojis.Sakulag;
-            case "saudor" -> Emojis.Saudor;
-            case "semlore" -> getRandomSemLore();
-            case "shalloq" -> Emojis.Shalloq;
-            case "siig" -> Emojis.Siig;
-            case "starpoint" -> Emojis.Starpoint;
-            case "tarmann" -> Emojis.Tarmann;
-            case "tequran" -> Emojis.Tequran;
-            case "thedark" -> Emojis.TheDark;
-            case "thibah" -> Emojis.Thibah;
-            case "torkan" -> Emojis.Torkan;
-            case "trenlak" -> Emojis.Trenlak;
-            case "valk", "valkk" -> Emojis.Valk;
-            case "vefut" -> Emojis.Vefut;
-            case "vegamajor" -> Emojis.VegaMajor;
-            case "vegaminor" -> Emojis.VegaMinor;
-            case "velnor" -> Emojis.Velnor;
-            case "vorhal" -> Emojis.Vorhal;
-            case "wellon" -> Emojis.Wellon;
-            case "winnu" -> Emojis.PlanetWinnu;
-            case "wrenterra" -> Emojis.WrenTerra;
-            case "xanhact" -> Emojis.Xanhact;
-            case "xxehan" -> Emojis.Xxehan;
-            case "ylir", "ylirk" -> Emojis.Ylir;
-            case "zohbat" -> Emojis.Zohbat;
-
-            default -> Emojis.SemLore;
-        };
-    }
-
-    public static String getColourEmojis(String colour) {
-        return switch (colour) {
-            case "gray" -> Emojis.gray + "**Gray**";
-            case "black" -> Emojis.black + "**Black**";
-            case "blue" -> Emojis.blue + "**Blue**";
-            case "green" -> Emojis.green + "**Green**";
-            case "orange" -> Emojis.orange + "**Orange**";
-            case "pink" -> Emojis.pink + "**Pink**";
-            case "purple" -> Emojis.purple + "**Purple**";
-            case "red" -> Emojis.red + "**Red**";
-            case "yellow" -> Emojis.yellow + "**Yellow**";
-            case "petrol" -> Emojis.petrol + "**Petrol**";
-            case "brown" -> Emojis.brown + "**Brown**";
-            case "tan" -> Emojis.tan + "**Tan**";
-            case "forest" -> Emojis.forest + "**Forest**";
-            case "chrome" -> Emojis.chrome + "**Chrome**";
-            case "sunset" -> Emojis.sunset + "**Sunset**";
-            case "turquoise" -> Emojis.turquoise + "**Turquoise**";
-            case "gold" -> Emojis.gold + "**Gold**";
-            case "lightgray" -> Emojis.lightgray + "**Lightgray**";
-            case "teal" -> Emojis.teal + "**Teal**";
-            case "bloodred" -> Emojis.bloodred + "**Bloodred**";
-            case "emerald" -> Emojis.emerald + "**Emerald**";
-            case "navy" -> Emojis.navy + "**Navy**";
-            case "rose" -> Emojis.rose + "**Rose**";
-            case "lime" -> Emojis.lime + "**Lime**";
-            case "lavender" -> Emojis.lavender + "**Lavender**";
-            case "spring" -> Emojis.spring + "**Spring**";
-            case "chocolate" -> Emojis.chocolate + "**Chocolate**";
-            case "rainbow" -> Emojis.rainbow + "**Rainbow**";
-            case "ethereal" -> Emojis.ethereal + "**Ethereal**";
-            case "orca" -> Emojis.orca + "**Orca**";
-            case "splitred" -> Emojis.splitred + "**Splitred**";
-            case "splitblue" -> Emojis.splitblue + "**Splitblue**";
-            case "splitgreen" -> Emojis.splitgreen + "**Splitgreen**";
-            case "splitpurple" -> Emojis.splitpurple + "**Splitpurple**";
-            case "splitorange" -> Emojis.splitorange + "**Splitorange**";
-            case "splityellow" -> Emojis.splityellow + "**Splityellow**";
-            case "splitpink" -> Emojis.splitpink + "**Splitpink**";
-            case "splitgold" -> Emojis.splitgold + "**Splitgold**";
-            case "splitlime" -> Emojis.splitlime + "**Splitlime**";
-            case "splittan" -> Emojis.splittan + "**Splittan**";
-            case "splitteal" -> Emojis.splitteal + "**Splitteal**";
-            case "splitturquoise" -> Emojis.splittorquoise + "**Splitturquoise**";
-            case "splitbloodred" -> Emojis.splitbloodred + "**Splitbloodred**";
-            case "splitchocolate" -> Emojis.splitchocolate + "**Splitchocolate**";
-            case "splitemerald" -> Emojis.splitemerald + "**Splitemerald**";
-            case "splitnavy" -> Emojis.splitnavy + "**Splitnavy**";
-            case "splitpetrol" -> Emojis.splitpetrol + "**Splitpetrol**";
-            case "splitrainbow" -> Emojis.splitrainbow + "**Splitrainbow**";
-            default -> colour;
-        };
-    }
-
     public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
-        return getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+        return Emojis.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
 
     public static String getBasicTileRep(String tileID) {
@@ -783,7 +504,7 @@ public class Helper {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
             Planet planet = (Planet) unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources()) + getInfluenceEmoji(planet.getInfluence());
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources()) + Emojis.getInfluenceEmoji(planet.getInfluence());
         }
     }
 
@@ -793,7 +514,7 @@ public class Helper {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
             Planet planet = (Planet) unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + getInfluenceEmoji(planet.getInfluence());
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getInfluenceEmoji(planet.getInfluence());
         }
     }
 
@@ -803,7 +524,7 @@ public class Helper {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
             Planet planet = (Planet) unitHolder;
-            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources());
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + Emojis.getResourceEmoji(planet.getResources());
         }
     }
 
@@ -844,7 +565,7 @@ public class Helper {
                 }
             }
             if (held) continue;
-            Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
+            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
             if (activeGame.getScTradeGoods().get(sc) > 0 && !activeGame.isFoWMode()) {
@@ -1044,383 +765,36 @@ public class Helper {
         }
     }
 
-    public static String getInfluenceEmoji(int count) {
-        return switch (count) {
-            case 0 -> Emojis.Influence_0;
-            case 1 -> Emojis.Influence_1;
-            case 2 -> Emojis.Influence_2;
-            case 3 -> Emojis.Influence_3;
-            case 4 -> Emojis.Influence_4;
-            case 5 -> Emojis.Influence_5;
-            case 6 -> Emojis.Influence_6;
-            case 7 -> Emojis.Influence_7;
-            case 8 -> Emojis.Influence_8;
-            case 9 -> Emojis.Influence_9;
-            default -> Emojis.influence + count;
-        };
-    }
-
-    public static String getResourceEmoji(int count) {
-        return switch (count) {
-            case 0 -> Emojis.Resources_0;
-            case 1 -> Emojis.Resources_1;
-            case 2 -> Emojis.Resources_2;
-            case 3 -> Emojis.Resources_3;
-            case 4 -> Emojis.Resources_4;
-            case 5 -> Emojis.Resources_5;
-            case 6 -> Emojis.Resources_6;
-            case 7 -> Emojis.Resources_7;
-            case 8 -> Emojis.Resources_8;
-            case 9 -> Emojis.Resources_9;
-            default -> Emojis.resources + count;
-        };
-    }
-
-    public static String getToesEmoji(int count) {
-        return switch (count) {
-            case 0 -> Emojis.NoToes;
-            case 1 -> Emojis.OneToe;
-            case 2 -> Emojis.TwoToes;
-            case 3 -> Emojis.ThreeToes;
-            case 4 -> Emojis.FourToes;
-            case 5 -> Emojis.FiveToes;
-            case 6 -> Emojis.SixToes;
-            case 7 -> Emojis.SevenToes;
-            case 8 -> Emojis.EightToes;
-            case 9 -> Emojis.NineToes;
-            default -> Emojis.NoToes + count;
-        };
-    }
-
     /**
-     * Takes an emoji's name string and returns its full name including ID.
-     * 
-     * @emojiName the name of the emoji as entered on the Emoji section of the server
-     * @return the name of the emoji including ID
+     * Deprecated - use game.getPing() instead
      */
-    public static String getEmojiFromDiscord(String emojiName) {
-        return switch (emojiName.toLowerCase()) {
-            //EXPLORATION
-            case "hfrag" -> Emojis.HFrag;
-            case "cfrag" -> Emojis.CFrag;
-            case "ifrag" -> Emojis.IFrag;
-            case "ufrag" -> Emojis.UFrag;
-            case "relic" -> Emojis.Relic;
-            case "cultural" -> Emojis.Cultural;
-            case "industrial" -> Emojis.Industrial;
-            case "hazardous" -> Emojis.Hazardous;
-            case "frontier" -> Emojis.Frontier;
-
-            //CARDS
-            case "sc1" -> Emojis.SC1;
-            case "sc2" -> Emojis.SC2;
-            case "sc3" -> Emojis.SC3;
-            case "sc4" -> Emojis.SC4;
-            case "sc5" -> Emojis.SC5;
-            case "sc6" -> Emojis.SC6;
-            case "sc7" -> Emojis.SC7;
-            case "sc8" -> Emojis.SC8;
-            case "sc1back" -> Emojis.SC1Back;
-            case "sc2back" -> Emojis.SC2Back;
-            case "sc3back" -> Emojis.SC3Back;
-            case "sc4back" -> Emojis.SC4Back;
-            case "sc5back" -> Emojis.SC5Back;
-            case "sc6back" -> Emojis.SC6Back;
-            case "sc7back" -> Emojis.SC7Back;
-            case "sc8back" -> Emojis.SC8Back;
-            case "actioncard" -> Emojis.ActionCard;
-            case "agenda" -> Emojis.Agenda;
-            case "pn" -> Emojis.PN;
-
-            //OBJECTIVES
-            case "secretobjective" -> Emojis.SecretObjective;
-            case "public1" -> Emojis.Public1;
-            case "public2" -> Emojis.Public2;
-            case "public1alt" -> Emojis.Public1alt;
-            case "public2alt" -> Emojis.Public2alt;
-            case "secretobjectivealt" -> Emojis.SecretObjectiveAlt;
-
-            //COMPONENTS
-            case "tg" -> Emojis.tg;
-            case "comm" -> Emojis.comm;
-            case "sleeper" -> Emojis.Sleeper;
-            case "sleeperb" -> Emojis.SleeperB;
-
-            //UNITS
-            case "warsun" -> Emojis.warsun;
-            case "spacedock" -> Emojis.spacedock;
-            case "pds" -> Emojis.pds;
-            case "mech" -> Emojis.mech;
-            case "infantry" -> Emojis.infantry;
-            case "flagship" -> Emojis.flagship;
-            case "fighter" -> Emojis.fighter;
-            case "dreadnought" -> Emojis.dreadnought;
-            case "destroyer" -> Emojis.destroyer;
-            case "carrier" -> Emojis.carrier;
-            case "cruiser" -> Emojis.cruiser;
-
-            //LEADERS - AGENTS
-            case "arborecagent" -> Emojis.ArborecAgent;
-            case "argentagent" -> Emojis.ArgentAgent;
-            case "cabalagent" -> Emojis.CabalAgent;
-            case "ghostagent", "creussagent" -> Emojis.CreussAgent;
-            case "empyreanagent" -> Emojis.EmpyreanAgent;
-            case "hacanagent" -> Emojis.HacanAgent;
-            case "jolnaragent" -> Emojis.JolNarAgent;
-            case "keleresagent" -> Emojis.KeleresAgent;
-            case "l1z1xagent" -> Emojis.L1Z1XAgent;
-            case "letnevagent" -> Emojis.LetnevAgent;
-            case "mahactagent" -> Emojis.MahactAgent;
-            case "mentakagent" -> Emojis.MentakAgent;
-            case "muaatagent" -> Emojis.MuaatAgent;
-            case "naaluagent" -> Emojis.NaaluAgent;
-            case "naazagent" -> Emojis.NaazAgent;
-            case "nekroagent" -> Emojis.NekroAgent;
-            case "nomadagentartuno" -> Emojis.NomadAgentArtuno;
-            case "nomadagentmercer" -> Emojis.NomadAgentMercer;
-            case "nomadagentthundarian" -> Emojis.NomadAgentThundarian;
-            case "sardakkagent" -> Emojis.SardakkAgent;
-            case "saaragent" -> Emojis.SaarAgent;
-            case "solagent" -> Emojis.SolAgent;
-            case "titansagent" -> Emojis.TitansAgent;
-            case "winnuagent" -> Emojis.WinnuAgent;
-            case "xxchaagent" -> Emojis.XxchaAgent;
-            case "yinagent" -> Emojis.YinAgent;
-            case "yssarilagent" -> Emojis.YssarilAgent;
-
-            //LEADERS - COMMANDERS
-            case "arboreccommander" -> Emojis.ArborecCommander;
-            case "argentcommander" -> Emojis.ArgentCommander;
-            case "cabalcommander" -> Emojis.CabalCommander;
-            case "ghostcommander", "creusscommander" -> Emojis.CreussCommander;
-            case "empyreancommander" -> Emojis.EmpyreanCommander;
-            case "hacancommander" -> Emojis.HacanCommander;
-            case "jolnarcommander" -> Emojis.JolNarCommander;
-            case "kelerescommander" -> Emojis.MentakAgent;
-            case "l1z1xcommander" -> Emojis.L1Z1XCommander;
-            case "letnevcommander" -> Emojis.LetnevCommander;
-            case "mahactcommander" -> Emojis.MahactCommander;
-            case "mentakcommander" -> Emojis.MentakCommander;
-            case "muaatcommander" -> Emojis.MuaatCommander;
-            case "naalucommander" -> Emojis.NaaluCommander;
-            case "naazcommander" -> Emojis.NaazCommander;
-            case "nekrocommander" -> Emojis.NekroCommander;
-            case "nomadcommander" -> Emojis.NomadCommander;
-            case "sardakkcommander" -> Emojis.SardakkCommander;
-            case "saarcommander" -> Emojis.SaarCommander;
-            case "solcommander" -> Emojis.SolCommander;
-            case "titanscommander" -> Emojis.TitansCommander;
-            case "winnucommander" -> Emojis.WinnuCommander;
-            case "xxchacommander" -> Emojis.XxchaCommander;
-            case "yincommander" -> Emojis.YinCommander;
-            case "yssarilcommander" -> Emojis.YssarilCommander;
-
-            //LEADERS - HEROES
-            case "arborechero" -> Emojis.ArborecHero;
-            case "argenthero" -> Emojis.ArgentHero;
-            case "cabalhero" -> Emojis.CabalHero;
-            case "ghosthero", "creusshero" -> Emojis.CreussHero;
-            case "empyreanhero" -> Emojis.EmpyreanHero;
-            case "hacanhero" -> Emojis.HacanHero;
-            case "jolnarhero" -> Emojis.JolNarHero;
-            case "keleresherokuuasi" -> Emojis.KeleresHeroKuuasi;
-            case "keleresheroodlynn" -> Emojis.KeleresHeroOdlynn;
-            case "keleresheroharka" -> Emojis.KeleresHeroHarka;
-            case "l1z1xhero" -> Emojis.L1Z1XHero;
-            case "letnevhero" -> Emojis.LetnevHero;
-            case "mahacthero" -> Emojis.MahactHero;
-            case "mentakhero" -> Emojis.MentakHero;
-            case "muaathero" -> Emojis.MuaatHero;
-            case "naaluhero" -> Emojis.NaaluHero;
-            case "naazhero" -> Emojis.NaazHero;
-            case "nekrohero" -> Emojis.NekroHero;
-            case "nomadhero" -> Emojis.NomadHero;
-            case "sardakkhero" -> Emojis.SardakkHero;
-            case "saarhero" -> Emojis.SaarHero;
-            case "solhero" -> Emojis.SolHero;
-            case "titanshero" -> Emojis.TitansHero;
-            case "winnuhero" -> Emojis.WinnuHero;
-            case "xxchahero" -> Emojis.XxchaHero;
-            case "yinhero" -> Emojis.YinHero;
-            case "yssarilhero" -> Emojis.YssarilHero;
-
-            // DS LEADERS
-            case "augersagent" -> Emojis.AugersAgent;
-            case "augerscommander" -> Emojis.AugersCommander;
-            case "augershero" -> Emojis.AugersHero;
-            case "axisagent" -> Emojis.AxisAgent;
-            case "axiscommander" -> Emojis.AxisCommander;
-            case "axishero" -> Emojis.AxisHero;
-            case "bentoragent" -> Emojis.BentorAgent;
-            case "bentorcommander" -> Emojis.BentorCommander;
-            case "bentorhero" -> Emojis.BentorHero;
-            case "blexagent" -> Emojis.BlexAgent;
-            case "blexcommander" -> Emojis.BlexCommander;
-            case "blexhero" -> Emojis.BlexHero;
-            case "celdauriagent" -> Emojis.CeldauriAgent;
-            case "celdauricommander" -> Emojis.CeldauriCommander;
-            case "celdaurihero" -> Emojis.CeldauriHero;
-            case "cheiranagent" -> Emojis.CheiranAgent;
-            case "cheirancommander" -> Emojis.CheiranCommander;
-            case "cheiranhero" -> Emojis.CheiranHero;
-            case "gheminaagent" -> Emojis.GheminaAgent;
-            case "gheminacommander" -> Emojis.GheminaCommander;
-            case "gheminaherolady" -> Emojis.GheminaHeroLady;
-            case "gheminaherolord" -> Emojis.GheminaHeroLord;
-            case "cymiaeagent" -> Emojis.CymiaeAgent;
-            case "cymiaecommander" -> Emojis.CymiaeCommander;
-            case "cymiaehero" -> Emojis.CymiaeHero;
-            case "dihmohnagent" -> Emojis.DihmohnAgent;
-            case "dihmohncommander" -> Emojis.DihmohnCommander;
-            case "dihmohnhero" -> Emojis.DihmohnHero;
-            case "edynagent" -> Emojis.EdynAgent;
-            case "edyncommander" -> Emojis.EdynCommander;
-            case "edynhero" -> Emojis.EdynHero;
-            case "florzenagent" -> Emojis.FlorzenAgent;
-            case "florzencommander" -> Emojis.FlorzenCommander;
-            case "florzenhero" -> Emojis.FlorzenHero;
-            case "freesystemcommander" -> Emojis.FreesystemCommander;
-            case "freesystemhero" -> Emojis.FreesystemHero;
-            case "freesystemsagent" -> Emojis.FreesystemsAgent;
-            case "ghotiagent" -> Emojis.GhotiAgent;
-            case "ghoticommander" -> Emojis.GhotiCommander;
-            case "ghotihero" -> Emojis.GhotiHero;
-            case "gledgeagent" -> Emojis.GledgeAgent;
-            case "gledgecommander" -> Emojis.GledgeCommander;
-            case "gledgehero" -> Emojis.GledgeHero;
-            case "khraskagent" -> Emojis.KhraskAgent;
-            case "khraskcommander" -> Emojis.KhraskCommander;
-            case "khraskhero" -> Emojis.KhraskHero;
-            case "kjalengardagent" -> Emojis.KjalengardAgent;
-            case "kjalengardcommander" -> Emojis.KjalengardCommander;
-            case "kjalengardhero" -> Emojis.KjalengardHero;
-
-            //OTHER
-            case "whalpha" -> Emojis.WHalpha;
-            case "grift" -> Emojis.GravityRift;
-            case "whbeta" -> Emojis.WHbeta;
-            case "whgamma" -> Emojis.WHgamma;
-            case "creussalpha" -> Emojis.CreussAlpha;
-            case "creussbeta" -> Emojis.CreussBeta;
-            case "creussgamma" -> Emojis.CreussGamma;
-            case "influence" -> Emojis.influence;
-            case "resources" -> Emojis.resources;
-            case "legendaryplanet" -> Emojis.LegendaryPlanet;
-            case "cybernetictech" -> Emojis.CyberneticTech;
-            case "propulsiontech" -> Emojis.PropulsionTech;
-            case "biotictech" -> Emojis.BioticTech;
-            case "warfaretech" -> Emojis.WarfareTech;
-            case "unitupgradetech" -> Emojis.UnitUpgradeTech;
-
-            default -> getRandomGoodDog();
-        };
-    }
-
+    @Deprecated
     public static String getGamePing(SlashCommandInteractionEvent event, Game activeGame) {
         return getGamePing(event.getGuild(), activeGame);
     }
 
+    /**
+     * Deprecated - use game.getPing() instead
+     */
+    @Deprecated
     public static String getGamePing(GenericInteractionCreateEvent event, Game activeGame) {
         return getGamePing(activeGame.getGuild(), activeGame);
     }
 
+    /**
+     * Deprecated - use game.getPing() instead
+     */
+    @Deprecated
     public static String getGamePing(Guild guild, Game activeGame) {
-        if (guild != null) {
-            for (Role role : guild.getRoles()) {
-                if (activeGame.getName().equals(role.getName().toLowerCase())) {
-                    return role.getAsMention();
-                }
-            }
-            StringBuilder sb = new StringBuilder(activeGame.getName()).append(" ");
-            for (String playerID : activeGame.getPlayerIDs()) {
-                Member member = guild.getMemberById(playerID);
-                if (member != null) sb.append(guild.getMemberById(playerID).getAsMention()).append(" ");
-            }
-            return sb.toString();
-        }
-        return "";
+        return activeGame.getPing();
     }
 
-    public static String getPlayerPing(Player player) {
-        User userById = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
-        if (userById == null) {
-            return "";
-        }
-        String mention = userById.getAsMention();
-        switch (player.getUserID()) {
-            case "154000388121559040" -> //mysonisalsonamedbort
-                mention += " " + Emojis.BortWindow;
-            case "150809002974904321" -> //tispoon
-                mention += " " + Emojis.SpoonAbides;
-            case "228999251328368640" -> //Jazzx
-                mention += " " + Emojis.Scout;
-        }
-        return mention;
-    }
-
-    public static String getPlayerRepresentation(Player player, Game activeGame) {
-        return getPlayerRepresentation(player, activeGame, true);
-    }
-
-    // Pass the buck
-    public static String getPlayerRepresentation(Player player, Game activeGame, boolean includePing) {
-        if (activeGame == null) return getPlayerRepresentation(player, null, null, false, includePing);
-        return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false, includePing);
-    }
-
+    /**
+     * Deprecated - use player.getRepresentation(overrideFow:true, includePing:true) instead
+     */
+    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
-        return getPlayerRepresentation(player, activeGame, guild, overrideFow, true);
-    }
-
-    // One representation to rule them all
-    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
-        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
-        if (privateGame && !overrideFow) {
-            return getColourEmojis(player.getColor());
-        }
-
-        if (activeGame != null && activeGame.isCommunityMode()) {
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                if(player.getTeamMateIDs().size() < 1){
-                    return defaultPlayerRepresentation(player, guild, includePing);
-                }else{
-                    StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-                    if (includePing) {
-                        for(String userID : player.getTeamMateIDs()){
-                            User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
-                            if (userById == null) {
-                                continue;
-                            }
-                            String mention = userById.getAsMention();
-                            sb.append(" ").append(mention);
-                        }
-                    }
-                    if (player.getColor() != null && !"null".equals(player.getColor())) {
-                        sb.append(" ").append(getColourEmojis(player.getColor()));
-                    }
-                    return sb.toString();
-                }
-                
-            } else {
-                return player.getFactionEmoji() + getRoleMentionByName(guild, roleForCommunity.getName()) + Helper.getColourEmojis(player.getColor());
-            }
-        }
-
-        return defaultPlayerRepresentation(player, guild, includePing);
-    }
-
-    private static String defaultPlayerRepresentation(Player player, Guild guild, boolean includePing) {
-        StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-        if (includePing) sb.append(" ").append(getPlayerPing(player));
-        if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" ").append(getColourEmojis(player.getColor()));
-        }
-        return sb.toString();
-    }
-
-    public static String getFactionLeaderEmoji(Leader leader) {
-        return getEmojiFromDiscord(leader.getId());
+        return player.getRepresentation(overrideFow, true);
     }
 
     @Deprecated
@@ -1441,7 +815,7 @@ public class Helper {
         String leaderUnlockCondition = leaderModel.getUnlockCondition();
 
         StringBuilder representation = new StringBuilder();
-        representation.append(getFactionLeaderEmoji(leader)).append(" **").append(leaderName).append("**");
+        representation.append(Emojis.getFactionLeaderEmoji(leader)).append(" **").append(leaderName).append("**");
         if (includeTitle) representation.append(": ").append(leaderTitle); //add title
         if (includeAbility && Constants.HERO.equals(leader.getType())) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
         if (includeAbility) representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); //add ability
@@ -1472,16 +846,6 @@ public class Helper {
 
     public static String getLeaderLockedRepresentation(Leader leader) {
         return getLeaderRepresentation(leader, true, true, true);
-    }
-
-    public static String getSCEmojiFromInteger(Integer strategy_card) {
-        String scEmojiName = "SC" + strategy_card;
-        return getEmojiFromDiscord(scEmojiName);
-    }
-
-    public static String getSCBackEmojiFromInteger(Integer strategy_card) {
-        String scEmojiName = "SC" + strategy_card + "Back";
-        return getEmojiFromDiscord(scEmojiName);
     }
 
     public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game activeGame, String color) {
@@ -1538,7 +902,7 @@ public class Helper {
             if (!activeGame.isFoWMode()) {
                 if (player != null) {
                     msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
-                    msg += getPlayerPing(player) + " ";
+                    msg += player.getPing() + " ";
                 }
             }
 
@@ -1774,7 +1138,7 @@ public class Helper {
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Game activeGame) {
-        return getPlayerRepresentation(player, activeGame) + ":\n" +
+        return player.getRepresentation() + ":\n" +
             "Resources: " + getPlayerResourcesAvailable(player, activeGame) + "/" + getPlayerResourcesTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalResourcesAvailable(player, activeGame)
             + "/" + getPlayerOptimalResourcesTotal(player, activeGame) + "\n" +
             "Influence: " + getPlayerInfluenceAvailable(player, activeGame) + "/" + getPlayerInfluenceTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalInfluenceAvailable(player, activeGame)
@@ -1960,18 +1324,6 @@ public class Helper {
         }
     }
 
-    public static String getTechRepresentation(String techID) {
-        TechnologyModel tech = Mapper.getTechs().get(techID);
-
-        String techName = tech.getName();
-        TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction().orElse("");
-        String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
-        String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-        return techEmoji + "**" + techName + "**" + factionEmoji;
-    }
-
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
         return getTechButtons(techs, techType, player, "nope");
     }
@@ -2095,25 +1447,33 @@ public class Helper {
         return techs;
     }
 
-    public static String getTechRepresentationLong(String techID) {
+    /**
+     * DEPRECATED - Use TechnologyModel.getRepresentation() instead
+     */
+    @Deprecated
+    public static String getTechRepresentation(String techID) {
         TechnologyModel tech = Mapper.getTechs().get(techID);
-
-        String techName = tech.getName();
-        TechnologyType techType = tech.getType();
-        String techFaction = tech.getFaction().orElse("");
-        String factionEmoji = "";
-        if (!techFaction.isBlank()) factionEmoji = getFactionIconFromDiscord(techFaction);
-        String techEmoji = getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
-
-        String techText = tech.getText();
-        return techEmoji + "**" + techName + "**" + factionEmoji + "\n" +
-            "> " + techText + "\n";
+        return tech.getRepresentation(false);
     }
 
+    /**
+     * DEPRECATED - Use TechnologyModel.getRepresentation(true) instead
+     */
+    @Deprecated
+    public static String getTechRepresentationLong(String techID) {
+        TechnologyModel tech = Mapper.getTechs().get(techID);
+        return tech.getRepresentation(true);
+    }
+
+    /**
+     * DEPRECATED - Use AgendaModel.getRepresentation() instead
+     */
+    @Deprecated
     public static String getAgendaRepresentation(@NotNull String agendaID) {
         return getAgendaRepresentation(agendaID, null);
     }
 
+    @Deprecated
     public static String getAgendaRepresentation(@NotNull String agendaID, @Nullable Integer uniqueID) {
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
         return agendaDetails.getRepresentation(uniqueID);

@@ -30,7 +30,7 @@ public class SetUnitCap extends GameSubcommandData {
         Player player = Helper.getPlayer(activeGame, null, event);
         String unitID = AliasHandler.resolveUnit(unit);
         player.setUnitCap(unitID, unitCap);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ unit+ " max to "+unitCap+" for "+Helper.getPlayerRepresentation(player, activeGame));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set "+ unit+ " max to "+unitCap+" for "+player.getRepresentation());
 
     }
 }

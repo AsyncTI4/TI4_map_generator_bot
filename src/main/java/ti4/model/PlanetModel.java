@@ -91,7 +91,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getInfResEmojis() {
-        return Helper.getResourceEmoji(resources) + Helper.getResourceEmoji(influence);
+        return Emojis.getResourceEmoji(resources) + Emojis.getResourceEmoji(influence);
     }
 
     private String getPlanetTypeEmoji() {
@@ -140,7 +140,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getEmoji() {
-        return Helper.getPlanetEmoji(getId());
+        return Emojis.getPlanetEmoji(getId());
     }
 
     public String getEmojiURL() {

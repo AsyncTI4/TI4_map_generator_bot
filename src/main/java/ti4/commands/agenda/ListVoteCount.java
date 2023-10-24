@@ -33,7 +33,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         int itemNo = 1;
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
-            sb.append(Helper.getPlayerRepresentation(player, activeGame));
+            sb.append(player.getRepresentation());
             if (player.getUserID().equals(activeGame.getSpeaker())) sb.append(Emojis.SpeakerToken);
             sb.append(AgendaHelper.getPlayerVoteText(activeGame, player));
             sb.append("\n");

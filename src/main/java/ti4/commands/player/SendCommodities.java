@@ -62,8 +62,8 @@ public class SendCommodities extends PlayerSubcommandData {
             player_.setCommodities(targetTG);
         }
         
-        String p1 = Helper.getPlayerRepresentation(player, activeGame);
-        String p2 = Helper.getPlayerRepresentation(player_, activeGame);
+        String p1 = player.getRepresentation();
+        String p2 = player_.getRepresentation();
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
         String message =  p1 + " sent " + commString + " to " + p2;
         sendMessage(message);
@@ -73,7 +73,7 @@ public class SendCommodities extends PlayerSubcommandData {
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
 			ClearDebt.clearDebt(player_, player, sendCommodities);
-			sendMessage(Helper.getPlayerRepresentation(player_, activeGame) + " cleared " + sendCommodities + " debt tokens owned by " + Helper.getPlayerRepresentation(player, activeGame));
+			sendMessage(player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
 		}
 
         if (activeGame.isFoWMode()) {

@@ -30,6 +30,6 @@ public class PlanetExhaustAll extends PlanetSubcommandData {
         for (String planet : player.getPlanets()) {
             player.exhaustPlanet(planet);
         }
-        sendMessage(Helper.getPlayerRepresentation(player, activeGame) + " exhausted all planets.");
+        sendMessage(player.getRepresentation() + " exhausted all planets.");
     }
 }

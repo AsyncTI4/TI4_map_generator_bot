@@ -17,6 +17,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -139,10 +140,10 @@ public class SystemInfo extends SpecialSubcommandData {
                     Player player = activeGame.getPlayerFromColorOrFaction(colour);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColour()).append(Helper.getColourEmojis(colour));
+                    sb.append(player.getFactionEmojiOrColour()).append(Emojis.getColourEmojis(colour));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(Helper.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
+                        sb.append(Emojis.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
                     } else {
                         sb.append(unitKey).append("\n");
                     }

@@ -84,7 +84,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
-            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getPlayerRepresentation(mainPlayer, activeGame) + " ended turn");
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
         }
 
         MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();

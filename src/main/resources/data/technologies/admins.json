@@ -5,7 +5,6 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "admins",
-        "baseUpgrade": "",
         "source": "homebrew",
         "text": "Systems that contain a planet with one of your Space Docks on it are considered adjacent to each other for all game effects."
     },
