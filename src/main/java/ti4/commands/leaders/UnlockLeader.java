@@ -10,6 +10,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
 
 public class UnlockLeader extends LeaderAction {
     public UnlockLeader() {
@@ -21,23 +22,33 @@ public class UnlockLeader extends LeaderAction {
         unlockLeader(event, leaderID, activeGame, player);
     }
 
-    public void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Game activeGame, Player player) {
+    public static void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Game activeGame, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = activeGame.getMainGameChannel();
-        if (activeGame.isFoWMode()) channel = player.getPrivateChannel();
+        if (activeGame.isFoWMode())
+            channel = player.getPrivateChannel();
 
-        if (playerLeader != null){
-            playerLeader.setLocked(false);
-            MessageHelper.sendMessageToChannel(channel, Emojis.getFactionLeaderEmoji(playerLeader));
-          String message = player.getRepresentation() +
-              " unlocked " +
-              Helper.getLeaderFullRepresentation(playerLeader);
-            MessageHelper.sendMessageToChannel(channel, message);
-            if (playerLeader.isExhausted()){
-                MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
-            }
-        } else {
+        if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(channel, "Leader not found");
+            return;
+        }
+        playerLeader.setLocked(false);
+
+        LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
+
+        boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
+        
+        if (leaderModel != null) {
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " unlocked:");
+            channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
+        } else {
+            MessageHelper.sendMessageToChannel(channel, Emojis.getFactionLeaderEmoji(playerLeader));
+            String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader);
+            MessageHelper.sendMessageToChannel(channel, message);
+        }
+
+        if (playerLeader.isExhausted()) {
+            MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
         }
     }
 }
