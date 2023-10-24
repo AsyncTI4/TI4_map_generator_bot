@@ -9,8 +9,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -79,6 +79,19 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(requirements);
     }
 
+    public String getRepresentation(boolean includeCardText) {
+        String techName = getName();
+        TechnologyType techType = getType();
+        String techFaction = getFaction().orElse("");
+        String factionEmoji = "";
+        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+        StringBuilder sb = new StringBuilder();
+        sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji);
+        if (includeCardText) sb.append("\n").append("> ").append(getText()).append("\n");
+        return sb.toString();
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
     }
@@ -89,8 +102,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         //TITLE
         String factionEmoji = "";
         String techFaction = getFaction().orElse("");
-        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-        String techEmoji = Helper.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
+        if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
         eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
 
         //DESCRIPTION

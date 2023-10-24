@@ -51,6 +51,27 @@ public class FoWHelper {
 		return isPrivateGame(activeGame, null, null);
 	}
 
+	public static boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+		Channel eventChannel = event == null ? null : event.getChannel();
+		Channel channel = channel_ != null ? channel_ : eventChannel;
+		if (channel == null) {
+			return activeGame.isFoWMode();
+		}
+		if (activeGame == null) {
+			String gameName = channel.getName();
+			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			activeGame = GameManager.getInstance().getGame(gameName);
+			if (activeGame == null) {
+				return false;
+			}
+		}
+		if (activeGame.isFoWMode() && channel_ != null || event != null) {
+			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
+		}
+		return false;
+	}
+
 	/** Method to determine of a viewing player should be able to see the stats of a particular faction */
 	public static boolean canSeeStatsOfFaction(Game activeGame, String faction, Player viewingPlayer) {
 		for (Player player : activeGame.getPlayers().values()) {
@@ -205,27 +226,6 @@ public class FoWHelper {
 	private static boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
 		List<String> mahactCCs = viewingPlayer.getMahactCC();
 		return mahactCCs.contains(player.getColor());
-	}
-
-	public static boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
-		Channel eventChannel = event == null ? null : event.getChannel();
-		Channel channel = channel_ != null ? channel_ : eventChannel;
-		if (channel == null) {
-			return activeGame.isFoWMode();
-		}
-		if (activeGame == null) {
-			String gameName = channel.getName();
-			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
-			gameName = gameName.substring(0, gameName.indexOf("-"));
-			activeGame = GameManager.getInstance().getGame(gameName);
-			if (activeGame == null) {
-				return false;
-			}
-		}
-		if (activeGame.isFoWMode() && channel_ != null || event != null) {
-			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
-		}
-		return false;
 	}
 
 	/**
@@ -679,7 +679,7 @@ public class FoWHelper {
 		List<Player> players = getAdjacentPlayers(activeGame, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
-			String playerMessage = Helper.getPlayerRepresentation(player_, activeGame) + " - System " + position + " has been pinged:\n>>> " + message;
+			String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
 			MessageChannel channel = player_.getPrivateChannel();
 			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system",
@@ -694,7 +694,7 @@ public class FoWHelper {
 		int succesfulCount = 0;
 
 		for (Player player_ : activeGame.getPlayers().values()) {
-			String playerMessage = Helper.getPlayerRepresentation(player_, activeGame) + " all player ping\n>>> " + message;
+			String playerMessage = player_.getRepresentation() + " all player ping\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -707,7 +707,7 @@ public class FoWHelper {
 			.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
-		String playerMessage = Helper.getPlayerRepresentation(playerWithChange, activeGame) + " stats changed:\n" + message;
+		String playerMessage = playerWithChange.getRepresentation() + " stats changed:\n" + message;
 		for (Player player_ : playersToPing) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, playerMessage);
 			succesfulCount += success ? 1 : 0;
@@ -767,13 +767,13 @@ public class FoWHelper {
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
 			if (senderVisible) {
-				sb.append(Helper.getPlayerRepresentation(sendingPlayer, activeGame));
+				sb.append(sendingPlayer.getRepresentation());
 			} else {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
 			if (receiverVisible) {
-				sb.append(Helper.getPlayerRepresentation(receivingPlayer, activeGame));
+				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");
 			}

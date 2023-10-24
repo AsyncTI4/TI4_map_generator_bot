@@ -93,7 +93,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         String abilityText = getWindowEffect().orElse("");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getFactionIconFromDiscord(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
+        sb.append(Emojis.getFactionIconFromDiscord(abilitySourceFaction)).append("__**").append(abilityName).append("**__");
         if (!abilityRawModifier.isBlank()) sb.append(": ").append(abilityRawModifier);
         if (!abilityWindow.isBlank() || !abilityText.isBlank()) sb.append("\n> *").append(abilityWindow).append("*:\n> ").append(abilityText);
 
@@ -119,7 +119,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getFactionEmoji() {
-        return Helper.getFactionIconFromDiscord(getFaction());
+        return Emojis.getFactionIconFromDiscord(getFaction());
     }
 
     private String getSourceEmoji() {

@@ -18,6 +18,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -137,8 +138,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet cannot be explored");
             return;
         }
-        String messageText = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
-            Helper.getEmojiFromDiscord(drawColor) +
+        String messageText = player.getRepresentation() + " explored " +
+            Emojis.getEmojiFromDiscord(drawColor) +
             "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
             "> " + displayExplore(cardID);
         resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);

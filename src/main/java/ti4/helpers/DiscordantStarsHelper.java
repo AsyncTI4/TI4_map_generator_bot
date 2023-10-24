@@ -157,8 +157,8 @@ public class DiscordantStarsHelper {
         if (!player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
             player.setHasUsedEnvironmentPreserveAbility(true);
             String planetType = planetModel.getPlanetType().toString();
-            String fragmentType = Helper.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
-            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the " + Helper.getEmojiFromDiscord(planetType) + planetType + " deck; if it is a " + fragmentType
+            String fragmentType = Emojis.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
+            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the " + Emojis.getEmojiFromDiscord(planetType) + planetType + " deck; if it is a " + fragmentType
                 + " relic fragment, gain it, otherwise discard that card.\n");
         }
     }

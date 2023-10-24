@@ -33,13 +33,13 @@ public class UnitInfo extends PlayerSubcommandData {
     }
 
     public static void sendUnitInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendUnitInfo(activeGame, player);
     }
 
     public static void sendUnitInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " pressed `" + event.getButton().getId() + "`";
+        String headerText = player.getRepresentation() + " pressed `" + event.getButton().getId() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendUnitInfo(activeGame, player);
     }

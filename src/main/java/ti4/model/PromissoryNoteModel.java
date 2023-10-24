@@ -100,7 +100,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         //TITLE
         StringBuilder title = new StringBuilder();
         title.append(Emojis.PN);
-        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Helper.getFactionIconFromDiscord(getFaction().get()));
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
         if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
         title.append(getSourceEmoji());

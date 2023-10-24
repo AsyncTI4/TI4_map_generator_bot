@@ -116,7 +116,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
             TileModel tile = TileHelper.getTile(tileID);
             tileEmbeds.add(tile.getHelpMessageEmbed(false));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled.toString());
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
     }
     

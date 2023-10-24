@@ -168,7 +168,7 @@ public class PNInfo extends PNCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
 
         sb.append(Emojis.PN);
-        if (pnModel.getFaction().isPresent()) sb.append(Helper.getFactionIconFromDiscord(pnModel.getFaction().get()));
+        if (pnModel.getFaction().isPresent()) sb.append(Emojis.getFactionIconFromDiscord(pnModel.getFaction().get()));
         sb.append("__**").append(pnName).append("**__   ");
 
         String pnText = pnModel.getText();
