@@ -33,6 +33,7 @@ public class GameEnd extends GameSubcommandData {
     public GameEnd() {
         super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "Publish? Default true/yes").setRequired(false));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -53,11 +54,17 @@ public class GameEnd extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with 'YES'");
             return;
         }
+        boolean publish = true;
+        OptionMapping option2 = event.getOption(Constants.PUBLISH);
+        if (option2 == null && !option.getAsBoolean()) {
+            publish = false;
+        }
 
-        secondHalfOfGameEnd(event, activeGame);
+
+        secondHalfOfGameEnd(event, activeGame, publish);
     }
 
-    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame) {
+    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame, boolean publish) {
         String gameName = activeGame.getName();
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
@@ -107,7 +114,7 @@ public class GameEnd extends GameSubcommandData {
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
         //CREATE POST IN #THE-PBD-CHRONICLES
-        if(AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0){
+        if(publish && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0){
             TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
             String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
             if (pbdChroniclesChannel == null) {
