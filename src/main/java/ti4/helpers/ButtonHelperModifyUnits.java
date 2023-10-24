@@ -209,7 +209,7 @@ public class ButtonHelperModifyUnits {
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String pos = buttonID.replace("umbatTile_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "muaatagent", "place");
-        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to produce units. ";
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -221,7 +221,7 @@ public class ButtonHelperModifyUnits {
         String unit = AliasHandler.resolveUnit(unitLong);
 
         String successMessage;
-        String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+        String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
@@ -406,7 +406,7 @@ public class ButtonHelperModifyUnits {
             producedOrPlaced = "Placed";
         }
         String successMessage;
-        String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+        String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),

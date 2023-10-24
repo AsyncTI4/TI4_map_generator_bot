@@ -56,7 +56,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame));
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved ").append(Helper.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentation());
         for (Tile tile_ : activeGame.getTileMap().values()) {

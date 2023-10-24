@@ -35,7 +35,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             scoredSecretObjective.remove(id);
         }
 
-        sb.append(Helper.getPlayerRepresentation(player, activeGame));
+        sb.append(player.getRepresentation());
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;

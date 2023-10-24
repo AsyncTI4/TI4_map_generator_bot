@@ -28,7 +28,7 @@ public class Speaker extends PlayerSubcommandData {
             return;
         }
         activeGame.setSpeaker(player.getUserID());
-        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeGame);
+        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
         sendMessage(msg);
     }
 }

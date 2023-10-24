@@ -59,7 +59,7 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-        sendMessage(Helper.getPlayerRepresentation(sendingPlayer, activeGame) + " sent " + debtCountToSend + " debt tokens to " + Helper.getPlayerRepresentation(receivingPlayer, activeGame));
+        sendMessage(sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
         
     }
 

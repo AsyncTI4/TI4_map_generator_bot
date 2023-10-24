@@ -95,7 +95,7 @@ public class PlayPN extends PNCardsSubcommandData {
        
 
         String emojiToUse = activeGame.isFoWMode() ? "" : pnOwner.getFactionEmoji();
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: " + pnName + "\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
         sb.append(emojiToUse).append(Emojis.PN);
         String pnText;
 

@@ -152,7 +152,7 @@ public class Setup extends PlayerSubcommandData {
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
         if (setSpeaker) {
             activeGame.setSpeaker(player.getUserID());
-            sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeGame));
+            sendMessage(Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 
         // STARTING PNs
@@ -202,7 +202,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (!activeGame.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeGame) + " has been set up");
+            sendMessage("Player: " + player.getRepresentation() + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }

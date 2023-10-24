@@ -62,7 +62,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            text += Helper.getPlayerRepresentation(player, activeGame);
+            text += player.getRepresentation();
             if (passed) {
                 text += "~~ - PASSED";
             }

@@ -18,7 +18,7 @@ public class FactionTechAdd extends FactionTechAddRemove {
 
     @Override
     public void doAction(Player player, List<String> techIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" added techs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added techs:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player had this faction tech)");

@@ -112,7 +112,7 @@ public class SCUnpick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
+                msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeGame.updateActivePlayer(nextPlayer);
             }
