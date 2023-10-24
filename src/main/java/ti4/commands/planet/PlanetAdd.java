@@ -68,7 +68,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (activeGame.isFoWMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeGame) + " scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
                 String message2 = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
@@ -89,7 +89,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     alreadyOwned = true;
                     player_.removePlanet(planet);
                     if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_)&& !doubleCheck) {
-                        String msg2 = Helper.getPlayerRepresentation(player_, activeGame) + " lost shard and lost a victory point. " + Helper.getPlayerRepresentation(player, activeGame)
+                        String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
                             + " gained shard and a victory point.";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
                         player_.removeRelic("shard");
@@ -99,7 +99,7 @@ public class PlanetAdd extends PlanetAddRemove {
                         activeGame.scorePublicObjective(player.getUserID(), shardID);
                         Helper.checkEndGame(activeGame, player);
                     }
-                    String msg = Helper.getPlayerRepresentation(player_, activeGame) + " has a window to play reparations for the taking of the planet " + planet
+                    String msg = player_.getRepresentation() + " has a window to play reparations for the taking of the planet " + planet
                         + " (and maybe also a window for parley if this wasnt taken after a combat). You can maybe float this window. ";
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
                     if (moveTitanPN) {

@@ -52,7 +52,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(player.getRepresentation() + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
@@ -70,7 +70,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             FoWHelper.pingPlayersDifferentMessages(activeGame, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
-        String headerText = Helper.getPlayerRepresentation(player, activeGame);
+        String headerText = player.getRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         SOInfo.sendSecretObjectiveInfo(activeGame, player);
         Helper.checkIfHeroUnlocked(event, activeGame, player);

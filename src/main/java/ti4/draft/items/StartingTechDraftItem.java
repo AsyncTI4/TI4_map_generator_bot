@@ -40,13 +40,13 @@ public class StartingTechDraftItem extends DraftItem {
         TechnologyModel tech;
         for (int i = 0; i < techs.size() - 1; i++) {
             tech = Mapper.getTech(techs.get(i));
-            builder.append(Helper.getEmojiFromDiscord(tech.getType().toString().toLowerCase() + "tech"));
+            builder.append(Emojis.getEmojiFromDiscord(tech.getType().toString().toLowerCase() + "tech"));
             builder.append(" ");
             builder.append(tech.getName());
             builder.append(", ");
         }
         tech = Mapper.getTech(techs.get(techs.size() - 1));
-        builder.append(Helper.getEmojiFromDiscord(tech.getType().toString().toLowerCase() + "tech"));
+        builder.append(Emojis.getEmojiFromDiscord(tech.getType().toString().toLowerCase() + "tech"));
         builder.append(" ");
         builder.append(tech.getName());
         return String.join(",\n", builder.toString());

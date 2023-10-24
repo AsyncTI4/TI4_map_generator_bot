@@ -80,7 +80,7 @@ public class ButtonHelperHeroes {
         String pos = buttonID.split("_")[1];
         List<Button> buttons;
         buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "arboHeroBuild", "place");
-        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to produce units. ";
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -132,7 +132,7 @@ public class ButtonHelperHeroes {
         
         List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techType, player.getFaction(), player);
         List<Button> buttons = Helper.getTechButtons(techs, techType, player, "nekro");
-        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to get the tech you want";
+        String message = player.getRepresentation() + " Use the buttons to get the tech you want";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -172,7 +172,7 @@ public class ButtonHelperHeroes {
                 ButtonHelper.riftAllUnitsInASystem(pos, event, activeGame, p2, p2.getFactionEmoji(), player);
             }
             if (FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeGame, player)) {
-                String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " has failed to eat units owned by " + Helper.getPlayerRepresentation(player, activeGame)
+                String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " has failed to eat units owned by " + player.getRepresentation()
                     + " because they were blockaded. Wah-wah.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
             }
@@ -232,7 +232,7 @@ public class ButtonHelperHeroes {
         PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
         PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        message2 = Helper.getPlayerRepresentation(p1, activeGame) + " sent " + Emojis.PN + text + "PN to " + ident2;
+        message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
         Helper.checkEndGame(activeGame, p2);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message2);
         if (activeGame.isFoWMode()) {
@@ -304,7 +304,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveNaaluHeroInitiation(Player player, Game activeGame, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("naaluhero");
-        StringBuilder message2 = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+        StringBuilder message2 = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -616,7 +616,7 @@ public class ButtonHelperHeroes {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : activeGame.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
-            Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
+            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {

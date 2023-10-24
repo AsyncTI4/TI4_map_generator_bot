@@ -13,6 +13,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -913,8 +914,62 @@ public class Player {
         initAbilities();
     }
 
-    public String getRepresentationShort() {
-        return Helper.getPlayerRepresentation(this, getGame(), false);
+    @JsonIgnore
+    public String getRepresentation() {
+        return getRepresentation(false, true);
+    }
+
+    public String getRepresentation(boolean overrideFow, boolean includePing) {
+        Game activeGame = getGame();
+        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
+        if (privateGame && !overrideFow) {
+            return Emojis.getColourEmojis(getColor());
+        }
+
+        if (activeGame != null && activeGame.isCommunityMode()) {
+            Role roleForCommunity = getRoleForCommunity();
+            if (roleForCommunity == null && getTeamMateIDs().size() >= 1) {
+                StringBuilder sb = new StringBuilder(getFactionEmoji());
+                if (includePing) {
+                    for (String userID : getTeamMateIDs()) {
+                        User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                        if (userById == null) {
+                            continue;
+                        }
+                        String mention = userById.getAsMention();
+                        sb.append(" ").append(mention);
+                    }
+                }
+                if (getColor() != null && !"null".equals(getColor())) {
+                    sb.append(" ").append(Emojis.getColourEmojis(getColor()));
+                }
+                return sb.toString();
+            } else {
+                return getFactionEmoji() + roleForCommunity.getAsMention() + Emojis.getColourEmojis(getColor());
+            }
+        }
+
+        // DEFAULT REPRESENTATION
+        StringBuilder sb = new StringBuilder(getFactionEmoji());
+        if (includePing) sb.append(getPing());
+        if (getColor() != null && !"null".equals(getColor())) {
+            sb.append(" ").append(Emojis.getColourEmojis(getColor()));
+        }
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public String getPing() {
+        User userById = AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        if (userById == null) return "";
+        
+        StringBuilder sb = new StringBuilder(userById.getAsMention());
+        switch (getUserID()) {
+            case "154000388121559040" -> sb.append(Emojis.BortWindow); //mysonisalsonamedbort
+            case "150809002974904321" -> sb.append(Emojis.SpoonAbides); //tispoon 
+            case "228999251328368640" -> sb.append(Emojis.Scout); //Jazzx
+        }
+        return sb.toString();
     }
 
     @NotNull
@@ -922,12 +977,12 @@ public class Player {
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             return factionEmoji;
         }
-        return Helper.getFactionIconFromDiscord(getFaction());
+        return Emojis.getFactionIconFromDiscord(getFaction());
     }
 
     public String getFactionEmojiOrColour() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
-            return Helper.getColourEmojis(getColor());
+            return Emojis.getColourEmojis(getColor());
         }
         return getFactionEmoji();
     }
@@ -937,7 +992,7 @@ public class Player {
     }
 
     public boolean hasCustomFactionEmoji() {
-        return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Helper.getFactionIconFromDiscord(getFaction()));
+        return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji) && !factionEmoji.equalsIgnoreCase(Emojis.getFactionIconFromDiscord(getFaction()));
     }
 
     private void initAbilities() {

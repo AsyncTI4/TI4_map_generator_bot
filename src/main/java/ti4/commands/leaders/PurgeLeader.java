@@ -3,6 +3,7 @@ package ti4.commands.leaders;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -18,8 +19,8 @@ public class PurgeLeader extends LeaderAction {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
-            sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-          String message = Helper.getPlayerRepresentation(player, activeGame) +
+            sendMessage(Emojis.getFactionLeaderEmoji(playerLeader));
+          String message = player.getRepresentation() +
               " purged " + Helper.getLeaderShortRepresentation(playerLeader);
             sendMessage(message);
         } else {

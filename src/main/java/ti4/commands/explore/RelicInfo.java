@@ -34,7 +34,7 @@ public class RelicInfo extends ExploreSubcommandData {
     }
 
     public static void sendRelicInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendRelicInfo(activeGame, player);
     }

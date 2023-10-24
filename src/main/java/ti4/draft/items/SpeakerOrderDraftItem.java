@@ -27,6 +27,6 @@ public class SpeakerOrderDraftItem extends DraftItem {
         if (ItemId.equals("1")) {
             return Emojis.SpeakerToken;
         }
-        return Helper.getResourceEmoji(Integer.parseInt(ItemId));
+        return Emojis.getResourceEmoji(Integer.parseInt(ItemId));
     }
 }

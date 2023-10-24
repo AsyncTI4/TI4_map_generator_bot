@@ -67,7 +67,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 			activePlayer.removeFragment(id);
 		}
 
-		String message = Helper.getPlayerRepresentation(activePlayer, activeGame) + " purged fragments: " + fragmentsToPurge;
+		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
