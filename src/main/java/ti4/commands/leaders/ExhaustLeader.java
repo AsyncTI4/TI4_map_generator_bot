@@ -1,15 +1,22 @@
 package ti4.commands.leaders;
 
+import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
+import ti4.model.LeaderModel;
 
 public class ExhaustLeader extends LeaderAction {
 	public ExhaustLeader() {
@@ -30,24 +37,33 @@ public class ExhaustLeader extends LeaderAction {
 			return;
 		}
 
-		playerLeader.setExhausted(true);
-		sendMessage(Emojis.getFactionLeaderEmoji(playerLeader));
-		StringBuilder messageText = new StringBuilder(player.getRepresentation())
-				.append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-		OptionMapping optionTG = event.getOption(Constants.TG);
-		if (optionTG != null) {
-			playerLeader.setTgCount(optionTG.getAsInt());
-			messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
-					.append(" was placed on top of the leader");
-			if (playerLeader.getTgCount() != optionTG.getAsInt()) {
-				messageText.append(" _(").append(playerLeader.getTgCount()).append(Emojis.tg)
-						.append(" total)_\n");
+		if (playerLeader.isExhausted()) {
+			sendMessage("Leader '" + playerLeader.getId() + "' is exhausted already");
+			return;
+		}
+
+		Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
+		exhaustLeader(event, activeGame, player, playerLeader, tgCount);
+	}
+	
+	public static void exhaustLeader(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader leader, Integer tgCount) {
+		leader.setExhausted(true);
+		MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " exhausted:");
+		LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
+		if (leaderModel != null) {
+			event.getMessageChannel().sendMessageEmbeds(leaderModel.getRepresentationEmbed()).queue();
+		} else {
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), leader.getId());
+		}
+
+		if (tgCount != null) {
+			StringBuilder sb = new StringBuilder();
+			leader.setTgCount(tgCount);
+			sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" was placed on top of the leader");
+			if (leader.getTgCount() != tgCount) {
+				sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" total)*\n");
 			}
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 		}
-		String msg = messageText.toString();
-		if(activeGame.getNomadCoin()){
-			msg = msg.replace(Emojis.tg, Emojis.nomadcoin);
-		}
-		sendMessage(msg);
 	}
 }

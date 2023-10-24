@@ -1,9 +1,14 @@
 package ti4.map;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.model.LeaderModel;
 
 public class Leader {
     private final String id;
@@ -80,5 +85,10 @@ public class Leader {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    @JsonIgnore
+    public Optional<LeaderModel> getLeaderModel() {
+        return Optional.ofNullable(Mapper.getLeader(getId()));
     }
 }
