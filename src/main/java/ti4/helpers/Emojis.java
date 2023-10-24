@@ -529,7 +529,7 @@ public class Emojis {
     public static final String splitteal = "<:splitteal:1165037010910728242>";
     public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
-    
+
     // END EMOJI FARM 10
 
     // ANOMOLIES
@@ -606,25 +606,24 @@ public class Emojis {
     public static final String BLT = "<:BLT:1080954650339065866>";
 
     // HOMEBREW
-    public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; //Symbol for Will's Action Deck 2 mod
-    public static final String Eronous = "<:eronous:1157307622920290444>"; //Symbol for Eronous' stuff
-    public static final String IgnisAurora = "<:ignis_aurora:1165445236957388800>"; //Symbol for Ignis Aurora's stuff
+    public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; // Symbol for Will's Action Deck 2 mod
+    public static final String Eronous = "<:eronous:1157307622920290444>"; // Symbol for Eronous' stuff
+    public static final String IgnisAurora = "<:ignis_aurora:1165445236957388800>"; // Symbol for Ignis Aurora's stuff
 
     // LIST OF SYMBOLS FOR FOG STUFF
-    public static final List<String> symbols =
-        Arrays.asList(
+    public static final List<String> symbols = Arrays.asList(
             warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
             CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
             tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
             PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-            BortWindow
-        );
+            BortWindow);
 
+    // private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
-        @NotNull
+    @NotNull
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
-        //symbols = new ArrayList<>(testingEmoji);
+        // symbols = new ArrayList<>(testingEmoji);
         Random seed = messageID == null ? ThreadLocalRandom.current() : new Random(messageID.hashCode());
         Collections.shuffle(symbols, seed);
         value = value % symbols.size();
@@ -950,7 +949,7 @@ public class Emojis {
      */
     public static String getEmojiFromDiscord(String emojiName) {
         return switch (emojiName.toLowerCase()) {
-            //EXPLORATION
+            // EXPLORATION
             case "hfrag" -> Emojis.HFrag;
             case "cfrag" -> Emojis.CFrag;
             case "ifrag" -> Emojis.IFrag;
@@ -961,7 +960,7 @@ public class Emojis {
             case "hazardous" -> Emojis.Hazardous;
             case "frontier" -> Emojis.Frontier;
 
-            //CARDS
+            // CARDS
             case "sc1" -> Emojis.SC1;
             case "sc2" -> Emojis.SC2;
             case "sc3" -> Emojis.SC3;
@@ -982,7 +981,7 @@ public class Emojis {
             case "agenda" -> Emojis.Agenda;
             case "pn" -> Emojis.PN;
 
-            //OBJECTIVES
+            // OBJECTIVES
             case "secretobjective" -> Emojis.SecretObjective;
             case "public1" -> Emojis.Public1;
             case "public2" -> Emojis.Public2;
@@ -990,13 +989,13 @@ public class Emojis {
             case "public2alt" -> Emojis.Public2alt;
             case "secretobjectivealt" -> Emojis.SecretObjectiveAlt;
 
-            //COMPONENTS
+            // COMPONENTS
             case "tg" -> Emojis.tg;
             case "comm" -> Emojis.comm;
             case "sleeper" -> Emojis.Sleeper;
             case "sleeperb" -> Emojis.SleeperB;
 
-            //UNITS
+            // UNITS
             case "warsun" -> Emojis.warsun;
             case "spacedock" -> Emojis.spacedock;
             case "pds" -> Emojis.pds;
@@ -1009,7 +1008,7 @@ public class Emojis {
             case "carrier" -> Emojis.carrier;
             case "cruiser" -> Emojis.cruiser;
 
-            //LEADERS - AGENTS
+            // LEADERS - AGENTS
             case "arborecagent" -> Emojis.ArborecAgent;
             case "argentagent" -> Emojis.ArgentAgent;
             case "cabalagent" -> Emojis.CabalAgent;
@@ -1038,7 +1037,7 @@ public class Emojis {
             case "yinagent" -> Emojis.YinAgent;
             case "yssarilagent" -> Emojis.YssarilAgent;
 
-            //LEADERS - COMMANDERS
+            // LEADERS - COMMANDERS
             case "arboreccommander" -> Emojis.ArborecCommander;
             case "argentcommander" -> Emojis.ArgentCommander;
             case "cabalcommander" -> Emojis.CabalCommander;
@@ -1065,7 +1064,7 @@ public class Emojis {
             case "yincommander" -> Emojis.YinCommander;
             case "yssarilcommander" -> Emojis.YssarilCommander;
 
-            //LEADERS - HEROES
+            // LEADERS - HEROES
             case "arborechero" -> Emojis.ArborecHero;
             case "argenthero" -> Emojis.ArgentHero;
             case "cabalhero" -> Emojis.CabalHero;
@@ -1145,7 +1144,7 @@ public class Emojis {
             case "kjalengardcommander" -> Emojis.KjalengardCommander;
             case "kjalengardhero" -> Emojis.KjalengardHero;
 
-            //OTHER
+            // OTHER
             case "whalpha" -> Emojis.WHalpha;
             case "grift" -> Emojis.GravityRift;
             case "whbeta" -> Emojis.WHbeta;
