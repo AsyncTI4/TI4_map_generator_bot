@@ -4430,8 +4430,8 @@ public class ButtonHelper {
             }
         }
 
-        String text = Helper.getPlayerRepresentation(player, activeGame);
-        if ("Not Following".equalsIgnoreCase(message)) text = player.getRepresentationShort();
+        String text = player.getRepresentation();
+        if ("Not Following".equalsIgnoreCase(message)) text = player.getRepresentation(false, false);
         text = text + " " + message;
         if (activeGame.isFoWMode() && sendPublic) {
             text = message;

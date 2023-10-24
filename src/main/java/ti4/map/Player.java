@@ -913,8 +913,48 @@ public class Player {
         initAbilities();
     }
 
-    public String getRepresentationShort() {
-        return Helper.getPlayerRepresentation(this, getGame(), false);
+    @JsonIgnore
+    public String getRepresentation() {
+        return getRepresentation(false, true);
+    }
+
+    public String getRepresentation(boolean overrideFow, boolean includePing) {
+        Game activeGame = getGame();
+        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
+        if (privateGame && !overrideFow) {
+            return Helper.getColourEmojis(getColor());
+        }
+
+        if (activeGame != null && activeGame.isCommunityMode()) {
+            Role roleForCommunity = getRoleForCommunity();
+            if (roleForCommunity == null && getTeamMateIDs().size() >= 1) {
+                StringBuilder sb = new StringBuilder(getFactionEmoji());
+                if (includePing) {
+                    for (String userID : getTeamMateIDs()) {
+                        User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                        if (userById == null) {
+                            continue;
+                        }
+                        String mention = userById.getAsMention();
+                        sb.append(" ").append(mention);
+                    }
+                }
+                if (getColor() != null && !"null".equals(getColor())) {
+                    sb.append(" ").append(Helper.getColourEmojis(getColor()));
+                }
+                return sb.toString();
+            } else {
+                return getFactionEmoji() + roleForCommunity.getAsMention() + Helper.getColourEmojis(getColor());
+            }
+        }
+
+        // DEFAULT REPRESENTATION
+        StringBuilder sb = new StringBuilder(getFactionEmoji());
+        if (includePing) sb.append(Helper.getPlayerPing(this));
+        if (getColor() != null && !"null".equals(getColor())) {
+            sb.append(" ").append(Helper.getColourEmojis(getColor()));
+        }
+        return sb.toString();
     }
 
     @NotNull

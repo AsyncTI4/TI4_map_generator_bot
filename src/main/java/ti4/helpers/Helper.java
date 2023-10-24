@@ -1358,21 +1358,35 @@ public class Helper {
         return mention;
     }
 
+    /**
+     * Deprecated - use player.getRepresentation() instead
+     */
+    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame) {
         return getPlayerRepresentation(player, activeGame, true);
     }
 
-    // Pass the buck
+    /**
+     * Deprecated - use player.getRepresentation() instead
+     */
+    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, boolean includePing) {
         if (activeGame == null) return getPlayerRepresentation(player, null, null, false, includePing);
         return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false, includePing);
     }
 
+    /**
+     * Deprecated - use player.getRepresentation() instead
+     */
+    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
         return getPlayerRepresentation(player, activeGame, guild, overrideFow, true);
     }
 
-    // One representation to rule them all
+    /**
+     * Deprecated - use player.getRepresentation() instead
+     */
+    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
         boolean privateGame = FoWHelper.isPrivateGame(activeGame);
         if (privateGame && !overrideFow) {
@@ -1383,7 +1397,7 @@ public class Helper {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
                 if(player.getTeamMateIDs().size() < 1){
-                    return defaultPlayerRepresentation(player, guild, includePing);
+                    return defaultPlayerRepresentation(player, includePing);
                 }else{
                     StringBuilder sb = new StringBuilder(player.getFactionEmoji());
                     if (includePing) {
@@ -1403,14 +1417,14 @@ public class Helper {
                 }
                 
             } else {
-                return player.getFactionEmoji() + getRoleMentionByName(guild, roleForCommunity.getName()) + Helper.getColourEmojis(player.getColor());
+                return player.getFactionEmoji() + roleForCommunity.getAsMention() + Helper.getColourEmojis(player.getColor());
             }
         }
 
-        return defaultPlayerRepresentation(player, guild, includePing);
+        return defaultPlayerRepresentation(player, includePing);
     }
 
-    private static String defaultPlayerRepresentation(Player player, Guild guild, boolean includePing) {
+    private static String defaultPlayerRepresentation(Player player, boolean includePing) {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
         if (includePing) sb.append(" ").append(getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
