@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.jetbrains.annotations.NotNull;
 
+import ti4.map.Game;
 import ti4.map.Leader;
 
 public class Emojis {
@@ -1173,5 +1174,10 @@ public class Emojis {
     public static String getSCBackEmojiFromInteger(Integer strategy_card) {
         String scEmojiName = "SC" + strategy_card + "Back";
         return getEmojiFromDiscord(scEmojiName);
+    }
+
+    public static String getTGorNomadCoinEmoji(Game activeGame) {
+        if (activeGame == null) return Emojis.tg;
+        return activeGame.getNomadCoin() ? Emojis.nomadcoin : Emojis.tg;
     }
 }

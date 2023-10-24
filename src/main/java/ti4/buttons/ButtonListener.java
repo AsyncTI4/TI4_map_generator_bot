@@ -1979,6 +1979,7 @@ public class ButtonListener extends ListenerAdapter {
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
                     TurnEnd.pingNextPlayer(event, activeGame, player);
+                    ButtonHelper.updateMap(activeGame, event);
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Decided to skip waiting for afters and proceed to voting.");

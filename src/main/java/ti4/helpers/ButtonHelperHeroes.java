@@ -3,6 +3,7 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -35,7 +36,7 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperHeroes {
 
-    public static List<Button> getArboHeroButtons(Game activeGame, Player player, ButtonInteractionEvent event){
+    public static List<Button> getArboHeroButtons(Game activeGame, Player player, GenericInteractionCreateEvent event){
         List<Button> buttons = new ArrayList<>();
         for(Tile tile : ButtonHelper.getAllTilesWithProduction(activeGame, player, event)){
             buttons.add(Button.success("arboHeroBuild_"+tile.getPosition(),tile.getRepresentationForButtons(activeGame, player)));
@@ -44,7 +45,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-     public static List<Button> getSaarHeroButtons(Game activeGame, Player player, ButtonInteractionEvent event){
+     public static List<Button> getSaarHeroButtons(Game activeGame, Player player, GenericInteractionCreateEvent event){
         List<Button> buttons = new ArrayList<>();
         List<Tile> tilesUsed = new ArrayList<>();
         for(Tile tile1 : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Spacedock)){
