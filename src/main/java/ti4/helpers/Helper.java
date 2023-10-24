@@ -1341,23 +1341,6 @@ public class Helper {
         return "";
     }
 
-    public static String getPlayerPing(Player player) {
-        User userById = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
-        if (userById == null) {
-            return "";
-        }
-        String mention = userById.getAsMention();
-        switch (player.getUserID()) {
-            case "154000388121559040" -> //mysonisalsonamedbort
-                mention += " " + Emojis.BortWindow;
-            case "150809002974904321" -> //tispoon
-                mention += " " + Emojis.SpoonAbides;
-            case "228999251328368640" -> //Jazzx
-                mention += " " + Emojis.Scout;
-        }
-        return mention;
-    }
-
     /**
      * Deprecated - use player.getRepresentation() instead
      */
@@ -1426,7 +1409,7 @@ public class Helper {
 
     private static String defaultPlayerRepresentation(Player player, boolean includePing) {
         StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-        if (includePing) sb.append(" ").append(getPlayerPing(player));
+        if (includePing) sb.append(" ").append(player.getPing());
         if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" ").append(getColourEmojis(player.getColor()));
         }
@@ -1552,7 +1535,7 @@ public class Helper {
             if (!activeGame.isFoWMode()) {
                 if (player != null) {
                     msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
-                    msg += getPlayerPing(player) + " ";
+                    msg += player.getPing() + " ";
                 }
             }
 
