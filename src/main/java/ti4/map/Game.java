@@ -17,6 +17,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
@@ -2714,6 +2717,23 @@ public class Game {
 
     public String getName() {
         return name;
+    }
+
+    public String getPing() {
+        Guild guild = getGuild();
+        if (guild != null) {
+            for (Role role : guild.getRoles()) {
+                if (getName().equals(role.getName().toLowerCase())) {
+                    return role.getAsMention();
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder(getName()).append(" ");
+        for (String playerID : getPlayerIDs()) {
+            User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
+            if (user != null) sb.append(user.getAsMention()).append(" ");
+        }
+        return sb.toString();
     }
 
     public HashMap<String, Tile> getTileMap() {
