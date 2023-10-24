@@ -1346,7 +1346,7 @@ public class Helper {
      */
     @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
-        return getPlayerRepresentation(player, activeGame, guild, overrideFow, true);
+        return player.getRepresentation(overrideFow, true);
     }
 
     /**
@@ -1354,49 +1354,7 @@ public class Helper {
      */
     @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
-        boolean privateGame = FoWHelper.isPrivateGame(activeGame);
-        if (privateGame && !overrideFow) {
-            return getColourEmojis(player.getColor());
-        }
-
-        if (activeGame != null && activeGame.isCommunityMode()) {
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                if(player.getTeamMateIDs().size() < 1){
-                    return defaultPlayerRepresentation(player, includePing);
-                }else{
-                    StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-                    if (includePing) {
-                        for(String userID : player.getTeamMateIDs()){
-                            User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
-                            if (userById == null) {
-                                continue;
-                            }
-                            String mention = userById.getAsMention();
-                            sb.append(" ").append(mention);
-                        }
-                    }
-                    if (player.getColor() != null && !"null".equals(player.getColor())) {
-                        sb.append(" ").append(getColourEmojis(player.getColor()));
-                    }
-                    return sb.toString();
-                }
-                
-            } else {
-                return player.getFactionEmoji() + roleForCommunity.getAsMention() + Helper.getColourEmojis(player.getColor());
-            }
-        }
-
-        return defaultPlayerRepresentation(player, includePing);
-    }
-
-    private static String defaultPlayerRepresentation(Player player, boolean includePing) {
-        StringBuilder sb = new StringBuilder(player.getFactionEmoji());
-        if (includePing) sb.append(" ").append(player.getPing());
-        if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" ").append(getColourEmojis(player.getColor()));
-        }
-        return sb.toString();
+        return player.getRepresentation(overrideFow, includePing);
     }
 
     public static String getFactionLeaderEmoji(Leader leader) {
