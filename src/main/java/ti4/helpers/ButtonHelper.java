@@ -936,10 +936,10 @@ public class ButtonHelper {
         String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         if (buttonID.contains("tech_")) {
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " readied tech: " + Helper.getTechRepresentation(last));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Helper.getTechRepresentation(last));
         } else {
             player.refreshPlanet(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " readied planet: " + Helper.getPlanetRepresentation(last, activeGame));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, activeGame));
         }
     }
 
@@ -3417,7 +3417,7 @@ public class ButtonHelper {
 
         //INFORM FIRST PLAYER IS UP FOR ACTION
         if (nextPlayer != null) {
-            msgExtra += "# " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
+            msgExtra += "# " + nextPlayer.getRepresentation() + " is up for an action";
             privatePlayer = nextPlayer;
             activeGame.updateActivePlayer(nextPlayer);
             if (activeGame.isFoWMode()) {
@@ -3494,7 +3494,7 @@ public class ButtonHelper {
 
         //INFORM FIRST PLAYER IS UP FOR ACTION
         if (nextPlayer != null) {
-            msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
+            msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
             privatePlayer = nextPlayer;
             activeGame.updateActivePlayer(nextPlayer);
             if (activeGame.isFoWMode()) {
@@ -3796,8 +3796,8 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         buttons.add(getTech);
         buttons.add(Button.danger("deleteButtons", "Delete These"));
-        MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), Helper.getPlayerRepresentation(player, activeGame) + " purged Maw Of Worlds.");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " Use the button to get a tech", buttons);
+        MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " purged Maw Of Worlds.");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -3806,7 +3806,7 @@ public class ButtonHelper {
         player.removeExhaustedRelic("emphidia");
         Integer poIndex = activeGame.addCustomPO("Crown of Emphidia", 1);
         activeGame.scorePublicObjective(player.getUserID(), poIndex);
-        MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), Helper.getPlayerRepresentation(player, activeGame) + " scored Crown of Emphidia");
+        MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " scored Crown of Emphidia");
         event.getMessage().delete().queue();
     }
 
@@ -4142,7 +4142,7 @@ public class ButtonHelper {
                 PNInfo.sendPromissoryNoteInfo(activeGame, p1, false);
                 PNInfo.sendPromissoryNoteInfo(activeGame, p2, false);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-                message2 = Helper.getPlayerRepresentation(p1, activeGame) + " sent " + Emojis.PN + text + "PN to " + ident2;
+                message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
                 Helper.checkEndGame(activeGame, p2);
             }
             case "Frags" -> {
@@ -4485,7 +4485,7 @@ public class ButtonHelper {
             }
         }
 
-        String text = Helper.getPlayerRepresentation(player, activeGame) + " " + message;
+        String text = player.getRepresentation() + " " + message;
         if (activeGame.isFoWMode() && sendPublic) {
             text = message;
         } else if (activeGame.isFoWMode() && !sendPublic) {
@@ -4623,7 +4623,7 @@ public class ButtonHelper {
             case "tech" -> {
                 p1.exhaustTech(buttonID);
 
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(p1, activeGame) + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (p1.getRepresentation() + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
                 if ("mi".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "getACFrom", null);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(p1, activeGame) + " Select who you would like to mageon.", buttons);
@@ -4670,7 +4670,7 @@ public class ButtonHelper {
                         && !"xxchaagent".equalsIgnoreCase(buttonID) && !"axisagent".equalsIgnoreCase(buttonID)) {
                         playerLeader.setExhausted(true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getFactionLeaderEmoji(playerLeader));
-                        String messageText = Helper.getPlayerRepresentation(p1, activeGame) +
+                        String messageText = p1.getRepresentation() +
                             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
                     } else {
@@ -4679,7 +4679,7 @@ public class ButtonHelper {
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     }
                 } else {
-                    StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(p1, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    StringBuilder message = new StringBuilder(p1.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
                     if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
                         playerLeader.setLocked(false);
                         playerLeader.setActive(true);
@@ -5059,7 +5059,7 @@ public class ButtonHelper {
             PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         }
         String emojiToUse = activeGame.isFoWMode() ? "" : owner.getFactionEmoji();
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " played promissory note: " + pnName + "\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
         sb.append(emojiToUse).append(Emojis.PN);
         String pnText;
 

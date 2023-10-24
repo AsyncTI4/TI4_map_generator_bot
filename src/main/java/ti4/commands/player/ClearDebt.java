@@ -64,7 +64,7 @@ public class ClearDebt extends PlayerSubcommandData {
         }
 
         clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
-        sendMessage(Helper.getPlayerRepresentation(clearingPlayer, activeGame) + " cleared " + debtCountToClear + " debt tokens owned by " + Helper.getPlayerRepresentation(clearedPlayer, activeGame));
+        sendMessage(clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {

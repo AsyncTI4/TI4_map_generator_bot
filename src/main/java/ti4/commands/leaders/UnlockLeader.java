@@ -28,7 +28,7 @@ public class UnlockLeader extends LeaderAction {
         if (playerLeader != null){
             playerLeader.setLocked(false);
             MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(playerLeader));
-          String message = Helper.getPlayerRepresentation(player, activeGame) +
+          String message = player.getRepresentation() +
               " unlocked " +
               Helper.getLeaderFullRepresentation(playerLeader);
             MessageHelper.sendMessageToChannel(channel, message);

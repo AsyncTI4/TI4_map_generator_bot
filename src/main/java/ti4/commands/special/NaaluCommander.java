@@ -70,7 +70,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
 
         if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-            Helper.getPlayerRepresentation(player, activeGame) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+            player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
     }
 }

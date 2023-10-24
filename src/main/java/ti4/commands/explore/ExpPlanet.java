@@ -137,7 +137,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet cannot be explored");
             return;
         }
-        String messageText = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
+        String messageText = player.getRepresentation() + " explored " +
             Helper.getEmojiFromDiscord(drawColor) +
             "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
             "> " + displayExplore(cardID);

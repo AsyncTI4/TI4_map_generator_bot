@@ -330,7 +330,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                 }
 
-                String exploredMessage = Helper.getPlayerRepresentation(player, activeGame) + " explored " +
+                String exploredMessage = player.getRepresentation() + " explored " +
                     Helper.getEmojiFromDiscord(planetTrait) +
                     "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) + " *(tile " + tile.getPosition() + ")*" + ":\n" +
                     displayExplore(exploreID);

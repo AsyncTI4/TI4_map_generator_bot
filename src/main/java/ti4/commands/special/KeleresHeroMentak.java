@@ -77,7 +77,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             activeGame.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player, activeGame) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), "All non-component action cards have been reshuffled back into the deck.");
@@ -135,7 +135,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             activeGame.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");

@@ -41,7 +41,7 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeGame.drawExplore(Constants.FRONTIER);
-          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeGame) + ":\n" +
+          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
               displayExplore(cardID);
             resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {
@@ -53,7 +53,7 @@ public class ExpFrontier extends ExploreSubcommandData {
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
-          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeGame) + ":\n" +
+          String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
               displayExplore(cardID);
             resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
         } else {

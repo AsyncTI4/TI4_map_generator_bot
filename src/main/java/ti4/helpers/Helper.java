@@ -1345,14 +1345,6 @@ public class Helper {
      * Deprecated - use player.getRepresentation() instead
      */
     @Deprecated
-    public static String getPlayerRepresentation(Player player, Game activeGame) {
-        return getPlayerRepresentation(player, activeGame, true);
-    }
-
-    /**
-     * Deprecated - use player.getRepresentation() instead
-     */
-    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, boolean includePing) {
         if (activeGame == null) return getPlayerRepresentation(player, null, null, false, includePing);
         return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false, includePing);
@@ -1771,7 +1763,7 @@ public class Helper {
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Game activeGame) {
-        return getPlayerRepresentation(player, activeGame) + ":\n" +
+        return player.getRepresentation() + ":\n" +
             "Resources: " + getPlayerResourcesAvailable(player, activeGame) + "/" + getPlayerResourcesTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalResourcesAvailable(player, activeGame)
             + "/" + getPlayerOptimalResourcesTotal(player, activeGame) + "\n" +
             "Influence: " + getPlayerInfluenceAvailable(player, activeGame) + "/" + getPlayerInfluenceTotal(player, activeGame) + "  Optimal: " + getPlayerOptimalInfluenceAvailable(player, activeGame)

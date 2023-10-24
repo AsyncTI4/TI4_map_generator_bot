@@ -231,9 +231,9 @@ public class ButtonHelperFactionSpecific {
         player1.removeSC(player1SC);
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
-        String sb = Helper.getPlayerRepresentation(player1, activeGame) + " swapped SC with " + Helper.getPlayerRepresentation(player2, activeGame) + "\n" +
-            "> " + Helper.getPlayerRepresentation(player2, activeGame) + Helper.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player1SC) + "\n" +
-            "> " + Helper.getPlayerRepresentation(player1, activeGame) + Helper.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player2SC) + "\n";
+        String sb = player1.getRepresentation() + " swapped SC with " + player2.getRepresentation() + "\n" +
+            "> " + player2.getRepresentation() + Helper.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player1SC) + "\n" +
+            "> " + player1.getRepresentation() + Helper.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Helper.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
     }
 
@@ -533,7 +533,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void cabalEatsUnit(Player player, Game activeGame, Player cabal, int amount, String unit, GenericInteractionCreateEvent event) {
         String msg = Helper.getPlayerRepresentation(cabal, activeGame, activeGame.getGuild(), true) + " has failed to eat " + amount + " of the " + unit + "s owned by "
-            + Helper.getPlayerRepresentation(player, activeGame) + " because they were blockaded. Wah-wah.";
+            + player.getRepresentation() + " because they were blockaded. Wah-wah.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd") || cabal.getAllianceMembers().contains(player.getFaction())) {
             return;
@@ -777,7 +777,7 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         } else {
-            StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame));
+            StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
             sb.append(" moved ").append(Helper.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentationForButtons(activeGame, player));
             for (Tile tile_ : activeGame.getTileMap().values()) {

@@ -54,7 +54,7 @@ public class HeroPlay extends LeaderAction {
         }
 
         sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);

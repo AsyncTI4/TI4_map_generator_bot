@@ -204,7 +204,7 @@ public class ButtonHelperAgents {
         List<Button> buttons;
         buttons = Helper.getPlaceUnitButtons(event, player, activeGame,
             activeGame.getTileByPosition(pos), "muaatagent", "place");
-        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to produce units. ";
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -293,7 +293,7 @@ public class ButtonHelperAgents {
         playerLeader.setExhausted(true);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getFactionLeaderEmoji(playerLeader));
-        String messageText = Helper.getPlayerRepresentation(player, activeGame) +
+        String messageText = player.getRepresentation() +
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));

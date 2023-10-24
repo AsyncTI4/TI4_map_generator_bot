@@ -44,10 +44,10 @@ public class Announce extends FOWSubcommandData {
                 if (anonY.compareToIgnoreCase("y") == 0) {
                      message =  "[REDACTED] announces: " + msg;
                 } else {
-                     message = Helper.getPlayerRepresentation(player, activeGame) + " announces: " + msg;
+                     message = player.getRepresentation() + " announces: " + msg;
                 }
             } else {
-                message = Helper.getPlayerRepresentation(player, activeGame) + " announces: " + msg;
+                message = player.getRepresentation() + " announces: " + msg;
             }
 
             MessageChannel mainGameChannel = activeGame.getMainGameChannel() == null ? event.getChannel() : activeGame.getMainGameChannel();
