@@ -1342,19 +1342,11 @@ public class Helper {
     }
 
     /**
-     * Deprecated - use player.getRepresentation() instead
+     * Deprecated - use player.getRepresentation(overrideFow:true, includePing:true) instead
      */
     @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
         return player.getRepresentation(overrideFow, true);
-    }
-
-    /**
-     * Deprecated - use player.getRepresentation() instead
-     */
-    @Deprecated
-    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow, boolean includePing) {
-        return player.getRepresentation(overrideFow, includePing);
     }
 
     public static String getFactionLeaderEmoji(Leader leader) {
