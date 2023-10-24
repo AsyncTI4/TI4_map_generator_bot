@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.FoWHelper;
@@ -189,7 +190,7 @@ abstract public class AddRemoveUnits implements Command {
                 }
             }
             if (!pingedAlready) {
-                String colorMention = Helper.getColourEmojis(color);
+                String colorMention = Emojis.getColourEmojis(color);
                 String message = colorMention + " has modified units in the system. ";
                 if (getActionDescription().contains("add_units")) {
                     message = message + " Specific units modified include: " + unitList;

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -62,11 +63,11 @@ public class ExpInfo extends ExploreSubcommandData {
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (")
+            info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (")
                 .append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             info.append(listNames(deck, true)).append("\n");
 
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (")
+            info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (")
                 .append(discardCount).append(")\n");
             info.append(listNames(discard, false));
 

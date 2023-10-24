@@ -36,6 +36,7 @@ import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
@@ -214,7 +215,7 @@ public class StartMilty extends MiltySubcommandData {
         for (String faction : activeGame.getMiltyDraftManager().getFactionDraft()) {
             if (faction != null && Mapper.isFaction(faction)) {
                 net.dv8tion.jda.api.interactions.components.buttons.Button button = Button.secondary("milty_faction_" + faction, " ");
-                String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                String factionEmojiString = Emojis.getFactionIconFromDiscord(faction);
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 factionChoose.add(button);
             }

@@ -1142,7 +1142,7 @@ public class AgendaHelper {
         for (int x = 1; x < 9; x++) {
             Button button;
             if (rider == null) {
-                Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(x));
+                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(x));
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                     button = Button.secondary(prefix + "_" + x, " ").withEmoji(scEmoji);
                 } else {
@@ -1622,7 +1622,7 @@ public class AgendaHelper {
             }
 
             if (voteAmount != 0) {
-                Emoji emoji = Emoji.fromFormatted(Helper.getPlanetEmoji(planet));
+                Emoji emoji = Emoji.fromFormatted(Emojis.getPlanetEmoji(planet));
                 Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")");
                 if (emoji != null) button = button.withEmoji(emoji);
                 planetButtons.add(button);
@@ -1804,7 +1804,7 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     if (capitalize) {
-                        faction = Helper.getFactionIconFromDiscord(faction);
+                        faction = Emojis.getFactionIconFromDiscord(faction);
 
                         if (activeGame.isFoWMode()) {
                             faction = "Someone";
@@ -1833,11 +1833,11 @@ public class AgendaHelper {
                     }
 
                     if (!activeGame.isFoWMode() && activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
-                        summaryBuilder.append(Helper.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(Emojis.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
 
                     } else if (!activeGame.isHomeBrewSCMode() && activeGame.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                        summaryBuilder.append(Helper.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(Emojis.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
                     } else {
                         summaryBuilder.append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary).append(")\n");

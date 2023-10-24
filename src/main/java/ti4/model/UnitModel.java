@@ -81,12 +81,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getUnitEmoji() {
-        return Helper.getEmojiFromDiscord(getBaseType());
+        return Emojis.getEmojiFromDiscord(getBaseType());
     }
 
     public String getUnitRepresentation() {
-        String factionEmoji = Helper.getEmojiFromDiscord(getFaction().orElse(""));
-        String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = Emojis.getEmojiFromDiscord(getFaction().orElse(""));
+        String unitEmoji = Emojis.getEmojiFromDiscord(getBaseType());
 
         return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
     }
@@ -97,8 +97,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
 
-        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().orElse(""));
-        String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = getFaction() == null ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
+        String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -170,9 +170,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getCostText() {
         if (getCost() >= 1) {
-            return "Cost: " + Helper.getResourceEmoji(Math.round(getCost())) + "\n";
+            return "Cost: " + Emojis.getResourceEmoji(Math.round(getCost())) + "\n";
         } else if (getCost() == 0.5) {
-            return "Cost: " + Emojis.Resources_1 + " (for 2 " + Helper.getEmojiFromDiscord(getBaseType()) + ")\n";
+            return "Cost: " + Emojis.Resources_1 + " (for 2 " + Emojis.getEmojiFromDiscord(getBaseType()) + ")\n";
         }
         return "";
     }

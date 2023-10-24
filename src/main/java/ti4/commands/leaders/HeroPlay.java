@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -53,7 +54,7 @@ public class HeroPlay extends LeaderAction {
             return;
         }
 
-        sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
+        sendMessage(Emojis.getFactionLeaderEmoji(playerLeader));
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {

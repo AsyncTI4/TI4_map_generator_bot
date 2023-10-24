@@ -5,6 +5,7 @@ import java.util.List;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
@@ -48,6 +49,6 @@ public class HomeSystemDraftItem extends DraftItem {
 
     @Override
     public String getItemEmoji() {
-        return Helper.getFactionIconFromDiscord(ItemId);
+        return Emojis.getFactionIconFromDiscord(ItemId);
     }
 }

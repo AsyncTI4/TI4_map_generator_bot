@@ -228,7 +228,7 @@ public class ButtonHelper {
             damaged = true;
         }
         Die d1 = new Die(4);
-        String msg = Helper.getEmojiFromDiscord(unit.toLowerCase()) + " rolled a " + d1.getResult();
+        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " rolled a " + d1.getResult();
         if (damaged) {
             msg = "A damaged " + msg;
         }
@@ -367,11 +367,11 @@ public class ButtonHelper {
             buttons.add(lost2C);
         }
         if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0 && !event.getId().contains("leadership")) {
-            Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("cabal")));
+            Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("cabal")));
             buttons.add(release);
         }
         if (player.hasUnexhaustedLeader("khraskagent") && event.getId().contains("leadership")) {
-            Button release = Button.secondary("exhaustAgent_khraskagent", "Exhaust Khrask Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("khrask")));
+            Button release = Button.secondary("exhaustAgent_khraskagent", "Exhaust Khrask Agent").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("khrask")));
             buttons.add(release);
         }
 
@@ -421,7 +421,7 @@ public class ButtonHelper {
                         break;
                     index++;
                 }
-                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
             }
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
             if (reaction == null) {
@@ -2171,7 +2171,7 @@ public class ButtonHelper {
                     Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
                     startButtons.add(strategicAction);
                 } else {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC).withEmoji(Emoji.fromFormatted(Helper.getSCEmojiFromInteger(SC)));
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC).withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
                     startButtons.add(strategicAction);
                 }
             }
@@ -2453,7 +2453,7 @@ public class ButtonHelper {
         for (String trait : explorationTraits) {
             String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
             String buttonMessage = "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
-            Emoji emoji = Emoji.fromFormatted(Helper.getEmojiFromDiscord(trait));
+            Emoji emoji = Emoji.fromFormatted(Emojis.getEmojiFromDiscord(trait));
             Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
             buttons.add(button);
         }
@@ -2916,14 +2916,14 @@ public class ButtonHelper {
                 unit = unit.replace("_" + planet, "");
             }
             if (landing) {
-                messageBuilder.append(prefix).append(" Landed ").append(amount).append(" ").append(damagedMsg).append(Helper.getEmojiFromDiscord(unit.toLowerCase()));
+                messageBuilder.append(prefix).append(" Landed ").append(amount).append(" ").append(damagedMsg).append(Emojis.getEmojiFromDiscord(unit.toLowerCase()));
                 if (planet == null) {
                     messageBuilder.append("\n");
                 } else {
                     messageBuilder.append(" on the planet ").append(Helper.getPlanetRepresentation(planet.toLowerCase(), activeGame)).append("\n");
                 }
             } else {
-                messageBuilder.append(prefix).append(" ").append(moveOrRemove).append("d ").append(amount).append(" ").append(damagedMsg).append(Helper.getEmojiFromDiscord(unit.toLowerCase()));
+                messageBuilder.append(prefix).append(" ").append(moveOrRemove).append("d ").append(amount).append(" ").append(damagedMsg).append(Emojis.getEmojiFromDiscord(unit.toLowerCase()));
                 if (planet == null) {
                     messageBuilder.append("\n");
                 } else {
@@ -3139,7 +3139,7 @@ public class ButtonHelper {
                 }
                 Button validTile2 = Button.success(
                     finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x + unit.toLowerCase().replace(" ", "").replace("'", "") + damagedMsg.replace(" ", "") + "_reverse",
-                    blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
+                    blabel).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
                 buttons.add(validTile2);
             }
         }
@@ -3870,11 +3870,11 @@ public class ButtonHelper {
             stuffToTransButtons.add(transact);
         }
         if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, activeGame).size() > 0) {
-            Button transact = Button.success(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+            Button transact = Button.success(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
         if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, activeGame).size() > 0) {
-            Button transact = Button.success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(p2.getFaction())));
+            Button transact = Button.success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
         if (activeGame.getCurrentPhase().toLowerCase().contains("agenda")&& !ButtonHelper.playerHasDMZPlanet(p1, activeGame).equalsIgnoreCase("no")) {
@@ -4198,7 +4198,7 @@ public class ButtonHelper {
             TechnologyModel techRep = Mapper.getTechs().get(tech);
             String techName = techRep.getName();
             TechnologyType techType = techRep.getType();
-            String techEmoji = Helper.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
+            String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
             String techText = techRep.getText();
 
             if (techText.contains("ACTION")) {
@@ -4219,7 +4219,7 @@ public class ButtonHelper {
                 String leaderName = leaderModel.getName();
                 String leaderAbilityWindow = leaderModel.getAbilityWindow();
 
-                String factionEmoji = Helper.getFactionLeaderEmoji(leader);
+                String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
                 if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
                     if (leaderName.contains("Ssruu")) {
                         String led = "muaatagent";
@@ -4669,7 +4669,7 @@ public class ButtonHelper {
                     if (!"naaluagent".equalsIgnoreCase(buttonID) && !"muaatagent".equalsIgnoreCase(buttonID) && !"arborecagent".equalsIgnoreCase(buttonID)
                         && !"xxchaagent".equalsIgnoreCase(buttonID) && !"axisagent".equalsIgnoreCase(buttonID)) {
                         playerLeader.setExhausted(true);
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getFactionLeaderEmoji(playerLeader));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
                         String messageText = p1.getRepresentation() +
                             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);

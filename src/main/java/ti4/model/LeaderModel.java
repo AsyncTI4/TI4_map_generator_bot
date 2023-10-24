@@ -60,7 +60,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getLeaderEmoji() {
-        return Optional.ofNullable(getEmoji()).orElse(Helper.getEmojiFromDiscord(getID()));
+        return Optional.ofNullable(getEmoji()).orElse(Emojis.getEmojiFromDiscord(getID()));
     }
 
     public Optional<String> getAbilityName() {
@@ -108,9 +108,9 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (includeFactionType) {
             FactionModel faction = Mapper.getFactionSetup(getFaction());
             if (faction != null) {
-                description.append(Helper.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
+                description.append(Emojis.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
             } else {
-                description.append(Helper.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
+                description.append(Emojis.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
             }
             description.append(" ").append(StringUtils.capitalize(getType()));
         }

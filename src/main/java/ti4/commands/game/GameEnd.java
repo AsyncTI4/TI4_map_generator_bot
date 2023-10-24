@@ -21,6 +21,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -206,7 +207,7 @@ public class GameEnd extends GameSubcommandData {
             int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
-            sb.append(Helper.getColourEmojis(player.getColor()));
+            sb.append(Emojis.getColourEmojis(player.getColor()));
             sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
             sb.append(" - *").append(playerVP).append("VP* ");
             if (playerVP >= activeGame.getVp()) sb.append(" - **WINNER**");

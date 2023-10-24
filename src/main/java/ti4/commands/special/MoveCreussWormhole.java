@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -58,7 +59,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
 
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved ").append(Helper.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentation());
+        sb.append(" moved ").append(Emojis.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentation());
         for (Tile tile_ : activeGame.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 sb.append(" (from ").append(tile_.getRepresentation()).append(")");
