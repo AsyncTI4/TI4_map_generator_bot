@@ -51,6 +51,27 @@ public class FoWHelper {
 		return isPrivateGame(activeGame, null, null);
 	}
 
+	public static boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
+		Channel eventChannel = event == null ? null : event.getChannel();
+		Channel channel = channel_ != null ? channel_ : eventChannel;
+		if (channel == null) {
+			return activeGame.isFoWMode();
+		}
+		if (activeGame == null) {
+			String gameName = channel.getName();
+			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			activeGame = GameManager.getInstance().getGame(gameName);
+			if (activeGame == null) {
+				return false;
+			}
+		}
+		if (activeGame.isFoWMode() && channel_ != null || event != null) {
+			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
+		}
+		return false;
+	}
+
 	/** Method to determine of a viewing player should be able to see the stats of a particular faction */
 	public static boolean canSeeStatsOfFaction(Game activeGame, String faction, Player viewingPlayer) {
 		for (Player player : activeGame.getPlayers().values()) {
@@ -205,27 +226,6 @@ public class FoWHelper {
 	private static boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
 		List<String> mahactCCs = viewingPlayer.getMahactCC();
 		return mahactCCs.contains(player.getColor());
-	}
-
-	public static boolean isPrivateGame(Game activeGame, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
-		Channel eventChannel = event == null ? null : event.getChannel();
-		Channel channel = channel_ != null ? channel_ : eventChannel;
-		if (channel == null) {
-			return activeGame.isFoWMode();
-		}
-		if (activeGame == null) {
-			String gameName = channel.getName();
-			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
-			gameName = gameName.substring(0, gameName.indexOf("-"));
-			activeGame = GameManager.getInstance().getGame(gameName);
-			if (activeGame == null) {
-				return false;
-			}
-		}
-		if (activeGame.isFoWMode() && channel_ != null || event != null) {
-			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
-		}
-		return false;
 	}
 
 	/**
