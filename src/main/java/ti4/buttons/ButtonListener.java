@@ -2211,7 +2211,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_follow_leadership" -> {
-                    String message = Helper.getPlayerPing(player) + " following.";
+                    String message = player.getRepresentation() + " following.";
                     if (!player.getFollowedSCs().contains(1)) {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame);
                     }
@@ -2219,7 +2219,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "sc_leadership_follow" -> {
-                    String message = Helper.getPlayerPing(player) + " following.";
+                    String message = player.getRepresentation() + " following.";
                     if (!player.getFollowedSCs().contains(1)) {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 1, activeGame);
                     }
@@ -3393,7 +3393,7 @@ public class ButtonListener extends ListenerAdapter {
         playerUsedSC.put(messageID, players);
         if (contains) {
             String alreadyUsedMessage = defaultText.isEmpty() ? "used Secondary of Strategy Card" : defaultText;
-            String message = "Player: " + Helper.getPlayerPing(player) + " already " + alreadyUsedMessage;
+            String message = player.getRepresentation() + " already " + alreadyUsedMessage;
             if (activeGame.isFoWMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(player, activeGame, message);
             } else {
