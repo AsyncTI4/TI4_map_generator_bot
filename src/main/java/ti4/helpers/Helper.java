@@ -1345,15 +1345,6 @@ public class Helper {
      * Deprecated - use player.getRepresentation() instead
      */
     @Deprecated
-    public static String getPlayerRepresentation(Player player, Game activeGame, boolean includePing) {
-        if (activeGame == null) return getPlayerRepresentation(player, null, null, false, includePing);
-        return getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false, includePing);
-    }
-
-    /**
-     * Deprecated - use player.getRepresentation() instead
-     */
-    @Deprecated
     public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
         return getPlayerRepresentation(player, activeGame, guild, overrideFow, true);
     }
