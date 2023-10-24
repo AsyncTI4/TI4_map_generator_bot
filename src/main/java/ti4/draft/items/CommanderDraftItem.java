@@ -2,6 +2,7 @@ package ti4.draft.items;
 
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -53,7 +54,7 @@ public class CommanderDraftItem extends DraftItem {
     public String getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return Helper.getEmojiFromDiscord(leader.getID());
+            return Emojis.getEmojiFromDiscord(leader.getID());
         }
         return "";
     }

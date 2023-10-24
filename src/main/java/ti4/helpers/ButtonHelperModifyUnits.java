@@ -209,7 +209,7 @@ public class ButtonHelperModifyUnits {
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String pos = buttonID.replace("umbatTile_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "muaatagent", "place");
-        String message = Helper.getPlayerRepresentation(player, activeGame) + " Use the buttons to produce units. ";
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -221,7 +221,7 @@ public class ButtonHelperModifyUnits {
         String unit = AliasHandler.resolveUnit(unitLong);
 
         String successMessage;
-        String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+        String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
@@ -273,13 +273,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit + " " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in space.";
                     }
 
                 }
@@ -297,7 +297,7 @@ public class ButtonHelperModifyUnits {
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         unit, activeGame);
-                    successMessage = "Produced a " + Helper.getEmojiFromDiscord(unitLong) + " in tile "
+                    successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
                 }
 
@@ -406,7 +406,7 @@ public class ButtonHelperModifyUnits {
             producedOrPlaced = "Placed";
         }
         String successMessage;
-        String playerRep = Helper.getPlayerRepresentation(player, activeGame);
+        String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
@@ -454,13 +454,13 @@ public class ButtonHelperModifyUnits {
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit + " " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit,
                             activeGame);
-                        successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in space.";
                     }
 
                 }
@@ -473,7 +473,7 @@ public class ButtonHelperModifyUnits {
                     successMessage = producedOrPlaced + " 2 " + Emojis.destroyer + " in tile " + AliasHandler.resolveTile(planetName) + ".";
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName), unit, activeGame);
-                    successMessage = producedOrPlaced + " a " + Helper.getEmojiFromDiscord(unitLong) + " in tile " + AliasHandler.resolveTile(planetName) + ".";
+                    successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile " + AliasHandler.resolveTile(planetName) + ".";
                 }
 
             }

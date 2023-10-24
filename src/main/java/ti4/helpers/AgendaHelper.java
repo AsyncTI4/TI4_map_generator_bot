@@ -216,7 +216,7 @@ public class AgendaHelper {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(getTech);
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player2, activeGame),
-                        Helper.getPlayerRepresentation(player2, activeGame) + " Use the button to get a tech", buttons);
+                        player2.getRepresentation() + " Use the button to get a tech", buttons);
                 }
 
             } //"abolishment" || "absol_abolishment", "miscount" || "absol_miscount"
@@ -246,7 +246,7 @@ public class AgendaHelper {
                 message.append("Custom PO 'Mutiny' has been added.\n");
                 for (Player playerWL : winOrLose) {
                     activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(Helper.getPlayerRepresentation(playerWL, activeGame)).append(" scored 'Mutiny'\n");
+                    message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
@@ -295,7 +295,7 @@ public class AgendaHelper {
                 message.append("Custom PO 'Seed' has been added.\n");
                 for (Player playerWL : winOrLose) {
                     activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(Helper.getPlayerRepresentation(playerWL, activeGame)).append(" scored 'Seed'\n");
+                    message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
@@ -663,7 +663,7 @@ public class AgendaHelper {
                     pfaction2 = player.getFaction();
                 }
                 if (pfaction2 != null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame) + " Abstained");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Abstained");
                     event.getMessage().delete().queue();
                 }
 
@@ -1142,7 +1142,7 @@ public class AgendaHelper {
         for (int x = 1; x < 9; x++) {
             Button button;
             if (rider == null) {
-                Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(x));
+                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(x));
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
                     button = Button.secondary(prefix + "_" + x, " ").withEmoji(scEmoji);
                 } else {
@@ -1350,7 +1350,7 @@ public class AgendaHelper {
                             poIndex = activeGame.addCustomPO("Imperial Rider", 1);
                             msg = msg + "Custom PO 'Imperial Rider' has been added.\n";
                             activeGame.scorePublicObjective(winningR.getUserID(), poIndex);
-                            msg = msg + Helper.getPlayerRepresentation(winningR, activeGame) + " scored 'Imperial Rider'\n";
+                            msg = msg + winningR.getRepresentation() + " scored 'Imperial Rider'\n";
                             MessageHelper.sendMessageToChannel(channel, msg);
                         }
                         if (!winningRs.contains(winningR)) {
@@ -1622,7 +1622,7 @@ public class AgendaHelper {
             }
 
             if (voteAmount != 0) {
-                Emoji emoji = Emoji.fromFormatted(Helper.getPlanetEmoji(planet));
+                Emoji emoji = Emoji.fromFormatted(Emojis.getPlanetEmoji(planet));
                 Button button = Button.secondary("exhaust_" + planet, planetNameProper + " (" + voteAmount + ")");
                 if (emoji != null) button = button.withEmoji(emoji);
                 planetButtons.add(button);
@@ -1804,7 +1804,7 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     if (capitalize) {
-                        faction = Helper.getFactionIconFromDiscord(faction);
+                        faction = Emojis.getFactionIconFromDiscord(faction);
 
                         if (activeGame.isFoWMode()) {
                             faction = "Someone";
@@ -1833,11 +1833,11 @@ public class AgendaHelper {
                     }
 
                     if (!activeGame.isFoWMode() && activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
-                        summaryBuilder.append(Helper.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(Emojis.getFactionIconFromDiscord(outcome.toLowerCase())).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
 
                     } else if (!activeGame.isHomeBrewSCMode() && activeGame.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
-                        summaryBuilder.append(Helper.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
+                        summaryBuilder.append(Emojis.getSCEmojiFromInteger(Integer.parseInt(outcome))).append(" ").append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary)
                             .append(")\n");
                     } else {
                         summaryBuilder.append(outcome).append(": ").append(totalVotes).append(". (").append(outcomeSummary).append(")\n");

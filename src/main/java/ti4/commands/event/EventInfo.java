@@ -45,7 +45,7 @@ public class EventInfo extends EventSubcommandData {
     }
 
     public static void sendEventInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " pressed button: " + event.getButton().getLabel();
+        String headerText = player.getRepresentation() + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendEventInfo(activeGame, player);
     }

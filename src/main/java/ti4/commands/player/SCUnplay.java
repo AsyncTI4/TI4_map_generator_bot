@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -55,7 +56,7 @@ public class SCUnplay extends PlayerSubcommandData {
             player_.addFollowedSC(scToUnplay);
         }
 
-        sendMessage("SC has been flipped: " + Helper.getSCBackEmojiFromInteger(scToUnplay) + " to " + Helper.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
+        sendMessage("SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
     }
 
 }

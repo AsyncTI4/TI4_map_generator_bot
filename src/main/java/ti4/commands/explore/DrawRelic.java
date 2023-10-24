@@ -38,7 +38,7 @@ public class DrawRelic extends GenericRelicAction {
         player.addRelic(relicID);
         RelicModel relicData = Mapper.getRelic(relicID);
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getPlayerRepresentation(player, activeGame)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText()).append("\n");
+        message.append(player.getRepresentation()).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText()).append("\n");
 
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
@@ -64,7 +64,7 @@ public class DrawRelic extends GenericRelicAction {
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
                 Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
-                       .append(Helper.getPlayerRepresentation(player, activeGame)).append(" scored 'Shard of the Throne'");
+                       .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -73,7 +73,7 @@ public class DrawRelic extends GenericRelicAction {
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
                 Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO '").append(customPOName).append("' has been added.\n")
-                    .append(Helper.getPlayerRepresentation(player, activeGame)).append(" scored '").append(customPOName).append("'");
+                    .append(player.getRepresentation()).append(" scored '").append(customPOName).append("'");
             }
         }
         if (activeGame.isFoWMode()) {
