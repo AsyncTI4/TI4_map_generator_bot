@@ -71,7 +71,7 @@ public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
 
         //TITLE
         StringBuilder title = new StringBuilder();
-        title.append(Helper.getEmojiFromDiscord(Emojis.SecretObjectiveAlt));
+        title.append(Emojis.SecretObjective);
         title.append("__**").append(getName()).append("**__");
         title.append(getSourceEmoji());
         eb.setTitle(title.toString());
