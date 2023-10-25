@@ -35,7 +35,7 @@ public class GameEnd extends GameSubcommandData {
     public GameEnd() {
         super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "Publish? Default true/yes").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -56,13 +56,7 @@ public class GameEnd extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with 'YES'");
             return;
         }
-        boolean publish = true;
-        OptionMapping option2 = event.getOption(Constants.PUBLISH);
-        if (option2 == null && !option.getAsBoolean()) {
-            publish = false;
-        }
-
-
+        boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
         secondHalfOfGameEnd(event, activeGame, publish);
     }
 
