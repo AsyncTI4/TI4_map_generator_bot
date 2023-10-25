@@ -194,31 +194,38 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " Chose to Use " + Mapper.getRelic(order).getName());
         List<Button> buttons = new ArrayList<>();
         String message = "";
+        String techName = "";
+        boolean hasTech = false;
         if (Mapper.getRelic(order).getName().contains("Dreadnought")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "dreadnought", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 dreadnought in a system with your ships and cc";
+            techName = "dn2";
         }
         if (Mapper.getRelic(order).getName().contains("Carrier")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "carrier", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 carrier in a system with your ships and cc";
+            techName = "cv2";
         }
         if (Mapper.getRelic(order).getName().contains("Cruiser")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 cruiser in a system with your ships and cc";
+            techName = "cr2";
         }
         if (Mapper.getRelic(order).getName().contains("Destroyer")) {
             buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, activeGame, "2destroyer", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 2 destroyers in a system with your ships and cc";
-        }
+            techName = "dd2";
+        }        
         message = ButtonHelper.getTrueIdentity(player, activeGame) + " " + message;
         ButtonHelper.deleteTheOneButton(event);
         player.addExhaustedRelic(order);
         for (Player p2 : activeGame.getRealPlayers()) {
-            if (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "axiscommander")) {
+            if (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "axiscommander") && !p2.hasTech(techName)) {
                 activeGame.setComponentAction(true);
                 Button getTech = Button.success("acquireATech", "Get a tech");
                 List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(getTech);
+                buttons2.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName() + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r", buttons2);
             }
