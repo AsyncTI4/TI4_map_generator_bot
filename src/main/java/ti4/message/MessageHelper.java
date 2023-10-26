@@ -435,11 +435,11 @@ public class MessageHelper {
 			String smallMessage = messageIterator.next();
 
 			//More messages exists, so just frontload the plain messages
-			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.trim().isEmpty()) {
 				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
 
 				//We are at the last message, so try and add the first row of buttons
-			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.trim().isEmpty()) {
 				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
 				messageCreateBuilder.addContent(smallMessage);
 
