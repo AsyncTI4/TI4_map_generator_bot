@@ -2,7 +2,7 @@ package ti4.commands.game;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Member;
@@ -17,10 +17,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -122,14 +124,14 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             if (!activeGame.isFoWMode()) {
-            //INFORM PLAYERS
-            pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-                m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
-                String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-            });
-        }
+                //INFORM PLAYERS
+                pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
+                    String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                });
+            }
         }
 
         
@@ -213,7 +215,7 @@ public class GameEnd extends GameSubcommandData {
             int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
-            sb.append(Helper.getColourEmojis(player.getColor()));
+            sb.append(Emojis.getColourEmojis(player.getColor()));
             sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
             sb.append(" - *").append(playerVP).append("VP* ");
             if (playerVP >= activeGame.getVp()) sb.append(" - **WINNER**");

@@ -65,7 +65,7 @@ public class NovaSeed extends SpecialSubcommandData {
 
         if(player.hasLeaderUnlocked("muaathero")){
             Leader playerLeader = player.getLeader("muaathero").orElse(null);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader " + "muaathero" + " has been purged");

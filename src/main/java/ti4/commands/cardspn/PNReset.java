@@ -35,7 +35,7 @@ public class PNReset extends PNCardsSubcommandData {
             }
         }
         PNInfo.checkAndAddPNs(activeGame, player);
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, true);
         sendMessage("PN Info Sent");

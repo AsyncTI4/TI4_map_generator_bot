@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -26,7 +27,7 @@ public class RemoveCC extends AddRemoveToken {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
             }
             if (activeGame.isFoWMode()) {
-                String colorMention = Helper.getColourEmojis(color);
+                String colorMention = Emojis.getColourEmojis(color);
                 FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
             }
 
@@ -43,7 +44,7 @@ public class RemoveCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode()) {
-            String colorMention = Helper.getColourEmojis(color);
+            String colorMention = Emojis.getColourEmojis(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
         }
         tile.removeCC(ccID);

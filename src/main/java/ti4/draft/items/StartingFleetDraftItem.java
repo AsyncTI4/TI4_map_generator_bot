@@ -43,7 +43,7 @@ public class StartingFleetDraftItem extends DraftItem {
             }
 
             for (int i = 1; i <= count; i++) {
-                sb.append(Helper.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
+                sb.append(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
             }
         }
         return sb.toString();

@@ -106,7 +106,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(Helper.getPlayerRepresentation(player, activeGame) + " updated CCs: " + originalCCString + " -> " + newCCString);
+				sendMessage(player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
 				Helper.isCCCountCorrect(event, activeGame, player.getColor());
@@ -191,7 +191,7 @@ public class Stats extends PlayerSubcommandData {
 				boolean scIsPlayed = activeGame.getScPlayed().get(sc);
 				if (!scIsPlayed) {
 					activeGame.setSCPlayed(sc, true);
-					message.append("> flipped ").append(Helper.getSCEmojiFromInteger(sc)).append(" to ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" (played)");
+					message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
 				} else {
 					activeGame.setSCPlayed(sc, false);
 
@@ -203,7 +203,7 @@ public class Stats extends PlayerSubcommandData {
 						if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
 						player_.addFollowedSC(sc);
 					}
-					message.append("> flipped ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" to ").append(Helper.getSCEmojiFromInteger(sc)).append(" (unplayed)");
+					message.append("> flipped ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCEmojiFromInteger(sc)).append(" (unplayed)");
 				}
 			} else {
 				message.append(
@@ -222,7 +222,7 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
-		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame) + " player's current stats:\n");
+		StringBuilder sb = new StringBuilder(player.getRepresentation() + " player's current stats:\n");
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
@@ -240,9 +240,9 @@ public class Stats extends PlayerSubcommandData {
 			sb.append("      ");
 			for (int sc : player.getSCs()) {
 				if (getActiveGame().getScPlayed() != null && !getActiveGame().getScPlayed().isEmpty() && getActiveGame().getScPlayed().get(sc) != null) {
-					sb.append(Helper.getSCBackEmojiFromInteger(sc));
+					sb.append(Emojis.getSCBackEmojiFromInteger(sc));
 				} else {
-					sb.append(Helper.getSCEmojiFromInteger(sc));
+					sb.append(Emojis.getSCEmojiFromInteger(sc));
 				}
 			}
 		} else {
@@ -301,7 +301,7 @@ public class Stats extends PlayerSubcommandData {
 
 		player.addSC(scNumber);
 		if (activeGame.isFoWMode()) {
-			String messageToSend = Helper.getColourEmojis(player.getColor()) + " picked SC #" + scNumber;
+			String messageToSend = Emojis.getColourEmojis(player.getColor()) + " picked SC #" + scNumber;
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
@@ -309,9 +309,9 @@ public class Stats extends PlayerSubcommandData {
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), Helper.getPlayerRepresentation(player, activeGame) + " gained " + tgCount + " tgs from picking SC #" + scNumber);
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Helper.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
+				String messageToSend = Emojis.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);

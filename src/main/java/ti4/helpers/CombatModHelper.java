@@ -40,7 +40,7 @@ public class CombatModHelper {
                     Optional<UnitModel> unitScopeModel = units.keySet().stream()
                             .filter(unit -> unit.getAsyncId().equals(mod.getScope())).findFirst();
                     if (unitScopeModel.isPresent()) {
-                        unitScope = Helper.getEmojiFromDiscord(unitScopeModel.get().getBaseType());
+                        unitScope = Emojis.getEmojiFromDiscord(unitScopeModel.get().getBaseType());
                     }
                 } else {
                     unitScope = "all";
@@ -168,7 +168,7 @@ public class CombatModHelper {
                             activeGame)) {
                 alwaysOnMods.add(
                                 new NamedCombatModifierModel(relevantMod.get(),
-                                        Helper.getEmojiFromDiscord(unit.getBaseType()) + " "
+                                        Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
                                                 + unit.getName() + " " + unit.getAbility()));
             }
         }

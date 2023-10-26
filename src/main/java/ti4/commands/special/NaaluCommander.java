@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -64,13 +65,13 @@ public class NaaluCommander extends SpecialSubcommandData {
         for (Player player_ : player.getNeighbouringPlayers()) {
             sb.append("_ _\n**__");
             sb.append(player_.getFactionEmoji());
-            sb.append(Helper.getColourEmojis(player_.getColor())).append(" ");
+            sb.append(Emojis.getColourEmojis(player_.getColor())).append(" ");
             sb.append(player_.getUserName()).append("'s Promissory Notes:__**\n");
             sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false));
         }
 
         if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
-            Helper.getPlayerRepresentation(player, activeGame) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+            player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
     }
 }
