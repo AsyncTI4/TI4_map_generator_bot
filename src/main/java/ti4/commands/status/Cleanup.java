@@ -81,10 +81,7 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
-        int round = activeGame.getRound();
-        round++;
-        
-        activeGame.setRound(round);
+        activeGame.setHasHadAStatusPhase(true);
     }
   
 
