@@ -132,7 +132,7 @@ public class FrankenDraftHelper {
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
 
         String bagString = getCurrentBagRepresentation(draftables, undraftables);
-        MessageHelper.sendMessageToChannel(bagChannel, (bagString == null || bagString.isEmpty()) ? "Tmp" : bagString);
+        MessageHelper.sendMessageToChannel(bagChannel, bagString);
 
         int draftQueueCount = player.getDraftQueue().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
