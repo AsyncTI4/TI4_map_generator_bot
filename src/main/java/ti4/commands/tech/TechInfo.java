@@ -35,7 +35,7 @@ public class TechInfo extends TechSubcommandData {
     }
 
     public static void sendTechInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendTechInfo(activeGame, player);
     }

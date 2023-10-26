@@ -4,6 +4,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -106,7 +107,7 @@ public class Statistics extends AdminSubcommandData {
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append(Helper.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
+                .forEach(entry -> sb.append(Emojis.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 

@@ -28,8 +28,8 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
   public boolean isValid() {
         return alias != null
             && name != null
-            && (faction != null && colour != null)
-            && attachment != null
+            && (faction != null || colour != null)
+            // && attachment != null
             && text != null
             && source != null;
     }
@@ -60,8 +60,8 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         return playArea;
     }
 
-    public String getAttachment() {
-        return attachment;
+    public Optional<String> getAttachment() {
+        return Optional.ofNullable(attachment);
     }
 
     public String getText() {
@@ -100,7 +100,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         //TITLE
         StringBuilder title = new StringBuilder();
         title.append(Emojis.PN);
-        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Helper.getFactionIconFromDiscord(getFaction().get()));
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
         if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
         title.append(getSourceEmoji());
@@ -116,7 +116,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         //FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeHelpfulText) {
-            if (!StringUtils.isBlank(getAttachment())) footer.append("Attachment: ").append(getAttachment()).append("\n");
+            if (!StringUtils.isBlank(getAttachment().orElse(""))) footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
             if (getPlayArea()) {
                 footer.append("Play area card. ");
                 if (isPlayedDirectlyToPlayArea()) {

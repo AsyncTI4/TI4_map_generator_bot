@@ -14,7 +14,7 @@ public class PNAdd extends PNAddRemove {
 
     @Override
     public void doAction(Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveGame())).append(" added PNs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added PNs:\n");
         for (String pnID : pnIDs ){
             Player pnOwner = getActiveGame().getPNOwner(pnID);
             sb.append("> ");

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -68,7 +69,7 @@ public class ListMyGames extends SearchSubcommandData {
             List<String> secondaries = new ArrayList<>();
             for (int sc : playerGame.getPlayedSCs()) {
                 if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {
-                    secondaries.add(Helper.getSCBackEmojiFromInteger(sc));
+                    secondaries.add(Emojis.getSCBackEmojiFromInteger(sc));
                 }
             }
             if (!secondaries.isEmpty()) {

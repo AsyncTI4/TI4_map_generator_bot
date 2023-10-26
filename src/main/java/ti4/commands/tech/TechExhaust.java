@@ -25,6 +25,6 @@ public class TechExhaust extends TechAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select who you would like to mageon.", buttons);
         }
         
-        sendMessage(Helper.getPlayerRepresentation(player, getActiveGame()) + " exhausted tech: " + Helper.getTechRepresentation(techID));
+        sendMessage(player.getRepresentation() + " exhausted tech: " + Helper.getTechRepresentation(techID));
     }
 }

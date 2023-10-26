@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -36,7 +37,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         ArrayList<String> deck = activeGame.getExploreDeck(trait);
         ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
 
-        String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+        String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
             sendMessage(traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");

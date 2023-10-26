@@ -15,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -145,9 +146,9 @@ public class SCPick extends PlayerSubcommandData {
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player, activeGame)+" gained "+tgCount +" tgs from picking SC #"+scPicked);
+			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),player.getRepresentation()+" gained "+tgCount +" tgs from picking SC #"+scPicked);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Helper.getColourEmojis(player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
+				String messageToSend = Emojis.getColourEmojis(player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);
@@ -279,7 +280,7 @@ public class SCPick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeGame) + " is up for an action";
+                msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeGame.updateActivePlayer(nextPlayer);
                 ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, activeGame);                     

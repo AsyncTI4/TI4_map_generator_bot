@@ -12,6 +12,7 @@ import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -60,7 +61,7 @@ public class AddCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode() && ping) {
-            String colorMention = Helper.getColourEmojis(color);
+            String colorMention = Emojis.getColourEmojis(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
@@ -73,7 +74,7 @@ public class AddCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode() && ping) {
-            String colorMention = Helper.getColourEmojis(color);
+            String colorMention = Emojis.getColourEmojis(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);

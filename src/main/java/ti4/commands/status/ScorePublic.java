@@ -110,7 +110,7 @@ public class ScorePublic extends StatusSubcommandData {
 		String poName = both.split("_")[0];
 		String emojiName = both.split("_")[1];
 
-		String message = Helper.getPlayerRepresentation(player, activeGame) + " scored " + emojiName + " __**" + poName + "**__";
+		String message = player.getRepresentation() + " scored " + emojiName + " __**" + poName + "**__";
 		MessageHelper.sendMessageToChannel(channel, message);
 		if (activeGame.isFoWMode()) {
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message);
@@ -129,7 +129,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if (oldtg > 4) {
 				player.setTg(oldtg - 5);
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-					Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg() + ")");
+					player.getRepresentation() + " Automatically deducted 5tg (" + oldtg + "->" + player.getTg() + ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Did not deduct 5tg because you didnt have that");
 			}
@@ -139,7 +139,7 @@ public class ScorePublic extends StatusSubcommandData {
 			if (oldtg > 9) {
 				player.setTg(oldtg - 10);
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-					Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg() + ")");
+					player.getRepresentation() + " Automatically deducted 10tg (" + oldtg + "->" + player.getTg() + ")");
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Did not deduct 10tg because you didnt have that");
 			}
@@ -154,7 +154,7 @@ public class ScorePublic extends StatusSubcommandData {
 					}
 					player.setStrategicCC(currentStrat - 3);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 3 strat cc (" + currentStrat + "->" + player.getStrategicCC() + ")");
+						player.getRepresentation() + " Automatically deducted 3 strat cc (" + currentStrat + "->" + player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 3 - currentStrat;
@@ -164,7 +164,7 @@ public class ScorePublic extends StatusSubcommandData {
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 3 strat/tactic cc (" + currentCC + "->" + player.getCCRepresentation() + ")");
+						player.getRepresentation() + " Automatically deducted 3 strat/tactic cc (" + currentCC + "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Did not deduct 3cc because you didnt have that");
@@ -180,7 +180,7 @@ public class ScorePublic extends StatusSubcommandData {
 					}
 					player.setStrategicCC(currentStrat - 6);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 6 strat cc (" + currentStrat + "->" + player.getStrategicCC() + ")");
+						player.getRepresentation() + " Automatically deducted 6 strat cc (" + currentStrat + "->" + player.getStrategicCC() + ")");
 				} else {
 					String currentCC = player.getCCRepresentation();
 					int subtract = 6 - currentStrat;
@@ -190,7 +190,7 @@ public class ScorePublic extends StatusSubcommandData {
 					player.setStrategicCC(0);
 					player.setTacticalCC(currentTact - subtract);
 					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-						Helper.getPlayerRepresentation(player, activeGame) + " Automatically deducted 6 strat/tactic cc (" + currentCC + "->" + player.getCCRepresentation() + ")");
+						player.getRepresentation() + " Automatically deducted 6 strat/tactic cc (" + currentCC + "->" + player.getCCRepresentation() + ")");
 				}
 			} else {
 				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Did not deduct 6cc because you didnt have that");

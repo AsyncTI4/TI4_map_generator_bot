@@ -529,7 +529,7 @@ public class CombatHelper {
             String optionalText = optionalInfoParts.stream().filter(str -> StringUtils.isNotBlank(str))
                 .collect(Collectors.joining(" "));
 
-            String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
+            String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());
             resultBuilder.append(String.format("%s %s%s %s - %s hit%s\n", numOfUnit, unitEmoji, optionalText,
                 Arrays.toString(resultRolls), hitRolls.length, hitsSuffix));
         }
