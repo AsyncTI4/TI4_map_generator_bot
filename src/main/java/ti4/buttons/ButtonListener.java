@@ -3520,7 +3520,7 @@ public class ButtonListener extends ListenerAdapter {
                             break;
                         index++;
                     }
-                    reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
                 }
                 MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
                 if(reaction != null){
