@@ -195,6 +195,19 @@ public class Setup extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
         }
+
+        if(player.hasAbility("private_fleet")){
+            String unitID = AliasHandler.resolveUnit("destroyer");
+            player.setUnitCap(unitID, 12);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set destroyer max to 12 for "+player.getRepresentation() +" due to the private fleet ability");
+        }
+        if(player.hasAbility("teeming")){
+            String unitID = AliasHandler.resolveUnit("dreadnought");
+            player.setUnitCap(unitID, 7);
+            unitID = AliasHandler.resolveUnit("mech");
+            player.setUnitCap(unitID, 5);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set dread unit max to 7 and mech unit max to 5 for "+player.getRepresentation() +" due to the teeming ability");
+        }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player.");

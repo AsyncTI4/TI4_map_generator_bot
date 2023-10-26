@@ -530,6 +530,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_FACTION_REACTS + " " + activeGame.getBotFactionReacts());
         writer.write(System.lineSeparator());
+        writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + activeGame.getHasHadAStatusPhase());
+        writer.write(System.lineSeparator());
         writer.write(Constants.BOT_SHUSHING + " " + activeGame.getBotShushing());
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
@@ -1479,6 +1481,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setBotFactionReactions(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.HAS_HAD_A_STATUS_PHASE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setHasHadAStatusPhase(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

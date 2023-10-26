@@ -3508,30 +3508,36 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     public static boolean checkForASpecificPlayerReact(String messageId, Player player, Game activeGame) {
-        Message mainMessage;
+        
+        activeGame.setShushing(false);
         try {
-            mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).complete();
+            activeGame.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
+                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+                if (activeGame.isFoWMode()) {
+                    int index = 0;
+                    for (Player player_ : activeGame.getPlayers().values()) {
+                        if (player_ == player)
+                            break;
+                        index++;
+                    }
+                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
+                }
+                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                if(reaction != null){
+                    activeGame.setShushing(true);
+                }
+            });
         } catch (Exception e) {
             activeGame.removeMessageIDForSabo(messageId);
             return true;
         }
-
-        Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-        if (activeGame.isFoWMode()) {
-            int index = 0;
-            for (Player player_ : activeGame.getPlayers().values()) {
-                if (player_ == player)
-                    break;
-                index++;
-            }
-            reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
-        }
-        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-        if (reaction != null) {
+        if (activeGame.getBotShushing()) {
             return true;
         } else {
             return false;
         }
+
+        
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game activeGame) {

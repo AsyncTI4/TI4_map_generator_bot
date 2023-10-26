@@ -373,6 +373,9 @@ public class ButtonHelperModifyUnits {
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
         }
+        if (player.hasAbility("necrophage")) {
+            player.setCommoditiesTotal(1+ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+        }
         if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "mentak", event);
         }
@@ -500,6 +503,9 @@ public class ButtonHelperModifyUnits {
         }
         if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
+        }
+        if (player.hasAbility("necrophage")) {
+            player.setCommoditiesTotal(1+ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "mentak", event);
