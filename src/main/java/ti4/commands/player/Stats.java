@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -226,9 +227,9 @@ public class Stats extends PlayerSubcommandData {
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
-		if(activeGame.getNomadCoin()){
+		if (activeGame.getNomadCoin()) {
 			sb.append("      ").append(Emojis.nomadcoin).append(player.getTg());
-		}else{
+		} else {
 			sb.append("      ").append(Emojis.tg).append(player.getTg());
 		}
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -267,6 +268,10 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Alliance Members: `").append(player.getAllianceMembers()).append("`\n");
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
+		Guild guild = activeGame.getGuild();
+		if (guild != null && activeGame.isFrankenGame()) {
+			sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
+		}
 		sb.append("\n");
 
 		return sb.toString();

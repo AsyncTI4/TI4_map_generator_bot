@@ -17,11 +17,11 @@ import java.util.List;
 
 public abstract class BagDraft {
     protected Game owner;
+
     public static BagDraft GenerateDraft(String draftType, Game game) {
         if (draftType.equals("franken")) {
             return new FrankenDraft(game);
-        }
-        else if (draftType.equals("powered_franken")) {
+        } else if (draftType.equals("powered_franken")) {
             return new PoweredFrankenDraft(game);
         }
 
@@ -33,13 +33,16 @@ public abstract class BagDraft {
     }
 
     public abstract int getItemLimitForCategory(DraftItem.Category category);
+
     public abstract String getSaveString();
+
     public abstract List<DraftBag> generateBags(Game game);
+
     public abstract int getBagSize();
 
     public boolean isDraftStageComplete() {
         List<Player> players = owner.getRealPlayers();
-        for (Player p:players) {
+        for (Player p : players) {
             if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
                 return false;
             }
@@ -50,27 +53,28 @@ public abstract class BagDraft {
     public void passBags() {
         List<Player> players = owner.getRealPlayers();
         DraftBag firstPlayerBag = players.get(0).getCurrentDraftBag();
-        for (int i = 0; i < players.size()-1; i++) {
-            giveBagToPlayer(players.get(i+1).getCurrentDraftBag(), players.get(i));
+        for (int i = 0; i < players.size() - 1; i++) {
+            giveBagToPlayer(players.get(i + 1).getCurrentDraftBag(), players.get(i));
         }
-        giveBagToPlayer(firstPlayerBag, players.get(players.size()-1));
+        giveBagToPlayer(firstPlayerBag, players.get(players.size() - 1));
     }
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
         boolean newBagCanBeDraftedFrom = false;
-        for(DraftItem item : bag.Contents) {
+        for (DraftItem item : bag.Contents) {
             if (item.isDraftable(player)) {
                 newBagCanBeDraftedFrom = true;
                 break;
             }
         }
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, owner) + " you have been passed a new draft bag!", Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, owner) + " you have been passed a new draft bag!",
+            Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
     public boolean allPlayersReadyToPass() {
-        for (Player p: owner.getRealPlayers()) {
+        for (Player p : owner.getRealPlayers()) {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
                 setPlayerReadyToPass(p, true);
             }
@@ -91,11 +95,11 @@ public abstract class BagDraft {
 
     public String getShortBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
-        for (DraftItem.Category cat: DraftItem.Category.values()) {
+        for (DraftItem.Category cat : DraftItem.Category.values()) {
             sb.append("### ").append(cat.toString()).append(" (");
             sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
             sb.append("):\n");
-            for (DraftItem item : bag.Contents){
+            for (DraftItem item : bag.Contents) {
                 if (item.ItemCategory != cat) {
                     continue;
                 }
@@ -108,11 +112,11 @@ public abstract class BagDraft {
 
     public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
-        for (DraftItem.Category cat: DraftItem.Category.values()) {
+        for (DraftItem.Category cat : DraftItem.Category.values()) {
             sb.append("### ").append(cat.toString()).append(" (");
             sb.append(bag.getCategoryCount(cat)).append("/").append(getItemLimitForCategory(cat));
             sb.append("):\n");
-            for (DraftItem item : bag.Contents){
+            for (DraftItem item : bag.Contents) {
                 if (item.ItemCategory != cat) {
                     continue;
                 }
@@ -138,7 +142,7 @@ public abstract class BagDraft {
 
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
 
-        if(existingChannel != null) {
+        if (existingChannel != null) {
             existingChannel.delete().queue();
         }
 
