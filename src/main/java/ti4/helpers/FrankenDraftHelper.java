@@ -11,6 +11,7 @@ import ti4.draft.BagDraft;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -37,7 +38,13 @@ public class FrankenDraftHelper {
                 case 2 -> ButtonStyle.SECONDARY;
                 default -> ButtonStyle.SUCCESS;
             };
-            buttons.add(Button.of(style, ActionName + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji())));
+            Button b = Button.of(style, ActionName + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
+            if(b != null){
+                buttons.add(b);
+            }else{
+                BotLogger.log("Tried to build a null button in getSelectionButtons with "+item.getAlias());
+            }
+            
         }
         return buttons;
     }
@@ -186,8 +193,12 @@ public class FrankenDraftHelper {
 
             undraftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
             for (DraftItem item : undraftables) {
-                sb.append(item.getItemEmoji()).append(" ");
-                sb.append("**").append(item.getShortDescription()).append("**\n");
+                if(item != null && item.getItemEmoji() != null){
+                    sb.append(item.getItemEmoji()).append(" ");
+                }
+                if(item != null &&item.getShortDescription() != null){
+                    sb.append("**").append(item.getShortDescription()).append("**\n");
+                }
                 sb.append("\n");
             }
         }
