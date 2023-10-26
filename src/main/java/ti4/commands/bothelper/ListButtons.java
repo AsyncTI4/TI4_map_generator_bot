@@ -3,6 +3,7 @@ package ti4.commands.bothelper;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -27,12 +28,19 @@ public class ListButtons extends BothelperSubcommandData {
 
         Guild guild = event.getGuild();
         TextChannel channel = guild.getTextChannelById(channelId);
-        if (channel == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find channel");
+        ThreadChannel threadChannel = guild.getThreadChannelById(channelId);
+        if (channel == null && threadChannel == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find channel/thread");
             return;
         }
 
-        Message msg = channel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
+        Message msg = null;
+        if (channel != null) {
+            msg = channel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
+        } else if (threadChannel != null) {
+            msg = threadChannel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
+        }
+
         if (msg == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
             return;
