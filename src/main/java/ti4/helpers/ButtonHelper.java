@@ -1729,7 +1729,7 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
-        if ("space".equalsIgnoreCase(groundOrSpace)) {
+        if ("space".equalsIgnoreCase(groundOrSpace) && !activeGame.isFoWMode()) {
             buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
         }
         if ("space".equalsIgnoreCase(groundOrSpace)) {
@@ -1790,12 +1790,14 @@ public class ButtonHelper {
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
             }
-            if (nameOfHolder.equalsIgnoreCase("space")) {
+            if (nameOfHolder.equalsIgnoreCase("space") && "space".equalsIgnoreCase(groundOrSpace)) {
                 buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
             } else {
-                buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(),
+                if(!"space".equalsIgnoreCase(groundOrSpace)){
+                    buttons.add(Button.secondary("combatRoll_" + pos + "_" + unitH.getName(),
                     "Roll Ground Combat for " + nameOfHolder + ""));
-                buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
+                    buttons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence", "Roll Space Cannon Defence for " + nameOfHolder));
+                }
             }
 
         }
@@ -3698,6 +3700,13 @@ public class ButtonHelper {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game activeGame) {
+        if(activeGame.getHasHadAStatusPhase()){
+            int round = activeGame.getRound();
+            round++;
+            activeGame.setRound(round);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round "+activeGame.getRound());
+        
         if (activeGame.getNaaluAgent()) {
             activeGame.setNaaluAgent(false);
             for (Player p2 : activeGame.getRealPlayers()) {
@@ -4466,40 +4475,40 @@ public class ButtonHelper {
                 emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
-        Message mainMessage;
+        
         try {
-            mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageID).complete();
+            activeGame.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
+                Emoji emojiToUse = Helper.getPlayerEmoji(activeGame, player, mainMessage);
+                String messageId = mainMessage.getId();
+
+                if (!skipReaction) {
+                    activeGame.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+                    new ButtonListener().checkForAllReactions(messageId, activeGame);
+                    if (message == null || message.isEmpty()) {
+                        return;
+                    }
+                }
+                String text = Helper.getPlayerRepresentation(player, activeGame) + " " + message;
+                if (activeGame.isFoWMode() && sendPublic) {
+                    text = message;
+                } else if (activeGame.isFoWMode() && !sendPublic) {
+                    text = "(You) " + emojiToUse.getFormatted() + " " + message;
+                }
+
+                if (additionalMessage != null && !additionalMessage.isEmpty()) {
+                    text += Helper.getGamePing(guild, activeGame) + " " + additionalMessage;
+                }
+
+                if (activeGame.isFoWMode() && !sendPublic) {
+                    MessageHelper.sendPrivateMessageToPlayer(player, activeGame, text);
+                    return;
+                }
+            });
         } catch (Error e) {
             activeGame.removeMessageIDForSabo(messageID);
             return;
         }
 
-        Emoji emojiToUse = Helper.getPlayerEmoji(activeGame, player, mainMessage);
-        String messageId = mainMessage.getId();
-
-        if (!skipReaction) {
-            activeGame.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
-            new ButtonListener().checkForAllReactions(messageId, activeGame);
-            if (message == null || message.isEmpty()) {
-                return;
-            }
-        }
-
-        String text = Helper.getPlayerRepresentation(player, activeGame) + " " + message;
-        if (activeGame.isFoWMode() && sendPublic) {
-            text = message;
-        } else if (activeGame.isFoWMode() && !sendPublic) {
-            text = "(You) " + emojiToUse.getFormatted() + " " + message;
-        }
-
-        if (additionalMessage != null && !additionalMessage.isEmpty()) {
-            text += Helper.getGamePing(guild, activeGame) + " " + additionalMessage;
-        }
-
-        if (activeGame.isFoWMode() && !sendPublic) {
-            MessageHelper.sendPrivateMessageToPlayer(player, activeGame, text);
-            return;
-        }
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game activeGame) {
