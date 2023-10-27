@@ -4434,9 +4434,8 @@ public class ButtonHelper {
                 activeGame.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
 
-            event.getChannel().addReactionById(messageId, emojiToUse).queue( msg -> { 
-                new ButtonListener().checkForAllReactions(event, activeGame);
-            });
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            new ButtonListener().checkForAllReactions(event, activeGame);
             if (message == null || message.isEmpty()) {
                 return;
             }
