@@ -2132,6 +2132,9 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(activeGame, player, false));
                     }
+                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                    }
                 }
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeGame, player, event, " Drew a " + Emojis.SecretObjective);
@@ -3273,7 +3276,7 @@ public class ButtonListener extends ListenerAdapter {
                             properGain = properGain + 1;
                             reasons = reasons + "cybernetics ";
                         }
-                        if (netGain < properGain) {
+                        if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                                 "# " + ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, bot thinks you should have gained " + properGain + " cc due to: " + reasons);
                         }
