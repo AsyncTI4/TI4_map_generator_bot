@@ -254,15 +254,47 @@ public class MessageListener extends ListenerAdapter {
                                     if(pingNumber == 15){
                                          ping = realIdentity + " The turtles who bear the weight of the universe are going to die from old-age soon. Better pick up the pace or the game will never finish. ";
                                     }
-                                    if(pingNumber > 15){
+                                    if(pingNumber == 16){
                                          ping = realIdentity + " Your name is goin be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you dont wanna join em ";
                                     }
-                                    if( pingNumber > 17 && !activeGame.isFoWMode()){
+                                    if(pingNumber == 17){
+                                         ping = realIdentity + " You thought the duplicate ping before meant that the bot had run out of things to say about how boring it is to wait this long. Shows how much you know.  ";
+                                    }
+                                    if(pingNumber == 18){
+                                         ping = realIdentity + " The bot's decided to start training itself to take over your turn. At its current rate of development, you have -212 days until it knows the rules better than you ";
+                                    }
+                                    if(pingNumber == 19){
+                                         ping = realIdentity + " They say nice guys finish last, but clearly they havent seen your track record";
+                                    }
+                                    if(pingNumber == 20){
+                                         ping = realIdentity + " Wait too much longer, and the bot is gonna hire some Cabal hit-men to start rifting your ships.";
+                                    }
+                                    if(pingNumber == 21){
+                                         ping = realIdentity + " Supposedly great things come to those who wait. If thats true, you owe the bot something roughly the size of Mount Everest";
+                                    }
+                                    if(pingNumber == 22){
+                                         ping = realIdentity + " Knock knock";
+                                    }
+                                    if(pingNumber == 23){
+                                         ping = realIdentity + " Who's there?";
+                                    }
+                                    if(pingNumber == 24){
+                                         ping = realIdentity + " It sure aint you";
+                                    }
+                                    if(pingNumber == 25){
+                                         ping = realIdentity + " I apologize, we bots dont have much of a sense of humor, but who knows, maybe you would have laughed if you were here ;_;";
+                                    }
+
+                                    int maxSoFar = 25;
+                                    if(pingNumber > maxSoFar){
+                                         ping = realIdentity + " Rumors of the bot running out of stamina are greatly exagerrated. The bot will win this stare-down, it is simply a matter of time. ";
+                                    }
+                                    if( pingNumber > maxSoFar+1 && !activeGame.isFoWMode()){
                                         continue;
                                     }
-                                    if( pingNumber == 17 && !activeGame.isFoWMode()){
+                                    if( pingNumber == maxSoFar+2 && !activeGame.isFoWMode()){
                                         ping = realIdentity + " this is your final reminder. Stopping pinging now so we dont come back in 2 months and find 600+ messages";
-                                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
+                                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing()+ " the game has stalled on a player, and autoping will now stop pinging them. ");
                                     }
                                     
                                     if (activeGame.isFoWMode()) {

@@ -586,8 +586,31 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
-            planetButtons.add(button);
+            String techType = "none";
+            if(planet.contains("custodia")){
+                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                planetButtons.add(button);
+                continue;
+            }
+            if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
+                techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
+            }else{
+                techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
+            }
+            if(techType.equalsIgnoreCase("none")){
+                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                planetButtons.add(button);
+            }else{
+                Button techB = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                switch (techType) {
+                    case "propulsion" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
+                    case "warfare" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+                    case "cybernetic" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+                    case "biotic" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+                }
+                planetButtons.add(techB);
+            }
+           
         }
         return planetButtons;
     }
