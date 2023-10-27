@@ -587,6 +587,11 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             String techType = "none";
+            if(planet.contains("custodia")){
+                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                planetButtons.add(button);
+                continue;
+            }
             if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
                 techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
             }else{

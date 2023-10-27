@@ -28,6 +28,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         int buttonsPressed = 0;
         int slashCommandsUsed = 0;
+        int acsSabod = 0;
         boolean useOnlyLastMonth = false;
         Boolean onlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, null, OptionMapping::getAsBoolean);
         if (onlyLastMonth != null) {
@@ -62,11 +63,12 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 if (actionCards.containsKey(command)) {
                     numUsed2 = actionCards.get(command);
                 }
+                acsSabod = acsSabod+numUsed2;
                 actionCards.put(command, numUsed + numUsed2);
             }
         }
         String longMsg = "The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is "+largestAmountOfButtonsIn1Game+" in game "+largestGame+". The number of slash commands used is " + slashCommandsUsed
-            + ". The following is their recorded frequency \n";
+            + ". The number of ACs sabod used is " + acsSabod +". The following is the recorded frequency of slash commands \n";
         Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
             longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";
@@ -74,7 +76,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         longMsg = longMsg + "\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n";
         Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
-            longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";
+            longMsg = longMsg + command + ": " + sortedMapAscACs.get(command) + " \n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg);
     }
