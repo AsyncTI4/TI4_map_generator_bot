@@ -1776,7 +1776,7 @@
     "alias": "deep_space_station4",
     "name": "Deep Space Station",
     "phase": "Action",
-    "window": "After you resolve a tactical action in a system that contains your ships and does not contain a planet or a frontier token",
+    "window": "After you perform a tactical action in a system that contains your ships and does not contain a planet or a frontier token",
     "text": "Place and explore a frontier token in that system.",
     "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
     "source": "action_deck_2"
