@@ -58,6 +58,15 @@
         "source": "little_omega"
     },
     {
+        "alias": "little_omega_covert_legislation",
+        "name": "Covert Legislation ω",
+        "type": "Directive",
+        "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect player, etc.); the other players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects. The speaker votes first on this agenda, and must cast at least 1 vote if able.",
+        "text1": "",
+        "text2": "",
+        "source": "little_omega"
+    },
+    {
         "alias": "little_omega_economic_equality",
         "name": "Economic Equality ω",
         "type": "Directive",
@@ -124,7 +133,7 @@
         "source": "little_omega"
     },
     {
-        "alias": "little_omega_minister_commrece",
+        "alias": "little_omega_minister_commerce",
         "name": "Minister of Commerce ω",
         "type": "Law",
         "target": "Elect Player",
@@ -138,7 +147,7 @@
         "name": "Minister of Exploration ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
+        "text1": "The elected player gains this card. After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "text2": "",
         "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "source": "little_omega"

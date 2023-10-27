@@ -194,7 +194,6 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageWithFile(MessageChannel channel, FileUpload fileUpload, String messageText, boolean pinMessage) {
-
 		if (channel.getName().contains("-actions")) {
 			String threadName = channel.getName().replace("-actions", "") + "-bot-map-updates";
 			List<ThreadChannel> threadChannels = ((IThreadContainer) channel).getThreadChannels();
@@ -240,7 +239,6 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-
 					if (messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn")) {
 						String gameName = channel.getName();
 						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
