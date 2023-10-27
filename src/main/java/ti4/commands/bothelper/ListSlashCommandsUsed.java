@@ -28,16 +28,24 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         int buttonsPressed = 0;
         int slashCommandsUsed = 0;
+        int acsSabod = 0;
         boolean useOnlyLastMonth = false;
         Boolean onlyLastMonth = event.getOption(Constants.ONLY_LAST_MONTH, null, OptionMapping::getAsBoolean);
         if (onlyLastMonth != null) {
             useOnlyLastMonth = true;
         }
+        int largestAmountOfButtonsIn1Game = 0;
+        String largestGame = "";
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         HashMap<String, Integer> slashCommands = new HashMap<String, Integer>();
+        HashMap<String, Integer> actionCards = new HashMap<String, Integer>();
         for (Game activeGame : mapList.values()) {
             if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
+            }
+            if(activeGame.getButtonPressCount() > largestAmountOfButtonsIn1Game){
+                largestGame = activeGame.getName();
+                largestAmountOfButtonsIn1Game = activeGame.getButtonPressCount();
             }
             buttonsPressed = activeGame.getButtonPressCount() + buttonsPressed;
             slashCommandsUsed = activeGame.getSlashCommandsRunCount() + slashCommandsUsed;
@@ -49,18 +57,27 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 }
                 slashCommands.put(command, numUsed + numUsed2);
             }
+            for (String command : activeGame.getAllActionCardsSabod().keySet()) {
+                int numUsed = activeGame.getAllActionCardsSabod().get(command);
+                int numUsed2 = 0;
+                if (actionCards.containsKey(command)) {
+                    numUsed2 = actionCards.get(command);
+                }
+                acsSabod = acsSabod+numUsed2;
+                actionCards.put(command, numUsed + numUsed2);
+            }
         }
-        String longMsg = "The number of button pressed so far recorded is " + buttonsPressed + ". The number of slash commands used is " + slashCommandsUsed
-            + ". The following is their recorded frequency \n";
-        // List<String> keys = new ArrayList<String>();
-        // keys.addAll(slashCommands.keySet());
-        // Collections.sort(keys);
-
+        String longMsg = "The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is "+largestAmountOfButtonsIn1Game+" in game "+largestGame+". The number of slash commands used is " + slashCommandsUsed
+            + ". The number of ACs sabod used is " + acsSabod +". The following is the recorded frequency of slash commands \n";
         Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
             longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";
         }
-
+        longMsg = longMsg + "\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n";
+        Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
+        for (String command : sortedMapAscACs.keySet()) {
+            longMsg = longMsg + command + ": " + sortedMapAscACs.get(command) + " \n";
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg);
     }
 
