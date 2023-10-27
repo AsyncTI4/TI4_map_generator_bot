@@ -304,6 +304,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getReleaseButtons(Player cabal, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
+
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 for (Player player : activeGame.getRealPlayers()) {
                     if (player.unitBelongsToPlayer(unitKey)) {
