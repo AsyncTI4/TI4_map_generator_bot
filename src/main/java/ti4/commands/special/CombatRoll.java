@@ -165,7 +165,7 @@ public class CombatRoll extends SpecialSubcommandData {
         }
         
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(Arrays.asList(combatOnHolder));
-        if (rollType == CombatRollType.SpaceCannonDefence) {
+        if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
             // Including space for finding opponents for pds - since people will fire before landing sometimes
             // and fire after landing other times.
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
