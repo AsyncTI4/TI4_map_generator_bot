@@ -587,7 +587,7 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             String techType = "none";
-            if(planet.contains("custodia")){
+            if(planet.contains("custodia") || planet.contains("ghoti")){
                 Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
                 continue;
