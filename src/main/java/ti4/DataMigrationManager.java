@@ -62,6 +62,8 @@ public class DataMigrationManager {
             runMigration("migrateRelicDecksForEnigmaticStarCharts_110923", DataMigrationManager::migrateRelicDecksForEnigmaticStarChartsAndUnderscoresFromExploreDecks_110923);
             runMigration("migrateForceShuffleAllRelicsDecks_241223", DataMigrationManager::migrateForceShuffleAllRelicsDecks_241223);
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
+            runMigration("migrateInitializeACD2_271023", DataMigrationManager::migrateInitializeACD2_271023);
+            runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -584,5 +586,83 @@ public class DataMigrationManager {
             String mapNames = String.join(", ", migrationsAppliedThisTime);
             BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
         }
+    }
+
+    // MIGRATION: ACD2 id change
+    public static Boolean migrateInitializeACD2_271023(Game game) {
+        Map<String, String> replacements = Map.of("deep_space_station", "derelict_space_station",
+            "deep_space_station2", "derelict_space_station2",
+            "deep_space_station3", "derelict_space_station3",
+            "deep_space_station4", "derelict_space_station4");
+        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
+        return replaceActionCards(game, decksToCheck, replacements);
+    }
+
+    // MIGRATION: LO id change
+    public static Boolean migrateInitializeLO_271023(Game game) {
+        Map<String, String> replacements = Map.of("little_omega_minister_commrece", "little_omega_minister_commerce");
+        List<String> decksToCheck = List.of("agendas_little_omega");
+        return replaceAgendaCards(game, decksToCheck, replacements);
+    }
+
+    private static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+        if (!decksToCheck.contains(game.getAcDeckID())) {
+            return false;
+        }
+
+        boolean mapNeededMigrating = false;
+        for (String toReplace : replacements.keySet()) {
+            String replacement = replacements.get(toReplace);
+
+            for (Player player : game.getRealPlayers()) {
+                if (player.getActionCards().containsKey(toReplace)) {
+                    Integer value = player.getActionCards().remove(toReplace);
+                    player.getActionCards().put(replacement, value);
+                    mapNeededMigrating = true;
+                }
+            }
+
+            if (game.getDiscardActionCards().containsKey(toReplace)) {
+                Integer value = game.getDiscardActionCards().get(toReplace);
+                game.getDiscardActionCards().put(replacement, value);
+                mapNeededMigrating = true;
+            }
+
+            int index = game.getActionCards().indexOf(toReplace);
+            if (index > -1) {
+                game.getActionCards().set(index, replacement);
+                mapNeededMigrating = true;
+            }
+        }
+        return mapNeededMigrating;
+    }
+
+    private static boolean replaceAgendaCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+        if (!decksToCheck.contains(game.getAgendaDeckID())) {
+            return false;
+        }
+
+        boolean mapNeededMigrating = false;
+        for (String toReplace : replacements.keySet()) {
+            String replacement = replacements.get(toReplace);
+            int index = game.getAgendas().indexOf(toReplace);
+            if (index > -1) {
+                game.getAgendas().set(index, replacement);
+                mapNeededMigrating = true;
+            }
+
+            if (game.getDiscardAgendas().containsKey(toReplace)) {
+                Integer value = game.getDiscardActionCards().get(toReplace);
+                game.getDiscardActionCards().put(replacement, value);
+                mapNeededMigrating = true;
+            }
+
+            if (game.getSentAgendas().containsKey(toReplace)) {
+                Integer value = game.getSentAgendas().get(toReplace);
+                game.getSentAgendas().put(replacement, value);
+                mapNeededMigrating = true;
+            }
+        }
+        return mapNeededMigrating;
     }
 }
