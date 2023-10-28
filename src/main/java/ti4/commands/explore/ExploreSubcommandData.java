@@ -465,7 +465,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "hiddenlaboratory"->{
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Exploring frontier in this system.");
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
                 new ExpFrontier().expFront(event, tile, activeGame, player);
             }
