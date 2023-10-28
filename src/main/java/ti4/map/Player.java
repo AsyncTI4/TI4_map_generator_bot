@@ -77,6 +77,8 @@ public class Player {
     private int commoditiesTotal;
     private int stasisInfantry;
     private int autoSaboPassMedian;
+    private int actualHits;
+    private int expectedHitsTimes10;
 
     private Set<Integer> followedSCs = new HashSet<>();
 
@@ -1287,6 +1289,12 @@ public class Player {
     public int getTg() {
         return tg;
     }
+    public int getActualHits() {
+        return actualHits;
+    }
+    public int getExpectedHitsTimes10() {
+        return expectedHitsTimes10;
+    }
 
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
@@ -1343,6 +1351,12 @@ public class Player {
 
     public void setTg(int tg) {
         this.tg = tg;
+    }
+    public void setActualHits(int tg) {
+        actualHits = tg;
+    }
+    public void setExpectedHitsTimes10(int tg) {
+        expectedHitsTimes10 = tg;
     }
 
     public void setFollowedSCs(Set<Integer> followedSCs) {
