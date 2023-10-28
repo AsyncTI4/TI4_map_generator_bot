@@ -36,6 +36,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.SOInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.PositionMapper;
 import ti4.helpers.ButtonHelper;
@@ -193,6 +196,18 @@ public class GameSaveLoadManager {
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
                     Game loadedGame = loadMap(originalMapFile);
+                    boolean sendCards = false;
+                    for(Player p1 : loadedGame.getRealPlayers()){
+                        Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
+                        if(p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()){
+                            Player player = p1;
+                            String headerText = Helper.getPlayerRepresentation(player, activeGame, loadedGame.getGuild(), true) + " here is your cards info";
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, loadedGame, headerText);
+                            SOInfo.sendSecretObjectiveInfo(loadedGame, player);
+                            ACInfo.sendActionCardInfo(loadedGame, player);
+                            PNInfo.sendPromissoryNoteInfo(loadedGame, player, false);
+                        }
+                    }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     if (loadedGame != null && loadedGame.getSavedButtons().size() > 0) {
@@ -340,6 +355,14 @@ public class GameSaveLoadManager {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
+        writer.write(System.lineSeparator());
+
+        HashMap<String, String> currentCheckingForAllReacts = activeGame.getMessagesThatICheckedForAllReacts();
+        sb2 = new StringBuilder();
+        for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
+            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
+        }
+        writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
         HashMap<String, Integer> displaced1System = activeGame.getCurrentMovedUnitsFrom1System();
@@ -715,6 +738,12 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TG + " " + player.getTg());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
@@ -1383,6 +1412,21 @@ public class GameSaveLoadManager {
                         }
                     }
                 }
+                case Constants.CHECK_REACTS_INFO -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeGame.setCurrentReacts(outcome, voteInfo);
+                        }
+                    }
+                }
                 case Constants.DISPLACED_UNITS_SYSTEM -> {
                     StringTokenizer vote_info = new StringTokenizer(info, ":");
                     while (vote_info.hasMoreTokens()) {
@@ -1787,6 +1831,8 @@ public class GameSaveLoadManager {
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();

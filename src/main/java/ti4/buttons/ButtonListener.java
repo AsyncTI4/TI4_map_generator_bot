@@ -3434,22 +3434,9 @@ public class ButtonListener extends ListenerAdapter {
 
     public void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game activeGame) {
         String messageId = event.getInteraction().getMessage().getId();
-
         Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(1000, TimeUnit.MILLISECONDS);
-
         int matchingFactionReactions = 0;
-        for (Player player : activeGame.getPlayers().values()) {
-            if (!player.isRealPlayer()) {
-                matchingFactionReactions++;
-                continue;
-            }
-
-            String faction = player.getFaction();
-            if (faction == null || faction.isEmpty() || "null".equals(faction)) {
-                matchingFactionReactions++;
-                continue;
-            }
-
+        for (Player player : activeGame.getRealPlayers()) {
             Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
             if (activeGame.isFoWMode()) {
                 int index = 0;
@@ -3461,32 +3448,21 @@ public class ButtonListener extends ListenerAdapter {
                 reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, event.getMessageId()));
             }
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction != null)
+            if (reaction != null || (activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
                 matchingFactionReactions++;
+            }
         }
-        int numberOfPlayers = activeGame.getPlayers().size();
+        int numberOfPlayers = activeGame.getRealPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, activeGame);
+            activeGame.removeMessageIDFromCurrentReacts(messageId);
         }
     }
 
     public void checkForAllReactions(String messageId, Game activeGame) {
-
         Message mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
-
         int matchingFactionReactions = 0;
-        for (Player player : activeGame.getPlayers().values()) {
-            if (!player.isRealPlayer()) {
-                matchingFactionReactions++;
-                continue;
-            }
-
-            String faction = player.getFaction();
-            if (faction == null || faction.isEmpty() || "null".equals(faction)) {
-                matchingFactionReactions++;
-                continue;
-            }
-
+        for (Player player : activeGame.getRealPlayers()) {
             Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
             if (activeGame.isFoWMode()) {
                 int index = 0;
@@ -3498,10 +3474,11 @@ public class ButtonListener extends ListenerAdapter {
                 reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
             }
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction != null)
+            if (reaction != null || (activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
                 matchingFactionReactions++;
+            }
         }
-        int numberOfPlayers = activeGame.getPlayers().size();
+        int numberOfPlayers = activeGame.getRealPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) {
             mainMessage.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
             if (activeGame.getMessageIDsForSabo().contains(messageId)) {

@@ -478,6 +478,7 @@ public class CombatHelper {
                 int max = 10;
                 resultRolls[index] = ThreadLocalRandom.current().nextInt(max - min + 1) + min;
             }
+            player.setExpectedHitsTimes10(player.getExpectedHitsTimes10()+(numRolls * (11- toHit + modifierToHit)));
 
             int[] hitRolls = Arrays.stream(resultRolls)
                 .filter(roll -> roll >= toHit - modifierToHit)
@@ -538,6 +539,7 @@ public class CombatHelper {
         StringBuilder hitEmojis = new StringBuilder();
         hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
         result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
+        player.setActualHits(player.getActualHits()+totalHits);
         return result;
     }
 }
