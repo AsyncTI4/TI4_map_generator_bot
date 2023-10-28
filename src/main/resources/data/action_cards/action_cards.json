@@ -1746,15 +1746,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "deep_space_station",
-    "name": "Deep Space Station",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 system that contains your ships and does not contain any planets. If that system does not already have a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
-    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
-    "source": "action_deck_2_deprecated"
-  },
-  {
     "alias": "derelict_space_station",
     "name": "Deep Space Station",
     "phase": "Action",
