@@ -2160,6 +2160,7 @@ public class ButtonHelper {
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         activeGame.setDominusOrb(false);
+       
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Button.success(finChecker + "tacticalAction", "Tactical Action (" + player.getTacticalCC() + ")");
         int numOfComponentActions = getAllPossibleCompButtons(activeGame, player, event).size() - 2;
@@ -2188,6 +2189,19 @@ public class ButtonHelper {
             }
 
             startButtons.add(pass);
+
+            for(Player p2 : activeGame.getRealPlayers()){
+                
+                for (int sc : player.getSCs()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(ButtonHelper.getTrueIdentity(p2, activeGame));
+                    sb.append(" You are getting this ping because SC #"+sc+" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. ");
+                    sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
+                    if (!p2.hasFollowedSC(sc)) {
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                    }
+                }
+            }
 
         }
         if (doneActionThisTurn) {
@@ -3818,6 +3832,7 @@ public class ButtonHelper {
         Integer poIndex = activeGame.addCustomPO("Crown of Emphidia", 1);
         activeGame.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " scored Crown of Emphidia");
+        Helper.checkEndGame(activeGame, player);
         event.getMessage().delete().queue();
     }
 
@@ -4435,6 +4450,12 @@ public class ButtonHelper {
             }
 
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            if(activeGame.getFactionsThatReactedToThis(messageId) != null){
+                activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+            }else{
+                activeGame.setCurrentReacts(messageId, player.getFaction());
+            }
+            
             new ButtonListener().checkForAllReactions(event, activeGame);
             if (message == null || message.isEmpty()) {
                 return;
@@ -4485,6 +4506,11 @@ public class ButtonHelper {
 
         if (!skipReaction) {
             activeGame.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
+            if(activeGame.getFactionsThatReactedToThis(messageId) != null){
+                activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+            }else{
+                activeGame.setCurrentReacts(messageId, player.getFaction());
+            }
             new ButtonListener().checkForAllReactions(messageId, activeGame);
             if (message == null || message.isEmpty()) {
                 return;
