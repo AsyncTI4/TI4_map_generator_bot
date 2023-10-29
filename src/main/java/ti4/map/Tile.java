@@ -23,6 +23,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Tile {
     private final String tileID;
@@ -245,6 +246,10 @@ public class Tile {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
+        if ((tileID.equals("44") || (tileID.equals("45")))
+                && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
+            tileName = Mapper.getTileID("44c");
+        }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.log("Could not find tile: " + tileID);

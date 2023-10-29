@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -1395,6 +1396,12 @@ public class GenerateMap {
                     // BotLogger.log("Could not parse decal file for: " + player.getDecalSet(), e);
                 }
 
+                BufferedImage spoopy = null;
+                if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(10) == 0)) {
+                    String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
+                    spoopy = ImageHelper.read(spoopypath);
+                }
+
                 if (justNumber) {
                     graphics.setFont(Storage.getFont40());
                     graphics.setColor(Color.WHITE);
@@ -1405,6 +1412,10 @@ public class GenerateMap {
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
                     graphics.drawImage(decal, position.x, position.y + deltaY, null);
+                    if (spoopy != null) {
+                        graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
+                    }
+                                                                                      
                     deltaY += 14;
                 }
             }
