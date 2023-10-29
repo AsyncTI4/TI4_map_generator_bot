@@ -1403,6 +1403,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.placeUnitAndDeleteButton(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("mitoMechPlacement_")) {
             ButtonHelperAbilities.resolveMitosisMechPlacement(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("sendTradeHolder_")) {
+            ButtonHelper.sendTradeHolderSomething(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("place_")) {
             ButtonHelperModifyUnits.genericPlaceUnit(buttonID, event, activeGame, player, ident, trueIdentity, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("yssarilcommander_")) {
@@ -1468,15 +1470,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("tacticalActionBuild_")) {
             String pos = buttonID.replace("tacticalActionBuild_", "");
-            List<Button> buttons;
-            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "tacticalAction", "place");
+            List<Button> buttons= Helper.getPlaceUnitButtons(event, player, activeGame, activeGame.getTileByPosition(pos), "tacticalAction", "place");
             String message = player.getRepresentation() + " Use the buttons to produce units. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("getModifyTiles")) {
-            List<Button> buttons;
-            buttons = ButtonHelper.getTilesToModify(player, activeGame, event);
+            List<Button> buttons= ButtonHelper.getTilesToModify(player, activeGame, event);
             String message = player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         } else if (buttonID.startsWith("genericModify_")) {
@@ -2084,6 +2084,10 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
+
+                    if(!activeGame.isFoWMode() && activeGame.isCustodiansScored() && !player.getRelics().contains("mawofworlds") &&  !player.getActionCards().containsKey("stability") ){
+                        ButtonHelper.addReaction(event, false, false, "", "");
+                    }
                 }
                 case "leadershipGenerateCCButtons" -> {
                     if (!player.getFollowedSCs().contains(1)) {
@@ -2252,6 +2256,11 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.hasAbility("military_industrial_complex")) {
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)
                             + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+                        return;
+                    }
+                    if(!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")){
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame)
+                            + " since you do not currently hold your TA, washing here seems likely an error and will mess with the TA resolution. Nothing has been processed as a result. Try a different route of washing your comms if this correction is wrong");
                         return;
                     }
                     boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "Replenish and Wash");
@@ -3579,6 +3588,14 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getGamePing(event.getGuild(), activeGame)
                         + " All players have indicated completion of status phase. Proceed to Strategy Phase.");
                     StartPhase.startPhase(event, activeGame, "strategy");
+                }
+            }
+            case "redistributeCCButtons" ->{
+                if (activeGame.isCustodiansScored()) {
+                    // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
+                    Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
                 }
             }
         }

@@ -17,6 +17,7 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -122,10 +123,15 @@ public class ExpPlanet extends ExploreSubcommandData {
                                 "Using Distant Suns,  " + pF + " found a " + name1 + " and a " + name2 + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
 
                         } else {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and a " + name2 + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+" Found a " + name1 + " and a " + name2 + " on " + Helper.getPlanetRepresentation(planetName, activeGame));
                         }
 
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+
+                        String msg2 = "As a reminder of their text, the card abilities read as: \n";
+                        msg2 = msg2 + name1 +": "+cardInfo1[4]+"\n";
+                        msg2 = msg2 + name2 +": "+cardInfo2[4]+"\n";
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
 
                         return;
                     }
