@@ -156,6 +156,8 @@ public class SCPlay extends PlayerSubcommandData {
                                 if (scToPlay == 5) {
                                     Button transaction = Button.primary("transaction", "Transaction");
                                     scButtons.add(transaction);
+                                    scButtons.add(Button.success("sendTradeHolder_tg", "Send 1tg"));
+                                    scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                                 }
                                 MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
                             }

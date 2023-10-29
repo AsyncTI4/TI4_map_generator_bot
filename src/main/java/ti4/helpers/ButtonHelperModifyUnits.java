@@ -894,6 +894,13 @@ public class ButtonHelperModifyUnits {
                         if (player.hasInf2Tech() && unitName.toLowerCase().contains("inf")) {
                             ButtonHelper.resolveInfantryDeath(activeGame, player, amount);
                         }
+                        if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
+                            for(int x = 0; x < amount; x++){
+                                player.setTg(player.getTg()+1);
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembley Routine. This is not optional.");
+                                ButtonHelperAbilities.pillageCheck(player, activeGame);
+                            }
+                        }
                     }
                 } else {
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -943,6 +950,13 @@ public class ButtonHelperModifyUnits {
             planetName = AliasHandler.resolvePlanet(planetName);
             if (cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction()) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
+            }
+            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
+                for(int x = 0; x < amount; x++){
+                    player.setTg(player.getTg()+1);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembley Routine. This is not optional.");
+                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                }
             }
             if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);

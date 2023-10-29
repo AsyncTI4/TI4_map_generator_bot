@@ -48,6 +48,7 @@ import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.player.SendDebt;
 import ti4.commands.special.CombatRoll;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.StellarConverter;
@@ -436,7 +437,7 @@ public class ButtonHelper {
     public static String playerHasDMZPlanet(Player player, Game activeGame){
         String dmzPlanet = "no";
         for(String planet : player.getPlanets()){
-            if(planet.contains("custodia")){
+            if(planet.contains("custodia") || planet.contains("ghoti")){
                 continue;
             }
             UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
@@ -455,7 +456,7 @@ public class ButtonHelper {
             return buttons;
         }
         for (String planet : p1.getPlanets()) {
-            if (planet.contains("custodia")) {
+            if (planet.contains("custodia")|| planet.contains("ghoti")) {
                 continue;
             }
             if (ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame).getUnitColorsOnHolder().contains(receiver.getColorID())) {
@@ -2157,6 +2158,7 @@ public class ButtonHelper {
         return shipOrders;
     }
 
+
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         activeGame.setDominusOrb(false);
@@ -2189,19 +2191,20 @@ public class ButtonHelper {
             }
 
             startButtons.add(pass);
-
-            for(Player p2 : activeGame.getRealPlayers()){
-                
-                for (int sc : player.getSCs()) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(ButtonHelper.getTrueIdentity(p2, activeGame));
-                    sb.append(" You are getting this ping because SC #"+sc+" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. ");
-                    sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
-                    if (!p2.hasFollowedSC(sc)) {
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+            if(!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode()){
+                for(Player p2 : activeGame.getRealPlayers()){
+                    for (int sc : player.getSCs()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(ButtonHelper.getTrueIdentity(p2, activeGame));
+                        sb.append(" You are getting this ping because SC #"+sc+" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. ");
+                        sb.append("You currently have ").append(p2.getStrategicCC()).append(" CC in your strategy pool.");
+                        if (!p2.hasFollowedSC(sc)) {
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                        }
                     }
                 }
             }
+            
 
         }
         if (doneActionThisTurn) {
@@ -2404,11 +2407,47 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation());
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+
+                String msg2 = "As a reminder of their text, the card abilities read as: \n";
+                msg2 = msg2 + name1 +": "+cardInfo1[4]+"\n";
+                msg2 = msg2 + name2 +": "+cardInfo2[4]+"\n";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
                 new ExpFrontier().expFront(event, tile, activeGame, player);
             }
 
         }
+    }
+
+    public static void sendTradeHolderSomething(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event){
+        String tgOrDebt = buttonID.split("_")[1];
+        Player tradeHolder = null;
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(p2.getSCs().contains(5)){
+                tradeHolder = p2;
+                break;
+            }
+        }
+        String msg  = player.getRepresentation()+ " sent 1 "+tgOrDebt+" to "+ tradeHolder.getRepresentation();;
+        if(tradeHolder != null){
+            if(tgOrDebt.equalsIgnoreCase("tg")){
+                checkTransactionLegality(activeGame, player, tradeHolder);
+                if(player.getTg() > 0){
+                    tradeHolder.setTg(tradeHolder.getTg() +1);
+                    player.setTg(player.getTg() -1);
+                }else{
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you had no tg to send, no tg sent.");
+                    return;
+                }
+                
+            }else{
+                SendDebt.sendDebt(player, tradeHolder, 1);
+            }
+        }else{
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " game could not find trade holder. Ping Fin to fix this.");
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+
     }
 
     public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet) {
@@ -3728,7 +3767,7 @@ public class ButtonHelper {
             for (Player p2 : activeGame.getRealPlayers()) {
                 for (String planet : p2.getPlanets()) {
                     if (ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)) {
-                        if (planet.contains("custodia")) {
+                        if (planet.contains("custodia")|| planet.contains("ghoti")) {
                             continue;
                         }
                         p2.exhaustPlanet(planet);
