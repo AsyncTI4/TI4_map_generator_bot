@@ -266,7 +266,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         int count = 0;
         for(String planet: player.getPlanetsAllianceMode()){
-            if(planet.toLowerCase().contains("custodia")){
+            if(planet.toLowerCase().contains("custodia") || planet.contains("ghoti")){
                 continue;
             }
             Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
@@ -285,7 +285,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         int count = 0;
         for(String planet: player.getPlanetsAllianceMode()){
-            if(planet.toLowerCase().contains("custodia")){
+            if(planet.toLowerCase().contains("custodia") || planet.contains("ghoti")){
                 continue;
             }
             Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);

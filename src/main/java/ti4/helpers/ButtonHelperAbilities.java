@@ -164,7 +164,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<Button>();
         int coreCount = 0;
         for (String planetName : player.getPlanetsAllianceMode()) {
-            if (planetName.contains("custodia")) {
+            if (planetName.contains("custodia")|| planetName.contains("ghoti")) {
                 continue;
             }
             Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
@@ -545,14 +545,16 @@ public class ButtonHelperAbilities {
         String message;
         if ("decline".equalsIgnoreCase(info[0])) {
             message = "Rejected Distant Suns Ability";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 1, false);
         } else {
             message = "Exploring twice";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, activeGame, 2, false);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        
         event.getMessage().delete().queue();
     }
 

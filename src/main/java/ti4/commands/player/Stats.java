@@ -312,6 +312,10 @@ public class Stats extends PlayerSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
+		if(scNumber == 5 && !activeGame.isHomeBrewSCMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")){
+			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, you just picked trade but dont currently hold your Trade Agreement");
+		}
+
 		Integer tgCount = scTradeGoods.get(scNumber);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
