@@ -3570,6 +3570,13 @@ public class GenerateMap {
                 unitCount = 1;
             }
 
+            BufferedImage spoopy = null;
+            if ((unitKey.getUnitType().equals(UnitType.Warsun)) && (ThreadLocalRandom.current().nextInt(10) == 0)) {
+
+                String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
+                spoopy = ImageHelper.read(spoopypath);
+                BotLogger.log("SPOOPY TIME: " + spoopypath);
+            }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             // DRAW UNITS
             for (int i = 0; i < unitCount; i++) {
@@ -3618,6 +3625,10 @@ public class GenerateMap {
 
                 tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                if (spoopy != null) {
+                    tileGraphics.drawImage(spoopy, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                }
+
                 if (bulkUnitCount != null) {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
