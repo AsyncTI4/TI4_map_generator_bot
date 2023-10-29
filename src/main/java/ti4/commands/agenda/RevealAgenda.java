@@ -42,6 +42,10 @@ public class RevealAgenda extends AgendaSubcommandData {
 
     public void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame, MessageChannel channel) {
 
+        if((new Date().getTime()) - activeGame.getLastActivePlayerPing().getTime() < 10*60*10){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
+            return;
+        }
         String id = activeGame.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
