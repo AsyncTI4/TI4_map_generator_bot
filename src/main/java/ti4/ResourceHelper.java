@@ -119,7 +119,7 @@ public class ResourceHelper {
     @Nullable
     public String getSpoopyFile() {
         // overlay_jackolantern_1
-        int face = ThreadLocalRandom.current().nextInt(1, 3);
+        int face = ThreadLocalRandom.current().nextInt(1, 4);
         String name = "overlay_jackolantern_" + String.valueOf(face) + ".png";
         String spoopyPath = spoopyCache.get(name);
         if (spoopyPath != null) {
