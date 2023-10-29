@@ -1388,7 +1388,8 @@ public class GenerateMap {
                     String colour = AliasHandler.resolveColor(unitKey.getColorID());
                     Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(colour);
                     if (decalPlayer != null && !"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
-                        String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), unitKey.asyncID(), getBlackWhiteFileSuffix(Mapper.getColorID(decalPlayer.getColor())));
+                        String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), unitKey.asyncID(), getBlackWhiteFileSuffix(
+                                Mapper.getColorID(decalPlayer.getColor())));
                         String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                         decal = ImageHelper.read(decalPath);
                     }
@@ -1398,8 +1399,10 @@ public class GenerateMap {
 
                 BufferedImage spoopy = null;
                 if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(10) == 0)) {
+
                     String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                     spoopy = ImageHelper.read(spoopypath);
+                    BotLogger.log("SPOOPY TIME: " + spoopypath);
                 }
 
                 if (justNumber) {
