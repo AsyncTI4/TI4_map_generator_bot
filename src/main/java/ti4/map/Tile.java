@@ -248,7 +248,7 @@ public class Tile {
         String tileName = Mapper.getTileID(tileID);
         if ((tileID.equals("44") || (tileID.equals("45")))
                 && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
-            tileName = Mapper.getTileID("44c");
+            tileName = "S15_Cucumber.png";
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
