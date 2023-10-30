@@ -569,7 +569,7 @@ public class ButtonHelperFactionSpecific {
             ButtonHelper.getIdent(player) + " replaced 1 of their infantry with 1 " + unit + " on " + Helper.getPlanetRepresentation(planet, activeGame) + " using the mech's deploy ability");
         options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " pay 2r for it please", options);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveDarkPactCheck(Game activeGame, Player sender, Player receiver, int numOfComms, GenericInteractionCreateEvent event) {
