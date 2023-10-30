@@ -82,6 +82,55 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    public static void resolveGetDiplomatButtons(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        ButtonHelper.deleteTheOneButton(event);
+        String message = player.getRepresentation() + " select the planet you would like to exhaust";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getDiplomatButtons(activeGame, player));
+    }
+
+    public static List<Button> getDiplomatButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                if(unitHolder.getTokenList().contains("token_freepeople.png")){
+                    buttons.add(Button.success("exhaustViaDiplomats_"+unitHolder.getName(), Helper.getPlanetRepresentation(unitHolder.getName(), activeGame)));
+                }
+            }
+        }
+        return buttons;
+    }
+
+    public static void resolveFreePeopleAbility(Game activeGame){
+        for(Tile tile : activeGame.getTileMap().values()){
+            for(UnitHolder unitHolder : tile.getUnitHolders().values()){
+                if(unitHolder instanceof Planet){
+                    String planet = unitHolder.getName();
+                    boolean alreadyOwned = false;
+                    for (Player player_ : activeGame.getPlayers().values()) {
+                        if (player_.getPlanets().contains(planet)) {
+                            alreadyOwned = true;
+                        }
+                    }
+                    if(!alreadyOwned && !planet.equalsIgnoreCase("mr")){
+                        unitHolder.addToken("token_freepeople.png");
+                    }
+                }
+                
+
+            }
+        }
+    }
+    
+    public static void resolveDiplomatExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        String planet = buttonID.split("_")[1];
+        String message = ButtonHelper.getIdent(player) + " exhausted the unowned planet "+Helper.getPlanetRepresentation(planet, activeGame) + " using the diplomats ability";
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        unitHolder.removeToken("token_freepeople.png");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
+        event.getMessage().delete().queue();
+
+    }
+
     public static void resolveMitosisInf(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "infantry", "placeOneNDone_skipbuild"));
         String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Use buttons to put 1 infantry on a planet";
