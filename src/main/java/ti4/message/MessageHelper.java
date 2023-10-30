@@ -489,7 +489,7 @@ public class MessageHelper {
 		}
 		if (buttons == null || buttons.isEmpty()) return partitionedButtonRows;
 
-		List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+		List<List<Button>> partitions = ListUtils.partition(buttons, 4);
 		List<ActionRow> buttonRows = new ArrayList<>();
 		for (List<Button> partition : partitions) {
 			buttonRows.add(ActionRow.of(partition));
