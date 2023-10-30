@@ -3004,7 +3004,7 @@ public class ButtonHelper {
         List<LayoutComponent> list = new ArrayList<>();
         List<ItemComponent> buttonRow = new ArrayList<>();
         for (Button button : buttons) {
-            if (buttonRow.size() == 5) {
+            if (buttonRow.size() == 4) {
                 list.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
