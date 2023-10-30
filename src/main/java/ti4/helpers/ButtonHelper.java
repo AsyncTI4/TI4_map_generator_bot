@@ -377,6 +377,10 @@ public class ButtonHelper {
             Button release = Button.secondary("exhaustAgent_khraskagent", "Exhaust Khrask Agent").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("khrask")));
             buttons.add(release);
         }
+        if (player.hasAbility("diplomats") && ButtonHelperAbilities.getDiplomatButtons(activeGame, player).size() > 0) {
+            Button release = Button.secondary("getDiplomatsButtons", "Use Diplomats Ability").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("freesystems")));
+            buttons.add(release);
+        }
 
         return buttons;
     }
@@ -3161,7 +3165,10 @@ public class ButtonHelper {
         }
         Button concludeMove;
         Button doAll;
+        Button doAllShips;
         if ("Remove".equalsIgnoreCase(moveOrRemove)) {
+            doAllShips = Button.secondary(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_removeAllShips", "Remove all Ships");
+             buttons.add(doAllShips);
             doAll = Button.secondary(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_removeAll", "Remove all units");
             concludeMove = Button.primary(finChecker + "doneRemoving", "Done removing units");
         } else {
@@ -3235,7 +3242,7 @@ public class ButtonHelper {
                     int totalUnits = unitEntry.getValue() - damagedUnits;
 
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
-                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
+                    for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                         String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
                         String buttonText = "Remove " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame);
                         Button validTile2 = Button.danger(buttonID, buttonText);
@@ -3250,7 +3257,7 @@ public class ButtonHelper {
                             buttons.add(validTile3);
                         }
                     }
-                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
+                    for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                         String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_" + representation + "damaged";
                         String buttonText = "Remove " + x + " damaged " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame);
                         Button validTile2 = Button.danger(buttonID, buttonText);
@@ -3275,13 +3282,13 @@ public class ButtonHelper {
                     totalUnits = totalUnits - damagedUnits;
 
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
-                    for (int x = 1; x < damagedUnits + 1 && x < 3; x++) {
+                    for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                         Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "damaged",
                             "Remove " + x + " damaged " + unitModel.getBaseType());
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
-                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
+                    for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                         Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName, "Remove " + x + " " + unitModel.getBaseType());
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
@@ -3297,6 +3304,9 @@ public class ButtonHelper {
                 }
             }
         }
+        Button doAllShips;
+        doAllShips = Button.secondary(finChecker + "assignHits_" + tile.getPosition() + "_AllShips", "Remove all Ships");
+        buttons.add(doAllShips);
         Button doAll = Button.secondary(finChecker + "assignHits_" + tile.getPosition() + "_All", "Remove all units");
         Button concludeMove = Button.primary("deleteButtons", "Done removing/sustaining units");
         buttons.add(doAll);
@@ -3518,7 +3528,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " decided to use the Imperial Arbiter Law to swap SCs with someone");
         activeGame.removeLaw("arbiter");
         List<Button> buttons = ButtonHelperFactionSpecific.getSwapSCButtons(activeGame, "imperialarbiter", player);
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who you want to swap CCs with",
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose who you want to swap SCs with",
             buttons);
         event.getMessage().delete().queue();
     }

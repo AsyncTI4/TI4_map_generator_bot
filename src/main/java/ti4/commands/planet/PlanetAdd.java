@@ -37,12 +37,16 @@ public class PlanetAdd extends PlanetAddRemove {
     public void doAction(Player player, String planet, Game activeGame, GenericInteractionCreateEvent event) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(activeGame, planet, player);
         player.addPlanet(planet);
+        
         player.exhaustPlanet(planet);
         if ("mirage".equals(planet)) {
             activeGame.clearPlanetsCache();
         }
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
 
+        if(unitHolder.getTokenList().contains("token_freepeople.png")){
+            unitHolder.removeToken("token_freepeople.png");
+        }
         if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
             Planet mecatolRex = (Planet) unitHolder;
             if (mecatolRex != null) {
