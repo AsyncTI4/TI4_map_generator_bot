@@ -206,10 +206,39 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("industrialInitiative", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Repeal Law";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("getRepealLawButtons", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Divert Funding";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("getDivertFundingButtons", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Focused Research";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("focusedResearch", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Forward Supply Base";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("forwardSupplyBase", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
 
             codedName = "Rise of a Messiah";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("riseOfAMessiah", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Veto";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.primary("flip_agenda", "Reveal next Agenda"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
 

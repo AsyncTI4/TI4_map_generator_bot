@@ -14,6 +14,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -196,6 +197,11 @@ public class Setup extends PlayerSubcommandData {
                 ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
         }
 
+        if(player.hasAbility("diplomats")){
+            ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set up free people ability markers. "+  ButtonHelper.getTrueIdentity(player, activeGame) + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
+        }
+
         if(player.hasAbility("private_fleet")){
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
@@ -210,7 +216,7 @@ public class Setup extends PlayerSubcommandData {
         }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Set up peekable objective decks due to auger player. "+  ButtonHelper.getTrueIdentity(player, activeGame) + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 

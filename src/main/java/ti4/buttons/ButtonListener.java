@@ -1071,6 +1071,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.pillage(buttonID, event, activeGame, player, ident, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("exhaust_")) {
             AgendaHelper.exhaustStuffForVoting(buttonID, event, activeGame, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("exhaustViaDiplomats_")) {
+            ButtonHelperAbilities.resolveDiplomatExhaust(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("diplo_")) {
             ButtonHelper.resolveDiploPrimary(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("doneWithOneSystem_")) {
@@ -2779,8 +2781,20 @@ public class ButtonListener extends ListenerAdapter {
                 case "miningInitiative" -> {
                     ButtonHelperActionCards.miningInitiative(player, activeGame, event);
                 }
+                case "forwardSupplyBase" -> {
+                    ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
+                }
                 case "economicInitiative" -> {
                     ButtonHelperActionCards.economicInitiative(player, activeGame, event);
+                }
+                case "getRepealLawButtons" -> {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select Law to repeal", ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
+                }
+                case "getDivertFundingButtons" -> {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select tech to return", ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
+                }
+                case "focusedResearch" -> {
+                    ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
                 }
                 case "industrialInitiative" -> {
                     ButtonHelperActionCards.industrialInitiative(player, activeGame, event);
@@ -3067,6 +3081,9 @@ public class ButtonListener extends ListenerAdapter {
                     TurnEnd.pingNextPlayer(event, activeGame, player);
                     event.getMessage().delete().queue();
                     ButtonHelper.updateMap(activeGame, event);
+                }
+                case "getDiplomatsButtons" -> {
+                    ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
                 }
                 case "gameEnd" -> {
                     GameEnd.secondHalfOfGameEnd(event, activeGame, true);

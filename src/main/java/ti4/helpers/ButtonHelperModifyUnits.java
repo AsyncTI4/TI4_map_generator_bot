@@ -876,11 +876,11 @@ public class ButtonHelperModifyUnits {
                 UnitHolder unitHolder = entry.getValue();
                 HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
                 Map<UnitKey, Integer> units = new HashMap<>(units1);
-                if (unitHolder instanceof Planet) {
+                if (unitHolder instanceof Planet && !rest.contains("AllShips")) {
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                         UnitKey unitKey = unitEntry.getKey();
                         if (!unitKey.getColorID().equals(cID)) continue;
-
+                        
                         String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                         int amount = unitEntry.getValue();
 
@@ -897,16 +897,16 @@ public class ButtonHelperModifyUnits {
                         if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
                             for(int x = 0; x < amount; x++){
                                 player.setTg(player.getTg()+1);
-                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembley Routine. This is not optional.");
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                 ButtonHelperAbilities.pillageCheck(player, activeGame);
                             }
+                            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                         }
                     }
                 } else {
                     for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                         UnitKey unitKey = unitEntry.getKey();
                         if (!unitKey.getColorID().equals(cID)) continue;
-
                         String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                         int amount = unitEntry.getValue();
 
@@ -954,9 +954,10 @@ public class ButtonHelperModifyUnits {
             if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
                 for(int x = 0; x < amount; x++){
                     player.setTg(player.getTg()+1);
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembley Routine. This is not optional.");
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain");
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                 }
+                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             }
             if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);
