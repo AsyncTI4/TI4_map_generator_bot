@@ -822,10 +822,12 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
             List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
-        } else if (buttonID.startsWith("getDamageButtons_")) {
+        } else if (buttonID.startsWith("getDamageButtons_")) {// "repealLaw_"
             String pos = buttonID.replace("getDamageButtons_", "");
             List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
+         } else if (buttonID.startsWith("repealLaw_")) {// "repealLaw_"
+            ButtonHelperActionCards.repealLaw(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("getRepairButtons_")) {
             String pos = buttonID.replace("getRepairButtons_", "");
             List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, activeGame.getTileByPosition(pos));
@@ -1235,6 +1237,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.startCabalAgent(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("stellarConvert_")) {
             ButtonHelper.resolveStellar(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("forwardSupplyBaseStep2_")) {
+            ButtonHelperActionCards.resolveForwardSupplyBaseStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("divertFunding@")) {
+            ButtonHelperActionCards.divertFunding(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("cabalAgentCapture_")) {
             ButtonHelperAgents.resolveCabalAgentCapture(buttonID, player, activeGame, event);
         } else if (buttonID.startsWith("cabalRelease_")) {
