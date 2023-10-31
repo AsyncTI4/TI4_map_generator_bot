@@ -3008,11 +3008,14 @@ public class ButtonHelper {
                 list.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
-            buttonRow.add(button);
+            if(buttons.size() < 21 || !button.getId().contains("_2")){
+                buttonRow.add(button);
+            }
         }
         if (buttonRow.size() > 0) {
             list.add(ActionRow.of(buttonRow));
         }
+        
         return list;
     }
 
