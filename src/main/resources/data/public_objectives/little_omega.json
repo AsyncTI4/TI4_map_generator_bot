@@ -11,7 +11,7 @@
     "alias": "found_research_outposts_little_omega",
     "name": "Found Research Outposts ω",
     "phase": "Status",
-    "text": "Control 2 planets that have technology specialties and spend 2 tokens from your strategy pool.",
+    "text": "Control 2 planets that have technology specialties and spend 2 tokens from your tactic and/or strategy pools.",
     "points": 1,
     "source": "little_omega"
   },
