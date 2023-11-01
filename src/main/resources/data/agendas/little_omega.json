@@ -4,7 +4,7 @@
         "name": "Anti-Intellectual Revolution ω",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 3 command tokens instead.",
+        "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 2 command tokens instead.",
         "text2": "Against: Players return 1 of their non-unit upgrade, non-faction technologies that has the most prerequisites to their technology deck.",
         "mapText": "Technologies require 1 additional prerequisite, matching any prerequisite they already have.",
         "source": "little_omega"
@@ -33,7 +33,7 @@
         "name": "Colonial Redistribution ω",
         "type": "Directive",
         "target": "Elect Non-Home Planet",
-        "text1": "Units on the elected planet must be removed from the game board and placed by their owner on a different planet they control. Then, the player who controls the elected planet chooses another player with the fewest victory points; that player places 2 infantry and 1 PDS from their reinforcements on that planet.",
+        "text1": "Units on the elected planet must be removed from the game board and placed by their owner on a different planet they control. Then, the player who controls the elected planet chooses another player with the fewest victory points; that player gains control of the elected planet and places 2 infantry and 1 PDS from their reinforcements on it.",
         "text2": "",
         "source": "little_omega"
     },
@@ -149,7 +149,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
+        "mapText": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "source": "little_omega"
     },
     {
