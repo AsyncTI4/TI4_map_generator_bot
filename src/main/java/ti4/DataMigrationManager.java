@@ -64,6 +64,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateInitializeACD2_271023", DataMigrationManager::migrateInitializeACD2_271023);
             runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
+            runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -589,7 +590,7 @@ public class DataMigrationManager {
     }
 
     // MIGRATION: ACD2 id change
-    public static Boolean migrateInitializeACD2_271023(Game game) {
+    public static boolean migrateInitializeACD2_271023(Game game) {
         Map<String, String> replacements = Map.of("deep_space_station", "derelict_space_station",
             "deep_space_station2", "derelict_space_station2",
             "deep_space_station3", "derelict_space_station3",
@@ -599,10 +600,33 @@ public class DataMigrationManager {
     }
 
     // MIGRATION: LO id change
-    public static Boolean migrateInitializeLO_271023(Game game) {
+    public static boolean migrateInitializeLO_271023(Game game) {
         Map<String, String> replacements = Map.of("little_omega_minister_commrece", "little_omega_minister_commerce");
         List<String> decksToCheck = List.of("agendas_little_omega");
         return replaceAgendaCards(game, decksToCheck, replacements);
+    }
+
+    // LO id change
+    public static boolean migrateInitializeLO_021123(Game game) {
+        Map<String, String> replacements = Map.of("parade_marvels_little_omega", "engineer_marvel");
+        List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
+        return replaceStage1s(game, decksToCheck, replacements);
+    }
+
+    private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+        if (!decksToCheck.contains(game.getStage1PublicDeckID())) {
+            return false;
+        }
+
+        boolean mapNeededMigrating = false;
+        for (String toReplace : replacements.keySet()) {
+            String replacement = replacements.get(toReplace);
+
+            mapNeededMigrating |= replace(game.getPublicObjectives1(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getRevealedPublicObjectives(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getScoredPublicObjectives(), toReplace, replacement);
+        }
+        return mapNeededMigrating;
     }
 
     private static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
@@ -614,24 +638,11 @@ public class DataMigrationManager {
         for (String toReplace : replacements.keySet()) {
             String replacement = replacements.get(toReplace);
 
+            mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
+
             for (Player player : game.getRealPlayers()) {
-                if (player.getActionCards().containsKey(toReplace)) {
-                    Integer value = player.getActionCards().remove(toReplace);
-                    player.getActionCards().put(replacement, value);
-                    mapNeededMigrating = true;
-                }
-            }
-
-            if (game.getDiscardActionCards().containsKey(toReplace)) {
-                Integer value = game.getDiscardActionCards().get(toReplace);
-                game.getDiscardActionCards().put(replacement, value);
-                mapNeededMigrating = true;
-            }
-
-            int index = game.getActionCards().indexOf(toReplace);
-            if (index > -1) {
-                game.getActionCards().set(index, replacement);
-                mapNeededMigrating = true;
+                mapNeededMigrating |= replaceKey(player.getActionCards(), toReplace, replacement);
             }
         }
         return mapNeededMigrating;
@@ -645,24 +656,30 @@ public class DataMigrationManager {
         boolean mapNeededMigrating = false;
         for (String toReplace : replacements.keySet()) {
             String replacement = replacements.get(toReplace);
-            int index = game.getAgendas().indexOf(toReplace);
-            if (index > -1) {
-                game.getAgendas().set(index, replacement);
-                mapNeededMigrating = true;
-            }
 
-            if (game.getDiscardAgendas().containsKey(toReplace)) {
-                Integer value = game.getDiscardActionCards().get(toReplace);
-                game.getDiscardActionCards().put(replacement, value);
-                mapNeededMigrating = true;
-            }
-
-            if (game.getSentAgendas().containsKey(toReplace)) {
-                Integer value = game.getSentAgendas().get(toReplace);
-                game.getSentAgendas().put(replacement, value);
-                mapNeededMigrating = true;
-            }
+            mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getSentAgendas(), toReplace, replacement);
         }
         return mapNeededMigrating;
+    }
+
+    private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
+        if (map.containsKey(toReplace)) {
+            V value = map.get(toReplace);
+            map.put(replacement, value);
+            map.remove(toReplace);
+            return true;
+        }
+        return false;
+    }
+
+    private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+        int index = list.indexOf(toReplace);
+        if (index > -1) {
+            list.set(index, replacement);
+            return true;
+        }
+        return false;
     }
 }

@@ -24,14 +24,6 @@
     "source": "little_omega"
   },
   {
-    "alias": "parade_marvels_little_omega",
-    "name": "Parade Marvels ω",
-    "phase": "Status",
-    "text": "Have your flagship or a war sun on the game board that is not in or adjacent to your home system.",
-    "points": 1,
-    "source": "little_omega"
-  },
-  {
     "alias": "raise_fleets_little_omega",
     "name": "Raise Fleets ω",
     "phase": "Status",
@@ -51,7 +43,7 @@
     "alias": "impose_order_little_omega",
     "name": "Impose Order ω",
     "phase": "Status",
-    "text": "Have ships in 4 systems that contain a structure.",
+    "text": "Have ships in 3 systems that contain a structure.",
     "points": 1,
     "source": "little_omega"
   },
@@ -123,7 +115,7 @@
     "alias": "dominate_cities_little_omega",
     "name": "Dominate Cities ω",
     "phase": "Status",
-    "text": "Have ships in 6 systems that contain a structure.",
+    "text": "Have ships in 5 systems that contain a structure.",
     "points": 2,
     "source": "little_omega"
   },
