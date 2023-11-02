@@ -374,19 +374,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 switch (cardID.toLowerCase()) {
                     case "minent" -> {
                         player.setTg(player.getTg() + 1);
-                        message = "Gained 1" + Emojis.tg + " (" + (player.getTg() - 1) + " -> **" + player.getTg() + "**) ";
+                        message = "Gained 1" + Emojis.getTGorNomadCoinEmoji(activeGame) + " (" + (player.getTg() - 1) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperAbilities.pillageCheck(player, activeGame);
                         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg() + 2);
-                        message = "Gained 2" + Emojis.tg + " (" + (player.getTg() - 2) + " -> **" + player.getTg() + "**) ";
+                        message = "Gained 2" + Emojis.getTGorNomadCoinEmoji(activeGame) + " (" + (player.getTg() - 2) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperAbilities.pillageCheck(player, activeGame);
                         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 2);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg() + 3);
-                        message = "Gained 3" + Emojis.tg + " (" + (player.getTg() - 3) + " -> **" + player.getTg() + "**) ";
+                        message = "Gained 3" + Emojis.getTGorNomadCoinEmoji(activeGame) + " (" + (player.getTg() - 3) + " -> **" + player.getTg() + "**) ";
                         ButtonHelperAbilities.pillageCheck(player, activeGame);
                         ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 3);
                     }
@@ -403,9 +403,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
                 
-                if(activeGame.getNomadCoin()){
-                    message = message.replace(Emojis.tg, Emojis.nomadcoin);
-                }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }
