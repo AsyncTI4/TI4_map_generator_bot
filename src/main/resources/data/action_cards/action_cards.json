@@ -1983,9 +1983,9 @@
     "alias": "ixthian_gift",
     "name": "Ixthian Gift",
     "phase": "Action",
-    "window": "After you give a player trade goods, commodities, or relic fragments",
+    "window": "At the end of a turn during which you resolved a transaction with a player:",
     "text": "Commit 1 infantry from your reinforcements to any non-home planet that player controls and resolve a ground combat on that planet.",
-    "flavorText": "As the last of the containers were lifted into the Barony ship, the Mahact emissary turned to its smug captain, who had been eyeing him, waiting for a reaction to their extortion. He only nodded. The fool would get his response soon enough.",
+    "flavorText": "As the last of the extorted goods were lifted into the ship, the Mahact emissary turned to its smug captain, who had been eyeing him, waiting for a reaction. He only nodded. The fool would get his response soon enough.",
     "source": "action_deck_2"
   },
   {
@@ -2353,7 +2353,7 @@
     "name": "Space Mines",
     "phase": "Action",
     "window": "After another player activates a system",
-    "text": "Choose 1 system that contains your command token. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-4, remove that ship from the game board, along with any units it is transporting.",
+    "text": "Choose 1 system that contains your command token. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "Remnants of an age past, this forbidden means of warfare once brought galactic travel to a standstill.",
     "source": "action_deck_2"
   },
