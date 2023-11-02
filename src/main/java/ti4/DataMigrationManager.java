@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.checkerframework.checker.units.qual.K;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
