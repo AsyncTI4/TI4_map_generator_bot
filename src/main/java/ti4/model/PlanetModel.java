@@ -91,7 +91,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getInfResEmojis() {
-        return Emojis.getResourceEmoji(resources) + Emojis.getResourceEmoji(influence);
+        return Emojis.getResourceEmoji(resources) + Emojis.getInfluenceEmoji(influence);
     }
 
     private String getPlanetTypeEmoji() {
