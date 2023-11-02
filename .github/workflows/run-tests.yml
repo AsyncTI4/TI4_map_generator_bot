@@ -17,5 +17,5 @@ jobs:
             distribution: 'corretto'
             architecture: x64
         - name: Run the Maven verify phase
-          run: mvn --batch-mode --update-snapshots verify test-compile test
+          run: mvn --batch-mode --update-snapshots verify test-compile
         
