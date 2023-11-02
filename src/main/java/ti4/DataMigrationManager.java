@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 
+import org.checkerframework.checker.units.qual.K;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -622,23 +623,9 @@ public class DataMigrationManager {
         for (String toReplace : replacements.keySet()) {
             String replacement = replacements.get(toReplace);
 
-            int index = game.getPublicObjectives1().indexOf(toReplace);
-            if (index > -1) {
-                game.getPublicObjectives1().set(index, replacement);
-                mapNeededMigrating = true;
-            }
-
-            if (game.getRevealedPublicObjectives().containsKey(toReplace)) {
-                Integer value = game.getRevealedPublicObjectives().get(toReplace);
-                game.getRevealedPublicObjectives().put(replacement, value);
-                mapNeededMigrating = true;
-            }
-
-            if (game.getScoredPublicObjectives().containsKey(toReplace)) {
-                List<String> value = game.getScoredPublicObjectives().get(toReplace);
-                game.getScoredPublicObjectives().put(replacement, value);
-                mapNeededMigrating = true;
-            }
+            mapNeededMigrating |= replace(game.getPublicObjectives1(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getRevealedPublicObjectives(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getScoredPublicObjectives(), toReplace, replacement);
         }
         return mapNeededMigrating;
     }
@@ -652,24 +639,11 @@ public class DataMigrationManager {
         for (String toReplace : replacements.keySet()) {
             String replacement = replacements.get(toReplace);
 
+            mapNeededMigrating |= replace(game.getActionCards(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getDiscardActionCards(), toReplace, replacement);
+
             for (Player player : game.getRealPlayers()) {
-                if (player.getActionCards().containsKey(toReplace)) {
-                    Integer value = player.getActionCards().remove(toReplace);
-                    player.getActionCards().put(replacement, value);
-                    mapNeededMigrating = true;
-                }
-            }
-
-            if (game.getDiscardActionCards().containsKey(toReplace)) {
-                Integer value = game.getDiscardActionCards().get(toReplace);
-                game.getDiscardActionCards().put(replacement, value);
-                mapNeededMigrating = true;
-            }
-
-            int index = game.getActionCards().indexOf(toReplace);
-            if (index > -1) {
-                game.getActionCards().set(index, replacement);
-                mapNeededMigrating = true;
+                mapNeededMigrating |= replaceKey(player.getActionCards(), toReplace, replacement);
             }
         }
         return mapNeededMigrating;
@@ -683,24 +657,30 @@ public class DataMigrationManager {
         boolean mapNeededMigrating = false;
         for (String toReplace : replacements.keySet()) {
             String replacement = replacements.get(toReplace);
-            int index = game.getAgendas().indexOf(toReplace);
-            if (index > -1) {
-                game.getAgendas().set(index, replacement);
-                mapNeededMigrating = true;
-            }
 
-            if (game.getDiscardAgendas().containsKey(toReplace)) {
-                Integer value = game.getDiscardActionCards().get(toReplace);
-                game.getDiscardActionCards().put(replacement, value);
-                mapNeededMigrating = true;
-            }
-
-            if (game.getSentAgendas().containsKey(toReplace)) {
-                Integer value = game.getSentAgendas().get(toReplace);
-                game.getSentAgendas().put(replacement, value);
-                mapNeededMigrating = true;
-            }
+            mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getSentAgendas(), toReplace, replacement);
         }
         return mapNeededMigrating;
+    }
+
+    private static <K, V> boolean replaceKey(Map<K, V> map, K toReplace, K replacement) {
+        if (map.containsKey(toReplace)) {
+            V value = map.get(toReplace);
+            map.put(replacement, value);
+            map.remove(toReplace);
+            return true;
+        }
+        return false;
+    }
+
+    private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+        int index = list.indexOf(toReplace);
+        if (index > -1) {
+            list.set(index, replacement);
+            return true;
+        }
+        return false;
     }
 }
