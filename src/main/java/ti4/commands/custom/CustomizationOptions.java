@@ -16,7 +16,7 @@ public class CustomizationOptions extends CustomSubcommandData{
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.BOT_SHUSHING, "Bot shush reacts on msgs in actions. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
@@ -54,13 +54,13 @@ public class CustomizationOptions extends CustomSubcommandData{
                 activeGame.setBotFactionReactions(false);
             }
         }
-        OptionMapping shushing = event.getOption(Constants.BOT_SHUSHING);
+        OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
         if (shushing != null){
             String ccNP = shushing.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)){
-                activeGame.setShushing(true);
+                activeGame.setSpinMode(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)){
-                activeGame.setShushing(false);
+                activeGame.setSpinMode(false);
             }
         }
 

@@ -740,6 +740,9 @@ public class Helper {
             Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff, "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
         }
+        if(player.hasTech("yso")){
+             unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+        }
 
         return unitButtons;
     }

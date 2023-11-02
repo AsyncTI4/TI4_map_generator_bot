@@ -378,7 +378,7 @@ public class ButtonHelper {
             buttons.add(release);
         }
         if (player.hasAbility("diplomats") && ButtonHelperAbilities.getDiplomatButtons(activeGame, player).size() > 0) {
-            Button release = Button.secondary("getDiplomatsButtons", "Use Diplomats Ability").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("freesystems")));
+            Button release = Button.secondary("getDiplomatsButtons", "Use Diplomats Ability").withEmoji(Emoji.fromFormatted(Emojis.freesystems));
             buttons.add(release);
         }
 
@@ -1292,7 +1292,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(activeGame, player);
-        String ident = player.getFactionEmoji();
+        String ident = ButtonHelper.getIdentOrColor(player, activeGame);
         String msg = ident + " removed CC from " + tileRep;
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
@@ -3004,11 +3004,11 @@ public class ButtonHelper {
         List<LayoutComponent> list = new ArrayList<>();
         List<ItemComponent> buttonRow = new ArrayList<>();
         for (Button button : buttons) {
-            if (buttonRow.size() == 4) {
+            if (buttonRow.size() == 5) {
                 list.add(ActionRow.of(buttonRow));
                 buttonRow = new ArrayList<>();
             }
-            if(buttons.size() < 21 || !button.getId().contains("_2")){
+            if(buttons.size() < 26 || !button.getId().contains("_2")){
                 buttonRow.add(button);
             }
         }
@@ -4035,7 +4035,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, activeGame));
             }
             case "ACs" -> {
-                String message = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true) + " Click the GREEN button that indicates the AC you would like to send";
+                String message = p1.getRepresentation() + " Click the GREEN button that indicates the AC you would like to send";
                 for (String acShortHand : p1.getActionCards().keySet()) {
                     Button transact = Button.success(finChecker + "send_ACs_" + p2.getFaction() + "_" + p1.getActionCards().get(acShortHand), Mapper.getActionCardName(acShortHand));
                     stuffToTransButtons.add(transact);
@@ -4189,6 +4189,15 @@ public class ButtonHelper {
                 p2.setActionCard(acID);
                 ACInfo.sendActionCardInfo(activeGame, p2);
                 ACInfo.sendActionCardInfo(activeGame, p1);
+                if(p1.ownsPromissoryNote("spynet") && !p2.hasAbility("arbiters")){
+                    if (activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
+                        MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+                    } else {
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
+                    }
+                    return;
+                }
             }
             case "PNs" -> {
                 String id = null;
@@ -5052,6 +5061,9 @@ public class ButtonHelper {
             }
             String message = getTrueIdentity(player, activeGame) + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
+        }
+        if("spynet".equalsIgnoreCase(id)){
+            ButtonHelperFactionSpecific.offerSpyNetOptions(player);
         }
 
         //Fog of war ping

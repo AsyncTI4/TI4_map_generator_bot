@@ -3393,7 +3393,7 @@ public class GenerateMap {
                 if (tokenPath.contains(Constants.DMZ_LARGE) ||
                     tokenPath.contains(Constants.WORLD_DESTROYED) ||
                     tokenPath.contains(Constants.CONSULATE_TOKEN) ||
-                    tokenPath.contains(Constants.GLEDGE_CORE)) {
+                    tokenPath.contains(Constants.GLEDGE_CORE) || tokenPath.contains("freepeople")) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);

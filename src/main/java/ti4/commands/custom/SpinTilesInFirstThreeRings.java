@@ -3,6 +3,7 @@ package ti4.commands.custom;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.generator.GenerateMap;
@@ -21,6 +22,10 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
+        spinRings(activeGame);
+    }
+
+    public void spinRings(Game activeGame){
         List<Tile> tilesToSet = new ArrayList<>();
         //first ring
         for (int y = 1; y < 4; y++) {
@@ -62,9 +67,7 @@ public class SpinTilesInFirstThreeRings extends CustomSubcommandData {
             activeGame.setTile(tile);
         }
         activeGame.rebuildTilePositionAutoCompleteList();
-        GameSaveLoadManager.saveMap(activeGame, event);
         DisplayType displayType = DisplayType.map;
-        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
-        MessageHelper.sendFileUploadToChannel(event.getChannel(), file);
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Spun the rings");
     }
 }

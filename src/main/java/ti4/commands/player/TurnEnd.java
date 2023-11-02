@@ -119,8 +119,11 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         TurnStart.turnStart(event, activeGame, nextPlayer);
     }
-
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
+        return getScoreObjectiveButtons(event, activeGame, "");
+    }
+
+    public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame, String prefix) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeGame.getRevealedPublicObjectives();
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
@@ -150,13 +153,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
+                    objectiveButton = Button.success(prefix+Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
+                    objectiveButton = Button.primary(prefix+ Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
-                    objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    objectiveButton = Button.secondary(prefix+Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                     poButtonsCustom.add(objectiveButton);
                 }
             }

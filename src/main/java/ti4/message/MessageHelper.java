@@ -63,7 +63,11 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
-			buttons.add(Button.secondary("ultimateUndo", "UNDO"));
+			if(buttons.size() > 4){
+				buttons.add(4,Button.secondary("ultimateUndo", "UNDO"));
+			}else{
+				buttons.add(Button.secondary("ultimateUndo", "UNDO"));
+			}
 		}
 
 		splitAndSent(messageText, channel, buttons);
@@ -489,7 +493,7 @@ public class MessageHelper {
 		}
 		if (buttons == null || buttons.isEmpty()) return partitionedButtonRows;
 
-		List<List<Button>> partitions = ListUtils.partition(buttons, 4);
+		List<List<Button>> partitions = ListUtils.partition(buttons, 5);
 		List<ActionRow> buttonRows = new ArrayList<>();
 		for (List<Button> partition : partitions) {
 			buttonRows.add(ActionRow.of(partition));

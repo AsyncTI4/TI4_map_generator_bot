@@ -113,6 +113,8 @@ public class Game {
     @ExportableField
     private boolean homebrewSCMode;
     @ExportableField
+    private boolean spinMode;
+    @ExportableField
     private boolean stratPings = true;
     @ExportableField
     @Getter
@@ -595,8 +597,15 @@ public class Game {
         return homebrewSCMode;
     }
 
+    public boolean isSpinMode() {
+        return spinMode;
+    }
     public void setHomeBrewSCMode(boolean homeBrewSCMode) {
         homebrewSCMode = homeBrewSCMode;
+    }
+
+    public void setSpinMode(boolean homeBrewSCMode) {
+        spinMode = homeBrewSCMode;
     }
 
     public boolean isStratPings() {
@@ -661,7 +670,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isHomeBrewSCMode() || isFrankenGame());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame());
     }
 
     public boolean isFrankenGame() {
