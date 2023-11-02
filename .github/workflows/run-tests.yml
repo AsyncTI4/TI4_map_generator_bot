@@ -2,8 +2,6 @@ on:
     pull_request:
         branches: [ "master" ]
 name: Run tests
-concurrency:
-    group: "Start Bot"
 jobs:
     build:
         name: Build
