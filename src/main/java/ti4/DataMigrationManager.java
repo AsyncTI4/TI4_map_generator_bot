@@ -64,6 +64,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeFactionTechs_181023", DataMigrationManager::migrateInitializeFactionTechs_181023);
             runMigration("migrateInitializeACD2_271023", DataMigrationManager::migrateInitializeACD2_271023);
             runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
+            runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -589,7 +590,7 @@ public class DataMigrationManager {
     }
 
     // MIGRATION: ACD2 id change
-    public static Boolean migrateInitializeACD2_271023(Game game) {
+    public static boolean migrateInitializeACD2_271023(Game game) {
         Map<String, String> replacements = Map.of("deep_space_station", "derelict_space_station",
             "deep_space_station2", "derelict_space_station2",
             "deep_space_station3", "derelict_space_station3",
@@ -599,10 +600,47 @@ public class DataMigrationManager {
     }
 
     // MIGRATION: LO id change
-    public static Boolean migrateInitializeLO_271023(Game game) {
+    public static boolean migrateInitializeLO_271023(Game game) {
         Map<String, String> replacements = Map.of("little_omega_minister_commrece", "little_omega_minister_commerce");
         List<String> decksToCheck = List.of("agendas_little_omega");
         return replaceAgendaCards(game, decksToCheck, replacements);
+    }
+
+    // LO id change
+    public static boolean migrateInitializeLO_021123(Game game) {
+        Map<String, String> replacements = Map.of("parade_marvels_little_omega", "engineer_marvel");
+        List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
+        return replaceStage1s(game, decksToCheck, replacements);
+    }
+
+    private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
+        if (!decksToCheck.contains(game.getStage1PublicDeckID())) {
+            return false;
+        }
+
+        boolean mapNeededMigrating = false;
+        for (String toReplace : replacements.keySet()) {
+            String replacement = replacements.get(toReplace);
+
+            int index = game.getPublicObjectives1().indexOf(toReplace);
+            if (index > -1) {
+                game.getPublicObjectives1().set(index, replacement);
+                mapNeededMigrating = true;
+            }
+
+            if (game.getRevealedPublicObjectives().containsKey(toReplace)) {
+                Integer value = game.getRevealedPublicObjectives().get(toReplace);
+                game.getRevealedPublicObjectives().put(replacement, value);
+                mapNeededMigrating = true;
+            }
+
+            if (game.getScoredPublicObjectives().containsKey(toReplace)) {
+                List<String> value = game.getScoredPublicObjectives().get(toReplace);
+                game.getScoredPublicObjectives().put(replacement, value);
+                mapNeededMigrating = true;
+            }
+        }
+        return mapNeededMigrating;
     }
 
     private static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
