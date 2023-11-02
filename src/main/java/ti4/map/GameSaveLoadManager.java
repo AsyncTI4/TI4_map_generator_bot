@@ -559,6 +559,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeGame.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SPIN_MODE + " " + activeGame.isSpinMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_UNIT_TAGS + " " + activeGame.isShowUnitTags());
         writer.write(System.lineSeparator());
 
@@ -1629,6 +1631,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setHomeBrewSCMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.SPIN_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setSpinMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

@@ -246,7 +246,9 @@ public class AgendaHelper {
                 message.append("Custom PO 'Mutiny' has been added.\n");
                 for (Player playerWL : winOrLose) {
                     activeGame.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
+                    if(!activeGame.isFoWMode()){
+                        message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
+                    }
                 }
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
             }
