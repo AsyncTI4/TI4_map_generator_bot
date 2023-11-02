@@ -34,7 +34,7 @@ public class PositionMapperTest {
 
     @Test
     public void testIsCornerOfHexRing() {
-        assertTrue(PositionMapper.isCornerOfHexRing("202"));
+        assertTrue(PositionMapper.isCornerOfHexRing("201"));
         assertTrue(PositionMapper.isCornerOfHexRing("203"));
         assertTrue(PositionMapper.isCornerOfHexRing("526"));
         assertTrue(PositionMapper.isCornerOfHexRing("625"));
