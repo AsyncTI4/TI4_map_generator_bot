@@ -55,11 +55,8 @@ public class SendTG extends PlayerSubcommandData {
 		if (player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")) {
 			ButtonHelper.commanderUnlockCheck(player_, activeGame, "hacan", event);
 		}
-		String tgString = sendTG + " " + Emojis.tg + " trade goods";
+		String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade goods";
 		String message = p1 + " sent " + tgString + " to " + p2;
-		if(activeGame.getNomadCoin()){
-			message = message.replace(Emojis.tg, Emojis.nomadcoin);
-		}
 		sendMessage(message);
 
 		if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
