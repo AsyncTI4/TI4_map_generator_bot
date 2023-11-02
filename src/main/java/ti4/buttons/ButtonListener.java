@@ -2119,6 +2119,8 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
                 }
+                case "spyNetYssarilChooses" -> {ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, activeGame, event); }
+                case "spyNetPlayerChooses" -> {ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, activeGame, event); }
                 case "diploSystem" -> {
                     String message = trueIdentity + " Click the name of the planet who's system you wish to diplo";
                     List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, null);
@@ -2447,6 +2449,14 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                     }
 
+                }
+                case "startYinSpinner" -> {
+                    List<Button> buttons = new ArrayList<Button>();
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+" Chose to Use Yin Spinner");
+                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    String message = "Use buttons to drop 2 infantry on a planet. Technically you can also drop 2 infantry with your ships, but this aint supported yet via button. ";
+                    ButtonHelper.deleteTheOneButton(event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 }
                 case "convert_2_comms" -> {
                     String message;
@@ -3142,7 +3152,7 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "scoreAnObjective" -> {
-                    List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(event, activeGame);
+                    List<Button> poButtons = TurnEnd.getScoreObjectiveButtons(event, activeGame, finsFactionCheckerPrefix);
                     poButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                     MessageChannel channel = event.getMessageChannel();
                     if (activeGame.isFoWMode()) {
@@ -3174,7 +3184,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
                 case "ultimateUndo" -> {
-                    if (activeGame.getSavedButtons().size() > 0) {
+                    if (activeGame.getSavedButtons().size() > 0 && !activeGame.getCurrentPhase().contains("status")) {
                         String buttonString = activeGame.getSavedButtons().get(0);
                         if (activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
                             if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])) {
