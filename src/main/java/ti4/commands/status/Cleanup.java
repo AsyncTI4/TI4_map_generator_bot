@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.custom.SpinTilesInFirstThreeRings;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -82,6 +83,9 @@ public class Cleanup extends StatusSubcommandData {
             }
         }
         activeGame.setHasHadAStatusPhase(true);
+        if(activeGame.isSpinMode()){
+            new SpinTilesInFirstThreeRings().spinRings(activeGame);
+        }
     }
   
 

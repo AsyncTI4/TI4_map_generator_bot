@@ -44,6 +44,40 @@ public class ButtonHelperFactionSpecific {
         return somebodyHasIt;
     }
 
+    public static Player findPNOwner(String pn, Game activeGame){
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.ownsPromissoryNote(pn)){
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public static void offerSpyNetOptions(Player player){
+        String msg = player.getRepresentation() +" you have a choice now as to how you want to resolve spy net. You can do it the traditional way of accepting a card Yssaril chooses, without looking "+
+        "at the other cards. Or you can look at all of Yssaril's cards and choose one.";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("spyNetYssarilChooses", "Have Yssaril Choose For You"));
+        buttons.add(Button.secondary("spyNetPlayerChooses", "Look And Choose Yourself"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void resolveSpyNetYssarilChooses(Player player, Game activeGame, ButtonInteractionEvent event){
+        Player yssaril = findPNOwner("spynet", activeGame);
+        String buttonID = "transact_ACs_" + player.getFaction();
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you an AC");
+        ButtonHelper.resolveSpecificTransButtons(activeGame, yssaril, buttonID, event);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveSpyNetPlayerChooses(Player player, Game activeGame, ButtonInteractionEvent event){
+        Player yssaril = findPNOwner("spynet", activeGame);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take an AC", ACInfo.getToBeStolenActionCardButtons(activeGame, yssaril));
+        event.getMessage().delete().queue();
+    }
+
+
+
     public static void returnFightersToSpace(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
@@ -723,7 +757,7 @@ public class ButtonHelperFactionSpecific {
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + "Acquired " + acID);
         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-            "# " + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true) + " Lost " + acID + " to mageon (or perhaps Yssaril hero)");
+            "# " + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true) + " Lost " + acID + " to a players ability");
         ACInfo.sendActionCardInfo(activeGame, player2);
         ACInfo.sendActionCardInfo(activeGame, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
