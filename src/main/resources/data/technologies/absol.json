@@ -616,24 +616,6 @@
         "homebrewReplacesID": "lw2"
     },
     {
-        "alias": "absol_vax",
-        "name": "Valefar Assimilator X",
-        "type": "NONE",
-        "faction": "nekro",
-        "source": "absol",
-        "text": "COMBAT 6\n \n This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.\n \n PLANETARY SHIELD; SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1",
-        "homebrewReplacesID": "vax"
-    },
-    {
-        "alias": "absol_vay",
-        "name": "Valefar Assimilator Y",
-        "type": "NONE",
-        "faction": "nekro",
-        "source": "absol",
-        "text": "COST 2; COMBAT 6; MOVE 3; CAPACITY 2\n \n SUSTAIN DAMAGE",
-        "homebrewReplacesID": "vay"
-    },
-    {
         "alias": "absol_ht2",
         "name": "Hel-Titan II",
         "type": "UNITUPGRADE",
