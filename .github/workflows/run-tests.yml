@@ -1,7 +1,7 @@
+name: RunTests
 on:
     pull_request:
         branches: [ "master" ]
-name: Run tests
 jobs:
     build:
         name: Build
