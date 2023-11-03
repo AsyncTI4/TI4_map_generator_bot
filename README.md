@@ -2,6 +2,9 @@
 
 Hello Async TI Developers!
 
+1. Please read the [Code of Conduct](CODE_OF_CONDUCT.md)
+2. Please read through our [Contribution Guide](CONTRIBUTING.md)
+
 Please *test your changes* (`mvn package`) before making a PR.
 See below for methods and examples of how to test.
 If you have a different way, please share!
