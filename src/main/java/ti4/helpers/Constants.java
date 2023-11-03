@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Constants {
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
+    public static final String TEN_MIN_REMINDER = "ten_min_reminder";
     public static final String DRAFT_HAND = "franken_personal_bag";
     public static final String DRAFT_BAG = "franken_bag_to_pass";
     public static final String DRAFT_QUEUE = "franken_items_to_draft";

@@ -9,15 +9,75 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.tokens.RemoveCC;
+import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.TechnologyModel;
 
 public class ButtonHelperActionCards {
+
+
+    public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event){
+        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
+        String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke";
+        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+        String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain a CC";
+        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveSummit(Game activeGame, Player player, ButtonInteractionEvent event){
+        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+        String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain a CC";
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveWarEffort(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
+        String message = "Use buttons to put 1 cruiser with your ships";
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveHarnessEnergy(Game activeGame, Player player, ButtonInteractionEvent event){
+        String message = ButtonHelper.getIdent(player)+ " Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
+        + ").";
+        player.setCommodities(player.getCommoditiesTotal());
+        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
+        ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
+        ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
+        if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+        }
+        event.getMessage().delete().queue();
+    }
+
+     public static void resolveRally(Game activeGame, Player player, ButtonInteractionEvent event){
+        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
+        String message = ButtonHelper.getIdent(player) + " gained 2 fleet CC ("+player.getFleetCC()+ "->"+(player.getFleetCC()+2)+") using rally";
+        player.setFleetCC(player.getFleetCC()+2);
+        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
+        event.getMessage().delete().queue();
+    }
 
     public static List<Button> getArcExpButtons(Game activeGame, Player player) {
         List<Button> buttons = new ArrayList<>();
@@ -154,6 +214,43 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who took the planet from you", buttons);
     }
 
+    public static void resolveUprisingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("uprisingStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("uprisingStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to uprise", buttons);
+    }
+    public static void resolveUnstableStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("unstableStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("unstableStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to unstable planet", buttons);
+    }
+
     public static void resolveReparationsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if(p2.getReadiedPlanets().size() == 0){
@@ -168,6 +265,75 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
     }
+
+    public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if(p2.getReadiedPlanets().size() == 0){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Chosen player had no readied planets. Nothing has been done.");
+            event.getMessage().delete().queue();
+            return;
+        }
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getReadiedPlanets()){
+            buttons.add(Button.secondary("uprisingStep3_" + p2.getFaction()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
+    }
+
+    public static void resolveUnstableStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getPlanets()){
+            if(planet.toLowerCase().contains("custodia")){
+                continue;
+            }
+            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if(p != null && (p.getOriginalPlanetType().equalsIgnoreCase("hazardous") || p.getTokenList().contains("attachment_titanspn.png"))){
+                buttons.add(Button.secondary("unstableStep3_" + p2.getFaction()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
+    }
+
+    public static void resolveUnstableStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        if(p2.getReadiedPlanets().contains(planet)){
+            p2.exhaustPlanet(planet);
+        }
+        if (p2.hasInf2Tech()) {
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+            if(amount > 3){
+                amount = 3;
+            }
+            ButtonHelper.resolveInfantryDeath(activeGame, p2, amount);
+        }
+        new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "3 inf "+planet, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted " + planetRep + " and killed up to 3 infantry there");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was exhausted and up to 3 infantry were destroyed.");
+     }
+
+     public static void resolveUprisingStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        p2.exhaustPlanet(planet);
+        int resValue = Helper.getPlanetResources(planet, activeGame);
+        int oldTg = player.getTg();
+        int count = resValue;
+        player.setTg(oldTg+count);
+        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " gained "+count+ " tgs ("+oldTg +"->"+player.getTg()+")");
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted " + planetRep);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was exhausted.");
+     }
 
      public static void resolveReparationsStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -186,12 +352,22 @@ public class ButtonHelperActionCards {
 
 
     public static void resolveFocusedResearch(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
-        activeGame.setComponentAction(true);
-        Button getTech = Button.success("acquireATech", "Get a tech");
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(getTech);
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-            ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your tech", buttons);
+        if(!player.hasAbility("propagation")){
+            activeGame.setComponentAction(true);
+            Button getTech = Button.success("acquireATech", "Get a tech");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(getTech);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your tech", buttons);
+        }else{
+            Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+            Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+            Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+            Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+            List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain a CC";
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+        }
     }
 
     public static void repealLaw(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){

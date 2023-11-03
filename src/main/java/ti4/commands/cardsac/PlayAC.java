@@ -201,6 +201,49 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
 
+            codedName = "Reveal Prototype";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("focusedResearch", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Reparations";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveReparationsStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Uprising";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveUprisingStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Harness Energy";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveHarness", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "War Effort";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveWarEffort", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Summit";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSummit", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Unstable Planet";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveUnstableStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Rally";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveRally", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Industrial Initiative";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("industrialInitiative", "Resolve "+codedName));
@@ -211,7 +254,12 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("getRepealLawButtons", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
-
+            //"resolveCounterStroke"
+            codedName = "Counterstroke";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveCounterStroke", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Divert Funding";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("getDivertFundingButtons", "Resolve "+codedName));

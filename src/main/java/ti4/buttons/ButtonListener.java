@@ -182,14 +182,23 @@ public class ButtonListener extends ListenerAdapter {
                 return;
             }
         }
+        
 
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
         String ident = player.getFactionEmoji();
+        if(!buttonID.equalsIgnoreCase("doneWithTacticalAction")){
+            player.setWhetherPlayerShouldBeTenMinReminded(false);
+        }else{
+            player.setWhetherPlayerShouldBeTenMinReminded(true);
+        }
+        
         if (!buttonID.equalsIgnoreCase("ultimateundo")) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
+
+        
         if (activeGame.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeGame.getActivePlayer())) {
             activeGame.setLastActivePlayerPing(new Date());
         }
@@ -1685,6 +1694,18 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
             ButtonHelperModifyUnits.landingUnits(buttonID, event, activeGame, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("reparationsStep2_")) {
+            ButtonHelperActionCards.resolveReparationsStep2(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("reparationsStep3_")) {
+            ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("uprisingStep2_")) {
+            ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("uprisingStep3_")) {
+            ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("upstableStep2_")) {
+            ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("upstableStep3_")) {
+            ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
             ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("reinforcements_cc_placement_")) {
@@ -2806,11 +2827,32 @@ public class ButtonListener extends ListenerAdapter {
                 case "getRepealLawButtons" -> {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select Law to repeal", ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
                 }
+                case "resolveCounterStroke" -> {
+                    ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event);
+                }
                 case "getDivertFundingButtons" -> {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select tech to return", ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
                 }
                 case "focusedResearch" -> {
                     ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
+                }
+                case "resolveReparationsStep1" -> {
+                    ButtonHelperActionCards.resolveReparationsStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveUprisingStep1" -> {
+                    ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveUnstableStep1" -> {
+                    ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveRally" -> {
+                    ButtonHelperActionCards.resolveRally(activeGame, player, event);
+                }
+                case "resolveHarness" -> {
+                    ButtonHelperActionCards.resolveHarnessEnergy(activeGame, player, event);
+                }
+                case "resolveSummit" -> {
+                    ButtonHelperActionCards.resolveSummit(activeGame, player, event);
                 }
                 case "industrialInitiative" -> {
                     ButtonHelperActionCards.industrialInitiative(player, activeGame, event);
