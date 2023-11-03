@@ -12,7 +12,7 @@ import ti4.map.Player;
 public class SetFactionName extends FrankenSubcommandData {
 
     public SetFactionName() {
-        super(Constants.SET_FACTION_NAME, "Set franken faction suffix");
+        super(Constants.SET_FACTION_NAME, "Set franken faction suffix (no spaces)");
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_FACTION_NAME, "Suffix to use, will look like frankenWhateverName.").setRequired(true));
     }
 
@@ -30,8 +30,15 @@ public class SetFactionName extends FrankenSubcommandData {
             sendMessage("This can only be run in Franken games.");
             return;
         }
-        
+
         String frankenName = event.getOption(Constants.FRANKEN_FACTION_NAME, null, OptionMapping::getAsString);
+        if (!frankenName.matches("[A-z0-9]{1,32}")){
+            sendMessage("Franken Faction must only contain letters and numbers, and need to be less than 32 characters long");
+            return;
+        }
+
+
+        
 
         player.setFaction("franken"+frankenName);
         
