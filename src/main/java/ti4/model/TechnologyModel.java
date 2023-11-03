@@ -22,6 +22,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String baseUpgrade;
     private String source;
     private String text;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {
@@ -77,6 +78,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getRequirements() {
         return Optional.ofNullable(requirements);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public String getRepresentation(boolean includeCardText) {
