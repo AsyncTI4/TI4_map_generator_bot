@@ -11,7 +11,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
 @Data

@@ -57,6 +57,9 @@ public class SetDeck extends GameSubcommandData {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
                 }
+                if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
+                    activeGame.swapInVariantTechs();
+                }
             }
         });
 
