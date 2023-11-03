@@ -166,6 +166,7 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds");
             activeGame.setAbsolMode(false);
+            activeGame.swapOutVariantTechs();
         }
         activeGame.setDiscordantStarsMode(discordantStarsMode);
 
@@ -198,6 +199,7 @@ public class Setup extends GameSubcommandData {
             activeGame.setBaseGameMode(false);
             activeGame.setAbsolMode(false);
             activeGame.setDiscordantStarsMode(false);
+            activeGame.swapOutVariantTechs();
             activeGame.swapInVariantUnits("pok");
         }
 
