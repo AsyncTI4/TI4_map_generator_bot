@@ -3408,21 +3408,19 @@ public class Game {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
             for (TechnologyModel tech : techsToReplace) {
-                if (tech.getHomebrewReplacesID().isPresent()) {
-                    String replacedTechID = tech.getHomebrewReplacesID().get();
-                    String replacingTechID = tech.getAlias();
-                    if (player.hasTech(tech.getHomebrewReplacesID().get())) {
-                        if (!player.hasTechReady(replacedTechID)) {
-                            player.refreshTech(replacedTechID);
-                            newExhaustedTechs.add(replacingTechID);
-                        }
-                        player.removeTech(replacedTechID);
-                        player.addTech(replacingTechID);
+                String replacedTechID = tech.getHomebrewReplacesID().get();
+                String replacingTechID = tech.getAlias();
+                if (player.hasTech(tech.getHomebrewReplacesID().get())) {
+                    if (!player.hasTechReady(replacedTechID)) {
+                        player.refreshTech(replacedTechID);
+                        newExhaustedTechs.add(replacingTechID);
                     }
-                    if (player.getFactionTechs().contains(replacedTechID)) {
-                        player.removeFactionTech(replacedTechID);
-                        player.addFactionTech(replacingTechID);
-                    }
+                    player.removeTech(replacedTechID);
+                    player.addTech(replacingTechID);
+                }
+                if (player.getFactionTechs().contains(replacedTechID)) {
+                    player.removeFactionTech(replacedTechID);
+                    player.addFactionTech(replacingTechID);
                 }
             }
             player.setExhaustedTechs(newExhaustedTechs);
