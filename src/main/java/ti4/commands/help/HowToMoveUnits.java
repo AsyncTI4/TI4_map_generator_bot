@@ -2,6 +2,8 @@ package ti4.commands.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.message.MessageHelper;
@@ -9,15 +11,22 @@ import ti4.message.MessageHelper;
 public class HowToMoveUnits extends HelpSubcommandData {
     public HowToMoveUnits() {
         super(Constants.HOW_TO_MOVE_UNITS, "How to move units using the /move_units command");
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXAMPLES_ONLY, "True to only show examples"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXAMPLES_ONLY, "True to only show examples"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean examplesOnly = event.getOption(Constants.EXAMPLES_ONLY, false, OptionMapping::getAsBoolean);
 
-        String message = "# So you want to move some units\n" + 
-                "> Typical /move_units command: `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 2 mech to`\n" +
+        String message = "# So you want to add, remove, or move some units\n" + 
+                "# Use the [Modify Units] Button\n" +
+                "> - The button will give you the options to either add or remove units from a system tile. Simply press the buttons to add/remove.\n" +
+                "> - When adding units, you will be given the option to spend resources on them afterwards. If it's just a quick fix, just skip the spending part.\n" +
+                "\n\n" +
+                "If for whatever reason the Modify Units button does not suit your needs, you can go old school and use the `/move_units`, `/add_units`, or `/remove_units` commands:\n" +
+                "# /move_units\n" +
+                " - /move_units is simply equivalent to `/remove_units` followed by `/add_units` - it will remove units from one system, and add them to another. In that regard, the below logic can also be applied to `/remove_units` and `/add_units`\n" +
+                "> - Typical /move_units command: `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 2 mech to`\n" +
                 "## You'll need to input four things after /move_units:\n" +
                 "### 1. __tile_name__\n> This is the name of the tile the units are in right now. It might be the same tile the units should end up in, but usually it won't be.\n" +
                 "> - Examples include **310** (the tile number), **hacan** (the Hacan home tile), **meer** (the Arinam/Meer tile; **arinam** would work too), or you can pick from the suggestions as you start typing too.\n" +
@@ -61,7 +70,16 @@ public class HowToMoveUnits extends HelpSubcommandData {
                 "- /move_units is really just doing /remove_units in the first tile and /add_units + /add_cc in the second tile, which has some interesting consequences.\n" +
                 "- If you are using the ghosts commander with cruiser 2, the following would add all the fighters you'd gain (assuming this took you through a wormhole):\n" +
                 " - `/move_units tile_name: creuss unit_names: 6 cr tile_name_to: 104 unit_names_to: 6cr, 6 ff`\n" + 
-                "# " + Emojis.BLT;
-        MessageHelper.sendMessageToThread(event.getChannel(), "How to Move Units", message);
+                "# " + Emojis.BLT + "\n";
+
+        String examples = "# Examples of the `/move_units` command:\n" +
+                "> - `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 1 mech to, 1 mech te` will remove 1 War Sun, 4 Fighters, 2 Mechs on Meer from the Arinam/Meer system and then add 1 War Sun, 4 Fighters, land 1 Mech on Tequran, and land 1 Mech on Torkan in the Tequran/Torkan system\n" +
+                "> - `/move_units tile_name: argent unit_names: 2 mech avar, 2 inf ylir tile_name_to: argent unit_names_to: mech valk, mech ylir, 2 inf avar` will remove 2 Mechs from Avar, 2 Infantry from Ylir and then add 1 Mech to Valk, 1 Mech to Ylir, and 2 Infantry to Avar\n";
+        
+        if (examplesOnly) {
+            MessageHelper.sendMessageToThread(event.getChannel(), "How to Move Units (Examples Only)", examples);
+        } else {
+            MessageHelper.sendMessageToThread(event.getChannel(), "How to Move Units", message + examples);
+        }
     }
 }
