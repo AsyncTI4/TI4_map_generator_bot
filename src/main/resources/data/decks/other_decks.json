@@ -23,7 +23,7 @@
         "type": "public_stage_1_objective",
         "description": "A facelift to various objectives based on online stats. Expected to be played with Little Omega Secret Objectives.\nSee: [google doc - public objectives tab](<https://docs.google.com/spreadsheets/d/1zcr-lKfsSIxpzlGPy33rCx4PcmPrZDCDz2tqExqQD9g/edit#gid=991205782>) | [card sheet](<https://raw.githubusercontent.com/TI4-Online/TI4-Homebrew/main/assets/Textures/little-omega/card/objective/public_1/face.jpg>) | [news and feedback discord channel](https://discord.com/channels/743629929484386395/1124309831206051900)",
         "cardIDs": [
-            "amass_wealth","build_defenses","corner","deep_space","parade_marvels_little_omega","expand_borders_little_omega","infrastructure","intimidate_the_council_little_omega","make_history","monument","outer_rim","push_boundaries","raise_fleets_little_omega","found_research_outposts_little_omega","sway_council","trade_routes", "impose_order_little_omega", "monopolize_a_trade_route_little_omega", "study_the_unknown_little_omega", "bestow_a_keleres_fleet_little_omega"
+            "amass_wealth","build_defenses","corner","deep_space","engineer_marvel","expand_borders_little_omega","infrastructure","intimidate_the_council_little_omega","make_history","monument","outer_rim","push_boundaries","raise_fleets_little_omega","found_research_outposts_little_omega","sway_council","trade_routes", "impose_order_little_omega", "monopolize_a_trade_route_little_omega", "study_the_unknown_little_omega", "bestow_a_keleres_fleet_little_omega"
         ]
     },
     {

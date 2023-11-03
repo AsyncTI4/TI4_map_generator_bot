@@ -264,7 +264,7 @@ public class AsyncTI4DiscordBot {
             }
         }
 
-        // Async: Dread-not
+        // Async: Dreadn't
         if (args.length >= 7) {
             guild3rd = jda.getGuildById(args[6]);
             if (guild3rd != null) {

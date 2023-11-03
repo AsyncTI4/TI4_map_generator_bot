@@ -337,7 +337,6 @@
         "type": "UNITUPGRADE",
         "requirements": "GBY",
         "faction": "nomad",
-        "baseUpgrade": "fs",
         "source": "pok",
         "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6, SUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3). You may treat this unit as if it were adjacent to systems that contain one or more of your mechs."
     },
@@ -673,7 +672,7 @@
     },
     {
         "alias": "yso",
-        "name": "Yin Spinner",
+        "name": "Yin Spinner Omega",
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "yin",
