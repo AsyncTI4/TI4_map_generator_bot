@@ -41,6 +41,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 import java.awt.*;
@@ -3383,6 +3384,7 @@ public class Game {
     }
 
     public void swapInVariantUnits(String source) {
+        // TODO: Update to use new UnitModel.getHomebrewReplacesID() method
         List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> unit.getSource().equals(source)).toList();
         for (Player player : getPlayers().values()) {
             List<UnitModel> playersUnits = new ArrayList<>(player.getUnitModels());
@@ -3395,6 +3397,60 @@ public class Game {
                     }
                 }
             }
+        }
+    }
+
+    public void swapInVariantTechs() {
+        DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
+        if (deckModel == null) return;
+        List<TechnologyModel> techsToReplace = deckModel.getNewDeck().stream().map(Mapper::getTech).filter(Objects::nonNull).filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
+        for (Player player : getPlayers().values()) {
+            List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
+
+            for (TechnologyModel tech : techsToReplace) {
+                String replacedTechID = tech.getHomebrewReplacesID().get();
+                String replacingTechID = tech.getAlias();
+                if (player.hasTech(tech.getHomebrewReplacesID().get())) {
+                    if (!player.hasTechReady(replacedTechID)) {
+                        player.refreshTech(replacedTechID);
+                        newExhaustedTechs.add(replacingTechID);
+                    }
+                    player.removeTech(replacedTechID);
+                    player.addTech(replacingTechID);
+                }
+                if (player.getFactionTechs().contains(replacedTechID)) {
+                    player.removeFactionTech(replacedTechID);
+                    player.addFactionTech(replacingTechID);
+                }
+            }
+            player.setExhaustedTechs(newExhaustedTechs);
+        }
+    }
+
+    public void swapOutVariantTechs() {
+        DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
+        if (deckModel == null) return;
+        List<TechnologyModel> techsToReplace = Mapper.getTechs().values().stream().filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
+        for (Player player : getPlayers().values()) {
+            List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
+
+            for (TechnologyModel tech : techsToReplace) {
+                String replacedTechID = tech.getAlias();
+                String replacingTechID =  tech.getHomebrewReplacesID().get();
+                if (player.hasTech(replacedTechID)) {
+                    if (!player.hasTechReady(replacedTechID)) {
+                        player.refreshTech(replacedTechID);
+                        newExhaustedTechs.add(replacingTechID);
+                    }
+                    player.removeTech(replacedTechID);
+                    player.addTech(replacingTechID);
+                }
+                if (player.getFactionTechs().contains(replacedTechID)) {
+                    player.removeFactionTech(replacedTechID);
+                    player.addFactionTech(replacingTechID);
+                }
+            }
+            player.setExhaustedTechs(newExhaustedTechs);
         }
     }
 }
