@@ -63,7 +63,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 if (actionCards.containsKey(command)) {
                     numUsed2 = actionCards.get(command);
                 }
-                acsSabod = acsSabod+numUsed2;
+                acsSabod = acsSabod+numUsed;
                 actionCards.put(command, numUsed + numUsed2);
             }
         }

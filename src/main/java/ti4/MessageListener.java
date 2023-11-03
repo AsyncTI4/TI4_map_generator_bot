@@ -200,7 +200,7 @@ public class MessageListener extends ListenerAdapter {
                         }
                         if (player != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                             long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
-                            if (milliSinceLastPing > (60*60*multiplier* activeGame.getAutoPingSpacer())) {
+                            if (milliSinceLastPing > (60*60*multiplier* activeGame.getAutoPingSpacer()) || (player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > (60*5*multiplier))) {
                                 String realIdentity = null;
                                 String ping = null;
                                 if(player != null){
@@ -313,7 +313,7 @@ public class MessageListener extends ListenerAdapter {
                                         }
                                     }
                                 }
-                                
+                                player.setWhetherPlayerShouldBeTenMinReminded(false);
                                 activeGame.setLastActivePlayerPing(new Date());
                                 GameSaveLoadManager.saveMap(activeGame);
                             }

@@ -174,6 +174,7 @@ public class TurnEnd extends PlayerSubcommandData {
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
+
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
             List<String> relics = new ArrayList<>();
@@ -222,6 +223,14 @@ public class TurnEnd extends PlayerSubcommandData {
                     PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
                 }
+            }
+            if(player.hasTech("dsauguy") && player.getTg() > 2){
+                activeGame.setComponentAction(true);
+                Button getTech = Button.success("acquireATech", "Get a tech");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(getTech);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", buttons);
             }
         }
 

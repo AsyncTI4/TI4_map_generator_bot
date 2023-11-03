@@ -23,10 +23,14 @@ public class ListTurnOrder extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-        turnOrder(event, activeGame);
+        turnOrder(event, activeGame, false);
     }
 
     public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame) {
+        turnOrder(event, activeGame, true);
+    }
+
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, boolean pingPeople) {
 
         if (activeGame.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
@@ -62,7 +66,12 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            text += player.getRepresentation();
+            if(pingPeople || activeGame.isFoWMode()){
+                text += player.getRepresentation();
+            }else{
+                text += player.getUserName();
+            }
+            
             if (passed) {
                 text += "~~ - PASSED";
             }

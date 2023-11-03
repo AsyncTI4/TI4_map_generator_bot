@@ -69,7 +69,7 @@ public class CombatHelper {
         }
         switch (roleType) {
             case combatround:
-                return GetUnitsInCombatRound(unitHolder, player, event);
+                return GetUnitsInCombatRound(unitHolder, player, event, tile);
             case AFB:
                 return GetUnitsInAFB(tile, player, event);
             case bombardment:
@@ -79,11 +79,11 @@ public class CombatHelper {
             case SpaceCannonDefence:
                 return getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
             default:
-                return GetUnitsInCombatRound(unitHolder, player, event);
+                return GetUnitsInCombatRound(unitHolder, player, event,tile);
         }
     }
 
-    public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event) {
+    public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player, GenericInteractionCreateEvent event, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> unitsByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         Map<UnitModel, Integer> unitsInCombat = unitsByAsyncId.entrySet().stream().map(
@@ -91,12 +91,39 @@ public class CombatHelper {
                 player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
                 entry.getValue()))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
-            output = new HashMap<>(unitsInCombat.entrySet().stream()
-                .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip())
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            if(unitsByAsyncId.keySet().contains("fs") && player.hasUnit("nekro_flagship")){
+                output = new HashMap<>(unitsInCombat.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()) )
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                for(UnitHolder u2 : tile.getUnitHolders().values()){
+                    if(u2 == unitHolder){
+                        continue;
+                    }
+                    HashMap<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
+                    Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream().map(
+                        entry -> new ImmutablePair<>(
+                            player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder),
+                            entry.getValue()))
+                        .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                    HashMap<UnitModel, Integer> output2;
+                    output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()) )
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    for(UnitModel unit : output2.keySet()){
+                        if(output.containsKey(unit)){
+                            output.put(unit, output.get(unit)+output2.get(unit));
+                        }else{
+                             output.put(unit, output2.get(unit));
+                        }
+                    }
+                }
+            }else{
+                output = new HashMap<>(unitsInCombat.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null && entry.getKey().getIsShip())
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+            }
         } else {
             output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
@@ -125,6 +152,7 @@ public class CombatHelper {
         if (missing.size() > 0 || dupes.size() > 0) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
         }
+        
 
         return output;
     }

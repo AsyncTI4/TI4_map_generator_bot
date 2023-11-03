@@ -2223,6 +2223,7 @@ public class ButtonHelper {
                     }
                 }
             }
+            player.setWhetherPlayerShouldBeTenMinReminded(true);
         } else {
             if (player.getTechs().contains("cm")) {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
