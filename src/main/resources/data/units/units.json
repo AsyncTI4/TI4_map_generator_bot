@@ -3449,6 +3449,7 @@
         "bombardHitsOn": 5,
         "bombardDieCount": 1,
         "sustainDamage": true,
+        "canBeDirectHit": false,
         "isShip": true
     },
     {

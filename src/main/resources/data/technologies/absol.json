@@ -199,13 +199,13 @@
         "homebrewReplacesID": "da"
     },
     {
-        "alias": "absol_ac",
+        "alias": "absol_asc",
         "name": "Assault Cannon",
         "type": "WARFARE",
         "requirements": "RRR",
         "source": "absol",
         "text": "At the start of space combat, your opponent must destroy 1 of their non-fighter ships for every 3 of your non-fighter, non-Infantry ships in the active system.",
-        "homebrewReplacesID": "ac"
+        "homebrewReplacesID": "asc"
     },
     {
         "alias": "absol_sd2",
@@ -289,14 +289,14 @@
         "homebrewReplacesID": "ws"
     },
     {
-        "alias": "absol_pb",
+        "alias": "absol_pm",
         "name": "Production Biomes",
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "hacan",
         "source": "absol",
         "text": "When you give another player 1 or more commodities, they gain an equal number of trade goods.",
-        "homebrewReplacesID": "pb"
+        "homebrewReplacesID": "pm"
     },
     {
         "alias": "absol_qdn",
@@ -422,7 +422,7 @@
         "homebrewReplacesID": "is"
     },
     {
-        "alias": "absol_sd2",
+        "alias": "absol_sdn2",
         "name": "Super-Dreadnought II",
         "type": "UNITUPGRADE",
         "requirements": "BBY",
@@ -504,14 +504,14 @@
         "homebrewReplacesID": "lgf"
     },
     {
-        "alias": "absol_htf",
+        "alias": "absol_htp",
         "name": "Hegemonic Trade Policy",
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "winnu",
         "source": "absol",
         "text": "During the Production step of your tactical actions, you may treat the resource value of each planet you control as if it were equal to its influence value instead.",
-        "homebrewReplacesID": "htf"
+        "homebrewReplacesID": "htp"
     },
     {
         "alias": "absol_mr",
@@ -534,14 +534,14 @@
         "homebrewReplacesID": "pws2"
     },
     {
-        "alias": "absol_ys",
+        "alias": "absol_yso",
         "name": "Yin Spinner",
         "type": "BIOTIC",
         "requirements": "GG",
         "faction": "yin",
         "source": "absol",
         "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
-        "homebrewReplacesID": "ys"
+        "homebrewReplacesID": "yso"
     },
     {
         "alias": "absol_ic",
@@ -564,7 +564,7 @@
         "homebrewReplacesID": "cm"
     },
     {
-        "alias": "absol_ff2",
+        "alias": "absol_ffac2",
         "name": "Floating Factory II",
         "type": "UNITUPGRADE",
         "requirements": "YY",
