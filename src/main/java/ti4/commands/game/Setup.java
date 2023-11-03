@@ -147,11 +147,11 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds_absol");
-            // SOMEHOW HANDLE STARTING/FACTION TECHS
             activeGame.setAbsolMode(absolMode);
             activeGame.setDiscordantStarsMode(discordantStarsMode);
             activeGame.setBaseGameMode(false);
             activeGame.swapInVariantUnits("absol");
+            activeGame.swapInVariantTechs();
             return true;
         }
 
@@ -166,6 +166,7 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds");
             activeGame.setAbsolMode(false);
+            activeGame.swapOutVariantTechs();
         }
         activeGame.setDiscordantStarsMode(discordantStarsMode);
 
@@ -181,7 +182,7 @@ public class Setup extends GameSubcommandData {
             activeGame.setTechnologyDeckID("techs_absol");
             activeGame.setDiscordantStarsMode(false);
             activeGame.swapInVariantUnits("absol");
-            // SOMEHOW STARTING/FACTION TECHS
+            activeGame.swapInVariantTechs();
         }
         activeGame.setAbsolMode(absolMode);
 
@@ -198,6 +199,7 @@ public class Setup extends GameSubcommandData {
             activeGame.setBaseGameMode(false);
             activeGame.setAbsolMode(false);
             activeGame.setDiscordantStarsMode(false);
+            activeGame.swapOutVariantTechs();
             activeGame.swapInVariantUnits("pok");
         }
 

@@ -467,7 +467,6 @@
         "type": "UNITUPGRADE",
         "requirements": "BRY",
         "faction": "nivyn",
-        "baseUpgrade": "mf2",
         "source": "ds",
         "text": "After a system is activated, you may have this unit become damaged to place or move the Wound token into this system. Cost 2, Combat 4; SUSTAIN DAMAGE"
     },

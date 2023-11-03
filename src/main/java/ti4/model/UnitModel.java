@@ -11,7 +11,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
+import ti4.message.BotLogger;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -46,6 +46,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing
@@ -64,6 +65,48 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
             && (!getFaction().isPresent() || Mapper.isFaction(getFaction().orElse("").toLowerCase()));
+    }
+
+    public void validationWarnings() {
+        validateBaseType();
+        validateUpgradesFromUnitId();
+        validateUpgradesToUnitId();
+        validateRequiredTechId();
+        validateHomebrewReplacesID();
+    }
+
+    private boolean validateBaseType() {
+        if (Mapper.isValidUnit(getBaseType())) return true;
+        BotLogger.log("Unit **" + getId() + "** failed validation due to invalid BaseType: `" + getBaseType() + "`");
+        return false;
+    }
+
+    private boolean validateUpgradesFromUnitId() {
+        if (getUpgradesFromUnitId().isEmpty()) return true;
+        if (Mapper.isValidUnit(getUpgradesFromUnitId().get())) return true;
+        BotLogger.log("Unit **" + getId() + "** failed validation due to invalid UpgradesFromUnitId ID: `" + getUpgradesFromUnitId().get() + "`");
+        return false;
+    }
+
+    private boolean validateUpgradesToUnitId() {
+        if (getUpgradesToUnitId().isEmpty()) return true;
+        if (Mapper.isValidUnit(getUpgradesToUnitId().get())) return true;
+        BotLogger.log("Unit **" + getId() + "** failed validation due to invalid UpgradesToUnitId ID: `" + getUpgradesToUnitId().get() + "`");
+        return false;
+    }
+
+    private boolean validateRequiredTechId() {
+        if (getRequiredTechId().isEmpty()) return true;
+        if (Mapper.isValidTech(getRequiredTechId().get())) return true;
+        BotLogger.log("Unit **" + getId() + "** failed validation due to invalid RequiredTechId ID: `" + getRequiredTechId().get() + "`");
+        return false;
+    }
+
+    private boolean validateHomebrewReplacesID() {
+        if (getHomebrewReplacesID().isEmpty()) return true;
+        if (Mapper.isValidUnit(getHomebrewReplacesID().get())) return true;
+        BotLogger.log("Unit **" + getId() + "** failed validation due to invalid HomebrewReplacesID ID: `" + getHomebrewReplacesID().get() + "`");
+        return false;
     }
 
     public String getAlias() {
@@ -319,5 +362,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAbility() {
         return Optional.ofNullable(ability);
+    }
+    
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 }

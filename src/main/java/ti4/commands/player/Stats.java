@@ -261,13 +261,13 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
 		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
 		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
-		sb.append("> Alliance Members: `").append(player.getAllianceMembers()).append("`\n");
+		sb.append("> Alliance Members: ").append(player.getAllianceMembers()).append("\n");
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
 		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10()/10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
-		if (guild != null && activeGame.isFrankenGame()) {
+		if (guild != null && activeGame.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
 			sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
 		}
 		sb.append("\n");

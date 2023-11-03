@@ -89,6 +89,7 @@ public class Setup extends PlayerSubcommandData {
         player.setFactionEmoji(null);
         player.getPlanets().clear();
         player.getTechs().clear();
+        player.getFactionTechs().clear();
 
         if (activeGame.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
