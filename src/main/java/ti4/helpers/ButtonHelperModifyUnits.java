@@ -54,28 +54,25 @@ public class ButtonHelperModifyUnits {
             }
             UnitHolder unitHolder = entry.getValue();
             if (unitHolder instanceof Planet planet) {
-                int limit;
-                if (planet.getUnits().get(infKey) != null) {
-                    limit = planet.getUnits().get(infKey);
-                    for (int x = 1; x < limit + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button.success(finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "infantry_" + representation,
-                            "Retreat " + x + " Infantry on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.infantry));
-                        buttons.add(validTile2);
+                int limit = unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) ;
+                for (int x = 1; x < limit + 1; x++) {
+                    if (x > 2) {
+                        break;
                     }
+                    Button validTile2 = Button.success(finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "infantry_" + representation,
+                        "Retreat " + x + " Infantry on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                    buttons.add(validTile2);
                 }
-                if (planet.getUnits().get(mechKey) != null) {
-                    for (int x = 1; x < planet.getUnits().get(mechKey) + 1; x++) {
-                        if (x > 2) {
-                            break;
-                        }
-                        Button validTile2 = Button.primary(finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "mech_" + representation,
-                            "Retreat " + x + " Mech(s) on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.mech));
-                        buttons.add(validTile2);
+                limit = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
+                for (int x = 1; x < planet.getUnits().get(mechKey) + 1; x++) {
+                    if (x > 2) {
+                        break;
                     }
+                    Button validTile2 = Button.primary(finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "mech_" + representation,
+                        "Retreat " + x + " Mech(s) on " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame)).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                    buttons.add(validTile2);
                 }
+                
             }
         }
         Button concludeMove = Button.secondary(finChecker + "deleteButtons", "Done Retreating troops");

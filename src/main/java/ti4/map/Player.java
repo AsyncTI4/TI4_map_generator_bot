@@ -48,6 +48,7 @@ public class Player {
     private String userName;
 
     private String gameID;
+    private boolean tenMinReminderPing = false;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -389,8 +390,16 @@ public class Player {
         return readyToPassBag;
     }
 
+    public boolean shouldPlayerBeTenMinReminded() {
+        return tenMinReminderPing;
+    }
+
     public void setReadyToPassBag(boolean passed) {
         readyToPassBag = passed;
+    }
+
+    public void setWhetherPlayerShouldBeTenMinReminded(boolean status){
+        tenMinReminderPing = status;
     }
 
     public HashSet<String> getAbilities() {

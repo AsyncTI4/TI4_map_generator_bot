@@ -72,7 +72,13 @@ public class ButtonHelperHeroes {
                 }
                 String name = unitHolder.getName().replace("space", "");
                 if(tile.containsPlayersUnits(p2)){
+                    if (p2.hasInf2Tech()) {
+                        UnitHolder uH = unitHolder;
+                        int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+                        ButtonHelper.resolveInfantryDeath(activeGame, p2, amount);
+                    }
                     new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf " + name, activeGame);
+                    
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), ButtonHelper.getCorrectChannel(p2, activeGame) + " heads up, a tile with your units in it got hit with a saar hero, removing all fighters and infantry.");
                 }
                 
