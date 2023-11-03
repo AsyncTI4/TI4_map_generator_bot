@@ -97,6 +97,11 @@ public class Mapper {
         for (TechnologyModel tech : technologies.values()) {
             tech.validationWarnings();
         }
+
+        //Ensure Unit lists contain valid data
+        for (UnitModel unit : units.values()) {
+            unit.validationWarnings();
+        }
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
