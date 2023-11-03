@@ -130,7 +130,6 @@
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "War Sun",
-        "upgradesFromUnitId": "",
         "requiredTechId": "absol_ws",
         "source": "absol",
         "moveValue": 2,

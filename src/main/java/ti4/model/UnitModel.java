@@ -105,7 +105,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private boolean validateHomebrewReplacesID() {
         if (getHomebrewReplacesID().isEmpty()) return true;
-        if (Mapper.isValidTech(getHomebrewReplacesID().get())) return true;
+        if (Mapper.isValidUnit(getHomebrewReplacesID().get())) return true;
         BotLogger.log("Unit **" + getId() + "** failed validation due to invalid HomebrewReplacesID ID: `" + getHomebrewReplacesID().get() + "`");
         return false;
     }
