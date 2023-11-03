@@ -433,10 +433,35 @@
         "ability": "After this unit is destroyed, roll 1 die.  If the result is 6 or greater, place the unit on this card.  At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
     },
     {
-        "id": "absol_nekro_valefarx"
+        "id": "absol_nekro_valefarx",
+        "name": "Valefar Assimilator X",
+        "asyncId": "absol_nekro_valefarx",
+        "baseType": "absol_nekro_valefarx",
+        "requiredTechId": "absol_vax",
+        "productionValue": 1,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "spaceCannonHitsOn": 5,
+        "spaceCannonDieCount": 1,
+        "sustainDamage": true,
+        "deepSpaceCannon": true,
+        "planetaryShield": true,
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "source": "absol"
     },
     {
-        "id": "absol_nekro_valefary"
+        "id": "absol_nekro_valefary",
+        "name": "Valefar Assimilator Y",
+        "asyncId": "absol_nekro_valefary",
+        "baseType": "absol_nekro_valefary",
+        "requiredTechId": "absol_vay",
+        "combatHitsOn": 6,
+        "cost": 2,
+        "moveValue": 3,
+        "capacityValue": 2,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "source": "absol"
     },
     {
         "id": "absol_titans_pds2",
