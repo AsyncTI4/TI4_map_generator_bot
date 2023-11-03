@@ -3408,15 +3408,21 @@ public class Game {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
             for (TechnologyModel tech : techsToReplace) {
-                if (tech.getHomebrewReplacesID().isPresent() && player.hasTech(tech.getHomebrewReplacesID().get())) {
+                if (tech.getHomebrewReplacesID().isPresent()) {
                     String replacedTechID = tech.getHomebrewReplacesID().get();
-                    if (!player.hasTechReady(replacedTechID)) {
-                        player.refreshTech(replacedTechID);
-                        newExhaustedTechs.add(tech.getAlias());
+                    String replacingTechID = tech.getAlias();
+                    if (player.hasTech(tech.getHomebrewReplacesID().get())) {
+                        if (!player.hasTechReady(replacedTechID)) {
+                            player.refreshTech(replacedTechID);
+                            newExhaustedTechs.add(replacingTechID);
+                        }
+                        player.removeTech(replacedTechID);
+                        player.addTech(replacingTechID);
                     }
-
-                    player.removeTech(replacedTechID);
-                    player.addTech(tech.getAlias());
+                    if (player.getFactionTechs().contains(replacedTechID)) {
+                        player.removeFactionTech(replacedTechID);
+                        player.addFactionTech(replacingTechID);
+                    }
                 }
             }
             player.setExhaustedTechs(newExhaustedTechs);
@@ -3431,16 +3437,19 @@ public class Game {
             List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
 
             for (TechnologyModel tech : techsToReplace) {
-                if (player.hasTech(tech.getAlias())) {
-                    String replacedTechID = tech.getAlias();
-                    String replacingTechID =  tech.getHomebrewReplacesID().get();
+                String replacedTechID = tech.getAlias();
+                String replacingTechID =  tech.getHomebrewReplacesID().get();
+                if (player.hasTech(replacedTechID)) {
                     if (!player.hasTechReady(replacedTechID)) {
                         player.refreshTech(replacedTechID);
                         newExhaustedTechs.add(replacingTechID);
                     }
-
                     player.removeTech(replacedTechID);
                     player.addTech(replacingTechID);
+                }
+                if (player.getFactionTechs().contains(replacedTechID)) {
+                    player.removeFactionTech(replacedTechID);
+                    player.addFactionTech(replacingTechID);
                 }
             }
             player.setExhaustedTechs(newExhaustedTechs);
