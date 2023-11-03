@@ -46,6 +46,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing
@@ -319,5 +320,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAbility() {
         return Optional.ofNullable(ability);
+    }
+    
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 }
