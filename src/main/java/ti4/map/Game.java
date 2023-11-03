@@ -3422,4 +3422,28 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
+
+    public void swapOutVariantTechs() {
+        DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
+        if (deckModel == null) return;
+        List<TechnologyModel> techsToReplace = Mapper.getTechs().values().stream().filter(t -> t.getHomebrewReplacesID().isPresent()).toList();
+        for (Player player : getPlayers().values()) {
+            List<String> newExhaustedTechs = new ArrayList<>(player.getExhaustedTechs());
+
+            for (TechnologyModel tech : techsToReplace) {
+                if (player.hasTech(tech.getAlias())) {
+                    String replacedTechID = tech.getAlias();
+                    String replacingTechID =  tech.getHomebrewReplacesID().get();
+                    if (!player.hasTechReady(replacedTechID)) {
+                        player.refreshTech(replacedTechID);
+                        newExhaustedTechs.add(replacingTechID);
+                    }
+
+                    player.removeTech(replacedTechID);
+                    player.addTech(replacingTechID);
+                }
+            }
+            player.setExhaustedTechs(newExhaustedTechs);
+        }
+    }
 }

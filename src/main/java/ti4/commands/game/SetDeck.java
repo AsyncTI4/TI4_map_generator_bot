@@ -58,6 +58,7 @@ public class SetDeck extends GameSubcommandData {
                     }
                 }
                 if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
+                    activeGame.swapOutVariantTechs();
                     activeGame.swapInVariantTechs();
                 }
             }
