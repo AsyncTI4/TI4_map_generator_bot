@@ -1654,11 +1654,11 @@ public class Player {
 
         if (techModel.getType() == TechnologyType.UNITUPGRADE) {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
-            if (unitModel != null && unitModel.getBaseType() != null) {
+            if (unitModel != null) {
                 // Remove all non-faction-upgrade matching units
                 String asyncId = unitModel.getAsyncId();
                 List<UnitModel> unitsToRemove = getUnitsByAsyncID(asyncId).stream()
-                    .filter(unit -> unit.getFaction() == null || unit.getUpgradesFromUnitId() == null).toList();
+                    .filter(unit -> unit.getFaction().isEmpty() || unit.getUpgradesFromUnitId().isEmpty()).toList();
                 for (UnitModel u : unitsToRemove) {
                     removeOwnedUnitByID(u.getId());
                 }
