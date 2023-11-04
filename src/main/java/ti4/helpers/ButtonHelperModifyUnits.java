@@ -433,7 +433,7 @@ public class ButtonHelperModifyUnits {
                 + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
         } else {
             Tile tile;
-            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong)) {
+            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong) || "3gf".equalsIgnoreCase(unitLong)) {
                 if ("2gf".equalsIgnoreCase(unitLong) || "3gf".equalsIgnoreCase(unitLong)) {
                     String amount = ""+unitLong.charAt(0);
                     if (!planetName.contains("space")) {
