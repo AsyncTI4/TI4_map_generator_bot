@@ -1402,7 +1402,7 @@ public class GenerateMap {
 
                     String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                     spoopy = ImageHelper.read(spoopypath);
-                    BotLogger.log("SPOOPY TIME: " + spoopypath);
+               //     BotLogger.log("SPOOPY TIME: " + spoopypath);
                 }
 
                 if (justNumber) {
@@ -3575,7 +3575,7 @@ public class GenerateMap {
 
                 String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                 spoopy = ImageHelper.read(spoopypath);
-                BotLogger.log("SPOOPY TIME: " + spoopypath);
+              //  BotLogger.log("SPOOPY TIME: " + spoopypath);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             // DRAW UNITS

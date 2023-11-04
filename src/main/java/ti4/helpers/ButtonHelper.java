@@ -1056,7 +1056,7 @@ public class ButtonHelper {
             }
             case "zealots" -> shouldBeUnlocked = true;
             case "yin" -> shouldBeUnlocked = true;
-            case "dihmohn" -> shouldBeUnlocked = true;
+            case "florzen" -> shouldBeUnlocked = true;
             case "letnev" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
