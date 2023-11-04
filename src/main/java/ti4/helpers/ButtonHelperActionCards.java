@@ -231,7 +231,6 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
         event.getMessage().delete().queue();
     }
-
     public static void resolveUprisingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
         for (Player p2 : activeGame.getRealPlayers()) {
