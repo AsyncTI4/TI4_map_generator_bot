@@ -313,7 +313,9 @@ public class MessageListener extends ListenerAdapter {
                                         }
                                     }
                                 }
-                                player.setWhetherPlayerShouldBeTenMinReminded(false);
+                                if(player != null){
+                                    player.setWhetherPlayerShouldBeTenMinReminded(false);
+                                }
                                 activeGame.setLastActivePlayerPing(new Date());
                                 GameSaveLoadManager.saveMap(activeGame);
                             }
