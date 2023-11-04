@@ -1922,7 +1922,7 @@ public class GenerateMap {
                 UnitModel unit = Mapper.getUnitModelByTechUpgrade(techInformation.getAlias());
 
                 if (unit == null) {
-                    BotLogger.log("Could not load unit associated with tech: " + techInformation.getAlias());
+                    BotLogger.log(activeGame.getName() + " " + player.getUserName() + " Could not load unit associated with tech: " + techInformation.getAlias());
                     continue;
                 }
                 Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);

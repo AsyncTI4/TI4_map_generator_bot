@@ -1300,12 +1300,7 @@ public class AgendaHelper {
                             } else {
                                 sb.append(" an ").append(Emojis.ActionCard).append(" Action Card");
                             }
-                            if(activeGame.getNomadCoin()){
-                                sb.append(" and 2 " + Emojis.nomadcoin + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
-                            }else{
-                                sb.append(" and 2 " + Emojis.tg + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
-                            }
-                            
+                            sb.append(" and 2 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade goods (" + currentTG + " -> " + winningR.getTg() + ")");
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
                             ButtonHelperAbilities.pillageCheck(winningR, activeGame);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, activeGame, 2);

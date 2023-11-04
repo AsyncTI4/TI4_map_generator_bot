@@ -297,11 +297,7 @@ public class ButtonHelperAgents {
             " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
-
-            messageText = messageText + "\n" + rest.split("_")[1] + " " + Emojis.tg + " was placed on top of the leader";
-            if(activeGame.getNomadCoin()){
-                messageText = messageText.replace(Emojis.tg, Emojis.nomadcoin);
-            }
+            messageText = messageText + "\n" + rest.split("_")[1] + " " + Emojis.getTGorNomadCoinEmoji(activeGame) + " was placed on top of the leader";
         }
         MessageHelper.sendMessageToChannel(channel2, messageText);
         if ("naazagent".equalsIgnoreCase(agent)) {
