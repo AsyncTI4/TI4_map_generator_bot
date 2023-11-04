@@ -1700,6 +1700,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("insubStep2_")) {
+            ButtonHelperActionCards.resolveInsubStep2(player, activeGame, event, buttonID);
          } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("upstableStep2_")) {
@@ -2835,6 +2837,15 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveUnexpected" -> {
+                    ButtonHelperActionCards.resolveUnexpectedAction(player, activeGame, event, buttonID);
+                }
+                case "resolveFrontline" -> {
+                    ButtonHelperActionCards.resolveFrontlineDeployment(player, activeGame, event, buttonID);
+                }
+                case "resolveInsubStep1" -> {
+                    ButtonHelperActionCards.resolveInsubStep1(player, activeGame, event, buttonID);
                 }
                 case "resolveUnstableStep1" -> {
                     ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -69,7 +70,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             if(pingPeople || activeGame.isFoWMode()){
                 text += player.getRepresentation();
             }else{
-                text += player.getUserName();
+                text += ButtonHelper.getIdent(player) + " "+player.getUserName();
             }
             
             if (passed) {

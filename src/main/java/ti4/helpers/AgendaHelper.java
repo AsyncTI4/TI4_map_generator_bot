@@ -367,8 +367,8 @@ public class AgendaHelper {
         List<Player> voters = getWinningVoters(winner, activeGame);
         voters.addAll(riders);
         for (Player player : voters) {
-            if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
-                ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
+            if (player.getLeaderIDs().contains("florzencommander") && !player.hasLeaderUnlocked("florzencommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "florzen", event);
             }
         }
         String ridSum = "People had riders to resolve.";

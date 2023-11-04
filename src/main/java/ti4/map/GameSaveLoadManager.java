@@ -210,7 +210,7 @@ public class GameSaveLoadManager {
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
-                    if (loadedGame != null && loadedGame.getSavedButtons().size() > 0) {
+                    if (loadedGame != null && loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
                         MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());

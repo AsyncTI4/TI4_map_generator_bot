@@ -434,18 +434,19 @@ public class ButtonHelperModifyUnits {
         } else {
             Tile tile;
             if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong)) {
-                if ("2gf".equalsIgnoreCase(unitLong)) {
+                if ("2gf".equalsIgnoreCase(unitLong) || "3gf".equalsIgnoreCase(unitLong)) {
+                    String amount = ""+unitLong.charAt(0);
                     if (!planetName.contains("space")) {
                         new AddUnits().unitParsing(event, player.getColor(),
-                            activeGame.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
+                            activeGame.getTile(AliasHandler.resolveTile(planetName)), amount+" gf " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " 2 " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " "+amount+" " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
                         new AddUnits().unitParsing(event, player.getColor(),
-                            tile, "2 gf ",
+                            tile, amount+" gf ",
                             activeGame);
-                        successMessage = producedOrPlaced + " 2 " + Emojis.infantry + " in space.";
+                        successMessage = producedOrPlaced + " "+amount+" " + Emojis.infantry + " in space.";
                     }
                 } else {
 
