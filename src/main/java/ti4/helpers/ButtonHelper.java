@@ -3669,16 +3669,16 @@ public class ButtonHelper {
                 buttons.add(Button.success("naaluHeroInitiation", "Play Naalu Hero"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                    player2.getRepresentation()
                         + " Reminder this is the window to do Naalu Hero. You can use the buttons to start the process",
                     buttons);
             }
             if (player2.getRelics() != null && player2.hasRelic("mawofworlds") && activeGame.isCustodiansScored()) {
                 MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                    player2.getRepresentation()
                         + " Reminder this is the window to do Maw of Worlds");
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                   player2.getRepresentation()
                         + " You can use these buttons to resolve Maw Of Worlds",
                     getMawButtons());
             }
@@ -3692,10 +3692,10 @@ public class ButtonHelper {
                     if (unitHolder != null && unitHolder.getTokenList() != null
                         && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-                            Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                            player2.getRepresentation()
                                 + "Reminder this is the window to purge Crown of Emphidia if you want to.");
                         MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(),
-                            Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                            player2.getRepresentation()
                                 + " You can use these buttons to resolve Crown of Emphidia",
                             getCrownButtons());
                     }
@@ -3704,20 +3704,26 @@ public class ButtonHelper {
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")
                 && !activeGame.isCustodiansScored()) {
                 MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                    player2.getRepresentation()
                         + "Reminder this is the window to do summit");
             }
             if (player2.getActionCards() != null && (player2.getActionCards().containsKey("investments")
                 && !activeGame.isCustodiansScored())) {
                 MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                    player2.getRepresentation()
                         + "Reminder this is the window to do manipulate investments.");
             }
 
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("stability")) {
                 MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
-                    Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                    player2.getRepresentation()
                         + "Reminder this is the window to play political stability.");
+            }
+
+            if (player2.getActionCards() != null && player2.getActionCards().containsKey("abs")&& activeGame.isCustodiansScored()) {
+                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
+                    player2.getRepresentation()
+                        + "Reminder this is the window to play ancient burial sites.");
             }
 
             for (String pn : player2.getPromissoryNotes().keySet()) {
