@@ -217,6 +217,34 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveUprisingStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Spy";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSpyStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Political Stability";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolvePSStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Plague";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolvePlagueStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Cripple Defenses";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveCrippleDefensesStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Ancient Burial Sites";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveABSStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Insubordination";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveInsubStep1", "Resolve "+codedName));

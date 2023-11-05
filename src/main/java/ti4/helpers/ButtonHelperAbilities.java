@@ -13,6 +13,7 @@ import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
@@ -543,9 +544,13 @@ public class ButtonHelperAbilities {
 
     public static void resolvePeaceAccords(String buttonID, String ident, Player player, Game activeGame, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
+        if(planet.equalsIgnoreCase("lockedmallice"));
+        planet = "mallice";
+        Tile tile = activeGame.getTileFromPlanet("lockedmallice");
+        tile = MoveUnits.flipMallice(event, tile, activeGame);
         new PlanetAdd().doAction(player, planet, activeGame, event);
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet, activeGame);
-        String msg = ident + " claimed the planet " + planetRepresentation2 + " using the peace accords ability";
+        String msg = ident + " claimed the planet " + planetRepresentation2 + " using the peace accords ability. ";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
         event.getMessage().delete().queue();
     }

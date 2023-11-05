@@ -1696,13 +1696,29 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.landingUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("reparationsStep2_")) {
             ButtonHelperActionCards.resolveReparationsStep2(player, activeGame, event, buttonID);
-         } else if (buttonID.startsWith("reparationsStep3_")) {
+        } else if (buttonID.startsWith("reparationsStep3_")) {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("spyStep2_")) {
+            ButtonHelperActionCards.resolveSpyStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("insubStep2_")) {
             ButtonHelperActionCards.resolveInsubStep2(player, activeGame, event, buttonID);
-         } else if (buttonID.startsWith("uprisingStep3_")) {
+        } else if (buttonID.startsWith("absStep2_")) {
+            ButtonHelperActionCards.resolveABSStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("psStep2_")) {
+            ButtonHelperActionCards.resolvePSStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("plagueStep2_")) {
+            ButtonHelperActionCards.resolvePlagueStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("crippleStep2_")) {
+            ButtonHelperActionCards.resolveCrippleStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("spyStep3_")) {
+            ButtonHelperActionCards.resolveSpyStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("plagueStep3_")) {
+            ButtonHelperActionCards.resolvePlagueStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("crippleStep3_")) {
+            ButtonHelperActionCards.resolveCrippleStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("upstableStep2_")) {
             ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
@@ -2838,6 +2854,15 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
                 }
+                case "resolvePlagueStep1" -> {
+                    ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveCrippleDefensesStep1" -> {
+                    ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveSpyStep1" -> {
+                    ButtonHelperActionCards.resolveSpyStep1(player, activeGame, event, buttonID);
+                }
                 case "resolveUnexpected" -> {
                     ButtonHelperActionCards.resolveUnexpectedAction(player, activeGame, event, buttonID);
                 }
@@ -2849,6 +2874,12 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveUnstableStep1" -> {
                     ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveABSStep1" -> {
+                    ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
+                }
+                case "resolvePSStep1" -> {
+                    ButtonHelperActionCards.resolvePSStep1(player, activeGame, event, buttonID);
                 }
                 case "resolveRally" -> {
                     ButtonHelperActionCards.resolveRally(activeGame, player, event);

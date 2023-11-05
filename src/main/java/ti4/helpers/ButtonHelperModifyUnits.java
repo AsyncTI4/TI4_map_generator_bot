@@ -43,9 +43,6 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = new ArrayList<>();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeGame.getTileByPosition(pos1);
-        String colorID = Mapper.getColorID(player.getColor());
-        UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
-        UnitKey infKey = Mapper.getUnitKey("mf", colorID);
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
             String representation = planetRepresentations.get(name);
@@ -64,7 +61,7 @@ public class ButtonHelperModifyUnits {
                     buttons.add(validTile2);
                 }
                 limit = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
-                for (int x = 1; x < planet.getUnits().get(mechKey) + 1; x++) {
+                for (int x = 1; x < limit + 1; x++) {
                     if (x > 2) {
                         break;
                     }

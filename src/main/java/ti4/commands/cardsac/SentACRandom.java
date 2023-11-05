@@ -1,10 +1,12 @@
 package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -33,13 +35,6 @@ public class SentACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
-        List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
-        if (actionCards.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
-        }
-        Collections.shuffle(actionCards);
-        String acID = actionCards.get(0);
         Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
@@ -51,15 +46,26 @@ public class SentACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
+        sendRandomACPart2(event, activeGame, player, player_);
+    }
 
+    public void sendRandomACPart2(GenericInteractionCreateEvent event, Game activeGame, Player player, Player player_){
+        LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
+        List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
+        if (actionCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
+        }
+        Collections.shuffle(actionCards);
+        String acID = actionCards.get(0);
 		// FoW specific pinging
 		if (activeGame.isFoWMode()) {
 			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, Emojis.ActionCard + " Action Card", null);
 		}
-
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
         ACInfo.sendActionCardInfo(activeGame, player_);
         ACInfo.sendActionCardInfo(activeGame, player);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# "+player.getRepresentation()+" you lost the AC "+Mapper.getActionCard(acID));
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# "+player_.getRepresentation()+" you gained the AC "+Mapper.getActionCard(acID));
     }
 }
