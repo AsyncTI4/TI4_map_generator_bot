@@ -1,18 +1,15 @@
-FROM amazoncorretto:18
+FROM maven:3.9.5-amazoncorretto-21
 WORKDIR /opt
-RUN df -h && \
-    yum install -y maven && \
-    mvn --version
-COPY ./src ./src
 COPY pom.xml pom.xml
 COPY .classpath .classpath
 COPY .project .project
 COPY ./src/main/resources /opt/resources
-RUN mvn --batch-mode clean compile assembly:single && \
-    mvn --batch-mode package && \
-    cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
+COPY ./src ./src
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
+RUN mvn --batch-mode --no-transfer-progress clean compile assembly:single && \
+    mvn --batch-mode --no-transfer-progress package && \
+    cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
 ARG DISCORD_BOT_KEY
 ARG DISCORD_USER
 ARG DISCORD_SERVER
