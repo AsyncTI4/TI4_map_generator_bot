@@ -236,12 +236,34 @@ public class ButtonHelperAgents {
 
     public static void resolveMercerMove(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String planetDestination = buttonID.split("_")[1];
-        String planetRemoval = buttonID.split("_")[2];
-        String unit = buttonID.split("_")[3];
-        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetRemoval), unit + " " + planetRemoval, activeGame);
-        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetDestination), unit + " " + planetDestination, activeGame);
+        String pos =  buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+        String planetRemoval = buttonID.split("_")[3];
+        String unit = buttonID.split("_")[4];
+        UnitHolder uH = tile.getUnitHolders().get(planetRemoval);
+        String message = "";
+        if(planetRemoval.equalsIgnoreCase("space")){
+            message = ident + " moved 1 " + unit + " from space area of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame);
+            planetRemoval = "";
+        }else{
+            message = ident + " moved 1 " + unit + " from " + Helper.getPlanetRepresentation(planetRemoval, activeGame) + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame);
 
-        String message = ident + " moved 1 " + unit + " from " + Helper.getPlanetRepresentation(planetRemoval, activeGame) + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame);
+        }
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " " + planetRemoval, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetDestination), unit + " " + planetDestination, activeGame);
+        if(unit.equalsIgnoreCase("mech")){
+            if(uH.getUnitCount(UnitType.Mech,player.getColor())< 1){
+                ButtonHelper.deleteTheOneButton(event);
+            }
+        }else{
+            if(unit.equalsIgnoreCase("pds")){
+                if(uH.getUnitCount(UnitType.Pds,player.getColor())< 1){
+                    ButtonHelper.deleteTheOneButton(event);
+                }
+            }else if(uH.getUnitCount(UnitType.Infantry,player.getColor())< 1){
+                ButtonHelper.deleteTheOneButton(event);
+            }
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
@@ -427,21 +449,7 @@ public class ButtonHelperAgents {
         if ("nomadagentmercer".equalsIgnoreCase(agent)) {
             String posNPlanet = rest.replace("nomadagentmercer_", "");
             String planetName = posNPlanet.split("_")[1];
-            List<Button> buttons = new ArrayList<>();
-            for (String planet : player.getPlanets()) {
-                if (planet.equals(planetName) || planet.toLowerCase().contains("custodiavigilia")) {
-                    continue;
-                }
-                if (ButtonHelper.getNumberOfInfantryOnPlanet(planet, activeGame, player) > 0) {
-                    buttons.add(Button.success("mercerMove_" + planetName + "_" + planet + "_infantry",
-                        "Move Infantry from " + Helper.getPlanetRepresentation(planet, activeGame) + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
-                }
-                if (ButtonHelper.getNumberOfMechsOnPlanet(planet, activeGame, player) > 0) {
-                    buttons.add(Button.success("mercerMove_" + planetName + "_" + planet + "_mech",
-                        "Move mech from " + Helper.getPlanetRepresentation(planet, activeGame) + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
-                }
-            }
-            buttons.add(Button.danger("deleteButtons", "Done moving to this planet"));
+            List<Button> buttons = ButtonHelper.getButtonsForMovingGroundForcesToAPlanet(activeGame, planetName, player);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to resolve move of mercer units to this planet", buttons);
         }
