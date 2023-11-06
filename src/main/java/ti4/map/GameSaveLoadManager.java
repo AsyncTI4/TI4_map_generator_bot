@@ -210,9 +210,14 @@ public class GameSaveLoadManager {
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
-                    if (loadedGame != null && loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
-                        MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
+                    try{
+                        if (loadedGame != null && loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
+                            MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
+                        }
+                    }catch(Exception e){
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
+                    
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
