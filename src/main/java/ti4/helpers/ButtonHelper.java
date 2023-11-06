@@ -431,13 +431,8 @@ public class ButtonHelper {
         if (mainGameChannel == null) {
             return playersWhoAreMissed;
         }
-        try{
-            Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(500,
-            TimeUnit.MILLISECONDS);
-        }catch(Exception e){
-            return playersWhoAreMissed;
-        }
-        Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(500,
+        
+        Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100,
             TimeUnit.MILLISECONDS);
         for (Player player : activeGame.getPlayers().values()) {
             if (!player.isRealPlayer()) {
