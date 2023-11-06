@@ -7,9 +7,9 @@ COPY ./src/main/resources /opt/resources
 COPY ./src ./src
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
-RUN mvn --batch-mode --no-transfer-progress clean compile assembly:single
-RUN mvn --batch-mode --no-transfer-progress package
-RUN cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
+RUN mvn --batch-mode --no-transfer-progress clean compile assembly:single && \
+    mvn --batch-mode --no-transfer-progress package && \
+    cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
 ARG DISCORD_BOT_KEY
 ARG DISCORD_USER
 ARG DISCORD_SERVER
