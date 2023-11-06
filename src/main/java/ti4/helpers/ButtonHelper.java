@@ -99,6 +99,26 @@ public class ButtonHelper {
         return buttons;
     }
 
+    public static List<Button> getForcedPNSendButtons(Game activeGame, Player player, Player p1) {
+        List<Button> stuffToTransButtons = new ArrayList<Button>();
+        for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
+            if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
+                continue;
+            }
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+            Player owner = activeGame.getPNOwner(pnShortHand);
+            Button transact;
+            if (activeGame.isFoWMode()) {
+                transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() + " " + promissoryNote.getName());
+            } else {
+                transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
+                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+            }
+            stuffToTransButtons.add(transact);
+        }
+        return stuffToTransButtons;
+    }
+
     public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
         if (player == player2 || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player.hasAbility("guild_ships") || player.getPromissoryNotes().containsKey("convoys")
             || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || player2.getNeighbouringPlayers().contains(player)
@@ -409,6 +429,12 @@ public class ButtonHelper {
         }
         TextChannel mainGameChannel = activeGame.getMainGameChannel();
         if (mainGameChannel == null) {
+            return playersWhoAreMissed;
+        }
+        try{
+            Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(500,
+            TimeUnit.MILLISECONDS);
+        }catch(Exception e){
             return playersWhoAreMissed;
         }
         Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(500,
@@ -800,6 +826,10 @@ public class ButtonHelper {
                         MessageHelper.sendMessageToChannel(channel, ident + " you triggered voidwatch");
                         channel = player.getPrivateChannel();
                     }
+                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, nonActivePlayer, player);
+                    String message = ButtonHelper.getTrueIdentity(player, activeGame)
+                        + " You have triggered void watch. Please select the PN you would like to send";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " you owe the defender one PN");
                 }
             }
@@ -1753,6 +1783,14 @@ public class ButtonHelper {
         if (p1.hasAbility("edict") || p1.hasAbility("imperia")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mentakcommander") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on "+p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mentakcommander")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on "+p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
         if ("space".equalsIgnoreCase(groundOrSpace) && !activeGame.isFoWMode()) {
             buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
@@ -2929,6 +2967,62 @@ public class ButtonHelper {
         }
         Button concludeMove = Button.danger(finChecker + "doneWithTacticalAction", "Conclude tactical action (will DET if applicable)");
         buttons.add(concludeMove);
+        return buttons;
+    }
+
+    public static void resolveTransitDiodesStep1(Game activeGame, Player player, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : player.getPlanetsAllianceMode()){
+            if(planet.toLowerCase().contains("custodia")|| planet.contains("ghoti")){
+                continue;
+            }
+            buttons.add(Button.success("transitDiodes_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        buttons.add(Button.danger("deleteButtons", "Done resolving transit diodes"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" use buttons to choose the planet you want to move troops too", buttons);
+    }
+    public static void resolveTransitDiodesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(activeGame, buttonID.split("_")[1], player);
+        deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" use buttons to choose the troops you want to move to "+Helper.getPlanetRepresentation(buttonID.split("_")[1], activeGame), buttons);
+    }
+
+    public static List<Button> getButtonsForMovingGroundForcesToAPlanet(Game activeGame, String planetName, Player player){
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            for(UnitHolder uH : tile.getUnitHolders().values()){
+                if(uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0){
+                    if(uH instanceof Planet){
+                        buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName() + "_infantry",
+                        "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), activeGame) + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                    }else{
+                        buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName()+ "_infantry",
+                        "Move Infantry from space of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                    }
+                }
+                if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0){
+                    if(uH instanceof Planet){
+                        buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName() + "_mech",
+                        "Move Mech from " + Helper.getPlanetRepresentation(uH.getName(), activeGame) + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                    }else{
+                        buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName()+ "_mech",
+                        "Move Mech from space of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                    }
+                }
+                if(player.hasUnit("titans_pds") || player.hasTech("ht2")){
+                    if(uH.getUnitCount(UnitType.Pds, player.getColor()) > 0){
+                        if(uH instanceof Planet){
+                            buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName() + "_pds",
+                            "Move PDS from " + Helper.getPlanetRepresentation(uH.getName(), activeGame) + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                        }else{
+                            buttons.add(Button.success("mercerMove_" + planetName + "_" +tile.getPosition()+"_"+ uH.getName()+ "_pds",
+                            "Move PDS from space of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetName, activeGame)));
+                        }
+                    }
+                }
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Done moving to this planet"));
         return buttons;
     }
 
@@ -4110,8 +4204,8 @@ public class ButtonHelper {
                     }
                 }
 
-                if (p1.getVrf() > 0) {
-                    for (int x = 1; x < p1.getVrf() + 1; x++) {
+                if (p1.getUrf() > 0) {
+                    for (int x = 1; x < p1.getUrf() + 1; x++) {
                         Button transact = Button.secondary(finChecker + "send_Frags_" + p2.getFaction() + "_URF" + x, "Frontier Fragments (" + x + ")");
                         stuffToTransButtons.add(transact);
                     }
@@ -4903,7 +4997,7 @@ public class ButtonHelper {
                         Button transact = Button.danger(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    if (p1.getVrf() > 0) {
+                    if (p1.getUrf() > 0) {
                         Button transact = Button.secondary(finChecker + "purge_Frags_URF_1", "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
@@ -4933,7 +5027,7 @@ public class ButtonHelper {
             case "getRelic" -> {
                 String message = "Click the fragments you'd like to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
-                int numToBeat = 2 - p1.getVrf();
+                int numToBeat = 2 - p1.getUrf();
                 if ((p1.hasAbility("fabrication") || p1.getPromissoryNotes().containsKey("bmf"))) {
                     numToBeat = numToBeat - 1;
                     if (p1.getPromissoryNotes().containsKey("bmf") && !p1.hasAbility("fabrication")) {
@@ -4961,8 +5055,8 @@ public class ButtonHelper {
                     }
                 }
 
-                if (p1.getVrf() > 0) {
-                    for (int x = 1; x < p1.getVrf() + 1; x++) {
+                if (p1.getUrf() > 0) {
+                    for (int x = 1; x < p1.getUrf() + 1; x++) {
                         Button transact = Button.secondary(finChecker + "purge_Frags_URF_" + x, "Frontier Fragments (" + x + ")");
                         purgeFragButtons.add(transact);
                     }

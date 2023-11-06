@@ -659,12 +659,12 @@ public class GenerateMap {
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
 
-                int vrf = player.getVrf();
+                int urf = player.getUrf();
                 int irf = player.getIrf();
-                String vrfImage = "pa_fragment_urf.png";
+                String urfImage = "pa_fragment_urf.png";
                 String irfImage = "pa_fragment_irf.png";
                 int xDelta = 0;
-                xDelta = drawFrags(y, x, yDelta, vrf, vrfImage, xDelta);
+                xDelta = drawFrags(y, x, yDelta, urf, urfImage, xDelta);
                 xDelta += 25;
                 xDelta = drawFrags(y, x, yDelta, irf, irfImage, xDelta);
 
@@ -881,9 +881,9 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int drawFrags(int y, int x, int yDelta, int vrf, String vrfImage, int xDelta) {
-        for (int i = 0; i < vrf; i++) {
-            drawPAImage(x + 475 + xDelta, y + yDelta - 25, vrfImage);
+    private int drawFrags(int y, int x, int yDelta, int urf, String urfImage, int xDelta) {
+        for (int i = 0; i < urf; i++) {
+            drawPAImage(x + 475 + xDelta, y + yDelta - 25, urfImage);
             xDelta += 15;
         }
         return xDelta;

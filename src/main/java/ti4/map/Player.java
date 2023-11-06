@@ -790,7 +790,7 @@ public class Player {
         return hrf;
     }
 
-    public int getVrf() {
+    public int getUrf() {
         return vrf;
     }
 
