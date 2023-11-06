@@ -233,6 +233,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolvePlagueStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Upgrade";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveUpgrade_"+activeGame.getActiveSystem(), "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
 
             codedName = "Cripple Defenses";
             if (actionCardTitle.contains(codedName)) {
@@ -243,6 +248,11 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Ancient Burial Sites";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveABSStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Salvage";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSalvageStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
             codedName = "Insubordination";
@@ -280,6 +290,16 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Unstable Planet";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveUnstableStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Ghost Ship";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveGhostShipStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Exploration Probe";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveProbeStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
             codedName = "Rally";

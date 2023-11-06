@@ -9,8 +9,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
+import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.tokens.RemoveCC;
+import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
@@ -19,6 +22,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -270,6 +274,30 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to plague", buttons);
     }
+    public static void resolveGhostShipStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = getGhostShipButtons(activeGame, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which tile you wish to place a ghost ship in", buttons);
+    }
+    public static void resolveProbeStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = getProbeButtons(activeGame, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which tile you wish to probe", buttons);
+    }
+
+    public static void resolveGhostShipStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        tile = MoveUnits.flipMallice(event, tile, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", activeGame);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " put a destroyer in "+tile.getRepresentation());
+    }
+    public static void resolveProbeStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        new ExpFrontier().expFront(event, tile, activeGame, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " explored the DET in "+tile.getRepresentation());
+    }
 
     public static void resolveCrippleDefensesStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
@@ -394,6 +422,24 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's cultural planet you want to exhaust", buttons);
     }
+    public static void resolveSalvageStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("salvageStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("salvageStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who youre playing salvage on", buttons);
+    }
     public static void resolveInsubStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC()-1);
@@ -414,6 +460,18 @@ public class ButtonHelperActionCards {
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted all the cultural planets of " + ButtonHelper.getIdentOrColor(player, activeGame));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your cultural planets were exhausted due to ABS.");
+        event.getMessage().delete().queue();
+    }
+
+
+
+    public static void resolveSalvageStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        int comm = p2.getCommodities();
+        p2.setCommodities(0);
+        player.setTg(player.getTg()+comm);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " stole the commodities (there were "+comm+" comms to steal )of " + ButtonHelper.getIdentOrColor(player, activeGame));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your commodities were stolen due to salvage.");
         event.getMessage().delete().queue();
     }
 
@@ -479,6 +537,13 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to cripple", buttons);
+    }
+    public static void resolveUpgrade(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced a cruiser with a dread in "+tile.getRepresentation());
     }
 
     public static void resolveUnstableStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -639,6 +704,47 @@ public class ButtonHelperActionCards {
             }
         }
         return techs;
+    }
+
+    public static List<Button> getGhostShipButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if (FoWHelper.doesTileHaveWHs(activeGame, tile.getPosition(), player)) {
+                boolean hasOtherShip = false;
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(FoWHelper.playerHasShipsInSystem(p2,tile)){
+                        hasOtherShip = true;
+                    }
+                }
+                if(!hasOtherShip){
+                     buttons.add(Button.success("ghostShipStep2_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+                }
+            }
+        }
+        return buttons;
+    }
+    public static List<Button> getProbeButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+                boolean hasShips = false;
+                for(String tile2pos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false)){
+                    if(FoWHelper.playerHasShipsInSystem(player,activeGame.getTileByPosition(tile2pos))){
+                        hasShips = true;
+                    }
+                }
+                if(FoWHelper.playerHasShipsInSystem(player,tile)){
+                    hasShips = true;
+                }
+                if(hasShips){
+                     buttons.add(Button.success("probeStep2_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+                }
+            }
+        }
+        return buttons;
     }
 
     public static void resolveReverse(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
