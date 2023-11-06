@@ -65,7 +65,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         player_.setActionCard(acID);
         ACInfo.sendActionCardInfo(activeGame, player_);
         ACInfo.sendActionCardInfo(activeGame, player);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# "+player.getRepresentation()+" you lost the AC "+Mapper.getActionCard(acID));
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# "+player_.getRepresentation()+" you gained the AC "+Mapper.getActionCard(acID));
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# "+player.getRepresentation()+" you lost the AC "+Mapper.getActionCard(acID).getName());
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# "+player_.getRepresentation()+" you gained the AC "+Mapper.getActionCard(acID).getName());
     }
 }

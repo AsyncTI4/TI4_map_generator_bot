@@ -232,7 +232,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
-		sb.append("   ").append(Emojis.UFrag).append(player.getVrf());
+		sb.append("   ").append(Emojis.UFrag).append(player.getUrf());
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc : player.getSCs()) {

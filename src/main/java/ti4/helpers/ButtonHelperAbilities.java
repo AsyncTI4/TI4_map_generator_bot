@@ -171,7 +171,7 @@ public class ButtonHelperAbilities {
                 }
                 if (numInf > 0) {
                     String buttonID = finChecker + "mitoMechPlacement_" + unitHolder.getName().toLowerCase().replace("'", "").replace("-", "").replace(" ", "");
-                    Button button = Button.success(buttonID, "Place mech on " + Helper.getPlanetRepresentation(unitHolder.getName(), activeGame));
+                    Button button = Button.success(buttonID, Helper.getPlanetRepresentation(unitHolder.getName(), activeGame));
                     planetButtons.add(button);
                 }
             }

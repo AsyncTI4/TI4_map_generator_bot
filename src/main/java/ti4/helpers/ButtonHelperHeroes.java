@@ -332,28 +332,15 @@ public class ButtonHelperHeroes {
             if (p1 == player) {
                 continue;
             }
-            List<Button> stuffToTransButtons = new ArrayList<Button>();
+            List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p1);
             String message = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), true)
                 + " The Naalu Hero has been played and you must send a PN. Please select the PN you would like to send";
-            for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
-                if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
-                    continue;
-                }
-                PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
-                Player owner = activeGame.getPNOwner(pnShortHand);
-                Button transact;
-                if (activeGame.isFoWMode()) {
-                    transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() + " " + promissoryNote.getName());
-                } else {
-                    transact = Button.success("naaluHeroSend_" + player.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                        .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
-                }
-                stuffToTransButtons.add(transact);
-            }
             MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
         }
         event.getMessage().delete().queue();
     }
+
+    
 
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String trueIdentity) {
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");

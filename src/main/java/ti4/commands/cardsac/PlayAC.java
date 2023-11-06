@@ -238,9 +238,19 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveUpgrade_"+activeGame.getActiveSystem(), "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Emergency Repairs";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveEmergencyRepairs_"+activeGame.getActiveSystem(), "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Cripple Defenses";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveCrippleDefensesStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Impersonation";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveImpersonation", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
 
@@ -286,6 +296,31 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveSummit", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Refit Troops";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveRefitTroops", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Seize Artifact";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSeizeArtifactStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Diplomatic Pressure";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveDiplomaticPressureStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Decoy Operation";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveDecoyOperationStep1_"+activeGame.getActiveSystem(), "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Reactor Meltdown";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveReactorMeltdownStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Unstable Planet";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveUnstableStep1", "Resolve "+codedName));
@@ -294,6 +329,11 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Ghost Ship";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveGhostShipStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Tactical Bombardment";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveTacticalBombardmentStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
             codedName = "Exploration Probe";

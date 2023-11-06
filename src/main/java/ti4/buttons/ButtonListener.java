@@ -400,6 +400,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.getGhostHeroTilesStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("resolveUpgrade_")) {
             ButtonHelperActionCards.resolveUpgrade(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("resolveEmergencyRepairs_")) {
+            ButtonHelperActionCards.resolveEmergencyRepairs(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("creussHeroStep2_")) {
             ButtonHelperHeroes.resolveGhostHeroStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
@@ -1108,6 +1110,8 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else if (buttonID.startsWith("combatRoll_")) {
             ButtonHelper.resolveCombatRoll(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("transitDiodes_")) {
+            ButtonHelper.resolveTransitDiodesStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("novaSeed_")) {
             new NovaSeed().secondHalfOfNovaSeed(player, event, activeGame.getTileByPosition(buttonID.split("_")[1]), activeGame);
             ButtonHelper.deleteTheOneButton(event);
@@ -1130,6 +1134,9 @@ public class ButtonListener extends ListenerAdapter {
             if (!"st".equals(tech)) {
                 if ("bs".equals(tech)) {
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player);
+                }
+                if ("td".equals(tech)) {
+                    ButtonHelper.resolveTransitDiodesStep1(activeGame, player, event);
                 }
                 if ("aida".equals(tech) || "sar".equals(tech)) {
                     if (!activeGame.isFoWMode() && event.getMessageChannel() != activeGame.getActionsChannel()) {
@@ -1462,6 +1469,15 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), trueIdentity + " no tech available to gain");
             }
+         } else if (buttonID.startsWith("mentakCommander_")) {
+            String color = buttonID.split("_")[1];
+            Player p2 = activeGame.getPlayerFromColorOrFaction(color);
+            List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p2);
+            String message = ButtonHelper.getTrueIdentity(p2, activeGame)
+                + " You have been hit with mentak commander. Please select the PN you would like to send";
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent "+color+" the buttons for resolving mentak commander");
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("mahactStealCC_")) {
             String color = buttonID.replace("mahactStealCC_", "");
             if (!player.getMahactCC().contains(color)) {
@@ -1698,10 +1714,22 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.landingUnits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("reparationsStep2_")) {
             ButtonHelperActionCards.resolveReparationsStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("seizeArtifactStep2_")) {
+            ButtonHelperActionCards.resolveSeizeArtifactStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("diplomaticPressureStep2_")) {
+            ButtonHelperActionCards.resolveDiplomaticPressureStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("decoyOperationStep2_")) {
+            ButtonHelperActionCards.resolveDecoyOperationStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("resolveDecoyOperationStep1_")) {
+            ButtonHelperActionCards.resolveDecoyOperationStep1(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("seizeArtifactStep3_")) {
+            ButtonHelperActionCards.resolveSeizeArtifactStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("reparationsStep3_")) {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("reactorMeltdownStep2_")) {
+            ButtonHelperActionCards.resolveReactorMeltdownStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spyStep2_")) {
             ButtonHelperActionCards.resolveSpyStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("insubStep2_")) {
@@ -1710,6 +1738,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveABSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("ghostShipStep2_")) {
             ButtonHelperActionCards.resolveGhostShipStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("tacticalBombardmentStep2_")) {
+            ButtonHelperActionCards.resolveTacticalBombardmentStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("probeStep2_")) {
             ButtonHelperActionCards.resolveProbeStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("salvageStep2_")) {
@@ -1726,6 +1756,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolvePlagueStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep3_")) {
             ButtonHelperActionCards.resolveCrippleStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("reactorMeltdownStep3_")) {
+            ButtonHelperActionCards.resolveReactorMeltdownStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("upstableStep2_")) {
@@ -2859,6 +2891,15 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveReparationsStep1" -> {
                     ButtonHelperActionCards.resolveReparationsStep1(player, activeGame, event, buttonID);
                 }
+                case "resolveSeizeArtifactStep1" -> {
+                    ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveDiplomaticPressureStep1" -> {
+                    ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveImpersonation" -> {
+                    ButtonHelperActionCards.resolveImpersonation(player, activeGame, event, buttonID);
+                }
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
                 }
@@ -2867,6 +2908,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveCrippleDefensesStep1" -> {
                     ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveReactorMeltdownStep1" -> {
+                    ButtonHelperActionCards.resolveReactorMeltdownStep1(player, activeGame, event, buttonID);
                 }
                 case "resolveSpyStep1" -> {
                     ButtonHelperActionCards.resolveSpyStep1(player, activeGame, event, buttonID);
@@ -2892,6 +2936,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveGhostShipStep1" -> {
                     ButtonHelperActionCards.resolveGhostShipStep1(player, activeGame, event, buttonID);
                 }
+                case "resolveTacticalBombardmentStep1" -> {
+                    ButtonHelperActionCards.resolveTacticalBombardmentStep1(player, activeGame, event, buttonID);
+                }
                 case "resolveProbeStep1" -> {
                     ButtonHelperActionCards.resolveProbeStep1(player, activeGame, event, buttonID);
                 }
@@ -2906,6 +2953,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveSummit" -> {
                     ButtonHelperActionCards.resolveSummit(activeGame, player, event);
+                }
+                case "resolveRefitTroops" -> {
+                    ButtonHelperActionCards.resolveRefitTroops(player, activeGame, event, buttonID, finsFactionCheckerPrefix);
                 }
                 case "industrialInitiative" -> {
                     ButtonHelperActionCards.industrialInitiative(player, activeGame, event);

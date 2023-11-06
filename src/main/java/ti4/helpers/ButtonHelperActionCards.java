@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.tokens.RemoveCC;
@@ -220,6 +221,43 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who took the planet from you", buttons);
     }
+    public static void resolveDiplomaticPressureStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("diplomaticPressureStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("diplomaticPressureStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who you want to diplo pressure", buttons);
+    }
+
+    public static void resolveReactorMeltdownStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("reactorMeltdownStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("reactorMeltdownStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who you want to play reactor meltdown on", buttons);
+    }
 
     public static void resolveFrontlineDeployment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
@@ -255,6 +293,24 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to uprise", buttons);
+    }
+    public static void resolveSeizeArtifactStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("seizeArtifactStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("seizeArtifactStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which neighbor you are stealing from", buttons);
     }
     public static void resolvePlagueStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
@@ -357,6 +413,29 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which SC(s) you used to have", buttons);
     }
+    public static void resolveImpersonation(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+        String message = ButtonHelper.getIdent(player)+" Drew Secret Objective";
+        activeGame.drawSecretObjective(player.getUserID());
+        if (player.hasAbility("plausible_deniability")) {
+            activeGame.drawSecretObjective(player.getUserID());
+            message = message + ". Drew a second SO due to plausible deniability.";
+        }
+        SOInfo.sendSecretObjectiveInfo(activeGame, player, event);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        buttons.add(Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation()+" Exhaust stuff to pay the 3 influence", buttons);
+        event.getMessage().delete().queue();
+    }
+
+
+
+
+
+
+
+
+
      public static void resolvePSStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Integer scNum = Integer.parseInt(buttonID.split("_")[1]);
         player.addSC(scNum);
@@ -443,14 +522,23 @@ public class ButtonHelperActionCards {
     public static void resolveInsubStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC()-1);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you subtracted 1 tactical cc from " + ButtonHelper.getIdentOrColor(player, activeGame));
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you lost a tactic cc due to insubordination ("+(player.getTacticalCC()+1)+"->"+player.getTacticalCC()+").");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you subtracted 1 tactical cc from " + ButtonHelper.getIdentOrColor(p2, activeGame));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you lost a tactic cc due to insubordination ("+(p2.getTacticalCC()+1)+"->"+p2.getTacticalCC()+").");
+        event.getMessage().delete().queue();
+    }
+    public static void resolveDiplomaticPressureStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(activeGame, player, p2);
+        String message = ButtonHelper.getTrueIdentity(p2, activeGame)
+            + " You have been diplo pressured. Please select the PN you would like to send";
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " sent buttons to resolve diplo pressure to " + ButtonHelper.getIdentOrColor(p2, activeGame));
         event.getMessage().delete().queue();
     }
     public static void resolveABSStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for(String planet: p2.getPlanetsAllianceMode()){
-            if(planet.toLowerCase().contains("custodia")){
+            if(planet.toLowerCase().contains("custodia")|| planet.contains("ghoti")){
                 continue;
             }
             Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
@@ -476,10 +564,10 @@ public class ButtonHelperActionCards {
 
     public static void resolveSpyStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " since spy is such a frequently sabod card, and it contains secret info, extra precaution has been taken with its resolution. A button has been sent to "+ButtonHelper.getIdentOrColor(player, activeGame)+" cards info thread, they can press this button to send a random AC to you.");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " since spy is such a frequently sabod card, and it contains secret info, extra precaution has been taken with its resolution. A button has been sent to "+ButtonHelper.getIdentOrColor(p2, activeGame)+" cards info thread, they can press this button to send a random AC to you.");
         List<Button> buttons = new ArrayList<Button>();
         buttons.add(Button.success("spyStep3_"+player.getFaction(), "Send random AC"));
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have been spyd on with the SPY AC. Press the button to send a random AC to the person.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have been hit with the Spy AC. Press the button to send a random AC to the person.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -504,6 +592,28 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
     }
 
+    public static void resolveSeizeArtifactStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        ArrayList<String> playerFragments = p2.getFragments();
+        for (String fragid : playerFragments) {
+            if (fragid.contains("crf")) {
+                buttons.add(Button.primary("seizeArtifactStep3_" + p2.getFaction()+"_"+fragid, "Seize Cultural ("+fragid+")"));
+            }
+            if (fragid.contains("irf")) {
+                buttons.add(Button.success("seizeArtifactStep3_" + p2.getFaction()+"_"+fragid, "Seize Industrial ("+fragid+")"));
+            }
+            if (fragid.contains("hrf")) {
+                buttons.add(Button.danger("seizeArtifactStep3_" + p2.getFaction()+"_"+fragid, "Seize Hazardous ("+fragid+")"));
+            }
+            if (fragid.contains("urf")) {
+                buttons.add(Button.secondary("seizeArtifactStep3_" + p2.getFaction()+"_"+fragid, "Seize Unknown ("+fragid+")"));
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the relic frag you want to grab", buttons);
+    }
+
     public static void resolveUprisingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if(p2.getReadiedPlanets().size() == 0){
@@ -518,6 +628,49 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
     }
+
+    public static void resolveReactorMeltdownStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getPlanetsAllianceMode()){
+            if(planet.contains("custodia") || planet.contains("ghoti")){
+                continue;
+            }
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if(uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0){
+                if(!ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, p2)){
+                    Tile tile = activeGame.getTileFromPlanet(planet);
+                    buttons.add(Button.secondary("reactorMeltdownStep3_" + p2.getFaction()+"_"+tile.getPosition()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+                }
+            }
+        }
+        if(p2.hasUnit("saar_spacedock") || p2.hasTech("ffac2")){
+            for(Tile tile : activeGame.getTileMap().values()){
+                if(tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0){
+                    buttons.add(Button.secondary("reactorMeltdownStep3_" + p2.getFaction()+"_"+tile.getPosition()+"_space",tile.getRepresentationForButtons(activeGame, player)));
+                }
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the SD you want to melt", buttons);
+    }
+    public static void resolveReactorMeltdownStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[2]);
+        String unitHolderName = buttonID.split("_")[3];
+        if(unitHolderName.equalsIgnoreCase("space")){
+            unitHolderName = "";
+        }
+        String c = "";
+        if(p2.hasUnit("cabal_spacedock") || p2.hasUnit("cabal_spacedock2")){
+            c = "c";
+        }
+        new RemoveUnits().unitParsing(event, p2.getColor(), tile, c+"sd "+unitHolderName, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you killed the space dock in "+tile.getRepresentation());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your space dock in "+tile.getRepresentation()+" was melted.");
+        event.getMessage().delete().queue();
+    }
+
     public static void resolvePlagueStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<Button>();
@@ -526,6 +679,15 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to plague", buttons);
+    }
+
+    public static void resolveRefitTroops(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID, String finChecker) {
+        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, activeGame, finChecker));
+        String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Use buttons to replace 1 infantry with a mech";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        List<Button> buttons2 = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, activeGame, finChecker));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons2);
+        event.getMessage().delete().queue();
     }
 
     public static void resolveCrippleStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -540,9 +702,59 @@ public class ButtonHelperActionCards {
     public static void resolveUpgrade(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "dread", activeGame);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced a cruiser with a dread in "+tile.getRepresentation());
+    }
+
+    public static void resolveDecoyOperationStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder uH : tile.getUnitHolders().values()){
+            if(uH instanceof Planet){
+                buttons.add(Button.success("decoyOperationStep2_"+uH.getName(), Helper.getPlanetRepresentation(uH.getName(), activeGame)));
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which planet you want to resolve decoy operations on", buttons);
+    }
+    public static void resolveDecoyOperationStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet  = buttonID.split("_")[1];
+        List<Button> buttons = ButtonHelper.getButtonsForMovingGroundForcesToAPlanet(activeGame, planet, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to move up to 2 troops", buttons);
+    }
+
+    public static void resolveEmergencyRepairs(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        tile.removeAllUnitDamage(player.getColor());
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " repaired all damaged units in "+tile.getRepresentation());
+    }
+
+    public static void resolveTacticalBombardmentStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = getTacticalBombardmentButtons(activeGame, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot which tile you wish to tactically bombard in", buttons);
+    }
+
+    public static void resolveTacticalBombardmentStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        for(UnitHolder uH : tile.getUnitHolders().values()){
+            if(uH instanceof Planet){
+                for(Player p2 : activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(p2.getPlanets().contains(uH.getName())){
+                        p2.exhaustPlanet(uH.getName());
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation()+" Your planets in "+tile.getRepresentation()+" were exhausted");
+                    }
+                }
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " exhausted all enemy planets in "+tile.getRepresentation());
     }
 
     public static void resolveUnstableStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -580,6 +792,15 @@ public class ButtonHelperActionCards {
         new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "3 inf "+planet, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted " + planetRep + " and killed up to 3 infantry there");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was exhausted and up to 3 infantry were destroyed.");
+     }
+     public static void resolveSeizeArtifactStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String fragID = buttonID.split("_")[2];
+        event.getMessage().delete().queue();
+        p2.removeFragment(fragID);
+        player.addFragment(fragID);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you gained the fragment "+fragID);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your fragment "+fragID+" was seized.");
      }
 
      public static void resolveUprisingStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -674,6 +895,7 @@ public class ButtonHelperActionCards {
             String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
         }
+        event.getMessage().delete().queue();
     }
 
     public static void repealLaw(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
@@ -691,6 +913,7 @@ public class ButtonHelperActionCards {
         activeGame.removeLaw(name);
         event.getMessage().delete().queue();
     }
+
     public static List<Button> getPlagiarizeButtons(Game activeGame, Player player) {
         List<String> techToGain = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers()) {
@@ -722,6 +945,13 @@ public class ButtonHelperActionCards {
                      buttons.add(Button.success("ghostShipStep2_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
                 }
             }
+        }
+        return buttons;
+    }
+    public static List<Button> getTacticalBombardmentButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : ButtonHelper.getTilesOfUnitsWithBombard(player, activeGame)) {
+            buttons.add(Button.success("tacticalBombardmentStep2_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
         }
         return buttons;
     }

@@ -1251,7 +1251,13 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     Player winningR = activeGame.getPlayerFromColorOrFaction(faction.toLowerCase());
-
+                    if (winningR != null && specificVote.contains("Sanction")){
+                        List<Player> loseFleetPlayers = getWinningVoters(winner, activeGame);
+                        for(Player p2 : loseFleetPlayers){
+                            p2.setFleetCC(p2.getFleetCC()-1);
+                            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation()+ " you lost 1 fleet CC due to voting the same way as a sanction");
+                        }
+                    }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight"))) {
 
                         MessageChannel channel = ButtonHelper.getCorrectChannel(winningR, activeGame);
