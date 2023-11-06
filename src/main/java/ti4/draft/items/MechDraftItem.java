@@ -48,7 +48,7 @@ public class MechDraftItem extends DraftItem {
             sb.append(unit.getProductionValue());
             sb.append(" ");
         }
-        sb.append(unit.getAbility());
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
     }
 
