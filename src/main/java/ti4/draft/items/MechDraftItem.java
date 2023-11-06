@@ -43,6 +43,11 @@ public class MechDraftItem extends DraftItem {
                 .append("x").append(unit.getAfbDieCount())
                 .append(" ");
         }
+        if (unit.getProductionValue() > 0) {
+            sb.append("PRODUCTION ");
+            sb.append(unit.getProductionValue());
+            sb.append(" ");
+        }
         sb.append(unit.getAbility());
         return sb.toString();
     }
