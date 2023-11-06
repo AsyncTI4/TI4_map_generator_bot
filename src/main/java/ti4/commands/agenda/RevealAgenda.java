@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -155,5 +156,9 @@ public class RevealAgenda extends AgendaSubcommandData {
                     ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }
         }
+        if(!activeGame.isFoWMode()){
+            ButtonHelper.updateMap(activeGame, event);
+        }
+        
     }
 }

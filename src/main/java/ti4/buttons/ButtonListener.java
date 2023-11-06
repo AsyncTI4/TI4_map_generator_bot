@@ -398,6 +398,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("creussHeroStep1_")) {
             ButtonHelperHeroes.getGhostHeroTilesStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("resolveUpgrade_")) {
+            ButtonHelperActionCards.resolveUpgrade(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("creussHeroStep2_")) {
             ButtonHelperHeroes.resolveGhostHeroStep2(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("placeGhostCommanderFF_")) {
@@ -1706,6 +1708,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveInsubStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("absStep2_")) {
             ButtonHelperActionCards.resolveABSStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("ghostShipStep2_")) {
+            ButtonHelperActionCards.resolveGhostShipStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("probeStep2_")) {
+            ButtonHelperActionCards.resolveProbeStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("salvageStep2_")) {
+            ButtonHelperActionCards.resolveSalvageStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("psStep2_")) {
             ButtonHelperActionCards.resolvePSStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep2_")) {
@@ -2877,6 +2885,15 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "resolveABSStep1" -> {
                     ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveSalvageStep1" -> {
+                    ButtonHelperActionCards.resolveSalvageStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveGhostShipStep1" -> {
+                    ButtonHelperActionCards.resolveGhostShipStep1(player, activeGame, event, buttonID);
+                }
+                case "resolveProbeStep1" -> {
+                    ButtonHelperActionCards.resolveProbeStep1(player, activeGame, event, buttonID);
                 }
                 case "resolvePSStep1" -> {
                     ButtonHelperActionCards.resolvePSStep1(player, activeGame, event, buttonID);
