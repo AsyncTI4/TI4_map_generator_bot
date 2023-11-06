@@ -238,7 +238,6 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveUpgrade_"+activeGame.getActiveSystem(), "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
-
             codedName = "Cripple Defenses";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveCrippleDefensesStep1", "Resolve "+codedName));

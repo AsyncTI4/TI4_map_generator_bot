@@ -464,7 +464,6 @@ public class ButtonHelperActionCards {
     }
 
 
-
     public static void resolveSalvageStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int comm = p2.getCommodities();
