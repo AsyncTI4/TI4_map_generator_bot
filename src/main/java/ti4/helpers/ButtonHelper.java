@@ -563,8 +563,9 @@ public class ButtonHelper {
     public static void getTech(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = ButtonHelper.getIdent(player);
         String tech = buttonID.split("_")[1];
-        String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
+        String message = ident + " Acquired The Tech " + techM.getRepresentation(false);
+        
         if (techM != null && techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
             if (player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "zealots", event);
@@ -737,7 +738,7 @@ public class ButtonHelper {
     public static int resolveOnActivationEnemyAbilities(Game activeGame, Tile activeSystem, Player player, boolean justChecking) {
         int numberOfAbilities = 0;
 
-        String activePlayerident = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
+        String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
         if (justChecking) {
             Player ghostPlayer = activeGame.getPlayerFromColorOrFaction("ghost");
@@ -786,6 +787,20 @@ public class ButtonHelper {
                         channel = player.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannel(channel, activePlayerident + " lost 1 fleet cc due to neuroglaive (" + cTG + "->" + player.getFleetCC() + ")");
+                }
+            }
+            if (nonActivePlayer.getTechs().contains("vw") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
+                if (justChecking) {
+                    if (!activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger voidwatch");
+                    }
+                    numberOfAbilities++;
+                } else {
+                    if (activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannel(channel, ident + " you triggered voidwatch");
+                        channel = player.getPrivateChannel();
+                    }
+                    MessageHelper.sendMessageToChannel(channel, activePlayerident + " you owe the defender one PN");
                 }
             }
             if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && nonActivePlayer.hasProductionUnitInSystem(activeSystem)) {

@@ -544,10 +544,11 @@ public class ButtonHelperAbilities {
 
     public static void resolvePeaceAccords(String buttonID, String ident, Player player, Game activeGame, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        if(planet.equalsIgnoreCase("lockedmallice"));
-        planet = "mallice";
-        Tile tile = activeGame.getTileFromPlanet("lockedmallice");
-        tile = MoveUnits.flipMallice(event, tile, activeGame);
+        if(planet.equalsIgnoreCase("lockedmallice")){
+            planet = "mallice";
+            Tile tile = activeGame.getTileFromPlanet("lockedmallice");
+            tile = MoveUnits.flipMallice(event, tile, activeGame);
+        }
         new PlanetAdd().doAction(player, planet, activeGame, event);
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet, activeGame);
         String msg = ident + " claimed the planet " + planetRepresentation2 + " using the peace accords ability. ";
