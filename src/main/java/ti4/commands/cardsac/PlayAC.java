@@ -3,8 +3,8 @@ package ti4.commands.cardsac;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -19,6 +19,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -27,6 +28,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
@@ -402,7 +404,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("fighterConscription", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
-
+            TemporaryCombatModifierModel combatModAC = CombatModHelper.GetPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberTurns());
+            if(combatModAC != null){
+                codedButtons.add(Button.success("applytempcombatmod__" + Constants.AC + "__"+actionCard.getAlias(), "Resolve " + actionCard.getName()));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + actionCard.getName(), codedButtons);
+            }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
 

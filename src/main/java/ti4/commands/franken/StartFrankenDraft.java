@@ -14,7 +14,7 @@ import ti4.map.GameSaveLoadManager;
 public class StartFrankenDraft extends FrankenSubcommandData {
     public StartFrankenDraft() {
         super(Constants.START_FRANKEN_DRAFT, "Start a franken draft");
-        addOptions(new OptionData(OptionType.STRING, Constants.POWERED, "1 extra faction tech/ability, enter yes or no, default no"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.POWERED, "'True' to add 1 extra faction tech/ability (Default: False)"));
     }
 
     @Override
@@ -23,20 +23,14 @@ public class StartFrankenDraft extends FrankenSubcommandData {
 
         FrankenDraftHelper.clearPlayerHands(activeGame);
 
-        OptionMapping stratPings = event.getOption(Constants.POWERED);
-        if (stratPings != null){
-            String stratP = stratPings.getAsString();
-            if ("yes".equalsIgnoreCase(stratP)){
-                activeGame.setBagDraft(new PoweredFrankenDraft(activeGame));
-                FrankenDraftHelper.startDraft(activeGame);
-            } else {
-                activeGame.setBagDraft(new FrankenDraft(activeGame));
-                FrankenDraftHelper.startDraft(activeGame);
-            }
-        }else{
+        boolean stratPings = event.getOption(Constants.POWERED, false, OptionMapping::getAsBoolean);
+        if (stratPings){
+            activeGame.setBagDraft(new PoweredFrankenDraft(activeGame));
+        } else {
             activeGame.setBagDraft(new FrankenDraft(activeGame));
-            FrankenDraftHelper.startDraft(activeGame);
         }
+        
+        FrankenDraftHelper.startDraft(activeGame);
         GameSaveLoadManager.saveMap(activeGame, event);
     }
 }
