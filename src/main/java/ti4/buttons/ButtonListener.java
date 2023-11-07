@@ -98,6 +98,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.helpers.CombatModHelper;
 
@@ -1207,6 +1208,10 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("indoctrinate_")) {
             ButtonHelperAbilities.resolveFollowUpIndoctrinationQuestion(player, activeGame, buttonID, event);
+        } else if (buttonID.startsWith("assimilate_")) {
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(buttonID.split("_")[1], activeGame);
+            ButtonHelperModifyUnits.infiltratePlanet(player, activeGame, uH, event);
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("letnevMechRes_")) {
             ButtonHelperFactionSpecific.resolveLetnevMech(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("initialIndoctrination_")) {
@@ -1752,12 +1757,16 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolvePlagueStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep2_")) {
             ButtonHelperActionCards.resolveCrippleStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("infiltrateStep2_")) {
+            ButtonHelperActionCards.resolveInfiltrateStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spyStep3_")) {
             ButtonHelperActionCards.resolveSpyStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("plagueStep3_")) {
             ButtonHelperActionCards.resolvePlagueStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("crippleStep3_")) {
             ButtonHelperActionCards.resolveCrippleStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("infiltrateStep3_")) {
+            ButtonHelperActionCards.resolveInfiltrateStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("reactorMeltdownStep3_")) {
             ButtonHelperActionCards.resolveReactorMeltdownStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep3_")) {
@@ -1832,7 +1841,6 @@ public class ButtonListener extends ListenerAdapter {
             String riderName = buttonID.replace("play_after_", "");
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
-
             List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
             if ("Keleres Rider".equalsIgnoreCase(riderName)) {
                 String pnKey = "fin";
@@ -2921,6 +2929,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveCrippleDefensesStep1" -> {
                     ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
                 }
+                case "resolveInfiltrateStep1" -> {
+                    ButtonHelperActionCards.resolveInfiltrateStep1(player, activeGame, event, buttonID);
+                }
                 case "resolveReactorMeltdownStep1" -> {
                     ButtonHelperActionCards.resolveReactorMeltdownStep1(player, activeGame, event, buttonID);
                 }
@@ -3366,6 +3377,9 @@ public class ButtonListener extends ListenerAdapter {
                     String msg = trueIdentity + " use buttons to discard";
                     List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                }
+                case "eraseMyRiders" -> {
+                    AgendaHelper.reverseAllRiders(event, activeGame, player);
                 }
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();

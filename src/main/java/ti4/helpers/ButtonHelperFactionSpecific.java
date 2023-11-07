@@ -554,6 +554,9 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isCabalBlockadedByPlayer(Player player, Game activeGame, Player cabal) {
+        if(cabal == player){
+            return false;
+        }
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, cabal, UnitType.CabalSpacedock, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;

@@ -238,9 +238,13 @@ public class Player {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
-            // BotLogger.log("Could not retrieve privateChannel for " + getName(), e);
+            try{
+                return getCardsInfoThread();
+            }catch (Exception e2) {
+                return null;
+            }
         }
-        return null;
+        
     }
 
     public String getCardsInfoThreadID() {
@@ -294,6 +298,9 @@ public class Player {
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode() || activeGame.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
+            if(actionsChannel == null){
+                actionsChannel = activeGame.getMainGameChannel();
+            }
         if (actionsChannel == null) {
             BotLogger.log(
                     "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
@@ -377,7 +384,7 @@ public class Player {
 
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!activeGame.isCommunityMode() && !activeGame.isFoWMode());
+        boolean isPrivateChannel = (!activeGame.isFoWMode());
         if (activeGame.getName().contains("pbd100") || activeGame.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
