@@ -108,6 +108,8 @@ public class Game {
     @ExportableField
     private boolean componentAction;
     @ExportableField
+    private boolean justPlayedComponentAC = false;
+    @ExportableField
     private boolean baseGameMode = false;
     @ExportableField
     private boolean lightFogMode;
@@ -901,6 +903,10 @@ public class Game {
         return componentAction;
     }
 
+    public boolean getJustPlayedComponentAC() {
+        return justPlayedComponentAC;
+    }
+
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
     }
@@ -917,6 +923,9 @@ public class Game {
 
     public void setComponentAction(boolean onStatus) {
         componentAction = onStatus;
+    }
+    public void setJustPlayedComponentAC(boolean onStatus) {
+        justPlayedComponentAC = onStatus;
     }
 
     public void setActivationCount(int count) {

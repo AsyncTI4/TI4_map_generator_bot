@@ -243,6 +243,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveEmergencyRepairs_"+activeGame.getActiveSystem(), "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Insider Information";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveInsiderInformation", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Cripple Defenses";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveCrippleDefensesStep1", "Resolve "+codedName));
@@ -427,7 +432,8 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
-                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);            
+                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                activeGame.setJustPlayedComponentAC(true);            
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
