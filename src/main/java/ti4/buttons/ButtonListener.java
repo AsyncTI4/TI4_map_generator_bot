@@ -97,7 +97,9 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.RelicModel;
+import ti4.helpers.CombatModHelper;
 
 public class ButtonListener extends ListenerAdapter {
     public static final HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
@@ -1970,11 +1972,21 @@ public class ButtonListener extends ListenerAdapter {
             if (activeGame.getSpeaker().equals(player.getUserID()) || buttonID.equals("rollIxthianIgnoreSpeaker")) {
                 AgendaHelper.rollIxthian(activeGame);
             } else {
-                Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact").withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
+                Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact")
+                        .withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
                 String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), msg, ixthianButton);
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
+            String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
+            TemporaryCombatModifierModel combatModAC = CombatModHelper.GetPossibleTempModifier(Constants.AC, acAlias,
+                    player.getNumberTurns());
+            if (combatModAC != null) {
+                player.addNewTempCombatMod(combatModAC);
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                        "Combat modifier will be applied next time you push the combat roll button.");
+            }
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
