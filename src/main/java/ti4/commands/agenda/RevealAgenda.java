@@ -144,6 +144,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button transaction = Button.primary("transaction", "Transaction");
         proceedButtons.add(transaction);
         proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
         MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,

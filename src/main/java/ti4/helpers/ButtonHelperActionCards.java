@@ -368,6 +368,25 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to cripple", buttons);
     }
 
+    public static void resolveInfiltrateStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("infiltrateStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("infiltrateStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you are infiltrating", buttons);
+    }
+
     public static void resolveSpyStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
         for (Player p2 : activeGame.getRealPlayers()) {
@@ -711,6 +730,16 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to cripple", buttons);
     }
+
+    public static void resolveInfiltrateStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getPlanets()){
+            buttons.add(Button.secondary("infiltrateStep3_" + p2.getFaction()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to infiltrate", buttons);
+    }
     public static void resolveUpgrade(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
@@ -865,13 +894,22 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
         int amount = uH.getUnitCount(UnitType.Pds, p2.getColor());
-        int hits = 0;
         if(amount > 0){
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
             new RemoveUnits().removeStuff(event, activeGame.getTileFromPlanet(planet), amount, planet, key, p2.getColor(), false, activeGame);
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you crippled " + planetRep +" and killed "+amount+" pds");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was crippled and you lost "+amount+" pds.");
+     }
+
+     public static void resolveInfiltrateStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        ButtonHelperModifyUnits.infiltratePlanet(player, activeGame, uH, event);
+        event.getMessage().delete().queue();
      }
 
      public static void resolveReparationsStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {

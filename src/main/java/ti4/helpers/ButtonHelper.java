@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
+import java.lang.Character.UnicodeScript;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -86,6 +87,17 @@ import ti4.model.TechnologyModel.TechnologyType;
 
 public class ButtonHelper {
 
+    public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile){
+        if(!player.hasUnit(flagshipID)){
+            return false;
+        }
+        UnitHolder space = tile.getUnitHolders().get("space");
+        if(space.getUnitCount(UnitType.Flagship, player.getColor()) > 0){
+            return true;
+        }
+
+        return false;
+    }
     public static void resolveInfantryDeath(Game activeGame, Player player, int amount) {
         for (int x = 0; x < amount; x++) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), rollInfantryRevival(activeGame, player));
@@ -269,6 +281,13 @@ public class ButtonHelper {
         return msg;
     }
 
+    public static boolean shouldKeleresRiderExist(Game activeGame){
+        if(activeGame.getPNOwner("ridera")!= null || activeGame.getPNOwner("riderm")!= null || activeGame.getPNOwner("riderx")!= null || activeGame.getPNOwner("ridera")!= null) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     public static String rollInfantryRevival(Game activeGame, Player player) {
 
         Die d1 = new Die(6);
@@ -1844,6 +1863,12 @@ public class ButtonHelper {
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 }
+                if (p1.hasAbility("assimilate") && "ground".equalsIgnoreCase(groundOrSpace) && (unitH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0
+                || unitH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0 || unitH.getUnitCount(UnitType.Pds, p2.getColor()) > 0)) {
+                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker + "assimilate_" + unitH.getName(), "Assimilate Structures on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
+                }
                 if (p1.hasUnit("letnev_mech") && "ground".equalsIgnoreCase(groundOrSpace) && unitH.getUnitCount(UnitType.Infantry, p1.getColor()) > 0
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, p1, "mech") < 4) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
@@ -1860,6 +1885,12 @@ public class ButtonHelper {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "initialIndoctrination_" + unitH.getName(), "Indoctrinate on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+                }
+                if (p2.hasAbility("assimilate")&& !activeGame.isFoWMode()  && "ground".equalsIgnoreCase(groundOrSpace) && (unitH.getUnitCount(UnitType.Spacedock, p1.getColor()) > 0
+                || unitH.getUnitCount(UnitType.CabalSpacedock, p1.getColor()) > 0 || unitH.getUnitCount(UnitType.Pds, p1.getColor()) > 0)) {
+                    String finChecker = "FFCC_" + p2.getFaction() + "_";
+                    buttons.add(Button.secondary(finChecker + "assimilate_" + unitH.getName(), "Assimilate Structures on " + nameOfHolder)
+                        .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
                 }
             }
             if (nameOfHolder.equalsIgnoreCase("space") && "space".equalsIgnoreCase(groundOrSpace)) {

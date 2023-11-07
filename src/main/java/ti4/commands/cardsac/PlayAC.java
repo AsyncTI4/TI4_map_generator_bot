@@ -240,6 +240,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveUpgrade_"+activeGame.getActiveSystem(), "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Infiltrate";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveInfiltrateStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName+". Warning, this will not work if the player has already removed their structures", codedButtons);
+            }
             codedName = "Emergency Repairs";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveEmergencyRepairs_"+activeGame.getActiveSystem(), "Resolve "+codedName));

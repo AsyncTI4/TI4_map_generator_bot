@@ -22,6 +22,30 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperModifyUnits {
 
+    public static void infiltratePlanet(Player player, Game activeGame, UnitHolder uH, ButtonInteractionEvent event){
+        int sdAmount = 0;
+        int pdsAmount = 0;
+        for(Player p2 : activeGame.getRealPlayers()){
+            sdAmount = uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor())+sdAmount+uH.getUnitCount(UnitType.Spacedock, p2.getColor());
+            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd "+uH.getName(), activeGame);
+            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " csd "+uH.getName(), activeGame);
+            pdsAmount = uH.getUnitCount(UnitType.Pds, p2.getColor())+pdsAmount;
+            new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds "+uH.getName(), activeGame);
+        }
+        if(pdsAmount > 0){
+            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), pdsAmount + " pds "+uH.getName(), activeGame);
+        }
+        if(player.hasUnit("cabal_spacedock") && sdAmount > 0){
+            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " csd "+uH.getName(), activeGame);
+        }else{
+            if(sdAmount > 0){
+                new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(uH.getName()), sdAmount + " sd "+uH.getName(), activeGame);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdentOrColor(player, activeGame) + " replaced "+pdsAmount+" pds and "+sdAmount+" space docks on "+Helper.getPlanetRepresentation(uH.getName(), activeGame)+" with their own units");
+        
+        
+    }
     public static List<Button> getRetreatSystemButtons(Player player, Game activeGame, String pos1) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -880,7 +904,7 @@ public class ButtonHelperModifyUnits {
                         int amount = unitEntry.getValue();
 
                         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
-                        if (cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName()) && !cabal.getFaction().equalsIgnoreCase(player.getFaction())) {
+                        if (cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName()) && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) ) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, unitEntry.getValue(), unitName, event);
                         }
                         if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
@@ -906,7 +930,7 @@ public class ButtonHelperModifyUnits {
                         int amount = unitEntry.getValue();
 
                         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, "space", unitKey, player.getColor(), false, activeGame);
-                        if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile) && !cabal.getFaction().equalsIgnoreCase(player.getFaction())) {
+                        if (cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile) && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
                         }
                     }
@@ -937,13 +961,21 @@ public class ButtonHelperModifyUnits {
         String planetName;
         if ("".equalsIgnoreCase(planet)) {
             planetName = "space";
-            if (cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction()) && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
+            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))&& FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
         } else {
             planetName = planet.replace("'", "");
             planetName = AliasHandler.resolvePlanet(planetName);
-            if (cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction()) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
+        }
+        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitKey, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
+
+        if ("".equalsIgnoreCase(planet)) {
+            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))&& FoWHelper.playerHasShipsInSystem(cabal, tile)) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
+            }
+        } else {
+            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
             if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
@@ -961,7 +993,6 @@ public class ButtonHelperModifyUnits {
                 ButtonHelper.resolveInfantryDeath(activeGame, player, amount);
             }
         }
-        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitKey, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
 
         String message = event.getMessage().getContentRaw();
         String message2 = ident + " Removed " + amount + " " + unitName + " from " + planetName + " in tile " + tile.getRepresentationForButtons(activeGame, player);

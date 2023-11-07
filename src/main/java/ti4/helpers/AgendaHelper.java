@@ -51,6 +51,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
@@ -873,6 +874,32 @@ public class AgendaHelper {
         //event.getMessage().delete().queue();
     }
 
+    public static void reverseAllRiders(ButtonInteractionEvent event, Game activeGame, Player player) {
+        
+        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        for (String outcome : outcomes.keySet()) {
+            String existingData = outcomes.getOrDefault(outcome, "empty");
+            if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
+            } else {
+                String[] votingInfo = existingData.split(";");
+                StringBuilder totalBuilder = new StringBuilder();
+                for (String onePiece : votingInfo) {
+                    String identifier = onePiece.split("_")[0];
+                    if (!identifier.equalsIgnoreCase(player.getFaction()) && !identifier.equalsIgnoreCase(player.getColor())) {
+                        totalBuilder.append(";").append(onePiece);
+                    }else{
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player,activeGame), ButtonHelper.getIdent(player) + " erased "+ onePiece.split("_")[1]);
+                    }
+                }
+                String total = totalBuilder.toString();
+                if (total.length() > 0 && total.charAt(0) == ';') {
+                    total = total.substring(1);
+                }
+                activeGame.setCurrentAgendaVote(outcome, total);
+            }
+        }
+    }
+
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
         // String choiceType = choiceParams[0];
@@ -938,7 +965,9 @@ public class AgendaHelper {
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
         afterButtons.add(playAfter);
 
-        if (activeGame.getPlayerFromColorOrFaction("keleres") != null && !activeGame.isFoWMode()) {
+
+        
+        if (ButtonHelper.shouldKeleresRiderExist(activeGame) && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
