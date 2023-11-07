@@ -34,15 +34,9 @@ public class ButtonHelperActionCards {
 
     public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event){
         RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
-        String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke";
-        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-        String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke and gained it to their tactics";
+        player.setTacticalCC(player.getTacticalCC()+1);
         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -590,6 +584,24 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
+    }
+
+    public static void resolveInsiderInformation(Player player, Game activeGame, ButtonInteractionEvent event){
+        StringBuilder sb = new StringBuilder();
+        sb.append(event.getUser().getAsMention()).append("\n");
+        sb.append("__**Top Agenda:**__\n");
+        String agendaID = activeGame.lookAtTopAgenda(0);
+        sb.append("1: ");
+        if (activeGame.getSentAgendas().get(agendaID) != null) {
+            sb.append("This agenda is currently in somebody's hand.");
+        } else if (agendaID != null) {
+            sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " "+sb.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to players cards info");
+        event.getMessage().delete().queue();
     }
 
     public static void resolveSeizeArtifactStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {

@@ -335,12 +335,26 @@ public class ButtonHelper {
     public static List<String> getTypesOfPlanetPlayerHas(Game activeGame, Player player) {
         List<String> types = new ArrayList<>();
         for (String planet : player.getPlanets()) {
+            if(planet.contains("custodia") || planet.contains("ghoti")){
+                continue;
+            }
             UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                 || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
             if (planetReal != null && oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
                 types.add(planetReal.getOriginalPlanetType());
+            }
+            if(unitHolder.getTokenList().contains("attachment_titanspn.png")){
+                if(!types.contains("hazardous")){
+                    types.add("hazardous");
+                }
+                if(!types.contains("industrial")){
+                    types.add("industrial");
+                }
+                if(!types.contains("cultural")){
+                    types.add("cultural");
+                }
             }
         }
         return types;
@@ -2274,8 +2288,11 @@ public class ButtonHelper {
                     }
                 }
             }
-            player.setWhetherPlayerShouldBeTenMinReminded(true);
+            if(!activeGame.getJustPlayedComponentAC()){
+                player.setWhetherPlayerShouldBeTenMinReminded(true);
+            }
         } else {
+            activeGame.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);

@@ -535,6 +535,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
         writer.write(System.lineSeparator());
+        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + activeGame.getJustPlayedComponentAC());
+        writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVATION_COUNT + " " + activeGame.getActivationCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.BASE_GAME_MODE + " " + activeGame.isBaseGameMode());
@@ -1630,6 +1632,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setComponentAction(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.JUST_PLAYED_COMPONENT_AC -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setJustPlayedComponentAC(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

@@ -55,6 +55,7 @@ public class Constants {
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
+    public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
     public static final String ACTIVATION_COUNT = "activation_count";
     public static final String SHUTDOWN = "shutdown";
     public static final String PLANET_ID = "planet_id";
