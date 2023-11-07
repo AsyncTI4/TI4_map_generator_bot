@@ -53,19 +53,22 @@ public class HeroPlay extends LeaderAction {
 
     @Override
     protected void options() {
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
     void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
-        
+
         if (playerLeader == null) {
             sendMessage("Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
-        
+
         if (playerLeader.isLocked()) {
             sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
             sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
@@ -80,16 +83,19 @@ public class HeroPlay extends LeaderAction {
         playHero(event, activeGame, player, playerLeader);
     }
 
-    public static void playHero(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader playerLeader) {
+    public static void playHero(GenericInteractionCreateEvent event, Game activeGame, Player player,
+            Leader playerLeader) {
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " played:");
-            event.getMessageChannel().sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
+            event.getMessageChannel()
+                    .sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
-            sb.append(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            sb.append(player.getRepresentation()).append(" played ")
+                    .append(Helper.getLeaderFullRepresentation(playerLeader));
             BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
         }
 
@@ -101,9 +107,11 @@ public class HeroPlay extends LeaderAction {
         } else {
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader " + playerLeader.getId() + " has been purged");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Leader " + playerLeader.getId() + " has been purged");
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Leader was not purged - something went wrong");
                 return;
             }
         }
@@ -248,6 +256,7 @@ public class HeroPlay extends LeaderAction {
                 KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
             }
         }
+
         
         var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
         if (posssibleCombatMod != null) {

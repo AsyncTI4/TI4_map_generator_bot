@@ -1,6 +1,7 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,10 +20,8 @@ import ti4.model.PromissoryNoteModel;
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note");
-        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID,
-                "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY,
-                "Long promissory display, y or yes to enable").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -42,8 +41,7 @@ public class PlayPN extends PNCardsSubcommandData {
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {
-            longPNDisplay = "y".equalsIgnoreCase(longPNOption.getAsString())
-                    || "yes".equalsIgnoreCase(longPNOption.getAsString());
+            longPNDisplay = "y".equalsIgnoreCase(longPNOption.getAsString()) || "yes".equalsIgnoreCase(longPNOption.getAsString());
         }
 
         String value = option.getAsString().toLowerCase();
@@ -86,7 +84,7 @@ public class PlayPN extends PNCardsSubcommandData {
         Player pnOwner = activeGame.getPNOwner(pnID);
         if (promissoryNote.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(pnID);
-        } else { // return to owner
+        } else { //return to owner
             player.removePromissoryNote(pnID);
             if (pnOwner != null) {
                 if (pnOwner.getPromissoryNotesOwned().contains(pnID)) {
@@ -95,6 +93,8 @@ public class PlayPN extends PNCardsSubcommandData {
                 }
             }
         }
+        
+       
 
         String emojiToUse = activeGame.isFoWMode() ? "" : pnOwner.getFactionEmoji();
         StringBuilder sb = new StringBuilder(player.getRepresentation() + " played promissory note: " + pnName + "\n");
@@ -104,20 +104,20 @@ public class PlayPN extends PNCardsSubcommandData {
         pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
         sb.append(pnText).append("\n");
 
-        // TERRAFORM TIP
+        //TERRAFORM TIP
         if ("terraform".equalsIgnoreCase(pnID)) {
             sb.append("`/add_token token:titanspn`\n");
         }
-
+        
         if ("dspnkoll".equalsIgnoreCase(pnID)) {
             ButtonHelperFactionSpecific.offerKolleccPNButtons(player, activeGame, event);
         }
-        // Fog of war ping
+        //Fog of war ping
         if (activeGame.isFoWMode()) {
             // Add extra message for visibility
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, sb.toString());
         }
-
+        
         var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID,
                 player.getNumberTurns());
         if (posssibleCombatMod != null) {
