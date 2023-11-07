@@ -1,5 +1,8 @@
 package ti4.commands.special;
 
+import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -7,11 +10,13 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class FighterConscription extends SpecialSubcommandData {
@@ -23,57 +28,47 @@ public class FighterConscription extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
+        doFfCon(event, player, activeGame);
+    }
 
-        List<String> planets = player.getPlanets();
+    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game activeGame){
         String colorID = Mapper.getColorID(player.getColor());
-        String playerSD = Mapper.getUnitID("sd", player.getColor());
-        String playerCSD = Mapper.getUnitID("csd", player.getColor());
+
         List<Tile> tilesAffected = new ArrayList<>();
-        for (Tile tile : activeMap.getTileMap().values()) {
+        for (Tile tile : activeGame.getTileMap().values()) {
             boolean hasSD = false;
             boolean hasCap = false;
             boolean blockaded = false;
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                // Planet controlled by the player has a space dock in the system
-                if (planets.contains(unitHolder.getName())) {
-                    HashMap<String, Integer> units = unitHolder.getUnits();
-                    Integer numSd = units.get(playerSD);
-                    Integer numCsd = units.get(playerCSD);
-                    if ((numCsd != null && numCsd > 0) || (numSd != null && numSd > 0)) {
-                        hasSD = true;
-                    }
+                // player has a space dock in the system
+                Integer numSd = unitHolder.getUnitCount(UnitType.Spacedock, colorID);
+                numSd += unitHolder.getUnitCount(UnitType.CabalSpacedock, colorID);
+                numSd += unitHolder.getUnitCount(UnitType.PlenaryOrbital, colorID);
+                if ((numSd != null && numSd > 0)) {
+                    hasSD = true;
                 }
+
                 // Check if space area contains capacity units or another player's units
                 if ("space".equals(unitHolder.getName())) {
-                    HashMap<String, Integer> units = unitHolder.getUnits();
-                    for (java.util.Map.Entry<String, Integer> unit : units.entrySet()) {
-                        String name = unit.getKey();
+                    Map<UnitKey, Integer> units = unitHolder.getUnits();
+                    for (Map.Entry<UnitKey, Integer> unit : units.entrySet()) {
+                        UnitKey unitKey = unit.getKey();
+
                         Integer quantity = unit.getValue();
-                        if (name.startsWith(colorID) && quantity != null && quantity > 0) {
-                            String unitType = name.substring(4);
-                            // Units that always have capacity (Carrier, Dread, Flagship, Warsun, Space Dock in space)
-                            if (unitType.startsWith("cv") || unitType.startsWith("dn") || unitType.startsWith("fs") || unitType.startsWith("sd") || unitType.startsWith("ws")) {
+
+                        if (player.unitBelongsToPlayer(unitKey) && quantity != null && quantity > 0) {
+                            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                            if (unitModel == null) continue;
+                            if (unitModel.getCapacityValue() > 0) {
                                 hasCap = true;
-                            }
-                            // Titans, Saturn Engine 2, Cruiser 2
-                            if (unitType.startsWith("ca")) {
-                                if (player.ownsUnit("titans_cruiser") || player.ownsUnit("titans_cruiser2") || player.hasTech("se2") || player.hasTech("cr2")) {
-                                    hasCap = true;
-                                }
-                            }
-                            // Argent, Strike Wing Alpha 2
-                            if (unitType.startsWith("dd")) {
-                                if (player.ownsUnit("argent_destroyer") || player.ownsUnit("argent_destroyer2") || player.hasTech("swa2")) {
-                                    hasCap = true;
-                                }
                             }
                         } else if (quantity != null && quantity > 0) {
                             blockaded = true;
@@ -88,7 +83,7 @@ public class FighterConscription extends SpecialSubcommandData {
             }
 
             if (!blockaded && (hasCap || hasSD)) {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", activeMap);
+                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", activeGame);
                 tilesAffected.add(tile);
             }
         }
@@ -98,14 +93,16 @@ public class FighterConscription extends SpecialSubcommandData {
             msg += " Please check fleet size and capacity in each of the systems: ";
         }
         boolean first = true;
+        StringBuilder msgBuilder = new StringBuilder(msg);
         for (Tile tile : tilesAffected) {
             if (first) {
-                msg += "\n> **" + tile.getPosition() + "**";
+                msgBuilder.append("\n> **").append(tile.getPosition()).append("**");
                 first = false;
             } else {
-                msg += ", **" + tile.getPosition() + "**";
+                msgBuilder.append(", **").append(tile.getPosition()).append("**");
             }
         }
+        msg = msgBuilder.toString();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 

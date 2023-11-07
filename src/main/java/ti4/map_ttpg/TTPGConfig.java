@@ -29,7 +29,7 @@ public class TTPGConfig {
     @JsonProperty("baseMagen")
     private Boolean baseMagen;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
+    private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
     @JsonProperty("codex1")
     public Boolean getCodex1() {
@@ -73,12 +73,12 @@ public class TTPGConfig {
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+        return additionalProperties;
     }
 
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+        additionalProperties.put(name, value);
     }
 
 }

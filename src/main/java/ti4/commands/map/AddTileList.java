@@ -1,14 +1,16 @@
 package ti4.commands.map;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.commands.Command;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
@@ -16,25 +18,18 @@ import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.MapStringMapper;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class AddTileList implements Command {
-
-    @Override
-    public String getActionID() {
-        return Constants.ADD_TILE_LIST;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+public class AddTileList extends MapSubcommandData {
+    public AddTileList() {
+        super(Constants.ADD_TILE_LIST, "Add tile list to generate map");
+        addOption(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format", true);
     }
 
     @Override
@@ -45,34 +40,34 @@ public class AddTileList implements Command {
             return;
         }
         String userID = member.getId();
-        MapManager mapManager = MapManager.getInstance();
-        Map userActiveMap = mapManager.getUserActiveMap(userID);
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        
+
         String tileList = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
         tileList = tileList.replaceAll(",", "");
-        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveMap);
+        HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveGame);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;
         }
 
         List<String> badTiles = new ArrayList<>();
-        userActiveMap.clearTileMap();
-        for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
+        userActiveGame.clearTileMap();
+        for (Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue().toLowerCase();
-            if (tileID.equals("-1")) {
+            if ("-1".equals(tileID)) {
                 continue;
             }
-            if (tileID.equals("0")) {
+            if ("0".equals(tileID)) {
                 tileID = "0g";
             }
             if (!TileHelper.getAllTiles().containsKey(tileID)) {
                 badTiles.add(tileID);
-                tileID = "0r";
+                tileID = "0gray";
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
@@ -83,42 +78,30 @@ public class AddTileList implements Command {
             }
             Tile tile = new Tile(tileID, position);
             AddTile.addCustodianToken(tile);
-            userActiveMap.setTile(tile);
+            userActiveGame.setTile(tile);
         }
 
-        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles.toString() + "\n");
+        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
 
         try {
             Tile tile;
             tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
-            userActiveMap.setTile(tile);
+            userActiveGame.setTile(tile);
             if (!tileList.startsWith("{") && !tileList.contains("}")) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                 AddTile.addCustodianToken(tile);
-                userActiveMap.setTile(tile);
+                userActiveGame.setTile(tile);
             }
         } catch (Exception e) {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
-        new AddFrontierTokens().parsingForTile(event, userActiveMap);
-        
-        MapSaveLoadManager.saveMap(userActiveMap, event);
+        new AddFrontierTokens().parsingForTile(event, userActiveGame);
 
-        File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
+        GameSaveLoadManager.saveMap(userActiveGame, event);
+
+        FileUpload file = GenerateMap.getInstance().saveImage(userActiveGame, event);
         MessageHelper.replyToMessage(event, file);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), "Add tile list to generate map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list in TTPG/TTS format")
-                                .setRequired(true))
-
-        );
     }
 }

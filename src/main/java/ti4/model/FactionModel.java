@@ -1,11 +1,21 @@
 package ti4.model;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
+import ti4.message.BotLogger;
+
 import java.util.ArrayList;
 
-public class FactionModel implements ModelInterface {
+public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
+    private String shortTag;
     private String homeSystem;
     private String startingFleet;
     private int commodities;
@@ -16,8 +26,7 @@ public class FactionModel implements ModelInterface {
     private List<String> leaders;
     private List<String> promissoryNotes;
     private List<String> units;
-
-    public FactionModel() {}
+    private String source;
 
     public boolean isValid() {
         return alias != null
@@ -33,12 +42,26 @@ public class FactionModel implements ModelInterface {
             && units != null;
     }
 
+    public void validationWarnings() {
+        validateAbilities();
+        validateFactionTech();
+        validateHomePlanets();
+        validateStartingTech();
+        validateLeaders();
+        validatePromissoryNotes();
+        validateUnits();
+    }
+
     public String getAlias() {
         return alias;
     }
 
     public String getFactionName() {
         return factionName;
+    }
+
+    public String getShortTag() {
+        return Optional.ofNullable(shortTag).orElse(StringUtils.left(getAlias(), 3).toUpperCase());
     }
 
     public String getHomeSystem() {
@@ -53,31 +76,130 @@ public class FactionModel implements ModelInterface {
         return commodities;
     }
 
+    public Optional<String> getSource() {
+        return Optional.ofNullable(source);
+    }
+
     public List<String> getFactionTech() {
-        return new ArrayList<String>(factionTech);
+        return new ArrayList<>(factionTech);
     }
 
     public List<String> getStartingTech() {
-        return new ArrayList<String>(startingTech);
+        return new ArrayList<>(startingTech);
     }
 
     public List<String> getHomePlanets() {
-        return new ArrayList<String>(homePlanets);
+        return new ArrayList<>(homePlanets);
     }
 
     public List<String> getAbilities() {
-        return new ArrayList<String>(abilities);
+        return new ArrayList<>(abilities);
     }
 
     public List<String> getLeaders() {
-        return new ArrayList<String>(leaders);
+        return new ArrayList<>(leaders);
     }
 
     public List<String> getPromissoryNotes() {
-        return new ArrayList<String>(promissoryNotes);
+        return new ArrayList<>(promissoryNotes);
     }
 
     public List<String> getUnits() {
-        return new ArrayList<String>(units);
+        return new ArrayList<>(units);
+    }
+
+    private boolean validateLeaders() {
+        if (Mapper.getLeaders().keySet().containsAll(getLeaders())) return true;
+        List<String> invalidLeaderIDs = new ArrayList<>();
+        for (String leaderID : getLeaders()) {
+            if (!Mapper.getLeaders().containsKey(leaderID)) invalidLeaderIDs.add(leaderID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid leader IDs: `" + invalidLeaderIDs + "`");
+        return false;
+    }
+
+    private boolean validateUnits() {
+        if (Mapper.getUnits().keySet().containsAll(getUnits())) return true;
+        List<String> invalidUnitIDs = new ArrayList<>();
+        for (String unitID : getUnits()) {
+            if (!Mapper.getUnits().containsKey(unitID)) invalidUnitIDs.add(unitID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid unit IDs: `" + invalidUnitIDs + "`");
+        return false;
+    }
+
+    private boolean validatePromissoryNotes() {
+        if (Mapper.getPromissoryNotes().keySet().containsAll(getPromissoryNotes())) return true;
+        List<String> invalidPromissoryNoteIDs = new ArrayList<>();
+        for (String promissoryNoteID : getPromissoryNotes()) {
+            if (!Mapper.getPromissoryNotes().containsKey(promissoryNoteID)) invalidPromissoryNoteIDs.add(promissoryNoteID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid promissory note IDs: `" + invalidPromissoryNoteIDs + "`");
+        return false;
+    }
+
+    private boolean validateAbilities() {
+        if (Mapper.getAbilities().keySet().containsAll(getAbilities())) return true;
+        List<String> invalidAbilityIDs = new ArrayList<>();
+        for (String abilityID : getAbilities()) {
+            if (!Mapper.getAbilities().containsKey(abilityID)) invalidAbilityIDs.add(abilityID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid ability IDs: `" + invalidAbilityIDs + "`");
+        return false;
+    }
+
+    private boolean validateHomePlanets() {
+        if (TileHelper.getAllPlanets().keySet().containsAll(getHomePlanets())) return true;
+        List<String> invalidPlanetIDs = new ArrayList<>();
+        for (String planetID : getHomePlanets()) {
+            if (!TileHelper.getAllPlanets().containsKey(planetID)) invalidPlanetIDs.add(planetID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
+        return false;
+    }
+
+    private boolean validateStartingTech() {
+        if (Mapper.getTechs().keySet().containsAll(getStartingTech())) return true;
+        List<String> invalidStartingTechIDs = new ArrayList<>();
+        for (String startingTechID : getStartingTech()) {
+            if (!Mapper.getTechs().containsKey(startingTechID)) invalidStartingTechIDs.add(startingTechID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid starting tech IDs: `" + invalidStartingTechIDs + "`");
+        return false;
+    }
+
+    private boolean validateFactionTech() {
+        if (Mapper.getTechs().keySet().containsAll(getFactionTech())) return true;
+        List<String> invalidFactionTechIDs = new ArrayList<>();
+        for (String factionTechID : getFactionTech()) {
+            if (!Mapper.getTechs().containsKey(factionTechID)) invalidFactionTechIDs.add(factionTechID);
+        }
+
+        BotLogger.log("Faction **" + getAlias() + "** failed validation due to invalid faction tech IDs: `" + invalidFactionTechIDs + "`");
+        return false;
+    }
+
+    @Override
+    public MessageEmbed getRepresentationEmbed() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
     }
 }

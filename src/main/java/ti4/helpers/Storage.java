@@ -15,22 +15,26 @@ public class Storage {
     public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
-    private static Font TI_FONT_8 = null;
-    private static Font TI_FONT_12 = null;
-    private static Font TI_FONT_14 = null;
-    private static Font TI_FONT_16 = null;
-    private static Font TI_FONT_18 = null;
-    private static Font TI_FONT_20 = null;
-    private static Font TI_FONT_21 = null;
-    private static Font TI_FONT_24 = null;
-    private static Font TI_FONT_26 = null;
-    private static Font TI_FONT_28 = null;
-    private static Font TI_FONT_30 = null;
-    private static Font TI_FONT_32 = null;
-    private static Font TI_FONT_35 = null;
-    private static Font TI_FONT_40 = null;
-    private static Font TI_FONT_50 = null;
-    private static Font TI_FONT_64 = null;
+    private static Font TI_FONT_8;
+    private static Font TI_FONT_12;
+    private static Font TI_FONT_13;
+    private static Font TI_FONT_14;
+    private static Font TI_FONT_16;
+    private static Font TI_FONT_18;
+    private static Font TI_FONT_20;
+    private static Font TI_FONT_21;
+    private static Font TI_FONT_24;
+    private static Font TI_FONT_26;
+    private static Font TI_FONT_28;
+    private static Font TI_FONT_30;
+    private static Font TI_FONT_32;
+    private static Font TI_FONT_35;
+    private static Font TI_FONT_40;
+    private static Font TI_FONT_50;
+    private static Font TI_FONT_64;
+    private static Font TI_FONT_90;
+    private static Font TI_FONT_100;
+    private static Font TI_FONT_110;
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
@@ -46,6 +50,14 @@ public class Storage {
         }
         TI_FONT_12 = getFont(12f);
         return TI_FONT_12;
+    }
+
+    public static Font getFont13() {
+        if (TI_FONT_13 != null) {
+            return TI_FONT_13;
+        }
+        TI_FONT_13 = getFont(13f);
+        return TI_FONT_13;
     }
 
     public static Font getFont14() {
@@ -134,14 +146,6 @@ public class Storage {
         return TI_FONT_35;
     }
 
-    public static Font getFont64() {
-        if (TI_FONT_64 != null) {
-            return TI_FONT_64;
-        }
-        TI_FONT_64 = getFont(64f);
-        return TI_FONT_64;
-    }
-
     public static Font getFont40() {
         if (TI_FONT_40 != null) {
             return TI_FONT_40;
@@ -158,10 +162,42 @@ public class Storage {
         return TI_FONT_50;
     }
 
+    public static Font getFont64() {
+        if (TI_FONT_64 != null) {
+            return TI_FONT_64;
+        }
+        TI_FONT_64 = getFont(64f);
+        return TI_FONT_64;
+    }
+
+    public static Font getFont90() {
+        if (TI_FONT_90 != null) {
+            return TI_FONT_90;
+        }
+        TI_FONT_90 = getFont(90f);
+        return TI_FONT_90;
+    }
+
+    public static Font getFont100() {
+        if (TI_FONT_100 != null) {
+            return TI_FONT_100;
+        }
+        TI_FONT_100 = getFont(100f);
+        return TI_FONT_100;
+    }
+
+    public static Font getFont110() {
+        if (TI_FONT_110 != null) {
+            return TI_FONT_110;
+        }
+        TI_FONT_110 = getFont(110f);
+        return TI_FONT_110;
+    }
+
     private static Font getFont(float size) {
         Font tiFont = null;
         String resource = getResourcePath();
-        if (resource == null) return tiFont;
+        if (resource == null) return null;
         File file = new File(resource + "/font/SLIDER.TTF");
         try (InputStream inputStream = new FileInputStream(file)) {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);

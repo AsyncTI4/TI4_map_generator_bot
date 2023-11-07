@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -19,25 +19,25 @@ public class ShowAllSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
         
-        Player player_ = Helper.getPlayer(activeMap, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             sendMessage("Player not found");
             return;
         }
-        showAll(player, player_, activeMap);
+        showAll(player, player_, activeGame);
     }
 
-    public void showAll(Player player, Player player_, Map activeMap ) {
+    public void showAll(Player player, Player player_, Game activeGame) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Game: ").append(activeGame.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Secret Objectives:").append("\n");
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
@@ -45,7 +45,7 @@ public class ShowAllSO extends SOCardsSubcommandData {
         for (String id : secrets) {
             sb.append(SOInfo.getSecretObjectiveRepresentation(id)).append("\n");
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, "All SOs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "All SOs shown to player");
     }
 }

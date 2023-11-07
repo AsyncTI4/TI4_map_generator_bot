@@ -21,7 +21,7 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.THREAD_SEARCH_STRING, null, OptionMapping::getAsString).toLowerCase();
-        if (searchString == null || searchString.isEmpty() || searchString.isBlank()) {
+        if (searchString.isEmpty() || searchString.isBlank()) {
             sendMessage("Please do better with the search string.");
             return;
         }
@@ -48,8 +48,8 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
             return;
         }
 
-        final AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(tc -> tc.getName().toLowerCase().contains(searchString) && !tc.getAutoArchiveDuration().equals(autoArchiveDuration_)).toList();
+        AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
+        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(tc -> tc.getName().toLowerCase().contains(searchString) && tc.getAutoArchiveDuration() != autoArchiveDuration_).toList();
 
         StringBuilder sb = new StringBuilder("**__Threads Updated__**\n");
         for (ThreadChannel threadChannel : threadChannels) {

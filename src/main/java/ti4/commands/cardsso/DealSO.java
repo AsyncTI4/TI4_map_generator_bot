@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public class DealSO extends SOCardsSubcommandData {
@@ -20,7 +20,7 @@ public class DealSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;
         if (option != null) {
@@ -28,21 +28,21 @@ public class DealSO extends SOCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player_ = Helper.getPlayer(activeMap, null, event);
+        Player player_ = Helper.getPlayer(activeGame, null, event);
         if (player_ == null) {
             sendMessage("Player not found");
             return;
         }
-        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
         if (user == null) {
             sendMessage("User for faction not found. Report to ADMIN");
             return;
         }
 
         for (int i = 0; i < count; i++) {
-            activeMap.drawSecretObjective(player_.getUserID());
+            activeGame.drawSecretObjective(player_.getUserID());
         }
         sendMessage(count + " SO Dealt");
-        SOInfo.sendSecretObjectiveInfo(activeMap, player_, event);
+        SOInfo.sendSecretObjectiveInfo(activeGame, player_, event);
     }
 }

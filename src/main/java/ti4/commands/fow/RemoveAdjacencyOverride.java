@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class RemoveAdjacencyOverride extends FOWSubcommandData {
@@ -17,7 +17,7 @@ public class RemoveAdjacencyOverride extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
         if (primaryTileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
@@ -29,6 +29,6 @@ public class RemoveAdjacencyOverride extends FOWSubcommandData {
             return;
         }
 
-        activeMap.removeAdjacentTileOverrides(primaryTile);
+        activeGame.removeAdjacentTileOverrides(primaryTile);
     }
 }

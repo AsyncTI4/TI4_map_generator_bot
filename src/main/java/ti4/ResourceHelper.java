@@ -1,26 +1,28 @@
 package ti4;
 
+import java.util.concurrent.ThreadLocalRandom;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.Units.UnitKey;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Random;
 
 public class ResourceHelper {
-    private static ResourceHelper resourceHelper = null;
-    private HashMap<String, String> unitCache = new HashMap<>();
-    private HashMap<String, String> tileCache = new HashMap<>();
-    private HashMap<String, String> ccCache = new HashMap<>();
-    private HashMap<String, String> attachmentCache = new HashMap<>();
-    private HashMap<String, String> tokenCache = new HashMap<>();
-    private HashMap<String, String> factionCache = new HashMap<>();
-    private HashMap<String, String> generalCache = new HashMap<>();
-    private HashMap<String, String> planetCache = new HashMap<>();
-    private HashMap<String, String> paCache = new HashMap<>();
+    private static ResourceHelper resourceHelper;
+    private final HashMap<String, String> unitCache = new HashMap<>();
+    private final HashMap<String, String> decalCache = new HashMap<>();
+    private final HashMap<String, String> spoopyCache = new HashMap<>();
+    private final HashMap<String, String> tileCache = new HashMap<>();
+    private final HashMap<String, String> ccCache = new HashMap<>();
+    private final HashMap<String, String> attachmentCache = new HashMap<>();
+    private final HashMap<String, String> tokenCache = new HashMap<>();
+    private final HashMap<String, String> factionCache = new HashMap<>();
+    private final HashMap<String, String> generalCache = new HashMap<>();
+    private final HashMap<String, String> planetCache = new HashMap<>();
+    private final HashMap<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -30,23 +32,6 @@ public class ResourceHelper {
             resourceHelper = new ResourceHelper();
         }
         return resourceHelper;
-    }
-
-    public File getResource(String name) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream stream = classLoader.getResourceAsStream(name);
-        try
-        {
-            if (stream == null) {
-                throw new Exception("Cannot find file " + name);
-            }
-            return new File(stream.toString());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        return null;
     }
 
     @Nullable
@@ -91,21 +76,60 @@ public class ResourceHelper {
         return tile;
     }
 
+    //@Deprecated
     @Nullable
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
-            if (new Random().nextInt(Constants.EYE_CHANCE) == 0) {
-                return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD,Constants.UNIT_DD_EYE ), "Could not find eye file");
+            if (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
+                return getResourceFromFolder("units/", name.replaceFirst(Constants.UNIT_DD, Constants.UNIT_DD_EYE), "Could not find eye file");
             }
         }
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
             return unitPath;
         }
-        String unit = getResourceFromFolder("units/new_units/", name, "Could not find unit file");
+        String unit = getResourceFromFolder("units/", name, "Could not find unit file");
         unitCache.put(name, unit);
         return unit;
     }
+
+    @Nullable
+    public String getUnitFile(UnitKey unit) {
+        String name = unit.getFileName();
+        String unitPath = unitCache.get(name);
+        if (unitPath != null) {
+            return unitPath;
+        }
+        String filePath = getResourceFromFolder("units/", name, "Could not find unit file");
+        unitCache.put(name, filePath);
+        return filePath;
+    }
+
+    @Nullable
+    public String getDecalFile(String name) {
+        String decalPath = decalCache.get(name);
+        if (decalPath != null) {
+            return decalPath;
+        }
+        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        decalCache.put(name, unit);
+        return unit;
+    }
+
+    @Nullable
+    public String getSpoopyFile() {
+        // overlay_jackolantern_1
+        int face = ThreadLocalRandom.current().nextInt(1, 4);
+        String name = "overlay_jackolantern_" + String.valueOf(face) + ".png";
+        String spoopyPath = spoopyCache.get(name);
+        if (spoopyPath != null) {
+            return spoopyPath;
+        }
+        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        spoopyCache.put(name, unit);
+        return unit;
+    }
+
     @Nullable
     public String getCCFile(String name) {
         String ccPath = ccCache.get(name);
@@ -164,19 +188,22 @@ public class ResourceHelper {
     @Nullable
     public String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
-        if (resourceFile.exists()){
+        if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
-        }
-        else {
-           // System.out.println("Could not find resource file " + name + " in folder " + folder);
-            System.out.println(errorDescription);
+        } else {
+            // System.out.println("Could not find resource file " + name + " in folder " + folder);
+            // System.out.println(errorDescription);
         }
         return null;
     }
 
     @Nullable
-    public String getInfoFile(String name) {
-        return getResourceFromFolder("info/", name, "Could not find info file");
+    public String getDataFile(String name) {
+        return getResourceFromFolder("data/", name, "Could not find data file");
+    }
+
+    public String getDataFolder(String name) {
+        return Storage.getResourcePath() + File.separator + "data" + File.separator + name;
     }
 
     @Nullable

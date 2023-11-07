@@ -1,22 +1,29 @@
 package ti4.helpers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DiceHelper {
 
     public static class Die {
-        private int threshold;
-        private int result;
+        private final int threshold;
+        private final int result;
 
         Die(int threshold) {
             this.threshold = threshold;
-            result = new Random().nextInt(1,11);
+            result = ThreadLocalRandom.current().nextInt(1, 11);
         }
-        
-        public int getResult() { return result; }
-        public int getThreshold() { return threshold; }
-       
-        
+
+        public int getResult() {
+            return result;
+        }
+
+        public int getThreshold() {
+            return threshold;
+        }
+
         public String printResult() {
             if (isSuccess()) {
                 return String.format("**%d**", result);
@@ -33,7 +40,7 @@ public class DiceHelper {
         return new Die(threshold);
     }
 
-    public static  List<Die> rollDice(int threshold, int numDice)  {
+    public static List<Die> rollDice(int threshold, int numDice) {
         List<Die> output = new ArrayList<>();
         for (int i = 0; i < numDice; ++i) {
             output.add(rollDie(threshold));
@@ -41,12 +48,12 @@ public class DiceHelper {
         return output;
     }
 
-    public static  String formatDiceResults(List<Die> dice) {
+    public static String formatDiceResults(List<Die> dice) {
         List<String> resultStrings = dice.stream().map(Die::printResult).toList();
         return String.format("[%s] = %d hits", String.join(", ", resultStrings), countSuccesses(dice));
     }
 
-    public static  int countSuccesses(List<Die> dice) {
+    public static int countSuccesses(List<Die> dice) {
         return (int) dice.stream().filter(Die::isSuccess).count();
     }
 
@@ -54,7 +61,7 @@ public class DiceHelper {
         HashMap<Integer, List<Die>> mapByThreshold = new HashMap<>();
         for (Die d : dice) {
             List<Die> l = mapByThreshold.get(d.getThreshold());
-            if (l == null) { 
+            if (l == null) {
                 l = new ArrayList<>();
             }
             l.add(d);

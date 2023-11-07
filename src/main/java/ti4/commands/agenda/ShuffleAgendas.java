@@ -20,7 +20,7 @@ public class ShuffleAgendas extends AgendaSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveMap().shuffleAgendas();
+        getActiveGame().shuffleAgendas();
         MessageHelper.replyToMessage(event, "Agenda deck shuffled");
     }
 }

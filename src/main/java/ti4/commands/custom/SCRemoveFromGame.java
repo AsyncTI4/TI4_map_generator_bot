@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class SCRemoveFromGame extends CustomSubcommandData {
@@ -17,7 +17,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-		Map activeMap = getActiveMap();
+		Game activeGame = getActiveGame();
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
@@ -25,7 +25,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
             return;
         }
 
-        if (activeMap.removeSC(sc)) {
+        if (activeGame.removeSC(sc)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Strategy Card: " + sc);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card did not exist: " + sc);

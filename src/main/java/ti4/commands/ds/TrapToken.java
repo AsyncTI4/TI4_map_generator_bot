@@ -1,5 +1,6 @@
 package ti4.commands.ds;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,37 +23,37 @@ public class TrapToken extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
-        trapForPlanet(event, activeMap, Constants.PLANET, Constants.LIZHO_TRAP_ID, player);
+        trapForPlanet(event, activeGame, Constants.PLANET, Constants.LIZHO_TRAP_ID, player);
 
     }
 
-    private void trapForPlanet(SlashCommandInteractionEvent event, Map activeMap, String planet, String lizhoTrapId, Player player) {
+    private void trapForPlanet(SlashCommandInteractionEvent event, Game activeGame, String planet, String lizhoTrapId, Player player) {
         OptionMapping planetOption = event.getOption(planet);
         if (planetOption == null){
             return;
         }
         String planetName = planetOption.getAsString();
-        if (!activeMap.getPlanets().contains(planetName)) {
+        if (!activeGame.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
         Tile tile = null;
         UnitHolder unitHolder = null;
-        for (Tile tile_ : activeMap.getTileMap().values()) {
+        for (Tile tile_ : activeGame.getTileMap().values()) {
             if (tile != null) {
                 break;
             }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     tile = tile_;
                     unitHolder = unitHolderEntry.getValue();
@@ -67,8 +68,8 @@ public class TrapToken extends DiscordantStarsSubcommandData {
 
         if (unitHolder.getTokenList().contains(Constants.LIZHO_TRAP_PNG)){
             tile.removeToken(Constants.LIZHO_TRAP_PNG, unitHolder.getName());
-            LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>(player.getTrapCardsPlanets());
-            for (java.util.Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
+            Map<String, String> trapCardsPlanets = new LinkedHashMap<>(player.getTrapCardsPlanets());
+            for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
                 if (planetName.equals(entry.getValue())) {
                     player.setTrapCardPlanet(entry.getKey(), null);
                 }
@@ -89,7 +90,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
             LinkedHashMap<String, Integer> trapCards = player.getTrapCards();
             LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             String trap = null;
-            for (java.util.Map.Entry<String, Integer> traps : trapCards.entrySet()) {
+            for (Map.Entry<String, Integer> traps : trapCards.entrySet()) {
                 if (traps.getValue() == trapID){
                     trap = traps.getKey();
                     String planetUnitHolderName = trapCardsPlanets.get(traps.getKey());

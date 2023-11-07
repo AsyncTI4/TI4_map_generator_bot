@@ -1,14 +1,13 @@
 package ti4.commands.game;
 
-import net.dv8tion.jda.api.entities.User;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -26,35 +25,14 @@ public class SetOrder extends GameSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
-        User callerUser = event.getUser();
-        String mapName;
-        if (gameOption != null) {
-            mapName = event.getOptions().get(0).getAsString();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
-                return;
-            }
-        } else {
-            Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
-            if (userActiveMap == null){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
-                return;
-            }
-            mapName = userActiveMap.getName();
-        }
-
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getMap(mapName);
-
+        Game activeGame = getActiveGame();
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeMap.getPlayers());
-        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeMap.getPlayers());
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
+        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
         try {
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER1));
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER2));
@@ -67,15 +45,15 @@ public class SetOrder extends GameSubcommandData {
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
             }
-            activeMap.setPlayers(newPlayerOrder);
+            activeGame.setPlayers(newPlayerOrder);
         } catch (Exception e){
-            activeMap.setPlayers(playersBackup);
+            activeGame.setPlayers(playersBackup);
         }
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
-    private void setPlayerOrder(LinkedHashMap<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
         if (option1 != null) {
             String id = option1.getAsUser().getId();
             Player player = players.get(id);
@@ -85,6 +63,11 @@ public class SetOrder extends GameSubcommandData {
             }
         }
     }
-
-    ;
+    public void setPlayerOrder(Map<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, Player player) {
+        if (player != null){
+            newPlayerOrder.put(player.getUserID(), player);
+            players.remove(player.getUserID());
+        }
+        
+    }
 }

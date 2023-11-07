@@ -4,10 +4,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -22,51 +23,61 @@ public class ListTurnOrder extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        turnOrder(event, activeMap);
+        Game activeGame = getActiveGame();
+        turnOrder(event, activeGame, false);
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Map activeMap) {
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame) {
+        turnOrder(event, activeGame, true);
+    }
 
-        if (activeMap.isFoWMode()) {
+    public static void turnOrder(GenericInteractionCreateEvent event, Game activeGame, boolean pingPeople) {
+
+        if (activeGame.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
         }
 
         HashMap<Integer, String> order = new HashMap<>();
         int naaluSC = 0;
-        for (Player player : activeMap.getRealPlayers()) {
+        for (Player player : activeGame.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeGame, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             boolean passed = player.isPassed();
 
             Set<Integer> SCs = player.getSCs();
-            HashMap<Integer, Boolean> scPlayed = activeMap.getScPlayed();
-            String text = "";
+            HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+            StringBuilder textBuilder = new StringBuilder();
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
                 boolean isPlayed = found != null ? found : false;
-                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
+                String scEmoji = isPlayed ? Emojis.getSCBackEmojiFromInteger(sc_) : Emojis.getSCEmojiFromInteger(sc_);
                 if (isPlayed) {
-                    text += "~~";
+                    textBuilder.append("~~");
                 }
-                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_, activeMap);
+                textBuilder.append(scEmoji).append(Helper.getSCAsMention(sc_, activeGame));
                 if (isPlayed) {
-                    text += "~~";
+                    textBuilder.append("~~");
                 }
             }
+            String text = textBuilder.toString();
             if (passed) {
                 text += "~~";
             }
-            text += Helper.getPlayerRepresentation(player, activeMap);
+            if(pingPeople || activeGame.isFoWMode()){
+                text += player.getRepresentation();
+            }else{
+                text += ButtonHelper.getIdent(player) + " "+player.getUserName();
+            }
+            
             if (passed) {
                 text += "~~ - PASSED";
             }
 
-            if (player.getUserID().equals(activeMap.getSpeaker())) {
+            if (player.getUserID().equals(activeGame.getSpeaker())) {
                 text += " " + Emojis.SpeakerToken;
             }
 
@@ -79,7 +90,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             String text = order.get(naaluSC);
             msg.append("`").append(0).append(".`").append(text).append("\n");
         }
-        Integer max = Collections.max(activeMap.getScTradeGoods().keySet());
+        Integer max = Collections.max(activeGame.getScTradeGoods().keySet());
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {
                 continue;

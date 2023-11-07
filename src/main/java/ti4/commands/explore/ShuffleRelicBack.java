@@ -27,9 +27,9 @@ public class ShuffleRelicBack extends GenericRelicAction {
         if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
-            boolean success = getActiveMap().shuffleRelicBack(relicId);
+            boolean success = getActiveGame().shuffleRelicBack(relicId);
             if (success) {
-                String relicName = Mapper.getRelic(relicId).split(";")[0];
+                String relicName = Mapper.getRelic(relicId).getName();
                 sendMessage("Shuffled relic back: " + relicName);
             } else {
                 sendMessage("Could not shuffle relic back into deck.");

@@ -19,7 +19,7 @@ public class RefreshRelic extends ExhaustRelic {
     @Override
     protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
         player.removeExhaustedRelic(relicId);
-        String relicName = Mapper.getRelic(relicId).split(";")[0];
+        String relicName = Mapper.getRelic(relicId).getName();
         sendMessage("Refreshed " + Emojis.Relic + "Relic: " + relicName);
     }
 }

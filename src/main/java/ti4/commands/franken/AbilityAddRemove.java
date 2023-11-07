@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public abstract class AbilityAddRemove extends FrankenSubcommandData {
@@ -24,6 +24,7 @@ public abstract class AbilityAddRemove extends FrankenSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_3, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_4, "Ability Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_5, "Ability Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -35,11 +36,12 @@ public abstract class AbilityAddRemove extends FrankenSubcommandData {
         }
 
         abilityIDs.removeIf(StringUtils::isEmpty);
-        abilityIDs.removeIf(a -> !Mapper.getFactionAbilities().keySet().contains(a));
+        abilityIDs.removeIf(a -> !Mapper.getAbilities().containsKey(a));
 
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;

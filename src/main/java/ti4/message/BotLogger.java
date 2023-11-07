@@ -5,8 +5,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDu
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.MapGenerator;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Helper;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,7 @@ public class BotLogger {
      * @param msg - message to send to the #bot-log channel
      */
     public static void log(String msg) {
-        log((GenericInteractionCreateEvent) null, msg, null);
+        log(null, msg, null);
     }
 
     /** Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
@@ -27,12 +29,11 @@ public class BotLogger {
      * @e - Exception
      */
     public static void log(String msg, Exception e) {
-        log((GenericInteractionCreateEvent) null, msg, e);
+        log(null, msg, e);
     }
 
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      */
     public static void log(GenericInteractionCreateEvent event, String msg) {
         log(event, msg, null);
@@ -41,7 +42,6 @@ public class BotLogger {
     /** Sends just the stack trace the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * <p> Will create a thread and post the full Stack Trace
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      */
     public static void log(GenericInteractionCreateEvent event, Exception e) {
         log(event, null, e);
@@ -50,7 +50,6 @@ public class BotLogger {
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      *  <p> Will create a thread and post the full Stack Trace when supplied with an Exception
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
-     * @param msg
      * @param e Exception
      */
     public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
@@ -62,51 +61,73 @@ public class BotLogger {
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
-        if (botLogChannel != null) {
-            if (event == null) { //NON-EVENT LOGS
-                if (e == null) {
-                    botLogChannel.sendMessage(msg).queue();
-                } else {
-                    botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
-            } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
-                if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
-                } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
-            } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
-                String channelName = event.getChannel().getName();
-                String channelMention = event.getChannel().getAsMention();
-                Button button = ((ButtonInteractionEvent) event).getButton();
-                if (e == null) {
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
-                } else {
-                    Helper.checkThreadLimitAndArchive(event.getGuild());
-                    botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
-                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
-                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                    }));
-                }
+
+        System.out.println("[BOT-LOG] " + msg);
+
+        if (botLogChannel == null) {
+            String name;
+            if(event == null) {
+                name = "None";
+                System.out.println(e);
+                return;
+            } else {
+                name = event.getGuild().getName();
+            }
+            MessageHelper.sendMessageToBotLogWebhook("Failed to find bot-log channel for server: " + name + "\nSending via webhook to main server.\n>" + msg);
+            return;
+        }
+
+        if (event == null) { //NON-EVENT LOGS
+            if (e == null) {
+                botLogChannel.sendMessage(msg).queue();
+            } else {
+                botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
+            String channelName = event.getChannel().getName();
+            String channelMention = event.getChannel().getAsMention();
+            String commandString = ((CommandInteractionPayload) event).getCommandString();
+            if (e == null) {
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
+            String channelName = event.getChannel().getName();
+            String channelMention = event.getChannel().getAsMention();
+            Button button = ((ButtonInteraction) event).getButton();
+            if (e == null) {
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage(channelMention + "\n" + channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
+            }
+        } else {
+            if (e == null) {
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue();
+            } else {
+                Helper.checkThreadLimitAndArchive(event.getGuild());
+                botLogChannel.sendMessage("[unknown event]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                }));
             }
         }
     }
 
     /** Retreives either the event's guild's #bot-log channel, or, if that is null, the Primary server's #bot-log channel.
-     * @param event
-     * @return
      */
-    private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
+    public static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
         TextChannel botLogChannel = null;
         if (event != null) {
             for (TextChannel textChannel : event.getGuild().getTextChannels()) {
@@ -115,13 +136,18 @@ public class BotLogger {
                 }
             }
         }
-        if ((botLogChannel == null || event == null) && MapGenerator.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
-            for (TextChannel textChannel : MapGenerator.guildPrimary.getTextChannels()) {
-                if ("bot-log".equals(textChannel.getName())) {
-                    botLogChannel = textChannel;
-                }
-            }
+        if (botLogChannel == null && AsyncTI4DiscordBot.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
+            botLogChannel = getPrimaryBotLogChannel();
         }
         return botLogChannel;
+    }
+
+    public static TextChannel getPrimaryBotLogChannel() {
+        for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
+            if ("bot-log".equals(textChannel.getName())) {
+                return textChannel;
+            }
+        }
+        return null;
     }
 }

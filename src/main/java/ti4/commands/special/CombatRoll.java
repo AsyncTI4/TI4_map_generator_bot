@@ -1,8 +1,10 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -15,20 +17,24 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatHelper;
 import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatRollType;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
+import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -48,25 +54,29 @@ public class CombatRoll extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
                 "comma list of <count> <unit> eg 2 fighter 1 dreadnought")
                 .setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE,
+                "switch to afb/bombardment/spacecannonoffence")
+                .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
                 .setAutoComplete(true).setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         OptionMapping mods = event.getOption(Constants.COMBAT_MODIFIERS);
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
+        OptionMapping rollTypeOption = event.getOption(Constants.COMBAT_ROLL_TYPE);
 
         String userID = getUser().getId();
-        Player player = activeMap.getPlayer(userID);
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(userID);
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
 
-         if (player == null) {
+        if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
@@ -79,7 +89,7 @@ public class CombatRoll extends SpecialSubcommandData {
             customMods = parseCustomUnitMods(mods.getAsString());
         }
 
-        HashMap<String, Integer> extraRollsParsed = new HashMap<String, Integer>();
+        HashMap<String, Integer> extraRollsParsed = new HashMap<>();
         if (extraRollsOption != null) {
             extraRollsParsed = parseUnits(extraRollsOption.getAsString());
         }
@@ -91,66 +101,127 @@ public class CombatRoll extends SpecialSubcommandData {
 
         // Get tile info
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Tile " + tileOption.getAsString() + " not found");
             return;
         }
 
-        secondHalfOfCombatRoll(player, activeMap, event, tile, unitHolderName, extraRollsParsed, customMods);
+        CombatRollType rollType = CombatRollType.combatround;
+        if (rollTypeOption != null) {
+            if (rollTypeOption.getAsString().toLowerCase().equals("afb")) {
+                rollType = CombatRollType.AFB;
+            }
+            if (rollTypeOption.getAsString().toLowerCase().equals("bombardment")) {
+                rollType = CombatRollType.bombardment;
+            }
+            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannonoffence")) {
+                rollType = CombatRollType.SpaceCannonOffence;
+            }
+            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannondefence")) {
+                rollType = CombatRollType.SpaceCannonDefence;
+            }
+        }
+
+        secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, rollType);
     }
 
-    public void secondHalfOfCombatRoll(Player player, Map activeMap, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods){
+    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile,
+            String unitHolderName,
+            HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods,
+            CombatRollType rollType) {
+        String sb = "";
+        UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
+        if (combatOnHolder == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
+            return;
+        }
+
+        if (rollType == CombatRollType.SpaceCannonDefence && !(combatOnHolder instanceof Planet)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
+        }
+
+        Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
+                rollType, activeGame);
+        if (activeGame.getLaws().containsKey("articles_war")) {
+            if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
+                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream()
+                        .filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
+            }
+        }
+        if (unitsByQuantity.size() == 0) {
+            String fightingOnUnitHolderName = unitHolderName;
+            if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
+                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "There are no units in " + fightingOnUnitHolderName + " on tile " + tile.getPosition()
+                            + " for player " + player.getColor() + " "
+                            + player.getFactionEmoji() + "\n"
+                            + "Ping bothelper if this seems to be in error.");
+
+            return;
+        }
+
+        List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(Arrays.asList(combatOnHolder));
+        if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
+            // Including space for finding opponents for pds - since people will fire before
+            // landing sometimes
+            // and fire after landing other times.
+            combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
+        }
+        Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, activeGame);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
-        String tileName = tile.getTilePath();
-        tileName = tileName.substring(tileName.indexOf("_") + 1);
-        tileName = tileName.substring(0, tileName.indexOf(".png"));
-        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
-        StringBuilder sb = new StringBuilder();
-        UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
-        if(combatOnHolder == null){
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
-            return;
-        }
-        
-        HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(combatOnHolder, player, event);
-        if (activeMap.getLaws().containsKey("articles_war")) {
-            if (unitsByQuantity.keySet().stream().anyMatch(unit -> unit.getAlias().equals("naaz_mech_space"))) {
-                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !e.getKey().getAlias().equals("naaz_mech_space"))
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Helper.getFactionIconFromDiscord("naaz") + " Z-Grav Eidolon due to Articles of War agenda.");
-            }
-        }
-        if(unitsByQuantity.size() == 0){
-            String fightingOnUnitHolderName = unitHolderName;
-            if(!unitHolderName.toLowerCase().equals(Constants.SPACE)){
-                fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeMap);
-            }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no units in " + fightingOnUnitHolderName +" on tile " + tile.getPosition() + " for player " + player.getColor() + " " + Helper.getFactionIconFromDiscord(player.getFaction()) + "\n" 
-            + "Ping bothelper if this seems to be in error.");
+        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent,
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_MODIFIERS);
 
-            return;
-        }
-        Player opponent = CombatHelper.GetOpponent(player, combatOnHolder, activeMap);
-        
-        List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent, unitsByQuantity, tileModel, activeMap);
-        
-        //Check for temp mods
+        List<NamedCombatModifierModel> autoExtraRolls = CombatModHelper.CalculateAutomaticMods(player, opponent,
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_EXTRA_ROLLS);
+
+        // Check for temp mods
         CombatModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
-        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel, combatOnHolder);
+        CombatModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
+                combatOnHolder);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
-        customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat);
-        autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat);
+        customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat, rollType);
+        autoMods = CombatModHelper.FilterRelevantMods(autoMods, unitsInCombat, rollType);
 
-        String message = String.format("%s combat rolls for %s on %s %s:  \n",
-                StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
+        autoExtraRolls = CombatModHelper.FilterRelevantMods(autoExtraRolls, unitsInCombat, rollType);
+
+        String holderName = combatOnHolder.getName();
+        Planet holderPlanet = null;
+        if (combatOnHolder instanceof Planet) {
+            holderPlanet = (Planet) combatOnHolder;
+        }
+        if (holderPlanet != null) {
+            PlanetModel planetModel = Mapper.getPlanet(holderPlanet.getName());
+            holderName = planetModel.getName();
+        }
+
+        String combatTypeName = StringUtils.capitalize(holderName) + " combat";
+        if (rollType != CombatRollType.combatround) {
+            combatTypeName = rollType.getValue();
+            if (holderPlanet != null) {
+                combatTypeName += " on " + StringUtils.capitalize(holderName);
+            }
+        }
+        String message = String.format("**%s** rolls for %s on %s %s:  \n",
+                combatTypeName, player.getFactionEmoji(),
                 tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, extraRollsParsed, customMods, autoMods, tempMods, player, opponent, activeMap);
+        message += CombatHelper.RollForUnits(unitsByQuantity, autoExtraRolls, customMods, autoMods, tempMods, player,
+                opponent,
+                activeGame, rollType);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
@@ -184,19 +255,17 @@ public class CombatRoll extends SpecialSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
 
-            if (unit != null) {
-                CombatModifierModel combatModifier = new CombatModifierModel();
-                combatModifier.setValue(count);
-                combatModifier.setScope(unit);
-                combatModifier.setPersistanceType("CUSTOM");
-                resultList.add(new NamedCombatModifierModel(combatModifier, ""));
-            }
+            CombatModifierModel combatModifier = new CombatModifierModel();
+            combatModifier.setValue(count);
+            combatModifier.setScope(unit);
+            combatModifier.setPersistenceType("CUSTOM");
+            resultList.add(new NamedCombatModifierModel(combatModifier, ""));
         }
         return resultList;
     }
 
     private HashMap<String, Integer> parseUnits(String unitList) {
-        HashMap<String, Integer> resultList = new HashMap<String, Integer>();
+        HashMap<String, Integer> resultList = new HashMap<>();
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
@@ -219,9 +288,7 @@ public class CombatRoll extends SpecialSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
 
-            if (unit != null) {
-                resultList.put(unit, count);
-            }
+            resultList.put(unit, count);
         }
         return resultList;
     }

@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -12,7 +13,7 @@ import ti4.model.PublicObjectiveModel;
 
 public class RevealStage2 extends StatusSubcommandData {
     public RevealStage2() {
-        super(Constants.REVEAL_STATGE2, "Reveal Stage2 Public Objective");
+        super(Constants.REVEAL_STAGE2, "Reveal Stage2 Public Objective");
     }
 
     @Override
@@ -21,22 +22,18 @@ public class RevealStage2 extends StatusSubcommandData {
     }
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
+        Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Map.Entry<String, Integer> objective = activeGame.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeMap));
-        sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
-        sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(po.getRepresentation()).append("\n");
-        MessageHelper.sendMessageToChannelAndPin(channel, sb.toString());
+        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 2 Public Objective Revealed**");
+        channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(activeGame, event);
     }
 }

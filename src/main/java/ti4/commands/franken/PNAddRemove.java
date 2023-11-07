@@ -13,13 +13,14 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 
 public abstract class PNAddRemove extends FrankenSubcommandData {
     public PNAddRemove(String name, String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -33,18 +34,19 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         pnIDs.removeIf(StringUtils::isEmpty);
         pnIDs.removeIf(pn -> !Mapper.getAllPromissoryNoteIDs().contains(pn));
 
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+        Game activeGame = getActiveGame();
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
 
         doAction(player, pnIDs);
-        activeMap.checkPromissoryNotes();
-        PNInfo.checkAndAddPNs(getActiveMap(), player);
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
+        activeGame.checkPromissoryNotes();
+        PNInfo.checkAndAddPNs(getActiveGame(), player);
+        PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
     }
 
     public abstract void doAction(Player player, List<String> pnIDs);

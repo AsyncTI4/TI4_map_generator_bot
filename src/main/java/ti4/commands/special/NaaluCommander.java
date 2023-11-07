@@ -1,12 +1,12 @@
 package ti4.commands.special;
 
-import java.util.Set;
-
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -18,54 +18,60 @@ public class NaaluCommander extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        Player player = activeGame.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        player = Helper.getPlayer(activeGame, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;
         }
+        secondHalfOfNaaluCommander(event, activeGame, player);
+    }
 
-        if (!activeMap.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) { //TODO: switch logic from isNaalu to hasNaaluCommander
+    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player) {
+
+        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append(event.getUser().getAsMention()).append("\n");
-        sb.append("`").append(event.getCommandString()).append("`").append("\n");
         sb.append("__**Top Agenda:**__\n");
-        String agendaID = activeMap.lookAtTopAgenda(0);
+        String agendaID = activeGame.lookAtTopAgenda(0);
         sb.append("1: ");
-        if (activeMap.getSentAgendas().get(agendaID) != null) {
+        if (activeGame.getSentAgendas().get(agendaID) != null) {
             sb.append("This agenda is currently in somebody's hand.");
-        } else {
+        } else if (agendaID != null) {
             sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
         }
         sb.append("\n\n");
         sb.append("__**Bottom Agenda:**__\n");
-        agendaID = activeMap.lookAtBottomAgenda(0);
+        agendaID = activeGame.lookAtBottomAgenda(0);
         sb.append("1: ");
-        if (activeMap.getSentAgendas().get(agendaID) != null) {
+        if (activeGame.getSentAgendas().get(agendaID) != null) {
             sb.append("This agenda is currently in somebody's hand.");
-        } else {
+        } else if (agendaID != null) {
             sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
         }
         sb.append("\n\n");
 
-        Set<Player> neighbours = Helper.getNeighbouringPlayers(activeMap, player);
-
-        for (Player player_ : neighbours) {
+        for (Player player_ : player.getNeighbouringPlayers()) {
             sb.append("_ _\n**__");
-            sb.append(Helper.getFactionIconFromDiscord(player_.getFaction()));
-            sb.append(Helper.getColourAsMention(event.getGuild(), player_.getColor())).append(" ");
+            sb.append(player_.getFactionEmoji());
+            sb.append(Emojis.getColourEmojis(player_.getColor())).append(" ");
             sb.append(player_.getUserName()).append("'s Promissory Notes:__**\n");
-            sb.append(PNInfo.getPromissoryNoteCardInfo(activeMap, player_, false));
+            sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false));
         }
 
-        if (!activeMap.isFoWMode()) MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getPlayerRepresentation(player, activeMap) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
+        if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+            player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
     }
 }

@@ -1,9 +1,20 @@
 package ti4.model;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-public class PromissoryNoteModel implements ModelInterface {
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
+@Data
+public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String faction;
@@ -11,15 +22,14 @@ public class PromissoryNoteModel implements ModelInterface {
     private Boolean playArea;
     private String attachment;
     private String source;
-    private String text; 
+    private String text;
+    private List<String> searchTags = new ArrayList<>();
 
-    public PromissoryNoteModel() {}
-
-    public boolean isValid() {
+  public boolean isValid() {
         return alias != null
             && name != null
-            && (faction != null && colour != null)
-            && attachment != null
+            && (faction != null || colour != null)
+            // && attachment != null
             && text != null
             && source != null;
     }
@@ -32,20 +42,26 @@ public class PromissoryNoteModel implements ModelInterface {
         return name;
     }
     
-    public String getFaction() {
-        return faction;
+    public Optional<String> getFaction() {
+        return Optional.ofNullable(faction);
     }
 
-    public String getColour() {
-        return colour;
+    public Optional<String> getColour() {
+        return Optional.ofNullable(colour);
+    }
+
+    public String getFactionOrColour() {
+        if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
+        if (!StringUtils.isBlank(getColour().orElse(""))) return colour;
+        return faction + "_" + colour;
     }
 
     public Boolean getPlayArea() {
         return playArea;
     }
 
-    public String getAttachment() {
-        return attachment;
+    public Optional<String> getAttachment() {
+        return Optional.ofNullable(attachment);
     }
 
     public String getText() {
@@ -72,6 +88,68 @@ public class PromissoryNoteModel implements ModelInterface {
             "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
 
         return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
+    }
+
+    public MessageEmbed getRepresentationEmbed() {
+        return getRepresentationEmbed(false, false, false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean justShowName, boolean includeID, boolean includeHelpfulText) {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        //TITLE
+        StringBuilder title = new StringBuilder();
+        title.append(Emojis.PN);
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        title.append("__**").append(getName()).append("**__");
+        if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
+        title.append(getSourceEmoji());
+        eb.setTitle(title.toString());
+
+        if (justShowName) return eb.build();
+
+        //DESCRIPTION
+        StringBuilder description = new StringBuilder();
+        description.append(getText());
+        eb.setDescription(description.toString());
+
+        //FOOTER
+        StringBuilder footer = new StringBuilder();
+        if (includeHelpfulText) {
+            if (!StringUtils.isBlank(getAttachment().orElse(""))) footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
+            if (getPlayArea()) {
+                footer.append("Play area card. ");
+                if (isPlayedDirectlyToPlayArea()) {
+                    footer.append("Sent directly to play area when received.");
+                } else {
+                    footer.append("Must be played from hand to enter play area.");
+                }
+                footer.append("\n");
+            }
+        }
+        if (includeID) {
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource()).append("\n");
+        }
+        eb.setFooter(footer.toString());
+        
+        eb.setColor(Color.blue);
+        return eb.build();
+    }
+
+    private String getSourceEmoji() {
+        return switch (getSource()) {
+            case "Discordant Stars" -> Emojis.DiscordantStars;
+            case "Absol" -> Emojis.Absol;
+            default -> "";
+        };
+    }
+
+    public boolean search(String searchString) {
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+    }
+
+    public String getAutoCompleteName() {
+        return getName() + " (" + getFactionOrColour() + ") (" + getSource() + ")";
     }
 
 }

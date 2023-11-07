@@ -1,24 +1,24 @@
 package ti4.commands.game;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class GameCommand implements Command {
 
@@ -39,7 +39,7 @@ public class GameCommand implements Command {
         User user = event.getUser();
         String userName = user.getName();
         String commandExecuted = "User: " + userName + " executed command.\n" +
-                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -47,7 +47,7 @@ public class GameCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getType().equals(OptionType.USER)){
+        if (option.getType() == OptionType.USER) {
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -61,18 +61,19 @@ public class GameCommand implements Command {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                if (subcommandName.equals(Constants.UNDO)){
+                if (subcommandName.equals(Constants.UNDO)) {
                     undoCommand = true;
                 }
             }
         }
         String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
+        if (activeGame == null) return;
         if (!undoCommand) {
-            MapSaveLoadManager.saveMap(activeMap, event);
+            GameSaveLoadManager.saveMap(activeGame, event);
         }
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING)) {
+        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, event);
+        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
             MessageHelper.replyToMessage(event, file);
         }
     }
@@ -84,7 +85,6 @@ public class GameCommand implements Command {
     private Collection<GameSubcommandData> getSubcommands() {
         Collection<GameSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Info());
-        //subcommands.add(new SetStatus());
         subcommands.add(new Join());
         subcommands.add(new Leave());
         subcommands.add(new Add());
@@ -109,7 +109,7 @@ public class GameCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

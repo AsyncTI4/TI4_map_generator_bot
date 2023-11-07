@@ -6,21 +6,20 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 
 public class RemoveAllCC implements Command {
 
-    void parsingForTile(SlashCommandInteractionEvent event, Map activeMap) {
-        Collection<Tile> tileList = activeMap.getTileMap().values();
+    void parsingForTile(SlashCommandInteractionEvent event, Game activeGame) {
+        Collection<Tile> tileList = activeGame.getTileMap().values();
         for (Tile tile : tileList) {
             tile.removeAllCC();
         }
@@ -33,15 +32,14 @@ public class RemoveAllCC implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            parsingForTile(event, activeMap);
-            MapSaveLoadManager.saveMap(activeMap, event);
-            File file = GenerateMap.getInstance().saveImage(activeMap, event);
-            MessageHelper.replyToMessage(event, file);
+            Game activeGame = gameManager.getUserActiveGame(userID);
+            parsingForTile(event, activeGame);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            ShowGame.simpleShowGame(activeGame, event);
         }
     }
 

@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 
 import java.util.LinkedHashMap;
 
@@ -24,7 +24,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
@@ -32,7 +32,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
             sendMessage("SO ID needs to be specified");
             return;
         }
-        User user = null;
+        User user;
         if (playerOption == null) {
           //  sendMessage("Player option was null");
            // return;
@@ -42,9 +42,9 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         {
            user = playerOption.getAsUser();
         }
-        if(optionPurge != null && optionPurge.getAsString().equals("YES"))
+        if(optionPurge != null && "YES".equals(optionPurge.getAsString()))
         {
-            if(activeMap.purgeSpecificSecretObjective(option.getAsString()))
+            if(activeGame.purgeSpecificSecretObjective(option.getAsString()))
             {
                 sendMessage("Purged specified SO");
             }
@@ -56,12 +56,12 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         }
 
         
-        LinkedHashMap<String, Integer> secrets = activeMap.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        LinkedHashMap<String, Integer> secrets = activeGame.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null){
             sendMessage("SO not retrieved");
             return;
         }
-        MapSaveLoadManager.saveMap(activeMap, event);
+        GameSaveLoadManager.saveMap(activeGame, event);
         sendMessage("SO sent to user's hand - please check `/ac info`");
     }
 }

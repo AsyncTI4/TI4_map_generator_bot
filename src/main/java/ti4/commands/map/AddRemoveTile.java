@@ -3,29 +3,27 @@ package ti4.commands.map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
-import ti4.commands.Command;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
 
-abstract public class AddRemoveTile implements Command {
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+abstract public class AddRemoveTile extends MapSubcommandData {
+    public AddRemoveTile(@NotNull String name, @NotNull String description) {
+        super(name, description);
+        addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
+        addOption(OptionType.STRING, Constants.POSITION, "Tile position on map", true);
     }
+
+    abstract protected void tileAction(Tile tile, String position, Game userActiveGame);
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -35,19 +33,17 @@ abstract public class AddRemoveTile implements Command {
             return;
         }
         String userID = member.getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Map userActiveMap = tileParsing(event, userID, mapManager);
-            if (userActiveMap == null) return;
-            MapSaveLoadManager.saveMap(userActiveMap, event);
-            File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
-            MessageHelper.replyToMessage(event, file);
+            Game userActiveGame = tileParsing(event, userID, gameManager);
+            if (userActiveGame == null) return;
+            GameSaveLoadManager.saveMap(userActiveGame, event);
         }
     }
 
-    protected Map tileParsing(SlashCommandInteractionEvent event, String userID, MapManager mapManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
         if (!PositionMapper.isTilePositionValid(position)) {
@@ -63,40 +59,22 @@ abstract public class AddRemoveTile implements Command {
         }
 
         Tile tile = new Tile(planetTileName, position);
-        if (planetTileName.equals("18")){
+        if ("18".equals(planetTileName)) {
             tile.addToken("token_custodian.png", "mr");
         }
 
-        Map userActiveMap = mapManager.getUserActiveMap(userID);
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
         Boolean isFowPrivate = null;
-        if (userActiveMap.isFoWMode() && event != null) {
-            isFowPrivate = false;
-            if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
-                isFowPrivate = true;
-            }
+        if (userActiveGame.isFoWMode()) {
+            isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         if (isFowPrivate != null && isFowPrivate) {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return null;
         }
 
-        tileAction(tile, position, userActiveMap);
-        userActiveMap.rebuildTilePositionAutoCompleteList();
-        return userActiveMap;
+        tileAction(tile, position, userActiveGame);
+        userActiveGame.rebuildTilePositionAutoCompleteList();
+        return userActiveGame;
     }
-
-    abstract protected void tileAction(Tile tile, String position, Map userActiveMap);
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true))
-        );
-    }
-
-    abstract protected String getActionDescription();
 }

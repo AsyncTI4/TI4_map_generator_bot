@@ -1,21 +1,20 @@
 package ti4.commands.status;
 
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.cardspn.PNInfo;
-import ti4.generator.GenerateMap;
+import ti4.commands.custom.SpinTilesInFirstThreeRings;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.generator.Mapper;
 import ti4.model.PromissoryNoteModel;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,13 +35,13 @@ public class Cleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Map activeMap = getActiveMap();
-        runStatusCleanup(activeMap);
+        Game activeGame = getActiveGame();
+        runStatusCleanup(activeGame);
     }
 
-    public void runStatusCleanup(Map activeMap) {
+    public void runStatusCleanup(Game activeGame) {
 
-        HashMap<String, Tile> tileMap = activeMap.getTileMap();
+        HashMap<String, Tile> tileMap = activeGame.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -51,20 +50,20 @@ public class Cleanup extends StatusSubcommandData {
                 unitHolder.removeAllUnitDamage();
             }
         }
-        HashMap<Integer, Boolean> scPlayed = activeMap.getScPlayed();
-        for (java.util.Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
+        HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
 
-        returnEndStatusPNs(activeMap); // return any PNs with "end of status phase" return timing
+        returnEndStatusPNs(activeGame); // return any PNs with "end of status phase" return timing
 
-        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+        LinkedHashMap<String, Player> players = activeGame.getPlayers();
 
         for (Player player : players.values()) {
             player.setPassed(false);
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {
-                activeMap.setScTradeGood(sc, 0);
+                activeGame.setScTradeGood(sc, 0);
             }            
             player.clearSCs();
             player.clearFollowedSCs();
@@ -72,43 +71,41 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
-            List<Leader> leads = new ArrayList<Leader>();
-            leads.addAll(player.getLeaders());
+            List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()){
                     if (leader.isActive()){
                         player.removeLeader(leader.getId());
                     } else {
-                        RefreshLeader.refreshLeader(player, leader, activeMap);
+                        RefreshLeader.refreshLeader(player, leader, activeGame);
                     }
                 }
             }
         }
-        int round = activeMap.getRound();
-        round++;
-        
-        activeMap.setRound(round);
+        activeGame.setHasHadAStatusPhase(true);
+        if(activeGame.isSpinMode()){
+            new SpinTilesInFirstThreeRings().spinRings(activeGame);
+        }
     }
   
 
-    public void returnEndStatusPNs(Map activeMap) {
-        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+    public void returnEndStatusPNs(Game activeGame) {
+        LinkedHashMap<String, Player> players = activeGame.getPlayers();
          for (Player player : players.values()) {
-           List<String> pns = new ArrayList<String>();
-            pns.addAll(player.getPromissoryNotesInPlayArea());
+             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
-                Player pnOwner = activeMap.getPNOwner(pn);
-                if(!pnOwner.isRealPlayer() ){
+                Player pnOwner = activeGame.getPNOwner(pn);
+                if(pnOwner == null || !pnOwner.isRealPlayer() ){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                 if(pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")){
                         player.removePromissoryNote(pn);
                         pnOwner.setPromissoryNote(pn);  
-                        PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
-		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), pnModel.getName() + " was returned");
+                        PNInfo.sendPromissoryNoteInfo(activeGame, pnOwner, false);
+		                PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
                     }
                 }
             }
@@ -117,8 +114,8 @@ public class Cleanup extends StatusSubcommandData {
     @Override
 
     public void reply(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        int prevRound = activeMap.getRound() - 1;
+        Game activeGame = getActiveGame();
+        int prevRound = activeGame.getRound() - 1;
 
         StatusCommand.reply(event, "End of round " + prevRound + " status phase.");
     }

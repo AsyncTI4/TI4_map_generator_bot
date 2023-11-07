@@ -1,54 +1,56 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.GenerateMap;
-import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.map.*;
-import ti4.message.MessageHelper;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+
 public class Stats extends PlayerSubcommandData {
 	public Stats() {
 		super(Constants.STATS, "Player Stats: CC,TG,Commodities");
 		addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-				.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
+			.addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
+			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
+			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
+			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 
-		Map activeMap = getActiveMap();
-		Player player = activeMap.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(activeMap, player, event, null);
-		player = Helper.getPlayer(activeMap, player, event);
+		Game activeGame = getActiveGame();
+		Player player = activeGame.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeGame, player, event, null);
+		player = Helper.getPlayer(activeGame, player, event);
 		if (player == null) {
 			sendMessage("Player could not be found");
 			return;
@@ -61,10 +63,10 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(factionColorOption);
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty()) {
-			if (activeMap.isFoWMode()) {
-				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeMap));
+			if (activeGame.isFoWMode()) {
+				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeGame));
 			} else {
-				sendMessage(getPlayersCurrentStatsText(player, activeMap));
+				sendMessage(getPlayersCurrentStatsText(player, activeGame));
 			}
 			return;
 		}
@@ -79,37 +81,36 @@ public class Stats extends PlayerSubcommandData {
 		} else {
 			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
 			if (optionCC != null) {
-				@SuppressWarnings("ConstantConditions")
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
 				StringTokenizer tokenizer = new StringTokenizer(cc, "/");
 				if (tokenizer.countTokens() != 3) {
 					sendMessage("Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
-						setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
-						setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
-						setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
+						setValue(event, activeGame, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						sendMessage("Not number entered, check CC count again");
 					}
 				}
-				Helper.isCCCountCorrect(event, activeMap, player.getColor());
+				Helper.isCCCountCorrect(event, activeGame, player.getColor());
 			}
 			if (optionT != null) {
-				setValue(event, activeMap, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
+				setValue(event, activeGame, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
 			}
 			if (optionF != null) {
-				setValue(event, activeMap, player, optionF, player::setFleetCC, player::getFleetCC, true);
+				setValue(event, activeGame, player, optionF, player::setFleetCC, player::getFleetCC, true);
 			}
 			if (optionS != null) {
-				setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
+				setValue(event, activeGame, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " updated CCs: " + originalCCString + " -> " + newCCString);
+				sendMessage(player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
-				Helper.isCCCountCorrect(event, activeMap, player.getColor());
+				Helper.isCCCountCorrect(event, activeGame, player.getColor());
 			}
 		}
 		optionMappings.remove(optionCC);
@@ -118,20 +119,30 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionS);
 		if (optionMappings.isEmpty()) return;
 
-		sendMessage(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " player stats changed:");
+		sendMessage(Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " player stats changed:");
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
-			if(optionTG.getAsString().contains("+")){
-				ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+			if (optionTG.getAsString().contains("+")) {
+				ButtonHelperAbilities.pillageCheck(player, activeGame);
 			}
-			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
+			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 
 		}
 
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
 		if (optionC != null) {
-			setValue(event, activeMap, player, optionC, player::setCommodities, player::getCommodities);
+
+			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
+			if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
+				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+					ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+			}
+		}
+
+		OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
+		if (optionMedian != null) {
+			player.setAutoSaboPassMedian(optionMedian.getAsInt());
 		}
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -149,7 +160,7 @@ public class Stats extends PlayerSubcommandData {
 			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
 			String value = optionSpeaker.getAsString().toLowerCase();
 			if ("y".equals(value) || "yes".equals(value)) {
-				activeMap.setSpeaker(player.getUserID());
+				activeGame.setSpeaker(player.getUserID());
 			} else {
 				message.append(", which is not a valid input. Please use one of: y/yes");
 			}
@@ -170,68 +181,65 @@ public class Stats extends PlayerSubcommandData {
 			}
 			sendMessage(message.toString());
 		}
-		
-		pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
+
+		pickSC(event, activeGame, player, event.getOption(Constants.STRATEGY_CARD));
 
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
 		if (optionSCPlayed != null) {
 			StringBuilder message = new StringBuilder();
 			int sc = optionSCPlayed.getAsInt();
 			if (sc > 0) {
-				boolean scIsPlayed = activeMap.getScPlayed().get(sc);
+				boolean scIsPlayed = activeGame.getScPlayed().get(sc);
 				if (!scIsPlayed) {
-					activeMap.setSCPlayed(sc, true);
-					message.append("> flipped " + Helper.getSCEmojiFromInteger(sc) + " to "
-							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
+					activeGame.setSCPlayed(sc, true);
+					message.append("> flipped ").append(Emojis.getSCEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" (played)");
 				} else {
-					activeMap.setSCPlayed(sc, false);
+					activeGame.setSCPlayed(sc, false);
 
-					for (Player player_ : activeMap.getPlayers().values()) {
+					for (Player player_ : activeGame.getPlayers().values()) {
 						if (!player_.isRealPlayer()) {
 							continue;
 						}
 						String faction = player_.getFaction();
-						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+						if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
 						player_.addFollowedSC(sc);
 					}
-					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
-							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
+					message.append("> flipped ").append(Emojis.getSCBackEmojiFromInteger(sc)).append(" to ").append(Emojis.getSCEmojiFromInteger(sc)).append(" (unplayed)");
 				}
 			} else {
 				message.append(
-						"> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
+					"> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
 			}
 			sendMessage(message.toString());
 		}
 
 		OptionMapping optionDummy = event.getOption(Constants.DUMMY);
 		if (optionDummy != null) {
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionDummy));
 			boolean value = optionDummy.getAsBoolean();
 			player.setDummy(value);
-			sendMessage(message.toString());
+			sendMessage(getGeneralMessage(event, player, optionDummy));
 		}
 
 	}
 
-	private String getPlayersCurrentStatsText(Player player, Map activeMap) {
-		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " player's current stats:\n");
+	private String getPlayersCurrentStatsText(Player player, Game activeGame) {
+		StringBuilder sb = new StringBuilder(player.getRepresentation() + " player's current stats:\n");
 
-		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
+		sb.append("> VP: ").append(player.getTotalVictoryPoints());
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
-		sb.append("      ").append(Emojis.tg).append(player.getTg());
+		sb.append("      ").append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(player.getTg());
 		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
 		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
-		sb.append("   ").append(Emojis.UFrag).append(player.getVrf());
+		sb.append("   ").append(Emojis.UFrag).append(player.getUrf());
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
-			for (int sc: player.getSCs()) {
-				if (getActiveMap().getScPlayed() != null && !getActiveMap().getScPlayed().isEmpty() && getActiveMap().getScPlayed().get(sc) != null) {
-					sb.append(Helper.getSCBackEmojiFromInteger(sc));
+			for (int sc : player.getSCs()) {
+				if (getActiveGame().getScPlayed() != null && !getActiveGame().getScPlayed().isEmpty() && getActiveGame().getScPlayed().get(sc) != null) {
+					sb.append(Emojis.getSCBackEmojiFromInteger(sc));
 				} else {
-					sb.append(Helper.getSCEmojiFromInteger(sc));
+					sb.append(Emojis.getSCEmojiFromInteger(sc));
 				}
 			}
 		} else {
@@ -239,7 +247,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 		sb.append("\n");
 		sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-		sb.append("> Speaker: `").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("`\n");
+		sb.append("> Speaker: `").append(getActiveGame().getSpeaker().equals(player.getUserID())).append("`\n");
 		sb.append("> Passed: `").append(player.isPassed()).append("`\n");
 		sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
 		sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
@@ -253,103 +261,103 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
 		sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
 		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
+		sb.append("> Alliance Members: ").append(player.getAllianceMembers()).append("\n");
+		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
+		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10()/10.0)).append("`\n");
+		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
+		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
+		Guild guild = activeGame.getGuild();
+		if (guild != null && activeGame.isFrankenGame() && guild.getThreadChannelById(player.getBagInfoThreadID()) != null) {
+			sb.append("> Bag Draft Thread: ").append(guild.getThreadChannelById(player.getBagInfoThreadID()).getAsMention()).append("\n");
+		}
 		sb.append("\n");
 
 		return sb.toString();
 	}
 
-	@Override
-	public void reply(SlashCommandInteractionEvent event) {
-		String userID = event.getUser().getId();
-		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-		MapSaveLoadManager.saveMap(activeMap, event);
-
-		GenerateMap.getInstance().saveImage(activeMap, event);
-	}
-
-	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+	public boolean pickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, OptionMapping optionSC) {
 		if (optionSC == null) {
 			return false;
 		}
-		if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
-			activeMap.setMapStatus(MapStatus.open);
-		}
 		int scNumber = optionSC.getAsInt();
-		return secondHalfOfPickSC(event, activeMap, player, scNumber);
+		return secondHalfOfPickSC(event, activeGame, player, scNumber);
 	}
 
-	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber) {
-		LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game activeGame, Player player, int scNumber) {
+		LinkedHashMap<Integer, Integer> scTradeGoods = activeGame.getScTradeGoods();
 		if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can only pick SC if both Faction and Color have been picked");
 			return false;
 		}
 		if (!scTradeGoods.containsKey(scNumber)) {
-			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
 			return false;
 		}
 
-		LinkedHashMap<String, Player> players = activeMap.getPlayers();
+		LinkedHashMap<String, Player> players = activeGame.getPlayers();
 		for (Player playerStats : players.values()) {
 			if (playerStats.getSCs().contains(scNumber)) {
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
+				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "SC #" + scNumber + " is already picked.");
 				return false;
 			}
 		}
 
 		player.addSC(scNumber);
-		if (activeMap.isFoWMode()) {
-			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
-			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+		if (activeGame.isFoWMode()) {
+			String messageToSend = Emojis.getColourEmojis(player.getColor()) + " picked SC #" + scNumber;
+			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
-		
+
+		if(scNumber == 5 && !activeGame.isHomeBrewSCMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")){
+			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, you just picked trade but dont currently hold your Trade Agreement");
+		}
+
 		Integer tgCount = scTradeGoods.get(scNumber);
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
-			if (activeMap.isFoWMode()) {
-				String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
+			if (activeGame.isFoWMode()) {
+				String messageToSend = Emojis.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
+				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
-
 			player.setTg(tg);
-			if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
-				ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+			if (player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")) {
+				ButtonHelper.commanderUnlockCheck(player, activeGame, "hacan", event);
 			}
-			ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+			ButtonHelperAbilities.pillageCheck(player, activeGame);
 		}
 		return true;
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
-			Consumer<Integer> consumer, Supplier<Integer> supplier) {
-		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), false);
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
+		Consumer<Integer> consumer, Supplier<Integer> supplier) {
+		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
-			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
-		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, OptionMapping option,
+		Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
+		setValue(event, activeGame, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, String optionName,
-			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
+	public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, String optionName,
+		Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
 			String explanation = "";
-			if(value.contains("?")){	
-				explanation = value.substring(value.indexOf("?")+1, value.length());
-				value = value.substring(0, value.indexOf("?")).replace(" ", "");		
+			if (value.contains("?")) {
+				explanation = value.substring(value.indexOf("?") + 1);
+				value = value.substring(0, value.indexOf("?")).replace(" ", "");
 			}
-			
+
 			int number = Integer.parseInt(value);
 			int existingNumber = supplier.get();
 			if (setValue) {
 				consumer.accept(number);
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				if (activeGame.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
 			} else {
 				int newNumber = existingNumber + number;
@@ -357,8 +365,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(newNumber);
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (activeMap.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				if (activeGame.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 				}
 			}
 		} catch (Exception e) {
@@ -367,34 +375,34 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-							+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
-							+ ")_";
-		}else{
-			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
-				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
-				+ ")_ for the reason of: "+explanation;
+		if (explanation == null || "".equalsIgnoreCase(explanation)) {
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
+				+ ")_";
+		} else {
+			return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+				+ existingNumber + ", a change of " + (setToNumber - existingNumber)
+				+ ")_ for the reason of: " + explanation;
 		}
-		
+
 	}
 
 	public static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
-			Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
+		Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
 		String changeDescription = "changed";
 		if (changeNumber > 0) {
 			changeDescription = "increased";
 		} else if (changeNumber < 0) {
 			changeDescription = "decreased";
 		}
-		if(explanation == null || explanation.equalsIgnoreCase("")){
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_";
-		}else{
-			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
-				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_ for the reason of: "+explanation; 
+		if (explanation == null || "".equalsIgnoreCase(explanation)) {
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_";
+		} else {
+			return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
+				+ existingNumber + ", now **" + newNumber + "**)_ for the reason of: " + explanation;
 		}
-		
+
 	}
 
 	private static String getGeneralMessage(SlashCommandInteractionEvent event, Player player, OptionMapping option) {

@@ -9,17 +9,17 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.collections4.CollectionUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardModel;
 
 public class SetDeck extends GameSubcommandData {
 
-    private List<String> deckTypes;
+    private final List<String> deckTypes;
 
     public SetDeck() {
-        super(Constants.SET_DECK, "Change game decks");
+        super(Constants.SET_DECK, "Change game card decks");
         deckTypes = new ArrayList<>();
         addDefaultOption(Constants.AC_DECK, "AC");
         addDefaultOption(Constants.SO_DECK, "SO");
@@ -27,77 +27,93 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.STAGE_2_PUBLIC_DECK, "Stage 2 public");
         addDefaultOption(Constants.RELIC_DECK, "Relic");
         addDefaultOption(Constants.AGENDA_DECK, "Agenda");
+        addDefaultOption(Constants.EVENT_DECK, "Event");
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
+        addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        Game activeGame = getActiveGame();
 
-        java.util.Map<String, DeckModel> changedDecks = new HashMap<>();
+        Map<String, DeckModel> changedDecks = new HashMap<>();
 
-        this.deckTypes.forEach(deckType -> {
+        deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
                 if (deckType.equals(Constants.STRATEGY_CARD_SET)) {
                     StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
-                    activeMap.setHomeBrewSCMode(!value.equals("pok") && !value.equals("base_game"));
-                    activeMap.setScTradeGoods(new LinkedHashMap<>());
-                    activeMap.setScSetID(strategyCardModel.getAlias());
+                    activeGame.setHomeBrewSCMode(!"pok".equals(value) && !"base_game".equals(value));
+                    activeGame.setScTradeGoods(new LinkedHashMap<>());
+                    activeGame.setScSetID(strategyCardModel.getAlias());
 
-                    strategyCardModel.getCardValues().keySet().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
+                    strategyCardModel.getCardValues().keySet().forEach(scValue -> activeGame.setScTradeGood(scValue, 0));
                 } else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
-                    if (setDeck(event, activeMap, deckType, deckModel)) {
+                    if (setDeck(event, activeGame, deckType, deckModel)) {
                         changedDecks.put(deckModel.getType(), deckModel);
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the deck ***" + value + "*** could not be set, please see error above or try executing the command again (without copy/pasting).");
                     }
-                    else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong, and the deck " + value + " could not be found, try executing the command again (without copy/pasting).");
-                    }
+                }
+                if (deckType.equals(Constants.TECHNOLOGY_DECK)) {
+                    activeGame.swapOutVariantTechs();
+                    activeGame.swapInVariantTechs();
                 }
             }
         });
 
         if(CollectionUtils.isNotEmpty(changedDecks.keySet())) {
             List<String> changeMessage = new ArrayList<>();
-            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n> " + deck.getDescription()));
+            changedDecks.values().forEach(deck -> changeMessage.add(deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n>>> " + deck.getDescription()));
             MessageHelper.sendMessageToChannel(event.getChannel(), String.join("\n", changeMessage));
         }
     }
 
     private void addDefaultOption(String constantName, String descName) {
         addOptions(new OptionData(OptionType.STRING, constantName, descName + " deck").setRequired(false).setAutoComplete(true));
-        this.deckTypes.add(constantName);
+        deckTypes.add(constantName);
     }
 
-    public static boolean setDeck(SlashCommandInteractionEvent event, Map activeMap, String deckType, DeckModel deckModel) {
+    public static boolean setDeck(SlashCommandInteractionEvent event, Game activeGame, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
             switch (deckType) {
-                case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
+                case Constants.AC_DECK -> {
+                    return activeGame.validateAndSetActionCardDeck(event, deckModel);
+                }
                 case Constants.SO_DECK -> {
-                    activeMap.setSecretObjectives(deckModel.getShuffledCardList());
-                    activeMap.setSoDeckID(deckModel.getAlias());
+                    return activeGame.validateAndSetSecretObjectiveDeck(event, deckModel);
                 }
                 case Constants.STAGE_1_PUBLIC_DECK -> {
-                    activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
-                    activeMap.setStage1PublicDeckID(deckModel.getAlias());
+                    activeGame.setPublicObjectives1(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    activeGame.setStage1PublicDeckID(deckModel.getAlias());
+                    return true;
                 }
                 case Constants.STAGE_2_PUBLIC_DECK -> {
-                    activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
-                    activeMap.setStage2PublicDeckID(deckModel.getAlias());
+                    activeGame.setPublicObjectives2(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    activeGame.setStage2PublicDeckID(deckModel.getAlias());
+                    return true;
                 }
                 case Constants.RELIC_DECK -> {
-                    activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
-                    activeMap.setRelicDeckID(deckModel.getAlias());
+                    return activeGame.validateAndSetRelicDeck(event, deckModel);
                 }
-                case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
+                case Constants.AGENDA_DECK -> {
+                    return activeGame.validateAndSetAgendaDeck(event, deckModel);
+                }
+                case Constants.EVENT_DECK -> {
+                    return activeGame.validateAndSetEventDeck(event, deckModel);
+                }
                 case Constants.EXPLORATION_DECKS -> {
-                    activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
-                    activeMap.setExplorationDeckID(deckModel.getAlias());
+                    activeGame.setExploreDeck(new ArrayList<>(deckModel.getNewShuffledDeck()));
+                    activeGame.setExplorationDeckID(deckModel.getAlias());
+                    return true;
+                }
+                case Constants.TECHNOLOGY_DECK -> {
+                    activeGame.setTechnologyDeckID(deckModel.getAlias());
+                    return true;
                 }
             }
-            return true;
         }
         return false;
     }

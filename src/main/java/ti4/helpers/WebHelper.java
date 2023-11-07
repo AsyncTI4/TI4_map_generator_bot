@@ -2,13 +2,14 @@ package ti4.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Map;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
-import ti4.map.Map;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
@@ -27,7 +28,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -45,12 +45,14 @@ public class WebHelper {
 
     }
 
-    public static void putData(String gameId, Map activeMap) {
+    public static void putData(String gameId, Game activeGame) {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, Object> exportableFieldMap = activeMap.getExportableFieldMap();
-            String json = mapper.writeValueAsString( exportableFieldMap );
+            Map<String, Object> exportableFieldMap = activeGame.getExportableFieldMap();
+            String json = mapper.writeValueAsString(exportableFieldMap);
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -58,22 +60,20 @@ public class WebHelper {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            HttpResponse<String> response = client.send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
+            client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             BotLogger.log("Could not put data to web server", e);
         }
-
-
     }
-
 
     public static void putMap(String gameId, BufferedImage img) {
         putMap(gameId, img, false, null);
     }
 
     public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
+
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
@@ -113,9 +113,9 @@ public class WebHelper {
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
         } catch (SdkClientException e) {
-            // BotLogger.log("Could not add image to web server. Likely invalid credentials.", e);
+            BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
-            BotLogger.log("Could not add image to web server", e);
+            BotLogger.log("Could not add image for game `" + gameId + "` to web server", e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -31,6 +32,10 @@ public class CreateTile extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_PLANET_IDS, "A comma-separated list of the IDs of the planets that are in the tile. Make sure to make the planets").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "The tile's layout type. If you don't know what this is, ask.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_WORMHOLES, "Comma-separated list of what wormholes are in the tile. Supports all greek letters through omega.").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_ASTEROID_FIELD, "Has an Asteroid Field?"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_SUPERNOVA, "Has a Supernova?"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_NEBULA, "Has a Nebula?"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_GRAVITY_RIFT, "Has a Gravity Rift?"));
         //addOptions(new OptionData(OptionType.STRING, Constants.TILE_TOKEN_LOCATIONS, "The location of space tokens in the tile. Use only to override").setRequired(false));
     }
 
@@ -42,31 +47,35 @@ public class CreateTile extends BothelperSubcommandData {
         TileModel tile = null;
         try {
             tile = createNewTile(
-                    event.getOption(Constants.TILE_ID).getAsString(),
+                    event.getOption(Constants.TILE_ID).getAsString().toLowerCase(),
                     event.getOption(Constants.TILE_NAME).getAsString(),
                     event.getOption(Constants.TILE_ALIASES).getAsString(),
                     event.getOption(Constants.TILE_IMAGE).getAsString(),
-                    event.getOption(Constants.TILE_PLANET_IDS).getAsString(),
+                    event.getOption(Constants.TILE_PLANET_IDS).getAsString().toLowerCase(),
                     event.getOption(Constants.TILE_TYPE).getAsString(),
-                    whString
+                    whString,
+                    event.getOption(Constants.IS_ASTEROID_FIELD, false, OptionMapping::getAsBoolean),
+                    event.getOption(Constants.IS_SUPERNOVA, false, OptionMapping::getAsBoolean),
+                    event.getOption(Constants.IS_NEBULA, false, OptionMapping::getAsBoolean),
+                    event.getOption(Constants.IS_GRAVITY_RIFT, false, OptionMapping::getAsBoolean)
             );
         } catch (Exception e) {
             BotLogger.log("Something went wrong creating the tile! "
-                    + e.getMessage() + "\n" + e.getStackTrace());
+                    + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
         }
         if(Optional.ofNullable(tile).isPresent()) {
             try {
                 exportTileModelToJson(tile);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong exporting the tile to json! "
-                        + e.getMessage() + "\n" +e.getStackTrace());
+                        + e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
             try {
                 TileHelper.addNewTileToList(tile);
                 AliasHandler.addNewTileAliases(tile);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the tile to the active tiles list! " +
-                        e.getMessage() + "\n" + e.getStackTrace());
+                        e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
             }
         }
         sendMessage("Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
@@ -79,7 +88,11 @@ public class CreateTile extends BothelperSubcommandData {
                                            String image,
                                            String planetIds,
                                            String type,
-                                           String wormholes) {
+                                           String wormholes,
+                                           boolean isAsteroidField,
+                                           boolean isSupernova,
+                                           boolean isNebula,
+                                           boolean isGravityRift) {
         ShipPositionModel shipPositionModel = new ShipPositionModel();
 
         TileModel tile = new TileModel();
@@ -90,9 +103,12 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
         tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
-        if(!wormholes.equals(""))
+        if(!"".equals(wormholes))
             tile.setWormholes(getWormholesFromString(wormholes));
-
+        tile.setIsAsteroidField(isAsteroidField);
+        tile.setIsSupernova(isSupernova);
+        tile.setIsNebula(isNebula);
+        tile.setIsGravityRift(isGravityRift);
         return tile;
     }
 

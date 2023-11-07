@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class CreateGameChannelsTest {
     @Test
-    void testGetCategoryNameForGame() {
+    public void testGetCategoryNameForGame() {
         assertEquals("PBD #76-100", CreateGameChannels.getCategoryNameForGame("pbd99"));
         assertEquals("PBD #76-100", CreateGameChannels.getCategoryNameForGame("pbd100"));
         assertEquals("PBD #101-125", CreateGameChannels.getCategoryNameForGame("pbd101"));

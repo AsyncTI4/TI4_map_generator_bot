@@ -5,7 +5,7 @@ import ti4.model.FactionModel;
 
 public class Faction {
 
-    private FactionModel baseFaction;
+    private final FactionModel baseFaction;
 
     // private List<String> factionAbilities;
     // private List<String> factionTechs;
@@ -21,7 +21,7 @@ public class Faction {
 
     //Constructors
     public Faction(String faction) {
-        this.baseFaction = Mapper.getFactionSetup(faction);
+        baseFaction = Mapper.getFactionSetup(faction);
     }
 
     public FactionModel getBaseFaction() {

@@ -1,0 +1,1094 @@
+[
+    {
+        "id": "frln1",
+        "name": "Freelancers",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "source": "pok"
+    },
+    {
+        "id": "frln2",
+        "name": "Freelancers",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "source": "pok"
+    },
+    {
+        "id": "frln3",
+        "name": "Freelancers",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may produce 1 unit in this system. You may spend influence as if it were resources to produce this unit.",
+        "source": "pok"
+    },
+    {
+        "id": "mo1",
+        "name": "Mercenary Outfit",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "mo2",
+        "name": "Mercenary Outfit",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "mo3",
+        "name": "Mercenary Outfit",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may place 1 infantry from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "gw",
+        "name": "Gamma Wormhole",
+        "type": "Cultural",
+        "resolution": "Token",
+        "text": "Place a gamma wormhole token in this system. Then, purge this card.",
+        "attachmentId": "gamma",
+        "source": "pok"
+    },
+    {
+        "id": "dmz",
+        "name": "Demilitarized Zone",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "Return all structures on this planet to your reinforcements. Then, return all ground forces on this planet to the space area. Attach: Units cannot be committed to, produced on, or placed on this planet. During the agenda phase, this planet's planet card can be traded as part of a transaction.",
+        "attachmentId": "dmz",
+        "source": "pok"
+    },
+    {
+        "id": "ds",
+        "name": "Dyson Sphere",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This planet's resource value is increased by 2 and its influence values is increased by 1.",
+        "attachmentId": "dysonsphere",
+        "source": "pok"
+    },
+    {
+        "id": "pw",
+        "name": "Paradise World",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This planet's influence value is increased by 2.",
+        "attachmentId": "paradiseworld",
+        "source": "pok"
+    },
+    {
+        "id": "toe",
+        "name": "Tomb of Emphidia",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This planet's influence value is increased by 1. If the player who has the \"Crown of Emphidia\" relic has control of this planet, they can use that relic to gain 1 VP.",
+        "attachmentId": "tombofemphidia",
+        "source": "pok"
+    },
+    {
+        "id": "crf1",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf2",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf3",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf4",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf5",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf6",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf7",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf8",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "crf9",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "vfs1",
+        "name": "Volatile Fuel Source",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "source": "pok"
+    },
+    {
+        "id": "vfs2",
+        "name": "Volatile Fuel Source",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "source": "pok"
+    },
+    {
+        "id": "vfs3",
+        "name": "Volatile Fuel Source",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 command token.",
+        "source": "pok"
+    },
+    {
+        "id": "exp1",
+        "name": "Expedition",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "exp2",
+        "name": "Expedition",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "exp3",
+        "name": "Expedition",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "cm1",
+        "name": "Core Mine",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "source": "pok"
+    },
+    {
+        "id": "cm2",
+        "name": "Core Mine",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "source": "pok"
+    },
+    {
+        "id": "cm3",
+        "name": "Core Mine",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, gain 1 trade good.",
+        "source": "pok"
+    },
+    {
+        "id": "ls",
+        "name": "Lazax Survivors",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This planet's resource value is increased by 1 and its influence value is increased by 2.",
+        "attachmentId": "lazaxsurvivors",
+        "source": "pok"
+    },
+    {
+        "id": "mw",
+        "name": "Mining World",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This planet's resource value is increased by 2.",
+        "attachmentId": "miningworld",
+        "source": "pok"
+    },
+    {
+        "id": "rw",
+        "name": "Rich World",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This planet's resource value is increased by 1.",
+        "attachmentId": "richworld",
+        "source": "pok"
+    },
+    {
+        "id": "warfare",
+        "name": "Warfare Research Facility",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This planet has a red technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "attachmentId": "warfare",
+        "source": "pok"
+    },
+    {
+        "id": "hrf1",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf2",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf3",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf4",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf5",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf6",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "hrf7",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "aw1",
+        "name": "Abandoned Warehouses",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "aw2",
+        "name": "Abandoned Warehouses",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "aw3",
+        "name": "Abandoned Warehouses",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "aw4",
+        "name": "Abandoned Warehouses",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 2 commodities, or you may convert up to 2 of your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "fb1",
+        "name": "Functioning Base",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "source": "pok"
+    },
+    {
+        "id": "fb2",
+        "name": "Functioning Base",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "source": "pok"
+    },
+    {
+        "id": "fb3",
+        "name": "Functioning Base",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "source": "pok"
+    },
+    {
+        "id": "fb4",
+        "name": "Functioning Base",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to draw 1 action card.",
+        "source": "pok"
+    },
+    {
+        "id": "lf1",
+        "name": "Local Fabricators",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "lf2",
+        "name": "Local Fabricators",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "lf3",
+        "name": "Local Fabricators",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "lf4",
+        "name": "Local Fabricators",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may gain 1 commodity, or you may spend 1 trade good or 1 commodity to place 1 mech from your reinforcements on this planet.",
+        "source": "pok"
+    },
+    {
+        "id": "biotic",
+        "name": "Biotic Research Facility",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This planet has a green technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "attachmentId": "biotic",
+        "source": "pok"
+    },
+    {
+        "id": "cybernetic",
+        "name": "Cybernetic Research Facility",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This planet has a yellow technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "attachmentId": "cybernetic",
+        "source": "pok"
+    },
+    {
+        "id": "propulsion",
+        "name": "Propulsion Research Facility",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This planet has a blue technology specialty. If this planet already has a technology specialty, this planet's resource and influence values are each increased by 1 instead.",
+        "attachmentId": "propulsion",
+        "source": "pok"
+    },
+    {
+        "id": "irf1",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "irf2",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "irf3",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "irf4",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "irf5",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "pok"
+    },
+    {
+        "id": "dv1",
+        "name": "Derelict Vessel",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 1 secret objective.",
+        "source": "pok"
+    },
+    {
+        "id": "dv2",
+        "name": "Derelict Vessel",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 1 secret objective.",
+        "source": "pok"
+    },
+    {
+        "id": "ed1",
+        "name": "Enigmatic Device",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "source": "pok"
+    },
+    {
+        "id": "ed2",
+        "name": "Enigmatic Device",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place this card faceup in your play area. Action: You may spend 6 resource and purge this card to research 1 technology.",
+        "source": "pok"
+    },
+    {
+        "id": "gamma",
+        "name": "Gamma Relay",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Place a gamma wormhole token in this system. Then, purge this card.",
+        "attachmentId": "gamma",
+        "source": "pok"
+    },
+    {
+        "id": "ion",
+        "name": "Ion Storm",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Place the ion storm token in this system with either side faceup. Then, place this card in the common play area. At the end of the \"Move Ships\" or \"Retreat\" substep of a tactical action during which 1 or more of your ships use the ion storm wormhole, flip the ion storm token to its opposing side.",
+        "attachmentId": "ionalpha",
+        "source": "pok"
+    },
+    {
+        "id": "lc1",
+        "name": "Lost Crew",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 2 action cards.",
+        "source": "pok"
+    },
+    {
+        "id": "lc2",
+        "name": "Lost Crew",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 2 action cards.",
+        "source": "pok"
+    },
+    {
+        "id": "ms1",
+        "name": "Merchant Station",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "You may replenish your commodities, or you may convert your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "ms2",
+        "name": "Merchant Station",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "You may replenish your commodities, or you may convert your commodities to trade goods.",
+        "source": "pok"
+    },
+    {
+        "id": "mirage",
+        "name": "Mirage",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Place the Mirage planet token in this system. Gain the Mirage planet card and ready it. Then, purge this card.",
+        "attachmentId": "mirage",
+        "source": "pok"
+    },
+    {
+        "id": "urf1",
+        "name": "Unknown Relic Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "The card counts as a relic fragment of any type.",
+        "source": "pok"
+    },
+    {
+        "id": "urf2",
+        "name": "Unknown Relic Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "The card counts as a relic fragment of any type.",
+        "source": "pok"
+    },
+    {
+        "id": "urf3",
+        "name": "Unknown Relic Fragment",
+        "type": "Frontier",
+        "resolution": "Fragment",
+        "text": "The card counts as a relic fragment of any type.",
+        "source": "pok"
+    },
+    {
+        "id": "minent",
+        "name": "Minor Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 1 trade good.",
+        "source": "codexiii"
+    },
+    {
+        "id": "ent",
+        "name": "Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 2 trade goods.",
+        "source": "codexiii"
+    },
+    {
+        "id": "majent",
+        "name": "Major Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 3 trade goods.",
+        "source": "codexiii"
+    },
+    {
+        "id": "kel1",
+        "name": "Keleres Ship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 2 command tokens.",
+        "source": "codexiii"
+    },
+    {
+        "id": "kel2",
+        "name": "Keleres Ship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 2 command tokens.",
+        "source": "codexiii"
+    },
+    {
+        "id": "dw",
+        "name": "Dead World",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 1 relic.",
+        "source": "codexiii"
+    },
+    {
+        "id": "starchartcultural",
+        "name": "Star Chart",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
+        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "id": "starcharthazardous",
+        "name": "Star Chart",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
+        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "id": "starchartindustrial",
+        "name": "Star Chart",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
+        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "id": "starchartfrontier",
+        "name": "Star Chart",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random",
+        "attachmentId": "place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "ds"
+    },
+    {
+        "id": "forgottentradestation",
+        "name": "Forgotten Trade Station",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "For each planet in this system, gain 1 trade good.",
+        "source": "ds"
+    },
+    {
+        "id": "distinguishedadmiral",
+        "name": "Distinguished Admiral",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "source": "ds"
+    },
+    {
+        "id": "councilpreserve",
+        "name": "Council Preserve",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: When you exhaust this planet to cast votes, cast 3 additional votes.",
+        "attachmentId": "council_preserve",
+        "source": "ds"
+    },
+    {
+        "id": "seedyspaceport",
+        "name": "Seedy Spaceport",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready your agent or draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "id": "warforgeruins",
+        "name": "War Forge Ruins",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, place 1 mech or 2 infantry from your reinforcements on this planet.",
+        "source": "ds"
+    },
+    {
+        "id": "arcaneshieldemitter",
+        "name": "Arcane Shield Emitter",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: Return all infantry on this planet to the space area or destroy them. This planet cannot be bombarded. Infantry cannot be committed to, produced on, or placed on this planet.",
+        "attachmentId": "arcane_shield",
+        "source": "ds"
+    },
+    {
+        "id": "hiddenlaboratory",
+        "name": "Hidden Laboratory",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Explore the frontier deck in this system.",
+        "source": "ds"
+    },
+    {
+        "id": "ancientshipyard",
+        "name": "Ancient Shipyard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place up to 1 cruiser from your reinforcements in this system if it contains no other players' ships.",
+        "source": "ds"
+    },
+    {
+        "id": "orbitalfoundries",
+        "name": "Orbital Foundries",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet has a PRODUCTION value of 2 as if it were a unit.",
+        "attachmentId": "orbital_foundries",
+        "source": "ds"
+    },
+    {
+        "id": "folderspace",
+        "name": "Folded Space",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place 1 command token from your reinforcements in your fleet pool and move any number of your units in this system to the space area of another system that contains no other players' ships.",
+        "source": "ds"
+    },
+    {
+        "id": "suspiciouswreckage",
+        "name": "Suspicious Wreckage",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Choose 2 other players, each of those players must give you 1 promissory note from their hand.",
+        "source": "ds"
+    },
+    {
+        "id": "darkvisions",
+        "name": "Dark Visions",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Look at the top card of each exploration deck, discard any number of those cards and explore up to 1 planet you control. Then, shuffle each exploration deck.",
+        "source": "ds"
+    },
+    {
+        "id": "imperialresearchinstitute",
+        "name": "Imperial Research Institute",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet gains a non-unit technology specialty (exhaust this planet to ignore one prerequisite on any non-unit upgrade).",
+        "attachmentId": "imperialinstitute",
+        "source": "asteroid"
+    },
+    {
+        "id": "tradeoffice",
+        "name": "Trade Office",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: Whenever you exhaust this planet, gain 1 commodity.",
+        "attachmentId": "traderoute",
+        "source": "asteroid"
+    },
+    {
+        "id": "spyagency",
+        "name": "Spy Agency",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: Whenever you ready this planet, draw 1 action card, or 2 if you have the Neural Motivators technology.",
+        "attachmentId": "interplanetaryhub",
+        "source": "asteroid"
+    },
+    {
+        "id": "galacticheritagesite",
+        "name": "Galactic Heritage Site",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: While this planet has no units on it, it is worth a point to whoever controls it.",
+        "attachmentId": "galacticheritagesite",
+        "source": "asteroid"
+    },
+    {
+        "id": "distinguishedcouncilor",
+        "name": "Distinguished Councilor",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may purge your agent and replace it with this card. While this card is your agent, it counts as a point.",
+        "source": "asteroid"
+    },
+    {
+        "id": "talentedofficer1",
+        "name": "Talented Officer",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "source": "asteroid"
+    },
+    {
+        "id": "talentedofficer2",
+        "name": "Talented Officer",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf1",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf2",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf3",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf4",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf5",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf6",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "weaponsresearchfacility",
+        "name": "Weapons Research Facility",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet gains a unit technology specialty (exhaust this planet to ignore one prerequisite on any unit upgrade).",
+        "attachmentId": "weapon",
+        "source": "asteroid"
+    },
+    {
+        "id": "freighterconversion1",
+        "name": "Freighter Conversion",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face-up in your play area, you may capture one of your carrier units from the board or your reserves. Place a captured carrier on this card. While you have a carrier on this card, your commodity value is increased by 1. At any time, you may return one of your carriers you have captured to your reserves. If this card does not have a captured carrier on it, purge this card.",
+        "source": "asteroid"
+    },
+    {
+        "id": "freighterconversion2",
+        "name": "Freighter Conversion",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face-up in your play area, you may capture one of your carrier units from the board or your reserves. Place a captured carrier on this card. While you have a carrier on this card, your commodity value is increased by 1. At any time, you may return one of your carriers you have captured to your reserves. If this card does not have a captured carrier on it, purge this card.",
+        "source": "asteroid"
+    },
+    {
+        "id": "bootstrapping1",
+        "name": "Bootstrapping",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may remove a mech or remove an infantry and pay 2 resources to place a structure onto this planet.",
+        "source": "asteroid"
+    },
+    {
+        "id": "bootstrapping2",
+        "name": "Bootstrapping",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may remove a mech or remove an infantry and pay 2 resources to place a structure onto this planet.",
+        "source": "asteroid"
+    },
+    {
+        "id": "wormholegenerator1",
+        "name": "Wormhole Generator",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may place a non-delta wormhole token of your choice in this sytem. If you do, gain 1 trade good for each player that is your neighbor.",
+        "source": "asteroid"
+    },
+    {
+        "id": "wormholegenerator2",
+        "name": "Wormhole Generator",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may place a non-delta wormhole token of your choice in this sytem. If you do, gain 1 trade good for each player that is your neighbor.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf1",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf2",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf3",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf4",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard1",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard2",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard3",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard4",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel1",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel2",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel3",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "lazaxmanufactorum",
+        "name": "Lazax Manufactorum",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "ATTACH: While this planet has a spacedock, it is legendary and worth a point to whoever controls it. Any structures on this planet are treated as though you had their unit upgrade technologies if you do not have them. When you produce units in this system, reduce the combined cost of the produced units by 1.",
+        "attachmentId": "manufactorum",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf1",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf2",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf3",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf4",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf5",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "Action: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    }
+]

@@ -1,0 +1,35 @@
+[
+    {
+        "id": "keleres_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Artemiris",
+        "source": "codexiii",
+        "faction": "keleresm",
+        "moveValue": 1,
+        "capacityValue": 6,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "Other players must spend 2 influence to activate the system that contains this ship."
+    },
+    {
+        "id": "keleres_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Omniopiares",
+        "source": "codexiii",
+        "faction": "keleresm",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "Other players must spend 1 influence to commit ground forces to the planet that contains this unit."
+    }
+]

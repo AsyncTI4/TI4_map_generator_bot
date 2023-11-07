@@ -13,10 +13,13 @@ public class TemporaryCombatModifierModel {
     private String useInSystem;
     private String useInUnitHolder;
 
-    public TemporaryCombatModifierModel(String relatedType, String relatedID, CombatModifierModel modifier) {
+    public TemporaryCombatModifierModel(String relatedType, String relatedID, CombatModifierModel modifier,
+            Integer useInTurn) {
         this.relatedType = relatedType;
         this.relatedID = relatedID;
         this.modifier = modifier;
+        this.useInTurn = useInTurn;
     }
 }
-//store in map against player, like <mod-id>,<mod-related-type>,<mod-related-id>,<useInTurn>,<useInSystem>,<useInHolder>
+// store in map against player, like
+// <mod-id>,<mod-related-type>,<mod-related-id>,<useInTurn>,<useInSystem>,<useInHolder>

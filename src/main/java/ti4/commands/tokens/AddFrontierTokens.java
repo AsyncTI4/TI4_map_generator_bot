@@ -9,13 +9,12 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,37 +31,39 @@ public class AddFrontierTokens implements Command {
         return event.getName().equals(getActionID());
     }
 
-    public void parsingForTile(GenericInteractionCreateEvent event, Map activeMap) {
-        Collection<Tile> tileList = activeMap.getTileMap().values();
+    public void parsingForTile(GenericInteractionCreateEvent event, Game activeGame) {
+        Collection<Tile> tileList = activeGame.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
             if (frontierTileList.contains(tile.getTileID())) {
                 boolean hasMirage = false;
                 for (UnitHolder unitholder : tile.getUnitHolders().values()) {
-                    if (unitholder.getName().equals(Constants.MIRAGE)) hasMirage = true;
+                    if (unitholder.getName().equals(Constants.MIRAGE)) {
+                        hasMirage = true;
+                        break;
+                    }
                 }
-                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, activeMap);
+                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
             }
         }
-        if(activeMap.getRound() == 1){
-            List<Button> buttons = new ArrayList<Button>();
+        if(activeGame.getRound() == 1){
+            List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("deal2SOToAll" , "Deal 2 SO To All"));
-            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "Press this button after every player is setup", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "Press this button after every player is setup", buttons);
         }
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        if (!mapManager.isUserWithActiveMap(userID)) {
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            parsingForTile(event, activeMap);
-            MapSaveLoadManager.saveMap(activeMap, event);
-            File file = GenerateMap.getInstance().saveImage(activeMap, event);
-            MessageHelper.replyToMessage(event, file);
+            Game activeGame = gameManager.getUserActiveGame(userID);
+            parsingForTile(event, activeGame);
+            GameSaveLoadManager.saveMap(activeGame, event);
+            ShowGame.simpleShowGame(activeGame, event);
         }
     }
 

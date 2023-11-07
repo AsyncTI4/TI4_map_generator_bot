@@ -8,7 +8,6 @@ import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.*;
-import ti4.map.Map;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -27,14 +26,14 @@ public class PersonalCleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Map activeMap = getActiveMap();
-        runStatusCleanup(activeMap);
+        Game activeGame = getActiveGame();
+        runStatusCleanup(activeGame);
     }
 
-    public void runStatusCleanup(Map activeMap) {
+    public void runStatusCleanup(Game activeGame) {
 
-        HashMap<String, Tile> tileMap = activeMap.getTileMap();
-        Player player = activeMap.getPlayer(getUser().getId());
+        HashMap<String, Tile> tileMap = activeGame.getTileMap();
+        Player player = activeGame.getPlayer(getUser().getId());
         String color = player.getColor();
         String ccID = Mapper.getCCID(color);
 
@@ -48,8 +47,8 @@ public class PersonalCleanup extends StatusSubcommandData {
                 unitHolder.removeAllUnitDamage();
             }
         }
-        HashMap<Integer, Boolean> scPlayed = activeMap.getScPlayed();
-        for (java.util.Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
+        HashMap<Integer, Boolean> scPlayed = activeGame.getScPlayed();
+        for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             if (player.getSCs().contains(sc.getKey()))
                 sc.setValue(false);
         }
@@ -57,7 +56,7 @@ public class PersonalCleanup extends StatusSubcommandData {
         player.setPassed(false);
         Set<Integer> SCs = player.getSCs();
         for (int sc : SCs) {
-            activeMap.setScTradeGood(sc, 0);
+            activeGame.setScTradeGood(sc, 0);
         }
         player.clearSCs();
         player.clearFollowedSCs();
@@ -65,14 +64,13 @@ public class PersonalCleanup extends StatusSubcommandData {
         player.cleanExhaustedPlanets(true);
         player.cleanExhaustedRelics();
         player.clearExhaustedAbilities();
-        List<Leader> leads = new ArrayList<>();
-        leads.addAll(player.getLeaders());
+      List<Leader> leads = new ArrayList<>(player.getLeaders());
         for (Leader leader : leads) {
             if (!leader.isLocked()){
                 if (leader.isActive()){
                     player.removeLeader(leader.getId());
                 } else {
-                    RefreshLeader.refreshLeader(player, leader, activeMap);
+                    RefreshLeader.refreshLeader(player, leader, activeGame);
                 }
             }
         }

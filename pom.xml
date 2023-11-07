@@ -28,19 +28,25 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.1</version>
+            <version>5.9.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.14.0-rc2</version>
+            <version>2.15.2</version>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.10</version>
+            <version>5.0.0-beta.16</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
@@ -52,7 +58,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.0-rc2</version>
+            <version>2.15.2</version>
         </dependency>
         <dependency>
             <groupId>com.pngencoder</groupId>
@@ -62,7 +68,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-batch</artifactId>
-            <version>1.12.451</version>
+            <version>1.12.468</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -77,8 +83,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version>
         </dependency>
     </dependencies>
 
@@ -112,7 +123,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ti4.MapGenerator</mainClass>
+                            <mainClass>ti4.AsyncTI4DiscordBot</mainClass>
                         </manifest>
                         <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
@@ -126,7 +137,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>ti4.MapGenerator</mainClass>
+                            <mainClass>ti4.AsyncTI4DiscordBot</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
