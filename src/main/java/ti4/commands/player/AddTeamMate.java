@@ -32,7 +32,7 @@ public class AddTeamMate extends PlayerSubcommandData {
             player.addTeamMateID(addOption.getAsUser().getId());
         }
         
-        
+        activeGame.setCommunityMode(true);
         sendMessage("Added "+addOption.getAsUser().getAsMention() + " as part of "+player.getFaction()+"'s team. This works 2 ways");
     }
 }
