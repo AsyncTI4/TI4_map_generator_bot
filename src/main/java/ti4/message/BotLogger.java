@@ -14,6 +14,8 @@ import ti4.helpers.Helper;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BotLogger {
     /** Sends a message to the Primary Async Server's #bot-log channel
@@ -55,14 +57,15 @@ public class BotLogger {
     public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
+        
+        Logger logger = LoggerFactory.getLogger(BotLogger.class);
+        logger.info(msg);
 
         //Adding so we dont cause an exception by attempting to log 
         if(msg.length() > 2000){
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
-
-        System.out.println("[BOT-LOG] " + msg);
 
         if (botLogChannel == null) {
             String name;
