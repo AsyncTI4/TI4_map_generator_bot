@@ -24,14 +24,6 @@
     "source": "little_omega"
   },
   {
-    "alias": "raise_fleets_little_omega",
-    "name": "Raise Fleets ω",
-    "phase": "Status",
-    "text": "Have 3 non-fighter ships in each of 3 systems.",
-    "points": 1,
-    "source": "little_omega"
-  },
-  {
     "alias": "bestow_a_keleres_fleet_little_omega",
     "name": "Bestow a Keleres Fleet ω",
     "phase": "Status",
