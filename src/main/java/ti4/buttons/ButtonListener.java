@@ -2953,6 +2953,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveABSStep1" -> {
                     ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
                 }
+                case "resolveWarEffort" -> {
+                    ButtonHelperActionCards.resolveWarEffort(activeGame, player,event);
+                }
                 case "resolveInsiderInformation" -> {
                     ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
                 }
