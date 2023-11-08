@@ -113,6 +113,7 @@ public class ButtonHelperModifyUnits {
         }
 
         String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
+        ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, activeGame, event);
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if ("space".equalsIgnoreCase(unitHolder.getName())) {
@@ -903,8 +904,13 @@ public class ButtonHelperModifyUnits {
                         String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                         int amount = unitEntry.getValue();
 
+                        boolean cabalMech = false;
+                        if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+                            cabalMech = true;
+                        }
+
                         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
-                        if (cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName()) && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) ) {
+                        if (cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName()) && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech) ) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, unitEntry.getValue(), unitName, event);
                         }
                         if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
@@ -961,9 +967,6 @@ public class ButtonHelperModifyUnits {
         String planetName;
         if ("".equalsIgnoreCase(planet)) {
             planetName = "space";
-            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))&& FoWHelper.playerHasShipsInSystem(cabal, tile)) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
-            }
         } else {
             planetName = planet.replace("'", "");
             planetName = AliasHandler.resolvePlanet(planetName);
@@ -975,7 +978,11 @@ public class ButtonHelperModifyUnits {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
         } else {
-            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
+            boolean cabalMech = false;
+            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+                cabalMech = true;
+            }
+            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
             if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){

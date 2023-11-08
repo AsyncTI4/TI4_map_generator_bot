@@ -335,10 +335,57 @@ public class ButtonHelperFactionSpecific {
 
     }
 
+    public static void checkBlockadeStatusOfEverything(Player player, Game activeGame, GenericInteractionCreateEvent event){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(doesPlayerHaveAnyCapturedUnits(p2, activeGame, player, event)){
+                if(isCabalBlockadedByPlayer(player, activeGame, p2)){
+                    releaseAllUnits(p2, activeGame, player, event);
+                }
+            }
+        }
+    }
+    public static boolean doesPlayerHaveAnyCapturedUnits(Player cabal, Game activeGame, Player blockader, GenericInteractionCreateEvent event){
+        if(cabal == blockader){
+            return false;
+        }
+         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
+            List<UnitKey> unitKeys = new ArrayList<>();
+            unitKeys.addAll(unitHolder.getUnits().keySet());
+            for (UnitKey unitKey : unitKeys) {
+                if (blockader.unitBelongsToPlayer(unitKey)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void releaseAllUnits(Player cabal, Game activeGame, Player blockader, GenericInteractionCreateEvent event){
+         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
+            Player player = blockader;
+            List<UnitKey> unitKeys = new ArrayList<>();
+            unitKeys.addAll(unitHolder.getUnits().keySet());
+            for (UnitKey unitKey : unitKeys) {
+                if (blockader.unitBelongsToPlayer(unitKey)) {
+                    int amount = unitHolder.getUnits().get(unitKey);
+                    String unit = ButtonHelper.getUnitName(unitKey.asyncID());
+                    new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), amount + " "+unit, activeGame);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame),
+                        ButtonHelper.getTrueIdentity(cabal, activeGame) + " released "+amount+" " + ButtonHelper.getIdentOrColor(player, activeGame) + " " + unit + " from prison due to blockade");
+                    if (cabal != player) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            ButtonHelper.getTrueIdentity(player, activeGame) + " "+amount+" " + unit + " of yours was released from prison.");
+                    }
+        
+                }
+                
+            }
+        }
+    }
+
     public static List<Button> getReleaseButtons(Player cabal, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
-
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 for (Player player : activeGame.getRealPlayers()) {
                     if (player.unitBelongsToPlayer(unitKey)) {
@@ -352,7 +399,6 @@ public class ButtonHelperFactionSpecific {
                     }
                 }
             }
-
         }
         buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
         return buttons;

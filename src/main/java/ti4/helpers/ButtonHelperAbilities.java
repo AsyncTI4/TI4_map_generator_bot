@@ -532,7 +532,7 @@ public class ButtonHelperAbilities {
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, activeGame);
                     if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol") && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
-                        buttons.add(Button.success(finChecker + "peaceAccords_" + planet2, "Use peace accords to take control of " + planetRepresentation2)
+                        buttons.add(Button.success(finChecker + "peaceAccords_" + planet2, planetRepresentation2)
                             .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
                         planetsChecked.add(planet2);
                     }
