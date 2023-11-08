@@ -3,6 +3,7 @@ on:
     pull_request:
         branches: [ "master" ]
 jobs:
+    name: RunTestsOnPR
     ci:
         runs-on: ubuntu-latest
         steps:
