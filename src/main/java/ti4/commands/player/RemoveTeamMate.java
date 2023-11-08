@@ -10,9 +10,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddTeamMate extends PlayerSubcommandData {
-    public AddTeamMate() {
-        super(Constants.ADD_TEAMMATE, "Add a teammate");
+public class RemoveTeamMate extends PlayerSubcommandData {
+    public RemoveTeamMate() {
+        super(Constants.REMOVE_TEAMMATE, "Remove a teammate");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "User who is on your team").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -29,14 +29,8 @@ public class AddTeamMate extends PlayerSubcommandData {
         }
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if(addOption!= null){
-            if(player.getTeamMateIDs().contains(addOption.getAsUser().getId())){
-                sendMessage("User "+addOption.getAsUser().getAsMention() + " is already a part of "+player.getFaction()+"'s team.");
-                return;
-            }
-            player.addTeamMateID(addOption.getAsUser().getId());
+            player.removeTeamMateID(addOption.getAsUser().getId());
         }
-        
-        activeGame.setCommunityMode(true);
-        sendMessage("Added "+addOption.getAsUser().getAsMention() + " as part of "+player.getFaction()+"'s team.");
+        sendMessage("Removed "+addOption.getAsUser().getAsMention() + " from "+player.getFaction()+"'s team");
     }
 }
