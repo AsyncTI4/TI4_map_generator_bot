@@ -57,6 +57,9 @@ public class MessageListener extends ListenerAdapter {
             event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
             return;
         }
+        long timeNow = new Date().getTime();
+        
+       
 
         String userID = event.getUser().getId();
 
@@ -107,6 +110,9 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
+         if(new Date().getTime() - timeNow > 3000){
+             BotLogger.log(event, "This slash command took longer than 3000 ms ("+(new Date().getTime() - timeNow)+")");
+        }
     }
 
     public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
@@ -141,7 +147,7 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (!isAsyncServer(event.getGuild().getId())) return;
-
+        long timeNow = new Date().getTime();
         try {
             Message msg = event.getMessage();
             if (msg.getContentRaw().startsWith("[DELETE]")) {
@@ -153,6 +159,9 @@ public class MessageListener extends ListenerAdapter {
             saveJSONInTTPGExportsChannel(event);
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
+        }
+        if(new Date().getTime() - timeNow > 1000){
+             BotLogger.log(event.getMessage().getChannel().getName()+ " A message in this channel took longer than 1000 ms ("+(new Date().getTime() - timeNow)+")");
         }
     }
 
