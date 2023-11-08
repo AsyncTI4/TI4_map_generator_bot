@@ -114,10 +114,14 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         event.deferEdit().queue();
+        long timeNow = new Date().getTime();
         try {
             resolveButtonInteractionEvent(event);
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
+        }
+        if(new Date().getTime() - timeNow > 3000){
+             BotLogger.log(event, "This button command took longer than 3000 ms ("+(new Date().getTime() - timeNow)+")");
         }
     }
 
@@ -2489,11 +2493,22 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_after_persistent" -> {
                     String message = activeGame.isFoWMode() ? "No afters (locked in)" : null;
                     activeGame.addPlayersWhoHitPersistentNoAfter(player.getFaction());
+                    //activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").contains(player.getFaction())
+                    if(!activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").equalsIgnoreCase("")){
+                        activeGame.setCurrentReacts("noAfterThisAgenda", activeGame.getFactionsThatReactedToThis("noAfterThisAgenda")+"_"+player.getFaction());
+                    }else{
+                        activeGame.setCurrentReacts("noAfterThisAgenda", player.getFaction());
+                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_when_persistent" -> {
                     String message = activeGame.isFoWMode() ? "No whens (locked in)" : null;
                     activeGame.addPlayersWhoHitPersistentNoWhen(player.getFaction());
+                    if(!activeGame.getFactionsThatReactedToThis("noWhenThisAgenda").equalsIgnoreCase("")){
+                        activeGame.setCurrentReacts("noWhenThisAgenda", activeGame.getFactionsThatReactedToThis("noWhenThisAgenda")+"_"+player.getFaction());
+                    }else{
+                        activeGame.setCurrentReacts("noWhenThisAgenda", player.getFaction());
+                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "deal2SOToAll" -> {
@@ -3652,22 +3667,23 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     public void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game activeGame) {
+        String buttonID = event.getButton().getId();
+        
         String messageId = event.getInteraction().getMessage().getId();
-        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(1000, TimeUnit.MILLISECONDS);
         int matchingFactionReactions = 0;
         for (Player player : activeGame.getRealPlayers()) {
-            Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-            if (activeGame.isFoWMode()) {
-                int index = 0;
-                for (Player player_ : activeGame.getPlayers().values()) {
-                    if (player_ == player)
-                        break;
-                    index++;
+            boolean factionReacted = false;
+            if(buttonID.contains("no_after")){
+                if(activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").contains(player.getFaction())){
+                    factionReacted = true;
                 }
-                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, event.getMessageId()));
             }
-            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction != null || (activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
+            if(buttonID.contains("no_when")){
+                if(activeGame.getFactionsThatReactedToThis("noWhenThisAgenda").contains(player.getFaction())){
+                    factionReacted = true;
+                }
+            }
+            if (factionReacted || (activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
                 matchingFactionReactions++;
             }
         }
@@ -3679,26 +3695,16 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     public void checkForAllReactions(String messageId, Game activeGame) {
-        Message mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
         int matchingFactionReactions = 0;
         for (Player player : activeGame.getRealPlayers()) {
-            Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-            if (activeGame.isFoWMode()) {
-                int index = 0;
-                for (Player player_ : activeGame.getPlayers().values()) {
-                    if (player_ == player)
-                        break;
-                    index++;
-                }
-                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
-            }
-            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction != null || (activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
+            
+            if ((activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction()))){
                 matchingFactionReactions++;
             }
         }
         int numberOfPlayers = activeGame.getRealPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) {
+            Message mainMessage = activeGame.getMainGameChannel().retrieveMessageById(messageId).completeAfter(100, TimeUnit.MILLISECONDS);
             mainMessage.reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
             if (activeGame.getMessageIDsForSabo().contains(messageId)) {
                 activeGame.removeMessageIDForSabo(messageId);
