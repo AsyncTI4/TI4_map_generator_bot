@@ -1587,7 +1587,7 @@
     "alias": "boarding_torpedoes",
     "name": "Boarding Torpedoes",
     "phase": "Action",
-    "window": "After you destroy an opponent's non-fighter ship",
+    "window": "After a hit is assigned to your opponent's non-fighter ship",
     "text": "Place 1 ship of the same type from your reinforcements into the active system.",
     "flavorText": "\"It ain't the ship's guard I'm worried about, sonny, it's what happens if we miss...\"",
     "source": "action_deck_2"
@@ -1641,8 +1641,8 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After 1 of your opponent's non-fighter ships is destroyed during a space combat",
-    "text": "Produce 2 hits against your opponent's ships.",
+    "window": "After you destroy an opponent's non-fighter ship",
+    "text": "Produce 2 hits against your opponent's ships in the active system.",
     "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship that the youngster's ordinance connected with had become a deadlier weapon than any their fleet was equipped with.",
     "source": "action_deck_2"
   },
@@ -1669,7 +1669,7 @@
     "name": "Concise Legal Text",
     "phase": "Agenda",
     "window": "When an agenda is revealed",
-    "text": "Players cannot resolve abilities until after this agenda has been resolved.",
+    "text": "Players cannot resolve abilities other than those of this agenda until after this agenda has been resolved.",
     "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
     "source": "action_deck_2"
   },
@@ -1884,8 +1884,8 @@
     "alias": "flawless_strategy",
     "name": "Flawless Strategy",
     "phase": "Action",
-    "window": "After you resolve the primary ability of a strategy card",
-    "text": "Perform the secondary ability of that strategy card.",
+    "window": "Before you exhaust a strategy card",
+    "text": "Perform the secondary ability of that strategy card, spending any command tokens from your reinforcements instead of your strategy pool.",
     "flavorText": "PROTOCOL SUCCESSFUL >> [NULL ID] FATE SEALED << DEFEAT INEVITABLE >> PEERLESS MANY << INFINITE ONE >> [ID:NIITAKA] << QUEUED1 << QUEUED2 << QUEUED3...",
     "source": "action_deck_2"
   },
@@ -1983,8 +1983,8 @@
     "alias": "ixthian_gift",
     "name": "Ixthian Gift",
     "phase": "Action",
-    "window": "At the end of a turn during which you resolved a transaction with a player:",
-    "text": "Commit 1 infantry from your reinforcements to any non-home planet that player controls and resolve a ground combat on that planet.",
+    "window": "At the end of a turn during which you resolved a transaction with a player",
+    "text": "Choose 1 non-home planet that player controls. Commit 1 infantry from your reinforcements to that planet and resolve ground combat on it.",
     "flavorText": "As the last of the extorted goods were lifted into the ship, the Mahact emissary turned to its smug captain, who had been eyeing him, waiting for a reaction. He only nodded. The fool would get his response soon enough.",
     "source": "action_deck_2"
   },
@@ -2236,7 +2236,7 @@
     "name": "Risky Jump Piloting",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die. On a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
+    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
     "source": "action_deck_2"
   },
@@ -2496,7 +2496,7 @@
     "alias": "fulfillment_protocols_ds",
     "name": "Fulfillment Protocols",
     "phase": "Action",
-    "window": "After a player activates a system that contains 1 or more of your ships:",
+    "window": "After a player activates a system that contains 1 or more of your ships",
     "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer in that system.",
     "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
     "source": "ds"
@@ -2550,7 +2550,7 @@
     "alias": "shields_holding_ds",
     "name": "Shields Holding",
     "phase": "Action",
-    "window": "Before you assign hits to your ships during a space combat:",
+    "window": "Before you assign hits to your ships during a space combat",
     "text": "Cancel up to 2 hits.",
     "flavorText": "Jgin let out a cold, hard laugh as the attack intensified, enemy munitions rocking the ship but unable to penetrate their hull.",
     "source": "ds"
