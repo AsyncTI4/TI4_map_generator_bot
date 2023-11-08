@@ -238,11 +238,8 @@ public class Player {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
-            try{
-                return getCardsInfoThread();
-            }catch (Exception e2) {
-                return null;
-            }
+           return null;
+            
         }
         
     }
@@ -1687,6 +1684,9 @@ public class Player {
 
     public void addTeamMateID(String techID) {
         teamMateIDs.add(techID);
+    }
+    public void removeTeamMateID(String techID) {
+        teamMateIDs.remove(techID);
     }
 
     public void addTech(String techID) {
