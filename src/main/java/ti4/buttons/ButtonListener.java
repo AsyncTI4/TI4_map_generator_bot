@@ -2484,10 +2484,16 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "no_when" -> {
                     String message = activeGame.isFoWMode() ? "No whens" : null;
+                    if(activeGame.getFactionsThatReactedToThis("noWhenThisAgenda") == null){
+                        activeGame.setCurrentReacts("noWhenThisAgenda","");
+                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_after" -> {
                     String message = activeGame.isFoWMode() ? "No afters" : null;
+                    if(activeGame.getFactionsThatReactedToThis("noAfterThisAgenda") == null){
+                        activeGame.setCurrentReacts("noAfterThisAgenda","");
+                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_after_persistent" -> {
@@ -3683,7 +3689,7 @@ public class ButtonListener extends ListenerAdapter {
                 if(activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").contains(player.getFaction())){
                     factionReacted = true;
                 }
-                Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(200, TimeUnit.MILLISECONDS);
+                Message mainMessage = event.getMessage();
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                 if (activeGame.isFoWMode()) {
                     int index = 0;
@@ -3703,7 +3709,7 @@ public class ButtonListener extends ListenerAdapter {
                 if(activeGame.getFactionsThatReactedToThis("noWhenThisAgenda").contains(player.getFaction())){
                     factionReacted = true;
                 }
-                Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(200, TimeUnit.MILLISECONDS);
+                Message mainMessage = event.getMessage();
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                 if (activeGame.isFoWMode()) {
                     int index = 0;
