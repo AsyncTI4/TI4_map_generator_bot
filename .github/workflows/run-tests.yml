@@ -4,7 +4,7 @@ on:
         branches: [ "master" ]
 jobs:
     ci:
-        name: RunTestsOnPR
+        name: RunTestsOnPR FAKE PR
         runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v4
