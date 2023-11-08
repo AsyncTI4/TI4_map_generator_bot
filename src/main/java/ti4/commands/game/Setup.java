@@ -1,7 +1,6 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -27,6 +26,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
     @Override
@@ -85,6 +85,9 @@ public class Setup extends GameSubcommandData {
 
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean extraSecretMode = event.getOption("extra_secret_mode", false, OptionMapping::getAsBoolean);
+        activeGame.setExtraSecretMode(extraSecretMode);
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
