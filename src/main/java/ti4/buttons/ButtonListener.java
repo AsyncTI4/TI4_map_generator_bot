@@ -115,14 +115,10 @@ public class ButtonListener extends ListenerAdapter {
 
         event.deferEdit().queue();
         long timeNow = new Date().getTime();
-        long timeNow = new Date().getTime();
         try {
             resolveButtonInteractionEvent(event);
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
-        }
-        if(new Date().getTime() - timeNow > 3000){
-             BotLogger.log(event, "This button command took longer than 3000 ms ("+(new Date().getTime() - timeNow)+")");
         }
         if(new Date().getTime() - timeNow > 3000){
              BotLogger.log(event, "This button command took longer than 3000 ms ("+(new Date().getTime() - timeNow)+")");
@@ -3756,6 +3752,9 @@ public class ButtonListener extends ListenerAdapter {
         
         activeGame.setShushing(false);
         try {
+            if(activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
+                return true;
+            }
             activeGame.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                 if (activeGame.isFoWMode()) {
