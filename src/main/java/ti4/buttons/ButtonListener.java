@@ -3756,6 +3756,9 @@ public class ButtonListener extends ListenerAdapter {
         
         activeGame.setShushing(false);
         try {
+            if(activeGame.getFactionsThatReactedToThis(messageId) != null && activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
+                return true;
+            }
             activeGame.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                 if (activeGame.isFoWMode()) {
