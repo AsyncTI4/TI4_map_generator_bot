@@ -29,6 +29,10 @@ public class AddTeamMate extends PlayerSubcommandData {
         }
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if(addOption!= null){
+            if(player.getTeamMateIDs().contains(addOption.getAsUser().getId())){
+                sendMessage("User "+addOption.getAsUser().getAsMention() + " is already a part of "+player.getFaction()+"'s team.");
+                return;
+            }
             player.addTeamMateID(addOption.getAsUser().getId());
         }
         

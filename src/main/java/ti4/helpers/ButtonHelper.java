@@ -2308,6 +2308,7 @@ public class ButtonHelper {
 
         }
         if (doneActionThisTurn) {
+            ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, activeGame, event);
             if (getEndOfTurnAbilities(player, activeGame).size() > 1) {
                 startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(player, activeGame).size() - 1) + ")"));
             }
@@ -3452,8 +3453,9 @@ public class ButtonHelper {
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
+                    
                     if ((("mech".equalsIgnoreCase(unitName) && !activeGame.getLaws().containsKey("articles_war") && player.getUnitsOwned().contains("nomad_mech"))
-                        || "dreadnought".equalsIgnoreCase(unitName) || "warsun".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName)
+                        || "dreadnought".equalsIgnoreCase(unitName) || "warsun".equalsIgnoreCase(unitName) || "flagship".equalsIgnoreCase(unitName) || ("mech".equalsIgnoreCase(unitName) && ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile))
                         || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2")) || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
                         Button validTile2 = Button
                             .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName, "Sustain " + 1 + " " + unitModel.getBaseType());

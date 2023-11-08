@@ -74,7 +74,6 @@ public class ButtonHelperActionCards {
     }
 
      public static void resolveRally(Game activeGame, Player player, ButtonInteractionEvent event){
-        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
         String message = ButtonHelper.getIdent(player) + " gained 2 fleet CC ("+player.getFleetCC()+ "->"+(player.getFleetCC()+2)+") using rally";
         player.setFleetCC(player.getFleetCC()+2);
         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
