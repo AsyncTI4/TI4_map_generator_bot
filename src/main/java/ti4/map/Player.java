@@ -1627,7 +1627,13 @@ public class Player {
     }
 
     public void setTeamMateIDs(List<String> techs) {
-        teamMateIDs = techs;
+        List<String> nonDuplicates = new ArrayList<>();
+        for(String id : techs){
+            if(!nonDuplicates.contains(id)){
+                nonDuplicates.add(id);
+            }
+        }
+        teamMateIDs = nonDuplicates;
     }
 
     public void setRelics(List<String> relics) {
