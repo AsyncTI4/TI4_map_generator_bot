@@ -133,8 +133,22 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                String warning = "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), warning);
+                StringBuilder warning = new StringBuilder();
+                warning.append("Warning: Unit list should have a maximum of 3 parts (separated by a space) like: `{count} {unit} {planet}`\n");
+                warning.append("> if {count} is omitted, '1' will be assumed\n");
+                warning.append("> {unit} is mandatory\n");
+                warning.append("> if {planet} is omitted, 'space' will be assumed\n");
+                warning.append("`" + unitListToken + "` has " + tokenCount + " parts. There may be errors.\n");
+                warning.append("Acceptable examples look like this:\n");
+                warning.append("> `4 infantry primor`\n");
+                warning.append("> `4 inf pri`\n");
+                warning.append("> `infantry vegaminor` <- note that planet Vega Minor needs to be represented with no spaces\n");
+                warning.append("> `2 infantry vegaminor, 2 infantry vegamajor`\n");
+                warning.append("> `2 inf vegami, 2 inf vegama` <- note that planets can be shortened to the shortest unique name for the system\n");
+                warning.append("> `mech hopesend`\n");
+                warning.append("> `mech h` <- equivalent to above\n");
+                warning.append("Short hand aliases for units/planets can be found using the `/search units/planets` with the `include_aliases:True` parameter\n");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), warning.toString());
             }
 
             int count = 1;

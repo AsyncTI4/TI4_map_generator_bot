@@ -110,6 +110,24 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void checkForNaaluPN(Game activeGame){
+        activeGame.setCurrentReacts("Play Naalu PN", "");
+        for(Player player : activeGame.getRealPlayers()){
+            boolean naalu = false;
+            for (String pn : player.getPromissoryNotes().keySet()) {
+                if ("gift".equalsIgnoreCase(pn) && !player.ownsPromissoryNote("gift") ) {
+                    naalu = true;
+                }
+            }
+            if(naalu){
+                String msg = player.getRepresentation() + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("resolvePreassignment_Play Naalu PN","Pre-play Naalu PN"));
+                buttons.add(Button.danger("deleteButtons","Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+            }
+        }
+    }
 
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -335,10 +353,57 @@ public class ButtonHelperFactionSpecific {
 
     }
 
+    public static void checkBlockadeStatusOfEverything(Player player, Game activeGame, GenericInteractionCreateEvent event){
+        for(Player p2 : activeGame.getRealPlayers()){
+            if(doesPlayerHaveAnyCapturedUnits(p2, activeGame, player, event)){
+                if(isCabalBlockadedByPlayer(player, activeGame, p2)){
+                    releaseAllUnits(p2, activeGame, player, event);
+                }
+            }
+        }
+    }
+    public static boolean doesPlayerHaveAnyCapturedUnits(Player cabal, Game activeGame, Player blockader, GenericInteractionCreateEvent event){
+        if(cabal == blockader){
+            return false;
+        }
+         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
+            List<UnitKey> unitKeys = new ArrayList<>();
+            unitKeys.addAll(unitHolder.getUnits().keySet());
+            for (UnitKey unitKey : unitKeys) {
+                if (blockader.unitBelongsToPlayer(unitKey)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void releaseAllUnits(Player cabal, Game activeGame, Player blockader, GenericInteractionCreateEvent event){
+         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
+            Player player = blockader;
+            List<UnitKey> unitKeys = new ArrayList<>();
+            unitKeys.addAll(unitHolder.getUnits().keySet());
+            for (UnitKey unitKey : unitKeys) {
+                if (blockader.unitBelongsToPlayer(unitKey)) {
+                    int amount = unitHolder.getUnits().get(unitKey);
+                    String unit = ButtonHelper.getUnitName(unitKey.asyncID());
+                    new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), amount + " "+unit, activeGame);
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame),
+                        ButtonHelper.getTrueIdentity(cabal, activeGame) + " released "+amount+" " + ButtonHelper.getIdentOrColor(player, activeGame) + " " + unit + " from prison due to blockade");
+                    if (cabal != player) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+                            ButtonHelper.getTrueIdentity(player, activeGame) + " "+amount+" " + unit + " of yours was released from prison.");
+                    }
+        
+                }
+                
+            }
+        }
+    }
+
     public static List<Button> getReleaseButtons(Player cabal, Game activeGame) {
         List<Button> buttons = new ArrayList<Button>();
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
-
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 for (Player player : activeGame.getRealPlayers()) {
                     if (player.unitBelongsToPlayer(unitKey)) {
@@ -352,7 +417,6 @@ public class ButtonHelperFactionSpecific {
                     }
                 }
             }
-
         }
         buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
         return buttons;
@@ -554,6 +618,9 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isCabalBlockadedByPlayer(Player player, Game activeGame, Player cabal) {
+        if(cabal == player){
+            return false;
+        }
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, cabal, UnitType.CabalSpacedock, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;

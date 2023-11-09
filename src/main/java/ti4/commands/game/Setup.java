@@ -1,7 +1,6 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -27,6 +27,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
     @Override
@@ -85,6 +86,9 @@ public class Setup extends GameSubcommandData {
 
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) activeGame.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean extraSecretMode = event.getOption("extra_secret_mode", false, OptionMapping::getAsBoolean);
+        activeGame.setExtraSecretMode(extraSecretMode);
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game activeGame) {
@@ -107,6 +111,7 @@ public class Setup extends GameSubcommandData {
             return false;
         } else if (isTIGLGame) {
             activeGame.setCompetitiveTIGLGame(isTIGLGame);
+            sendTIGLSetupText(activeGame);
             return true;
         }
 
@@ -204,5 +209,15 @@ public class Setup extends GameSubcommandData {
         }
 
         return true;
+    }
+
+    private static void sendTIGLSetupText(Game activeGame) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("# ").append(Emojis.TIGL).append("TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n");
+        sb.append("Please ensure you have all:\n");
+        sb.append("- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n");
+        sb.append("- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n");
+        sb.append("For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360");
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb.toString());
     }
 }

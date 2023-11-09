@@ -13,7 +13,7 @@
 1. Enable developer mode on your Discord client, if you have not already
 2. Create a new Discord Server
 3. Record the Server's ID (right click Server Name -> "Copy Server ID")
-4. Setup a Test Bot (see instructions below)
+4. Setup a Test Bot - see [Step 1 from here](https://discord.com/developers/docs/getting-started#step-1-creating-an-app)
 5. Invite your Test Bot to your server
 
 # Setup a Test Bot

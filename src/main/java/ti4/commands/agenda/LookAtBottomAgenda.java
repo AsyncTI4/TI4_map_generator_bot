@@ -57,7 +57,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
         } else {
             User userById = event.getJDA().getUserById(player.getUserID());
             if (userById != null) {
-                if (activeGame.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
+                if (activeGame.isCommunityMode() &&player.getPrivateChannel() != null && player.getPrivateChannel() instanceof MessageChannel) {
                     MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
                 } else {
                     MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -59,11 +60,18 @@ public class ExhaustLeader extends LeaderAction {
 		if (tgCount != null) {
 			StringBuilder sb = new StringBuilder();
 			leader.setTgCount(tgCount);
-			sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" was placed on top of the leader");
+			sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame))
+					.append(" was placed on top of the leader");
 			if (leader.getTgCount() != tgCount) {
 				sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" total)*\n");
 			}
 			MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+		}
+		
+		var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
+		if (posssibleCombatMod != null) {
+			player.addNewTempCombatMod(posssibleCombatMod);
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
 		}
 	}
 }

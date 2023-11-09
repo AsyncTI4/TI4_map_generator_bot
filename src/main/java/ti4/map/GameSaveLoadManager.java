@@ -51,6 +51,7 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.TemporaryCombatModifierModel;
 
 public class GameSaveLoadManager {
 
@@ -534,6 +535,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.COMPONENT_ACTION + " " + activeGame.getComponentAction());
         writer.write(System.lineSeparator());
+        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + activeGame.getJustPlayedComponentAC());
+        writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVATION_COUNT + " " + activeGame.getActivationCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.BASE_GAME_MODE + " " + activeGame.isBaseGameMode());
@@ -835,6 +838,20 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID + " " + player.getBagInfoThreadID());
+            writer.write(System.lineSeparator());
+
+            List<String> newTempCombatMods = new ArrayList<>();
+            for(TemporaryCombatModifierModel mod : player.getNewTempCombatModifiers()){
+                newTempCombatMods.add(mod.getSaveString());
+            }
+            writer.write(Constants.PLAYER_NEW_TEMP_MODS + " " + String.join("|", newTempCombatMods));
+            writer.write(System.lineSeparator());
+
+            List<String> tempCombatMods = new ArrayList<>();
+            for(TemporaryCombatModifierModel mod : player.getTempCombatModifiers()){
+                tempCombatMods.add(mod.getSaveString());
+            }
+            writer.write(Constants.PLAYER_TEMP_MODS + " " + String.join("|", tempCombatMods));
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -1619,6 +1636,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.JUST_PLAYED_COMPONENT_AC -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setJustPlayedComponentAC(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.BASE_GAME_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -2038,6 +2063,18 @@ public class GameSaveLoadManager {
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
+                case Constants.PLAYER_NEW_TEMP_MODS -> {
+                    StringTokenizer mods = new StringTokenizer(tokenizer.nextToken(), "|");
+                    while (mods.hasMoreTokens()) {
+                        player.addNewTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
+                    }
+                }
+                case Constants.PLAYER_TEMP_MODS -> {
+                    StringTokenizer mods = new StringTokenizer(tokenizer.nextToken(), "|");
+                    while (mods.hasMoreTokens()) {
+                        player.addTempCombatMod(new TemporaryCombatModifierModel(mods.nextToken()));
+                    }
+                }
             }
         }
     }

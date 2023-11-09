@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.buttons.ButtonListener;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
@@ -21,6 +19,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -217,6 +216,11 @@ public class HeroPlay extends LeaderAction {
             case "keleresheroharka" -> {
                 KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
             }
+        }
+        var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
+        if (posssibleCombatMod != null) {
+            player.addNewTempCombatMod(posssibleCombatMod);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 }

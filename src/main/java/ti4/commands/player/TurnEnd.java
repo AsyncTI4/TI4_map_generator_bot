@@ -117,6 +117,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
+        ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         TurnStart.turnStart(event, activeGame, nextPlayer);
     }
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {

@@ -16,6 +16,7 @@ public class Constants {
     public static final String TEMPORARY_PING_DISABLE = "temporary_ping_disable";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
     public static final String ADD_TEAMMATE = "add_teammate";
+    public static final String REMOVE_TEAMMATE = "remove_teammate";
     public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
@@ -55,6 +56,7 @@ public class Constants {
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
+    public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
     public static final String ACTIVATION_COUNT = "activation_count";
     public static final String SHUTDOWN = "shutdown";
     public static final String PLANET_ID = "planet_id";
@@ -247,7 +249,6 @@ public class Constants {
 
     public static final String FRONTIER = "frontier";
 
-
     public static final String CREATION_DATE = "creation_date";
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
     public static final String ROUND = "round";
@@ -332,7 +333,7 @@ public class Constants {
     public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
     public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
-    public static final String CHECK_REACTS_INFO= "check_reacts_info";
+    public static final String CHECK_REACTS_INFO = "check_reacts_info";
     public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
     public static final String AC_ID = "ac_id";
@@ -809,7 +810,7 @@ public class Constants {
     public static final String SC_FOLLOW_7 = "sc_follow_7";
     public static final String SC_FOLLOW_8 = "sc_follow_8";
 
-    //Installation constants
+    // Installation constants
     public static final String INSTALLATION = "installation";
     public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
     public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
@@ -902,6 +903,7 @@ public class Constants {
 
     public static final String COMBAT = "combat";
 
+    public static final String MOD_OPPONENT_TEKKLAR_PLAYER_OWNER = "opponent_tekklar_player_owner";
     public static final String MOD_OPPONENT_STOLEN_TECH = "opponent_stolen_faction_tech";
     public static final String MOD_OPPONENT_FRAG = "opponent_frag";
     public static final String MOD_PLANET_MR_LEGEND_HOME = "planet_mr_legendary_home";
@@ -975,4 +977,10 @@ public class Constants {
     public static final String FACTION_TECH_ADD = "faction_tech_add";
     public static final String FACTION_TECH_REMOVE = "faction_tech_remove";
     public static final String SEARCH_DECKS = "decks";
+    public static final Object MOD_TEMP_ONE_ROUND = "ONE_ROUND";
+    public static final String MOD_TEMP_ONE_TACTICAL_ACTION = "ONE_TACTICAL_ACTION";
+    public static final String MOD_TEMP_ONE_COMBAT = "ONE_COMBAT";
+    public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
+    public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
+    public static final String ARCHIVE_CHANNELS = "archive_channels";
 }

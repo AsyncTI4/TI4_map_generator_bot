@@ -51,6 +51,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
@@ -447,6 +448,17 @@ public class AgendaHelper {
         return sb.toString();
     }
 
+    public static void offerEveryonePrepassOnShenanigans(Game activeGame){
+        for(Player player : activeGame.getRealPlayers()){
+            String msg = player.getRepresentation() + " you have the option to prepass on agenda shenanigans here. Agenda shenanigans are the action cards known as bribery, deadly plot, and the confounding/confusing legal texts. Feel free not to pre-pass, this is simply an optional way to resolve agendas faster";
+            List<Button> buttons = new ArrayList<>();
+
+            buttons.add(Button.success("resolvePreassignment_Pass On Shenanigans","Pre-pass"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+        }
+    }
+
     public static void rollIxthian(Game activeGame) {
         TextChannel watchParty = watchPartyChannel(activeGame);
         String watchPartyPing = watchPartyPing(activeGame);
@@ -787,8 +799,8 @@ public class AgendaHelper {
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
-
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage, deadlyActionRow);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage, activeGame, deadlyActionRow, "shenanigans");
+           // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage, deadlyActionRow);
             if (!activeGame.isFoWMode()) {
                 StringBuilder loseMessage = new StringBuilder();
                 for (Player los : losers) {
@@ -818,7 +830,9 @@ public class AgendaHelper {
             Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
             Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
             List<Button> buttons = List.of(noConfounding, noConfusing);
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage2, buttons);
+            //MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage2, buttons);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage2, activeGame, buttons, "shenanigans");
+
 
         } else {
             if (activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
@@ -871,6 +885,32 @@ public class AgendaHelper {
 
         event.getChannel().sendMessage(voteMessage).queue();
         //event.getMessage().delete().queue();
+    }
+
+    public static void reverseAllRiders(ButtonInteractionEvent event, Game activeGame, Player player) {
+        
+        HashMap<String, String> outcomes = activeGame.getCurrentAgendaVotes();
+        for (String outcome : outcomes.keySet()) {
+            String existingData = outcomes.getOrDefault(outcome, "empty");
+            if (existingData == null || "empty".equalsIgnoreCase(existingData) || "".equalsIgnoreCase(existingData)) {
+            } else {
+                String[] votingInfo = existingData.split(";");
+                StringBuilder totalBuilder = new StringBuilder();
+                for (String onePiece : votingInfo) {
+                    String identifier = onePiece.split("_")[0];
+                    if (!identifier.equalsIgnoreCase(player.getFaction()) && !identifier.equalsIgnoreCase(player.getColor())) {
+                        totalBuilder.append(";").append(onePiece);
+                    }else{
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player,activeGame), ButtonHelper.getIdent(player) + " erased "+ onePiece.split("_")[1]);
+                    }
+                }
+                String total = totalBuilder.toString();
+                if (total.length() > 0 && total.charAt(0) == ';') {
+                    total = total.substring(1);
+                }
+                activeGame.setCurrentAgendaVote(outcome, total);
+            }
+        }
     }
 
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
@@ -938,7 +978,9 @@ public class AgendaHelper {
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
         afterButtons.add(playAfter);
 
-        if (activeGame.getPlayerFromColorOrFaction("keleres") != null && !activeGame.isFoWMode()) {
+
+        
+        if (ButtonHelper.shouldKeleresRiderExist(activeGame) && !activeGame.isFoWMode()) {
             Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresAfter);
         }
