@@ -13,14 +13,13 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
-
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -206,13 +205,16 @@ public class GameEnd extends GameSubcommandData {
         sb.append("**Players:**").append("\n");
         int index = 1;
         for (Player player : activeGame.getRealPlayers()) {
-            if (player.getFaction() == null || player.isDummy()) continue;
-
+            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             int playerVP = player.getTotalVictoryPoints();
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
-            sb.append(Emojis.getColourEmojis(player.getColor()));
-            sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
+            sb.append(Emojis.getColourEmojis(player.getColor())).append(" ");
+            if (user.isPresent()) {
+                sb.append(user.get().getAsMention());
+            } else {
+                sb.append(player.getUserName());
+            }
             sb.append(" - *").append(playerVP).append("VP* ");
             if (playerVP >= activeGame.getVp()) sb.append(" - **WINNER**");
             sb.append("\n");
@@ -230,16 +232,15 @@ public class GameEnd extends GameSubcommandData {
     public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
-        sb.append("This was a TIGL game! ").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("**").append(activeGame.getName()).append("** - ").append(activeGame.getCustomName()).append("\n");
-        sb.append("Match Start Date: `").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append("` (TIGL wants Game End Date for Async)\n");
-        sb.append("Match Start Time: `00:00`\n");
-        sb.append("**Players:**").append("\n");
+        sb.append("This was a TIGL game! 👑").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
+        sb.append("```\nMatch Start Date: ").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append(" (TIGL wants Game End Date for Async)\n");
+        sb.append("Match Start Time: 00:00\n\n");
+        sb.append("Players:").append("\n");
         int index = 1;
         for (Player player : activeGame.getRealPlayers()) {
             int playerVP = player.getTotalVictoryPoints();
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-            sb.append("`").append(index).append(".` ");
+            sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
             if (user.isPresent()) {
                 sb.append(user.get().getName());
@@ -250,8 +251,11 @@ public class GameEnd extends GameSubcommandData {
             index++;
         }
 
+        sb.append("\n");
         sb.append("Platform: Async\n");
-        sb.append("Additional Notes: ").append(activeGame.getName()).append("   ").append(activeGame.getCustomName()).append("\n");
+        sb.append("Additional Notes: Async Game '").append(activeGame.getName());
+        if (!StringUtils.isBlank(activeGame.getCustomName())) sb.append("   ").append(activeGame.getCustomName());
+        sb.append("'\n```");
 
         return sb.toString();
     }
