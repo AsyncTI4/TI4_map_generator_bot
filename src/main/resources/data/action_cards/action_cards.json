@@ -1598,7 +1598,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
-    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand. Suddenly, the projection expanded outwards to the edges of the galaxy, \"Our dominion knows no border.\"",
+    "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
     "source": "action_deck_2"
   },
   {
@@ -1641,7 +1641,7 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After you destroy an opponent's non-fighter ship",
+    "window": "After you destroy 1 of your opponent's non-fighter ships",
     "text": "Produce 2 hits against your opponent's ships.",
     "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship that the youngster's ordinance connected with had become a deadlier weapon than any their fleet was equipped with.",
     "source": "action_deck_2"
@@ -1660,8 +1660,8 @@
     "name": "Collaborative Planning",
     "phase": "Action",
     "window": "After another player performs an action",
-    "text": "That player may perform an additional action this turn; otherwise, they must pass.",
-    "flavorText": "Mathis pursed his lips with disdain at the Yssaril informant. \"I wish not to rush our plans, only see them done with the correct expedience.\"",
+    "text": "That player must perform an additional action this turn or pass.",
+    "flavorText": "Mathis pursed his lips with disdain at the Yssaril informant. \"You will see to our agreements with the correct expedience,\" he said, before his anger broke through. \"Perhaps our massive fleets could provide you with motivation, should you continue to test us!\"",
     "source": "action_deck_2"
   },
   {
@@ -1713,9 +1713,9 @@
     "alias": "custodian_support",
     "name": "Custodian Support",
     "phase": "Action",
-    "window": "At the start of the agenda phase",
-    "text": "Spend 8 influence to either draw 1 secret objective or immediately score 1 secret objective if you fulfill its requirements.",
-    "flavorText": "As Elder Qanoj read the Custodians' proclamation, he grew anxious. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his experiences had taught him to discern a shifting of the tides.",
+    "window": "When you are the first to pass",
+    "text": "You may immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 1 secret objective.",
+    "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
     "source": "action_deck_2"
   },
   {
@@ -1822,7 +1822,7 @@
     "name": "Disrupt Logistics",
     "phase": "Action",
     "window": "After another player activates a system that contains your units",
-    "text": "During this tactical action, the maximum number of ships that player can have in the active system is reduced by 1.",
+    "text": "During this tactical action, the maximum number of non-fighter ships that player can have in the active system is reduced by 1.",
     "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked the admiral to his core.",
     "source": "action_deck_2"
   },
@@ -1831,7 +1831,7 @@
     "name": "Early Voting",
     "phase": "Action",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player. That player must immediately vote on this agenda, if able. They cannot vote on this agenda again.",
+    "text": "Choose 1 player. That player votes first on this agenda. [Note: Argent Flight still votes first.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -2002,7 +2002,7 @@
     "name": "Last Minute Deliberation",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Each player readies up to 2 planets they control. Then, reveal the top card of the agenda deck.",
+    "text": "Each player readies 1 planet they control. Then, reveal the top card of the agenda deck.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious is where Elder Junn thrived.",
     "source": "action_deck_2"
   },
@@ -2056,7 +2056,7 @@
     "name": "Production Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, use the Production ability of 1 of your units; the combined cost of the produced units cannot exceed 8 resources.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, use the Production ability of 1 of your units; the combined cost of the produced units cannot exceed 8 resources. [Note: Abilities that reduce the combined cost of units apply, including Nomad's Commander.]",
     "flavorText": "Magmus spoke with a gravelly voice, \"In the final moments of their empire, the Lazax wished to see us properly armed against our oppressors. I now invoke this final decree!\"",
     "source": "action_deck_2"
   },
@@ -2066,7 +2066,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "Exhaust up to 2 of your planets that have a trait. Then, place a number of infantry on each of those planets equal to their influence value.",
-    "flavorText": "Sara, Blake, and Nolad stepped in front of the camera with a salute as Jace spoke, \"They're doing their part. Are you? Join the Mobile Infantry and save the universe. Service guarantees citizenship.\"",
+    "flavorText": "Sara, Blake, and Nolad stepped in front of the camera with a salute. \"They're doing their part. Are you? Join the Mobile Infantry and save the universe. Service guarantees citizenship.\"",
     "source": "action_deck_2"
   },
   {
@@ -2190,9 +2190,9 @@
     "alias": "rehash_debates",
     "name": "Rehash Debates",
     "phase": "Agenda",
-    "window": "Before revealing the first agenda during the agenda phase",
-    "text": "Choose 1 agenda in play or in the discard pile. Players vote on that agenda as if it were just revealed from the agenda deck.",
-    "flavorText": "Ciel was met by a crowd when he arrived at the Senate Possessional. Apparently his agreement with the Jol-Nar to continue research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Each player readies 1 planet they control. Then, choose 1 agenda in play or in the discard pile. Players vote on that agenda as if it were just revealed from the agenda deck.",
+    "flavorText": "Ciel was met by a crowd when he arrived at the Senate Possessional. His agreements to fund research on the Ixthian artifact had conjured up doomsayers. They would learn the providence of Winnaran wisdom.",
     "source": "action_deck_2"
   },
   {
@@ -2219,7 +2219,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain 1 relic.",
-    "flavorText": "The representatives of the ancient civilization sat unmoving, waiting to hear today's deliberations. Their bodies, nearly stone, lent them to such activities. However, these unassuming folk were worth their weight in credits, for their memories stretched to the days of ancient wonders, and their stories flowed to those who would see their will done.",
+    "flavorText": "The representatives of the ancient civilization sat unmoving. Their bodies, nearly stone, lent them to such activities. However, these unassuming folk were worth their weight in credits, for their memories stretched to the days of ancient wonders, and their stories flowed to those who would see their will done.",
     "source": "action_deck_2"
   },
   {
@@ -2344,7 +2344,7 @@
     "name": "Smuggler Routes",
     "phase": "Status",
     "window": "At the start of the status phase",
-    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, gain 1 trade good and you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
+    "text": "Choose 1 revealed public objective. During this status phase, each time a player scores that objective, you may move 1 of your non-fighter ships to an adjacent system that does not contain another player's units.",
     "flavorText": "\"From Dirzuga to massive Letani, the whole symphony in every spore. You want infantry? I've got plenty. But who cares? No big deal. I want more... I wanna be where the Mentak are. I wanna see - wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
@@ -2379,8 +2379,8 @@
     "alias": "steal_prototype",
     "name": "Steal Prototype",
     "phase": "Action",
-    "window": "After you destroy another player's unit",
-    "text": "If that player owns the unit upgrade technology for that unit, spend 4 resources to gain that unit upgrade technology.",
+    "window": "After you destroy 1 of your opponent's non-fighter ships",
+    "text": "If that player owns a unit upgrade technology for that unit, research a unit upgrade technology of that unit's type; ignore 1 prerequisite of that technology for each unit of that type in the active system.",
     "flavorText": "The reengineering efforts were surprising. Many of the Hylar ship's advancements could be retrofitted with ease.",
     "source": "action_deck_2"
   },
@@ -2426,7 +2426,7 @@
     "phase": "Any",
     "window": "When or after you research a technology",
     "text": "Ready each of your planets that have a technology specialty.",
-    "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Countless sacrifices were made to reach these results, but the vast applications made it hard to feel regret.",
+    "flavorText": "The conference erupted in cheers as Doctor Sucaban announced their findings. Countless sacrifices were made to reach these results, but the vast applications made it hard to feel regret.",
     "source": "action_deck_2"
   },
   {
