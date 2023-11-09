@@ -125,17 +125,14 @@ public class GameEnd extends GameSubcommandData {
                 pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                     m.editMessageAttachments(fileUpload).queueAfter(50, TimeUnit.MILLISECONDS); //ADD MAP FILE TO MESSAGE
                     m.createThreadChannel(gameName).queueAfter(500, TimeUnit.MILLISECONDS, t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game [there](" + m.getJumpUrl() + ")!");
-
-                    // TIGL Extras
-                    if (activeGame.isCompetitiveTIGLGame() && activeGame.getGameWinner().isPresent()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("This was a TIGL game! ").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8)!\n");
-                        sb.append(getTIGLFormattedGameEndText(activeGame, event));
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
                 });
             }
+        }
+
+        // TIGL Extras
+        if (activeGame.isCompetitiveTIGLGame() && activeGame.getGameWinner().isPresent()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(activeGame, event));
         }
 
         // GET BOTHELPER LOUNGE
@@ -150,14 +147,12 @@ public class GameEnd extends GameSubcommandData {
         TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (inLimboCategory != null) {
-            if (inLimboCategory.getChannels().size() > 38) {
-                List<GuildChannel> chans = new ArrayList<>();
-                chans.addAll(inLimboCategory.getChannels());
-                for(GuildChannel chan : chans){
-                    chan.delete().queue();
-                }
+            int maxLimboChannels = 40;
+            int channelCountToDelete = maxLimboChannels / 2;
+            if (inLimboCategory.getChannels().size() >= maxLimboChannels) {
+                inLimboCategory.getChannels().stream().limit(channelCountToDelete).forEach(channel -> channel.delete().queue());
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel,
-                    inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " had 38 channels and got auto-cleaned");
+                    inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " had " + maxLimboChannels +" channels and " + channelCountToDelete + " were auto-cleaned");
             }
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -234,28 +229,29 @@ public class GameEnd extends GameSubcommandData {
 
     public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("## __TIGL Results__\n\n");
+        sb.append("# ").append(Emojis.TIGL).append("TIGL\n\n");
+        sb.append("This was a TIGL game! ").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
         sb.append("**").append(activeGame.getName()).append("** - ").append(activeGame.getCustomName()).append("\n");
-        sb.append("Match Start Date: `").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append("` (TIGL wants Game End Date for Async)");
-        sb.append("Match Start Time: `00:00`");
+        sb.append("Match Start Date: `").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append("` (TIGL wants Game End Date for Async)\n");
+        sb.append("Match Start Time: `00:00`\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
         for (Player player : activeGame.getRealPlayers()) {
             int playerVP = player.getTotalVictoryPoints();
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-            sb.append("`").append(index).append(".` `");
-            sb.append(player.getFaction()).append("` - `");
+            sb.append("`").append(index).append(".` ");
+            sb.append(player.getFaction()).append(" - ");
             if (user.isPresent()) {
                 sb.append(user.get().getName());
             } else {
                 sb.append(player.getUserName());
             }
-            sb.append("` - `").append(playerVP).append("` VP\n");
+            sb.append(" - ").append(playerVP).append(" VP\n");
             index++;
         }
 
-        sb.append("Platform: `Async`\n");
-        sb.append("Additional Notes: `").append(activeGame.getName()).append(": ").append(activeGame.getCustomName()).append("`\n");
+        sb.append("Platform: Async\n");
+        sb.append("Additional Notes: ").append(activeGame.getName()).append("   ").append(activeGame.getCustomName()).append("\n");
 
         return sb.toString();
     }
