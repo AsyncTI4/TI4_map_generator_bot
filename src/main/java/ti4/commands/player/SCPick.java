@@ -246,7 +246,7 @@ public class SCPick extends PlayerSubcommandData {
         if (allPicked) {
             ButtonHelperActionCards.checkForAssigningCoup(activeGame);
             for(Player p2 : activeGame.getRealPlayers()){
-                if(activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())){
+                if(activeGame.getFactionsThatReactedToThis("Play Naalu PN") != null && activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())){
                     if(!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().keySet().contains("gift")){
                         ButtonHelper.resolvePNPlay("gift", p2, activeGame, event);
                     }
