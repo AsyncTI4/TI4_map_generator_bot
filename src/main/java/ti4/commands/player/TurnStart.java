@@ -81,7 +81,9 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             MessageHelper.sendMessageToChannel(gameChannel, text);
-            MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
+            if(!goingToPass){
+                MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
+            }
             if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
             }
