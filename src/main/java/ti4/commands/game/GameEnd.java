@@ -110,7 +110,7 @@ public class GameEnd extends GameSubcommandData {
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
         //CREATE POST IN #THE-PBD-CHRONICLES
-        if(publish && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0){
+        if (publish && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0) {
             TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
             String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
             if (pbdChroniclesChannel == null) {
@@ -120,10 +120,10 @@ public class GameEnd extends GameSubcommandData {
             if (!activeGame.isFoWMode()) {
                 //INFORM PLAYERS
                 pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-                    m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
-                    String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+                    m.editMessageAttachments(fileUpload).queueAfter(50, TimeUnit.MILLISECONDS); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(gameName).queueAfter(500, TimeUnit.MILLISECONDS, t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game [there](" + m.getJumpUrl() + ")!");
+
                 });
             }
         }
