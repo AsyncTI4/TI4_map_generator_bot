@@ -862,7 +862,12 @@ public class Game {
     }
 
     public String getFactionsThatReactedToThis(String messageID) {
-        return checkingForAllReacts.get(messageID);
+        if(checkingForAllReacts.get(messageID) != null){
+            return checkingForAllReacts.get(messageID);
+        }else{
+            return "";
+        }
+        
     }
 
     public void resetCurrentAgendaVotes() {
