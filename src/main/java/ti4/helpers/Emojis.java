@@ -450,7 +450,7 @@ public class Emojis {
     public static final String Swog = "<:Swog:1171623581667557407>";
     public static final String Tarrock = "<:Tarrock:1171623583479509104>";
     public static final String Troac = "<:Troac:1171623597387812876>";
-    public static final String Vioss = "<:Vioss:1171623598650302566> ";
+    public static final String Vioss = "<:Vioss:1171623598650302566>";
     // END OF EMOJI FARM 11
 
     // LIST OF SEM-LORES
