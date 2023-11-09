@@ -982,4 +982,5 @@ public class Constants {
     public static final String MOD_TEMP_ONE_COMBAT = "ONE_COMBAT";
     public static final String PLAYER_TEMP_MODS = "PLAYER_TEMP_MODS";
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
+    public static final String ARCHIVE_CHANNELS = "archive_channels";
 }
