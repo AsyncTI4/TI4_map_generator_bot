@@ -64,7 +64,7 @@
     {
         "alias": "plus1_1round_fighter",
         "type": "DIE_MOD",
-        "value": "+1",
+        "value": "+2",
         "scope": "ff",
         "forCombatAbility": "combatround",
         "persistenceType": "ONE_ROUND",
