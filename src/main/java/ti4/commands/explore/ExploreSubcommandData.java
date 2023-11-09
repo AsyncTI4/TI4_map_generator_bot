@@ -462,11 +462,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "hiddenlaboratory"->{
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
                 new ExpFrontier().expFront(event, tile, activeGame, player);
             }
             case "ancientshipyard"->{
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if(colors.size() == 0 || colors.contains(player.getColorID())){
                     new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
@@ -477,6 +479,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 
             }
             case "forgottentradestation"->{
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 int tgGain = tile.getUnitHolders().size()-1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
@@ -486,6 +489,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
+                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 player.addRelic(cardID);
                 message = "Added as a relic (not actually a relic) - use /explore relic_purge to use it";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
