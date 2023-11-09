@@ -479,6 +479,17 @@ public class Game {
         this.vp = vp;
     }
 
+    @JsonIgnore
+    public Optional<Player> getGameWinner() {
+        for (Player player : getRealPlayers()) {
+            if (player.getTotalVictoryPoints() >= getVp()) {
+                return Optional.of(player);
+                // TODO: Handle if there are more than one player with a winning amount of VP
+            }
+        }
+        return Optional.empty();
+    }
+
     public int getRound() {
         return round;
     }
