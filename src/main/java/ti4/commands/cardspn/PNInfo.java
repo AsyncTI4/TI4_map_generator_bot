@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -63,9 +64,18 @@ public class PNInfo extends PNCardsSubcommandData {
             }else{
                 Button transact;
                 if(activeGame.isFoWMode()){
-                    transact = Button.success("resolvePNPlay_"  + pnShortHand, "Play " +owner.getColor() +" "+ promissoryNote.getName());
-                }else{
-                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                    transact = Button.success("resolvePNPlay_" + pnShortHand,
+                            "Play " + owner.getColor() + " " + promissoryNote.getName());
+                    
+                } else {
+                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
+                            .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                }
+                var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, promissoryNote.getAlias(),
+                        player.getNumberTurns());
+                if (posssibleCombatMod != null) {
+                    player.addNewTempCombatMod(posssibleCombatMod);
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
                 }
                 buttons.add(transact);
             }

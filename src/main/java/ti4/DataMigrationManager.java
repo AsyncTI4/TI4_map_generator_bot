@@ -12,9 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -65,6 +63,8 @@ public class DataMigrationManager {
             runMigration("migrateInitializeACD2_271023", DataMigrationManager::migrateInitializeACD2_271023);
             runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
             runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
+            runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
+            runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -472,12 +472,12 @@ public class DataMigrationManager {
     private static Boolean migrateGheminaAddCarrier_190923(Game game) {
         boolean mapNeededMigrating = false;
         for (Player player : game.getPlayers().values()) {
-            if (player.getFaction().equalsIgnoreCase("ghemina") && player.hasUnit("carrier")) {
+            if ("ghemina".equalsIgnoreCase(player.getFaction()) && player.hasUnit("carrier")) {
                 player.removeOwnedUnitByID("carrier");
                 player.addOwnedUnitByID("ghemina_carrier");
                 mapNeededMigrating = true;
             }
-            if (player.getFaction().equalsIgnoreCase("ghemina") && player.hasUnit("carrier2")) {
+            if ("ghemina".equalsIgnoreCase(player.getFaction()) && player.hasUnit("carrier2")) {
                 player.removeOwnedUnitByID("carrier2");
                 player.addOwnedUnitByID("ghemina_carrier2");
                 mapNeededMigrating = true;
@@ -489,23 +489,22 @@ public class DataMigrationManager {
     private static Boolean migrateRenameVeldyrAttachments_270923(Game game) {
         boolean mapNeededMigrating = false;
         for (Entry<String, UnitHolder> entry : game.getPlanetsInfo().entrySet()) {
-            if (entry.getValue() instanceof Planet) {
-                Planet p = (Planet) entry.getValue();
+            if (entry.getValue() instanceof Planet p) {
                 HashSet<String> tokens = new HashSet<>(p.getTokenList());
                 for (String token : tokens) {
-                    if (token.equals("attachment_veldyr1.png")) {
+                    if ("attachment_veldyr1.png".equals(token)) {
                         p.removeToken(token);
                         p.addToken("attachment_veldyrtaxhaven.png");
                         mapNeededMigrating = true;
-                    } else if (token.equals("attachment_veldyr2.png")) {
+                    } else if ("attachment_veldyr2.png".equals(token)) {
                         p.removeToken(token);
                         p.addToken("attachment_veldyrbroadcasthub.png");
                         mapNeededMigrating = true;
-                    } else if (token.equals("attachment_veldyr3.png")) {
+                    } else if ("attachment_veldyr3.png".equals(token)) {
                         p.removeToken(token);
                         p.addToken("attachment_veldyrreservebank.png");
                         mapNeededMigrating = true;
-                    } else if (token.equals("attachment_veldyr4.png")) {
+                    } else if ("attachment_veldyr4.png".equals(token)) {
                         p.removeToken(token);
                         p.addToken("attachment_veldyrorbitalshipyard.png");
                         mapNeededMigrating = true;
@@ -518,7 +517,7 @@ public class DataMigrationManager {
 
     private static Boolean migrateRenameDSExplores_061023(Game game) {
         boolean mapNeededMigrating = false;
-        if (game.getExplorationDeckID().equals("explores_DS")) {
+        if ("explores_DS".equals(game.getExplorationDeckID())) {
             List<String> oldDeck = game.getAllExplores();
             List<String> replacementDeck = new ArrayList<>();
             for (String ex : oldDeck) {
@@ -611,6 +610,21 @@ public class DataMigrationManager {
         Map<String, String> replacements = Map.of("parade_marvels_little_omega", "engineer_marvel");
         List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
         return replaceStage1s(game, decksToCheck, replacements);
+    }
+
+    // LO id change
+    public static boolean migrateInitializeLO_061123(Game game) {
+        Map<String, String> replacements = Map.of("raise_fleets_little_omega", "raise_fleet");
+        List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
+        return replaceStage1s(game, decksToCheck, replacements);
+    }
+
+    //
+    public static boolean migrateInitializeLO_081123(Game game) {
+        Map<String, String> replacements = Map.of("fulfullment_protocols", "mercenary_contract",
+            "magen_engineers", "ancient_defenses");
+        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
+        return replaceActionCards(game, decksToCheck, replacements);
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {

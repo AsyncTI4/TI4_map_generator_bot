@@ -1,29 +1,46 @@
 package ti4.map;
 
-import java.util.concurrent.ThreadLocalRandom;
-
-import lombok.Getter;
-import lombok.Setter;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
+import java.awt.Point;
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
@@ -44,18 +61,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-import java.awt.*;
-import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import java.util.*;
-
 public class Game {
 
     private String ownerID;
@@ -73,8 +78,8 @@ public class Game {
     private int mapImageGenerationCount;
     private final MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
-    private boolean botFactionReacts = false;
-    private boolean hasHadAStatusPhase = false;
+    private boolean botFactionReacts;
+    private boolean hasHadAStatusPhase;
     private boolean botShushing = true;
     @JsonIgnore
     private final HashMap<String, UnitHolder> planets = new HashMap<>();
@@ -90,25 +95,27 @@ public class Game {
     @ExportableField
     private int vp = 10;
     @ExportableField
-    private boolean competitiveTIGLGame = false;
+    private boolean competitiveTIGLGame;
     @ExportableField
-    private boolean communityMode = false;
+    private boolean communityMode;
     @ExportableField
-    private boolean allianceMode = false;
+    private boolean allianceMode;
     @ExportableField
-    private boolean fowMode = false;
+    private boolean fowMode;
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
     private boolean nomadCoin;
     @ExportableField
-    private boolean temporaryPingDisable = false;
+    private boolean temporaryPingDisable;
     @ExportableField
     private boolean dominusOrb;
     @ExportableField
     private boolean componentAction;
     @ExportableField
-    private boolean baseGameMode = false;
+    private boolean justPlayedComponentAC;
+    @ExportableField
+    private boolean baseGameMode;
     @ExportableField
     private boolean lightFogMode;
     @ExportableField
@@ -122,10 +129,13 @@ public class Game {
     @Setter
     private String textSize = "medium";
     @ExportableField
-    private boolean absolMode = false;
+    private boolean absolMode;
     @Getter
     @Setter
-    private boolean showUnitTags = false;
+    private boolean showUnitTags;
+    @Getter
+    @Setter
+    private boolean extraSecretMode;
     @Getter
     @Setter
     private String acDeckID = "action_cards_pok";
@@ -146,7 +156,7 @@ public class Game {
     private String agendaDeckID = "agendas_pok";
     @Getter
     @Setter
-    private String eventDeckID = null;
+    private String eventDeckID;
     @Getter
     @Setter
     private String explorationDeckID = "explores_pok";
@@ -158,9 +168,9 @@ public class Game {
     @ExportableField
     private String scSetID = "pok";
     @ExportableField
-    private boolean discordantStarsMode = false;
+    private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
-    private boolean testBetaFeaturesMode = false;
+    private boolean testBetaFeaturesMode;
     private boolean hasEnded;
     private long endedDate;
     @Getter
@@ -177,7 +187,7 @@ public class Game {
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     private final HashMap<Integer, Boolean> scPlayed = new HashMap<>();
     private HashMap<String, String> currentAgendaVotes = new HashMap<>();
-    private HashMap<String, String> checkingForAllReacts = new HashMap<>();
+    private final HashMap<String, String> checkingForAllReacts = new HashMap<>();
     @ExportableField
     private String speaker = "";
     @ExportableField
@@ -469,6 +479,17 @@ public class Game {
         this.vp = vp;
     }
 
+    @JsonIgnore
+    public Optional<Player> getGameWinner() {
+        for (Player player : getRealPlayers()) {
+            if (player.getTotalVictoryPoints() >= getVp()) {
+                return Optional.of(player);
+                // TODO: Handle if there are more than one player with a winning amount of VP
+            }
+        }
+        return Optional.empty();
+    }
+
     public int getRound() {
         return round;
     }
@@ -491,7 +512,6 @@ public class Game {
 
     public void increaseSlashCommandsRun() {
         slashCommandsRun++;
-        ;
     }
 
     public int getSlashCommandsRunCount() {
@@ -842,7 +862,12 @@ public class Game {
     }
 
     public String getFactionsThatReactedToThis(String messageID) {
-        return checkingForAllReacts.get(messageID);
+        if(checkingForAllReacts.get(messageID) != null){
+            return checkingForAllReacts.get(messageID);
+        }else{
+            return "";
+        }
+        
     }
 
     public void resetCurrentAgendaVotes() {
@@ -901,6 +926,10 @@ public class Game {
         return componentAction;
     }
 
+    public boolean getJustPlayedComponentAC() {
+        return justPlayedComponentAC;
+    }
+
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
     }
@@ -917,6 +946,9 @@ public class Game {
 
     public void setComponentAction(boolean onStatus) {
         componentAction = onStatus;
+    }
+    public void setJustPlayedComponentAC(boolean onStatus) {
+        justPlayedComponentAC = onStatus;
     }
 
     public void setActivationCount(int count) {

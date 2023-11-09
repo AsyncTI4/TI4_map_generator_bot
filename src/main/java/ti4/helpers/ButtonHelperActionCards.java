@@ -34,15 +34,9 @@ public class ButtonHelperActionCards {
 
     public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event){
         RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
-        String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke";
-        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-        String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+        String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke and gained it to their tactics";
+        player.setTacticalCC(player.getTacticalCC()+1);
         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
         event.getMessage().delete().queue();
     }
 
@@ -80,7 +74,6 @@ public class ButtonHelperActionCards {
     }
 
      public static void resolveRally(Game activeGame, Player player, ButtonInteractionEvent event){
-        RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
         String message = ButtonHelper.getIdent(player) + " gained 2 fleet CC ("+player.getFleetCC()+ "->"+(player.getFleetCC()+2)+") using rally";
         player.setFleetCC(player.getFleetCC()+2);
         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
@@ -374,6 +367,25 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to cripple", buttons);
     }
 
+    public static void resolveInfiltrateStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("infiltrateStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("infiltrateStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you are infiltrating", buttons);
+    }
+
     public static void resolveSpyStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
         for (Player p2 : activeGame.getRealPlayers()) {
@@ -592,6 +604,24 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
     }
 
+    public static void resolveInsiderInformation(Player player, Game activeGame, ButtonInteractionEvent event){
+        StringBuilder sb = new StringBuilder();
+        sb.append(event.getUser().getAsMention()).append("\n");
+        sb.append("__**Top Agenda:**__\n");
+        String agendaID = activeGame.lookAtTopAgenda(0);
+        sb.append("1: ");
+        if (activeGame.getSentAgendas().get(agendaID) != null) {
+            sb.append("This agenda is currently in somebody's hand.");
+        } else if (agendaID != null) {
+            sb.append(Helper.getAgendaRepresentation(agendaID));
+        } else {
+            sb.append("Could not find agenda");
+        }
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " "+sb.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top agenda info to players cards info");
+        event.getMessage().delete().queue();
+    }
+
     public static void resolveSeizeArtifactStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<Button>();
@@ -699,12 +729,70 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to cripple", buttons);
     }
+
+    public static void resolveInfiltrateStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getPlanets()){
+            buttons.add(Button.secondary("infiltrateStep3_" + p2.getFaction()+"_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to infiltrate", buttons);
+    }
     public static void resolveUpgrade(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Tile tile  = activeGame.getTileByPosition(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
         new AddUnits().unitParsing(event, player.getColor(), tile, "dread", activeGame);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced a cruiser with a dread in "+tile.getRepresentation());
+    }
+
+    public static void checkForAssigningCoup(Game activeGame){
+        activeGame.setCurrentReacts("Coup", "");
+        for(Player player : activeGame.getRealPlayers()){
+            if(player.getActionCards().keySet().contains("coup")){
+                String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will coup. Coup is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                List<Button> scButtons = new ArrayList<>();
+                for (Integer sc : activeGame.getSCList()) {
+                    if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                    Button button;
+                    String label = " ";
+                    if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
+                        button = Button.secondary("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
+                    } else {
+                        button = Button.secondary("resolvePreassignment_Coup_" + sc, "" + sc + label);
+                    }
+                    scButtons.add(button);
+                }
+                scButtons.add(Button.danger("deleteButtons","Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, scButtons);
+            }
+        }
+    }
+
+    
+
+    public static void checkForAssigningPublicDisgrace(Game activeGame, Player player){
+        activeGame.setCurrentReacts("Public Disgrace", "");
+        if(player.getActionCards().keySet().contains("disgrace")){
+            String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target";
+            List<Button> scButtons = new ArrayList<>();
+            for (Integer sc : activeGame.getSCList()) {
+                if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                Button button;
+                String label = " ";
+                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
+                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, "" + sc + label);
+                }
+                scButtons.add(button);
+            }
+            scButtons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, scButtons);
+        }
     }
 
     public static void resolveDecoyOperationStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -853,13 +941,22 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
         int amount = uH.getUnitCount(UnitType.Pds, p2.getColor());
-        int hits = 0;
         if(amount > 0){
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
             new RemoveUnits().removeStuff(event, activeGame.getTileFromPlanet(planet), amount, planet, key, p2.getColor(), false, activeGame);
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you crippled " + planetRep +" and killed "+amount+" pds");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was crippled and you lost "+amount+" pds.");
+     }
+
+     public static void resolveInfiltrateStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        ButtonHelperModifyUnits.infiltratePlanet(player, activeGame, uH, event);
+        event.getMessage().delete().queue();
      }
 
      public static void resolveReparationsStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {

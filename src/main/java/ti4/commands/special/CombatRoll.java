@@ -42,23 +42,23 @@ public class CombatRoll extends SpecialSubcommandData {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL,
-            "*V2* *BETA* Combat rolls for units on tile. *Auto includes always on mods*");
+                "*V2* *BETA* Combat rolls for units on tile. *Auto includes always on mods*");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
-            .setAutoComplete(true));
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
-            "+/- <unit type>. Eg -1 all, +2 mech. Temp ACs/PN/exhaust-tech mods")
+                "+/- <unit type>. Eg -1 all, +2 mech. Temp ACs/PN/exhaust-tech mods")
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
-            "(optional) Planet to have combat on. Default is space combat.").setAutoComplete(true)
+                "(optional) Planet to have combat on. Default is space combat.").setAutoComplete(true)
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
-            "comma list of <count> <unit> eg 2 fighter 1 dreadnought")
+                "comma list of <count> <unit> eg 2 fighter 1 dreadnought")
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE,
-            "switch to afb/bombardment/spacecannonoffence")
+                "switch to afb/bombardment/spacecannonoffence")
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
-            .setAutoComplete(true).setRequired(false));
+                .setAutoComplete(true).setRequired(false));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class CombatRoll extends SpecialSubcommandData {
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Tile " + tileOption.getAsString() + " not found");
+                    "Tile " + tileOption.getAsString() + " not found");
             return;
         }
 
@@ -127,8 +127,10 @@ public class CombatRoll extends SpecialSubcommandData {
         secondHalfOfCombatRoll(player, activeGame, event, tile, unitHolderName, extraRollsParsed, customMods, rollType);
     }
 
-    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, String unitHolderName,
-        HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods, CombatRollType rollType) {
+    public void secondHalfOfCombatRoll(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile,
+            String unitHolderName,
+            HashMap<String, Integer> extraRollsParsed, List<NamedCombatModifierModel> customMods,
+            CombatRollType rollType) {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {
@@ -136,19 +138,21 @@ public class CombatRoll extends SpecialSubcommandData {
                     "Cannot find the planet " + unitHolderName + " on tile " + tile.getPosition());
             return;
         }
-        
+
         if (rollType == CombatRollType.SpaceCannonDefence && !(combatOnHolder instanceof Planet)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
         }
 
         Map<UnitModel, Integer> unitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
-            rollType, activeGame);
+                rollType, activeGame);
         if (activeGame.getLaws().containsKey("articles_war")) {
             if (unitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
-                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream().filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
-                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
+                unitsByQuantity = new HashMap<>(unitsByQuantity.entrySet().stream()
+                        .filter(e -> !"naaz_mech_space".equals(e.getKey().getAlias()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Skipping " + Emojis.Naaz + " Z-Grav Eidolon due to Articles of War agenda.");
             }
         }
         if (unitsByQuantity.size() == 0) {
@@ -157,16 +161,18 @@ public class CombatRoll extends SpecialSubcommandData {
                 fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, activeGame);
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "There are no units in " + fightingOnUnitHolderName + " on tile " + tile.getPosition() + " for player " + player.getColor() + " "
-                    + player.getFactionEmoji() + "\n"
-                    + "Ping bothelper if this seems to be in error.");
+                    "There are no units in " + fightingOnUnitHolderName + " on tile " + tile.getPosition()
+                            + " for player " + player.getColor() + " "
+                            + player.getFactionEmoji() + "\n"
+                            + "Ping bothelper if this seems to be in error.");
 
             return;
         }
-        
+
         List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(Arrays.asList(combatOnHolder));
         if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
-            // Including space for finding opponents for pds - since people will fire before landing sometimes
+            // Including space for finding opponents for pds - since people will fire before
+            // landing sometimes
             // and fire after landing other times.
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
         }
@@ -174,10 +180,16 @@ public class CombatRoll extends SpecialSubcommandData {
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         List<NamedCombatModifierModel> autoMods = CombatModHelper.CalculateAutomaticMods(player, opponent,
-            unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_MODIFIERS);
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_MODIFIERS);
 
         List<NamedCombatModifierModel> autoExtraRolls = CombatModHelper.CalculateAutomaticMods(player, opponent,
-            unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_EXTRA_ROLLS);
+                unitsByQuantity, tileModel, activeGame, rollType, Constants.COMBAT_EXTRA_ROLLS);
+
+        // Check for temp mods
+        CombatModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
+        CombatModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
+                combatOnHolder);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat, rollType);
@@ -203,10 +215,11 @@ public class CombatRoll extends SpecialSubcommandData {
             }
         }
         String message = String.format("**%s** rolls for %s on %s %s:  \n",
-            combatTypeName, player.getFactionEmoji(),
-            tile.getPosition(), Emojis.RollDice);
-        message += CombatHelper.RollForUnits(unitsByQuantity, autoExtraRolls, customMods, autoMods, player, opponent,
-            activeGame, rollType);
+                combatTypeName, player.getFactionEmoji(),
+                tile.getPosition(), Emojis.RollDice);
+        message += CombatHelper.RollForUnits(unitsByQuantity, autoExtraRolls, customMods, autoMods, tempMods, player,
+                opponent,
+                activeGame, rollType);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");

@@ -423,6 +423,36 @@ public class Emojis {
     public static final String Zohbat = "<:Zohbat:1159528246166167586>";
     // END OF EMOJI FARM 8
 
+    // EMOJI FARM 11 - DS PLANETS
+    public static final String Derbrae = "<:Derbrae:1171623488746958890>";
+    public static final String Detic = "<:Detic:1171623490516963360>";
+    public static final String Domna = "<:Domna:1171623492106596424>";
+    public static final String Dorvok = "<:Dorvok:1171623493381669004>";
+    public static final String Echo = "<:Echo:1171623494577041438>";
+    public static final String EtirV = "<:EtirV:1171623515506622545>";
+    public static final String Fakrenn = "<:Fakrenn:1171623517507289149>";
+    public static final String Gwiyun = "<:Gwiyun:1171623518442627083>";
+    public static final String Inan = "<:Inan:1171623519289888828>";
+    public static final String Larred = "<:Larred:1171623520422346782>";
+    public static final String Lliot = "<:Lliot:1171623538067779585>";
+    public static final String Lodran = "<:Lodran:1171623539380584458>";
+    public static final String Mandle = "<:Mandle:1171623540370460813>";
+    public static final String Moln = "<:Moln:1171623541330952333>";
+    public static final String Nairb = "<:Nairb:1171623542194974901>";
+    public static final String Prism = "<:Prism:1171623558225608856>";
+    public static final String Qaak = "<:Qaak:1171623559647465532>";
+    public static final String Regnem = "<:Regnem:1171623560477937826>";
+    public static final String Rysaa = "<:Rysaa:1171623561086128179>";
+    public static final String Salin = "<:Salin:1171623562633814037>";
+    public static final String Sanvit = "<:Sanvit:1171623578614120489>";
+    public static final String Sierpen = "<:Sierpen:1171623579541049419>";
+    public static final String Silence = "<:Silence:1171623580946141226>";
+    public static final String Swog = "<:Swog:1171623581667557407>";
+    public static final String Tarrock = "<:Tarrock:1171623583479509104>";
+    public static final String Troac = "<:Troac:1171623597387812876>";
+    public static final String Vioss = "<:Vioss:1171623598650302566>";
+    // END OF EMOJI FARM 11
+
     // LIST OF SEM-LORES
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor, SemLore);
 
@@ -831,6 +861,34 @@ public class Emojis {
             case "xxehan" -> Emojis.Xxehan;
             case "ylir", "ylirk" -> Emojis.Ylir;
             case "zohbat" -> Emojis.Zohbat;
+
+            case "derbrae", "debrbrae" -> Emojis.Derbrae;
+            case "detic" -> Emojis.Detic;
+            case "domna" -> Emojis.Domna;
+            case "dorvok" -> Emojis.Dorvok;
+            case "echo" -> Emojis.Echo;
+            case "etirv" -> Emojis.EtirV;
+            case "fakrenn" -> Emojis.Fakrenn;
+            case "gwiyun" -> Emojis.Gwiyun;
+            case "inan" -> Emojis.Inan;
+            case "larred" -> Emojis.Larred;
+            case "lliot" -> Emojis.Lliot;
+            case "lodran" -> Emojis.Lodran;
+            case "mandle" -> Emojis.Mandle;
+            case "moln" -> Emojis.Moln;
+            case "nairb" -> Emojis.Nairb;
+            case "prism" -> Emojis.Prism;
+            case "qaak" -> Emojis.Qaak;
+            case "regnem" -> Emojis.Regnem;
+            case "rysaa" -> Emojis.Rysaa;
+            case "salin" -> Emojis.Salin;
+            case "sanvit" -> Emojis.Sanvit;
+            case "sierpen" -> Emojis.Sierpen;
+            case "silence" -> Emojis.Silence;
+            case "swog" -> Emojis.Swog;
+            case "tarrock" -> Emojis.Tarrock;
+            case "troac" -> Emojis.Troac;
+            case "vioss" -> Emojis.Vioss;
 
             default -> Emojis.SemLore;
         };

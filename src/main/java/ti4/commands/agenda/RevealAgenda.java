@@ -47,6 +47,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
             return;
         }
+        activeGame.setCurrentReacts("noWhenThisAgenda","");
+        activeGame.setCurrentReacts("noAfterThisAgenda","");
         String id = activeGame.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
@@ -117,6 +119,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             }
 
         }
+        activeGame.setCurrentReacts("Pass On Shenanigans", "");
+        AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
         activeGame.resetCurrentAgendaVotes();
         activeGame.setHackElectionStatus(false);
         activeGame.setPlayersWhoHitPersistentNoAfter("");
@@ -144,6 +148,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button transaction = Button.primary("transaction", "Transaction");
         proceedButtons.add(transaction);
         proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
         MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
