@@ -5,6 +5,8 @@
   - [Run Docker Container](#run-docker-container)
     - [Windows 10, VS Code, Docker Desktop](#windows-10-vs-code-docker-desktop)
 - [Adding Homebrew Content](#adding-homebrew-content)
+- [Testing your Changes](#testing-your-changes)
+  - [VSCode Test](#vscode-test)
   
 # Setup a Test Server
 
@@ -82,3 +84,23 @@ Bot should now be running and able to receive commands on your test server!
 # Adding Homebrew Content
 
 For the most part, all raw data files are [here](src\main\resources\data).
+
+# Testing your Changes
+
+## VSCode Test
+
+To run Java tests in VSCode - make sure you add a test configuration your .vscode/settings.json file to pass the enviroment variables in. Paths below are just examples.
+
+```json
+"java.test.config": [
+    {
+        "name": "tests",
+        "workingDirectory": "${workspaceFolder}",
+        "env": {
+            "DB_PATH": "C:/Users/USERNAME/Documents/GitHub/TI4_map_generator_bot/storage",
+            "RESOURCE_PATH": "C:/Users/USERNAME/Documents/GitHub/TI4_map_generator_bot/src/main/resources"
+        }
+    }
+]
+```
+
