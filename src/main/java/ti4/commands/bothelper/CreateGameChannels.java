@@ -342,9 +342,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // CHECK IF TERTIARY SERVER HAS ROOM
-        guild = AsyncTI4DiscordBot.guild3rd;
+        guild = AsyncTI4DiscordBot.guildTertiary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET SECONDARY SERVER AS DEFAULT
+            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET TERTIARY SERVER AS DEFAULT
+            return guild;
+        }
+
+        // CHECK IF QUATERNARY SERVER HAS ROOM
+        guild = AsyncTI4DiscordBot.guildQuaternary;
+        if (serverHasRoomForNewFullCategory(guild)) {
+            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET QUATERNARY SERVER AS DEFAULT
             return guild;
         }
 
