@@ -9,10 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -27,6 +23,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
@@ -81,6 +79,7 @@ import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -96,11 +95,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.model.PromissoryNoteModel;
-import ti4.model.RelicModel;
-import ti4.helpers.CombatModHelper;
 
 public class ButtonListener extends ListenerAdapter {
     public static final HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
@@ -194,13 +191,9 @@ public class ButtonListener extends ListenerAdapter {
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
         String ident = player.getFactionEmoji();
-        if(!buttonID.equalsIgnoreCase("doneWithTacticalAction")){
-            player.setWhetherPlayerShouldBeTenMinReminded(false);
-        }else{
-            player.setWhetherPlayerShouldBeTenMinReminded(true);
-        }
+        player.setWhetherPlayerShouldBeTenMinReminded("doneWithTacticalAction".equalsIgnoreCase(buttonID));
         
-        if (!buttonID.equalsIgnoreCase("ultimateundo")) {
+        if (!"ultimateundo".equalsIgnoreCase(buttonID)) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
@@ -237,7 +230,6 @@ public class ButtonListener extends ListenerAdapter {
                     BotLogger.log(event, "Could not parse AC ID: " + acID, e);
                     event.getChannel().asThreadChannel()
                         .sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
-                    return;
                 }
             } else {
                 event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
@@ -383,7 +375,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("augersHeroStart_")) {
             ButtonHelperHeroes.augersHeroResolution(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("augersPeak_")) {
-            if (buttonID.split("_")[1].equalsIgnoreCase("1")) {
+            if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
                 new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, 1);
             } else {
                 new PeakAtStage2().secondHalfOfPeak(event, activeGame, player, 1);
@@ -528,7 +520,6 @@ public class ButtonListener extends ListenerAdapter {
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
-                return;
             }
         } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
@@ -1998,7 +1989,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
-            if (activeGame.getSpeaker().equals(player.getUserID()) || buttonID.equals("rollIxthianIgnoreSpeaker")) {
+            if (activeGame.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
                 AgendaHelper.rollIxthian(activeGame);
             } else {
                 Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact")
@@ -2520,7 +2511,7 @@ public class ButtonListener extends ListenerAdapter {
                         activeGame.setCurrentReacts("noAfterThisAgenda","");
                     }
                     //activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").contains(player.getFaction())
-                    if(!activeGame.getFactionsThatReactedToThis("noAfterThisAgenda").equalsIgnoreCase("")){
+                    if(!"".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("noAfterThisAgenda"))){
                         activeGame.setCurrentReacts("noAfterThisAgenda", activeGame.getFactionsThatReactedToThis("noAfterThisAgenda")+"_"+player.getFaction());
                     }else{
                         activeGame.setCurrentReacts("noAfterThisAgenda", player.getFaction());
@@ -2533,7 +2524,7 @@ public class ButtonListener extends ListenerAdapter {
                     if(activeGame.getFactionsThatReactedToThis("noWhenThisAgenda") == null){
                         activeGame.setCurrentReacts("noWhenThisAgenda","");
                     }
-                    if(!activeGame.getFactionsThatReactedToThis("noWhenThisAgenda").equalsIgnoreCase("")){
+                    if(!"".equalsIgnoreCase(activeGame.getFactionsThatReactedToThis("noWhenThisAgenda"))){
                         activeGame.setCurrentReacts("noWhenThisAgenda", activeGame.getFactionsThatReactedToThis("noWhenThisAgenda")+"_"+player.getFaction());
                     }else{
                         activeGame.setCurrentReacts("noWhenThisAgenda", player.getFaction());
@@ -2550,7 +2541,7 @@ public class ButtonListener extends ListenerAdapter {
                         speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
                     }
                     for (Player p : activeGame.getRealPlayers()) {
-                        if (p.getSecrets().size() > 1) {
+                        if (p.getSecrets().size() > 1  && !activeGame.isExtraSecretMode()) {
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please ensure everyone has discarded secrets before hitting this button. ");
                             return;
                         }
@@ -3320,7 +3311,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
                 }
                 case "gameEnd" -> {
-                    GameEnd.secondHalfOfGameEnd(event, activeGame, true);
+                    GameEnd.secondHalfOfGameEnd(event, activeGame, true, true);
                     event.getMessage().delete().queue();
                 }
                 case "purgeHacanHero" -> {
@@ -3415,10 +3406,9 @@ public class ButtonListener extends ListenerAdapter {
                     
                     GameSaveLoadManager.undo(activeGame, event);
                     
-                    if (activeGame.getCurrentPhase().equalsIgnoreCase("action")) {
+                    if ("action".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                         event.getMessage().delete().queue();
                     }
-                    return;
                 }
                 case "getDiscardButtonsACs" -> {
                     String msg = trueIdentity + " use buttons to discard";
@@ -3522,7 +3512,7 @@ public class ButtonListener extends ListenerAdapter {
                         cyber = true;
                     }
                 }
-                if (activeGame.getCurrentPhase().equalsIgnoreCase("statusHomework")) {
+                if ("statusHomework".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                     if (player.hasAbility("versatile") || player.hasTech("hm") || cyber) {
                         int properGain = 2;
                         String reasons = "";
@@ -3797,11 +3787,7 @@ public class ButtonListener extends ListenerAdapter {
             activeGame.removeMessageIDForSabo(messageId);
             return true;
         }
-        if (activeGame.getBotShushing()) {
-            return true;
-        } else {
-            return false;
-        }
+        return activeGame.getBotShushing();
 
         
     }
