@@ -64,6 +64,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_271023", DataMigrationManager::migrateInitializeLO_271023);
             runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
             runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
+            runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -616,6 +617,14 @@ public class DataMigrationManager {
         Map<String, String> replacements = Map.of("raise_fleets_little_omega", "raise_fleet");
         List<String> decksToCheck = List.of("public_stage_1_objectives_little_omega");
         return replaceStage1s(game, decksToCheck, replacements);
+    }
+
+    //
+    public static boolean migrateInitializeLO_081123(Game game) {
+        Map<String, String> replacements = Map.of("fulfullment_protocols", "mercenary_contract",
+            "magen_engineers", "ancient_defenses");
+        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
+        return replaceActionCards(game, decksToCheck, replacements);
     }
 
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
