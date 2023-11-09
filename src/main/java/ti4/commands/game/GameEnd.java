@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -124,11 +127,16 @@ public class GameEnd extends GameSubcommandData {
                     m.createThreadChannel(gameName).queueAfter(500, TimeUnit.MILLISECONDS, t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game [there](" + m.getJumpUrl() + ")!");
 
+                    // TIGL Extras
+                    if (activeGame.isCompetitiveTIGLGame() && activeGame.getGameWinner().isPresent()) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("This was a TIGL game! ").append(activeGame.getGameWinner().get().getPing()).append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8)!\n");
+                        sb.append(getTIGLFormattedGameEndText(activeGame, event));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                    }
                 });
             }
         }
-
-        
 
         // GET BOTHELPER LOUNGE
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
@@ -138,7 +146,6 @@ public class GameEnd extends GameSubcommandData {
         }
 
         //MOVE CHANNELS TO IN-LIMBO
-        
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
@@ -221,6 +228,34 @@ public class GameEnd extends GameSubcommandData {
         String gameModesText = activeGame.getGameModesText();
         if (gameModesText.isEmpty()) gameModesText = "None";
         sb.append("Game Modes: ").append(gameModesText).append("\n");
+
+        return sb.toString();
+    }
+
+    public static String getTIGLFormattedGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("## __TIGL Results__\n\n");
+        sb.append("**").append(activeGame.getName()).append("** - ").append(activeGame.getCustomName()).append("\n");
+        sb.append("Match Start Date: `").append(Helper.getDateRepresentation(activeGame.getEndedDate())).append("` (TIGL wants Game End Date for Async)");
+        sb.append("Match Start Time: `00:00`");
+        sb.append("**Players:**").append("\n");
+        int index = 1;
+        for (Player player : activeGame.getRealPlayers()) {
+            int playerVP = player.getTotalVictoryPoints();
+            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+            sb.append("`").append(index).append(".` `");
+            sb.append(player.getFaction()).append("` - `");
+            if (user.isPresent()) {
+                sb.append(user.get().getName());
+            } else {
+                sb.append(player.getUserName());
+            }
+            sb.append("` - `").append(playerVP).append("` VP\n");
+            index++;
+        }
+
+        sb.append("Platform: `Async`\n");
+        sb.append("Additional Notes: `").append(activeGame.getName()).append(": ").append(activeGame.getCustomName()).append("`\n");
 
         return sb.toString();
     }
