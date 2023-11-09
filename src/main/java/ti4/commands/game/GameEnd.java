@@ -1,6 +1,5 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
 import java.util.Date;
 
 import java.util.List;
@@ -38,6 +37,7 @@ public class GameEnd extends GameSubcommandData {
         super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -59,10 +59,11 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
         boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
-        secondHalfOfGameEnd(event, activeGame, publish);
+        boolean archiveChannels = event.getOption(Constants.ARCHIVE_CHANNELS, true, OptionMapping::getAsBoolean);
+        secondHalfOfGameEnd(event, activeGame, publish, archiveChannels);
     }
 
-    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame, boolean publish) {
+    public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game activeGame, boolean publish, boolean archiveChannels) {
         String gameName = activeGame.getName();
         List<Role> gameRoles = event.getGuild().getRolesByName(gameName, true);
         boolean deleteRole = true;
@@ -80,7 +81,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game's channels' permissions have been updated.");
 
         //DELETE THE ROLE
-        if (deleteRole) {
+        if (deleteRole && archiveChannels) {
             Role gameRole = gameRoles.get(0);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
             gameRole.delete().queue();
@@ -145,7 +146,7 @@ public class GameEnd extends GameSubcommandData {
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
-        if (inLimboCategory != null) {
+        if (inLimboCategory != null && archiveChannels) {
             int maxLimboChannels = 40;
             int channelCountToDelete = maxLimboChannels / 2;
             if (inLimboCategory.getChannels().size() >= maxLimboChannels) {
