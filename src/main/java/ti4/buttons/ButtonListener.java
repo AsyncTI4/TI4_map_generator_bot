@@ -3294,7 +3294,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
                 }
                 case "gameEnd" -> {
-                    GameEnd.secondHalfOfGameEnd(event, activeGame, true);
+                    GameEnd.secondHalfOfGameEnd(event, activeGame, true, true);
                     event.getMessage().delete().queue();
                 }
                 case "purgeHacanHero" -> {

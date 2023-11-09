@@ -94,7 +94,8 @@ public class AsyncTI4DiscordBot {
     public static String guildPrimaryID;
     public static Guild guildPrimary;
     public static Guild guildSecondary;
-    public static Guild guild3rd;
+    public static Guild guildTertiary;
+    public static Guild guildQuaternary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static Set<Guild> guilds = new HashSet<>();
@@ -236,13 +237,25 @@ public class AsyncTI4DiscordBot {
 
         // Async: Dreadn't
         if (args.length >= 7) {
-            guild3rd = jda.getGuildById(args[6]);
-            if (guild3rd != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guild3rd.getName());
-                CommandListUpdateAction commandsD = guild3rd.updateCommands();
+            guildTertiary = jda.getGuildById(args[6]);
+            if (guildTertiary != null) {
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildTertiary.getName());
+                CommandListUpdateAction commandsD = guildTertiary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
-                guilds.add(guild3rd);
+                guilds.add(guildTertiary);
+            }
+        }
+
+        // Fourth Server
+        if (args.length >= 8) {
+            guildQuaternary = jda.getGuildById(args[7]);
+            if (guildQuaternary != null) {
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuaternary.getName());
+                CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+                guilds.add(guildQuaternary);
             }
         }
 
