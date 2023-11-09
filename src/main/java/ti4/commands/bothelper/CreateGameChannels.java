@@ -328,16 +328,28 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static Guild getNextAvailableServer() {
+        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
         Guild guild = AsyncTI4DiscordBot.jda.getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
-        return guild;
-        // TODO: Auto Load Balancing for guilds
-        // if (serverCanHostNewGame(AsyncTI4DiscordBot.guildPrimary)) {
-        //     return AsyncTI4DiscordBot.guildPrimary;
-        // } else if (serverCanHostNewGame(AsyncTI4DiscordBot.guildSecondary)) {
-        //     return AsyncTI4DiscordBot.guildSecondary;
-        // } else {
-        //     return null;
-        // }
+        
+        // CURRENT SET GUILD HAS ROOM
+        if (serverHasRoomForNewFullCategory(guild)) return guild;
+
+        // CHECK IF SECONDARY SERVER HAS ROOM
+        guild = AsyncTI4DiscordBot.guildSecondary;
+        if (serverHasRoomForNewFullCategory(guild)) {
+            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET SECONDARY SERVER AS DEFAULT
+            return guild;
+        }
+
+        // CHECK IF TERTIARY SERVER HAS ROOM
+        guild = AsyncTI4DiscordBot.guild3rd;
+        if (serverHasRoomForNewFullCategory(guild)) {
+            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET SECONDARY SERVER AS DEFAULT
+            return guild;
+        }
+
+        BotLogger.log("`CreateGameChannels.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
+        return null;
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
@@ -351,6 +363,28 @@ public class CreateGameChannels extends BothelperSubcommandData {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
+        return true;
+    }
+
+    private static boolean serverHasRoomForNewFullCategory(Guild guild) {
+        if (guild == null) return false;
+
+        // SPACE FOR 25 ROLES
+        int roleCount = guild.getRoles().size();
+        if (roleCount > 225) {
+            BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
+            return false;
+        }
+
+        // SPACE FOR 50 CHANNELS
+        int channelCount = guild.getChannels().size();
+        int channelMax = 500;
+        int channelsCountRequiredForNewCategory = 50;
+        if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
+            BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
+            return false;
+        }
+
         return true;
     }
 
