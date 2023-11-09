@@ -110,6 +110,24 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void checkForNaaluPN(Game activeGame){
+        activeGame.setCurrentReacts("Play Naalu PN", "");
+        for(Player player : activeGame.getRealPlayers()){
+            boolean naalu = false;
+            for (String pn : player.getPromissoryNotes().keySet()) {
+                if ("gift".equalsIgnoreCase(pn) && !player.ownsPromissoryNote("gift") ) {
+                    naalu = true;
+                }
+            }
+            if(naalu){
+                String msg = player.getRepresentation() + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("resolvePreassignment_Play Naalu PN","Pre-play Naalu PN"));
+                buttons.add(Button.danger("deleteButtons","Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+            }
+        }
+    }
 
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
