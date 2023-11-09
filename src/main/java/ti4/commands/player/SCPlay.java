@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -76,6 +77,23 @@ public class SCPlay extends PlayerSubcommandData {
         if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
             return;
+        }
+        if(!winnuHero && activeGame.getFactionsThatReactedToThis("Coup")!= null &&  activeGame.getFactionsThatReactedToThis("Coup").contains("_"+scToPlay)){
+            for(Player p2: activeGame.getRealPlayers()){
+                if(activeGame.getFactionsThatReactedToThis("Coup").contains(p2.getFaction())&&p2.getActionCards().keySet().contains("coup")){
+                    if(p2 == player){
+                        continue;
+                    }
+                    PlayAC.playAC(event, activeGame, p2, "coup", activeGame.getMainGameChannel(), event.getGuild());
+                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                    activeGame.setJustPlayedComponentAC(true); 
+                    String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";           
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+                    activeGame.setCurrentReacts("Coup", "");
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have been couped. If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
+                    return;
+                }
+            }
         }
 
         if(!winnuHero){

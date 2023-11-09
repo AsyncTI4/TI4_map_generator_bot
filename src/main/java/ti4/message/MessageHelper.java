@@ -102,12 +102,17 @@ public class MessageHelper {
 				}
 				activeGame.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoWhen(), "_");
-			} else {
+			} else if ("after".equalsIgnoreCase(whenOrAfter)){
 				if (activeGame.getLatestAfterMsg() != null && !"".equals(activeGame.getLatestAfterMsg())) {
 					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestAfterMsg()).queue();
 				}
 				activeGame.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoAfter(), "_");
+			}else {
+				if(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null){
+					activeGame.setCurrentReacts("Pass On Shenanigans", "");
+				}
+				players = new StringTokenizer(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans"), "_");
 			}
 			while (players.hasMoreTokens()) {
 				String player = players.nextToken();
