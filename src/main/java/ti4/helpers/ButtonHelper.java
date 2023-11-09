@@ -3402,7 +3402,7 @@ public class ButtonHelper {
                     int totalUnits = unitEntry.getValue() - damagedUnits;
 
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
-                    for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
                         String buttonText = "Remove " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), activeGame);
                         Button validTile2 = Button.danger(buttonID, buttonText);
@@ -3448,7 +3448,7 @@ public class ButtonHelper {
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
-                    for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         Button validTile2 = Button.danger(finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName, "Remove " + x + " " + unitModel.getBaseType());
                         if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
@@ -4676,7 +4676,9 @@ public class ButtonHelper {
 
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
             if(activeGame.getFactionsThatReactedToThis(messageId) != null){
-                activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+                if(!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
+                    activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+                }
             }else{
                 activeGame.setCurrentReacts(messageId, player.getFaction());
             }

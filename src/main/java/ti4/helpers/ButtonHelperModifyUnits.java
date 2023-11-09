@@ -971,15 +971,7 @@ public class ButtonHelperModifyUnits {
             planetName = planet.replace("'", "");
             planetName = AliasHandler.resolvePlanet(planetName);
         }
-        new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitKey, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
 
-        if ("".equalsIgnoreCase(planet)) {
-            if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))&& FoWHelper.playerHasShipsInSystem(cabal, tile)) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
-            }
-        } else {
-           
-        }
         new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), amount, planetName, unitKey, player.getColor(), buttonLabel.toLowerCase().contains("damaged"), activeGame);
 
         if ("".equalsIgnoreCase(planet)) {
