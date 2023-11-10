@@ -26,29 +26,25 @@ public class AbilityModelTest {
 
     @Test
     public void testPermanentEffect() {
-        String permanentEffect = "testPermanentEffect";
-        abilityModel.setPermanentEffect(permanentEffect);
+        String permanentEffect = "Your space docks cannot produce infantry";
         assertEquals(Optional.of(permanentEffect), abilityModel.getPermanentEffect());
     }
 
     @Test
     public void testWindow() {
-        String window = "testWindow";
-        abilityModel.setWindow(window);
+        String window = "At the start of the status phase";
         assertEquals(Optional.of(window), abilityModel.getWindow());
     }
 
     @Test
     public void testWindowEffect() {
-        String windowEffect = "testWindowEffect";
-        abilityModel.setWindowEffect(windowEffect);
+        String windowEffect = "Place 1 infantry from your reinforcements on any planet you control.";
         assertEquals(Optional.of(windowEffect), abilityModel.getWindowEffect());
     }
 
     @Test
     public void testSource() {
         String source = "testSource";
-        abilityModel.setSource(source);
         assertEquals(source, abilityModel.getSource());
     }
 
