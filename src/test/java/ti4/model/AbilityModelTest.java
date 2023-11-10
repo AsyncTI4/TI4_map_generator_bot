@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 
@@ -18,11 +20,13 @@ public class AbilityModelTest {
     
     @BeforeAll
     public static void init() {
+        TileHelper.init();
+        PositionMapper.init();
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
     }
-    AbilityModel abilityModel = Mapper.getAbility("mitosis");
 
     @Test
     public void testAbilities() {
@@ -33,6 +37,7 @@ public class AbilityModelTest {
 
     @Test
     public void testFaction() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String arborec = "arborec";
         assertEquals(arborec, abilityModel.getFaction());
         String faction = "testFaction";
@@ -42,30 +47,35 @@ public class AbilityModelTest {
 
     @Test
     public void testPermanentEffect() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String permanentEffect = "Your space docks cannot produce infantry";
         assertEquals(Optional.of(permanentEffect), abilityModel.getPermanentEffect());
     }
 
     @Test
     public void testWindow() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String window = "At the start of the status phase";
         assertEquals(Optional.of(window), abilityModel.getWindow());
     }
 
     @Test
     public void testWindowEffect() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String windowEffect = "Place 1 infantry from your reinforcements on any planet you control.";
         assertEquals(Optional.of(windowEffect), abilityModel.getWindowEffect());
     }
 
     @Test
     public void testSource() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String source = "testSource";
         assertEquals(source, abilityModel.getSource());
     }
 
     @Test
     public void testSearchTags() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         List<String> searchTags = new ArrayList<>();
         searchTags.add("testTag1");
         searchTags.add("testTag2");
@@ -75,6 +85,7 @@ public class AbilityModelTest {
 
     @Test
     public void testIsValid() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         abilityModel.setId("testId");
         abilityModel.setName("testName");
         abilityModel.setFaction("testFaction");
@@ -84,6 +95,7 @@ public class AbilityModelTest {
 
     @Test
     public void testGetAlias() {
+        AbilityModel abilityModel = Mapper.getAbility("mitosis");
         String id = "testId";
         abilityModel.setId(id);
         assertEquals(id, abilityModel.getAlias());
