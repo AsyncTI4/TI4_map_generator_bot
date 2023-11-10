@@ -7,12 +7,21 @@ import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Storage;
 
 public class AbilityModelTest {
     
+    @BeforeAll
+    public static void init() {
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+    }
     AbilityModel abilityModel = Mapper.getAbility("mitosis");
 
     @Test
