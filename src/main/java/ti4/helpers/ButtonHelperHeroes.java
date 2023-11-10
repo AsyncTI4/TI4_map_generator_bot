@@ -38,8 +38,14 @@ public class ButtonHelperHeroes {
 
     public static List<Button> getArboHeroButtons(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Tile tile : ButtonHelper.getAllTilesWithProduction(activeGame, player, event)) {
-            buttons.add(Button.success("arboHeroBuild_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry);
+        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech));
+        List<String> poses = new ArrayList<>();
+        for (Tile tile :tiles) {
+            if(!poses.contains(tile.getPosition())){
+                buttons.add(Button.success("arboHeroBuild_" + tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+                poses.add(tile.getPosition());
+            }
         }
         buttons.add(Button.danger("deleteButtons", "Done"));
         return buttons;

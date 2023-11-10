@@ -1656,6 +1656,7 @@ public class ButtonListener extends ListenerAdapter {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
                 List<Button> buttons2 = new ArrayList<Button>();
                 buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
+                buttons2.add(Button.danger("declinePDS", "Decline PDS"));
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                 }
@@ -2260,6 +2261,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
                     }
+                }
+                case "checkForAllACAssignments" -> {
+                    ButtonHelperActionCards.checkForAllAssignmentACs(activeGame, player);
                 }
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeGame, player, event, " Drew a " + Emojis.SecretObjective);
@@ -3109,6 +3113,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "announceARetreat" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " announces a retreat");
                 }
+                case "declinePDS" -> {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " officially declines to fire PDS");
+                }
                 case "startQDN" -> {
                     ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
                 }
@@ -3860,7 +3867,6 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
                 }
-                ButtonHelperActionCards.checkForAssigningCoup(activeGame);
             }
         }
     }

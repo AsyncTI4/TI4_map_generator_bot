@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
@@ -740,6 +741,8 @@ public class ButtonHelper {
         checkACLimit(activeGame, event, player);
         activeGame.setACDrawStatusInfo(activeGame.getACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(activeGame, player);
+        ButtonHelperActionCards.checkForPlayingManipulateInvestments(activeGame,player);
+        ButtonHelperActionCards.checkForPlayingSummit(activeGame,player);
     }
 
     public static void resolveMinisterOfCommerceCheck(Game activeGame, Player player, GenericInteractionCreateEvent event) {
@@ -896,9 +899,9 @@ public class ButtonHelper {
                     }
                     numberOfAbilities++;
                 } else {
-                    Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs");
-                    Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs");
-                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs");
+                    Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs ("+player.getAc()+")");
+                    Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs ("+player.getPnCount()+")");
+                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs ("+(player.getSo()-player.getSoScored())+")");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, Decline2);
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Yssaril commander ", buttons);
@@ -1587,6 +1590,9 @@ public class ButtonHelper {
             List<Button> buttons2 = new ArrayList<Button>();
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
+            if(!activeGame.isFoWMode()){
+                buttons2.add(Button.danger("declinePDS", "Decline PDS"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
         }
     }
@@ -3106,6 +3112,8 @@ public class ButtonHelper {
         x = 36;
         buttons.add(Button.secondary("setAutoPassMedian_" + x, "" + x));
         buttons.add(Button.danger("deleteButtons", "Decline"));
+        x = 0;
+        buttons.add(Button.danger("setAutoPassMedian_" + x, "Turn off"));
         for (Player player : activeGame.getRealPlayers()) {
             String message = getTrueIdentity(player, activeGame)
                 + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
@@ -3725,8 +3733,8 @@ public class ButtonHelper {
             .toList();
         Player nextPlayer = null;
         int lowestSC = 100;
-        ButtonHelperActionCards.checkForAssigningCoup(activeGame);
         for(Player p2 : activeGame.getRealPlayers()){
+            ButtonHelperActionCards.checkForAssigningCoup(activeGame,p2);
             if(activeGame.getFactionsThatReactedToThis("Play Naalu PN") != null && activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())){
                 if(!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().keySet().contains("gift")){
                     ButtonHelper.resolvePNPlay("gift", p2, activeGame, event);
@@ -3966,7 +3974,14 @@ public class ButtonHelper {
         }
         ButtonHelperFactionSpecific.checkForNaaluPN(activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round "+activeGame.getRound());
-        
+        for(Player p2: activeGame.getRealPlayers()){
+            if(activeGame.getFactionsThatReactedToThis("Summit") != null && activeGame.getFactionsThatReactedToThis("Summit").contains(p2.getFaction()) && p2.getActionCards().keySet().contains("summit")){
+                PlayAC.playAC(event, activeGame, p2, "summit", activeGame.getMainGameChannel(), event.getGuild());
+            }
+            if(activeGame.getFactionsThatReactedToThis("Investments") != null && activeGame.getFactionsThatReactedToThis("Investments").contains(p2.getFaction()) && p2.getActionCards().keySet().contains("investments")){
+                PlayAC.playAC(event, activeGame, p2, "investments", activeGame.getMainGameChannel(), event.getGuild());
+            }
+        }
         if (activeGame.getNaaluAgent()) {
             activeGame.setNaaluAgent(false);
             for (Player p2 : activeGame.getRealPlayers()) {

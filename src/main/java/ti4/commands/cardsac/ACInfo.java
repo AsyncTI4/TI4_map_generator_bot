@@ -189,6 +189,9 @@ public class ACInfo extends ACCardsSubcommandData {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
                 acButtons.add(nekroButton);
             }
+            if(actionCards.keySet().contains("coup") || actionCards.keySet().contains("disgrace")||actionCards.keySet().contains("investments")||actionCards.keySet().contains("summit")){
+                 acButtons.add(Button.secondary("checkForAllACAssignments","Pre assign ACs"));
+            }
             
         }
         return acButtons;
