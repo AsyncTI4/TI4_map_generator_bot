@@ -16,6 +16,13 @@ public class AbilityModelTest {
     AbilityModel abilityModel = Mapper.getAbility("mitosis");
 
     @Test
+    public void testAbilities() {
+        for (AbilityModel model : Mapper.getAbilities().values()) {
+            assertTrue(model.isValid());
+        }
+    }
+
+    @Test
     public void testFaction() {
         String arborec = "arborec";
         assertEquals(arborec, abilityModel.getFaction());
