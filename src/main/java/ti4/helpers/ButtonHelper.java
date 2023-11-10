@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
@@ -708,11 +709,11 @@ public class ButtonHelper {
             activeGame.drawActionCard(player.getUserID());
             amount = amount + 1;
         }
-        if (player.getRelics().contains("absol_codex")) {
-            amount = amount + 1;
-            activeGame.drawActionCard(player.getUserID());
-            message = message + " Absol Codex has been accounted for.";
-        }
+        // if (player.getRelics().contains("absol_codex")) {
+        //     amount = amount + 1;
+        //     activeGame.drawActionCard(player.getUserID());
+        //     message = message + " Absol Codex has been accounted for.";
+        // }
 
         StringBuilder messageBuilder = new StringBuilder(message);
         for (String law : activeGame.getLaws().keySet()) {
@@ -739,6 +740,9 @@ public class ButtonHelper {
         addReaction(event, true, false, message, "");
         checkACLimit(activeGame, event, player);
         activeGame.setACDrawStatusInfo(activeGame.getACDrawStatusInfo() + "_" + player.getFaction());
+        ButtonHelperActionCards.checkForAssigningPublicDisgrace(activeGame, player);
+        ButtonHelperActionCards.checkForPlayingManipulateInvestments(activeGame,player);
+        ButtonHelperActionCards.checkForPlayingSummit(activeGame,player);
     }
 
     public static void resolveMinisterOfCommerceCheck(Game activeGame, Player player, GenericInteractionCreateEvent event) {
@@ -895,9 +899,9 @@ public class ButtonHelper {
                     }
                     numberOfAbilities++;
                 } else {
-                    Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs");
-                    Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs");
-                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs");
+                    Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs ("+player.getAc()+")");
+                    Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs ("+player.getPnCount()+")");
+                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs ("+(player.getSo()-player.getSoScored())+")");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, Decline2);
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Yssaril commander ", buttons);
@@ -1586,6 +1590,9 @@ public class ButtonHelper {
             List<Button> buttons2 = new ArrayList<Button>();
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
             buttons2.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
+            if(!activeGame.isFoWMode()){
+                buttons2.add(Button.danger("declinePDS", "Decline PDS"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
         }
     }
@@ -1694,7 +1701,7 @@ public class ButtonHelper {
     }
     public static void resolveWarForgeRuins(Game activeGame, String buttonID, Player player, ButtonInteractionEvent event){
         String planet = buttonID.split("_")[1];
-        String mech = buttonID.split("_")[1];
+        String mech = buttonID.split("_")[2];
         String message = "";
         boolean failed = false;
         message = message + ButtonHelper.mechOrInfCheck(planet, activeGame, player);
@@ -2367,6 +2374,22 @@ public class ButtonHelper {
         return startButtons;
     }
 
+    public static void checkForPrePassing(Game activeGame, Player player){
+        activeGame.setCurrentReacts("Pre Pass "+player.getFaction(), "");
+        boolean hadAnyUnplayedSCs = false;
+        for (Integer SC : player.getSCs()) {
+            if (!activeGame.getPlayedSCs().contains(SC)) {
+                hadAnyUnplayedSCs = true;
+            }
+        }
+        if(player.getTacticalCC() == 0 && !hadAnyUnplayedSCs && !player.isPassed()){
+            String msg = player.getRepresentation() + " you have the option to pre-pass, which means on your next turn, the bot automatically passes for you. This is entirely optional";
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Button.success("resolvePreassignment_Pre Pass "+player.getFaction(), "Pass on Next Turn"));
+            scButtons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, scButtons);
+        }
+    }
     public static List<Button> getPossibleRings(Player player, Game activeGame) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
@@ -3089,6 +3112,8 @@ public class ButtonHelper {
         x = 36;
         buttons.add(Button.secondary("setAutoPassMedian_" + x, "" + x));
         buttons.add(Button.danger("deleteButtons", "Decline"));
+        x = 0;
+        buttons.add(Button.danger("setAutoPassMedian_" + x, "Turn off"));
         for (Player player : activeGame.getRealPlayers()) {
             String message = getTrueIdentity(player, activeGame)
                 + " you can choose to automatically pass on sabo's after a random amount of time if you don't have a sabo/instinct training/watcher mechs. How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below. It's random so people cant derive much information from it. You are free to decline, noone will ever know either way, but if necessary you can change your time later with /player stats";
@@ -3694,6 +3719,8 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
     }
 
+    
+
     //playerHasUnitsInSystem(player, tile);
     public static void startActionPhase(GenericInteractionCreateEvent event, Game activeGame) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
@@ -3706,6 +3733,14 @@ public class ButtonHelper {
             .toList();
         Player nextPlayer = null;
         int lowestSC = 100;
+        for(Player p2 : activeGame.getRealPlayers()){
+            ButtonHelperActionCards.checkForAssigningCoup(activeGame,p2);
+            if(activeGame.getFactionsThatReactedToThis("Play Naalu PN") != null && activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())){
+                if(!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().keySet().contains("gift")){
+                    ButtonHelper.resolvePNPlay("gift", p2, activeGame, event);
+                }
+            }
+        }
         msgExtra += Helper.getGamePing(event, activeGame) + "\nAll players picked SC";
         for (Player player_ : activePlayers) {
             int playersLowestSC = player_.getLowestSC();
@@ -3898,7 +3933,7 @@ public class ButtonHelper {
         if (custodiansTaken) {
             passOnAbilities = Button.danger("pass_on_abilities", "Ready For Agenda");
             message2 = message2
-                + "Ready For Agenda means you are done playing/passing on: \n- Political Stability \n- Ancient Burial Sites\n- Maw of Worlds \n- Naalu hero\n- Crown of Emphidia";
+                + "This is the moment when you should resolve: \n- Political Stability \n- Ancient Burial Sites\n- Maw of Worlds \n- Naalu hero\n- Crown of Emphidia";
         } else {
             passOnAbilities = Button.danger("pass_on_abilities", "Ready For Strategy Phase");
             message2 = message2
@@ -3924,10 +3959,10 @@ public class ButtonHelper {
             buttons.add(getCCs);
             buttons.add(passOnAbilities);
         }
-        if (activeGame.getActionCards().size() > 130 && activeGame.getPlayerFromColorOrFaction("hacan") != null
-            && getButtonsToSwitchWithAllianceMembers(activeGame.getPlayerFromColorOrFaction("hacan"), activeGame, false).size() > 0) {
-            buttons.add(Button.secondary("getSwapButtons_", "Swap"));
-        }
+        // if (activeGame.getActionCards().size() > 130 && activeGame.getPlayerFromColorOrFaction("hacan") != null
+        //     && getButtonsToSwitchWithAllianceMembers(activeGame.getPlayerFromColorOrFaction("hacan"), activeGame, false).size() > 0) {
+        //     buttons.add(Button.secondary("getSwapButtons_", "Swap"));
+        // }
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message2, buttons);
     }
 
@@ -3937,8 +3972,16 @@ public class ButtonHelper {
             round++;
             activeGame.setRound(round);
         }
+        ButtonHelperFactionSpecific.checkForNaaluPN(activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round "+activeGame.getRound());
-        
+        for(Player p2: activeGame.getRealPlayers()){
+            if(activeGame.getFactionsThatReactedToThis("Summit") != null && activeGame.getFactionsThatReactedToThis("Summit").contains(p2.getFaction()) && p2.getActionCards().keySet().contains("summit")){
+                PlayAC.playAC(event, activeGame, p2, "summit", activeGame.getMainGameChannel(), event.getGuild());
+            }
+            if(activeGame.getFactionsThatReactedToThis("Investments") != null && activeGame.getFactionsThatReactedToThis("Investments").contains(p2.getFaction()) && p2.getActionCards().keySet().contains("investments")){
+                PlayAC.playAC(event, activeGame, p2, "investments", activeGame.getMainGameChannel(), event.getGuild());
+            }
+        }
         if (activeGame.getNaaluAgent()) {
             activeGame.setNaaluAgent(false);
             for (Player p2 : activeGame.getRealPlayers()) {
@@ -4604,7 +4647,36 @@ public class ButtonHelper {
 
         return compButtons;
     }
+    public static void resolvePreAssignment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String messageID = buttonID.split("_")[1];
+        String msg = getIdent(player)+" successfully preset "+messageID;
+        String part2 = player.getFaction();
+        if(activeGame.getFactionsThatReactedToThis(messageID) != null && !activeGame.getFactionsThatReactedToThis(messageID).isEmpty()){
+            part2 = activeGame.getFactionsThatReactedToThis(messageID) + "_"+player.getFaction();
+        }
+        if(StringUtils.countMatches(buttonID, "_") > 1){
+            part2  = part2+ "_"+buttonID.split("_")[2];
+            msg = msg + " on "+buttonID.split("_")[2];
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg );
+        activeGame.setCurrentReacts(messageID, part2);
+        event.getMessage().delete().queue();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.danger("removePreset_"+messageID, "Remove The Preset"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),player.getRepresentation()+ " you can use this button to undo the preset. Ignore it otherwise", buttons);
 
+    }
+    public static void resolveRemovalOfPreAssignment(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String messageID = buttonID.split("_")[1];
+        String msg = getIdent(player)+" successfully removed the preset for "+messageID;
+        String part2 = player.getFaction();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),msg);
+        if(activeGame.getFactionsThatReactedToThis(messageID) != null){
+            activeGame.setCurrentReacts(messageID, activeGame.getFactionsThatReactedToThis(messageID).replace(part2, ""));
+        }
+        event.getMessage().delete().queue();
+
+    }
     public static String mechOrInfCheck(String planetName, Game activeGame, Player player) {
         String message;
         Tile tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
@@ -5228,9 +5300,7 @@ public class ButtonHelper {
             String message = getTrueIdentity(player, activeGame) + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
         }
-        if("spynet".equalsIgnoreCase(id)){
-            ButtonHelperFactionSpecific.offerSpyNetOptions(player);
-        }
+        
 
         //Fog of war ping
         if (activeGame.isFoWMode()) {
@@ -5281,6 +5351,9 @@ public class ButtonHelper {
         }
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
+        if("spynet".equalsIgnoreCase(id)){
+            ButtonHelperFactionSpecific.offerSpyNetOptions(player);
+        }
     }
 
     public static void offerSpeakerButtons(Game activeGame, Player player) {

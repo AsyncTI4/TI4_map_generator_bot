@@ -106,12 +106,11 @@ public class Setup extends PlayerSubcommandData {
 
         String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
-        activeGame.setTile(tile);
+        if (!StringUtils.isBlank(hsTile)) activeGame.setTile(tile);
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)) {
-
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
             activeGame.setTile(tile);

@@ -32,6 +32,13 @@ import ti4.model.TechnologyModel;
 public class ButtonHelperActionCards {
 
 
+    public static void checkForAllAssignmentACs(Game activeGame, Player player){
+        checkForAssigningCoup(activeGame, player);
+        checkForAssigningPublicDisgrace(activeGame, player);
+        checkForPlayingManipulateInvestments(activeGame, player);
+        checkForPlayingSummit(activeGame, player);
+    }
+
     public static void resolveCounterStroke(Game activeGame, Player player, ButtonInteractionEvent event){
         RemoveCC.removeCC(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), activeGame);
         String message = ButtonHelper.getIdent(player) + " removed their CC from tile "+activeGame.getActiveSystem()+ " using counterstroke and gained it to their tactics";
@@ -745,6 +752,72 @@ public class ButtonHelperActionCards {
         new AddUnits().unitParsing(event, player.getColor(), tile, "dread", activeGame);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced a cruiser with a dread in "+tile.getRepresentation());
+    }
+
+    public static void checkForAssigningCoup(Game activeGame, Player player){
+        if(player.getActionCards().keySet().contains("coup")){
+            activeGame.setCurrentReacts("Coup", "");
+            String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will coup. Coup is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+            List<Button> scButtons = new ArrayList<>();
+            for (Integer sc : activeGame.getSCList()) {
+                if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                Button button;
+                String label = " ";
+                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
+                    button = Button.secondary("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary("resolvePreassignment_Coup_" + sc, "" + sc + label);
+                }
+                scButtons.add(button);
+            }
+            scButtons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, scButtons);
+        }
+        
+    }
+
+    public static void checkForPlayingSummit(Game activeGame, Player player){
+        if(player.getActionCards().keySet().contains("summit")){
+            String msg = player.getRepresentation() + " you have the option to pre-play summit. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("resolvePreassignment_Summit","Pre-play Summit"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+        }
+    }
+
+     public static void checkForPlayingManipulateInvestments(Game activeGame, Player player){
+        if(player.getActionCards().keySet().contains("investments")){
+            String msg = player.getRepresentation() + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("resolvePreassignment_Investments","Pre-play Manipulate Investments"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+        }
+    }
+
+    
+
+    public static void checkForAssigningPublicDisgrace(Game activeGame, Player player){
+        if(player.getActionCards().keySet().contains("disgrace")){
+            String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target";
+            List<Button> scButtons = new ArrayList<>();
+            for (Integer sc : activeGame.getSCList()) {
+                if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                Button button;
+                String label = " ";
+                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back") && !activeGame.isHomeBrewSCMode()) {
+                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
+                } else {
+                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, "" + sc + label);
+                }
+                scButtons.add(button);
+            }
+            scButtons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, scButtons);
+        }
     }
 
     public static void resolveDecoyOperationStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {

@@ -1560,6 +1560,19 @@ public class ButtonListener extends ListenerAdapter {
             Stats stats = new Stats();
             String num = buttonID.replace("scPick_", "");
             int scpick = Integer.parseInt(num);
+            if(activeGame.getFactionsThatReactedToThis("Public Disgrace")!= null &&  activeGame.getFactionsThatReactedToThis("Public Disgrace").contains("_"+scpick)){
+                for(Player p2: activeGame.getRealPlayers()){
+                    if(p2 == player){
+                        continue;
+                    }
+                    if(activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction())&&p2.getActionCards().keySet().contains("disgrace")){
+                        PlayAC.playAC(event, activeGame, p2, "disgrace", activeGame.getMainGameChannel(), event.getGuild());
+                        activeGame.setCurrentReacts("Public Disgrace", "");
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have been public disgraced. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
+                        return;
+                    }
+                }
+            }
 
             if (activeGame.getLaws().containsKey("checks") || activeGame.getLaws().containsKey("absol_checks")) {
                 new SCPick().secondHalfOfSCPickWhenChecksNBalances(event, player, activeGame, scpick);
@@ -1643,6 +1656,7 @@ public class ButtonListener extends ListenerAdapter {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
                 List<Button> buttons2 = new ArrayList<Button>();
                 buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
+                buttons2.add(Button.danger("declinePDS", "Decline PDS"));
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(Helper.getPlayerRepresentation(playerWithPds, activeGame, activeGame.getGuild(), false));
                 }
@@ -1685,6 +1699,10 @@ public class ButtonListener extends ListenerAdapter {
                 + activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player)
                 + ". Use buttons to select the units you want to move.", systemButtons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("resolvePreassignment_")) {
+            ButtonHelper.resolvePreAssignment(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("removePreset_")) {
+            ButtonHelper.resolveRemovalOfPreAssignment(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("purge_Frags_")) {
             String typeNAmount = buttonID.replace("purge_Frags_", "");
             String type = typeNAmount.split("_")[0];
@@ -2243,6 +2261,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
                     }
+                }
+                case "checkForAllACAssignments" -> {
+                    ButtonHelperActionCards.checkForAllAssignmentACs(activeGame, player);
                 }
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeGame, player, event, " Drew a " + Emojis.SecretObjective);
@@ -3092,6 +3113,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "announceARetreat" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " announces a retreat");
                 }
+                case "declinePDS" -> {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " officially declines to fire PDS");
+                }
                 case "startQDN" -> {
                     ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
                 }
@@ -3493,7 +3517,6 @@ public class ButtonListener extends ListenerAdapter {
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
-
                     }
                 }
                 if ("statusHomework".equalsIgnoreCase(activeGame.getCurrentPhase())) {

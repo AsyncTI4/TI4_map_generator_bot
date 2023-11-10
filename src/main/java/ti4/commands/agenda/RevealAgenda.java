@@ -119,6 +119,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             }
 
         }
+        activeGame.setCurrentReacts("Pass On Shenanigans", "");
+        AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
         activeGame.resetCurrentAgendaVotes();
         activeGame.setHackElectionStatus(false);
         activeGame.setPlayersWhoHitPersistentNoAfter("");
