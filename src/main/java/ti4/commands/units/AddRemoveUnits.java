@@ -186,7 +186,7 @@ abstract public class AddRemoveUnits implements Command {
 
                 sb.append(isValidUnit ? "✅" : "❌");
                 sb.append(" Unit = `").append(originalUnit).append("`");
-                sb.append(isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Use `/search units include_aliases=true` to learn which aliases you can use for a unit");
+                sb.append(isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`");
                 sb.append("\n> ");
 
                 sb.append(isValidUnitHolder ? "✅" : "❌");
