@@ -4,6 +4,9 @@ on:
         branches: [ "master" ]
 jobs:
     ci:
+        env:
+          DB_PATH: "./db_storage"
+          RESOURCE_PATH: "./src/main/resources"
         name: RunTestsOnPR
         runs-on: ubuntu-latest
         steps:
