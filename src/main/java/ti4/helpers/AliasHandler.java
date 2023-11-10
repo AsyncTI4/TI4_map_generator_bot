@@ -226,7 +226,7 @@ public class AliasHandler {
 
     public static String resolvePlanet(String name) {
         if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
-        if("gamma".equalsIgnoreCase(name)){
+        if ("gamma".equalsIgnoreCase(name)) {
             return name;
         }
         String aliasID = allPlanetAliases.get(name.toLowerCase());
