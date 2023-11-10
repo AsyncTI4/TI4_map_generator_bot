@@ -83,7 +83,7 @@ Bot should now be running and able to receive commands on your test server!
 
 # Adding Homebrew Content
 
-For the most part, all raw data files are [here](src\main\resources\data).
+For the most part, all raw data files are in `TI4_map_generator_bot/src/main/resources/data/`
 
 # Testing your Changes
 
