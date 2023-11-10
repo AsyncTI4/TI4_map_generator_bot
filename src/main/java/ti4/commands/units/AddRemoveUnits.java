@@ -172,7 +172,7 @@ abstract public class AddRemoveUnits implements Command {
             }
             planetName = getPlanet(event, tile, planetName);
             
-            boolean isValidCount = count > 0;
+            boolean isValidCount = count >= 0;
             boolean isValidUnit = unitPath != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
             if (!isValidCount || !isValidUnit || !isValidUnitHolder) {
