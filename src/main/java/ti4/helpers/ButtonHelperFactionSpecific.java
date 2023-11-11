@@ -53,6 +53,62 @@ public class ButtonHelperFactionSpecific {
         return null;
     }
 
+    public static void offerKeleresStartingTech(Player player, Game activeGame, ButtonInteractionEvent event){
+        List<String> techToGain = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if(p2 == player){
+                continue;
+            }
+            techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, activeGame);
+        }
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        event.getMessage().delete().queue();
+        List<Button> techs2 = new ArrayList<>();
+        techs2.addAll(techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get a tech the other players had", techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get another tech the other players had", techs2);
+
+    }
+    public static void offerArgentStartingTech(Player player, Game activeGame){
+        List<String> techToGain = new ArrayList<>();
+        techToGain.add("st");
+        techToGain.add("nm");
+        techToGain.add("ps");
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        List<Button> techs2 = new ArrayList<>();
+        techs2.addAll(techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get one of the 3 starting argent tech", techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to the second of the 3 starting argent tech", techs2);
+    }
+    public static void offerWinnuStartingTech(Player player, Game activeGame){
+        List<String> techToGain = new ArrayList<>();
+        techToGain.add("st");
+        techToGain.add("nm");
+        techToGain.add("ps");
+        techToGain.add("amd");
+        techToGain.add("det");
+        techToGain.add("aida");
+        techToGain.add("pa");
+        techToGain.add("sdn");
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get one of the starting winnu tech", techs);
+    }
+
     public static void offerSpyNetOptions(Player player){
         String msg = player.getRepresentation() +" you have a choice now as to how you want to resolve spy net. You can do it the traditional way of accepting a card Yssaril chooses, without looking "+
         "at the other cards. Or you can look at all of Yssaril's cards and choose one.";

@@ -15,6 +15,7 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -189,12 +190,24 @@ public class Setup extends PlayerSubcommandData {
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
-            activeGame.setComponentAction(true);
-            Button getTech = Button.success("acquireATech", "Get a tech");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(getTech);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+            if(player.getFaction().contains("keleres")){
+                Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(getTech);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    ButtonHelper.getTrueIdentity(player, activeGame) + " after every other faction gets their tech, press this button to resolve Keleres tech", buttons);
+            } else if(player.getFaction().contains("winnu")){
+                ButtonHelperFactionSpecific.offerWinnuStartingTech(player, activeGame);
+            }else if(player.getFaction().contains("argent")){
+                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
+            }else{
+                activeGame.setComponentAction(true);
+                Button getTech = Button.success("acquireATech", "Get a tech");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(getTech);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+            }
         }
 
         if(player.hasAbility("diplomats")){

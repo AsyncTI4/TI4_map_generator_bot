@@ -68,7 +68,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
             }
         }
         String longMsg = "The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is "+largestAmountOfButtonsIn1Game+" in game "+largestGame+". The number of slash commands used is " + slashCommandsUsed
-            + ". The number of ACs sabod used is " + acsSabod +". The following is the recorded frequency of slash commands \n";
+            + ". The number of ACs sabod is " + acsSabod +". The following is the recorded frequency of slash commands \n";
         Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
             longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";

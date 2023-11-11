@@ -759,7 +759,7 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
             Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Exhaust stuff to pay the 5 influence", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
             event.getMessage().delete().queue();
             //"saarHeroResolution_"
         } else if (buttonID.startsWith("arboHeroBuild_")) {
@@ -1748,6 +1748,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("signalJammingStep2_")) {
+            ButtonHelperActionCards.resolveSignalJammingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("signalJammingStep3_")) {
+            ButtonHelperActionCards.resolveSignalJammingStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("signalJammingStep4_")) {
+            ButtonHelperActionCards.resolveSignalJammingStep4(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("reactorMeltdownStep2_")) {
             ButtonHelperActionCards.resolveReactorMeltdownStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spyStep2_")) {
@@ -1855,52 +1861,55 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
-            if ("Keleres Rider".equalsIgnoreCase(riderName)) {
-                String pnKey = "fin";
-                for (String pn : player.getPromissoryNotes().keySet()) {
-                    if (pn.contains("rider")) {
-                        pnKey = pn;
+            if("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName)){
+                if ("Keleres Rider".equalsIgnoreCase(riderName)) {
+                    String pnKey = "fin";
+                    for (String pn : player.getPromissoryNotes().keySet()) {
+                        if (pn.contains("rider")) {
+                            pnKey = pn;
+                        }
+                    }
+                    if ("fin".equalsIgnoreCase(pnKey)) {
+                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Keleres Rider");
+                        return;
+                    }
+                    ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
+                }
+                if ("Edyn Rider".equalsIgnoreCase(riderName)) {
+                    String pnKey = "fin";
+                    for (String pn : player.getPromissoryNotes().keySet()) {
+                        if (pn.contains("dspnedyn")) {
+                            pnKey = pn;
+                        }
+                    }
+                    if ("fin".equalsIgnoreCase(pnKey)) {
+                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
+                        return;
+                    }
+                    ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
+                }
+            }else{
+                if (riderName.contains("Unity Algorithm")) {
+                    player.exhaustTech("dsedyng");
+                }
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeGame, player, riderButtons);
+                if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
+                    Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                    if (playerLeader != null) {
+                        StringBuilder message = new StringBuilder(player.getRepresentation());
+                        message.append(" played ");
+                        message.append(Helper.getLeaderFullRepresentation(playerLeader));
+                        boolean purged = player.removeLeader(playerLeader);
+                        if (purged) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader Oodlynn has been purged");
+                        } else {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
+                        }
                     }
                 }
-                if ("fin".equalsIgnoreCase(pnKey)) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Keleres Rider");
-                    return;
-                }
-                ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeGame, afterButtons, "after");
             }
             //"dspnedyn"
-            if (riderName.contains("Unity Algorithm")) {
-                player.exhaustTech("dsedyng");
-            }
-            if ("Edyn Rider".equalsIgnoreCase(riderName)) {
-                String pnKey = "fin";
-                for (String pn : player.getPromissoryNotes().keySet()) {
-                    if (pn.contains("dspnedyn")) {
-                        pnKey = pn;
-                    }
-                }
-                if ("fin".equalsIgnoreCase(pnKey)) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
-                    return;
-                }
-                ButtonHelper.resolvePNPlay(pnKey, player, activeGame, event);
-            }
-            MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeGame, player, riderButtons);
-            if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
-                Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
-                if (playerLeader != null) {
-                    StringBuilder message = new StringBuilder(player.getRepresentation());
-                    message.append(" played ");
-                    message.append(Helper.getLeaderFullRepresentation(playerLeader));
-                    boolean purged = player.removeLeader(playerLeader);
-                    if (purged) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Leader Oodlynn has been purged");
-                    } else {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeGame, afterButtons, "after");
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("componentActionRes_")) {
             ButtonHelper.resolvePressedCompButton(activeGame, player, event, buttonID);
@@ -2038,6 +2047,9 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
+                }
+                case "getKeleresTechOptions"->{
+                    ButtonHelperFactionSpecific.offerKeleresStartingTech(player, activeGame, event);
                 }
                 case "transaction" -> {
                     List<Button> buttons;
@@ -2962,6 +2974,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
                 }
+                case "resolveSignalJammingStep1" -> {
+                    ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
+                }
                 case "resolvePlagueStep1" -> {
                     ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
                 }
@@ -3377,6 +3392,14 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to score an objective", poButtons);
                 }
                 case "startChaosMapping" -> ButtonHelperFactionSpecific.firstStepOfChaos(activeGame, player, event);
+                case "useLawsOrder" -> {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), ident + " is paying 1 influence to ignore laws for the turn.");
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                    Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+                    buttons.add(DoneExhausting);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 1 influence", buttons);
+                    ButtonHelper.deleteTheOneButton(event);
+                }
                 case "orbitolDropFollowUp" -> ButtonHelperAbilities.oribtalDropFollowUp(buttonID, event, activeGame, player, ident);
                 case "dropAMechToo" -> {
                     String message = "Please select the same planet you dropped the infantry on";

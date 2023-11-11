@@ -2336,6 +2336,10 @@ public class ButtonHelper {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);
             }
+            if (player.hasAbility("laws_order") && !activeGame.getLaws().isEmpty()) {
+                Button chaos = Button.secondary("useLawsOrder", "Pay To Ignore Laws").withEmoji(Emoji.fromFormatted(Emojis.Keleres));
+                startButtons.add(chaos);
+            }
             if (player.hasTech("td") && !player.getExhaustedTechs().contains("td")) {
                 Button transit = Button.secondary(finChecker + "exhaustTech_td", "Exhaust Transit Diodes");
                 transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
@@ -5348,6 +5352,25 @@ public class ButtonHelper {
         if (("scepter".equalsIgnoreCase(id))) {
             String message = getTrueIdentity(player, activeGame) + " Use buttons choose which system to mahact diplo";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, owner));
+        }
+        if (("rider".equalsIgnoreCase(id))) {
+            String riderName = "Keleres Rider";
+            String finsFactionCheckerPrefix = "FFCC_"+player.getFaction()+"_";
+
+            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
+            List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
+            MessageHelper.sendMessageToChannelWithFactionReact(activeGame.getMainGameChannel(), "Please select your rider target", activeGame, player, riderButtons);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");
+
+        }
+        if("dspnedyn".equalsIgnoreCase(id)){
+            String riderName = "Edyn Rider";
+            String finsFactionCheckerPrefix = "FFCC_"+player.getFaction()+"_";
+
+            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeGame, finsFactionCheckerPrefix);
+            List<Button> afterButtons = AgendaHelper.getAfterButtons(activeGame);
+            MessageHelper.sendMessageToChannelWithFactionReact(activeGame.getMainGameChannel(), "Please select your rider target", activeGame, player, riderButtons);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), "Please indicate no afters again.", activeGame, afterButtons, "after");
         }
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
         PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
