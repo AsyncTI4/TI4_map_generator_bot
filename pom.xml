@@ -166,7 +166,7 @@
             <configuration>
                 <systemPropertyVariables>
                     <DB_PATH>./db_storage</DB_PATH>
-                    <broke_RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
+                    <broke_RESOURCE_PATH>./src/main/resources</broke_RESOURCE_PATH>
                 </systemPropertyVariables>
             </configuration>
           </plugin>        
