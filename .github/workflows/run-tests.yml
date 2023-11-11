@@ -18,5 +18,4 @@ jobs:
             distribution: 'corretto'
             architecture: x64
         - name: Run the Maven verify phase
-          run: mvn -DDB_PATH=$DB_PATH -DRESOURCE_PATH=$RESOURCE_PATH  --batch-mode --update-snapshots --no-transfer-progress verify test-compile
-        
+          run: mvn --batch-mode --update-snapshots --no-transfer-progress verify test-compile
