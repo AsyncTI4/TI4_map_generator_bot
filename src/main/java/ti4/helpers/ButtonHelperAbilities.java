@@ -164,6 +164,9 @@ public class ButtonHelperAbilities {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         List<String> tiles = new ArrayList<>();
         for (String planet : planets) {
+            if(planet.contains("custodia") || planet.contains("ghoti")){
+                continue;
+            }
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
             if (tiles.contains(tile.getPosition())) {
                 continue;

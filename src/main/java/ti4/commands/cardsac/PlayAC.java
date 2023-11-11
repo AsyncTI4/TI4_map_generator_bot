@@ -219,6 +219,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 codedButtons.add(Button.success("resolveUprisingStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
+            codedName = "Signal Jamming";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSignalJammingStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
             codedName = "Spy";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveSpyStep1", "Resolve "+codedName));
