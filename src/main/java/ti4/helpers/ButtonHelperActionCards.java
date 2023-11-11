@@ -12,6 +12,7 @@ import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -293,6 +294,24 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to uprise", buttons);
+    }
+    public static void resolveSignalJammingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("signalJammingStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("signalJammingStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's cc you want to place down", buttons);
     }
     public static void resolveSeizeArtifactStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
@@ -664,6 +683,41 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
+    }
+
+    public static void resolveSignalJammingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasShipsInSystem(player, tile)){
+                buttons.add(Button.secondary("signalJammingStep3_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentation()));
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " the map is a big place. Please tell the bot where the origin of the signal jam is coming from (a tile where your ships are)", buttons);
+    }
+    public static void resolveSignalJammingStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String pos = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<Button>();
+        for(String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos, player, false)){
+            Tile tile = activeGame.getTileByPosition(tilePos);
+            buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentation()));
+        }
+        Tile tile = activeGame.getTileByPosition(pos);
+        buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentation()));
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the tile you wish to jam. Remember you can't signal jam home systems, but the bot didnt check for this.", buttons);
+    }
+    public static void resolveSignalJammingStep4(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String pos = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+        AddCC.addCC(event,p2.getColor(), tile);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you signal jammed the tile: "+tile.getRepresentationForButtons(activeGame, player));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you were signal jammed in tile: "+tile.getRepresentationForButtons(activeGame, p2));
+
     }
 
     public static void resolveReactorMeltdownStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
