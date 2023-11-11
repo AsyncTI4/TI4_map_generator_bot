@@ -11,7 +11,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -98,7 +97,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
 
-        String factionEmoji = getFaction() == null ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
+        String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
         String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
@@ -254,8 +253,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public static int sortFactionUnitsFirst(UnitModel a, UnitModel b) {
-        boolean fa = a.getFaction() == null || a.getFaction().isEmpty();
-        boolean fb = b.getFaction() == null || b.getFaction().isEmpty();
+        boolean fa = a.getFaction().isEmpty();
+        boolean fb = b.getFaction().isEmpty();
         if (fa && fb) return 0;
         if (!fa && !fb) return 0;
         if (!fa && fb) return -1;

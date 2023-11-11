@@ -22,11 +22,12 @@ import ti4.message.MessageHelper;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.amazonaws.util.CollectionUtils;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -127,65 +128,75 @@ abstract public class AddRemoveUnits implements Command {
     public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
+
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
 
-            int tokenCount = unitInfoTokenizer.countTokens();
-            if (tokenCount > 3) {
-                StringBuilder warning = new StringBuilder();
-                warning.append("Warning: Unit list should have a maximum of 3 parts (separated by a space) like: `{count} {unit} {planet}`\n");
-                warning.append("> if {count} is omitted, '1' will be assumed\n");
-                warning.append("> {unit} is mandatory\n");
-                warning.append("> if {planet} is omitted, 'space' will be assumed\n");
-                warning.append("`" + unitListToken + "` has " + tokenCount + " parts. There may be errors.\n");
-                warning.append("Acceptable examples look like this:\n");
-                warning.append("> `4 infantry primor`\n");
-                warning.append("> `4 inf pri`\n");
-                warning.append("> `infantry vegaminor` <- note that planet Vega Minor needs to be represented with no spaces\n");
-                warning.append("> `2 infantry vegaminor, 2 infantry vegamajor`\n");
-                warning.append("> `2 inf vegami, 2 inf vegama` <- note that planets can be shortened to the shortest unique name for the system\n");
-                warning.append("> `mech hopesend`\n");
-                warning.append("> `mech h` <- equivalent to above\n");
-                warning.append("Short hand aliases for units/planets can be found using the `/search units/planets` with the `include_aliases:True` parameter\n");
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), warning.toString());
-            }
-
             int count = 1;
             boolean numberIsSet = false;
 
-            String unit = "";
+            String originalUnit = "";
+            String resolvedUnit = "";
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String ifNumber = unitInfoTokenizer.nextToken();
                 try {
                     count = Integer.parseInt(ifNumber);
                     numberIsSet = true;
                 } catch (Exception e) {
-                    unit = AliasHandler.resolveUnit(ifNumber);
+                    originalUnit = ifNumber;
                 }
             }
             if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
-                unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
+                originalUnit = unitInfoTokenizer.nextToken();
             }
+            resolvedUnit = AliasHandler.resolveUnit(originalUnit);
 
             // !!!!!!
-            color = recheckColorForUnit(unit, color, event);
+            color = recheckColorForUnit(resolvedUnit, color, event);
 
-            UnitKey unitID = Mapper.getUnitKey(unit, color);
+            UnitKey unitID = Mapper.getUnitKey(resolvedUnit, color);
             String unitPath = Tile.getUnitPath(unitID);
-            if (unitPath == null) {
-                String warning = "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), warning);
-                continue;
-            }
+
+            // RESOLVE PLANET NAME
+            String originalPlanetName = "";
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String planetToken = unitInfoTokenizer.nextToken();
+                if (unitInfoTokenizer.hasMoreTokens()) {
+                    planetToken = planetToken + unitInfoTokenizer.nextToken();
+                }
+                originalPlanetName = planetToken;
                 planetName = AliasHandler.resolvePlanet(planetToken);
             } else {
                 planetName = Constants.SPACE;
             }
-
             planetName = getPlanet(event, tile, planetName);
+            
+            boolean isValidCount = count > 0;
+            boolean isValidUnit = unitPath != null;
+            boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
+            if (event instanceof SlashCommandInteractionEvent && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Could not parse this section of the command: `" + unitListToken + "`\n> ");
+
+                sb.append(isValidCount ? "✅" : "❌");
+                sb.append(" Count = `").append(count).append("`");
+                sb.append(isValidCount ? "" : " -> Count must be a positive integer");
+                sb.append("\n> ");
+
+                sb.append(isValidUnit ? "✅" : "❌");
+                sb.append(" Unit = `").append(originalUnit).append("`");
+                sb.append(isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`");
+                sb.append("\n> ");
+
+                sb.append(isValidUnitHolder ? "✅" : "❌");
+                sb.append(" Planet = ` ").append(originalPlanetName).append("`");
+                sb.append(isValidUnitHolder ? " -> `" + planetName + "`" : " -> Planets in this system are: `" + CollectionUtils.join(tile.getUnitHolders().keySet(), ", ") + "`");
+                sb.append("\n");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                continue;
+            }
+
             unitAction(event, tile, count, planetName, unitID, color, activeGame);
             addPlanetToPlayArea(event, tile, planetName, activeGame);
         }
@@ -233,7 +244,7 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game activeGame) {
+    public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game activeGame) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
         if (activeGame == null) {
@@ -269,22 +280,11 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
-        if (!tile.isSpaceHolderValid(planetName)) {
-            Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
-            unitHolderIDs.remove(Constants.SPACE);
-            String finalPlanetName = planetName;
-            List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
-                .toList();
-            if (validUnitHolderIDs.size() == 1) {
-                planetName = validUnitHolderIDs.get(0);
-            } else if (validUnitHolderIDs.size() > 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Multiple planets found that match `" + planetName + "`: `" + validUnitHolderIDs + "`");
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Planet `" + planetName + "` could not be resolved. Valid options for tile `" + tile.getRepresentationForAutoComplete() + "` are: `" + unitHolderIDs + "`");
-            }
-        }
-        return planetName;
+        if (tile.isSpaceHolderValid(planetName)) return planetName;
+        return tile.getUnitHolders().keySet().stream()
+                .filter(id -> !Constants.SPACE.equals(planetName))
+                .filter(unitHolderID -> unitHolderID.startsWith(planetName))
+                .findFirst().orElse(planetName);
     }
 
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame);
