@@ -164,10 +164,10 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.0.0-M5</version>
             <configuration>
-                <systemPropertyVariables>
+                <environmentVariables>
                     <DB_PATH>./db_storage</DB_PATH>
-                    <broke_RESOURCE_PATH>./src/main/resources</broke_RESOURCE_PATH>
-                </systemPropertyVariables>
+                    <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
+                </environmentVariables>
             </configuration>
           </plugin>        
         </plugins>
