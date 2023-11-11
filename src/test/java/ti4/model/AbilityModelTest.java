@@ -25,6 +25,7 @@ public class AbilityModelTest {
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+        String resourcePath = Storage.getResourcePath();
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
     }
 
