@@ -6,7 +6,7 @@ jobs:
     ci:
         env:
           Broke_DB_PATH: "./db_storage"
-          Broke_RESOURCE_PATH: "./src/main/resources"
+          RESOURCE_PATH: "./src/main/resources"
         name: RunTestsOnPR
         runs-on: ubuntu-latest
         steps:
