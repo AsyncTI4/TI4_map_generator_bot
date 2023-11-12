@@ -72,7 +72,7 @@ public class Eliminate extends AddRemovePlayer {
             User extraUser = option.getAsUser();
             Player player = activeGame.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
-            if (player != null && player.getFaction() != null && !player.getFaction().equalsIgnoreCase("null")&& !player.getFaction().equalsIgnoreCase("")) {
+            if (player != null  && player.getColor() != null && player.getFaction() != null && !player.getFaction().equalsIgnoreCase("null")&& !player.getFaction().equalsIgnoreCase("")) {
                 //send back all the PNs of others that the player was holding
                 Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
                 for (String pnID : pns) {
@@ -129,8 +129,11 @@ public class Eliminate extends AddRemovePlayer {
                 for (int sc : scs) {
                     player.removeSC(sc);
                 }
+                player.setDummy(true);
+            }else{
+                activeGame.removePlayer(player.getUserID());
             }
-            activeGame.removePlayer(player.getUserID());
+            
             Guild guild = event.getGuild();
             Member removedMember = guild.getMemberById(player.getUserID());
             List<Role> roles = guild.getRolesByName(activeGame.getName(), true);
