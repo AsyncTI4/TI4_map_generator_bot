@@ -304,6 +304,9 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
+            if(Mapper.getTileRepresentations().get(getTileID()) == null){
+                return getTileID() + "("+getPosition()+ ")";
+            }
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
             // DO NOTHING

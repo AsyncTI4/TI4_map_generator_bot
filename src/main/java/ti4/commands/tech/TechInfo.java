@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -34,8 +35,8 @@ public class TechInfo extends TechSubcommandData {
         sendTechInfo(activeGame, player, event);
     }
 
-    public static void sendTechInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+    public static void sendTechInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + " used a button or slash command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendTechInfo(activeGame, player);
     }

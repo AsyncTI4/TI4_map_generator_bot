@@ -60,7 +60,7 @@ public class FrankenDraft extends BagDraft {
     };
 
     private static final String[] excludedFactions = {"lazax", "admins", "franken", "keleresm", "keleresx"};
-    private static List<String> getAllFactionIds(Game activeGame) {
+    public static List<String> getAllFactionIds(Game activeGame) {
         Map<String, String> factionSet = Mapper.getFactionRepresentations();
         List<String> factionIds = new ArrayList<String>();
         factionSet.forEach((String id, String name) -> {

@@ -1,6 +1,8 @@
 package ti4.commands.player;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -28,8 +30,8 @@ public class AbilityInfo extends PlayerSubcommandData {
         sendAbilityInfo(activeGame, player, event);
     }
 
-    public static void sendAbilityInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+    public static void sendAbilityInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + " used a command or button";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendAbilityInfo(activeGame, player);
     }

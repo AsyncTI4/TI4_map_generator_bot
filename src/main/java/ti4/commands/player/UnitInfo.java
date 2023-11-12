@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.generator.Mapper;
@@ -32,8 +33,8 @@ public class UnitInfo extends PlayerSubcommandData {
         sendUnitInfo(activeGame, player, event);
     }
 
-    public static void sendUnitInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+    public static void sendUnitInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + " used the force";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendUnitInfo(activeGame, player);
     }

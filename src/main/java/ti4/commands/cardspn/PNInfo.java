@@ -6,6 +6,7 @@ import java.util.List;
 
 import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
@@ -39,10 +40,10 @@ public class PNInfo extends PNCardsSubcommandData {
         sendMessage("PN Info Sent");
     }
 
-    public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
+    public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(activeGame, player);
         activeGame.checkPromissoryNotes();
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Heads up, someone used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Heads up, someone used some command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendPromissoryNoteInfo(activeGame, player, longFormat);
     }
