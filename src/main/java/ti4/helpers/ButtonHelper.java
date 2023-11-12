@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
@@ -470,35 +471,38 @@ public class ButtonHelper {
         if (mainGameChannel == null) {
             return playersWhoAreMissed;
         }
-        
-        Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100,
-            TimeUnit.MILLISECONDS);
-        for (Player player : activeGame.getPlayers().values()) {
-            if (!player.isRealPlayer()) {
-                continue;
-            }
-
-            String faction = player.getFaction();
-            if (faction == null || faction.isEmpty() || "null".equals(faction)) {
-                continue;
-            }
-
-            Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-            if (activeGame.isFoWMode()) {
-                int index = 0;
-                for (Player player_ : activeGame.getPlayers().values()) {
-                    if (player_ == player)
-                        break;
-                    index++;
+        try{
+            Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(100,
+                TimeUnit.MILLISECONDS);
+            for (Player player : activeGame.getPlayers().values()) {
+                if (!player.isRealPlayer()) {
+                    continue;
                 }
-                reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
+
+                String faction = player.getFaction();
+                if (faction == null || faction.isEmpty() || "null".equals(faction)) {
+                    continue;
+                }
+
+                Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
+                if (activeGame.isFoWMode()) {
+                    int index = 0;
+                    for (Player player_ : activeGame.getPlayers().values()) {
+                        if (player_ == player)
+                            break;
+                        index++;
+                    }
+                    reactionEmoji = Emoji.fromFormatted(Emojis.getRandomizedEmoji(index, messageId));
+                }
+                MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                if (reaction == null) {
+                    playersWhoAreMissed.add(player);
+                }
             }
-            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction == null) {
-                playersWhoAreMissed.add(player);
-            }
+            return playersWhoAreMissed;
+        }catch(Exception e){
+            return playersWhoAreMissed;
         }
-        return playersWhoAreMissed;
     }
 
     public static String playerHasDMZPlanet(Player player, Game activeGame){
