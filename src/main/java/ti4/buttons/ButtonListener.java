@@ -1748,6 +1748,16 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setupStep1_")) {
+            ButtonHelper.resolveSetupStep1(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setupStep2_")) {
+            ButtonHelper.resolveSetupStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setupStep3_")) {
+            ButtonHelper.resolveSetupStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setupStep4_")) {
+            ButtonHelper.resolveSetupStep4And5(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setupStep5_")) {
+            ButtonHelper.resolveSetupStep4And5(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep2_")) {
             ButtonHelperActionCards.resolveSignalJammingStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep3_")) {
@@ -2655,6 +2665,9 @@ public class ButtonListener extends ListenerAdapter {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                     }
+                }
+                case "startPlayerSetup" -> {
+                    ButtonHelper.resolveSetupStep0(player, activeGame, event);
                 }
                 case "gain_1_comm_from_MahactInf" -> {
                     String message;

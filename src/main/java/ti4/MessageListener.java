@@ -160,8 +160,8 @@ public class MessageListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-        if(new Date().getTime() - timeNow > 1000){
-             BotLogger.log(event.getMessage().getChannel().getName()+ " A message in this channel took longer than 1000 ms ("+(new Date().getTime() - timeNow)+")");
+        if(new Date().getTime() - timeNow > 1500){
+             BotLogger.log(event.getMessage().getChannel().getName()+ " A message in this channel took longer than 1500 ms ("+(new Date().getTime() - timeNow)+")");
         }
     }
 

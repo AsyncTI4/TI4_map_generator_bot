@@ -51,6 +51,7 @@ import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
+import ti4.commands.player.Setup;
 import ti4.commands.special.CombatRoll;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.StellarConverter;
@@ -63,6 +64,8 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.draft.DraftItem;
+import ti4.draft.FrankenDraft;
 import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -77,7 +80,9 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
@@ -1956,6 +1961,9 @@ public class ButtonHelper {
 
     public static boolean isTileHomeSystem(Tile tile) {
         boolean isHome = false;
+        if(tile.getTileID().equalsIgnoreCase("0g")){
+            return true;
+        }
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = planetHolder.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
@@ -3502,6 +3510,201 @@ public class ButtonHelper {
         buttons.add(doAll);
         buttons.add(concludeMove);
         return buttons;
+    }
+    public static List<Button> getUserSetupButtons(Game activeGame){
+        List<Button> buttons = new ArrayList<>();
+        for (Player player : activeGame.getPlayers().values()) {
+            String userId = player.getUserID();
+            buttons.add(Button.success("setupStep1_"+userId, player.getUserName()));
+        }
+        return buttons;
+    }
+
+    public static void setUpFrankenFactions(Game activeGame, GenericInteractionCreateEvent event){
+        List<Player> players = new ArrayList<Player>();
+        players.addAll(activeGame.getPlayers().values());
+        int x = 1;
+        for (Player player : players) {
+            if(x < 9){
+                switch(x){
+                    case 1 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "black", "franken1", "201", event, false);}
+                    case 2 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "green", "franken2", "202", event, false);}
+                    case 3 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "purple", "franken3", "203", event, false);}
+                    case 4 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "orange", "franken4", "204", event, false);}
+                    case 5 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "pink", "franken5", "205", event, false);}
+                    case 6 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "yellow", "franken6", "206", event, false);}
+                    case 7 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "red", "franken7", "207", event, false);}
+                    case 8 ->{new Setup().secondHalfOfPlayerSetup(player, activeGame, "blue", "franken8", "208", event, false);}
+                    default ->{
+
+                    }
+                }
+            }
+            x++;
+        }
+    }
+
+    public static List<Button> getFactionSetupButtons(Game activeGame, String buttonID){
+        String userId = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        List<String> allFactions = FrankenDraft.getAllFactionIds(activeGame);
+        for (var factionId : allFactions) {
+            FactionModel faction  = Mapper.getFactionSetup(factionId);
+            if(faction != null && activeGame.getPlayerFromColorOrFaction(factionId) == null){
+                String name = faction.getFactionName();
+
+                if(factionId.contains("keleres")){
+                    factionId = "keleres";
+                    name = "The Council Keleres";
+                }
+                buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(factionId))));
+            }else{
+                BotLogger.log("Faction returned null on this id"+factionId);
+            }
+        }
+        return buttons;
+    }
+    public static List<Button> getColorSetupButtons(Game activeGame, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        List<String> allColors = Mapper.getColors();
+        for (String color : allColors) {
+            if(activeGame.getPlayerFromColorOrFaction(color) == null){
+                buttons.add(Button.success("setupStep3_"+userId+"_"+factionId+"_"+color, color));
+            }
+        }
+        return buttons;
+    }
+     public static void resolveSetupStep0(Player player, Game activeGame, ButtonInteractionEvent event){
+        
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()+"Please tell the bot which user you are setting up", getUserSetupButtons(activeGame));
+     }
+     public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String userId = buttonID.split("_")[1];
+        event.getMessage().delete().queue();
+        List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
+        List<Button> newButtons = new ArrayList<>();
+        int maxBefore = 0;
+        for(int x = 0; x < buttons.size(); x++){
+            if(x > maxBefore && x < (maxBefore+23)){
+                newButtons.add(buttons.get(x));
+            }
+        }
+        newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+    }
+    public static void resolveSetupStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        event.getMessage().delete().queue();
+        if(factionId.contains("!")){
+            List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
+            List<Button> newButtons = new ArrayList<>();
+            int maxBefore = Integer.parseInt(factionId.replace("!", ""));
+            for(int x = 0; x < buttons.size(); x++){
+                if(x > maxBefore && x < (maxBefore+23)){
+                    newButtons.add(buttons.get(x));
+                }
+            }
+            newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+            return;
+        }
+        if(factionId.equalsIgnoreCase("keleres")){
+            List<Button> newButtons = new ArrayList<>();
+            newButtons.add(Button.success("setupStep2_"+userId+"_keleresa", "Keleres Argent").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("argent"))));
+            newButtons.add(Button.success("setupStep2_"+userId+"_keleresm", "Keleres Mentak").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mentak"))));
+            newButtons.add(Button.success("setupStep2_"+userId+"_keleresx", "Keleres Xxcha").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("xxcha"))));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: "+Mapper.getFactionSetup(factionId).getFactionName());
+        List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
+        List<Button> newButtons = new ArrayList<>();
+        int maxBefore = 0;
+        for(int x = 0; x < buttons.size(); x++){
+            if(x > maxBefore && x < (maxBefore+23)){
+                newButtons.add(buttons.get(x));
+            }
+        }
+        newButtons.add(Button.secondary("setupStep3_"+userId+"_"+factionId+"_"+(maxBefore+22)+"!", "Get more colors"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired player color", newButtons);
+        
+    }
+
+    public static List<Button> getTileSetupButtons(Game activeGame, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        String color = buttonID.split("_")[3];
+        
+        for (Tile tile : activeGame.getTileMap().values()) {
+            if(ButtonHelper.isTileHomeSystem(tile)){
+                String rep = tile.getRepresentation();
+                if(rep == null || rep.isEmpty()){
+                    rep = tile.getTileID() + "("+tile.getPosition()+ ")";
+                }
+                buttons.add(Button.success("setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition(), rep));
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Button> getSpeakerSetupButtons(Game activeGame, String buttonID){
+        List<Button> buttons = new ArrayList<>();
+        String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        String color = buttonID.split("_")[3];
+        String pos = buttonID.split("_")[4];
+        buttons.add(Button.success("setupStep5_"+userId+"_"+factionId+"_"+color+"_"+pos+"_yes", "Yes, setting up speaker"));
+        buttons.add(Button.success("setupStep5_"+userId+"_"+factionId+"_"+color+"_"+pos+"_no", "No"));
+        return buttons;
+    }
+    public static void resolveSetupStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+         String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        String color = buttonID.split("_")[3];
+        event.getMessage().delete().queue();
+        if(color.contains("!")){
+            List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
+            List<Button> newButtons = new ArrayList<>();
+            int maxBefore = Integer.parseInt(color.replace("!", ""));
+            for(int x = 0; x < buttons.size(); x++){
+                if(x > maxBefore && x < (maxBefore+23)){
+                    newButtons.add(buttons.get(x));
+                }
+            }
+            newButtons.add(Button.secondary("setupStep3_"+userId+"_"+factionId+"_"+(maxBefore+22)+"!", "Get more color"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired color", newButtons);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as color: "+color);
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the home system location", getTileSetupButtons(activeGame, buttonID));
+        
+    }
+
+    public static void resolveSetupStep4And5(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String userId = buttonID.split("_")[1];
+        String factionId = buttonID.split("_")[2];
+        String color = buttonID.split("_")[3];
+        String pos = buttonID.split("_")[4];
+        Player speaker = null;
+        player = activeGame.getPlayer(userId);
+        if (activeGame.getPlayer(activeGame.getSpeaker()) != null) {
+            speaker = activeGame.getPlayers().get(activeGame.getSpeaker());
+        }
+        if(buttonID.split("_").length == 6 || speaker != null){
+            if(speaker != null){
+                new Setup().secondHalfOfPlayerSetup(player, activeGame, color, factionId, pos, event, false);
+            }else{
+                new Setup().secondHalfOfPlayerSetup(player, activeGame, color, factionId, pos, event, buttonID.split("_")[5].equalsIgnoreCase("yes"));
+            }
+        }else{
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot if the player is the speaker", getSpeakerSetupButtons(activeGame, buttonID));
+        }
+        event.getMessage().delete().queue();
     }
 
     public static void resolveStellar(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
