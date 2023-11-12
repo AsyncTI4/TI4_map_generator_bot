@@ -510,6 +510,7 @@ public class AgendaHelper {
     }
 
     public static void pingMissingPlayers(Game activeGame) {
+       
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestWhenMsg(), activeGame);
         List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestAfterMsg(), activeGame);
         if (missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0) {
