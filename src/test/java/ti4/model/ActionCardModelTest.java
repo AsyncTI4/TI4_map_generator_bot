@@ -1,0 +1,122 @@
+package ti4.model;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Storage;
+
+public class ActionCardModelTest {
+
+    @BeforeAll
+    public static void init() {
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+    }
+
+    ActionCardModel actionCardModel = new ActionCardModel();
+
+    @Test
+    // test a specific card
+    public void testDirectHit() {
+        ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
+        assertEquals("Direct Hit", dhActionCardModel.getName());
+    }
+
+    @Test
+    public void testAlias() {
+        String alias = "testAlias";
+        actionCardModel.setAlias(alias);
+        assertEquals(alias, actionCardModel.getAlias());
+    }
+
+    @Test
+    public void testName() {
+        String name = "testName";
+        actionCardModel.setName(name);
+        assertEquals(name, actionCardModel.getName());
+    }
+
+    @Test
+    public void testPhase() {
+        String phase = "testPhase";
+        actionCardModel.setPhase(phase);
+        assertEquals(phase, actionCardModel.getPhase());
+    }
+
+    @Test
+    public void testWindow() {
+        String window = "testWindow";
+        actionCardModel.setWindow(window);
+        assertEquals(window, actionCardModel.getWindow());
+    }
+
+    @Test
+    public void testText() {
+        String text = "testText";
+        actionCardModel.setText(text);
+        assertEquals(text, actionCardModel.getText());
+    }
+
+    @Test
+    public void testFlavorText() {
+        String flavorText = "testFlavorText";
+        actionCardModel.setFlavorText(flavorText);
+        assertEquals(flavorText, actionCardModel.getFlavorText());
+    }
+
+    @Test
+    public void testSource() {
+        String source = "testSource";
+        actionCardModel.setSource(source);
+        assertEquals(source, actionCardModel.getSource());
+    }
+
+    @Test
+    public void testSearchTags() {
+        List<String> searchTags = new ArrayList<>();
+        searchTags.add("testTag1");
+        searchTags.add("testTag2");
+        actionCardModel.setSearchTags(searchTags);
+        assertEquals(searchTags, actionCardModel.getSearchTags());
+    }
+
+    @Test
+    public void testIsValid() {
+        actionCardModel.setAlias("testAlias");
+        actionCardModel.setName("testName");
+        actionCardModel.setPhase("testPhase");
+        actionCardModel.setWindow("testWindow");
+        actionCardModel.setText("testText");
+        actionCardModel.setFlavorText("testFlavorText");
+        actionCardModel.setSource("testSource");
+        assertTrue(actionCardModel.isValid());
+    }
+
+    @Test
+    public void testSearch() {
+        String searchString = "testAlias";
+        actionCardModel.setAlias(searchString);
+        assertTrue(actionCardModel.search(searchString.toLowerCase()));
+    }
+
+    @Test
+    public void testAutoCompleteName() {
+        String name = "testName";
+        String source = "testSource";
+        actionCardModel.setName(name);
+        actionCardModel.setSource(source);
+        assertEquals(name + " (" + source + ")", actionCardModel.getAutoCompleteName());
+    }
+}
