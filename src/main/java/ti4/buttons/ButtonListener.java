@@ -1800,6 +1800,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReactorMeltdownStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep3_")) {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("asnStep2_")) {
+            ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("upstableStep2_")) {
             ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
          } else if (buttonID.startsWith("upstableStep3_")) {
@@ -3634,10 +3636,12 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.updateMap(activeGame, event);
                 buttons.add(DoneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
+            if(player.hasTech("asn") && (buttonID.contains("tacticalAction")||buttonID.contains("warfare"))){
+                ButtonHelperFactionSpecific.offerASNButtonsStep1(activeGame, player, buttonID);
+            } 
             if (buttonID.contains("tacticalAction")) {
                 ButtonHelper.exploreDET(player, activeGame, event);
                 List<Button> systemButtons2 = new ArrayList<>();
@@ -3665,11 +3669,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Use buttons to end turn or do another action.";
                 List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                MessageChannel channel = event.getMessageChannel();
-                if (activeGame.isFoWMode()) {
-                    channel = player.getPrivateChannel();
-                }
-                MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, systemButtons);
                 player.resetOlradinPolicyFlags();
             }
         }
