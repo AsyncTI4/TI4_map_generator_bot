@@ -1984,6 +1984,9 @@ public class ButtonHelper {
         if (tile.getRepresentation() == null || tile.getRepresentation().equalsIgnoreCase("null")) {
             return;
         }
+        if(tile.getRepresentation().toLowerCase().contains("nombox")){
+            return;
+        }
         int armadaValue = 0;
         if (player == null) {
             return;
@@ -2027,6 +2030,7 @@ public class ButtonHelper {
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
         for (UnitModel unit : unitsByQuantity.keySet()) {
             if ("fighter".equalsIgnoreCase(unit.getBaseType()) || "infantry".equalsIgnoreCase(unit.getBaseType()) || "mech".equalsIgnoreCase(unit.getBaseType())) {
+
                 if ("fighter".equalsIgnoreCase(unit.getBaseType()) && player.hasFF2Tech()) {
                     numFighter2s = unitsByQuantity.get(unit) - fightersIgnored;
                     if (numFighter2s < 0) {
@@ -2064,6 +2068,8 @@ public class ButtonHelper {
                 numFighter2s = numInfNFightersNMechs - capacity;
                 if (player.hasTech("hcf2")) {
                     numFighter2sFleet = numFighter2s;
+                }else{
+                    numFighter2sFleet = numFighter2s*2;
                 }
                 if (numFighter2sFleet + numOfCapitalShips > fleetCap) {
                     fleetSupplyViolated = true;
