@@ -17,7 +17,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 
 public class AbilityModelTest {
-    
+
     @BeforeAll
     public static void init() {
         TileHelper.init();
@@ -25,8 +25,6 @@ public class AbilityModelTest {
         Mapper.init();
         AliasHandler.init();
         Storage.init();
-        String resourcePath = Storage.getResourcePath();
-        AbilityModel abilityModel = Mapper.getAbility("mitosis");
     }
 
     @Test

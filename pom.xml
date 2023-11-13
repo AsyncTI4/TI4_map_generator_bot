@@ -159,17 +159,17 @@
                     </execution>
                 </executions>
             </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0-M5</version>
-            <configuration>
-                <environmentVariables>
-                    <DB_PATH>./db_storage</DB_PATH>
-                    <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
-                </environmentVariables>
-            </configuration>
-          </plugin>        
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <environmentVariables>
+                        <DB_PATH>./db_storage</DB_PATH>
+                        <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
+                    </environmentVariables>
+                </configuration>
+            </plugin>        
         </plugins>
     </build>
 </project>

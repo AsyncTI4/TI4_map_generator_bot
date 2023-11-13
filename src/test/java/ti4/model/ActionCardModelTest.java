@@ -5,11 +5,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Storage;
+
 public class ActionCardModelTest {
-    
+
+    @BeforeAll
+    public static void init() {
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+    }
+
     ActionCardModel actionCardModel = new ActionCardModel();
+
+    @Test
+    // test a specific card
+    public void testDirectHit() {
+        ActionCardModel dhActionCardModel = Mapper.getActionCard("dh1");
+        assertEquals("Direct Hit", dhActionCardModel.getName());
+    }
 
     @Test
     public void testAlias() {
