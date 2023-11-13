@@ -140,7 +140,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card."
+        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card.",
+        "homebrewReplacesID": "naaz_mech_space"
     },
     {
         "id": "absol_spacedock2",
@@ -152,7 +153,8 @@
         "source": "absol",
         "productionValue": "+4",
         "capacityValue": 5,
-        "isStructure": true
+        "isStructure": true,
+        "homebrewReplacesID": "spacedock2"
     },
     {
         "id": "absol_infantry2",
@@ -167,7 +169,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
+        "homebrewReplacesID": "infantry2"
     },
     {
         "id": "absol_pds2",
@@ -181,7 +184,8 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
         "planetaryShield": true,
-        "isStructure": true
+        "isStructure": true,
+        "homebrewReplacesID": "pds2"
     },
     {
         "id": "absol_fighter2",
@@ -197,7 +201,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "homebrewReplacesID": "fighter2"
     },
     {
         "id": "absol_destroyer2",
@@ -214,7 +219,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 6,
         "afbDieCount": 3,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "destroyer2"
     },
     {
         "id": "absol_cruiser2",
@@ -230,7 +236,8 @@
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "cruiser2"
     },
     {
         "id": "absol_carrier2",
@@ -246,7 +253,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "carrier2"
     },
     {
         "id": "absol_dreadnought2",
@@ -266,7 +274,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": false,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "dreadnought2"
     },
     {
         "id": "absol_warsun",
@@ -285,7 +294,8 @@
         "sustainDamage": true,
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "warsun"
     },
     {
         "id": "absol_sol_carrier2",
@@ -304,7 +314,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "sol_carrier2"
     },
     {
         "id": "absol_sol_infantry2",
@@ -320,7 +331,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "homebrewReplacesID": "sol_infantry2"
     },
     {
         "id": "absol_sardakk_dreadnought2",
@@ -341,7 +353,8 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "homebrewReplacesID": "sardakk_dreadnought2"
     },
     {
         "id": "absol_l1z1x_dreadnought2",
@@ -361,7 +374,8 @@
         "bombardHitsOn": 4,
         "bombardDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "l1z1x_dreadnought2"
     },
     {
         "id": "absol_naalu_fighter2",
@@ -375,7 +389,8 @@
         "capacityUsed": 1,
         "isShip": true,
         "combatHitsOn": 7,
-        "combatDieCount": 1
+        "combatDieCount": 1,
+        "homebrewReplacesID": "naalu_fighter2"
     },
     {
         "id": "absol_muaat_warsun2",
@@ -398,7 +413,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "homebrewReplacesID": "muaat_warsun2"
     },
     {
         "id": "absol_saar_spacedock2",
@@ -413,7 +429,8 @@
         "productionValue": 7,
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "homebrewReplacesID": "saar_spacedock2"
     },
     {
         "id": "absol_arborec_infantry2",
@@ -430,7 +447,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die.  If the result is 6 or greater, place the unit on this card.  At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+        "ability": "After this unit is destroyed, roll 1 die.  If the result is 6 or greater, place the unit on this card.  At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "homebrewReplacesID": "arborec_infantry2"
     },
     {
         "id": "absol_titans_pds2",
@@ -451,7 +469,8 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems."
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "homebrewReplacesID": "titans_pds2"
     },
     {
         "id": "absol_titans_cruiser2",
@@ -469,7 +488,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "sustainDamage": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "titans_cruiser2"
     },
     {
         "id": "absol_argent_destroyer2",
@@ -489,7 +509,8 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system."
+        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "homebrewReplacesID": "argent_destroyer2"
     },
     {
         "id": "absol_cabal_spacedock2",
@@ -502,7 +523,8 @@
         "faction": "cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity."
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
+        "homebrewReplacesID": "cabal_spacedock2"
     },
     {
         "id": "absol_nomad_flagship2",
@@ -524,7 +546,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs."
+        "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
+        "homebrewReplacesID": "nomad_flagship2"
     },
     {
         "id": "absol_mahact_infantry2",
@@ -540,6 +563,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system or that contains 1 of your space docks."
+        "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system or that contains 1 of your space docks.",
+        "homebrewReplacesID": "mahact_infantry2"
     }
 ]
