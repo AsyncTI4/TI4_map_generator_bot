@@ -201,6 +201,7 @@ public class Mapper {
     }
 
     public static String getDecalName(String decalID) {
+        if (decalID == null || "null".equals(decalID)) return null;
         return decals.getProperty(decalID);
     }
 
