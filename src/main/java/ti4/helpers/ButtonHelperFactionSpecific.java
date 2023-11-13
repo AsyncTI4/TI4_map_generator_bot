@@ -33,6 +33,38 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+
+    public static void offerASNButtonsStep1(Game activeGame, Player player, String warfareOrTactical){
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have the ability to use Agency Supply Network (ASN). Select the tile you want to build out of, or decline (please decline if you already used ASN)";
+        List<Button> buttons = new ArrayList<>();
+        Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(player, activeGame);
+        for(Tile tile : tiles){
+            buttons.add(Button.success("asnStep2_"+tile.getPosition()+"_"+warfareOrTactical, tile.getRepresentation()));
+        }
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+    public static void resolveASNStep2(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        String msg = ButtonHelper.getIdent(player) + " is resolving Agency Supply Network in tile "+tile.getRepresentation();
+        
+        String warfareOrTactical = buttonID.split("_")[2];
+        ButtonHelper.sendMessageToRightStratThread(player, activeGame, msg, warfareOrTactical);
+        List<Button> buttons = new ArrayList<>();
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, warfareOrTactical, "place");
+        String message = player.getRepresentation()
+            + " Use the buttons to produce."
+            + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        }
+        event.getMessage().delete().queue();
+       
+    }
+
     public static boolean somebodyHasThisRelic(Game activeGame, String relic) {
         boolean somebodyHasIt = false;
         for (Player player : activeGame.getRealPlayers()) {
