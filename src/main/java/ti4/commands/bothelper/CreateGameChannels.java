@@ -437,11 +437,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return null;
         }
         EnumSet<Permission> allow = EnumSet.of(Permission.VIEW_CHANNEL);
+        EnumSet<Permission> deny = EnumSet.of(Permission.VIEW_CHANNEL);
         Role bothelperRole = getRole("Bothelper", guild);
         Role spectatorRole = getRole("Spectator", guild);
+        Role everyoneRole = getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null) createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
         if (spectatorRole != null) createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
+        if (everyoneRole != null) createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
         return createCategoryAction.complete();
     }
 
