@@ -127,6 +127,13 @@ public class HeroPlay extends LeaderAction {
                     }
                 }
             }
+            case "l1z1xhero"->{
+                String message = player.getRepresentation()+" Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical cc from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
+                List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
+                activeGame.setL1Hero(true);
+                activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
+            }
             case "winnuhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(activeGame, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText)

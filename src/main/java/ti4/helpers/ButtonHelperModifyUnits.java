@@ -946,6 +946,9 @@ public class ButtonHelperModifyUnits {
                 }
             }
             String message2 = ident + " Removed all units";
+            if(rest.contains("AllShips")){
+                message2 = ident + " Removed all units in space area";
+            }
             String message = event.getMessage().getContentRaw();
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, tile);
             event.getMessage().editMessage(message)

@@ -1319,6 +1319,14 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.reverseRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("rider_")) {
             AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("startToScuttleAUnit_")) {
+            ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("endScuttle_")) {
+            ButtonHelperActionCards.resolveScuttleEnd(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleOn_")) {
+            ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleIn_")) {
+            ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("winnuHero_")) {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {
@@ -1629,7 +1637,7 @@ public class ButtonListener extends ListenerAdapter {
             if (!activeGame.isFoWMode()) {
                 playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeGame, pos);
                 int abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, true);
-                if (abilities > 0) {
+                if (abilities > 0 || activeGame.getL1Hero()) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Button.success(finsFactionCheckerPrefix + "doActivation_" + pos, "Confirm"));
                     buttons.add(Button.danger(finsFactionCheckerPrefix + "deleteButtons", "This activation was a mistake"));
@@ -1637,7 +1645,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                 }
                 for (Player player_ : activeGame.getRealPlayers()) {
-                    if (!player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
+                    if (!activeGame.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction()) && !player_.isPlayerMemberOfAlliance(player)
                         && FoWHelper.playerHasUnitsInSystem(player_, activeGame.getTileByPosition(pos))) {
                         String msgA = player_.getRepresentation()
                             + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. You can proceed and float them unless you think they are particularly relevant, or wish to offer a pleading window. ";
@@ -1652,7 +1660,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
             }
-            if (!activeGame.isFoWMode() && playersWithPds2.size() > 0) {
+            if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
                 List<Button> buttons2 = new ArrayList<Button>();
                 buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
@@ -1664,11 +1672,11 @@ public class ButtonListener extends ListenerAdapter {
             }
             List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeGame, event);
             List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(activeGame, player);
-            if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty()) {
+            if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !activeGame.getL1Hero()) {
                 String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " You can use buttons to resolve L1 Agent if you want";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
             }
-            if (player.getTechs().contains("sdn") && !button2.isEmpty()) {
+            if (player.getTechs().contains("sdn") && !button2.isEmpty() && !activeGame.getL1Hero()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink", button2);
                 if (player.hasAbility("awaken")) {
                     ButtonHelper.resolveTitanShenanigansOnActivation(player, activeGame, activeGame.getTileByPosition(pos), event);
@@ -2110,7 +2118,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
                     }
                     String reply = activeGame.isFoWMode() ? "No secret objective scored" : null;
-                    ButtonHelper.addReaction(event, false, false, reply, "");
+                    ButtonHelper.addReaction(event, true, false, reply, "");
                 }
                 // AFTER AN ACTION CARD HAS BEEN PLAYED
                 case "no_sabotage" -> {
@@ -3109,6 +3117,7 @@ public class ButtonListener extends ListenerAdapter {
                         return;
                     }
                     activeGame.setNaaluAgent(false);
+                    activeGame.setL1Hero(false);
                     String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
                     activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -3162,7 +3171,10 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
                 }
                 case "doneWithTacticalAction" -> {
-                    ButtonHelper.exploreDET(player, activeGame, event);
+                    if(!activeGame.getL1Hero()){
+                        ButtonHelper.exploreDET(player, activeGame, event);
+                    }
+                    
                     if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
                         String message = trueIdentity + " You can use the button to explore using crown of emphidia";
                         List<Button> systemButtons2 = new ArrayList<>();
@@ -3173,6 +3185,7 @@ public class ButtonListener extends ListenerAdapter {
                         player = activeGame.getPlayer(activeGame.getActivePlayer());
                         activeGame.setNaaluAgent(false);
                     }
+                    activeGame.setL1Hero(false);
 
                     String message = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
@@ -3240,7 +3253,7 @@ public class ButtonListener extends ListenerAdapter {
                             }
                         }
                     }
-                    if (systemButtons.size() == 2) {
+                    if (systemButtons.size() == 2 || activeGame.getL1Hero()) {
                         systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
