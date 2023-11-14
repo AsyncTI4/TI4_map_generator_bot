@@ -52,6 +52,10 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         String tileName = Mapper.getTileID(planetTileName);
+        if(tileName == null){
+            MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+            return null;
+        }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);

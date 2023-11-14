@@ -1,10 +1,15 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
@@ -29,9 +34,127 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 public class ButtonHelperActionCards {
 
+    public static List<Button> getTilesToScuttle(Player player, Game activeGame, GenericInteractionCreateEvent event, int tgAlready) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Button.success(finChecker + "scuttleIn_" + tileEntry.getKey()+"_"+tgAlready, tile.getRepresentationForButtons(activeGame, player));
+                buttons.add(validTile);
+            }
+        }
+        Button validTile2 = Button.danger(finChecker + "deleteButtons", "Decline");
+        buttons.add(validTile2);
+        return buttons;
+    }
+
+    public static List<Button> getUnitsToScuttle(Player player, Game activeGame, GenericInteractionCreateEvent event, Tile tile, int tgAlready) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            HashMap<UnitKey, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet) continue;
+
+            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (!player.unitBelongsToPlayer(unitKey)) continue;
+
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                    continue;
+                }
+
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String unitName = unitKey.unitName();
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+
+                if (unitHolder.getUnitDamage() != null) {
+                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
+                }
+
+                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
+                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
+                    String buttonID = finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "damaged"+"_"+tgAlready;
+                    Button validTile2 = Button.danger(buttonID, "Remove A Damaged " + prettyName);
+                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+                totalUnits = totalUnits - damagedUnits;
+                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    Button validTile2 = Button.danger(finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName+"_"+tgAlready, "Remove " + x + " " + prettyName);
+                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
+                    buttons.add(validTile2);
+                }
+            }
+        }
+        return buttons;
+    }
+    public static void resolveScuttleStart(Player player, Game activeGame, ButtonInteractionEvent event,  String buttonID) {
+        int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
+        List<Button> buttons = getTilesToScuttle(player, activeGame, event, tgAlready);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to select tile to scuttle in", buttons);
+        event.getMessage().delete().queue();
+    }
+     public static void resolveScuttleEnd(Player player, Game activeGame, ButtonInteractionEvent event,  String buttonID) {
+        int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " tgs increased by "+tgAlready+" (" + player.getTg() + "->" + (player.getTg() + tgAlready) + ")");
+        player.setTg(player.getTg() + tgAlready);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgAlready);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveScuttleTileSelection(Player player, Game activeGame, ButtonInteractionEvent event,  String buttonID) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileByPosition(pos);
+        int tgAlready = Integer.parseInt(buttonID.split("_")[2]);
+        List<Button> buttons = getUnitsToScuttle(player, activeGame, event, tile, tgAlready);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to select unit to scuttle", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveScuttleRemoval(Player player, Game activeGame, ButtonInteractionEvent event,  String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        int tgAlready = Integer.parseInt(buttonID.split("_")[3]);
+        Tile tile = activeGame.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+
+        boolean damaged = false;
+        if (unit.contains("damaged")) {
+            unit = unit.replace("damaged", "");
+            damaged = true;
+        }
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
+        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, activeGame);
+        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile "+tile.getRepresentation()+" was removed via the Scuttle AC by " + ButtonHelper.getIdent(player);
+
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+        if(tgAlready > 0){
+            tgAlready = tgAlready+(int)removedUnit.getCost();
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " tgs increased by "+tgAlready+" (" + player.getTg() + "->" + (player.getTg() + tgAlready) + ")");
+            player.setTg(player.getTg() + tgAlready);
+            ButtonHelperAbilities.pillageCheck(player, activeGame);
+            ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgAlready);
+        }else{
+            tgAlready = tgAlready+(int)removedUnit.getCost();
+            buttons.add(Button.success("startToScuttleAUnit_"+tgAlready, "Scuttle another Unit"));
+            buttons.add(Button.danger("endScuttle_"+tgAlready, "End Scuttle"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+" Use buttons to scuttle another unit or end scuttling.", buttons);
+        }
+        event.getMessage().delete().queue();
+    }
 
     public static void checkForAllAssignmentACs(Game activeGame, Player player){
         checkForAssigningCoup(activeGame, player);

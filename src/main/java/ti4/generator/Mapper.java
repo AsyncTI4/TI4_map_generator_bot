@@ -238,6 +238,9 @@ public class Mapper {
     }
 
     public static String getTileID(String tileID) {
+        if(TileHelper.getAllTiles().get(tileID) == null){
+            return null;
+        }
         return TileHelper.getAllTiles().get(tileID).getImagePath();
     }
 
