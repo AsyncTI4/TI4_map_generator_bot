@@ -527,6 +527,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NAALU_AGENT + " " + activeGame.getNaaluAgent());
         writer.write(System.lineSeparator());
+        writer.write(Constants.L1_HERO + " " + activeGame.getL1Hero());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
@@ -1600,6 +1602,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setNaaluAgent(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.L1_HERO -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setL1Hero(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

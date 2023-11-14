@@ -106,8 +106,10 @@ public class ButtonHelper {
         return false;
     }
     public static void resolveInfantryDeath(Game activeGame, Player player, int amount) {
-        for (int x = 0; x < amount; x++) {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), rollInfantryRevival(activeGame, player));
+        if (player.hasInf2Tech()) {
+            for (int x = 0; x < amount; x++) {
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), rollInfantryRevival(activeGame, player));
+            }
         }
     }
 
@@ -804,7 +806,9 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game activeGame, Tile activeSystem, Player player, boolean justChecking) {
         int numberOfAbilities = 0;
-
+        if(activeGame.getL1Hero()){
+            return 0;
+        }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = activeGame.getActionsChannel();
         if (justChecking) {
@@ -1112,7 +1116,7 @@ public class ButtonHelper {
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game activeGame, Tile tile) {
-        if (activeGame.getDominusOrbStatus()) {
+        if (activeGame.getDominusOrbStatus() || activeGame.getL1Hero()) {
             return true;
         }
         return player.getLeader("nomadhero").map(Leader::isActive).orElse(false);
@@ -2824,7 +2828,7 @@ public class ButtonHelper {
         }
         int cc = player.getTacticalCC();
 
-        if (!activeGame.getNaaluAgent() && !AddCC.hasCC(event, player.getColor(), tile)) {
+        if (!activeGame.getNaaluAgent() && !activeGame.getL1Hero() && !AddCC.hasCC(event, player.getColor(), tile)) {
             cc -= 1;
             player.setTacticalCC(cc);
             AddCC.addCC(event, player.getColor(), tile, true);
@@ -2980,6 +2984,7 @@ public class ButtonHelper {
         if (player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")) {
             commanderUnlockCheck(player, activeGame, "ghost", event);
         }
+        
         return buttons;
     }
 
@@ -3568,8 +3573,6 @@ public class ButtonHelper {
                     name = "The Council Keleres";
                 }
                 buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(factionId))));
-            }else{
-                BotLogger.log("Faction returned null on this id"+factionId);
             }
         }
         return buttons;
@@ -4048,7 +4051,7 @@ public class ButtonHelper {
         int playersWithSCs = 0;
         activeGame.setCurrentPhase("statusHomework");
         for (Player player2 : activeGame.getPlayers().values()) {
-            if (playersWithSCs > 1) {
+            if (playersWithSCs > 0) {
                 new Cleanup().runStatusCleanup(activeGame);
                 MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame) + "Status Cleanup Run!");
                 playersWithSCs = -30;

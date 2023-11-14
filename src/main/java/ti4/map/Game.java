@@ -105,6 +105,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+      private boolean l1Hero;
+    @ExportableField
     private boolean nomadCoin;
     @ExportableField
     private boolean temporaryPingDisable;
@@ -911,6 +913,9 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+    public boolean getL1Hero() {
+        return l1Hero;
+    }
     public boolean getNomadCoin() {
         return nomadCoin;
     }
@@ -932,6 +937,9 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setL1Hero(boolean onStatus) {
+        l1Hero = onStatus;
     }
     public void setNomadCoin(boolean onStatus) {
         nomadCoin = onStatus;
