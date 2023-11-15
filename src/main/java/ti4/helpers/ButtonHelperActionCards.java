@@ -418,6 +418,25 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to uprise", buttons);
     }
+
+    public static void resolveAssRepsStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("assRepsStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("assRepsStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who you want to assassinate", buttons);
+    }
     public static void resolveSignalJammingStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<Button>();
         for (Player p2 : activeGame.getRealPlayers()) {
@@ -807,6 +826,13 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to exhaust", buttons);
     }
+    public static void resolveAssRepsStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame)+" successfully assassinated all the representatives of "+ButtonHelper.getIdentOrColor(p2, activeGame));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+" your representatives got sent to the headsman");
+        activeGame.setCurrentReacts("AssassinatedReps", activeGame.getFactionsThatReactedToThis("AssassinatedReps")+p2.getFaction());
+    }
 
     public static void resolveSignalJammingStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -932,6 +958,9 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForAssigningCoup(Game activeGame, Player player){
+        if(ButtonHelper.isPlayerElected(activeGame, player, "censure") || ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+            return;
+        }
         if(player.getActionCards().keySet().contains("coup")){
             activeGame.setCurrentReacts("Coup", "");
             String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will coup. Coup is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
@@ -955,6 +984,9 @@ public class ButtonHelperActionCards {
     }
 
     public static void checkForPlayingSummit(Game activeGame, Player player){
+        if(ButtonHelper.isPlayerElected(activeGame, player, "censure") || ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+            return;
+        }
         if(player.getActionCards().keySet().contains("summit")){
             String msg = player.getRepresentation() + " you have the option to pre-play summit. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
             List<Button> buttons = new ArrayList<>();
@@ -965,6 +997,9 @@ public class ButtonHelperActionCards {
     }
 
      public static void checkForPlayingManipulateInvestments(Game activeGame, Player player){
+        if(ButtonHelper.isPlayerElected(activeGame, player, "censure") || ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+            return;
+        }
         if(player.getActionCards().keySet().contains("investments")){
             String msg = player.getRepresentation() + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
             List<Button> buttons = new ArrayList<>();
@@ -977,6 +1012,9 @@ public class ButtonHelperActionCards {
     
 
     public static void checkForAssigningPublicDisgrace(Game activeGame, Player player){
+        if(ButtonHelper.isPlayerElected(activeGame, player, "censure") || ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+            return;
+        }
         if(player.getActionCards().keySet().contains("disgrace")){
             String msg = player.getRepresentation() + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target";
             List<Button> scButtons = new ArrayList<>();

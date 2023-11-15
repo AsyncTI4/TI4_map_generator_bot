@@ -1327,6 +1327,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("scuttleIn_")) {
             ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("startToScuttleAUnit_")) {
+            ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("endScuttle_")) {
+            ButtonHelperActionCards.resolveScuttleEnd(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleOn_")) {
+            ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleIn_")) {
+            ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("winnuHero_")) {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {
@@ -1756,6 +1764,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("showDeck_")) {
+            ButtonHelper.resolveDeckChoice(activeGame, event, buttonID, player);
+        } else if (buttonID.startsWith("assRepsStep2_")) {
+            ButtonHelperActionCards.resolveAssRepsStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("setupStep1_")) {
             ButtonHelper.resolveSetupStep1(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("setupStep2_")) {
@@ -2114,11 +2126,8 @@ public class ButtonListener extends ListenerAdapter {
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()
                         + " - no Secret Objective scored.";
-                    if (!activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                    }
-                    String reply = activeGame.isFoWMode() ? "No secret objective scored" : null;
-                    ButtonHelper.addReaction(event, true, false, reply, "");
+                    
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
                 }
                 // AFTER AN ACTION CARD HAS BEEN PLAYED
                 case "no_sabotage" -> {
@@ -2997,6 +3006,12 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
                 }
+                case "offerDeckButtons" -> {
+                    ButtonHelper.offerDeckButtons(activeGame, event);
+                }
+                case "resolveAssRepsStep1" -> {
+                    ButtonHelperActionCards.resolveAssRepsStep1(player, activeGame, event, buttonID);
+                }
                 case "resolveSignalJammingStep1" -> {
                     ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
                 }
@@ -3454,7 +3469,13 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeGame.getSavedButtons().size() > 0 && !activeGame.getCurrentPhase().contains("status")) {
                         String buttonString = activeGame.getSavedButtons().get(0);
                         if (activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
-                            if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0])) {
+                            boolean showGame = false;
+                            for(String buttonString2 : activeGame.getSavedButtons()){
+                                if(buttonString2.contains("Show Game")){
+                                    showGame = true;
+                                }
+                            }
+                            if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) && !showGame) {
                                 MessageHelper.sendMessageToChannel(event.getChannel(),
                                     "You were not the player who pressed the latest button. Use /game undo if you truly want to undo " + activeGame.getLatestCommand());
                                 return;
