@@ -13,9 +13,9 @@ public class PNDraftItem extends DraftItem {
 
     private FactionModel getFaction() {
         if (ItemId.equals("keleres")) {
-            return Mapper.getFactionSetup("keleresa");
+            return Mapper.getFaction("keleresa");
         }
-        return Mapper.getFactionSetup(ItemId);
+        return Mapper.getFaction(ItemId);
     }
 
     private PromissoryNoteModel getPn() {
