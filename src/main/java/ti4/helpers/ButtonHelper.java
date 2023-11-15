@@ -41,9 +41,11 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
+import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
@@ -670,6 +672,10 @@ public class ButtonHelper {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
             buttons.add(aiDEVButton);
         }
+        if (player.hasTechReady("is")) {
+            Button aiDEVButton = Button.secondary("exhaustTech_is", "Exhaust Inheritance Systems");
+            buttons.add(aiDEVButton);
+        }
         if (player.hasRelicReady("prophetstears")) {
             Button pT1 = Button.danger("prophetsTears_AC", "Exhaust Prophets Tears for AC");
             buttons.add(pT1);
@@ -700,6 +706,45 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
         }
+    }
+
+    public static void offerDeckButtons(Game activeGame, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.secondary("showDeck_frontier", "Frontier").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("frontier"))));
+        buttons.add(Button.primary("showDeck_cultural", "Cultural").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("cultural"))));
+        buttons.add(Button.danger("showDeck_hazardous", "Hazardous").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("hazardous"))));
+        buttons.add(Button.success("showDeck_industrial", "Industrial").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("industrial"))));
+        buttons.add(Button.secondary("showDeck_all", "All Explores"));
+        buttons.add(Button.danger("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
+    }
+    public static void resolveDeckChoice(Game activeGame, ButtonInteractionEvent event, String buttonID, Player player){
+        String type = buttonID.split("_")[1];
+        List<String> types = new ArrayList<>();
+        if(type.equalsIgnoreCase("ac")){
+            new ShowDiscardActionCards().showDiscard(activeGame, event);
+        }else if(type.equalsIgnoreCase("all")){
+            types.add(Constants.CULTURAL);
+            types.add(Constants.INDUSTRIAL);
+            types.add(Constants.HAZARDOUS);
+            types.add(Constants.FRONTIER);
+            new ExpInfo().secondHalfOfExpInfo(types, event, player, activeGame, false);
+        }else{
+            types.add(type);
+            new ExpInfo().secondHalfOfExpInfo(types, event, player, activeGame, false);
+        }
+        event.getMessage().delete().queue();
+    }
+
+    public static boolean isPlayerElected(Game activeGame, Player player, String lawID){
+        for (String law : activeGame.getLaws().keySet()) {
+            if (lawID.equalsIgnoreCase(law)) {
+                if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static void drawStatusACs(Game activeGame, Player player, ButtonInteractionEvent event) {
@@ -914,7 +959,7 @@ public class ButtonHelper {
                 } else {
                     Button lookAtACs = Button.success(fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(), "Look at ACs ("+player.getAc()+")");
                     Button lookAtPNs = Button.success(fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(), "Look at PNs ("+player.getPnCount()+")");
-                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs ("+(player.getSo()-player.getSoScored())+")");
+                    Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs ("+(player.getSo())+")");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, Decline2);
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Yssaril commander ", buttons);
@@ -1092,6 +1137,7 @@ public class ButtonHelper {
                     }
                     buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
                     buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
+                    buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                     MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, file, "", buttonsWeb);
 
                 }
@@ -1109,6 +1155,7 @@ public class ButtonHelper {
             }
             buttonsWeb.add(Button.success("cardsInfo", "Cards Info"));
             buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
+            buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
             MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "", buttonsWeb);
 
         }
@@ -4306,8 +4353,14 @@ public class ButtonHelper {
     }
 
     public static void resolveCrownOfE(Game activeGame, Player player, ButtonInteractionEvent event) {
-        player.removeRelic("emphidia");
-        player.removeExhaustedRelic("emphidia");
+        if(player.hasRelic("absol_emphidia")){
+            player.removeRelic("absol_emphidia");
+            player.removeExhaustedRelic("absol_emphidia");
+        }
+        if(player.hasRelic("emphidia")){
+             player.removeRelic("emphidia");
+            player.removeExhaustedRelic("emphidia");
+        }
         Integer poIndex = activeGame.addCustomPO("Crown of Emphidia", 1);
         activeGame.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getRepresentation() + " scored Crown of Emphidia");
@@ -5519,6 +5572,10 @@ public class ButtonHelper {
             }
             String message = getTrueIdentity(player, activeGame) + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
+        }
+        if (!activeGame.isAbsolMode() && id.endsWith("_ps")) {
+            MessageHelper.sendMessageToChannel(getCorrectChannel(owner, activeGame), getTrueIdentity(owner, activeGame) +" due to a play of your PS, you will be unable to vote in agenda (unless you have xxcha alliance). The bot doesnt enforce the other restrictions regarding no abilities, but you should abide by them.");
+            activeGame.setCurrentReacts("AssassinatedReps", activeGame.getFactionsThatReactedToThis("AssassinatedReps")+owner.getFaction());
         }
         
 
