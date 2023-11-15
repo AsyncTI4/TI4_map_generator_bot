@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
@@ -21,7 +20,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import java.lang.Character.UnicodeScript;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,7 +41,6 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
@@ -52,22 +49,18 @@ import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.special.CombatRoll;
-import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
@@ -83,7 +76,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -93,6 +85,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
@@ -3659,8 +3652,8 @@ public class ButtonHelper {
             }
         }
         newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction",
-                newButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+        if (activeGame.isTestBetaFeaturesMode()) SelectFaction.offerFactionSelectionMenu(event);
     }
     public static void resolveSetupStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         String userId = buttonID.split("_")[1];

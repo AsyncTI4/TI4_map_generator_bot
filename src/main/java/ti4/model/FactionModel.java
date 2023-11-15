@@ -199,7 +199,6 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getFactionName();
     }
 }
