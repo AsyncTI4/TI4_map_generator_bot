@@ -232,7 +232,7 @@ public class DataMigrationManager {
 
                 // Trying to assign an accurate Faction Model for old keleres players.
                 if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
-                    List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
+                    List<FactionModel> keleresSubfactions = Mapper.getFactionIDs().stream()
                         .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
                         .map(Mapper::getFactionSetup)
                         .toList();
@@ -339,7 +339,7 @@ public class DataMigrationManager {
 
                 // Trying to assign an accurate Faction Model for old keleres players.
                 if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
-                    List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
+                    List<FactionModel> keleresSubfactions = Mapper.getFactionIDs().stream()
                         .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
                         .map(Mapper::getFactionSetup)
                         .toList();

@@ -795,11 +795,17 @@ public class Mapper {
         return abilities.get(abilityID);
     }
 
-    public static List<String> getFactions() {
+    public static List<String> getFactionIDs() {
         return factionSetup.keySet().stream()
             .filter(token -> token instanceof String)
             .map(token -> (String) token)
             .sorted()
+            .collect(Collectors.toList());
+    }
+
+    public static List<FactionModel> getFactions() {
+        return factionSetup.values().stream()
+            .sorted(Comparator.comparing(FactionModel::getFactionName))
             .collect(Collectors.toList());
     }
 
