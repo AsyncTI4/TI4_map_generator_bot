@@ -40,6 +40,7 @@ public class StartPhase extends GameSubcommandData {
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, activeGame);
             case "agendaResolve" -> AgendaHelper.resolveTime(event, activeGame, null);
             case "action" -> ButtonHelper.startActionPhase(event, activeGame);
+            case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel());
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
         }
     }
