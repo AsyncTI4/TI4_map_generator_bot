@@ -3641,6 +3641,11 @@ public class ButtonHelper {
     }
 
     public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        if (activeGame.isTestBetaFeaturesMode()) {
+            SelectFaction.offerFactionSelectionMenu(event);
+            return;
+        } 
+        
         String userId = buttonID.split("_")[1];
         event.getMessage().delete().queue();
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
@@ -3653,12 +3658,14 @@ public class ButtonHelper {
         }
         newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
-        if (activeGame.isTestBetaFeaturesMode()) SelectFaction.offerFactionSelectionMenu(event);
     }
-    public static void resolveSetupStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+
+    public static void resolveSetupStep2(Player player, Game activeGame, GenericInteractionCreateEvent event, String buttonID){
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        event.getMessage().delete().queue();
+        if (event instanceof ButtonInteractionEvent) {
+            ((ButtonInteractionEvent) event).getMessage().delete().queue();
+        }
         if(factionId.contains("!")){
             List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
             List<Button> newButtons = new ArrayList<>();
@@ -3669,7 +3676,7 @@ public class ButtonHelper {
                 }
             }
             newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired faction", newButtons);
             return;
         }
         if(factionId.equalsIgnoreCase("keleres")){
@@ -3677,10 +3684,15 @@ public class ButtonHelper {
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresa", "Keleres Argent").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("argent"))));
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresm", "Keleres Mentak").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mentak"))));
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresx", "Keleres Xxcha").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("xxcha"))));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: "+Mapper.getFaction(factionId).getFactionName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: " + Mapper.getFaction(factionId).getFactionName());
+        offerColourSetupButtons(activeGame, event, buttonID, userId, factionId);
+        
+    }
+
+    private static void offerColourSetupButtons(Game activeGame, GenericInteractionCreateEvent event, String buttonID, String userId, String factionId) {
         List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = 0;
@@ -3690,8 +3702,7 @@ public class ButtonHelper {
             }
         }
         newButtons.add(Button.secondary("setupStep3_"+userId+"_"+factionId+"_"+(maxBefore+22)+"!", "Get more colors"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired player color", newButtons);
-        
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color", newButtons);
     }
 
     public static List<Button> getTileSetupButtons(Game activeGame, String buttonID){
