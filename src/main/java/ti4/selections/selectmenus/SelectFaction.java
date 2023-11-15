@@ -1,6 +1,10 @@
 package ti4.selections.selectmenus;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+import org.apache.commons.collections4.ListUtils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -29,18 +33,34 @@ public class SelectFaction implements Selection {
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {
-        StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
-        List<FactionModel> factions = Mapper.getFactions().stream().limit(25).toList();
-        for (FactionModel faction : factions) {
-            menuBuilder.addOptions(SelectOption.of(faction.getFactionName(), faction.getAlias())
-                .withDescription(faction.getAlias())
-                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias())))
-                .withLabel(faction.getAutoCompleteName())
-            );
+        List<FactionModel> factions = Mapper.getFactions().stream().sorted(Comparator.comparing(FactionModel::getFactionName)).sorted(Comparator.comparing(FactionModel::getSource)).toList();
+        List<List<FactionModel>> factionPages = ListUtils.partition(factions, 25);
+        List<StringSelectMenu> menus = new ArrayList<>();
+        
+        for (List<FactionModel> factionPage : factionPages) {
+            StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
+            for (FactionModel faction : factionPage) {
+                Emoji emojiToUse = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias()));
+                
+                SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
+                    .withDescription(faction.getAlias())
+                    .withLabel(faction.getAutoCompleteName());
+
+                if (emojiToUse != null) option = option.withEmoji(emojiToUse);
+
+                menuBuilder.addOptions(SelectOption.of(faction.getFactionName(), faction.getAlias())
+                    .withDescription(faction.getAlias())
+                    .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias())))
+                    .withLabel(faction.getAutoCompleteName())
+                );
+                menuBuilder.addOptions(option);
+            }
+            menuBuilder.setRequiredRange(1, 1);
+            menus.add(menuBuilder.build());
         }
-        menuBuilder.setRequiredRange(1, 1);
-        StringSelectMenu menu = menuBuilder.build();
-        event.getMessageChannel().sendMessage("Select a faction:").addComponents(ActionRow.of(menu)).queue();
+        for (StringSelectMenu menu : menus) {
+            event.getMessageChannel().sendMessage("").addComponents(ActionRow.of(menu)).queue();
+        }
     }
 
     
