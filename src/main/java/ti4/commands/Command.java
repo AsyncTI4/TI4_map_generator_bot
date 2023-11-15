@@ -11,7 +11,6 @@ import ti4.message.MessageHelper;
 import java.util.stream.Collectors;
 
 public interface Command {
-
     String getActionID();
 
     //If command can be executed for given command text
