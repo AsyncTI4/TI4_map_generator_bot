@@ -1327,6 +1327,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("scuttleIn_")) {
             ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("startToScuttleAUnit_")) {
+            ButtonHelperActionCards.resolveScuttleStart(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("endScuttle_")) {
+            ButtonHelperActionCards.resolveScuttleEnd(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleOn_")) {
+            ButtonHelperActionCards.resolveScuttleRemoval(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("scuttleIn_")) {
+            ButtonHelperActionCards.resolveScuttleTileSelection(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("winnuHero_")) {
             ButtonHelperHeroes.resolveWinnuHeroSC(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("construction_")) {

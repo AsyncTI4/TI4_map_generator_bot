@@ -3424,13 +3424,14 @@ public class Game {
     }
 
     public void swapInVariantUnits(String source) {
-        // TODO: Update to use new UnitModel.getHomebrewReplacesID() method
-        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> unit.getSource().equals(source)).toList();
+        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> source.equals(unit.getSource())).toList();
         for (Player player : getPlayers().values()) {
-            List<UnitModel> playersUnits = new ArrayList<>(player.getUnitModels());
+            List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
-                    if (playerUnit.getFaction().isPresent() && playerUnit.getFaction().get().equalsIgnoreCase(variantUnit.getFaction().orElse("")) && playerUnit.getBaseType().equalsIgnoreCase(variantUnit.getBaseType()) && !playerUnit.getSource().equalsIgnoreCase(variantUnit.getSource())) {
+                    if (   (variantUnit.getHomebrewReplacesID().isPresent() && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
+                        || (playerUnit.getHomebrewReplacesID().isPresent()  &&  playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
+                    ) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
                         break;
