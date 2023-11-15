@@ -41,18 +41,10 @@ public class SelectFaction implements Selection {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
                 Emoji emojiToUse = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias()));
-                
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
                     .withDescription(faction.getAlias())
                     .withLabel(faction.getAutoCompleteName());
-
                 if (emojiToUse != null) option = option.withEmoji(emojiToUse);
-
-                menuBuilder.addOptions(SelectOption.of(faction.getFactionName(), faction.getAlias())
-                    .withDescription(faction.getAlias())
-                    .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(faction.getAlias())))
-                    .withLabel(faction.getAutoCompleteName())
-                );
                 menuBuilder.addOptions(option);
             }
             menuBuilder.setRequiredRange(1, 1);
