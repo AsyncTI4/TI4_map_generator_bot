@@ -3604,7 +3604,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         List<String> allFactions = FrankenDraft.getAllFactionIds(activeGame);
         for (var factionId : allFactions) {
-            FactionModel faction  = Mapper.getFactionSetup(factionId);
+            FactionModel faction  = Mapper.getFaction(factionId);
             if(faction != null && activeGame.getPlayerFromColorOrFaction(factionId) == null){
                 String name = faction.getFactionName();
 
@@ -3680,7 +3680,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: "+Mapper.getFactionSetup(factionId).getFactionName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: "+Mapper.getFaction(factionId).getFactionName());
         List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = 0;

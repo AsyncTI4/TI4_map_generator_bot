@@ -110,7 +110,7 @@ public class FrankenDraft extends BagDraft {
         List<String> allFactions = getAllFactionIds(activeGame);
         List<DraftItem> allAbilityItems = new ArrayList<>();
         for (var factionId : allFactions) {
-            FactionModel faction  = Mapper.getFactionSetup(factionId);
+            FactionModel faction  = Mapper.getFaction(factionId);
             if(faction != null){
                 for (var ability : faction.getAbilities()) {
                     allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY,ability));
@@ -129,7 +129,7 @@ public class FrankenDraft extends BagDraft {
         List<String> allFactions = getAllFactionIds(activeGame);
         List<DraftItem> allDraftableTechs = new ArrayList<>();
         for (var factionId : allFactions) {
-            FactionModel faction = Mapper.getFactionSetup(factionId);
+            FactionModel faction = Mapper.getFaction(factionId);
             for(var tech : faction.getFactionTech()) {
                 allDraftableTechs.add(DraftItem.Generate(DraftItem.Category.TECH, tech));
             }

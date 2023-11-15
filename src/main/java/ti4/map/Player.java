@@ -951,7 +951,7 @@ public class Player {
 
     @JsonIgnore
     public FactionModel getFactionModel() {
-        return Mapper.getFactionSetup(faction);
+        return Mapper.getFaction(faction);
     }
 
     public void setFaction(String faction) {
@@ -1067,7 +1067,7 @@ public class Player {
     public FactionModel getFactionSetupInfo() {
         if (faction == null || "null".equals(faction) || "keleres".equals(faction))
             return null;
-        FactionModel factionSetupInfo = Mapper.getFactionSetup(faction);
+        FactionModel factionSetupInfo = Mapper.getFaction(faction);
         if (factionSetupInfo == null) {
             BotLogger.log("Could not get faction setup info for: " + faction);
             return null;
