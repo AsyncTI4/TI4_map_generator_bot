@@ -1,7 +1,9 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -10,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
@@ -74,7 +77,16 @@ public class GameCommand implements Command {
         }
         FileUpload file = GenerateMap.getInstance().saveImage(activeGame, event);
         if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
-            MessageHelper.replyToMessage(event, file);
+           // MessageHelper.replyToMessage(event, file);
+            List<Button> buttons = new ArrayList<>();
+            if (!activeGame.isFoWMode()) {
+                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + activeGame.getName(), "Website View");
+                buttons.add(linkToWebsite);
+            }
+            buttons.add(Button.success("cardsInfo", "Cards Info"));
+            buttons.add(Button.secondary("showGameAgain", "Show Game"));
+            buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
+            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "", buttons);
         }
     }
 

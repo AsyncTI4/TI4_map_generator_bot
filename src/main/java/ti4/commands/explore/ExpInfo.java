@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import java.util.List;
 import java.util.Map;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
@@ -11,6 +12,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -51,7 +53,11 @@ public class ExpInfo extends ExploreSubcommandData {
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        for (String currentType : types) {
+       secondHalfOfExpInfo(types, event, player, activeGame, over);
+    }
+
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide){
+         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             ArrayList<String> deck = activeGame.getExploreDeck(currentType);
             Collections.sort(deck);
@@ -75,12 +81,12 @@ public class ExpInfo extends ExploreSubcommandData {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || over || !activeGame.isFoWMode()) {
-                sendMessage(info.toString());
+            if (player == null || player.getSCs().isEmpty() || overRide || !activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
-            sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase())  && activeGame.isFoWMode()&& !overRide) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
 
