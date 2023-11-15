@@ -57,6 +57,7 @@ public class AutoCompleteProvider {
             case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
             case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName, activeGame);
+            case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, activeGame);
         }
 
         // DON'T APPLY GENERIC HANDLING IF SPECIFIC HANDLING WAS APPLIED
@@ -962,6 +963,37 @@ public class AutoCompleteProvider {
                             .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
+                }
+            }
+        }
+    }
+
+    private static void resolveMapAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game activeGame) {
+        if (activeGame == null) {
+            event.replyChoiceStrings("No Active Map for this Channel").queue();
+            return;
+        }
+        switch (subCommandName) {
+            case Constants.ADD_TILE -> {
+                switch (optionName) {
+                    case Constants.TILE_NAME -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        List<Command.Choice> options = TileHelper.getAllTiles().entrySet().stream()
+                            .filter(entry -> entry.getValue().search(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                    // case Constants.POSITION -> {
+                    //     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    //     List<Command.Choice> options = activeGame.getTileMap().entrySet().stream()
+                    //         .filter(entry -> entry.getValue().search(enteredValue))
+                    //         .limit(25)
+                    //         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                    //         .collect(Collectors.toList());
+                    //     event.replyChoices(options).queue();
+                    // }
                 }
             }
         }

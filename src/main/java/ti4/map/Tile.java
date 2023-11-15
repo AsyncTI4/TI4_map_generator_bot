@@ -304,8 +304,8 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
-            if(Mapper.getTileRepresentations().get(getTileID()) == null){
-                return getTileID() + "("+getPosition()+ ")";
+            if (Mapper.getTileRepresentations().get(getTileID()) == null){
+                return getTileID() + "(" + getPosition()+ ")";
             }
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
@@ -336,7 +336,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public String getRepresentationForAutoComplete() {
+    public String getAutoCompleteName() {
         try {
             return getPosition() + " (" + getRepresentation() + ")";
         } catch (Exception e) {
@@ -437,5 +437,12 @@ public class Tile {
             .map(Map.Entry::getKey)
             .filter(x -> x != null)
             .anyMatch(condition);
+    }
+
+    @JsonIgnore
+    public boolean search(String searchString) {
+        return getTileID().contains(searchString) ||
+            getPosition().contains(searchString)  ||
+            getTileModel().search(searchString);
     }
 }

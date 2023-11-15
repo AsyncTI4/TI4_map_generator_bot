@@ -3018,7 +3018,7 @@ public class Game {
 
     public void rebuildTilePositionAutoCompleteList() {
         setTileNameAutocompleteOptionsCache(getTileMap().values().stream()
-            .map(tile -> new SimpleEntry<>(tile.getRepresentationForAutoComplete(), tile.getPosition()))
+            .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
             .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
             .toList());
     }
