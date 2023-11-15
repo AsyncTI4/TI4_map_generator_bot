@@ -3636,23 +3636,31 @@ public class ButtonHelper {
         }
         return buttons;
     }
-     public static void resolveSetupStep0(Player player, Game activeGame, ButtonInteractionEvent event){
-        
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()+"Please tell the bot which user you are setting up", getUserSetupButtons(activeGame));
-     }
-     public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+
+    public static void offerPlayerSetupButtons(MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("startPlayerSetup", "Setup a Player"));
+        MessageHelper.sendMessageToChannelWithButtons(channel, "After setting up the map, you can use this button instead of /player setup if you wish", buttons);
+    }
+
+    public static void resolveSetupStep0(Player player, Game activeGame, ButtonInteractionEvent event) {
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + "Please tell the bot which user you are setting up", getUserSetupButtons(activeGame));
+    }
+
+    public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String userId = buttonID.split("_")[1];
         event.getMessage().delete().queue();
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = 0;
-        for(int x = 0; x < buttons.size(); x++){
-            if(x > maxBefore && x < (maxBefore+23)){
+        for (int x = 0; x < buttons.size(); x++) {
+            if (x > maxBefore && x < (maxBefore + 23)) {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+        newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction",
+                newButtons);
     }
     public static void resolveSetupStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         String userId = buttonID.split("_")[1];
