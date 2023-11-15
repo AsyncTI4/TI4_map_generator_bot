@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -108,5 +109,26 @@ public class TileModel {
     @JsonIgnore
     public boolean isGravityRift() {
         return Optional.ofNullable(isGravityRift).orElse(false);
+    }
+
+    @JsonIgnore
+    public List<String> getAliases() {
+        if (aliases == null) return new ArrayList<String>();
+        return aliases;
+    }
+
+    @JsonIgnore
+    public String getAutoCompleteName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId()).append(" ");
+        if (getName() != null) sb.append(getName());
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public boolean search(String searchString) {
+        return getId().toLowerCase().contains(searchString) ||
+            getNameNullSafe().toLowerCase().contains(searchString) ||
+            getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString));
     }
 }
