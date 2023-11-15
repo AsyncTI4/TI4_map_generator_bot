@@ -101,7 +101,7 @@ public class AutoCompleteProvider {
                 }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeGame.isFoWMode()) {
-                    List<String> factionColors = new ArrayList<>(Mapper.getFactions());
+                    List<String> factionColors = new ArrayList<>(Mapper.getFactionIDs());
                     factionColors.addAll(Mapper.getColors());
 
                     List<String> factionColorsRetain = new ArrayList<>();
