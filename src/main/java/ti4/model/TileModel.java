@@ -109,4 +109,19 @@ public class TileModel {
     public boolean isGravityRift() {
         return Optional.ofNullable(isGravityRift).orElse(false);
     }
+
+    @JsonIgnore
+    public String getAutoCompleteName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId()).append(" ");
+        if (getName() != null) sb.append(getName());
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public boolean search(String searchString) {
+        return getId().toLowerCase().contains(searchString) ||
+            getNameNullSafe().toLowerCase().contains(searchString) ||
+            (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+    }
 }
