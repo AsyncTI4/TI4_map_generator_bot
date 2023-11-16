@@ -987,7 +987,10 @@ public class AgendaHelper {
     public static List<Button> getAfterButtons(Game activeGame) {
         List<Button> afterButtons = new ArrayList<>();
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
-        afterButtons.add(playAfter);
+        if(activeGame.isFoWMode()){
+            afterButtons.add(playAfter);
+        }
+        
 
 
         
