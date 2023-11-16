@@ -151,7 +151,7 @@ public class GenerateMap {
             int mostObjs = Math.max(Math.max(stage1, stage2), other);
             int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
-            int playerCountForMap = activeGame.getRealPlayers().size();
+            int playerCountForMap = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
             int playerHeight = 340;
             int playerY = playerCountForMap * playerHeight;
 

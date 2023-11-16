@@ -1822,9 +1822,9 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
-        } else if (buttonID.startsWith("upstableStep2_")) {
+        } else if (buttonID.startsWith("unstableStep2_")) {
             ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
-         } else if (buttonID.startsWith("upstableStep3_")) {
+         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
             ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, activeGame, player, ident, buttonLabel);
