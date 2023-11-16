@@ -2855,6 +2855,11 @@ public class Game {
     }
 
     @JsonIgnore
+    public List<Player> getDummies() {
+        return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public List<Player> getNotRealPlayers() {
         return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
     }

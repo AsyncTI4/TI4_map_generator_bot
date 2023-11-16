@@ -907,7 +907,7 @@ public class ButtonHelperModifyUnits {
                             int amount = unitEntry.getValue();
 
                             boolean cabalMech = false;
-                            if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+                            if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
                                 cabalMech = true;
                             }
 
@@ -986,7 +986,7 @@ public class ButtonHelperModifyUnits {
             }
         } else {
              boolean cabalMech = false;
-            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
                 cabalMech = true;
             }
             if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {

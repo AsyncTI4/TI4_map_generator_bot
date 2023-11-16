@@ -936,7 +936,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Arborec commander ", buttons);
                 }
             }
-            if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor())) {
+            if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor()) && !activeGame.getLaws().containsKey("articles_war")) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger an opportunity for a mahact mech trigger");
@@ -4914,6 +4914,13 @@ public class ButtonHelper {
         //ACs
         Button acButton = Button.secondary(finChecker + prefix + "actionCards_", "Play \"ACTION:\" AC");
         compButtons.add(acButton);
+
+        //absol
+        if(ButtonHelper.isPlayerElected(activeGame, p1, "absol_minswar") && !activeGame.getFactionsThatReactedToThis("absolMOW").contains(p1.getFaction())){
+            Button absolButton = Button.secondary(finChecker + prefix + "absolMOW_", "Absol Minister of War Action");
+            compButtons.add(absolButton);
+        }
+        
         //Generic
         Button genButton = Button.secondary(finChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
@@ -5458,6 +5465,18 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, purgeFragButtons);
             }
             case "generic" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Doing unspecified component action. You could ping Fin to add this. ");
+            case "absolMOW" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(p1)+ " is exhausting the agenda called Minister of War and spending a strategy cc to remove 1 cc from the board");
+                if(p1.getStrategicCC() > 0){
+                    p1.setStrategicCC(p1.getStrategicCC()-1);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(p1)+ " strategy cc went from "+(p1.getStrategicCC()+1)+" to "+p1.getStrategicCC());
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, activeGame, event);
+                }
+                List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(p1, activeGame, event, "absol");
+                MessageChannel channel = ButtonHelper.getCorrectChannel(p1, activeGame);
+                MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+                activeGame.setCurrentReacts("absolMOW", p1.getFaction());
+            }
             case "actionCards" -> {
                 String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
                 List<Button> acButtons = ACInfo.getActionPlayActionCardButtons(activeGame, p1);

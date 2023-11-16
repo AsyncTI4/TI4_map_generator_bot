@@ -459,8 +459,8 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
+                activeGame.setJustPlayedComponentAC(true);       
                 List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                activeGame.setJustPlayedComponentAC(true);            
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
