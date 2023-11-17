@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_021123", DataMigrationManager::migrateInitializeLO_021123);
             runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
             runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
+            runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -192,7 +194,7 @@ public class DataMigrationManager {
     }
 
     /// MIGRATION: Update "absol mode" games' deck IDs
-    /// Only truly matters if map.resetRelics or map.resetAgendas is called 
+    /// Only truly matters if map.resetRelics or map.resetAgendas is called
     /// Migrated ~pbd893ish
     public static Boolean migrateAbsolDeckIDs_210823(Game game) {
         boolean mapNeededMigrating = false;
@@ -222,7 +224,7 @@ public class DataMigrationManager {
     /// The first version of this had two issues;
     /// 1. nekro unit upgrades werent included cause the base unit didnt exist in the faction setup (updated the code below slightly)
     /// 2. the cruiser unit.json was referring to the wrong tech (this just requires us to run the same code again after changing units.json)
-    /// Better to keep this code seprate so we know what was changed when. 
+    /// Better to keep this code seprate so we know what was changed when.
     ///
     public static Boolean migrateOwnedUnitsV2_210823(Game game) {
         boolean mapNeededMigrating = false;
@@ -619,10 +621,31 @@ public class DataMigrationManager {
         return replaceStage1s(game, decksToCheck, replacements);
     }
 
-    //
+    // ACD2
     public static boolean migrateInitializeLO_081123(Game game) {
-        Map<String, String> replacements = Map.of("fulfullment_protocols", "mercenary_contract",
+        Map<String, String> replacements = Map.of("fulfillment_protocols", "mercenary_contract",
             "magen_engineers", "ancient_defenses");
+        List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
+        return replaceActionCards(game, decksToCheck, replacements);
+    }
+
+    public static boolean migrateInitializeLO_171123(Game game) {
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("adrenaline_shots", "border_skirmish");
+        replacements.put("assassination_attempt", "arms_deal");
+        replacements.put("contradictory_legal_text", "double_agents");
+        replacements.put("counter-intelligence", "crisis_management");
+        replacements.put("deep_cover_operatives", "espionage");
+        replacements.put("disrupt_logistics", "disrupted_logistics");
+        replacements.put("emergency_conscription", "pivoted_plan");
+        replacements.put("fulfillment_protocols","mercenary_contract");
+        replacements.put("graviton_shielding", "commercial_applications");
+        replacements.put("magen_engineers", "boarding_torpedoes");
+        replacements.put("production_rider", "foreign_policy");
+        replacements.put("rigged_explosives", "armistice");
+        replacements.put("shock_and_awe", "classified_weapons");
+        replacements.put("space_mines", "dangerous_conditions");
+        replacements.put("transference_protocol", "masterclass_logistics");//mechanized_workforce
         List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
         return replaceActionCards(game, decksToCheck, replacements);
     }
