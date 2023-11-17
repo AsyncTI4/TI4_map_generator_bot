@@ -155,7 +155,7 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay);
             }
-            activeGame.setCurrentReacts("scPlay"+scToPlay, message_.getJumpUrl());
+            activeGame.setCurrentReacts("scPlay"+scToPlay, message_.getJumpUrl().replace(":","666fin"));
 
             if (activeGame.isFoWMode()) {
                 // in fow, send a message back to the player that includes their emoji
