@@ -473,7 +473,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     if(p2 == player){
                         continue;
                     }
-                    if(p2.getActionCards().keySet().contains("reverse_engineer")){
+                    if(p2.getActionCards().keySet().contains("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
                         List<Button> reverseButtons = new ArrayList<Button>();
                         String key = "reverse_engineer";
                         String ac_name = Mapper.getActionCardName(key);
