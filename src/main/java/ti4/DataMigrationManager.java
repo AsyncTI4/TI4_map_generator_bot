@@ -631,21 +631,23 @@ public class DataMigrationManager {
 
     public static boolean migrateInitializeLO_171123(Game game) {
         Map<String, String> replacements = new HashMap<>();
-        replacements.put("adrenaline_shots", "border_skirmish");
-        replacements.put("assassination_attempt", "arms_deal");
+        replacements.put("adrenaline_shots", "armistice");
+        replacements.put("assassination_attempt", "armistice");
         replacements.put("contradictory_legal_text", "double_agents");
         replacements.put("counter-intelligence", "crisis_management");
         replacements.put("deep_cover_operatives", "espionage");
         replacements.put("disrupt_logistics", "disrupted_logistics");
         replacements.put("emergency_conscription", "pivoted_plan");
+        replacements.put("efficient_protocols", "commercial_applications");
         replacements.put("fulfillment_protocols","mercenary_contract");
         replacements.put("graviton_shielding", "commercial_applications");
-        replacements.put("magen_engineers", "boarding_torpedoes");
+        replacements.put("magen_engineers", "double_agents");
         replacements.put("production_rider", "foreign_policy");
-        replacements.put("rigged_explosives", "armistice");
+        replacements.put("rigged_explosives", "mechanized_workforce");
         replacements.put("shock_and_awe", "classified_weapons");
         replacements.put("space_mines", "dangerous_conditions");
-        replacements.put("transference_protocol", "masterclass_logistics");//mechanized_workforce
+        replacements.put("transference_protocol", "masterclass_logistics");
+        replacements.put("virulent_gas_canisters", "virulent_gas");
         List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
         return replaceActionCards(game, decksToCheck, replacements);
     }

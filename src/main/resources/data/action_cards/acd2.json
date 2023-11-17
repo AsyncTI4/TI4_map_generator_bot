@@ -747,8 +747,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "virulent_gas_canisters",
-    "name": "Virulent Gas Canisters",
+    "alias": "virulent_gas",
+    "name": "Virulent Gas",
     "phase": "Action",
     "window": "After your unit's BOMBARDMENT or SPACE CANNON ability produces a hit against another player's ground forces on a planet",
     "text": "Destroy half of that player's infantry on that planet, rounded up.",
