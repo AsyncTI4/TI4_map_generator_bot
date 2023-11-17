@@ -209,6 +209,12 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
 
+            codedName = "Skilled Retreat";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("retreat_"+activeGame.getActiveSystem()+"_skilled", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
             codedName = "Reparations";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveReparationsStep1", "Resolve "+codedName));
@@ -217,6 +223,16 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Uprising";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveUprisingStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Assassinate Representative";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveAssRepsStep1", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+            codedName = "Signal Jamming";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("resolveSignalJammingStep1", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
             codedName = "Spy";
@@ -306,6 +322,12 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Summit";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("resolveSummit", "Resolve "+codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
+            }
+
+            codedName = "Scuttle";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Button.success("startToScuttleAUnit_0", "Resolve "+codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
             }
             codedName = "Refit Troops";
@@ -443,8 +465,8 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
+                activeGame.setJustPlayedComponentAC(true);       
                 List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                activeGame.setJustPlayedComponentAC(true);            
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
@@ -457,7 +479,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     if(p2 == player){
                         continue;
                     }
-                    if(p2.getActionCards().keySet().contains("reverse_engineer")){
+                    if(p2.getActionCards().keySet().contains("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
                         List<Button> reverseButtons = new ArrayList<Button>();
                         String key = "reverse_engineer";
                         String ac_name = Mapper.getActionCardName(key);

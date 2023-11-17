@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.cardsac.PlayAC;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -38,6 +39,15 @@ public class TurnStart extends PlayerSubcommandData {
     }
 
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
+
+        boolean goingToPass = false;
+        if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
+            Player p2 = player;
+            if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(p2.getFaction())&&!p2.isPassed()){
+                activeGame.setCurrentReacts("Pre Pass "+player.getFaction(), "");
+                goingToPass = true;
+            }
+        }
         String text = "# " + Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " UP NEXT";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, false, event);
@@ -54,8 +64,9 @@ public class TurnStart extends PlayerSubcommandData {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(player, activeGame, event, text, fail, success);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
-
+            if(!goingToPass){
+                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
+            }
             if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
             }
@@ -70,7 +81,9 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             MessageHelper.sendMessageToChannel(gameChannel, text);
-            MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
+            if(!goingToPass){
+                MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
+            }
             if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeGame, player));
             }
@@ -78,6 +91,12 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
             }
+        }
+        if(goingToPass){
+            player.setPassed(true);
+            String text2 = player.getRepresentation() + " PASSED";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
+            TurnEnd.pingNextPlayer(event, activeGame, player);
         }
     }
 
@@ -89,9 +108,13 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
         sb.append(" Please react to the following strategy cards before doing anything else:\n");
         int count = 0;
-        for (int sc : activeGame.getPlayedSCs()) {
+        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc)).append("\n");
+                sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
+                if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
+                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc).replace("666fin", ":"));
+                }
+                sb.append("\n");
                 sendReminder = true;
                 count++;
             }

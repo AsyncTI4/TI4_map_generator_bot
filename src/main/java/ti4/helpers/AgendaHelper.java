@@ -87,6 +87,16 @@ public class AgendaHelper {
                     activeGame.addLaw(aID, winner);
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), "# Added Law with " + winner + " as the elected!");
+                if("censure".equalsIgnoreCase(agID) || "absool_censure".equalsIgnoreCase(agID)){
+                    StringBuilder message = new StringBuilder();
+                    Integer poIndex = activeGame.addCustomPO("Political Censure", 1);
+                    message.append("Custom PO 'Political Censure' has been added.\n");
+                    activeGame.scorePublicObjective(player2.getUserID(), poIndex);
+                    if(!activeGame.isFoWMode()){
+                        message.append(player2.getRepresentation()).append(" scored 'Political Censure'\n");
+                    }
+                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message.toString());
+                }
                 if ("warrant".equalsIgnoreCase(agID)) {
                     player2.setSearchWarrant();
                     activeGame.drawSecretObjective(player2.getUserID());
@@ -258,7 +268,7 @@ public class AgendaHelper {
                     List<String> laws = new ArrayList<String>();
                     laws.addAll(activeGame.getLaws().keySet());
                     for (String law : laws) {
-                        activeGame.removeLaw(agID);
+                        activeGame.removeLaw(law);
                     }
                     activeGame.setNaaluAgent(true);
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
@@ -448,6 +458,17 @@ public class AgendaHelper {
         return sb.toString();
     }
 
+    public static void offerEveryonePrepassOnShenanigans(Game activeGame){
+        for(Player player : activeGame.getRealPlayers()){
+            String msg = player.getRepresentation() + " you have the option to prepass on agenda shenanigans here. Agenda shenanigans are the action cards known as bribery, deadly plot, and the confounding/confusing legal texts. Feel free not to pre-pass, this is simply an optional way to resolve agendas faster";
+            List<Button> buttons = new ArrayList<>();
+
+            buttons.add(Button.success("resolvePreassignment_Pass On Shenanigans","Pre-pass"));
+            buttons.add(Button.danger("deleteButtons","Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+        }
+    }
+
     public static void rollIxthian(Game activeGame) {
         TextChannel watchParty = watchPartyChannel(activeGame);
         String watchPartyPing = watchPartyPing(activeGame);
@@ -499,6 +520,7 @@ public class AgendaHelper {
     }
 
     public static void pingMissingPlayers(Game activeGame) {
+       
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestWhenMsg(), activeGame);
         List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(activeGame.getLatestAfterMsg(), activeGame);
         if (missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0) {
@@ -697,7 +719,7 @@ public class AgendaHelper {
 
             while (voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
                 String skippedMessage = realIdentity2
-                    + "You are being skipped because you either have 0 votes or have ridered";
+                    + "You are being skipped because the bot believes you cannot vote";
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
                 } else {
@@ -788,8 +810,8 @@ public class AgendaHelper {
             Button noDeadly = Button.primary("generic_button_id_1", "No Deadly Plot");
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
-
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage, deadlyActionRow);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage, activeGame, deadlyActionRow, "shenanigans");
+           // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage, deadlyActionRow);
             if (!activeGame.isFoWMode()) {
                 StringBuilder loseMessage = new StringBuilder();
                 for (Player los : losers) {
@@ -819,7 +841,9 @@ public class AgendaHelper {
             Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
             Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
             List<Button> buttons = List.of(noConfounding, noConfusing);
-            MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage2, buttons);
+            //MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), resMessage2, buttons);
+            MessageHelper.sendMessageToChannelWithPersistentReacts(activeGame.getMainGameChannel(), resMessage2, activeGame, buttons, "shenanigans");
+
 
         } else {
             if (activeGame.getCurrentAgendaInfo().contains("Elect Player")) {
@@ -963,7 +987,10 @@ public class AgendaHelper {
     public static List<Button> getAfterButtons(Game activeGame) {
         List<Button> afterButtons = new ArrayList<>();
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
-        afterButtons.add(playAfter);
+        if(activeGame.isFoWMode()){
+            afterButtons.add(playAfter);
+        }
+        
 
 
         
@@ -1078,7 +1105,7 @@ public class AgendaHelper {
             }
             int counter = 0;
             while (voteInfo[0] < 1 && counter < 10) {
-                String skippedMessage = realIdentity + "You are being skipped because you either have 0 votes or have ridered";
+                String skippedMessage = realIdentity + "You are being skipped because the bot thinks you cant vote";
                 if (activeGame.isFoWMode()) {
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, activeGame, skippedMessage);
                 } else {
@@ -1549,6 +1576,11 @@ public class AgendaHelper {
                 voteCount = 0;
             }
         }
+       
+        if(hasXxchaAlliance == 0 && activeGame.getFactionsThatReactedToThis("AssassinatedReps").contains(player.getFaction())){
+            voteCount = 0;
+        }
+        
 
         return new int[] { voteCount, hasXxchaHero, hasXxchaAlliance };
     }

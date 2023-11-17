@@ -70,6 +70,16 @@ public class ButtonHelperAbilities {
                 buttons.add(Button.danger("deleteButtons", "Done"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use Mentak Agent?", buttons);
             }
+            for(Player p2: activeGame.getRealPlayers()){
+                if(p2 != pillaged &&p2 != player && p2.hasUnexhaustedLeader("yssarilagent") && player.hasLeader("mentakagent")){
+                    List<Button> buttons = new ArrayList<>();
+                    Button winnuButton = Button.success("exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
+                        .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
+                    buttons.add(winnuButton);
+                    buttons.add(Button.danger("deleteButtons", "Done"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation()+ " Wanna use Mentak Agent?", buttons);
+                }
+            }
         }
         event.getMessage().delete().queue();
     }
@@ -154,6 +164,9 @@ public class ButtonHelperAbilities {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         List<String> tiles = new ArrayList<>();
         for (String planet : planets) {
+            if(planet.contains("custodia") || planet.contains("ghoti")){
+                continue;
+            }
             Tile tile = activeGame.getTile(AliasHandler.resolveTile(planet));
             if (tiles.contains(tile.getPosition())) {
                 continue;

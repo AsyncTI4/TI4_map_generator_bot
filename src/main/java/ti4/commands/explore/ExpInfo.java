@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import java.util.List;
 import java.util.Map;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
@@ -11,6 +12,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -51,7 +53,14 @@ public class ExpInfo extends ExploreSubcommandData {
         }
         Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        for (String currentType : types) {
+       secondHalfOfExpInfo(types, event, player, activeGame, over);
+    }
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide){
+        secondHalfOfExpInfo(types, event, player, activeGame, overRide, false);
+    }
+
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide, boolean fullText){
+         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             ArrayList<String> deck = activeGame.getExploreDeck(currentType);
             Collections.sort(deck);
@@ -65,26 +74,26 @@ public class ExpInfo extends ExploreSubcommandData {
 
             info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (")
                 .append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
-            info.append(listNames(deck, true)).append("\n");
+            info.append(listNames(deck, true, fullText)).append("\n");
 
             info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (")
                 .append(discardCount).append(")\n");
-            info.append(listNames(discard, false));
+            info.append(listNames(discard, false, fullText));
 
             if (types.indexOf(currentType) != types.size() - 1) {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || over || !activeGame.isFoWMode()) {
-                sendMessage(info.toString());
+            if (player == null || player.getSCs().isEmpty() || overRide || !activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
-            sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase())  && activeGame.isFoWMode()&& !overRide) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
 
-    private String listNames(List<String> deck, boolean showPercents) {
+    private String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
         Integer deckCount = deck.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
@@ -102,7 +111,13 @@ public class ExpInfo extends ExploreSubcommandData {
         for (Map.Entry<String, List<ExploreModel>> entry : orderedExplores) {
             String exploreName = entry.getKey();
             List<String> ids = entry.getValue().stream().map(ExploreModel::getId).toList();
-            sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
+            
+            if(showFullText){
+                sb.append("> ").append(exploreName).append("\n").append(entry.getValue().get(0).getText()).append(" [").append(String.join(", ", ids)).append("]");
+            }else{
+                sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
+            }
+            
             if (showPercents && ids.size() > 1) {
                 sb.append(" _").append(formatPercent.format(deckDrawChance * ids.size())).append("_");
             }

@@ -3,6 +3,7 @@ package ti4.commands.map;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -19,8 +20,8 @@ import org.jetbrains.annotations.NotNull;
 abstract public class AddRemoveTile extends MapSubcommandData {
     public AddRemoveTile(@NotNull String name, @NotNull String description) {
         super(name, description);
-        addOption(OptionType.STRING, Constants.TILE_NAME, "Tile name", true);
-        addOption(OptionType.STRING, Constants.POSITION, "Tile position on map", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true));
     }
 
     abstract protected void tileAction(Tile tile, String position, Game userActiveGame);
@@ -52,6 +53,10 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         }
 
         String tileName = Mapper.getTileID(planetTileName);
+        if(tileName == null){
+            MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+            return null;
+        }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);

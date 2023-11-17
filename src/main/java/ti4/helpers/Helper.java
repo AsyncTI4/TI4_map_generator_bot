@@ -1543,7 +1543,11 @@ public class Helper {
             if (tile == null) {
                 tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
             }
-            if (player.getFaction().contains("ghost") && activeGame.getTile("17") != null) {
+            boolean ghosty = false;
+            if(player.getPlayerStatsAnchorPosition() != null && activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null && activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID().equals("17")){
+                ghosty = true;
+            }
+            if ((player.getFaction().contains("ghost") && activeGame.getTile("17") != null) || ghosty) {
                 tile = activeGame.getTile("17");
             }
             hsLocations.add(Integer.parseInt(tile.getPosition()));

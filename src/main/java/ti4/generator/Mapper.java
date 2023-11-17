@@ -201,6 +201,7 @@ public class Mapper {
     }
 
     public static String getDecalName(String decalID) {
+        if (decalID == null || "null".equals(decalID)) return null;
         return decals.getProperty(decalID);
     }
 
@@ -237,6 +238,9 @@ public class Mapper {
     }
 
     public static String getTileID(String tileID) {
+        if(TileHelper.getAllTiles().get(tileID) == null){
+            return null;
+        }
         return TileHelper.getAllTiles().get(tileID).getImagePath();
     }
 
@@ -332,8 +336,13 @@ public class Mapper {
     // }
 
     public static UnitKey getUnitKey(String unitID, String colorID) {
+        if (!isValidAsyncUnitID(unitID)) return null;
         String actuallyColorID = getColorID(colorID) == null ? colorID : getColorID(colorID);
         return Units.getUnitKey(unitID, actuallyColorID);
+    }
+
+    public static boolean isValidAsyncUnitID(String asyncUnitID) {
+        return getUnitIDList().contains(asyncUnitID);
     }
 
     public static Set<String> getUnitIDList() {

@@ -21,7 +21,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
@@ -117,6 +119,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
+        ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         TurnStart.turnStart(event, activeGame, nextPlayer);
     }
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
@@ -177,6 +180,7 @@ public class TurnEnd extends PlayerSubcommandData {
 
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
+            SOInfo.sendSecretObjectiveInfo(activeGame, player);
             List<String> relics = new ArrayList<>();
             relics.addAll(player.getRelics());
             for (String relic : relics) {
@@ -232,6 +236,42 @@ public class TurnEnd extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", buttons);
             }
+
+            if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
+                for (String pl : player.getPlanets()) {
+                    Tile tile = activeGame.getTile(AliasHandler.resolveTile(pl));
+                    if (tile == null) {
+                        continue;
+                    }
+                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                    if (unitHolder != null && unitHolder.getTokenList() != null
+                        && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+
+                            if(player.hasRelic("emphidia")){
+                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                player.getRepresentation()
+                                    + "Reminder this is not the window to use Crown of Emphidia. You can purge crown of emphidia in the status homework phase, which is when buttons will appear");
+                            }else{
+                                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                    player.getRepresentation()
+                                        + "Reminder this is the window to use Crown of Emphidia.");
+                                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                                    player.getRepresentation()
+                                        + " You can use these buttons to resolve Crown of Emphidia",
+                                    ButtonHelper.getCrownButtons());
+                            }
+                        
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
         }
 
         for (Player p2 : activeGame.getRealPlayers()) {

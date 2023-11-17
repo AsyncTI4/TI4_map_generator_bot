@@ -49,6 +49,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         activeGame.setCurrentReacts("noWhenThisAgenda","");
         activeGame.setCurrentReacts("noAfterThisAgenda","");
+        activeGame.setCurrentReacts("AssassinatedReps", "");
         String id = activeGame.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeGame.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
@@ -119,6 +120,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             }
 
         }
+        activeGame.setCurrentReacts("Pass On Shenanigans", "");
+        AgendaHelper.offerEveryonePrepassOnShenanigans(activeGame);
         activeGame.resetCurrentAgendaVotes();
         activeGame.setHackElectionStatus(false);
         activeGame.setPlayersWhoHitPersistentNoAfter("");

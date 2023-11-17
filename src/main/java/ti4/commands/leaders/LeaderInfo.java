@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -42,8 +43,8 @@ public class LeaderInfo extends LeaderSubcommandData {
         sendLeadersInfo(activeGame, player, event);
     }
 
-    public static void sendLeadersInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+    public static void sendLeadersInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+        String headerText = player.getRepresentation() + " used something, idk, this silly";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendLeadersInfo(activeGame, player);
     }

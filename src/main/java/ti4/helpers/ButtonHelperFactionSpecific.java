@@ -33,6 +33,38 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+
+    public static void offerASNButtonsStep1(Game activeGame, Player player, String warfareOrTactical){
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have the ability to use Agency Supply Network (ASN). Select the tile you want to build out of, or decline (please decline if you already used ASN)";
+        List<Button> buttons = new ArrayList<>();
+        Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(player, activeGame);
+        for(Tile tile : tiles){
+            buttons.add(Button.success("asnStep2_"+tile.getPosition()+"_"+warfareOrTactical, tile.getRepresentation()));
+        }
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+    public static void resolveASNStep2(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        String msg = ButtonHelper.getIdent(player) + " is resolving Agency Supply Network in tile "+tile.getRepresentation();
+        
+        String warfareOrTactical = buttonID.split("_")[2];
+        ButtonHelper.sendMessageToRightStratThread(player, activeGame, msg, warfareOrTactical);
+        List<Button> buttons = new ArrayList<>();
+        buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, warfareOrTactical, "place");
+        String message = player.getRepresentation()
+            + " Use the buttons to produce."
+            + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
+        if (!activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        }
+        event.getMessage().delete().queue();
+       
+    }
+
     public static boolean somebodyHasThisRelic(Game activeGame, String relic) {
         boolean somebodyHasIt = false;
         for (Player player : activeGame.getRealPlayers()) {
@@ -51,6 +83,62 @@ public class ButtonHelperFactionSpecific {
             }
         }
         return null;
+    }
+
+    public static void offerKeleresStartingTech(Player player, Game activeGame, ButtonInteractionEvent event){
+        List<String> techToGain = new ArrayList<>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if(p2 == player){
+                continue;
+            }
+            techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, activeGame);
+        }
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        event.getMessage().delete().queue();
+        List<Button> techs2 = new ArrayList<>();
+        techs2.addAll(techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get a tech the other players had", techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get another tech the other players had", techs2);
+
+    }
+    public static void offerArgentStartingTech(Player player, Game activeGame){
+        List<String> techToGain = new ArrayList<>();
+        techToGain.add("st");
+        techToGain.add("nm");
+        techToGain.add("ps");
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        List<Button> techs2 = new ArrayList<>();
+        techs2.addAll(techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get one of the 3 starting argent tech", techs);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to the second of the 3 starting argent tech", techs2);
+    }
+    public static void offerWinnuStartingTech(Player player, Game activeGame){
+        List<String> techToGain = new ArrayList<>();
+        techToGain.add("st");
+        techToGain.add("nm");
+        techToGain.add("ps");
+        techToGain.add("amd");
+        techToGain.add("det");
+        techToGain.add("aida");
+        techToGain.add("pa");
+        techToGain.add("sdn");
+        List<Button> techs = new ArrayList<>();
+        for (String tech : techToGain) {
+            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use the buttons to get one of the starting winnu tech", techs);
     }
 
     public static void offerSpyNetOptions(Player player){
@@ -110,6 +198,24 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void checkForNaaluPN(Game activeGame){
+        activeGame.setCurrentReacts("Play Naalu PN", "");
+        for(Player player : activeGame.getRealPlayers()){
+            boolean naalu = false;
+            for (String pn : player.getPromissoryNotes().keySet()) {
+                if ("gift".equalsIgnoreCase(pn) && !player.ownsPromissoryNote("gift") ) {
+                    naalu = true;
+                }
+            }
+            if(naalu){
+                String msg = player.getRepresentation() + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("resolvePreassignment_Play Naalu PN","Pre-play Naalu PN"));
+                buttons.add(Button.danger("deleteButtons","Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+            }
+        }
+    }
 
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -258,7 +364,6 @@ public class ButtonHelperFactionSpecific {
             int oldTg = player2.getTg();
             player2.setTg(oldTg + 3);
             ButtonHelperAbilities.pillageCheck(player2, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player2, activeGame, 3);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), ButtonHelper.getIdent(player2) + " gained 3tg from QDN (" + oldTg + "->" + player2.getTg() + ")");
         }
         player1.addSC(player2SC);
@@ -269,6 +374,7 @@ public class ButtonHelperFactionSpecific {
             "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
+        ButtonHelper.startActionPhase(event, activeGame);
     }
 
     public static void resolveHacanMechTradeStepTwo(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -488,7 +594,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game activeGame) {
-        if (activeGame.getPlayerFromColorOrFaction(Mapper.getPromissoryNoteOwner("ra")) == player) {
+        if (activeGame.getPNOwner("ra") != null && activeGame.getPNOwner("ra") == player) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
                 for (Player p2 : activeGame.getRealPlayers()) {
                     if (p2 == player) {

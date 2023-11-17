@@ -82,6 +82,7 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
+        activeGame.setCurrentReacts("absolMOW", "");
         activeGame.setHasHadAStatusPhase(true);
         if(activeGame.isSpinMode()){
             new SpinTilesInFirstThreeRings().spinRings(activeGame);

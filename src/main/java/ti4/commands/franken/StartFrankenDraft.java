@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.draft.FrankenDraft;
 import ti4.draft.PoweredFrankenDraft;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
@@ -20,7 +21,9 @@ public class StartFrankenDraft extends FrankenSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-
+        if(activeGame.getRealPlayers().size() < (activeGame.getPlayers().size()-2)){
+            ButtonHelper.setUpFrankenFactions(activeGame, event);
+        }
         FrankenDraftHelper.clearPlayerHands(activeGame);
 
         boolean stratPings = event.getOption(Constants.POWERED, false, OptionMapping::getAsBoolean);

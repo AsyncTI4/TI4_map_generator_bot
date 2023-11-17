@@ -168,7 +168,7 @@ public class DataMigrationManager {
         };
 
         List<Player> players = new ArrayList<>(activeGame.getPlayers().values());
-        int playerCount = activeGame.getRealPlayers().size();
+        int playerCount = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
 
         ArrayList<String> setup;
         if (playerCount == 6 && activeGame.getRingCount() == 3) {

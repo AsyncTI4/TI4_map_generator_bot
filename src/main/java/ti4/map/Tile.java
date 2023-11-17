@@ -67,6 +67,7 @@ public class Tile {
 
     @Nullable
     public static String getUnitPath(UnitKey unitID) {
+        if (unitID == null) return null;
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID.toString());
@@ -303,6 +304,9 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
+            if (Mapper.getTileRepresentations().get(getTileID()) == null){
+                return getTileID() + "(" + getPosition()+ ")";
+            }
             return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
             // DO NOTHING
@@ -332,7 +336,7 @@ public class Tile {
     }
 
     @JsonIgnore
-    public String getRepresentationForAutoComplete() {
+    public String getAutoCompleteName() {
         try {
             return getPosition() + " (" + getRepresentation() + ")";
         } catch (Exception e) {
@@ -433,5 +437,12 @@ public class Tile {
             .map(Map.Entry::getKey)
             .filter(x -> x != null)
             .anyMatch(condition);
+    }
+
+    @JsonIgnore
+    public boolean search(String searchString) {
+        return getTileID().contains(searchString) ||
+            getPosition().contains(searchString)  ||
+            getTileModel().search(searchString);
     }
 }

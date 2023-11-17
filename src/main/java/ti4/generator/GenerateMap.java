@@ -151,7 +151,7 @@ public class GenerateMap {
             int mostObjs = Math.max(Math.max(stage1, stage2), other);
             int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
-            int playerCountForMap = activeGame.getRealPlayers().size();
+            int playerCountForMap = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
             int playerHeight = 340;
             int playerY = playerCountForMap * playerHeight;
 
@@ -3384,7 +3384,7 @@ public class GenerateMap {
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getRepresentationForAutoComplete());
+                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
                     continue;
                 }
                 BufferedImage tokenImage = ImageHelper.read(tokenPath);
