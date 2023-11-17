@@ -11,8 +11,10 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -64,6 +66,14 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
                         if (player.hasInf2Tech()) {
                             ButtonHelper.resolveInfantryDeath(activeGame, player, numTG);
+                        }
+                        boolean cabalMech = false;
+                        Player p2 = player;
+                        if(p2.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && p2.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war")){
+                            cabalMech = true;
+                        }
+                        if (p2.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(p2, tile, unitHolder.getName())) {
+                            ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, numTG, "infantry", event);
                         }
 
                     }

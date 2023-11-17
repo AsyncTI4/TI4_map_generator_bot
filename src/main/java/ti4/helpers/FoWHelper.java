@@ -550,7 +550,7 @@ public class FoWHelper {
 
 		for (Player player_ : activeGame.getPlayers().values()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
-			if ("ghost".equals(player_.getFaction())) {
+			if (player_.hasAbility("quantum_entanglement")) {
 				tiles.addAll(getWormholeAdjacencies(activeGame, position, player_));
 			}
 
