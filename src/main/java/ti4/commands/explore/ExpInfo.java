@@ -55,8 +55,11 @@ public class ExpInfo extends ExploreSubcommandData {
         player = Helper.getGamePlayer(activeGame, player, event, null);
        secondHalfOfExpInfo(types, event, player, activeGame, over);
     }
-
     public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide){
+        secondHalfOfExpInfo(types, event, player, activeGame, overRide, false);
+    }
+
+    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide, boolean fullText){
          for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             ArrayList<String> deck = activeGame.getExploreDeck(currentType);
@@ -71,11 +74,11 @@ public class ExpInfo extends ExploreSubcommandData {
 
             info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (")
                 .append(deckCount).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
-            info.append(listNames(deck, true)).append("\n");
+            info.append(listNames(deck, true, fullText)).append("\n");
 
             info.append(Emojis.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (")
                 .append(discardCount).append(")\n");
-            info.append(listNames(discard, false));
+            info.append(listNames(discard, false, fullText));
 
             if (types.indexOf(currentType) != types.size() - 1) {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
@@ -90,7 +93,7 @@ public class ExpInfo extends ExploreSubcommandData {
         }
     }
 
-    private String listNames(List<String> deck, boolean showPercents) {
+    private String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
         Integer deckCount = deck.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
@@ -108,7 +111,13 @@ public class ExpInfo extends ExploreSubcommandData {
         for (Map.Entry<String, List<ExploreModel>> entry : orderedExplores) {
             String exploreName = entry.getKey();
             List<String> ids = entry.getValue().stream().map(ExploreModel::getId).toList();
-            sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
+            
+            if(showFullText){
+                sb.append("> ").append(exploreName).append("\n").append(entry.getValue().get(0).getText()).append(" [").append(String.join(", ", ids)).append("]");
+            }else{
+                sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
+            }
+            
             if (showPercents && ids.size() > 1) {
                 sb.append(" _").append(formatPercent.format(deckDrawChance * ids.size())).append("_");
             }
