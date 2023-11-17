@@ -183,9 +183,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder(getName());
-        sb.append(" (");
-        if (!getFaction().orElse("").isBlank()) sb.append(getFaction()).append(") (");
-        sb.append(getSource()).append(")");
+        if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
+        sb.append(" [").append(getSource()).append("]");
         return sb.toString();
     }
 }
