@@ -112,7 +112,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
                 if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
-                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc));
+                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc).replace("666fin", ":"));
                 }
                 sb.append("\n");
                 sendReminder = true;

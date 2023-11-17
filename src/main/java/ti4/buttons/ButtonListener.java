@@ -95,6 +95,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -480,9 +481,19 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, activeGame, event, pos1, pos2));
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("retreat_")) {
-            String pos = buttonID.replace("retreat_", "");
-            String message = trueIdentity + " Use buttons to select a system to retreat too. Warning: bot does not know what the valid retreat tiles are, you will need to verify these.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos));
+            String pos = buttonID.split("_")[1];
+            boolean skilled = false;
+            if(buttonID.contains("skilled")){
+                skilled = true;
+                event.getMessage().delete().queue();
+            }
+            if(buttonID.contains("foresight")){
+                MessageHelper.sendMessageToChannel(event.getChannel(), ident+" lost a strategy cc to resolve the foresight ability");
+                player.setStrategicCC(player.getStrategicCC()-1);
+                skilled = true;
+            }
+            String message = trueIdentity + " Use buttons to select a system to move too. Warning: bot does not always know what the valid retreat tiles are, you will need to verify these.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeGame, pos, skilled));
         } else if (buttonID.startsWith("exhaustAgent_")) {
             ButtonHelperAgents.exhaustAgent(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("exhaustTCS_")) {
@@ -1436,6 +1447,9 @@ public class ButtonListener extends ListenerAdapter {
                 String message = Helper.getPlayerRepresentation(yssaril, activeGame, activeGame.getGuild(), true) + " " + offerName + " has offered you the action card " + buttonLabel
                     + " for your Yssaril Hero play. Use buttons to accept or reject it";
                 MessageHelper.sendMessageToChannelWithButtons(yssaril.getCardsInfoThread(), message, acButtons);
+                ActionCardModel ac = Mapper.getActionCard(acID);
+                
+                MessageHelper.sendMessageToChannel(yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as follows: \n"+ac.getText());
                 event.getMessage().delete().queue();
             }
         } else if (buttonID.startsWith("statusInfRevival_")) {
@@ -1764,8 +1778,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("prismStep2_")) {
+            new PlanetExhaustAbility().resolvePrismStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("prismStep3_")) {
+            new PlanetExhaustAbility().resolvePrismStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("showDeck_")) {
             ButtonHelper.resolveDeckChoice(activeGame, event, buttonID, player);
+         } else if (buttonID.startsWith("showTextOfDeck_")) {
+            ButtonHelper.resolveShowFullTextDeckChoice(activeGame, event, buttonID, player);
         } else if (buttonID.startsWith("assRepsStep2_")) {
             ButtonHelperActionCards.resolveAssRepsStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("setupStep1_")) {

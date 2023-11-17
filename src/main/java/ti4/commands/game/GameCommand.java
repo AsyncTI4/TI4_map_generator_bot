@@ -84,8 +84,9 @@ public class GameCommand implements Command {
                 buttons.add(linkToWebsite);
             }
             buttons.add(Button.success("cardsInfo", "Cards Info"));
-            buttons.add(Button.secondary("showGameAgain", "Show Game"));
             buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
+            buttons.add(Button.secondary("showGameAgain", "Show Game"));
+            
             MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "", buttons);
         }
     }

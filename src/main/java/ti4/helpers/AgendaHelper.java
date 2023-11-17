@@ -268,7 +268,7 @@ public class AgendaHelper {
                     List<String> laws = new ArrayList<String>();
                     laws.addAll(activeGame.getLaws().keySet());
                     for (String law : laws) {
-                        activeGame.removeLaw(agID);
+                        activeGame.removeLaw(law);
                     }
                     activeGame.setNaaluAgent(true);
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");

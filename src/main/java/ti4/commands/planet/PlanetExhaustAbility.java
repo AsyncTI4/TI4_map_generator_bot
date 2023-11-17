@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.helpers.AliasHandler;
@@ -72,6 +74,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player)+" Chose to Exhaust Tarrock's Ability to draw 1 agenda and bottom/top it");
             new DrawAgenda().drawAgenda(1, activeGame, player);
         }
+        if("prism".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))){
+            MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player)+" Chose to Exhaust Prism's Ability to Force Another Player to give either an AC or PN");
+            resolvePrismStep1(player, activeGame);
+        }
         if("echo".equalsIgnoreCase(AliasHandler.resolvePlanet(planet))){
             MessageHelper.sendMessageToChannel(channel, ButtonHelper.getIdent(player)+" Chose to Exhaust Echo's Ability");
              buttons.addAll(ButtonHelper.getEchoAvailableSystems(activeGame, player));
@@ -91,5 +97,52 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
            
         }
 
+    }
+
+    public void resolvePrismStep1(Player player, Game activeGame) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("prismStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("prismStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who you want to force into giving you a PN or AC", buttons);
+    }
+    public void resolvePrismStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+       
+            buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_AC", "Send AC"));
+            buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_PN", "Send PN"));
+        
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),ButtonHelper.getIdent(player)+" chose "+ButtonHelper.getIdentOrColor(p2, activeGame)+" as the target of the prism ability. The target has been sent buttons to resolve.");
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
+    }
+    public void resolvePrismStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        String pnOrAC = buttonID.split("_")[2];
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player)+" chose to send a "+pnOrAC);
+        if(pnOrAC.equalsIgnoreCase("pn")){
+            buttons =  ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " resolve", buttons);
+
+        }else{
+            String buttonID2 = "transact_ACs_" + p2.getFaction();
+            ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID2, event);
+            return;
+        }
+           
+        
     }
 }
