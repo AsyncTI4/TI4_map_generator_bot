@@ -7,12 +7,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Storage;
 
 public class AgendaModelTest {
 
     AgendaModel agendaModel = new AgendaModel();
+
+    @BeforeAll
+    public static void init() {
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+    }
 
     @BeforeEach
     public void setup() {
@@ -21,26 +37,27 @@ public class AgendaModelTest {
 
     @Test
     public void testIsValid() {
-        assertFalse(agendaModel.isValid());
+        AgendaModel ixthian = Mapper.getAgenda("artifact");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setAlias("testAlias");
-        assertFalse(agendaModel.isValid());
+        ixthian.setAlias("testAlias");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setName("testName");
-        assertFalse(agendaModel.isValid());
+        ixthian.setName("testName");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setCategory("faction");
-        agendaModel.setCategoryDescription("testFaction");
-        assertFalse(agendaModel.isValid());
+        ixthian.setCategory("agenda");
+        ixthian.setCategoryDescription("testFaction");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setType("testType");
-        assertFalse(agendaModel.isValid());
+        ixthian.setType("testType");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setText1("testText1");
-        assertFalse(agendaModel.isValid());
+        ixthian.setText1("testText1");
+        assertTrue(ixthian.isValid());
 
-        agendaModel.setSource("testSource");
-        assertFalse(agendaModel.isValid());
+        ixthian.setSource("testSource");
+        assertTrue(ixthian.isValid());
     }
 
     @Test
