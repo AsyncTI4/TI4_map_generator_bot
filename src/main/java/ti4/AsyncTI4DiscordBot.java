@@ -107,6 +107,7 @@ public class AsyncTI4DiscordBot {
         jda = JDABuilder.createDefault(args[0])
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .setChunkingFilter(ChunkingFilter.ALL)
             .setEnableShutdownHook(false)
