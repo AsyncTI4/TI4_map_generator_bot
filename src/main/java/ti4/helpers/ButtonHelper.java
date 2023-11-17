@@ -2373,6 +2373,9 @@ public class ButtonHelper {
                         StringBuilder sb = new StringBuilder();
                         sb.append(ButtonHelper.getTrueIdentity(p2, activeGame));
                         sb.append(" You are getting this ping because SC #"+sc+" has been played and now it is their turn again and you still havent reacted. Please do so, or ping Fin if this is an error. ");
+                        if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
+                            sb.append("Message link is: "+activeGame.getFactionsThatReactedToThis("scPlay"+sc)+"\n");
+                        }
                         sb.append("You currently have ").append(p2.getStrategicCC()).append(" CC in your strategy pool.");
                         if (!p2.hasFollowedSC(sc)) {
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());

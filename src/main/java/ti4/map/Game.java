@@ -881,6 +881,28 @@ public class Game {
         return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
+    public List<Integer> getPlayedSCsInOrder(Player player){
+        Set<Integer> playedSCs = getPlayedSCs();
+        List<Integer> orderedSCsBasic = new ArrayList<>();
+
+        orderedSCsBasic.addAll(playedSCs);
+        Collections.sort(orderedSCsBasic);
+        List<Integer> orderedSCs = new ArrayList<>();
+        int playerSC = player.getLowestSC();
+        for(int sc : orderedSCsBasic){
+            if(sc > playerSC){
+                orderedSCs.add(sc);
+            }
+        }
+        for(int sc : orderedSCsBasic){
+            if(sc < playerSC){
+                orderedSCs.add(sc);
+            }
+        }
+
+        return orderedSCs;
+    }
+
     public DisplayType getDisplayTypeForced() {
         return displayTypeForced;
     }
