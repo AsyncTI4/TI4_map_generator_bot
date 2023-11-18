@@ -52,7 +52,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getShortTag() {
-        return Optional.ofNullable(shortTag).orElse(StringUtils.left(getAlias(), 3).toUpperCase());
+        return StringUtils.left(Optional.ofNullable(shortTag).orElse(getAlias()), 3).toUpperCase();
     }
 
     public String getHomeSystem() {
