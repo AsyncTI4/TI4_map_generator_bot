@@ -1,0 +1,299 @@
+[
+  {
+    "alias": "adrenaline_shots",
+    "name": "Adrenaline Shots",
+    "phase": "Action",
+    "window": "After you exhaust 1 of your agents",
+    "text": "Ready that agent or unlock your commander.",
+    "flavorText": "Suffi was exhausted from the haul. After months of casing trade vessels, she had finally found what those pesky Tribesmen had paid so handsomely for. One of her crew handed her a vial from the thousands that had been stashed away inconspicuously. Without hesitation, she drank deeply from it.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "adrenaline_shots2",
+    "name": "Adrenaline Shots",
+    "phase": "Action",
+    "window": "After you exhaust 1 of your agents",
+    "text": "Ready that agent or unlock your commander.",
+    "flavorText": "Suffi was exhausted from the haul. After months of casing trade vessels, she had finally found what those pesky Tribesmen had paid so handsomely for. One of her crew handed her a vial from the thousands that had been stashed away inconspicuously. Without hesitation, she drank deeply from it.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "anti-gravity_drive2",
+    "name": "Anti-Gravity Drive",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Choose 1 system that does not contain planets or anomalies. During this tactical action, you treat that system as if it contains each non-delta wormhole; you may also treat it as if it contains a gravity rift.",
+    "flavorText": "Rin had received multiple warnings to avoid working with the Cabal. However, existential threats to the galaxy had never done much to quell her curiosity.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "artifact_hunters2",
+    "name": "Artifact Hunters",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that fragment to gain 1 relic.",
+    "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "artifact_hunters3",
+    "name": "Artifact Hunters",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that fragment to gain 1 relic.",
+    "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "artifact_hunters4",
+    "name": "Artifact Hunters",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that fragment to gain 1 relic.",
+    "flavorText": "\"This is…\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "artifact_research2",
+    "name": "Artifact Research",
+    "phase": "Action",
+    "window": "When you spend resources to research",
+    "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may discard 2 of your relic fragments to research 1 additional technology.",
+    "flavorText": "The observation team had protested with one voice, threatening to report to their respective governments and return with fleets should the Creuss continue to bar them from this discovery.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "assassination_attempt",
+    "name": "Assassination Attempt",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 player and spend up to 3 trade goods. That player must exhaust their agent. Then, for each trade good you spent, they must discard 1 action card.",
+    "flavorText": "Secret agent waiting, patient, forward deployed to a deep space station, cloaked up with transparasteel plating.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "brutal_occupation2",
+    "name": "Brutal Occupation",
+    "phase": "Action",
+    "window": "After you gain control of a planet",
+    "text": "Ready that planet and gain 2 commodities.",
+    "flavorText": "Cabal cultists were known to quell threats of rebellion with stories of their penal colonies on the other side of the rift.",
+    "source": "action_deck_2_asteroid"
+  },
+  {
+    "alias": "corporate_lobbying2",
+    "name": "Corporate Lobbying",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
+    "flavorText": "As he signed the last of the costly trade deals, Mot Nesretep sank back into his chair. It was a gamble with the fate of the galaxy at stake, but his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "counter-intelligence",
+    "name": "Counter-intelligence",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Remove 1 token from another player's strategy pool and return it to their reinforcements.",
+    "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "derelict_space_station2",
+    "name": "Derelict Space Station",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 system that contains your ships and does not contain any planets. If that system does not already have a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
+    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "derelict_space_station3",
+    "name": "Derelict Space Station",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 system that contains your ships and does not contain any planets. If that system does not already have a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
+    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "derelict_space_station4",
+    "name": "Derelict Space Station",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 system that contains your ships and does not contain any planets. If that system does not already have a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
+    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "fire_for_effect2",
+    "name": "Fire for Effect",
+    "phase": "Action",
+    "window": "At the end of a round of space combat",
+    "text": "Your units in the active system use their SPACE CANNON abilities against your opponent's ships.",
+    "flavorText": "Trrakan had stockpiled munitions for this moment. If the reports were correct, and their forces were able to stave off the invasion for long enough, the enemy would find themselves under near continuous fire.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "overtime2",
+    "name": "Overtime",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Spend between 1 and 3 trade goods to ready an equal number of planets you control.",
+    "flavorText": "The factories reopened without resistance in the end. Was it the generous payments or the Letnev gunships overhead?",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "propaganda2",
+    "name": "Propaganda",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex. Then, place a number of infantry on each of those planets equal to their influence value.",
+    "flavorText": "Sara, Blake, and Nolad stepped in front of the camera with a salute as Jace spoke, \"They're doing their part. Are you? Join the Mobile Infantry and save the universe. Service guarantees citizenship.\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "prophecy2",
+    "name": "Prophecy",
+    "phase": "Any",
+    "window": "After a die is rolled",
+    "text": "Apply +3 or -3 to the result of that roll.",
+    "flavorText": "\"Well, I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "proxy_war2",
+    "name": "Proxy War",
+    "phase": "Action",
+    "window": "Before you activate a system",
+    "text": "During this tactical action, you do not count as having activated a system containing another player's units for the purpose of promissory note ability timings.",
+    "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "public_outcry2",
+    "name": "Public Outcry",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "During this agenda, players cannot abstain if they are able to cast votes. If you did not cast votes for the resolved outcome of this agenda, each player who did must discard 1 action card.",
+    "flavorText": "The public was split, and equally outraged. This was a game of cutting one's losses.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "rapid_mobilization2",
+    "name": "Rapid Mobilization",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 of your units with Production; use that units Production ability, producing only infantry or fighters.",
+    "flavorText": "Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "reconstruction2",
+    "name": "Reconstruction",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Ready 1 planet you control. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+    "flavorText": "The world was far from its former glory, but with proper care, it would become a paradise once more.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "relay_connection2",
+    "name": "Relay Connection",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Choose 1 ship type. You may produce 1 ship of that type in each system that contains 1 of your space docks.",
+    "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns, my soul alight! This is our freedom!\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "shrapnel_turrets2",
+    "name": "Shrapnel Turrets",
+    "phase": "Action",
+    "window": "Before you roll dice for Anti-Fighter Barrage",
+    "text": "Each of your non-fighter ships in the active system that do not have Anti-Fighter Barrage gain Anti-Fighter Barrage 9 (x2) until the end of the combat.",
+    "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "side_project2",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
+    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "side_project3",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
+    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "side_project4",
+    "name": "Side Project",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
+    "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "steal_prototype2",
+    "name": "Steal Prototype",
+    "phase": "Action",
+    "window": "After you destroy another player's unit",
+    "text": "If that player owns the unit upgrade technology for that unit, spend 4 resources to gain that unit upgrade technology.",
+    "flavorText": "The reengineering efforts were surprising. Many of the Hylar ship's advancements could be retrofitted with ease.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "steal_prototype3",
+    "name": "Steal Prototype",
+    "phase": "Action",
+    "window": "After you destroy another player's unit",
+    "text": "If that player owns the unit upgrade technology for that unit, spend 4 resources to gain that unit upgrade technology.",
+    "flavorText": "The reengineering efforts were surprising. Many of the Hylar ship's advancements could be retrofitted with ease.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "steal_prototype4",
+    "name": "Steal Prototype",
+    "phase": "Action",
+    "window": "After you destroy another player's unit",
+    "text": "If that player owns the unit upgrade technology for that unit, spend 4 resources to gain that unit upgrade technology.",
+    "flavorText": "The reengineering efforts were surprising. Many of the Hylar ship's advancements could be retrofitted with ease.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "timely_reinforcements2",
+    "name": "Timely Reinforcements",
+    "phase": "Action",
+    "window": "At the start of the second round of a space combat",
+    "text": "Place 2 fighters from your reinforcements into the active system.",
+    "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "timely_reinforcements3",
+    "name": "Timely Reinforcements",
+    "phase": "Action",
+    "window": "At the start of the second round of a space combat",
+    "text": "Place 2 fighters from your reinforcements into the active system.",
+    "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "timely_reinforcements4",
+    "name": "Timely Reinforcements",
+    "phase": "Action",
+    "window": "At the start of the second round of a space combat",
+    "text": "Place 2 fighters from your reinforcements into the active system.",
+    "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
+    "source": "action_deck_2_old"
+  }
+]
