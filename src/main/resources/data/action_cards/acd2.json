@@ -292,7 +292,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player with the most victory points. Look at that player's action cards or 1 of their unscored secret objectives, at random.",
+    "text": "Choose 1 player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -337,7 +337,7 @@
     "name": "Foreign Policy",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of action cards from the action card deck equal to the number of other players. Each other player may give you 1 trade good or commodity to take 1 of those action cards. Then, take 1 of the remaining cards and discard the rest.",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those actions card to each other player and take the remaining card.",
     "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
@@ -454,7 +454,7 @@
     "name": "Mechanized Workforce",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "For each mech in the active system, apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
+    "text": "For each mech in the active system, apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 2.",
     "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
@@ -562,7 +562,7 @@
     "name": "Reconstruction",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready 1 planet you control. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+    "text": "Ready 1 planet you control that has a trait. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
     "flavorText": "Tungstantus collapsed mid-step as their energy completely depleted. The world was far from its former glory, and they would not stop until it was a paradise once more.",
     "source": "action_deck_2"
   },
