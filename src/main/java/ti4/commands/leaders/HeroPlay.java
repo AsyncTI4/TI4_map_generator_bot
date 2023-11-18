@@ -83,10 +83,10 @@ public class HeroPlay extends LeaderAction {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(activeGame.getOutputVerbosity());
         StringBuilder sb = new StringBuilder();
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " played:");
-            event.getMessageChannel().sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " played:");
+            ButtonHelper.getCorrectChannel(player, activeGame).sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText)).queue();
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.getFactionLeaderEmoji(playerLeader));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), Emojis.getFactionLeaderEmoji(playerLeader));
             sb.append(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
         }
@@ -95,11 +95,14 @@ public class HeroPlay extends LeaderAction {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be PURGED after status cleanup");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
         } else {
             boolean purged = player.removeLeader(playerLeader);
+
+
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader " + playerLeader.getId() + " has been purged");
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Leader " + playerLeader.getId() + " has been purged");
+                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId());
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
                 return;
