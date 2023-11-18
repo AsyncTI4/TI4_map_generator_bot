@@ -79,6 +79,8 @@ import ti4.helpers.Storage;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.selections.SelectionManager;
+import ti4.selections.SelectionMenuListener;
 
 public class AsyncTI4DiscordBot {
 
@@ -107,6 +109,7 @@ public class AsyncTI4DiscordBot {
         jda = JDABuilder.createDefault(args[0])
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .setChunkingFilter(ChunkingFilter.ALL)
             .setEnableShutdownHook(false)
@@ -116,7 +119,9 @@ public class AsyncTI4DiscordBot {
             new MessageListener(),
             new ButtonListener(),
             new UserJoinServerListener(),
-            new AutoCompleteListener());
+            new AutoCompleteListener(),
+            new SelectionMenuListener()
+        );
 
         try {
             jda.awaitReady();
@@ -136,6 +141,7 @@ public class AsyncTI4DiscordBot {
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+        SelectionManager.init();
         initializeWhitelistedRoles();
 
         CommandManager commandManager = CommandManager.getInstance();

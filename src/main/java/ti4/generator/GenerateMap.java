@@ -52,6 +52,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -151,7 +152,7 @@ public class GenerateMap {
             int mostObjs = Math.max(Math.max(stage1, stage2), other);
             int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
-            int playerCountForMap = activeGame.getRealPlayers().size();
+            int playerCountForMap = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
             int playerHeight = 340;
             int playerY = playerCountForMap * playerHeight;
 
@@ -699,6 +700,7 @@ public class GenerateMap {
                 // SECOND ROW RIGHT SIDE
                 xDeltaSecondRowFromRightSide = reinforcements(player, activeGame, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
+                
                 xDeltaSecondRowFromRightSide = speakerToken(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
 
                 if (player.hasAbility("ancient_blueprints")) {
@@ -716,6 +718,7 @@ public class GenerateMap {
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
+                xDelta = omenDice(activeGame, player, xDelta, yPlayArea);
 
                 if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
                     xDelta = pnInfo(player, xDelta, yPlayArea, activeGame);
@@ -780,6 +783,29 @@ public class GenerateMap {
             }
         }
         return xDeltaSecondRowFromRightSide;
+    }
+
+    private int omenDice(Game activeGame, Player player, int x, int y) {
+        int deltaX = 0;
+        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
+            
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setStroke(new BasicStroke(2));
+ 
+            for (int i = 0; i < ButtonHelperAbilities.getAllOmenDie(activeGame).size(); i++) {
+                String omen = "pa_ds_myko_omen_"+ButtonHelperAbilities.getAllOmenDie(activeGame).get(i)+".png";
+                omen = omen.replace("10","0");
+                graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
+                    
+                drawPAImage(x + deltaX, y, omen);
+                deltaX += 56;
+            }
+            return x + deltaX + 20;
+        }
+        return x + deltaX;
+            
+
+
     }
 
     private int bentorBluePrintInfo(Player player, int x, int y) {
@@ -3384,7 +3410,7 @@ public class GenerateMap {
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getRepresentationForAutoComplete());
+                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
                     continue;
                 }
                 BufferedImage tokenImage = ImageHelper.read(tokenPath);

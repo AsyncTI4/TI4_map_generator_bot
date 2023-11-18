@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -176,18 +178,33 @@ public class ACInfo extends ACCardsSubcommandData {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                Integer value = ac.getValue();
-                String key = ac.getKey();
-                String ac_name = Mapper.getActionCardName(key);
-                if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            if(!ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                    Integer value = ac.getValue();
+                    String key = ac.getKey();
+                    String ac_name = Mapper.getActionCardName(key);
+                    if (ac_name != null) {
+                        acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    }
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
             if (player.hasUnexhaustedLeader("nekroagent")) {
                 Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
                 acButtons.add(nekroButton);
+            }
+            if (player.hasUnexhaustedLeader("mykomentoriagent")) {
+                Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                acButtons.add(nekroButton);
+            }
+            if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
+                String omenDice = "";
+                for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
+                    omenDice=omenDice+" "+omenDie;
+                }
+                omenDice=omenDice.trim();
+                Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+                acButtons.add(augers);
             }
             if(actionCards.keySet().contains("coup") || actionCards.keySet().contains("disgrace")||actionCards.keySet().contains("investments")||actionCards.keySet().contains("summit")){
                  acButtons.add(Button.secondary("checkForAllACAssignments","Pre assign ACs"));

@@ -105,6 +105,8 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
+      private boolean l1Hero;
+    @ExportableField
     private boolean nomadCoin;
     @ExportableField
     private boolean temporaryPingDisable;
@@ -879,6 +881,28 @@ public class Game {
         return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
+    public List<Integer> getPlayedSCsInOrder(Player player){
+        Set<Integer> playedSCs = getPlayedSCs();
+        List<Integer> orderedSCsBasic = new ArrayList<>();
+
+        orderedSCsBasic.addAll(playedSCs);
+        Collections.sort(orderedSCsBasic);
+        List<Integer> orderedSCs = new ArrayList<>();
+        int playerSC = player.getLowestSC();
+        for(int sc : orderedSCsBasic){
+            if(sc > playerSC){
+                orderedSCs.add(sc);
+            }
+        }
+        for(int sc : orderedSCsBasic){
+            if(sc < playerSC){
+                orderedSCs.add(sc);
+            }
+        }
+
+        return orderedSCs;
+    }
+
     public DisplayType getDisplayTypeForced() {
         return displayTypeForced;
     }
@@ -911,6 +935,9 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+    public boolean getL1Hero() {
+        return l1Hero;
+    }
     public boolean getNomadCoin() {
         return nomadCoin;
     }
@@ -932,6 +959,9 @@ public class Game {
 
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
+    }
+    public void setL1Hero(boolean onStatus) {
+        l1Hero = onStatus;
     }
     public void setNomadCoin(boolean onStatus) {
         nomadCoin = onStatus;
@@ -2847,6 +2877,11 @@ public class Game {
     }
 
     @JsonIgnore
+    public List<Player> getDummies() {
+        return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public List<Player> getNotRealPlayers() {
         return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
     }
@@ -3010,7 +3045,7 @@ public class Game {
 
     public void rebuildTilePositionAutoCompleteList() {
         setTileNameAutocompleteOptionsCache(getTileMap().values().stream()
-            .map(tile -> new SimpleEntry<>(tile.getRepresentationForAutoComplete(), tile.getPosition()))
+            .map(tile -> new SimpleEntry<>(tile.getAutoCompleteName(), tile.getPosition()))
             .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
             .toList());
     }

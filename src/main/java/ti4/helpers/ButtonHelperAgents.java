@@ -230,6 +230,9 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to buy axis orders",
                 ButtonHelperAbilities.getBuyableAxisOrders(p2, activeGame));
         }
+        if (p2.getLeaderIDs().contains("mykomentoricommander") && !p2.hasLeaderUnlocked("mykomentoricommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
     }
@@ -343,7 +346,10 @@ public class ButtonHelperAgents {
             String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
-
+        if("mykomentoriagent".equalsIgnoreCase(agent)){
+            ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
+        }
+        
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg() + 2);

@@ -43,7 +43,7 @@ public class Mapper {
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, EventModel> events = new HashMap<>();
-    private static final Map<String, FactionModel> factionSetup = new HashMap<>();
+    private static final Map<String, FactionModel> factions = new HashMap<>();
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
@@ -59,7 +59,7 @@ public class Mapper {
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
-        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
+        importJsonObjectsFromFolder("factions", factions, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
         readData("decals.properties", decals, "Could not read decals name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
@@ -83,20 +83,10 @@ public class Mapper {
         importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
         importJsonObjectsFromFolder("decks", decks, DeckModel.class, "could not read decks file");
         importJsonObjectsFromFolder("units", units, UnitModel.class, "could not read units file");
-        importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
-        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
-        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
-
-        //Ensure Faction Setup lists contain valid data
-        for (FactionModel faction : factionSetup.values()) {
-            faction.validationWarnings();
-        }
-
-        //Ensure Technology lists contain valid data
-        for (TechnologyModel tech : technologies.values()) {
-            tech.validationWarnings();
-        }
+        importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class, "Could not read attachments file");
+        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
+        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -112,6 +102,7 @@ public class Mapper {
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
+        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
         try {
             File folder = new File(folderPath);
@@ -143,13 +134,15 @@ public class Mapper {
         }
 
         List<String> badObjects = new ArrayList<>();
-        allObjects.forEach(obj -> {
-            if (obj.isValid()) {
-                objectMap.put(obj.getAlias(), obj);
-            } else {
+        for (T obj : allObjects) {
+            if (objectMap.containsKey(obj.getAlias())) { //duplicate found
+                BotLogger.log("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
+            }
+            objectMap.put(obj.getAlias(), obj);
+            if (!obj.isValid()) {
                 badObjects.add(obj.getAlias());
             }
-        });
+        }
         if (!badObjects.isEmpty())
             BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
                 + String.join("\n> ", badObjects));
@@ -216,7 +209,7 @@ public class Mapper {
     }
 
     public static boolean isFaction(String faction) {
-        return factionSetup.containsKey(faction);
+        return factions.containsKey(faction);
     }
 
     public static String getColorID(String color) {
@@ -238,6 +231,9 @@ public class Mapper {
     }
 
     public static String getTileID(String tileID) {
+        if(TileHelper.getAllTiles().get(tileID) == null){
+            return null;
+        }
         return TileHelper.getAllTiles().get(tileID).getImagePath();
     }
 
@@ -367,8 +363,8 @@ public class Mapper {
         return tokens.getProperty(tokenID);
     }
 
-    public static FactionModel getFactionSetup(String factionID) {
-        return factionSetup.get(factionID);
+    public static FactionModel getFaction(String factionID) {
+        return factions.get(factionID);
     }
 
     public static String getControlID(String color) {
@@ -792,11 +788,17 @@ public class Mapper {
         return abilities.get(abilityID);
     }
 
-    public static List<String> getFactions() {
-        return factionSetup.keySet().stream()
+    public static List<String> getFactionIDs() {
+        return factions.keySet().stream()
             .filter(token -> token instanceof String)
             .map(token -> (String) token)
             .sorted()
+            .collect(Collectors.toList());
+    }
+
+    public static List<FactionModel> getFactions() {
+        return factions.values().stream()
+            .sorted(Comparator.comparing(FactionModel::getFactionName))
             .collect(Collectors.toList());
     }
 

@@ -192,7 +192,7 @@ public class FoWHelper {
 		} else if ("ghost".equals(faction)) {
 			hsIDs.add("51");
 		} else {
-			FactionModel playerSetup = Mapper.getFactionSetup(faction);
+			FactionModel playerSetup = Mapper.getFaction(faction);
 			if (playerSetup != null) {
 				hsIDs.add(playerSetup.getHomeSystem());
 			}
@@ -550,7 +550,7 @@ public class FoWHelper {
 
 		for (Player player_ : activeGame.getPlayers().values()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
-			if ("ghost".equals(player_.getFaction())) {
+			if (player_.hasAbility("quantum_entanglement")) {
 				tiles.addAll(getWormholeAdjacencies(activeGame, position, player_));
 			}
 
@@ -619,6 +619,18 @@ public class FoWHelper {
 				continue;
 			}
 			if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game activeGame) {
+		for (Player p2 : activeGame.getRealPlayers()) {
+			if (p2 == player) {
+				continue;
+			}
+			if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
 				return true;
 			}
 		}

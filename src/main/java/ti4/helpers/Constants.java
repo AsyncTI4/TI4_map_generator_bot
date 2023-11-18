@@ -53,6 +53,7 @@ public class Constants {
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
     public static final String NAALU_AGENT = "naalu_agent";
+    public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
@@ -605,6 +606,7 @@ public class Constants {
     public static final String SC_COUNT = "sc_count";
 
     public static final String COUNT = "count";
+    public static final String RESULT = "result";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw";
     public static final String DEAL_SO = "deal";
@@ -945,6 +947,7 @@ public class Constants {
     public static final Object TECHNOLOGY = "technology";
     public static final String TECH_DECK_ID = "tech_deck_id";
     public static final String DRAW_BLUE_BACK_TILE = "draw_blue_back_tile";
+    public static final String ADD_OMEN_DIE = "add_omen_die";
     public static final String INCLUDE_ALL_ASYNC_TILES = "include_all_async_tiles";
     public static final String MOD_NEBULA_DEFENDER = "nebula_defender";
     public static final String COMBAT_ROLL_TYPE = "rolltype";
