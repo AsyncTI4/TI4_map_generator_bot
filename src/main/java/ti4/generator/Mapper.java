@@ -87,11 +87,6 @@ public class Mapper {
         importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
         importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
-
-        //Ensure Faction Setup lists contain valid data
-        for (FactionModel faction : factions.values()) {
-            faction.validationWarnings();
-        }
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -138,13 +133,15 @@ public class Mapper {
         }
 
         List<String> badObjects = new ArrayList<>();
-        allObjects.forEach(obj -> {
-            if (obj.isValid()) {
-                objectMap.put(obj.getAlias(), obj);
-            } else {
+        for (T obj : allObjects) {
+            if (objectMap.containsKey(obj.getAlias())) { //duplicate found
+                BotLogger.log("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
+            }
+            objectMap.put(obj.getAlias(), obj);
+            if (!obj.isValid()) {
                 badObjects.add(obj.getAlias());
             }
-        });
+        }
         if (!badObjects.isEmpty())
             BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
                 + String.join("\n> ", badObjects));
