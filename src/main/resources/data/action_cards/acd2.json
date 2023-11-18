@@ -292,7 +292,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player with the most victory points. Look at that player's action cards or 1 of their unscored secret objectives, at random.",
+    "text": "Choose 1 player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -562,7 +562,7 @@
     "name": "Reconstruction",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready 1 planet you control. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+    "text": "Ready 1 planet you control that has a trait. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
     "flavorText": "Tungstantus collapsed mid-step as their energy completely depleted. The world was far from its former glory, and they would not stop until it was a paradise once more.",
     "source": "action_deck_2"
   },
