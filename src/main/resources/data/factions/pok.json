@@ -2,16 +2,16 @@
     {
         "alias": "argent",
         "factionName": "The Argent Flight",
-        "homeSystem": "585",
+        "homeSystem": "58",
         "startingFleet": "cv,2 dd,2 ff,3 inf v,2 inf a, pds y,sd v",
         "commodities": 3,
-        "factionTech": ["ah", "swa52"],
+        "factionTech": ["ah", "swa2"],
         "startingTech": [],
-        "homePlanets": ["valk", "ylir", "av5ar"],
-        "abilities": ["zeal", "raid_forma5tion"],
-        "leaders": ["argentage5nt", "argentcom5mander", "argenthero"],
-        "promissoryNotes": ["ambu5scade"],
-        "units": ["fighter5", "argent_destroyer", "cruiser", "carrier", "dreadnought", "argent_flagship", "infantry", "argent_mech", "pds", "spacedock"],
+        "homePlanets": ["valk", "ylir", "avar"],
+        "abilities": ["zeal", "raid_formation"],
+        "leaders": ["argentagent", "argentcommander", "argenthero"],
+        "promissoryNotes": ["ambuscade"],
+        "units": ["fighter", "argent_destroyer", "cruiser", "carrier", "dreadnought", "argent_flagship", "infantry", "argent_mech", "pds", "spacedock"],
         "source": "pok"
     },
     {
