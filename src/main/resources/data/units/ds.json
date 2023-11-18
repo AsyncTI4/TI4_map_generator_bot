@@ -522,7 +522,7 @@
         "ability": "DEPLOY: After you use your RALLY TO THE CAUSE faction ability in a system, you may spend 1 trade good to place 1 mech on a planet you control adjacent to that system."
     },
     {
-        "id": "ghemina_flagship_lord",
+        "id": "ghemina_flagship_lady",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "The Lady",
@@ -542,7 +542,7 @@
         "ability": "When another player's structure in this system is destroyed, gain 2 trade goods."
     },
     {
-        "id": "ghemina_flagship_lady",
+        "id": "ghemina_flagship_lord",
         "baseType": "flagship",
         "asyncId": "fs",
         "name": "The Lord",
