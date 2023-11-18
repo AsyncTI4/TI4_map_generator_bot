@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -92,6 +93,19 @@ public class PNInfo extends PNCardsSubcommandData {
         if(player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")){
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
+        }
+        if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
+            String omenDice = "";
+            for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
+                omenDice=omenDice+" "+omenDie;
+            }
+            omenDice=omenDice.trim();
+            Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            buttons.add(augers);
+        }
+        if (player.hasUnexhaustedLeader("mykomentoriagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            buttons.add(nekroButton);
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));

@@ -58,6 +58,7 @@ public class TurnStart extends PlayerSubcommandData {
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);             
         ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
+        
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "started turn");
 
@@ -74,6 +75,8 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
             }
+            ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
+            
 
             activeGame.setPingSystemCounter(0);
             for (int x = 0; x < 10; x++) {
@@ -91,6 +94,7 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
             }
+            ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
         }
         if(goingToPass){
             player.setPassed(true);

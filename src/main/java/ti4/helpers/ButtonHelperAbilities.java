@@ -16,6 +16,7 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -26,6 +27,70 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperAbilities {
+
+
+    public static void addOmenDie(Game activeGame, int omenDie){
+        String omenDice = "";
+        if(!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()){
+            omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
+            omenDice = omenDice + "_"+omenDie;
+            activeGame.setCurrentReacts("OmenDice", ""+omenDice);
+        }else{
+            activeGame.setCurrentReacts("OmenDice", ""+omenDie);
+        }
+    }
+    public static void removeOmenDie(Game activeGame, int omenDie){
+        String omenDice = "";
+        if(!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()){
+            omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
+            omenDice = omenDice.replaceFirst(""+omenDie,"");
+            omenDice = omenDice.replace("__","_");
+            activeGame.setCurrentReacts("OmenDice", ""+omenDice);
+        }
+    }
+    public static List<Integer> getAllOmenDie(Game activeGame){
+        List<Integer> dice = new ArrayList<>();
+        for(String dieResult : activeGame.getFactionsThatReactedToThis("OmenDice").split("_")){
+            if(!dieResult.isEmpty() && !dieResult.contains("_")){
+                int die = Integer.parseInt(dieResult);
+                dice.add(die);
+            }
+        }
+        return dice;
+    }
+
+    public static void offerOmenDiceButtons(Game activeGame, Player player){
+        String msg = ButtonHelper.getTrueIdentity(player,activeGame)+" you can play an omen die with the following buttons. Duplicate dice are not shown.";
+        List<Button> buttons = new ArrayList<>();
+        List<Integer> dice = new ArrayList<>();
+        for(int die : getAllOmenDie(activeGame)){
+            if(!dice.contains(die)){
+                buttons.add(Button.success("useOmenDie_"+die, "Use Result: "+die));
+                dice.add(die);
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Delete these"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void useOmenDie(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+
+        int die = Integer.parseInt(buttonID.split("_")[1]);
+        removeOmenDie(activeGame, die);
+        String msg = ButtonHelper.getTrueIdentity(player,activeGame)+" used an omen die with the number "+die;
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+    public static void rollOmenDiceAtStartOfStrat(Game activeGame, Player myko){
+         activeGame.setCurrentReacts("OmenDice", "");
+        String msg = ButtonHelper.getTrueIdentity(myko,activeGame)+" rolled 4 omen dice and rolled the following numbers: ";
+        for(int x= 0; x < 4;x++){
+            Die d1 = new Die(6);
+            msg = msg+ d1.getResult()+" ";
+            addOmenDie(activeGame, d1.getResult());
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, activeGame), msg);
+    }
 
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String finsFactionCheckerPrefix) {
         buttonID = buttonID.replace("pillage_", "");
@@ -457,6 +522,9 @@ public class ButtonHelperAbilities {
 
     public static void giveKeleresCommsNTg(Game activeGame, GenericInteractionCreateEvent event) {
         for (Player player : activeGame.getRealPlayers()) {
+            if(player.hasAbility("divination")){
+                ButtonHelperAbilities.rollOmenDiceAtStartOfStrat(activeGame, player);
+            }
             if (!player.hasAbility("council_patronage")) continue;
             MessageChannel channel = activeGame.getActionsChannel();
             if (activeGame.isFoWMode()) {

@@ -933,6 +933,11 @@ public class ButtonHelperModifyUnits {
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                             }
+                            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")){
+                                for(int x = 0; x < amount; x++){
+                                    ButtonHelper.rollMykoMechRevival(activeGame, player);
+                                }
+                            }
                         }
                     }
                 } else {
@@ -1003,6 +1008,11 @@ public class ButtonHelperModifyUnits {
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                 }
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+            }
+            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")){
+                for(int x = 0; x < amount; x++){
+                    ButtonHelper.rollMykoMechRevival(activeGame, player);
+                }
             }
             if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2")) && unitName.toLowerCase().contains("inf")) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, activeGame);

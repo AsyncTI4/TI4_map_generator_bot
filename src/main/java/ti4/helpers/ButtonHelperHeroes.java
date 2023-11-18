@@ -15,6 +15,9 @@ import java.util.*;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
+import ti4.commands.franken.LeaderAdd;
+import ti4.commands.leaders.HeroPlay;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.player.SCPlay;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
@@ -620,6 +623,28 @@ public class ButtonHelperHeroes {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, activeGame, activeGame.getMainGameChannel(), player, true);
         event.getMessage().delete().queue();
+    }
+
+
+    public static void checkForMykoHero(Game activeGame, String hero){
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("mykoheroSteal_"+hero, "Copy "+hero));
+        buttons.add(Button.danger("deleteButtons","Decline"));
+        for(Player p2: activeGame.getRealPlayers()){
+            if(p2.hasLeaderUnlocked("mykomentorihero")){
+                String msg = ButtonHelper.getTrueIdentity(p2, activeGame) +" you have the opportunity to use your hero to grab the ability of the hero "+hero+". Use buttons to resolve";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
+            }
+        }
+    }
+
+    public static void resolveMykoHero(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String hero = buttonID.split("_")[1];
+        HeroPlay.playHero(event, activeGame, player, player.unsafeGetLeader("mykomentorihero"));
+        new LeaderAdd().addLeader(player, hero);
+        UnlockLeader.unlockLeader(event, hero, activeGame, player);
+        event.getMessage().delete().queue();
+
     }
 
     public static List<Button> getWinnuHeroSCButtons(Game activeGame, Player winnu) {

@@ -143,6 +143,9 @@ public class Stats extends PlayerSubcommandData {
 				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
 					ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
 			}
+			if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
+				ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+			}
 		}
 
 		OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);

@@ -561,6 +561,63 @@ public class ButtonHelperFactionSpecific {
 
         return types;
     }
+    public static void increaseMykoMech(Game activeGame){
+        int amount = 0;
+        if(!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()){
+                amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+                amount = amount +1;
+        }else{
+            amount = 1;
+        }
+        activeGame.setCurrentReacts("mykoMech", ""+amount);
+    }
+    public static void decreaseMykoMech(Game activeGame){
+        int amount = 0;
+        if(!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()){
+                amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+                amount = amount -1;
+        }
+        if(amount < 0){
+            amount = 0;
+        }
+        activeGame.setCurrentReacts("mykoMech", ""+amount);
+    }
+    public static void resolveMykoMech(Player player, Game activeGame){
+        decreaseMykoMech(activeGame);
+        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, activeGame, ""));
+        String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Use buttons to replace 1 infantry with a mech";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
+    public static void resolveMykoMechCheck(Player player, Game activeGame){
+        if(player.hasUnit("mykomentori_mech")){
+            if(!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()){
+                int amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("resolveMykoMech", "Replace Infantry With Mech"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                if(amount > 0){
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) +" you have "+amount+ " mechs that can replace infantry", buttons);
+                }
+            }
+        }
+    }
+    public static void deployMykoSD(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        int requiredNum = 4;
+        Tile tile = activeGame.getTileFromPlanet(planet);
+        if(player.hasTech("dsmykosd")){
+            requiredNum = 3;
+        }
+        if(ButtonHelper.getNumberOfInfantryOnPlanet(planet, activeGame, player) +1> requiredNum){
+            new RemoveUnits().unitParsing(event, player.getColor(), tile, requiredNum +" infantry "+planet, activeGame);
+            new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+planet, activeGame);
+            MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " deployed a spacedock on "+planet+" by removing "+requiredNum+" infantry");
+            event.getMessage().delete().queue();
+        }else{
+            MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " does not have "+requiredNum+" infantry on "+planet +" and therefore cannot deploy the spacedock");
+        }
+    }
 
     public static void offerMahactInfButtons(Player player, Game activeGame) {
         String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Resolve Mahact infantry loss using the buttons";
@@ -568,6 +625,15 @@ public class ButtonHelperFactionSpecific {
         Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
         List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
+    public static void offerNekrophageButtons(Player player, Game activeGame, ButtonInteractionEvent event) {
+        String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Resolve Necrophage ability using buttons. ";
+        Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void KeleresIIHQCCGainCheck(Player player, Game activeGame) {

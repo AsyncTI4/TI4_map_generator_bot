@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -133,6 +134,16 @@ public class PlanetAdd extends PlanetAddRemove {
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+        }
+
+        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2")) && !doubleCheck&& event != null) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("deployMykoSD_"+planet, "Deploy Dock "+planet));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd") < 3){
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a spacedock on "+planet+" using the buttons.", buttons);
+
+            }
         }
         for (String law : activeGame.getLaws().keySet()) {
             if ("minister_exploration".equalsIgnoreCase(law)&& !doubleCheck) {

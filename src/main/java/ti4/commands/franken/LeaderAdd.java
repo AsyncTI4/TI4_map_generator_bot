@@ -2,10 +2,13 @@ package ti4.commands.franken;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class LeaderAdd extends LeaderAddRemove {
     public LeaderAdd() {
@@ -26,5 +29,20 @@ public class LeaderAdd extends LeaderAddRemove {
             player.addLeader(leaderID);
         }
         sendMessage(sb.toString());
+    }
+
+    public void addLeader(Player player, String leaderID) {
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
+
+        if (player.hasLeader(leaderID)) {
+            sb.append("> ").append(leaderID).append(" (player had this leader)");
+        } else {
+            Leader leader = new Leader(leaderID);
+            sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
+        }
+        sb.append("\n");
+        player.addLeader(leaderID);
+        
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, getActiveGame()), sb.toString());
     }
 }

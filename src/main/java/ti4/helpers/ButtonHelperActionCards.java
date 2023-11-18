@@ -201,6 +201,9 @@ public class ButtonHelperActionCards {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
         }
+        if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
+        }
         event.getMessage().delete().queue();
     }
 
