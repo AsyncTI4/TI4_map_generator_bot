@@ -106,7 +106,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
-            FactionModel faction = Mapper.getFactionSetup(getFaction());
+            FactionModel faction = Mapper.getFaction(getFaction());
             if (faction != null) {
                 description.append(Emojis.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
             } else {

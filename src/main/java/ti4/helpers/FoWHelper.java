@@ -192,7 +192,7 @@ public class FoWHelper {
 		} else if ("ghost".equals(faction)) {
 			hsIDs.add("51");
 		} else {
-			FactionModel playerSetup = Mapper.getFactionSetup(faction);
+			FactionModel playerSetup = Mapper.getFaction(faction);
 			if (playerSetup != null) {
 				hsIDs.add(playerSetup.getHomeSystem());
 			}

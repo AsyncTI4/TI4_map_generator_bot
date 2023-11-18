@@ -79,7 +79,7 @@ public class Emojis {
 
     // FACTIONS - OTHER
     public static final String AdminsFaction = "<:Admins:1084476380584083527>";
-    public static final String Qulane = "<:Qulane:1165445638096420895> ";
+    public static final String Qulane = "<:qulane:1165445638096420895>";
 
     // EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";

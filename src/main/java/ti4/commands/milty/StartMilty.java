@@ -91,7 +91,7 @@ public class StartMilty extends MiltySubcommandData {
             factionCount = 25;
         }
 
-        List<String> factions = new ArrayList<>(Mapper.getFactions());
+        List<String> factions = new ArrayList<>(Mapper.getFactionIDs());
         List<String> factionDraft = createFactionDraft(factionCount, factions);
 
         OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
