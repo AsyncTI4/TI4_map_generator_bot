@@ -795,8 +795,6 @@ public class GenerateMap {
             for (int i = 0; i < ButtonHelperAbilities.getAllOmenDie(activeGame).size(); i++) {
                 String omen = "pa_ds_myko_omen_"+ButtonHelperAbilities.getAllOmenDie(activeGame).get(i)+".png";
                 omen = omen.replace("10","0");
-
-
                 graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
                     
                 drawPAImage(x + deltaX, y, omen);
