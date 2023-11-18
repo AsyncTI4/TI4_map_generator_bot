@@ -319,6 +319,17 @@ public class ButtonHelper {
         }
         return getIdent(player) + " " + msg;
     }
+    public static void rollMykoMechRevival(Game activeGame, Player player) {
+        Die d1 = new Die(6);
+        String msg = Emojis.mech + " rolled a " + d1.getResult();
+        if (d1.isSuccess()) {
+            msg = msg + " and revived. You will be prompted to replace an infantry with a mech at the start of your turn.";
+            ButtonHelperFactionSpecific.increaseMykoMech(activeGame);
+        } else {
+            msg = msg + " and failed. No revival";
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), getIdent(player) + " " + msg);
+    }
 
     public static void placeInfantryFromRevival(Game activeGame, ButtonInteractionEvent event, Player player, String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -1222,12 +1233,18 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            
             case "zealots" -> shouldBeUnlocked = true;
             case "yin" -> shouldBeUnlocked = true;
             case "florzen" -> shouldBeUnlocked = true;
             case "letnev" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mykomentori" -> {
+                if (player.getCommodities() > 3) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -1346,7 +1363,7 @@ public class ButtonHelper {
             // missing: yin, ghost, cabal, naalu,letnev
         }
         if (shouldBeUnlocked) {
-            new UnlockLeader().unlockLeader(event, faction + "commander", activeGame, player);
+            UnlockLeader.unlockLeader(event, faction + "commander", activeGame, player);
         }
     }
 
@@ -1907,6 +1924,21 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
+
+
+
+        if (p2.hasAbility("necrophage")  && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "offerNecrophage", "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if (p1.hasAbility("necrophage")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "offerNecrophage" + p2.getColor(), "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+
+
         if ("space".equalsIgnoreCase(groundOrSpace) &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mentakcommander") && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on "+p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
@@ -1915,6 +1947,32 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on "+p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
+
+        if ("space".equalsIgnoreCase(groundOrSpace) &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mykomentoricommander")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+        if ("space".equalsIgnoreCase(groundOrSpace) &&ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+
+
+
+
+
         if ("space".equalsIgnoreCase(groundOrSpace) && !activeGame.isFoWMode()) {
             buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
         }

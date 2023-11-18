@@ -26,6 +26,19 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperCommanders {
 
+
+    public static void mykoCommanderUsage(Player player, Game activeGame, ButtonInteractionEvent event){
+        String msg = ButtonHelper.getIdent(player)+ " spent 1 ";
+        if(player.getCommodities() > 0){
+            msg = msg + "commoditity ("+player.getCommodities()+"->"+(player.getCommodities()-1)+") ";
+            player.setCommodities(player.getCommodities()-1);
+        }else{
+            msg = msg + "tg ("+player.getTg()+"->"+(player.getTg()-1)+") ";
+            player.setTg(player.getTg()-1);
+        }
+        msg = msg + " to cancel one hit";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
