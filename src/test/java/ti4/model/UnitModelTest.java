@@ -33,27 +33,27 @@ public class UnitModelTest {
         }
     }
     
-    public boolean validateBaseType(UnitModel unitModel) {
+    private static boolean validateBaseType(UnitModel unitModel) {
         if (Mapper.isValidUnit(unitModel.getBaseType())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid BaseType: `" + unitModel.getBaseType() + "`");
         return false;
     }
     
-    public boolean validateUpgradesFromUnitId(UnitModel unitModel) {
+    private static boolean validateUpgradesFromUnitId(UnitModel unitModel) {
         if (unitModel.getUpgradesFromUnitId().isEmpty()) return true;
         if (Mapper.isValidUnit(unitModel.getUpgradesFromUnitId().get())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid UpgradesFromUnitId ID: `" + unitModel.getUpgradesFromUnitId().get() + "`");
         return false;
     }
     
-    public boolean validateUpgradesToUnitId(UnitModel unitModel) {
+    private static boolean validateUpgradesToUnitId(UnitModel unitModel) {
         if (unitModel.getUpgradesToUnitId().isEmpty()) return true;
         if (Mapper.isValidUnit(unitModel.getUpgradesToUnitId().get())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid UpgradesToUnitId ID: `" + unitModel.getUpgradesToUnitId().get() + "`");
         return false;
     }
 
-    public boolean validateRequiredTechId(UnitModel unitModel) {
+    private static boolean validateRequiredTechId(UnitModel unitModel) {
         if (unitModel.getRequiredTechId().isEmpty()) return true;
         if (Mapper.isValidTech(unitModel.getRequiredTechId().get())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid RequiredTechId ID: `" + unitModel.getRequiredTechId().get() + "`");

@@ -234,9 +234,9 @@ public class DataMigrationManager {
 
                 // Trying to assign an accurate Faction Model for old keleres players.
                 if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
-                    List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
+                    List<FactionModel> keleresSubfactions = Mapper.getFactionIDs().stream()
                         .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
-                        .map(Mapper::getFactionSetup)
+                        .map(Mapper::getFaction)
                         .toList();
 
                     // guess subfaction based on homeplanet
@@ -248,7 +248,7 @@ public class DataMigrationManager {
                             homesystem = game.getTile(factionModel.getHomeSystem().replace("new", ""));
                         }
                         if (homesystem != null) {
-                            factionSetupInfo = Mapper.getFactionSetup(factionModel.getAlias());
+                            factionSetupInfo = Mapper.getFaction(factionModel.getAlias());
                             break;
                         }
 
@@ -268,7 +268,7 @@ public class DataMigrationManager {
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {
-                                    FactionModel otherFactionSetup = Mapper.getFactionSetup(factionId);
+                                    FactionModel otherFactionSetup = Mapper.getFaction(factionId);
                                     if (otherFactionSetup != null
                                         && otherFactionSetup.getHomeSystem().equals(homeSystem.getTileID())) {
                                         isHomeSystemUsedBySomeoneElse = true;
@@ -341,9 +341,9 @@ public class DataMigrationManager {
 
                 // Trying to assign an accurate Faction Model for old keleres players.
                 if (factionSetupInfo == null && "keleres".equals(player.getFaction())) {
-                    List<FactionModel> keleresSubfactions = Mapper.getFactions().stream()
+                    List<FactionModel> keleresSubfactions = Mapper.getFactionIDs().stream()
                         .filter(factionID -> factionID.startsWith("keleres") && !"keleres".equals(factionID))
-                        .map(Mapper::getFactionSetup)
+                        .map(Mapper::getFaction)
                         .toList();
 
                     // guess subfaction based on homeplanet
@@ -355,7 +355,7 @@ public class DataMigrationManager {
                             homesystem = game.getTile(factionModel.getHomeSystem().replace("new", ""));
                         }
                         if (homesystem != null) {
-                            factionSetupInfo = Mapper.getFactionSetup(factionModel.getAlias());
+                            factionSetupInfo = Mapper.getFaction(factionModel.getAlias());
                             break;
                         }
 
@@ -375,7 +375,7 @@ public class DataMigrationManager {
                             if (homeSystem != null) {
                                 boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : game.getFactions()) {
-                                    FactionModel otherFactionSetup = Mapper.getFactionSetup(factionId);
+                                    FactionModel otherFactionSetup = Mapper.getFaction(factionId);
                                     if (otherFactionSetup != null
                                         && otherFactionSetup.getHomeSystem().equals(homeSystem.getTileID())) {
                                         isHomeSystemUsedBySomeoneElse = true;

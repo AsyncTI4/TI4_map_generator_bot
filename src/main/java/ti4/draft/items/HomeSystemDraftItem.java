@@ -26,7 +26,7 @@ public class HomeSystemDraftItem extends DraftItem {
         if (ItemId.equals("ghost")) {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
         }
-        FactionModel faction = Mapper.getFactionSetup(ItemId);
+        FactionModel faction = Mapper.getFaction(ItemId);
         TileModel tile = TileHelper.getTile(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanetIds();

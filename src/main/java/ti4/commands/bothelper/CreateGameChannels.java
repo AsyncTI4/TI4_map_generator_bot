@@ -26,10 +26,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -230,9 +230,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
             "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
         MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("startPlayerSetup", "Setup a Player"));
-        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "After setting up the map, you can use this button instead of /player setup if you wish", buttons);
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel);
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +

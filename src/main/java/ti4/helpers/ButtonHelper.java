@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
@@ -21,7 +20,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import java.lang.Character.UnicodeScript;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,7 +42,6 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
@@ -53,22 +50,18 @@ import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
-import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.special.CombatRoll;
-import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
@@ -94,6 +87,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
@@ -318,6 +312,17 @@ public class ButtonHelper {
             msg = msg + " and failed. No revival";
         }
         return getIdent(player) + " " + msg;
+    }
+    public static void rollMykoMechRevival(Game activeGame, Player player) {
+        Die d1 = new Die(6);
+        String msg = Emojis.mech + " rolled a " + d1.getResult();
+        if (d1.isSuccess()) {
+            msg = msg + " and revived. You will be prompted to replace an infantry with a mech at the start of your turn.";
+            ButtonHelperFactionSpecific.increaseMykoMech(activeGame);
+        } else {
+            msg = msg + " and failed. No revival";
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), getIdent(player) + " " + msg);
     }
 
     public static void placeInfantryFromRevival(Game activeGame, ButtonInteractionEvent event, Player player, String buttonID) {
@@ -1222,12 +1227,18 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            
             case "zealots" -> shouldBeUnlocked = true;
             case "yin" -> shouldBeUnlocked = true;
             case "florzen" -> shouldBeUnlocked = true;
             case "letnev" -> shouldBeUnlocked = true;
             case "hacan" -> {
                 if (player.getTg() > 9) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mykomentori" -> {
+                if (player.getCommodities() > 3) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -1346,7 +1357,7 @@ public class ButtonHelper {
             // missing: yin, ghost, cabal, naalu,letnev
         }
         if (shouldBeUnlocked) {
-            new UnlockLeader().unlockLeader(event, faction + "commander", activeGame, player);
+            UnlockLeader.unlockLeader(event, faction + "commander", activeGame, player);
         }
     }
 
@@ -1907,6 +1918,21 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         }
+
+
+
+        if (p2.hasAbility("necrophage")  && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "offerNecrophage", "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if (p1.hasAbility("necrophage")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "offerNecrophage" + p2.getColor(), "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+
+
         if ("space".equalsIgnoreCase(groundOrSpace) &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mentakcommander") && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p1.getColor(), "Mentak Commander on "+p1.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
@@ -1915,6 +1941,32 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "mentakCommander_" + p2.getColor(), "Mentak Commander on "+p2.getColor()).withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
+
+        if ("space".equalsIgnoreCase(groundOrSpace) &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander") && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "mykomentoricommander")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Myko Commander").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+        if ("space".equalsIgnoreCase(groundOrSpace) &&ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p2, tile) && !activeGame.isFoWMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+        if ("space".equalsIgnoreCase(groundOrSpace) && ButtonHelper.doesPlayerHaveFSHere("mykomentori_flagship", p1, tile)) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "gain_1_comm_from_MahactInf", "Myko Flagship").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
+        }
+
+
+
+
+
+
+
         if ("space".equalsIgnoreCase(groundOrSpace) && !activeGame.isFoWMode()) {
             buttons.add(Button.secondary("announceARetreat", "Announce A Retreat"));
         }
@@ -3652,7 +3704,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         List<String> allFactions = FrankenDraft.getAllFactionIds(activeGame);
         for (var factionId : allFactions) {
-            FactionModel faction  = Mapper.getFactionSetup(factionId);
+            FactionModel faction  = Mapper.getFaction(factionId);
             if(faction != null && activeGame.getPlayerFromColorOrFaction(factionId) == null){
                 String name = faction.getFactionName();
 
@@ -3677,28 +3729,43 @@ public class ButtonHelper {
         }
         return buttons;
     }
-     public static void resolveSetupStep0(Player player, Game activeGame, ButtonInteractionEvent event){
+
+    public static void offerPlayerSetupButtons(MessageChannel channel) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("startPlayerSetup", "Setup a Player"));
+        MessageHelper.sendMessageToChannelWithButtons(channel, "After setting up the map, you can use this button instead of /player setup if you wish", buttons);
+    }
+
+    public static void resolveSetupStep0(Player player, Game activeGame, ButtonInteractionEvent event) {
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + "Please tell the bot which user you are setting up", getUserSetupButtons(activeGame));
+    }
+
+    public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        if (activeGame.isTestBetaFeaturesMode()) {
+            SelectFaction.offerFactionSelectionMenu(event);
+            return;
+        } 
         
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()+"Please tell the bot which user you are setting up", getUserSetupButtons(activeGame));
-     }
-     public static void resolveSetupStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         String userId = buttonID.split("_")[1];
         event.getMessage().delete().queue();
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = 0;
-        for(int x = 0; x < buttons.size(); x++){
-            if(x > maxBefore && x < (maxBefore+23)){
+        for (int x = 0; x < buttons.size(); x++) {
+            if (x > maxBefore && x < (maxBefore + 23)) {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
+        newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
     }
-    public static void resolveSetupStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+
+    public static void resolveSetupStep2(Player player, Game activeGame, GenericInteractionCreateEvent event, String buttonID){
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        event.getMessage().delete().queue();
+        if (event instanceof ButtonInteractionEvent) {
+            ((ButtonInteractionEvent) event).getMessage().delete().queue();
+        }
         if(factionId.contains("!")){
             List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
             List<Button> newButtons = new ArrayList<>();
@@ -3709,7 +3776,7 @@ public class ButtonHelper {
                 }
             }
             newButtons.add(Button.secondary("setupStep2_"+userId+"_"+(maxBefore+22)+"!", "Get more factions"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired faction", newButtons);
             return;
         }
         if(factionId.equalsIgnoreCase("keleres")){
@@ -3717,10 +3784,15 @@ public class ButtonHelper {
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresa", "Keleres Argent").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("argent"))));
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresm", "Keleres Mentak").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mentak"))));
             newButtons.add(Button.success("setupStep2_"+userId+"_keleresx", "Keleres Xxcha").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("xxcha"))));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: "+Mapper.getFactionSetup(factionId).getFactionName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: " + Mapper.getFaction(factionId).getFactionName());
+        offerColourSetupButtons(activeGame, event, buttonID, userId, factionId);
+        
+    }
+
+    private static void offerColourSetupButtons(Game activeGame, GenericInteractionCreateEvent event, String buttonID, String userId, String factionId) {
         List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = 0;
@@ -3730,8 +3802,7 @@ public class ButtonHelper {
             }
         }
         newButtons.add(Button.secondary("setupStep3_"+userId+"_"+factionId+"_"+(maxBefore+22)+"!", "Get more colors"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired player color", newButtons);
-        
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color", newButtons);
     }
 
     public static List<Button> getTileSetupButtons(Game activeGame, String buttonID){
@@ -3924,6 +3995,10 @@ public class ButtonHelper {
         List<Player> playersWithPds2 = new ArrayList<>();
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
+            if (adjTile == null) {
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + activeGame.getName() + " Tile: " + tilePos + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles.toString() + "`");
+                continue;
+            }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                     if (unitEntry.getValue() == 0) {
