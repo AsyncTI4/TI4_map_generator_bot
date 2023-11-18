@@ -58,7 +58,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that fragment to gain 1 relic.",
+    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that relic fragment to gain 1 relic.",
     "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -68,7 +68,7 @@
     "phase": "Action",
     "window": "When you spend resources to research",
     "text": "For each relic fragment in your and your neighbors' play areas, reduce the resources spent by 1. Then, you may discard 2 of your relic fragments to research 1 additional technology.",
-    "flavorText": "The observation team had protested with one voice, threatening return with fleets should the Creuss continue to bar them from this discovery.",
+    "flavorText": "The observation team had protested with one voice, threatening to return with fleets should the Creuss continue to bar them from this discovery.",
     "source": "action_deck_2"
   },
   {
@@ -355,7 +355,7 @@
     "name": "Frontier Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose 1 system that contains your ships and does not contain a planet. If that system does not already have a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose 1 system that does not contain a planet. If that system does not contain a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
     "flavorText": "Ciel grimaced at the provisions to explore the Ordinian nebula.",
     "source": "action_deck_2"
   },
@@ -634,7 +634,7 @@
     "name": "Short-lived Clone",
     "phase": "Any",
     "window": "At the start of your turn",
-    "text": "During this turn, 1 of your agents has the text ability of each player's agent, even if that agent is exhausted. At the end of your turn, ready that agent.",
+    "text": "Choose 1 of your agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted. At the end of your turn, ready that agent.",
     "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
     "source": "action_deck_2"
   },
