@@ -77,6 +77,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -3936,6 +3937,10 @@ public class ButtonHelper {
         List<Player> playersWithPds2 = new ArrayList<>();
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
+            if (adjTile == null) {
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + activeGame.getName() + " Tile: " + tilePos + " has a null adjacent tile: " + adjTilePos);
+                continue;
+            }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
                     if (unitEntry.getValue() == 0) {
