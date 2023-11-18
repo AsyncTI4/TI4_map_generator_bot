@@ -8,9 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
+
 
 public class DeckModel implements ModelInterface, EmbeddableModel {
 
@@ -25,8 +25,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
             && name != null
             && type != null
             && description != null
-            && cardIDs != null
-            && validateCardIDs();
+            && cardIDs != null;
     }
 
     public String getAlias() {
@@ -61,117 +60,6 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     private void setCardIDs(List<String> cardIDs) { // This method is for Jackson
       this.cardIDs = Collections.unmodifiableList(cardIDs);
-    }
-
-    private boolean validateCardIDs() {
-        return switch (getType()) {
-            case "technology" -> validateTechDeck();
-            case "agenda" -> validateAgendaDeck();
-            case "event" -> validateEventDeck();
-            case "action_card" -> validateActionCardDeck();
-            case "secret_objective" -> validateSecretObjectiveDeck();
-            case "public_stage_1_objective", "public_stage_2_objective" -> validatePublicObjectiveDecks();
-            case "relic" -> validateRelicDeck();
-            case "explore" -> validateExploreDecks();
-            case "template" -> true;
-            default -> false;
-        };
-    }
-
-    private boolean validateTechDeck() {
-        if (Mapper.getTechs().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getTechs().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateAgendaDeck() {
-        if (Mapper.getAgendas().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getAgendas().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateEventDeck() {
-        if (Mapper.getEvents().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getEvents().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateActionCardDeck() {
-        if (Mapper.getActionCards().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getActionCards().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateSecretObjectiveDeck() {
-        if (Mapper.getSecretObjectives().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getSecretObjectives().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validatePublicObjectiveDecks() {
-        if (Mapper.getPublicObjectives().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getPublicObjectives().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateRelicDeck() {
-        if (Mapper.getRelics().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getRelics().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
-    }
-
-    private boolean validateExploreDecks() {
-        if (Mapper.getExplores().keySet().containsAll(cardIDs))
-            return true;
-        List<String> missingCardIDs = new ArrayList<>();
-        for (String cardID : cardIDs) {
-            if (!Mapper.getExplores().containsKey(cardID))
-                missingCardIDs.add(cardID);
-        }
-        BotLogger.log("Deck **" + getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
-        return false;
     }
 
     @Override
