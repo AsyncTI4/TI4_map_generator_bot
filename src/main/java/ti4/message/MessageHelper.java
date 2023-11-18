@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -572,7 +573,7 @@ public class MessageHelper {
 		List<String> badButtonIDsAndReason = new ArrayList<>();
 		for (Button button : buttons) {
 			if (button == null) continue;
-			if (button.getId() == null) continue;
+			if (button.getId() == null && !button.getStyle().equals(ButtonStyle.LINK)) continue;
 
 			// REMOVE DUPLICATE IDs
 			if (goodButtonIDs.contains(button.getId())) {
