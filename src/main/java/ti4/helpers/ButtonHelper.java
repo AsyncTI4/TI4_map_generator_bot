@@ -3938,7 +3938,7 @@ public class ButtonHelper {
         for (String adjTilePos : adjTiles) {
             Tile adjTile = activeGame.getTileByPosition(adjTilePos);
             if (adjTile == null) {
-                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + activeGame.getName() + " Tile: " + tilePos + " has a null adjacent tile: " + adjTilePos);
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + activeGame.getName() + " Tile: " + tilePos + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles.toString() + "`");
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
