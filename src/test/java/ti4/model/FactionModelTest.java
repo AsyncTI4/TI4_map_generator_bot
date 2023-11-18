@@ -31,6 +31,7 @@ public class FactionModelTest {
             assertTrue(faction.isValid());
             assertTrue(validateAbilities(faction));
             assertTrue(validateFactionTech(faction));
+            assertTrue(validateHomeSystem(faction));
             assertTrue(validateHomePlanets(faction));
             assertTrue(validateStartingTech(faction));
             assertTrue(validateLeaders(faction));
@@ -86,6 +87,14 @@ public class FactionModelTest {
             if (!TileHelper.getAllPlanets().containsKey(planetID)) invalidPlanetIDs.add(planetID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
+        return false;
+    }
+
+    private static boolean validateHomeSystem(FactionModel faction) {
+        if (TileHelper.getAllTiles().keySet().contains(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+            return true;
+        }
+        System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");
         return false;
     }
 
