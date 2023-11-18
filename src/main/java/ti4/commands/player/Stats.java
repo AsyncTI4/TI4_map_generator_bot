@@ -123,10 +123,15 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
+			int oldTg = player.getTg();
+			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 			if (optionTG.getAsString().contains("+")) {
 				ButtonHelperAbilities.pillageCheck(player, activeGame);
+			}else{
+				if(player.getTg() > oldTg){
+					ButtonHelperAbilities.pillageCheck(player, activeGame);
+				}
 			}
-			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 
 		}
 

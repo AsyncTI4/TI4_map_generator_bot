@@ -364,7 +364,6 @@ public class ButtonHelperFactionSpecific {
             int oldTg = player2.getTg();
             player2.setTg(oldTg + 3);
             ButtonHelperAbilities.pillageCheck(player2, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(player2, activeGame, 3);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), ButtonHelper.getIdent(player2) + " gained 3tg from QDN (" + oldTg + "->" + player2.getTg() + ")");
         }
         player1.addSC(player2SC);
@@ -375,6 +374,7 @@ public class ButtonHelperFactionSpecific {
             "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
+        ButtonHelper.startActionPhase(event, activeGame);
     }
 
     public static void resolveHacanMechTradeStepTwo(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {

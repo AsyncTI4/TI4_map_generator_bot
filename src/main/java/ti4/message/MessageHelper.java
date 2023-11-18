@@ -21,10 +21,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -235,7 +237,7 @@ public class MessageHelper {
 		if (channel == null) {
 			return;
 		}
-
+		buttons = sanitizeButtons(buttons, channel);
 		List<MessageCreateData> objects = getMessageCreateDataObjects(messageText, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
@@ -562,5 +564,46 @@ public class MessageHelper {
 			case "1059645656295292968" -> "https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp"; //PrisonerOne's Test Server
 			default -> null;
 		};
+	}
+
+	private static List<Button> sanitizeButtons(List<Button> buttons, MessageChannel channel) {
+		if (buttons == null) return null;
+		List<Button> newButtons = new ArrayList<>();
+		List<String> goodButtonIDs = new ArrayList<>();
+		List<String> badButtonIDsAndReason = new ArrayList<>();
+		for (Button button : buttons) {
+			if (button == null) continue;
+			if (button.getId() == null && !button.getStyle().equals(ButtonStyle.LINK)) continue;
+
+			// REMOVE DUPLICATE IDs
+			if (goodButtonIDs.contains(button.getId())) {
+				badButtonIDsAndReason.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Duplicate ID");
+				continue;
+			}
+			goodButtonIDs.add(button.getId());
+
+			// REMOVE EMOJIS IF EMOJI NOT
+			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji) {
+				CustomEmoji emoji = (CustomEmoji) button.getEmoji();
+				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+					badButtonIDsAndReason.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
+					button = button.withEmoji(null);
+				}
+			}
+			newButtons.add(button);
+		}
+
+		// REPORT BAD BUTTONS
+		if (!badButtonIDsAndReason.isEmpty()) {
+			StringBuilder sb = new StringBuilder(channel.getAsMention());
+			sb.append(" Bad Buttons detected and sanitized:\n");
+			for (String error : badButtonIDsAndReason) {
+				sb.append("```\n");
+				sb.append(error);
+				sb.append("\n```");
+			}
+			BotLogger.log(sb.toString());
+		}
+		return newButtons;
 	}
 }
