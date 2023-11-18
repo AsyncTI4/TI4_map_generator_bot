@@ -72,7 +72,7 @@ public class Eliminate extends AddRemovePlayer {
             User extraUser = option.getAsUser();
             Player player = activeGame.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
-            if (player != null  && player.getColor() != null && player.getFaction() != null && !player.getFaction().equalsIgnoreCase("null")&& !player.getFaction().equalsIgnoreCase("")) {
+            if (player != null  && player.getColor() != null && player.getFaction() != null && !player.getFaction().equalsIgnoreCase("null")&& player.isRealPlayer() && !player.getFaction().equalsIgnoreCase("")) {
                 //send back all the PNs of others that the player was holding
                 Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
                 for (String pnID : pns) {

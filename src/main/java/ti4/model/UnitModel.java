@@ -265,7 +265,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(" (");
         if (getFaction().isPresent()) sb.append(getFaction().get()).append(" ");
-        sb.append(getBaseType()).append(")");
+        sb.append(getBaseType()).append(") [");
+        sb.append(getSource()).append("]");
         return sb.toString();
     }
 

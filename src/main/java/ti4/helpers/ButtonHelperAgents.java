@@ -343,7 +343,7 @@ public class ButtonHelperAgents {
             String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
-
+        
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
             player.setTg(player.getTg() + 2);

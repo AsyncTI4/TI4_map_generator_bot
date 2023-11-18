@@ -268,7 +268,7 @@ public class AgendaHelper {
                     List<String> laws = new ArrayList<String>();
                     laws.addAll(activeGame.getLaws().keySet());
                     for (String law : laws) {
-                        activeGame.removeLaw(agID);
+                        activeGame.removeLaw(law);
                     }
                     activeGame.setNaaluAgent(true);
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
@@ -987,7 +987,10 @@ public class AgendaHelper {
     public static List<Button> getAfterButtons(Game activeGame) {
         List<Button> afterButtons = new ArrayList<>();
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
-        afterButtons.add(playAfter);
+        if(activeGame.isFoWMode()){
+            afterButtons.add(playAfter);
+        }
+        
 
 
         

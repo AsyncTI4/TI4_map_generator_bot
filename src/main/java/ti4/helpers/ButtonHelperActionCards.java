@@ -1116,6 +1116,17 @@ public class ButtonHelperActionCards {
                 amount = 3;
             }
             ButtonHelper.resolveInfantryDeath(activeGame, p2, amount);
+            boolean cabalMech = false;
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            if(p2.hasAbility("amalgamation") && activeGame.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech, p2.getColor()) > 0 && p2.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war")){
+                cabalMech = true;
+            }
+            if (p2.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, amount, "infantry", event);
+            }
+        }
+        if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2")) ) {
+            ButtonHelperFactionSpecific.offerMahactInfButtons(p2, activeGame);
         }
         new RemoveUnits().unitParsing(event, p2.getColor(), activeGame.getTileFromPlanet(planet), "3 inf "+planet, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted " + planetRep + " and killed up to 3 infantry there");
@@ -1169,6 +1180,17 @@ public class ButtonHelperActionCards {
             new RemoveUnits().removeStuff(event, activeGame.getTileFromPlanet(planet), hits, planet, key, p2.getColor(), false, activeGame);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg);
             ButtonHelper.resolveInfantryDeath(activeGame, p2, hits);
+            if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2")) ) {
+                ButtonHelperFactionSpecific.offerMahactInfButtons(p2, activeGame);
+            }
+            boolean cabalMech = false;
+            Tile tile = activeGame.getTileFromPlanet(planet);
+            if(p2.hasAbility("amalgamation") && activeGame.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech, p2.getColor()) > 0 && p2.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war")){
+                cabalMech = true;
+            }
+            if (p2.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, hits, "infantry", event);
+            }
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you plagued " + planetRep +" and got "+hits+" hits");
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your planet "+planetRep+" was plagued and you lost "+hits+" infantry.");

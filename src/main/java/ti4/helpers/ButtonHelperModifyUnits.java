@@ -46,7 +46,7 @@ public class ButtonHelperModifyUnits {
         
         
     }
-    public static List<Button> getRetreatSystemButtons(Player player, Game activeGame, String pos1) {
+    public static List<Button> getRetreatSystemButtons(Player player, Game activeGame, String pos1, boolean skilled) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)) {
@@ -55,7 +55,11 @@ public class ButtonHelperModifyUnits {
             }
             Tile tile2 = activeGame.getTileByPosition(pos2);
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)) {
-                buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2, "Retreat to " + tile2.getRepresentationForButtons(activeGame, player)));
+                if(!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, activeGame) || skilled){
+                    if(FoWHelper.playerIsInSystem(activeGame, tile2, player) || player.hasTech("det") || skilled){
+                        buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2, "Retreat to " + tile2.getRepresentationForButtons(activeGame, player)));
+                    }
+                }
             }
 
         }
@@ -907,7 +911,7 @@ public class ButtonHelperModifyUnits {
                             int amount = unitEntry.getValue();
 
                             boolean cabalMech = false;
-                            if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+                            if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
                                 cabalMech = true;
                             }
 
@@ -986,7 +990,7 @@ public class ButtonHelperModifyUnits {
             }
         } else {
              boolean cabalMech = false;
-            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry")){
+            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
                 cabalMech = true;
             }
             if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {

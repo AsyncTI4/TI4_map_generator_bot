@@ -108,9 +108,13 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
         sb.append(" Please react to the following strategy cards before doing anything else:\n");
         int count = 0;
-        for (int sc : activeGame.getPlayedSCs()) {
+        for (int sc : activeGame.getPlayedSCsInOrder(player)) {
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc)).append("\n");
+                sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
+                if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
+                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc).replace("666fin", ":"));
+                }
+                sb.append("\n");
                 sendReminder = true;
                 count++;
             }
