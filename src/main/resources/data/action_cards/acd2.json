@@ -337,7 +337,7 @@
     "name": "Foreign Policy",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal a number of action cards from the action card deck equal to the number of other players. Each other player may give you 1 trade good or commodity to take 1 of those action cards. Then, take 1 of the remaining cards and discard the rest.",
+    "text": "Reveal a number of action cards from the action card deck equal to the number of players. Give 1 of those actions card to each other player and take the remaining card.",
     "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
     "source": "action_deck_2"
   },
