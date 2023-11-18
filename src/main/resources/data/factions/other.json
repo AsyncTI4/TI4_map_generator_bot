@@ -1,0 +1,48 @@
+[
+    {
+        "alias": "lazax",
+        "factionName": "Lazax",
+        "shortTag": "LAZ",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 0,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"],
+        "source": "lazax"
+    },
+    {
+        "alias": "admins",
+        "factionName": "The Admins of Asyncia",
+        "homeSystem": "s14",
+        "startingFleet": "3 inf t,2 ff,cv,2 dd,sd t",
+        "commodities": 3,
+        "factionTech": [],
+        "startingTech": ["sar", "gd"],
+        "homePlanets": ["somna", "tera", "hospoona"],
+        "abilities": [],
+        "leaders": ["adminsagent", "adminscommander", "adminshero"],
+        "promissoryNotes": ["adminspn"],
+        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "admins_flagship", "infantry", "admins_mech", "pds", "admins_spacedock"],
+        "source": "admins"
+    },
+    {
+        "alias": "qulane",
+        "factionName": "The Seers of Qulane",
+        "homeSystem": "qulane",
+        "startingFleet": "cv,2 dd,3 ff,4 inf m,sd k",
+        "commodities": 2,
+        "factionTech": ["gjenspecterii", "ciqineqreceptors"],
+        "startingTech": [],
+        "homePlanets": ["kull", "minaluk"],
+        "abilities": ["revelation", "redemption"],
+        "leaders": ["qulaneagent", "qulanecommander", "qulanehero"],
+        "promissoryNotes": ["qulaneafterssight"],
+        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "qulane_flagship", "qulane_infantry", "qulane_mech", "pds", "spacedock"],
+        "source": "ignis_aurora"
+    }
+]

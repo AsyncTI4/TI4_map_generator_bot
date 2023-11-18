@@ -43,7 +43,7 @@ public class Mapper {
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, EventModel> events = new HashMap<>();
-    private static final Map<String, FactionModel> factionSetup = new HashMap<>();
+    private static final Map<String, FactionModel> factions = new HashMap<>();
     private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
@@ -59,7 +59,7 @@ public class Mapper {
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
-        importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
+        importJsonObjectsFromFolder("factions", factions, FactionModel.class, "Could not read faction setup file");
         readData("color.properties", colors, "Could not read color name file");
         readData("decals.properties", decals, "Could not read decals name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
@@ -89,7 +89,7 @@ public class Mapper {
         importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
 
         //Ensure Faction Setup lists contain valid data
-        for (FactionModel faction : factionSetup.values()) {
+        for (FactionModel faction : factions.values()) {
             faction.validationWarnings();
         }
     }
@@ -211,7 +211,7 @@ public class Mapper {
     }
 
     public static boolean isFaction(String faction) {
-        return factionSetup.containsKey(faction);
+        return factions.containsKey(faction);
     }
 
     public static String getColorID(String color) {
@@ -365,8 +365,8 @@ public class Mapper {
         return tokens.getProperty(tokenID);
     }
 
-    public static FactionModel getFactionSetup(String factionID) {
-        return factionSetup.get(factionID);
+    public static FactionModel getFaction(String factionID) {
+        return factions.get(factionID);
     }
 
     public static String getControlID(String color) {
@@ -790,11 +790,17 @@ public class Mapper {
         return abilities.get(abilityID);
     }
 
-    public static List<String> getFactions() {
-        return factionSetup.keySet().stream()
+    public static List<String> getFactionIDs() {
+        return factions.keySet().stream()
             .filter(token -> token instanceof String)
             .map(token -> (String) token)
             .sorted()
+            .collect(Collectors.toList());
+    }
+
+    public static List<FactionModel> getFactions() {
+        return factions.values().stream()
+            .sorted(Comparator.comparing(FactionModel::getFactionName))
             .collect(Collectors.toList());
     }
 
