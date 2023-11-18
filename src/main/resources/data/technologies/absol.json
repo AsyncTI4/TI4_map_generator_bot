@@ -454,14 +454,14 @@
         "homebrewReplacesID": "hcf2"
     },
     {
-        "alias": "absol_so2",
+        "alias": "absol_so",
         "name": "Salvage Operations",
         "type": "CYBERNETIC",
         "requirements": "YY",
         "faction": "mentak",
         "source": "absol",
         "text": "At the start of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\n \n if you win a space combat, you may produce 1 ship of any type that was destroyed during that combat.",
-        "homebrewReplacesID": "so2"
+        "homebrewReplacesID": "so"
     },
     {
         "alias": "absol_mc",
@@ -668,14 +668,14 @@
         "homebrewReplacesID": "pfa"
     },
     {
-        "alias": "absol_scc",
+        "alias": "absol_sc",
         "name": "Supercharge",
         "type": "WARFARE",
         "requirements": "R",
         "faction": "naaz",
         "source": "absol",
         "text": "At the start of a combat round, you may exhaust a relic fragment in your play area to apply +1 to the results of each of your units’ combat rolls during this combat round.",
-        "homebrewReplacesID": "scc"
+        "homebrewReplacesID": "sc"
     },
     {
         "alias": "absol_ah",
