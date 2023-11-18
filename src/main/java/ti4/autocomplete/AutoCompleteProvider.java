@@ -101,7 +101,7 @@ public class AutoCompleteProvider {
                 }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeGame.isFoWMode()) {
-                    List<String> factionColors = new ArrayList<>(Mapper.getFactions());
+                    List<String> factionColors = new ArrayList<>(Mapper.getFactionIDs());
                     factionColors.addAll(Mapper.getColors());
 
                     List<String> factionColorsRetain = new ArrayList<>();
@@ -408,7 +408,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve")
+                List<Command.Choice> options = Stream.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve", "playerSetup")
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value, value))

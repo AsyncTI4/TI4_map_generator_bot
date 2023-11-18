@@ -21,7 +21,7 @@ public class Faction {
 
     //Constructors
     public Faction(String faction) {
-        baseFaction = Mapper.getFactionSetup(faction);
+        baseFaction = Mapper.getFaction(faction);
     }
 
     public FactionModel getBaseFaction() {

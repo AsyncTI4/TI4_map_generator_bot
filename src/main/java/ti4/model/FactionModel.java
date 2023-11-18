@@ -39,7 +39,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && abilities != null
             && leaders != null
             && promissoryNotes != null
-            && units != null;
+            && units != null
+            && source != null;
     }
 
     public void validationWarnings() {
@@ -76,8 +77,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return commodities;
     }
 
-    public Optional<String> getSource() {
-        return Optional.ofNullable(source);
+    public String getSource() {
+        return source;
     }
 
     public List<String> getFactionTech() {
@@ -199,7 +200,6 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAutoCompleteName'");
+        return getFactionName();
     }
 }
