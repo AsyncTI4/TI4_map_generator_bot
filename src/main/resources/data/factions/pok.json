@@ -16,7 +16,7 @@
     },
     {
         "alias": "cabal",
-        "factionName": "The Vuilraith Cabal",
+        "factionName": "The Vuil'raith Cabal",
         "shortTag": "VRC",
         "homeSystem": "54",
         "startingFleet": "dn,cv,cr,3 ff,3 inf a,csd a",
