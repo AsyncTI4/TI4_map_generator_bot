@@ -9,9 +9,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -43,25 +42,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             // && getBaseUpgrade() != null
             && source != null
             && text != null;
-    }
-
-    public void validationWarnings() {
-        validateBaseUpgrade();
-        validateHomebrewReplacesID();
-    }
-
-    private boolean validateBaseUpgrade() {
-        if (getBaseUpgrade().isEmpty()) return true;
-        if (Mapper.isValidTech(getBaseUpgrade().get())) return true;
-        BotLogger.log("Tech **" + getAlias() + "** failed validation due to invalid BaseUpgrade ID: `" + getBaseUpgrade().get() + "`");
-        return false;
-    }
-
-    private boolean validateHomebrewReplacesID() {
-        if (getHomebrewReplacesID().isEmpty()) return true;
-        if (Mapper.isValidTech(getHomebrewReplacesID().get())) return true;
-        BotLogger.log("Tech **" + getAlias() + "** failed validation due to invalid HomebrewReplacesID ID: `" + getHomebrewReplacesID().get() + "`");
-        return false;
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = (tech1, tech2) -> {

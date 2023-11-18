@@ -92,11 +92,6 @@ public class Mapper {
         for (FactionModel faction : factionSetup.values()) {
             faction.validationWarnings();
         }
-
-        //Ensure Technology lists contain valid data
-        for (TechnologyModel tech : technologies.values()) {
-            tech.validationWarnings();
-        }
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
