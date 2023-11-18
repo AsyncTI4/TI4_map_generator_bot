@@ -648,6 +648,7 @@ public class DataMigrationManager {
         replacements.put("space_mines", "dangerous_conditions");
         replacements.put("transference_protocol", "masterclass_logistics");
         replacements.put("virulent_gas_canisters", "virulent_gas");
+        replacements.put("cyberwarfare", "seized_facility");
         List<String> decksToCheck = List.of("asteroid_actions", "action_cards_ds_AD2", "action_deck_2");
         return replaceActionCards(game, decksToCheck, replacements);
     }

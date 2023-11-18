@@ -94,7 +94,7 @@
     "name": "Border Skirmish",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
+    "text": "Choose 2 adjacent systems that each contain a different player's ships. Each of those players roll 1 die for each of their ships in those systems; for each result equal to or greater than that ship's combat value, they produce 1 hit against the other player's ships in those systems.",
     "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of his hand, \"Our dominion knows no border.\" The man hesitated, then agreed.",
     "source": "action_deck_2"
   },
@@ -204,15 +204,6 @@
     "window": "When you are the first to pass",
     "text": "You may immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 1 secret objective.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "cyberwarfare",
-    "name": "Cyberwarfare",
-    "phase": "Action",
-    "window": "When you research a technology",
-    "text": "Exhaust 1 of another player's planets that has a technology specialty to ignore 1 prerequisite of a matching type.",
-    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE << BELONGS TO US",
     "source": "action_deck_2"
   },
   {
@@ -621,6 +612,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "seized_facility",
+    "name": "Seized Facility",
+    "phase": "Action",
+    "window": "When you gain control of a planet that contains another player's structure",
+    "text": "Gain a non-faction technology owned by that player.",
+    "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE << BELONGS TO US",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "shock_troops",
     "name": "Shock Troops",
     "phase": "Action",
@@ -733,7 +733,7 @@
     "name": "Terraforming Initiative",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready up to 2 hazardous planets.",
+    "text": "Ready up to 2 hazardous planets that any player controls.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected. Not what he'd wanted. But it had to be done. There would be time for fighting later.",
     "source": "action_deck_2"
   },
