@@ -83,10 +83,10 @@ public class Mapper {
         importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
         importJsonObjectsFromFolder("decks", decks, DeckModel.class, "could not read decks file");
         importJsonObjectsFromFolder("units", units, UnitModel.class, "could not read units file");
-        importJsonObjects("attachments_info.json", attachments, AttachmentModel.class, "Could not read attachments file");
-        importJsonObjects("strategyCardSets.json", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
-        importJsonObjects("combat_modifiers.json", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjects("franken_errata.json", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
+        importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class, "Could not read attachments file");
+        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
+        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -102,6 +102,7 @@ public class Mapper {
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
+        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
         try {
             File folder = new File(folderPath);
