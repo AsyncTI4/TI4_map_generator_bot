@@ -616,7 +616,7 @@
     "name": "Seized Facility",
     "phase": "Action",
     "window": "When you gain control of a planet that contains another player's structure",
-    "text": "Gain a non-faction technology owned by that player.",
+    "text": "Research a non-faction technology owned by that player; ignore 1 of that technology's prerequisites.",
     "flavorText": "PROTOCOL NOT FOUND >> [VAR:35782] RESISTANCE IS FUTILE << [NULL ID] DEFENSELESS >> ALL YOUR DATA ARE << BELONGS TO US",
     "source": "action_deck_2"
   },
