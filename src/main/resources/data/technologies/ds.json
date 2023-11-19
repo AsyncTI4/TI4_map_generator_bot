@@ -164,7 +164,7 @@
         "faction": "florzen",
         "baseUpgrade": "ff2",
         "source": "ds",
-        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Move 1(x2), Combat 8, Move 3; ANTI-FIGHTER BARRAGE 8"
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. Cost 1(x2), Combat 8, Move 3; ANTI-FIGHTER BARRAGE 8"
     },
     {
         "alias": "dsfreeg",
@@ -299,7 +299,7 @@
         "alias": "dskolug",
         "name": "Applied Biothermics",
         "type": "BIOTIC",
-        "requirements": "BB",
+        "requirements": "GG",
         "faction": "kolume",
         "source": "ds",
         "text": "When you pass, you may gain 1 commodity for each other player who has already passed. ACTION: Exhaust this card."
