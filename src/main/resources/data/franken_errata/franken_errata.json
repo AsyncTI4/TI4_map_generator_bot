@@ -427,7 +427,7 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "augershero",
+        "ItemId": "augers",
         "Undraftable": true
     },
     {
@@ -471,17 +471,17 @@
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "kjalengardagent",
+        "ItemId": "kjalengard",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "kjalengardcommander",
+        "ItemId": "kjalengard",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "kjalengardhero",
+        "ItemId": "kjalengard",
         "Undraftable": true
     },
     {
@@ -494,10 +494,10 @@
         "ItemId": "for_glory",
         "OptionalSwaps": [
             "TECH:dskjalg",
-            "AGENT:kjalengardagent",
-            "COMMANDER:kjalengardcommander",
-            "HERO:kjalengardhero",
-            "MECH:kjalengard_mech"
+            "AGENT:kjalengard",
+            "COMMANDER:kjalengard",
+            "HERO:kjalengard",
+            "MECH:kjalengard"
         ]
     },
     {
@@ -526,12 +526,12 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "lizhohero",
+        "ItemId": "lizho",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "lizhocommander",
+        "ItemId": "lizho",
         "Undraftable": true
     },
     {
@@ -550,9 +550,9 @@
         "ItemCategory": "ABILITY",
         "ItemId": "cunning",
         "OptionalSwaps": [
-            "HERO:lizhohero",
+            "HERO:lizho",
             "MECH:lizho",
-            "COMMANDER:lizhocommander"
+            "COMMANDER:lizho"
         ]
     },
     {
@@ -562,7 +562,7 @@
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "mykomentoriagent",
+        "ItemId": "mykomentori",
         "Undraftable": true
     },
     {
@@ -576,7 +576,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "prescient_memories",
         "OptionalSwaps": [
-           "AGENT:mykomentoriagent"
+           "AGENT:mykomentori"
         ]
     },
     {
@@ -586,7 +586,7 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "nivynhero",
+        "ItemId": "nivyn",
         "Undraftable": true
     },
     {
@@ -600,24 +600,24 @@
         "ItemCategory": "TECH",
         "ItemId": "nivyn_mech2",
         "OptionalSwaps": [
-           "HERO:nivynhero"
+           "HERO:nivyn"
         ]
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "nokarcommander",
+        "ItemId": "nokar",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "hired_guns",
         "OptionalSwaps": [
-           "COMMANDER:nokarcommander"
+           "COMMANDER:nokar"
         ]
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "olradinhero",
+        "ItemId": "olradin",
         "Undraftable": true
     },
     {
@@ -629,7 +629,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "policies",
         "OptionalSwaps": [
-           "HERO:olradinhero",
+           "HERO:olradin",
            "MECH:olradin"
         ]
     },
@@ -669,12 +669,12 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "vadencommander",
+        "ItemId": "vaden",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "vadenhero",
+        "ItemId": "vaden",
         "Undraftable": true
     },
     {
@@ -695,8 +695,8 @@
         "ItemId": "fine_print",
         "OptionalSwaps": [
           "MECH:vaden",
-          "HERO:vadenhero",
-          "COMMANDER:vadencommander"
+          "HERO:vaden",
+          "COMMANDER:vaden"
         ]
     },
     {
@@ -726,12 +726,12 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "veldyrcommander",
+        "ItemId": "veldyr",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "veldyrhero",
+        "ItemId": "veldyr",
         "Undraftable": true
     },
     {
@@ -745,8 +745,8 @@
         "ItemCategory": "ABILITY",
         "ItemId": "corporate_entity",
         "OptionalSwaps": [
-          "HERO:veldyrhero",
-          "COMMANDER:veldyrcommander",
+          "HERO:veldyr",
+          "COMMANDER:veldyr",
           "PN:dspnveld1"
         ]
     },
