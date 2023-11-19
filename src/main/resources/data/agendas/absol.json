@@ -240,8 +240,8 @@
         "name": "Hyperlane Development Program",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players\" ships to move through those systems. The player that cast the most votes \"For\" may research 1 propulsion technology.",
-        "text2": "Against: Exhaust the Trade strategy card. All players lose 3 trade goods, or all their trade goods if they have less than 3. The player who cast the most \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
+        "text1": "For: The player who cast the most votes 'For' may research 1 Propulsion technology. Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
+        "text2": "Exhaust the Trade strategy card. All players lose 3 trade goods, or all of their trade goods if they have less than 3. The player who cast the most votes 'Against' may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
         "mapText": "Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through those systems.",
         "source": "absol"
     },
