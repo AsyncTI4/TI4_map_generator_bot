@@ -74,7 +74,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 
     public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game activeGame, int numExplores,
         boolean ownerShipOverride) {
-        if (!player.getPlanets().contains(planetName) && !activeGame.isAllianceMode() && !ownerShipOverride) {
+        if (!player.getPlanetsAllianceMode().contains(planetName) && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
