@@ -1577,7 +1577,7 @@ public class ButtonHelper {
 
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
-        for (String plan : player.getPlanets()) {
+        for (String plan : player.getPlanetsAllianceMode()) {
             UnitHolder planetUnit = activeGame.getPlanetsInfo().get(plan);
             Planet planetReal = (Planet) planetUnit;
             if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
@@ -3083,6 +3083,9 @@ public class ButtonHelper {
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")) {
             buttons.addAll(ButtonHelperCommanders.getSardakkCommanderButtons(activeGame, player, event));
+        }
+        if (player.getPromissoryNotes().keySet().contains("ragh")) {
+            buttons.addAll(ButtonHelperFactionSpecific.getRaghsCallButtons(player, activeGame, tile));
         }
         Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
@@ -5784,6 +5787,9 @@ public class ButtonHelper {
         PNInfo.sendPromissoryNoteInfo(activeGame, owner, false);
         if("spynet".equalsIgnoreCase(id)){
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);
+        }
+        if("gift".equalsIgnoreCase(id)){
+            ButtonHelper.startActionPhase(event, activeGame);
         }
     }
 

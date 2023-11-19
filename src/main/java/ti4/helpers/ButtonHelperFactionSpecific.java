@@ -198,6 +198,23 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile ) {
+        List<Button> buttons = new ArrayList<Button>();
+        if (!player.getPromissoryNotes().keySet().contains("ragh")) {
+            return buttons;
+        }
+        Player saar = activeGame.getPNOwner("ragh");
+        if(saar == player){
+            return buttons;
+        }
+        for(UnitHolder uH : tile.getUnitHolders().values()){
+            if(uH instanceof Planet && FoWHelper.playerHasUnitsOnPlanet(saar, tile, uH.getName())){
+                buttons.add(Button.secondary("raghsCallStep1_"+uH.getName(), "Ragh's Call on "+Helper.getPlanetRepresentation(uH.getName(), activeGame)));
+            }
+        }
+        return buttons;
+    }
+
     public static void checkForNaaluPN(Game activeGame){
         activeGame.setCurrentReacts("Play Naalu PN", "");
         for(Player player : activeGame.getRealPlayers()){
@@ -217,6 +234,19 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    public static void resolveRaghsCallStepOne(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String origPlanet = buttonID.split("_")[1];
+        ButtonHelper.resolvePNPlay("ragh", player, activeGame, event);
+        List<Button> buttons = new ArrayList<Button>();
+        Player saar = activeGame.getPNOwner("ragh");
+        for (String planet : saar.getPlanetsAllianceMode()) {
+            if (!planet.equalsIgnoreCase(origPlanet)) {
+                buttons.add(Button.secondary("raghsCallStepTwo_" + origPlanet + "_" + planet, "Relocate to " + Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + "Choose which planet to relocate saar ground forces to", buttons);
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveHacanMechTradeStepOne(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
@@ -375,6 +405,34 @@ public class ButtonHelperFactionSpecific {
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player2, activeGame), sb);
         ButtonHelper.startActionPhase(event, activeGame);
+    }
+
+
+
+    public static void resolveRaghsCallStepTwo(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String origPlanet = buttonID.split("_")[1];
+        String newPlanet = buttonID.split("_")[2];
+        Player saar = activeGame.getPNOwner("ragh");
+        UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, activeGame);
+        HashMap<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
+        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+            UnitKey unitKey = unitEntry.getKey();
+            int amount = unitEntry.getValue();
+            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            if(!unitName.contains("pds")){
+                new RemoveUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(origPlanet), amount + " " + unitName + " " + origPlanet, activeGame);
+                new AddUnits().unitParsing(event, saar.getColor(), activeGame.getTileFromPlanet(newPlanet), amount + " " + unitName + " " + newPlanet, activeGame);
+            }
+        }
+        String ident = ButtonHelper.getIdentOrColor(player, activeGame);
+        String message2 = ident + " moved the ground forces on the planet " + Helper.getPlanetRepresentation(origPlanet, activeGame) + " to " + Helper.getPlanetRepresentation(newPlanet, activeGame);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannel(saar.getPrivateChannel(), message2);
+        } else {
+            MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message2);
+        }
+        event.getMessage().delete().queue();
     }
 
     public static void resolveHacanMechTradeStepTwo(Player hacan, Game activeGame, ButtonInteractionEvent event, String buttonID) {
@@ -614,6 +672,9 @@ public class ButtonHelperFactionSpecific {
             new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+planet, activeGame);
             MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " deployed a spacedock on "+planet+" by removing "+requiredNum+" infantry");
             event.getMessage().delete().queue();
+            if (player.hasAbility("necrophage")) {
+                player.setCommoditiesTotal(1+ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+            }
         }else{
             MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+ " does not have "+requiredNum+" infantry on "+planet +" and therefore cannot deploy the spacedock");
         }

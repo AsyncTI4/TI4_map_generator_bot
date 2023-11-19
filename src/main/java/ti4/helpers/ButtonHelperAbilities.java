@@ -129,7 +129,7 @@ public class ButtonHelperAbilities {
             MessageHelper.sendMessageToChannel(channel1, pillagedMessage);
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
-                Button winnuButton = Button.success("exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
+                Button winnuButton = Button.success("FFCC_" + player.getFaction() + "_"+"exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
@@ -138,7 +138,7 @@ public class ButtonHelperAbilities {
             for(Player p2: activeGame.getRealPlayers()){
                 if(p2 != pillaged &&p2 != player && p2.hasUnexhaustedLeader("yssarilagent") && player.hasLeader("mentakagent")){
                     List<Button> buttons = new ArrayList<>();
-                    Button winnuButton = Button.success("exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
+                    Button winnuButton = Button.success("FFCC_" + p2.getFaction() + "_"+"exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent To Draw ACs for you and pillaged player")
                         .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));

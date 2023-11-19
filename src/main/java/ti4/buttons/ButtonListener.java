@@ -367,6 +367,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.augersHeroSwap(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("hacanMechTradeStepOne_")) {
             ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(player, activeGame, event, buttonID);
+         } else if (buttonID.startsWith("raghsCallStepOne_")) {
+            ButtonHelperFactionSpecific.resolveRaghsCallStepOne(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("raghsCallStepTwo_")) {
+            ButtonHelperFactionSpecific.resolveRaghsCallStepTwo(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanMechTradeStepTwo_")) {
             ButtonHelperFactionSpecific.resolveHacanMechTradeStepTwo(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resolveDMZTrade_")) {
@@ -1448,15 +1452,25 @@ public class ButtonListener extends ListenerAdapter {
                 if (activeGame.isFoWMode()) {
                     offerName = player.getColor();
                 }
+                event.getMessage().delete().queue();
                 acButtons.add(Button.success("takeAC_" + acID + "_" + player.getFaction(), buttonLabel).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 acButtons.add(Button.danger("yssarilHeroRejection_" + player.getFaction(), "Reject " + buttonLabel + " and force them to discard of 3 random ACs"));
                 String message = Helper.getPlayerRepresentation(yssaril, activeGame, activeGame.getGuild(), true) + " " + offerName + " has offered you the action card " + buttonLabel
                     + " for your Yssaril Hero play. Use buttons to accept or reject it";
                 MessageHelper.sendMessageToChannelWithButtons(yssaril.getCardsInfoThread(), message, acButtons);
-                ActionCardModel ac = Mapper.getActionCard(acID);
+                String acStringID = "";
+                for(String acStrId : player.getActionCards().keySet()){
+                    if((player.getActionCards().get(acStrId)+"").equalsIgnoreCase(acID)){
+                        acStringID = acStrId;
+                    }
+                }
                 
-                MessageHelper.sendMessageToChannel(yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as follows: \n"+ac.getText());
-                event.getMessage().delete().queue();
+                
+                ActionCardModel ac = Mapper.getActionCard(acStringID);
+                if(ac != null){
+                    MessageHelper.sendMessageToChannel(yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as follows: \n"+ac.getText());
+                }
+                
             }
         } else if (buttonID.startsWith("statusInfRevival_")) {
             ButtonHelper.placeInfantryFromRevival(activeGame, event, player, buttonID);

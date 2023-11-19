@@ -854,10 +854,10 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<Button>();
         for(String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos, player, false)){
             Tile tile = activeGame.getTileByPosition(tilePos);
-            buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentation()));
+            buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
         }
         Tile tile = activeGame.getTileByPosition(pos);
-        buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentation()));
+        buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the tile you wish to jam. Remember you can't signal jam home systems, but the bot didnt check for this.", buttons);
     }
