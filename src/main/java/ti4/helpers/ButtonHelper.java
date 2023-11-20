@@ -5418,22 +5418,22 @@ public class ButtonHelper {
                 }
             }
             case "leader" -> {
-                Leader playerLeader = p1.getLeader(buttonID).orElse(null);
-                if (playerLeader == null || !Mapper.isValidLeader(playerLeader.getId())) {
+                
+                if (!Mapper.isValidLeader(buttonID)) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve leader.");
                     return;
                 }
                 if (buttonID.contains("agent")) {
                     List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "arborecagent", "xxchaagent", "axisagent");
-                    if (leadersThatNeedSpecialSelection.contains(playerLeader.getId().toLowerCase())) {
-                        List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeGame, playerLeader.getId());
+                    if (leadersThatNeedSpecialSelection.contains(buttonID)) {
+                        List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeGame, buttonID);
                         String message = p1.getRepresentation(true, true) + " Use buttons to select the user of the agent";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ExhaustLeader.exhaustLeader(event, activeGame, p1, playerLeader, null);
+                        ExhaustLeader.exhaustLeader(event, activeGame, p1, p1.getLeader(buttonID).orElse(null), null);
                     }
                 } else if (buttonID.contains("hero")) {
-                    HeroPlay.playHero(event, activeGame, p1, playerLeader);
+                    HeroPlay.playHero(event, activeGame, p1, p1.getLeader(buttonID).orElse(null));
                 }
             }
             case "relic" -> {
