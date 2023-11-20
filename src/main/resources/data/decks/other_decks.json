@@ -65,5 +65,14 @@
             "border_skirmish","ancient_data_archive","ancient_trade_routes","annexation","anti-gravity_drive","arms_deal","artifact_hunters","artifact_research","arms_deal","black_market_raid","brilliant_tactician","brutal_occupation","bureaucracy_rider","chain_reaction","close_quarters","collaborative_planning","concise_legal_text","double_agents","corporate_lobbying","crisis_management","custodian_support","seized_facility","espionage","derelict_space_station","defectors","defense_installation","defense_rider","deflection_tactics","disrupted_logistics","early_voting","pivoted_plan","exploration_rider","fire_for_effect","firing_solution_","flawless_strategy","freedom_fighters","frontier_rider","garner_tribute","grand_heist","commercial_applications","impeachment","intrigue","ixthian_gift","kickbacks","last_minute_deliberation","boarding_torpedoes","overtime","political_upheaval","foreign_policy","propaganda","prophecy","proxy_war","psychological_operations","public_outcry","rapid_mobilization","reconstruction","rehashed_debates","relay_connection","relic_rider","armistice","risky_jump_piloting","classified_weapons","short-lived_clone","shrapnel_turrets","side_project","smuggler_routes","dangerous_conditions","special_considerations","stasis_haul","steal_prototype","stranded_ship","technological_breakthrough","terraforming_initiative","timely_reinforcements","masterclass_logistics","virulent_gas",
             "fulfillment_protocols_ds","secured_trove","free_trade_network","carapace_plating","psionic_hammer","shields_holding_ds","special_session","diplomatic_pressure_ds","freedom_fighters_ds","morale_boost_ds","abyssal_starpaths","planetary_rigs","ai_augury","direct_hit_ds","aggressive_broker","meditative_firing_cycles","safety_overrides_ds","remnant_collection","sabotage_ds","hostile_world_ds","echo_shielding","illusory_duplication_ds","confused_sage","singularity_charge_ds","skilled_retreat_ds","renegotiation","forbidden_knowledge","war_machine_ds","bounty_contracts","flank_speed_ds","maneuvering_jets_ds","arbitrage","micrometeoroid_storm_ds","professional_archeologists","emergency_meeting","escape_clause","personnel_writ","preparation","spatial_collapse", "shock_troops"
         ]
+    },
+    {
+        "alias": "ixthian_boom_party",
+        "name": "Ixthian Boom Party (All Ixthian Agendas)",
+        "type": "agenda",
+        "description": "All agendas are Ixthian Artifact",
+        "cardIDs": [
+           "artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact","artifact"
+        ]
     }
 ]
