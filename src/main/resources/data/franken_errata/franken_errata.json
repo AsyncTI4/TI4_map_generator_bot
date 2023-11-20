@@ -442,7 +442,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "oracle_ai",
         "OptionalSwaps": [
-            "PN:dspnauge",
+            "PN:augers",
             "HERO:augers"
         ]
     },
@@ -513,8 +513,13 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "cloaked_fleets",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "shroud_of_lith",
         "OptionalSwaps": [
-            "ABILITY:shroud_of_lith",
+            "ABILITY:cloaked_fleets",
             "FLAGSHIP:kollecc",
             "MECH:kollecc"
         ]
@@ -554,6 +559,11 @@
             "MECH:lizho",
             "COMMANDER:lizho"
         ]
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "combat_drones",
+        "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
