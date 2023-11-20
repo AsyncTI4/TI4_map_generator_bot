@@ -101,7 +101,7 @@ public class FoWHelper {
 
 			Set<String> systems = new HashSet<>();
 			for (Map.Entry<String, Tile> tileEntry : new HashMap<>(activeGame.getTileMap()).entrySet()) {
-				if (!tileEntry.getValue().hasFog(player) ) {
+				if (!tileEntry.getValue().hasFog(player)) {
 					systems.add(tileEntry.getKey());
 				}
 			}

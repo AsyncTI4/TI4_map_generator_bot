@@ -1590,7 +1590,6 @@ public class ButtonHelper {
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Game activeGame) {
         List<Button> buttons = new ArrayList<>();
         for (String plan : player.getPlanetsAllianceMode()) {
-        for (String plan : player.getPlanetsAllianceMode()) {
             UnitHolder planetUnit = activeGame.getPlanetsInfo().get(plan);
             Planet planetReal = (Planet) planetUnit;
             if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
