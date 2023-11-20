@@ -295,5 +295,32 @@
     "text": "Place 2 fighters from your reinforcements into the active system.",
     "flavorText": "Most researchers question how the Naalu's prescience had not led them down a path of debilitating caution. The answer seems to lie in their excessive confidence.",
     "source": "action_deck_2_old"
+  },
+  {
+    "alias": "rapid_mobilization",
+    "name": "Rapid Mobilization",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Place 3 fighters from your reinforcements in each system that contains 1 of your space docks that is not blockaded.",
+    "flavorText": "Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "disrupted_logistics",
+    "name": "Disrupted Logistics",
+    "phase": "Action",
+    "window": "After another player activates a system that contains your units",
+    "text": "During this tactical action, the maximum number of non-fighter ships that player can have in the active system is reduced by 1.",
+    "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked the admiral to his core.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "commercial_applications",
+    "name": "Commercial Applications",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Gain trade goods equal to the resource or influence value of 1 of your planets that has a technology specialty.",
+    "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
+    "source": "action_deck_2"
   }
 ]
