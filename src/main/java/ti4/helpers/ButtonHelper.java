@@ -1443,6 +1443,18 @@ public class ButtonHelper {
         }
         return playersWithShips;
     }
+    public static List<Player> getOtherPlayersWithUnitsInTheSystem(Player player, Game activeGame, Tile tile) {
+        List<Player> playersWithShips = new ArrayList<>();
+        for (Player p2 : activeGame.getPlayers().values()) {
+            if (p2 == player || !p2.isRealPlayer()) {
+                continue;
+            }
+            if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+                playersWithShips.add(p2);
+            }
+        }
+        return playersWithShips;
+    }
 
     public static List<Player> getPlayersWithUnitsOnAPlanet(Game activeGame, Tile tile, String planet) {
         List<Player> playersWithShips = new ArrayList<>();
@@ -4751,11 +4763,22 @@ public class ButtonHelper {
             case "WashComms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 int oldP1Comms = p1.getCommodities();
+                int newP1Comms = 0;
+                int totalWashPowerP1 = p1.getCommodities()+p1.getTg();
+                int totalWashPowerP2 = p2.getCommodities()+p2.getTg();
+
+                if(oldP1Comms > totalWashPowerP2){
+                    newP1Comms = oldP1Comms-totalWashPowerP2;
+                }
                 int oldP2Comms = p2.getCommodities();
-                p1.setCommodities(0);
-                p2.setCommodities(0);
-                p1.setTg(p1.getTg()+oldP1Comms);
-                p2.setTg(p2.getTg()+oldP2Comms);
+                int newP2Comms = 0;
+                if(oldP2Comms > totalWashPowerP1){
+                    newP2Comms = oldP2Comms-totalWashPowerP1;
+                }
+                p1.setCommodities(newP1Comms);
+                p2.setCommodities(newP2Comms);
+                p1.setTg(p1.getTg()+(oldP1Comms-newP1Comms));
+                p2.setTg(p2.getTg()+(oldP2Comms-newP2Comms));
                 if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
                     commanderUnlockCheck(p2, activeGame, "hacan", event);
                 }
@@ -4763,7 +4786,7 @@ public class ButtonHelper {
                 //ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms, event);
                  ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
-                message2 = ident + " washed their " + oldP1Comms + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + oldP2Comms + " Commodities with " + ident;
+                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident;
             }
             case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
@@ -5548,8 +5571,8 @@ public class ButtonHelper {
                 int numToBeat = 2 - p1.getUrf();
                 if ((p1.hasAbility("fabrication") || p1.getPromissoryNotes().containsKey("bmf"))) {
                     numToBeat = numToBeat - 1;
-                    if (p1.getPromissoryNotes().containsKey("bmf") && !p1.hasAbility("fabrication")) {
-                        Button transact = Button.primary(finChecker + "resolvePNPlay_bmf", "Play BMF");
+                    if (p1.getPromissoryNotes().containsKey("bmf") && activeGame.getPNOwner("bmf") != p1) {
+                        Button transact = Button.primary(finChecker + "resolvePNPlay_bmfNotHand", "Play BMF");
                         purgeFragButtons.add(transact);
                     }
 
@@ -5666,6 +5689,11 @@ public class ButtonHelper {
 
     public static void resolvePNPlay(String id, Player player, Game activeGame, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
+        boolean fromHand = true;
+        if(id.equals("bmfNotHand")){
+            fromHand = false;
+            id = "bmf";
+        }
         PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(id);
         String pnName = pn.getName();
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
@@ -5699,6 +5727,11 @@ public class ButtonHelper {
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreusIFFTypeOptions(activeGame, player));
             String message = getTrueIdentity(player, activeGame) + " select type of wormhole you wish to drop";
+            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
+        }
+        if("greyfire".equalsIgnoreCase(id)){
+            List<Button> buttons = ButtonHelperFactionSpecific.getGreyfireButtons(activeGame, player);
+            String message = getTrueIdentity(player, activeGame) + " select planet you wish to use greyfire on";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
         }
         if ("ms".equalsIgnoreCase(id)) {
@@ -5790,6 +5823,46 @@ public class ButtonHelper {
         }
         if("gift".equalsIgnoreCase(id)){
             ButtonHelper.startActionPhase(event, activeGame);
+        }
+        if("bmf".equalsIgnoreCase(id)){
+            if(fromHand){
+                Player p1 = player;
+                String finChecker="";
+                String message = "Click the fragments you'd like to purge. ";
+                List<Button> purgeFragButtons = new ArrayList<>();
+                int numToBeat = 2 - p1.getUrf();
+                
+                    numToBeat = numToBeat - 1;
+                    
+                if (p1.getCrf() > numToBeat) {
+                    for (int x = numToBeat + 1; (x < p1.getCrf() + 1 && x < 4); x++) {
+                        Button transact = Button.primary(finChecker + "purge_Frags_CRF_" + x, "Cultural Fragments (" + x + ")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                if (p1.getIrf() > numToBeat) {
+                    for (int x = numToBeat + 1; (x < p1.getIrf() + 1 && x < 4); x++) {
+                        Button transact = Button.success(finChecker + "purge_Frags_IRF_" + x, "Industrial Fragments (" + x + ")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                if (p1.getHrf() > numToBeat) {
+                    for (int x = numToBeat + 1; (x < p1.getHrf() + 1 && x < 4); x++) {
+                        Button transact = Button.danger(finChecker + "purge_Frags_HRF_" + x, "Hazardous Fragments (" + x + ")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+
+                if (p1.getUrf() > 0) {
+                    for (int x = 1; x < p1.getUrf() + 1; x++) {
+                        Button transact = Button.secondary(finChecker + "purge_Frags_URF_" + x, "Frontier Fragments (" + x + ")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
+                purgeFragButtons.add(transact2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
+            }
         }
     }
 

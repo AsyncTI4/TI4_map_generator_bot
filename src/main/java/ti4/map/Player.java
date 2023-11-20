@@ -1894,6 +1894,7 @@ public class Player {
 
     @JsonIgnore
     public Tile buildFogTile(String position, Player player) {
+
         String tileID = fow_seenTiles.get(position);
         if (tileID == null)
             tileID = "0b";
