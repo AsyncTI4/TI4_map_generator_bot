@@ -73,7 +73,7 @@ public class Player {
     private int tacticalCC = 3;
     private int fleetCC = 3;
     private int strategicCC = 2;
-
+    private int turnCount;
     private int tg;
     private int commodities;
     private int commoditiesTotal;
@@ -1339,6 +1339,10 @@ public class Player {
         return tg;
     }
 
+    public int getTurnCount() {
+        return turnCount;
+    }
+
     public int getActualHits() {
         return actualHits;
     }
@@ -1403,6 +1407,10 @@ public class Player {
 
     public void setTg(int tg) {
         this.tg = tg;
+    }
+
+    public void setTurnCount(int turn) {
+        turnCount = turn;
     }
 
     public void setActualHits(int tg) {

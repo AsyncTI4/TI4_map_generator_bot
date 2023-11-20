@@ -35,6 +35,7 @@ public class Stats extends PlayerSubcommandData {
 			.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
@@ -160,6 +161,14 @@ public class Stats extends PlayerSubcommandData {
 			}
 			player.setCommoditiesTotal(commoditiesTotalCount);
 			String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
+			sendMessage(message);
+		}
+
+		Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
+		if (turnCount != null) {
+			
+			player.setTurnCount(turnCount);
+			String message = ">  set **Turn Count** to " + turnCount;
 			sendMessage(message);
 		}
 

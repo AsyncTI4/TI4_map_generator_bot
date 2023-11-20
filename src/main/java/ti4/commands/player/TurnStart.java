@@ -40,6 +40,7 @@ public class TurnStart extends PlayerSubcommandData {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
 
+        player.setTurnCount(player.getTurnCount()+1);
         boolean goingToPass = false;
         if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
             Player p2 = player;
@@ -48,7 +49,7 @@ public class TurnStart extends PlayerSubcommandData {
                 goingToPass = true;
             }
         }
-        String text = "# " + Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " UP NEXT";
+        String text = "# " + Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " UP NEXT (Turn #"+player.getTurnCount()+")";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, false, event);
         MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();

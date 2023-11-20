@@ -475,6 +475,7 @@ public class Constants {
     public static final String TG = "trade_goods";
     public static final String ACTUAL_HITS = "actual_hits";
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
+    public static final String TURN_COUNT = "turn_count";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String STASIS_INFANTRY = "stasis_infantry";
@@ -886,8 +887,10 @@ public class Constants {
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
+    public static final String DICE_LUCK = "dice_luck";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";
+    public static final String MINIMUM_NUMBER_OF_EXPECTED_HITS = "minimum_number_of_expected_hits";
     public static final String UNITS_OWNED = "units_owned";
     public static final String UNIT_ID = "unit_id";
     public static final String UNIT_ID_1 = "unit_id_1";
