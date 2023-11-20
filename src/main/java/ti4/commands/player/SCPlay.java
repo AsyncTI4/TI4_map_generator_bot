@@ -244,12 +244,12 @@ public class SCPlay extends PlayerSubcommandData {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
-                            String acqMessage = Helper.getPlayerRepresentation(player2, activeGame, event.getGuild(), true) + " reminder you can use Winnu's PN!";
-                            if (activeGame.isFoWMode()) {
-                                MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
-                            } else {
-                                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), acqMessage);
-                            }
+                            String acqMessage = Helper.getPlayerRepresentation(player2, activeGame, event.getGuild(), true) + " you can use this button to play Winnu PN!";
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Button.success("winnuPNPlay_"+scToPlay, "Use Acquisence"));
+                            buttons.add(Button.danger("deleteButtons", "Decline"));
+                            MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage, buttons);
+                            
                         }
                     }
                 }

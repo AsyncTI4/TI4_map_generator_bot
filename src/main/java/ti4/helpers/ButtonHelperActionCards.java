@@ -729,7 +729,7 @@ public class ButtonHelperActionCards {
                 p2.exhaustPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted all the cultural planets of " + ButtonHelper.getIdentOrColor(player, activeGame));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you exhausted all the cultural planets of " + ButtonHelper.getIdentOrColor(p2, activeGame));
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " your cultural planets were exhausted due to ABS.");
         event.getMessage().delete().queue();
     }
@@ -854,12 +854,16 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<Button>();
         for(String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, pos, player, false)){
             Tile tile = activeGame.getTileByPosition(tilePos);
-            buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+            if(!ButtonHelper.isTileHomeSystem(tile)){
+                buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+            }
         }
         Tile tile = activeGame.getTileByPosition(pos);
-        buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+        if(!ButtonHelper.isTileHomeSystem(tile)){
+            buttons.add(Button.secondary("signalJammingStep4_" + p2.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+        }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the tile you wish to jam. Remember you can't signal jam home systems, but the bot didnt check for this.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " select the tile you wish to jam.", buttons);
     }
     public static void resolveSignalJammingStep4(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
