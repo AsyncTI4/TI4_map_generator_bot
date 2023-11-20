@@ -18,6 +18,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.SendDebt;
+import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
@@ -33,6 +34,42 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+
+    public static void checkForStymie(Game activeGame, Player activePlayer, Tile tile){
+        for(Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, activeGame, tile)){
+            if(p2.getPromissoryNotes().keySet().contains("stymie") && activeGame.getPNOwner("stymie") != p2){
+                String msg = ButtonHelper.getTrueIdentity(p2, activeGame)+ " you have the opportunity to stymie "+ButtonHelper.getIdentOrColor(activePlayer,activeGame);
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Button.success("stymiePlayerStep1_"+activePlayer.getFaction(), "Play Stymie"));
+                buttons.add(Button.danger("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg,buttons);
+            }
+        }
+    }
+
+    public static void resolveStymiePlayerStep1(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        Player activePlayer = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame)+ " choose the system in which you wish to stymie";
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(!tile.getPosition().equalsIgnoreCase(activeGame.getActiveSystem()) && !ButtonHelper.isTileHomeSystem(tile) && !AddCC.hasCC(event, activePlayer.getColor(), tile)){
+                 buttons.add(Button.success("stymiePlayerStep2_"+activePlayer.getFaction()+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame,player)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        event.getMessage().delete().queue();
+        ButtonHelper.resolvePNPlay("stymie", player, activeGame, event);
+    }
+
+    public static void resolveStymiePlayerStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String pos = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+        AddCC.addCC(event,p2.getColor(), tile);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you stymied the tile: "+tile.getRepresentationForButtons(activeGame, player));
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you were stymied in tile: "+tile.getRepresentationForButtons(activeGame, p2));
+    }
 
     public static void offerASNButtonsStep1(Game activeGame, Player player, String warfareOrTactical){
         String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have the ability to use Agency Supply Network (ASN). Select the tile you want to build out of, or decline (please decline if you already used ASN)";
@@ -1065,6 +1102,41 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void resolveWinnuPN(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String scNum = buttonID.split("_")[1];
+        int sc = Integer.parseInt(scNum);
+        player.addFollowedSC(sc);
+        ButtonHelper.resolvePNPlay("acq", player, activeGame, event);
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) +" you will be marked as having followed "+sc+" without having needed to spend a CC. Please still use the SC buttons to resolve the SC effect";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+    }
+
+    public static List<Button> getGreyfireButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        for(UnitHolder uH : tile.getPlanetUnitHolders()){
+            buttons.add(Button.success("greyfire_"+uH.getName(), Helper.getPlanetRepresentation(uH.getName(), activeGame)));
+        }
+        return buttons;
+    }
+
+    public static void resolveGreyfire(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        String unit = "infantry";
+        Tile tile = activeGame.getTileFromPlanet(planet);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 " + unit + " " + planet, activeGame);
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
+                new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, activeGame);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            ButtonHelper.getIdent(player) + " replaced 1 of their opponent's infantry with 1 " + unit + " on " + Helper.getPlanetRepresentation(planet, activeGame) + " using greyfire");
+        event.getMessage().delete().queue();
+    }
     public static void resolveCreussIFFStart(Game activeGame, @NotNull Player player, String buttonID, String ident, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(activeGame, player, type);

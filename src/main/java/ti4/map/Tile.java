@@ -260,6 +260,11 @@ public class Tile {
 
     public boolean hasFog(Player player) {
         Boolean hasFog = fog.get(player);
+
+        Game activeGame = player.getGame();
+        if(activeGame.isLightFogMode() && player.getFogTiles().keySet().contains(getPosition())){
+            return false;
+        }
         //default all tiles to being foggy to prevent unintended info leaks
         return hasFog == null || hasFog;
     }
@@ -299,6 +304,16 @@ public class Tile {
 
     public HashMap<String, UnitHolder> getUnitHolders() {
         return unitHolders;
+    }
+
+    public List<UnitHolder> getPlanetUnitHolders() {
+        List<UnitHolder> planets = new ArrayList<>();
+        for(UnitHolder uH : unitHolders.values()){
+            if(uH instanceof Planet){
+                planets.add(uH);
+            }
+        }
+        return planets;
     }
 
     @JsonIgnore

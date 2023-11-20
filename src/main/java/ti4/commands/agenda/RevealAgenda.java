@@ -43,7 +43,7 @@ public class RevealAgenda extends AgendaSubcommandData {
 
     public void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game activeGame, MessageChannel channel) {
 
-        if((new Date().getTime()) - activeGame.getLastActivePlayerPing().getTime() < 10*60*10){
+        if(!activeGame.getFactionsThatReactedToThis("lastAgendaReactTime").isEmpty() && ((new Date().getTime()) - Long.parseLong(activeGame.getFactionsThatReactedToThis("lastAgendaReactTime"))) < 10*60*10){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake, and ping Fin if this didnt work properly");
             return;
         }
@@ -144,6 +144,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", activeGame, afterButtons, "after");
 
         ListVoteCount.turnOrder(event, activeGame, channel);
+        activeGame.setCurrentReacts("lastAgendaReactTime", ""+new Date().getTime());
         Button proceed = Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Button.primary("transaction", "Transaction");

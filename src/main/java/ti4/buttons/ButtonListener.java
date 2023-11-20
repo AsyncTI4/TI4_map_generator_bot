@@ -1516,10 +1516,10 @@ public class ButtonListener extends ListenerAdapter {
             List<String> potentialTech = new ArrayList<>();
             potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, activeGame);
             List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, activeGame);
-            if (buttons.size() > 0) {
+            if (buttons.size() > 0 && !p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " get enemy tech using the buttons", buttons);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), trueIdentity + " no tech available to gain");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), trueIdentity + " no tech available to gain (maybe other player has antivirus)");
             }
          } else if (buttonID.startsWith("mentakCommander_")) {
             String color = buttonID.split("_")[1];
@@ -1618,7 +1618,7 @@ public class ButtonListener extends ListenerAdapter {
                     if(activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction())&&p2.getActionCards().keySet().contains("disgrace")){
                         PlayAC.playAC(event, activeGame, p2, "disgrace", activeGame.getMainGameChannel(), event.getGuild());
                         activeGame.setCurrentReacts("Public Disgrace", "");
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have been public disgraced. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have been public disgraced because someone preset it to occur when the number "+scpick+" was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
                         return;
                     }
                 }
@@ -1798,6 +1798,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("stymiePlayerStep1_")) {
+            ButtonHelperFactionSpecific.resolveStymiePlayerStep1(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("stymiePlayerStep2_")) {
+            ButtonHelperFactionSpecific.resolveStymiePlayerStep2(activeGame, player, event, buttonID);
          } else if (buttonID.startsWith("prismStep2_")) {
             new PlanetExhaustAbility().resolvePrismStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("prismStep3_")) {
@@ -1912,6 +1916,8 @@ public class ButtonListener extends ListenerAdapter {
             //String message = playerRep + " Placed A " + StringUtils.capitalize(color) + " CC  In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, messageID, "construction");
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("greyfire_")) {
+            ButtonHelperFactionSpecific.resolveGreyfire(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("transactWith_")) {
             String faction = buttonID.replace("transactWith_", "");
             Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
@@ -2012,6 +2018,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolvePNPlay_")) {
             String pnID = buttonID.replace("resolvePNPlay_", "");
+           
             if (pnID.contains("ra_")) {
                 String tech = pnID.replace("ra_", "");
                 pnID = pnID.replace("_" + tech, "");
@@ -2027,7 +2034,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
             }
             ButtonHelper.resolvePNPlay(pnID, player, activeGame, event);
-            if (!"bmf".equalsIgnoreCase(pnID)) {
+            if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
                 event.getMessage().delete().queue();
             }
 
@@ -3313,6 +3320,7 @@ public class ButtonListener extends ListenerAdapter {
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " use button to exhaust Empy agent", empyButtons);
                         }
                         systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+                        ButtonHelperFactionSpecific.checkForStymie(activeGame, player, tile);
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                             if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                                 continue;
