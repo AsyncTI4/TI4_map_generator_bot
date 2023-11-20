@@ -164,7 +164,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             }
         }
         if(!activeGame.isFoWMode()){
-            ButtonHelper.updateMap(activeGame, event);
+            ButtonHelper.updateMap(activeGame, event, "Start of the agenda "+agendaName);
         }
         
     }

@@ -66,6 +66,7 @@ public class Cleanup extends StatusSubcommandData {
                 activeGame.setScTradeGood(sc, 0);
             }            
             player.clearSCs();
+            player.setTurnCount(0);
             player.clearFollowedSCs();
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets(true);
