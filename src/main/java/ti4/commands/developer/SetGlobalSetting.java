@@ -30,7 +30,6 @@ public class SetGlobalSetting extends DeveloperSubcommandData {
                 GlobalSettings.setSetting(setting.getAsString(), value.getAsInt());
             if ("bool".equals(type.getAsString()))
                 GlobalSettings.setSetting(setting.getAsString(), Boolean.parseBoolean(value.getAsString()));
-            GlobalSettings.saveSettings();
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad Command!");
             return;

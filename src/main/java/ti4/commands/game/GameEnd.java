@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -81,14 +82,14 @@ public class GameEnd extends GameSubcommandData {
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game's channels' permissions have been updated.");
 
-        //DELETE THE ROLE
+        // DELETE THE ROLE
         if (deleteRole && archiveChannels) {
             Role gameRole = gameRoles.get(0);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
             gameRole.delete().queue();
         }
 
-        //POST GAME INFO
+        // POST GAME INFO
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         activeGame.setHasEnded(true);
         activeGame.setEndedDate(new Date().getTime());
@@ -98,7 +99,7 @@ public class GameEnd extends GameSubcommandData {
         activeGame.setAutoPing(false);
         activeGame.setAutoPingSpacer(0);
 
-        //SEND THE MAP IMAGE
+        // SEND THE MAP IMAGE
         FileUpload fileUpload = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
         MessageHelper.replyToMessage(event, fileUpload);
 
@@ -113,7 +114,7 @@ public class GameEnd extends GameSubcommandData {
         String bothelperMention = Helper.getRoleMentionByName(AsyncTI4DiscordBot.guildPrimary, "bothelper");
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
-        //CREATE POST IN #THE-PBD-CHRONICLES
+        // CREATE POST IN #THE-PBD-CHRONICLES
         if (publish && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).size() > 0) {
             TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
             String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
@@ -122,7 +123,7 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             if (!activeGame.isFoWMode()) {
-                //INFORM PLAYERS
+                // INFORM PLAYERS
                 pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                     m.editMessageAttachments(fileUpload).queueAfter(50, TimeUnit.MILLISECONDS); //ADD MAP FILE TO MESSAGE
                     m.createThreadChannel(gameName).queueAfter(500, TimeUnit.MILLISECONDS, t -> t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
@@ -143,35 +144,30 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
 
-        //MOVE CHANNELS TO IN-LIMBO
+        // MAKE SPACE IN IN-LIMBO
+        cleanUpInLimboCategory(event.getGuild(), 2);
+
+        // MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (inLimboCategory != null && archiveChannels) {
-            int maxLimboChannels = 40;
-            int channelCountToDelete = maxLimboChannels / 2;
-            if (inLimboCategory.getChannels().size() >= maxLimboChannels) {
-                inLimboCategory.getChannels().stream().limit(channelCountToDelete).forEach(channel -> channel.delete().queue());
-                MessageHelper.sendMessageToChannel(bothelperLoungeChannel,
-                    inLimboCategory.getName() + " category on server " + inLimboCategory.getGuild().getName() + " had " + maxLimboChannels +" channels and " + channelCountToDelete + " were auto-cleaned");
-            }
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
-            } else {
-                String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
-                if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
-                    tableTalkChannel.getManager().setParent(inLimboCategory).queue();
-                    MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
-                }
-                if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
-                    actionsChannel.getManager().setParent(inLimboCategory).queue();
-                    MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
-                }
+                cleanUpInLimboCategory(event.getGuild(), 10);
+            }
+            
+            String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
+            if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
+                tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+                MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
+            }
+            if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
+                actionsChannel.getManager().setParent(inLimboCategory).queue();
+                MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
             }
         }
 
-        //CLOSE THREADS IN CHANNELS
+        // CLOSE THREADS IN CHANNELS
         if (tableTalkChannel != null) {
             for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
                 threadChannel.getManager().setArchived(true).queue();
@@ -260,5 +256,14 @@ public class GameEnd extends GameSubcommandData {
         sb.append("'\n```");
 
         return sb.toString();
+    }
+
+    public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
+        Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).get(0);
+        if (inLimboCategory == null) {
+            BotLogger.log("`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: " + guild.getName());
+            return;
+        }
+        inLimboCategory.getChannels().stream().limit(channelCountToDelete).forEach(channel -> channel.delete().queue());
     }
 }
