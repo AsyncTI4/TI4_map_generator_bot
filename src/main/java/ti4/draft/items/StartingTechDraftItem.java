@@ -34,6 +34,32 @@ public class StartingTechDraftItem extends DraftItem {
             return "Choose TWO of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring";
         } else if (ItemId.equals("keleres")) {
             return "Choose 2 non-faction technologies owned by other players.";
+        } else if (ItemId.equals("bentor")) {
+            return "Choose 2 of the following: Psychoarchaeology, Dark Energy Tap, and Scanlink Drone Network.";
+        } else if (ItemId.equals("celdauri")) {
+            return "Choose 2 of the following: Antimass Deflectors, Sarween Tools, Plasma Scoring";
+        } else if (ItemId.equals("cheiran")) {
+            return "Choose 1 of the following: Magen Defense Grid, Self-Assembly Routines";
+        } else if (ItemId.equals("edyn")) {
+            return "Choose any 3 technologies that have different colors and no prerequisites.";
+        } else if (ItemId.equals("ghoti")) {
+            return "Choose 1 of the following: Gravity Drive, Sling Relay.";
+        } else if (ItemId.equals("gledge")) {
+            return "Choose 2 of the following: Psychoarchaeology, Scanlink Drone Network, AI Development Algorithm.";
+        } else if (ItemId.equals("kjalengard")) {
+            return "Choose 1 non-faction unit upgrade.";
+        } else if (ItemId.equals("kolume")) {
+            return "Choose 1 of the following: Graviton Laser System, Predictive Intelligence.";
+        } else if (ItemId.equals("kyro")) {
+            return "Choose 1 of the following: Daxcive Animators, Bio-Stims.";
+        } else if (ItemId.equals("lanefir")) {
+            return "Choose 2 of the following: Dark Energy Tap, Scanlink Drone Network, AI Development Algorithm.";
+        } else if (ItemId.equals("nokar")) {
+            return "Choose 2 of the following: Psychoarchaeology, Dark Energy Tap, AI Development Algorithm.";
+        } else if (ItemId.equals("tnelis")) {
+            return "Choose 2 of the following: Neural Motivator, Antimass Deflectors, Plasma Scoring.";
+        } else if (ItemId.equals("vaden")) {
+            return "Choose 2 of the following: Neural Motivator, Antimass Deflectors, Sarween Tools.";
         }
         List<String> techs = startingTechs();
         StringBuilder builder = new StringBuilder();
