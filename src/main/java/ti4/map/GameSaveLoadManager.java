@@ -758,6 +758,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.TURN_COUNT + " " + player.getTurnCount());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
@@ -1886,6 +1889,7 @@ public class GameSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TURN_COUNT -> player.setTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();

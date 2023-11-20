@@ -2187,7 +2187,7 @@ public class ButtonListener extends ListenerAdapter {
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
                     TurnEnd.pingNextPlayer(event, activeGame, player);
-                    ButtonHelper.updateMap(activeGame, event);
+                    ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) "+player.getTurnCount()+", Round "+activeGame.getRound()+" for "+ButtonHelper.getIdent(player));
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Decided to skip waiting for afters and proceed to voting.");
@@ -3453,7 +3453,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "turnEnd" -> {
                     TurnEnd.pingNextPlayer(event, activeGame, player);
                     event.getMessage().delete().queue();
-                    ButtonHelper.updateMap(activeGame, event);
+                    ButtonHelper.updateMap(activeGame, event, "End of Turn "+player.getTurnCount()+", Round "+activeGame.getRound()+" for "+ButtonHelper.getIdent(player));
                 }
                 case "getDiplomatsButtons" -> {
                     ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
@@ -3750,7 +3750,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 }
-                ButtonHelper.updateMap(activeGame, event);
+                ButtonHelper.updateMap(activeGame, event, "Conclusion of build on turn "+player.getTurnCount()+" for "+ButtonHelper.getIdent(player));
                 buttons.add(DoneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
