@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
+import ti4.commands.game.GameEnd;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
@@ -377,13 +378,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
-
+        
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > 225) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
+
+        // CLEAN UP IN-LIMBO FIRST
+        GameEnd.cleanUpInLimboCategory(guild, 50);
 
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
