@@ -1152,6 +1152,11 @@ public class ButtonHelper {
     }
 
     public static void updateMap(Game activeGame, GenericInteractionCreateEvent event) {
+
+        updateMap(activeGame, event, "");
+    }
+
+    public static void updateMap(Game activeGame, GenericInteractionCreateEvent event, String message) {
         String threadName = activeGame.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
         boolean foundsomething = false;
@@ -1170,7 +1175,7 @@ public class ButtonHelper {
                     buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
                     buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
                     
-                    MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, file, "", buttonsWeb);
+                    MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, file, message, buttonsWeb);
 
                 }
             }
@@ -1189,7 +1194,7 @@ public class ButtonHelper {
             buttonsWeb.add(Button.primary("offerDeckButtons", "Show Decks"));
             buttonsWeb.add(Button.secondary("showGameAgain", "Show Game"));
             
-            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "", buttonsWeb);
+            MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, message, buttonsWeb);
 
         }
 
