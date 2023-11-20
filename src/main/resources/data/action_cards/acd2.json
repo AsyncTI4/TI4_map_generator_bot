@@ -49,7 +49,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player may place 1 or 2 cruisers or destroyers from their reinforcements in any system containing their ships.",
+    "text": "Choose 1 of your neighbors. That player may place 1 cruiser and 1 destroyer from their reinforcements in any system containing their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -162,15 +162,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "commercial_applications",
-    "name": "Commercial Applications",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Gain trade goods equal to the resource or influence value of 1 of your planets that has a technology specialty.",
-    "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "concise_legal_text",
     "name": "Concise Legal Text",
     "phase": "Agenda",
@@ -261,15 +252,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "disrupted_logistics",
-    "name": "Disrupted Logistics",
-    "phase": "Action",
-    "window": "After another player activates a system that contains your units",
-    "text": "During this tactical action, the maximum number of non-fighter ships that player can have in the active system is reduced by 1.",
-    "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked the admiral to his core.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "double_agents",
     "name": "Double Agents",
     "phase": "Action",
@@ -285,6 +267,15 @@
     "window": "After an agenda is revealed",
     "text": "Choose 1 player. That player votes first on this agenda. [Note: Argent Flight still votes first.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "efficiency_initiative",
+    "name": "Efficiency Initiative",
+    "phase": "Action",
+    "window": "When 1 or more of your units use their PRODUCTION ability",
+    "text": "Reduce the total PRODUCTION value of those units by any amount, to a minimum of 0. Then, gain trade goods equal to the amount you reduced it by.",
+    "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
   {
@@ -455,7 +446,7 @@
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
     "text": "For each mech in the active system, apply +1 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 2.",
-    "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
+    "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
   },
   {
@@ -474,6 +465,15 @@
     "window": "Action",
     "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
     "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "miraculous_escape",
+    "name": "Miraculous Escape",
+    "phase": "Action",
+    "window": "When 1 of your non-fighter ships would be destroyed",
+    "text": "That ship is not destroyed. Damage that ship, if able.",
+    "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
     "source": "action_deck_2"
   },
   {
@@ -546,15 +546,6 @@
     "window": "After an agenda is revealed",
     "text": "During this agenda, players cannot abstain if they are able to cast votes. You vote first on this agenda. After a player casts votes for a different outcome than the outcome you voted for, they must discard 1 random action card.",
     "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects towards those accessing the building, Ciel smiled, \"Nice dodge, Junn, quite agile for your age.\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "rapid_mobilization",
-    "name": "Rapid Mobilization",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Place 3 fighters from your reinforcements in each system that contains 1 of your space docks that is not blockaded.",
-    "flavorText": "Dannel smiled softly. A rare occurrence these days, to be sure. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
   {
@@ -717,6 +708,15 @@
     "window": "Action",
     "text": "Place 1 cruiser from your reinforcements in a non-home anomaly that does not contain another player's ships.",
     "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\" he gestured, \"here we are.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "strategic_withdrawal",
+    "name": "Strategic Withdrawal",
+    "phase": "Action",
+    "window": "After your ships move out of the active system",
+    "text": "Remove any of your command tokens from the system they moved to.",
+    "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
     "source": "action_deck_2"
   },
   {
