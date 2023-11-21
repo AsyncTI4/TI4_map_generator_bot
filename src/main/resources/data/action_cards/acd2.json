@@ -633,7 +633,7 @@
     "alias": "shrapnel_turrets",
     "name": "Shrapnel Turrets",
     "phase": "Action",
-    "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
+    "window": "At the start of the first round of a space combat",
     "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
     "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
     "source": "action_deck_2"
