@@ -4,7 +4,7 @@
     "name": "Ancient Data Archive",
     "phase": "Action",
     "window": "Before a player draws a card from an exploration deck or the relic deck",
-    "text": "That player reveals the top 3 cards of that deck, shuffles 2 of those cards back into it, and places the remaining card on top of it.",
+    "text": "That player reveals the top 3 cards of that deck, returns 2 of those cards to it, shuffles it, and places the remaining card on top of it.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -490,7 +490,7 @@
     "name": "Pivoted Plan",
     "phase": "Action",
     "window": "Action",
-    "text": "You may draw 1 action card; otherwise, discard 1 secret objective to draw 1 secret objective.",
+    "text": "You may draw 1 action card; otherwise, return 1 of your unscored secret objectives to the secret objective deck and shuffle it to draw 1 secret objective.",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
     "source": "action_deck_2"
   },
