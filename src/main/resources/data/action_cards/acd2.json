@@ -192,8 +192,8 @@
     "alias": "custodian_support",
     "name": "Custodian Support",
     "phase": "Action",
-    "window": "When you are the first to pass",
-    "text": "You may immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 1 secret objective.",
+    "window": "At the start of your turn",
+    "text": "Pass. Then, if you were the first to pass, immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 1 secret objective.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
     "source": "action_deck_2"
   },
@@ -714,8 +714,8 @@
     "alias": "strategic_withdrawal",
     "name": "Strategic Withdrawal",
     "phase": "Action",
-    "window": "After your ships move out of the active system",
-    "text": "Remove any of your command tokens from the system they moved to.",
+    "window": "After you move ships into a system other than the active system",
+    "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
     "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
     "source": "action_deck_2"
   },
