@@ -324,7 +324,7 @@ public class SCPick extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeGame, privatePlayer));
             }
             else{
-                   
+                privatePlayer.setTurnCount(privatePlayer.getTurnCount()+1);   
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeGame, false, event));
                 if(privatePlayer.getStasisInfantry() > 0){
                     if(ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer).size() > 0){
@@ -350,6 +350,7 @@ public class SCPick extends PlayerSubcommandData {
                     activeGame.setCurrentPhase("strategy");
                 } else {
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msgExtra);
+                    privatePlayer.setTurnCount(privatePlayer.getTurnCount()+1); 
                     MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeGame, false, event));
                     if(privatePlayer.getStasisInfantry() > 0){
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(privatePlayer, activeGame), "Use buttons to revive infantry. You have "+privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, privatePlayer));
