@@ -94,7 +94,7 @@ public class DiceLuck extends StatisticsSubcommandData {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(String.format("%.2f", averageDiceLuck));
             sb.append("` ").append(user.getEffectiveName());
-            sb.append("   [").append(actualHits).append("/"+expectedHits).append(" average/expected]");
+            sb.append("   [").append(actualHits).append("/"+String.format("%.1f", expectedHits)).append(" average/expected]");
             sb.append("\n");
             index++;     
         }

@@ -1446,7 +1446,7 @@ public class Helper {
             if(tech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")){
                 for(String factionTech : player.getNotResearchedFactionTechs()){
                     TechnologyModel fTech = Mapper.getTech(factionTech);
-                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getBaseUpgrade().orElse(""))) {
+                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade") && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getAlias())) {
                         addTech = false;
                     }
                 }
