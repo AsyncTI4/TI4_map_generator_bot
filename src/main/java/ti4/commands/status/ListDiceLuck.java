@@ -48,7 +48,7 @@ public class ListDiceLuck extends StatusSubcommandData {
 
       return "> " + player.getUserName() + ": `" +
           String.format("%.2f", total) +
-          "` (" + actualHits + "/"+expectedHits+" actual/expected)";
+          "` (" + actualHits + "/"+String.format("%.1f", expectedHits) +" actual/expected)";
     }
 
     @Override
