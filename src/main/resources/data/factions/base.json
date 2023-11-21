@@ -146,7 +146,7 @@
       "startingFleet": "dn,cv,cr,2 ff,2 inf m,sd m",
       "commodities": 3,
       "factionTech": ["vax", "vay"],
-      "startingTech": ["dxa", "vax", "vay"],
+      "startingTech": ["dxa"],
       "homePlanets": ["mordaiii"],
       "abilities": ["galactic_threat", "technological_singularity", "propagation"],
       "leaders": ["nekroagent", "nekrocommander", "nekrohero"],
