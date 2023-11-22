@@ -248,14 +248,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand"
                     : "Drew 2 Actions cards";
                 int count = hasSchemingAbility ? 3 : 2;
-                for (int i = 0; i < count; i++) {
-                    activeGame.drawActionCard(player.getUserID());
-                }
+                if(player.hasAbility("autonetic_memory")){
+                    ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 2);
+                    message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                }else{
+                    for (int i = 0; i < count; i++) {
+                        activeGame.drawActionCard(player.getUserID());
+                    }
 
-                if (activeGame.isFoWMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew 2 AC");
+                    if (activeGame.isFoWMode()) {
+                        FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew 2 AC");
+                    }
+                    ACInfo.sendActionCardInfo(activeGame, player, event);
                 }
-                ACInfo.sendActionCardInfo(activeGame, player, event);
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(activeGame, player, false));

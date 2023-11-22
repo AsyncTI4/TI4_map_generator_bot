@@ -91,6 +91,45 @@ import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
+
+    public static void pickACardFromDiscardStep1(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<>();
+        for(String acStringID : activeGame.getDiscardActionCards().keySet()){
+            buttons.add(Button.success("pickFromDiscard_"+acStringID, Mapper.getActionCardName(acStringID)));
+        }
+         buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+        if(buttons.size() > 25){
+            buttons.add(25, Button.danger("deleteButtons_", "Delete These Buttons"));
+        }
+        if(buttons.size() > 50){
+            buttons.add(50, Button.danger("deleteButtons_2", "Delete These Buttons"));
+        }
+        if(buttons.size() > 75){
+            buttons.add(75, Button.danger("deleteButtons_3", "Delete These Buttons"));
+        }
+        String msg = getTrueIdentity(player, activeGame) + " use buttons to grab an AC from the discard";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void pickACardFromDiscardStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        event.getMessage().delete().queue();
+        String acID = buttonID.split("_")[1];
+        boolean picked = activeGame.pickActionCard(player.getUserID(), activeGame.getDiscardActionCards().get(acID));
+        if (!picked) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
+        String msg2 = getTrueIdentity(player, activeGame) + " grabbed "+ Mapper.getActionCardName(acID) + " from the discard";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+
+        ACInfo.sendActionCardInfo(activeGame, player, event);
+        if(player.hasAbility("autonetic_memory")){
+            String message = getTrueIdentity(player, activeGame) + " if you did not just use the codex to get that ac, please discard an AC due to your cybernetic madness ability";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+        }
+    }
+    
+
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile){
         if(!player.hasUnit(flagshipID)){
             return false;
@@ -785,17 +824,27 @@ public class ButtonHelper {
         }
         String message = "";
         int amount = 1;
-        activeGame.drawActionCard(player.getUserID());
-        if (player.hasTech("nm")) {
-            message = " Neural motivator has been accounted for.";
+        if(player.hasAbility("autonetic_memory")){
+            if (player.hasTech("nm")) {
+                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 2);
+            }else{
+                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+            }
+            message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+        }else{
             activeGame.drawActionCard(player.getUserID());
-            amount = 2;
+            if (player.hasTech("nm")) {
+                message = " Neural motivator has been accounted for.";
+                activeGame.drawActionCard(player.getUserID());
+                amount = 2;
+            }
+            if (player.hasAbility("scheming")) {
+                message = message + " Scheming has been accounted for, please use blue button inside your card info thread to discard 1 AC.";
+                activeGame.drawActionCard(player.getUserID());
+                amount = amount + 1;
+            }
         }
-        if (player.hasAbility("scheming")) {
-            message = message + " Scheming has been accounted for, please use blue button inside your card info thread to discard 1 AC.";
-            activeGame.drawActionCard(player.getUserID());
-            amount = amount + 1;
-        }
+        
         // if (player.getRelics().contains("absol_codex")) {
         //     amount = amount + 1;
         //     activeGame.drawActionCard(player.getUserID());
@@ -814,7 +863,10 @@ public class ButtonHelper {
         }
         message = messageBuilder.toString();
 
-        message = "Drew " + amount + " AC." + message;
+        if(!player.hasAbility("autonetic_memory")){
+            message = "Drew " + amount + " AC." + message;
+        }
+        
         ACInfo.sendActionCardInfo(activeGame, player, event);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             commanderUnlockCheck(player, activeGame, "yssaril", event);
@@ -2119,7 +2171,7 @@ public class ButtonHelper {
 
     public static boolean isTileHomeSystem(Tile tile) {
         boolean isHome = false;
-        if(tile.getTileID().equalsIgnoreCase("0g")){
+        if(tile.getTileID().equalsIgnoreCase("0g") || tile.getTileID().equalsIgnoreCase("17")){
             return true;
         }
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -3825,23 +3877,28 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color", newButtons);
     }
 
-    public static List<Button> getTileSetupButtons(Game activeGame, String buttonID){
-        List<Button> buttons = new ArrayList<>();
-        String userId = buttonID.split("_")[1];
-        String factionId = buttonID.split("_")[2];
-        String color = buttonID.split("_")[3];
+    // public static List<Button> getTileSetupButtons(Game activeGame, String buttonID){
+    //     List<Button> buttons = new ArrayList<>();
+    //     String userId = buttonID.split("_")[1];
+    //     String factionId = buttonID.split("_")[2];
+    //     String color = buttonID.split("_")[3];
         
-        for (Tile tile : activeGame.getTileMap().values()) {
-            if(ButtonHelper.isTileHomeSystem(tile)){
-                String rep = tile.getRepresentation();
-                if(rep == null || rep.isEmpty()){
-                    rep = tile.getTileID() + "("+tile.getPosition()+ ")";
-                }
-                buttons.add(Button.success("setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition(), rep));
-            }
-        }
-        return buttons;
-    }
+    //     for (Tile tile : activeGame.getTileMap().values()) {
+    //         FactionModel fModel = Mapper.getFaction(factionId);
+    //         if(fModel.getHomeSystem().equalsIgnoreCase(tile.getTileID())){
+    //             ButtonHelper.resolveSetupStep4And5(player, activeGame, event, "setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition())
+    //         }
+    //         if(ButtonHelper.isTileHomeSystem(tile)){
+                
+    //             String rep = tile.getRepresentation();
+    //             if(rep == null || rep.isEmpty()){
+    //                 rep = tile.getTileID() + "("+tile.getPosition()+ ")";
+    //             }
+    //             buttons.add(Button.success("setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition(), rep));
+    //         }
+    //     }
+    //     return buttons;
+    // }
 
     public static List<Button> getSpeakerSetupButtons(Game activeGame, String buttonID){
         List<Button> buttons = new ArrayList<>();
@@ -3873,7 +3930,26 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as color: "+color);
 
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the home system location", getTileSetupButtons(activeGame, buttonID));
+       
+
+        List<Button> buttons = new ArrayList<>();
+        
+        for (Tile tile : activeGame.getTileMap().values()) {
+            FactionModel fModel = Mapper.getFaction(factionId);
+            if(fModel.getHomeSystem().equalsIgnoreCase(tile.getTileID())){
+                ButtonHelper.resolveSetupStep4And5(player, activeGame, event, "setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition());
+                return;
+            }
+            if(ButtonHelper.isTileHomeSystem(tile)){
+                
+                String rep = tile.getRepresentation();
+                if(rep == null || rep.isEmpty()){
+                    rep = tile.getTileID() + "("+tile.getPosition()+ ")";
+                }
+                buttons.add(Button.success("setupStep4_"+userId+"_"+factionId+"_"+color+"_"+tile.getPosition(), rep));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the home system location", buttons);
         
     }
 
