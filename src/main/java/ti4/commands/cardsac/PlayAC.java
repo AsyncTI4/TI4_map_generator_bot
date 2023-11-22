@@ -108,7 +108,13 @@ public class PlayAC extends ACCardsSubcommandData {
             return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
         }
 
-        activeGame.discardActionCard(player.getUserID(), acIndex);
+        if(player.hasAbility("cybernetic_madness")){
+            activeGame.purgedActionCard(player.getUserID(), acIndex);
+        }else{
+            activeGame.discardActionCard(player.getUserID(), acIndex);
+        }
+
+        
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(guild, activeGame)).append(" ").append(activeGame.getName()).append("\n");
 

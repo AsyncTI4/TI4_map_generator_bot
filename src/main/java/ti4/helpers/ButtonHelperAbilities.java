@@ -9,6 +9,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.special.SleeperToken;
@@ -27,6 +28,48 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperAbilities {
+
+    public static void autoneticMemoryStep1(Game activeGame, Player player, int count){
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("autoneticMemoryStep2_"+count,"Use Autonetic Memory"));
+        buttons.add(Button.danger("autoneticMemoryDecline_"+count, "Decline"));
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame)+ " you have the ability to draw 1 less action card and utilize your autonetic memory ability. Please use or decline to use.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void autoneticMemoryDecline(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        event.getMessage().delete().queue();
+        int count = Integer.parseInt(buttonID.split("_")[1]);
+        activeGame.drawActionCard(player.getUserID(),count);
+        ACInfo.sendActionCardInfo(activeGame, player, event);
+        ButtonHelper.checkACLimit(activeGame, event, player);
+    }
+
+
+
+    public static void autoneticMemoryStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        event.getMessage().delete().queue();
+        int count = Integer.parseInt(buttonID.split("_")[1]);
+        activeGame.drawActionCard(player.getUserID(),count-1);
+        ACInfo.sendActionCardInfo(activeGame, player, event);
+        String msg2 = ButtonHelper.getIdent(player)+" is choosing to resolve their Autonetic Memory ability";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.success("autoneticMemoryStep3a","Pick A Card From the Discard"));
+        buttons.add(Button.primary("autoneticMemoryStep3b", "Drop an infantry"));
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame)+ " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+    public static void autoneticMemoryStep3b(Game activeGame, Player player, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, activeGame, "gf", "placeOneNDone_skipbuild");
+        String message = ButtonHelper.getTrueIdentity(player, activeGame)+ " Use buttons to drop 1 infantry on a planet";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+    public static void autoneticMemoryStep3a(Game activeGame, Player player, ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+        ButtonHelper.pickACardFromDiscardStep1(activeGame, player);
+    }
 
 
     public static void addOmenDie(Game activeGame, int omenDie){

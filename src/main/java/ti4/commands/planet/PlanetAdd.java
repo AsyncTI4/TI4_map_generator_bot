@@ -117,7 +117,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-        if ((alreadyOwned || player.hasAbility("contagion_blex")) && player.hasTech("dxa")&& !doubleCheck) {
+        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir")) && player.hasTech("dxa")&& !doubleCheck) {
             String msg10 = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have an opportunity to use Dacxive Animators on " + Helper.getPlanetRepresentation(planet, activeGame)
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg10, ButtonHelper.getDacxiveButtons(activeGame, player, planet));
