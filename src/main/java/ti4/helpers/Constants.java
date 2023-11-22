@@ -490,6 +490,7 @@ public class Constants {
     public static final String STAGE_2_PUBLIC_DECK = "s2_public_deck";
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
+    public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String MESSAGEID_FOR_SABOS = "messageid_for_sabos";
     public static final String SECRET_OBJECTIVE = "secret_objective";
@@ -636,6 +637,7 @@ public class Constants {
     public static final String SHOW_ALL_AC = "show_all";
     public static final String SHOW_AC_TO_ALL = "show_to_all";
     public static final String DISCARD_AC = "discard";
+    public static final String PURGE_AC = "purge";
     public static final String DISCARD_AC_RANDOM = "discard_random";
     public static final String PLAY_AC = "play";
     public static final String PICK_AC_FROM_DISCARD = "pick_from_discard";
@@ -644,6 +646,7 @@ public class Constants {
     public static final String SEND_AC = "send";
     public static final String SEND_AC_RANDOM = "send_random";
     public static final String SHOW_AC_DISCARD_LIST = "show_discard_list";
+    public static final String SHOW_AC_PURGED_LIST = "show_purged_list";
     public static final String SHOW_AC_REMAINING_CARD_COUNT = "show_remaining_card_count";
 
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";

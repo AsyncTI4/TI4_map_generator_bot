@@ -860,7 +860,22 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.replace("getRepairButtons_", "");
             List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeGame, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to resolve", buttons);
+            //("autoneticMemoryStep2
+        } else if (buttonID.startsWith("pickFromDiscard_")) {
+            ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
+            ButtonHelperAbilities.autoneticMemoryStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryDecline_")) {
+            ButtonHelperAbilities.autoneticMemoryDecline(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep3")) {
+            if(buttonID.contains("autoneticMemoryStep3a")){
+                ButtonHelperAbilities.autoneticMemoryStep3a(activeGame, player, event);
+            }else{
+                ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
+            }
+            
         } else if (buttonID.startsWith("assignHits_")) {
+            
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("seedySpace_")) {
             ButtonHelper.resolveSeedySpace(activeGame, buttonID, player, event);
@@ -875,7 +890,10 @@ public class ButtonListener extends ListenerAdapter {
                     message = ButtonHelper.getIdent(player) + " Drew 2 AC With Scheming. Please Discard An AC with the blue buttons";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(activeGame, player, false));
-                } else {
+                } else if(player.hasAbility("autonetic_memory")){
+                    ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                    message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                }else{
                     activeGame.drawActionCard(player.getUserID());
                     message = ButtonHelper.getIdent(player) + " Drew 1 AC";
                     ACInfo.sendActionCardInfo(activeGame, player, event);
@@ -2339,11 +2357,18 @@ public class ButtonListener extends ListenerAdapter {
                         ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand"
                         : "Drew 2 Actions cards";
                     int count = hasSchemingAbility ? 3 : 2;
-                    for (int i = 0; i < count; i++) {
-                        activeGame.drawActionCard(player.getUserID());
+                    if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                        
+                    }else{
+                        for (int i = 0; i < count; i++) {
+                            activeGame.drawActionCard(player.getUserID());
+                        }
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        ButtonHelper.checkACLimit(activeGame, event, player);
                     }
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                    ButtonHelper.checkACLimit(activeGame, event, player);
+                    
                     ButtonHelper.addReaction(event, false, false, message, "");
                     if (hasSchemingAbility) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
@@ -2796,22 +2821,30 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelper.addReaction(event, false, false, "Didn't have any comms/tg to spend, no AC drawn", "");
                         break;
                     }
-                    for (int i = 0; i < count2; i++) {
-                        activeGame.drawActionCard(player.getUserID());
-                    }
-                    ButtonHelper.checkACLimit(activeGame, event, player);
-                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
-                    }
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                    if (hasSchemingAbility) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
-                            ACInfo.getDiscardActionCardButtons(activeGame, player, false));
-                    }
                     String message = hasSchemingAbility
                         ? "Spent 1 " + commOrTg + " to draw " + count2
                             + " Action Card (Scheming) - please discard an Action Card from your hand"
                         : "Spent 1 " + commOrTg + " to draw " + count2 + " AC";
+                    if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count2);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    }else{
+                        for (int i = 0; i < count2; i++) {
+                            activeGame.drawActionCard(player.getUserID());
+                        }
+                        ButtonHelper.checkACLimit(activeGame, event, player);
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                     }
+                    
+                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                    }
+                    
+                    if (hasSchemingAbility) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
+                            ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+                    }
+                    
                     ButtonHelper.addReaction(event, false, false, message, "");
                     event.getMessage().delete().queue();
                     if (!activeGame.isFoWMode() && (event.getChannel() != activeGame.getActionsChannel())) {
@@ -2871,7 +2904,10 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(activeGame, player, false));
 
-                    } else {
+                    } else if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    }else {
                         activeGame.drawActionCard(player.getUserID());
                         ACInfo.sendActionCardInfo(activeGame, player, event);
                         message = ButtonHelper.getIdent(player) + " Drew 1 AC";

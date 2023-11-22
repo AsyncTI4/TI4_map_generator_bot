@@ -224,6 +224,7 @@ public class Game {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private HashMap<String, Integer> slashCommandsUsed = new HashMap<>();
     private HashMap<String, Integer> actionCardsSabotaged = new HashMap<>();
@@ -2190,6 +2191,12 @@ public class Game {
         return agendas.get(index);
     }
 
+     @Nullable
+    public void drawActionCard(String userID, int count) {
+        for(int x = 0; x < count; x++){
+            drawActionCard(userID);
+        }
+    }
     @Nullable
     public LinkedHashMap<String, Integer> drawActionCard(String userID) {
         if (!actionCards.isEmpty()) {
@@ -2433,6 +2440,14 @@ public class Game {
         }
         discardActionCards.put(id, identifier);
     }
+    public void setPurgedActionCard(String id) {
+        Collection<Integer> values = purgedActionCards.values();
+        int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        purgedActionCards.put(id, identifier);
+    }
 
     @JsonIgnore
     public boolean discardActionCard(String userID, Integer acIDNumber) {
@@ -2455,12 +2470,36 @@ public class Game {
         return false;
     }
 
+     public boolean purgedActionCard(String userID, Integer acIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+            String acID = "";
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                if (ac.getValue().equals(acIDNumber)) {
+                    acID = ac.getKey();
+                    break;
+                }
+            }
+            if (!acID.isEmpty()) {
+                player.removeActionCard(acIDNumber);
+                setPurgedActionCard(acID);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void shuffleActionCards() {
         Collections.shuffle(actionCards);
     }
 
     public LinkedHashMap<String, Integer> getDiscardActionCards() {
         return discardActionCards;
+    }
+
+    public LinkedHashMap<String, Integer> getPurgedActionCards() {
+        return purgedActionCards;
     }
 
     public boolean pickActionCard(String userID, Integer acIDNumber) {
@@ -2778,6 +2817,11 @@ public class Game {
         this.discardActionCards = discardActionCards;
     }
 
+    
+    public void setPurgedActionCards(LinkedHashMap<String, Integer> purgedActionCards) {
+        this.purgedActionCards = purgedActionCards;
+    }
+
     public void setDiscardActionCards(List<String> discardActionCardList) {
         LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
         for (String card : discardActionCardList) {
@@ -2789,6 +2833,19 @@ public class Game {
             discardActionCards.put(card, identifier);
         }
         this.discardActionCards = discardActionCards;
+    }
+
+    public void setPurgedActionCards(List<String> purgedActionCardList) {
+        LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
+        for (String card : purgedActionCardList) {
+            Collection<Integer> values = purgedActionCards.values();
+            int identifier = ThreadLocalRandom.current().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = ThreadLocalRandom.current().nextInt(1000);
+            }
+            purgedActionCards.put(card, identifier);
+        }
+        this.purgedActionCards = purgedActionCards;
     }
 
     public String getOwnerID() {
