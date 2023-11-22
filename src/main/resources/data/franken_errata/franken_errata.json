@@ -271,15 +271,15 @@
         "Undraftable": true
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "edict",
+        "ItemCategory": "COMMANDER",
+        "ItemId": "mahact",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "imperia",
-        "AdditionalComponents": [
-            "ABILITY:edict"
+        "OptionalSwaps": [
+            "COMMANDER:mahact"
         ]
     },
     {
