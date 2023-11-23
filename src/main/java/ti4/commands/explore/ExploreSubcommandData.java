@@ -261,11 +261,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     ACInfo.sendActionCardInfo(activeGame, player, event);
                 }
-                    if (activeGame.isFoWMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew 2 AC");
-                    }
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                }
+                
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(activeGame, player, false));
