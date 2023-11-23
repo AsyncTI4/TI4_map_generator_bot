@@ -272,6 +272,18 @@
     },
     {
         "ItemCategory": "COMMANDER",
+        "ItemId": "mahact",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "imperia",
+        "OptionalSwaps": [
+            "COMMANDER:mahact"
+        ]
+    },
+    {
+        "ItemCategory": "COMMANDER",
         "ItemId": "axis",
         "Undraftable": true
     },
@@ -380,6 +392,11 @@
         "Undraftable": true
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "gheminaherolord",
+        "Undraftable": true
+    },
+    {
         "ItemCategory": "FLAGSHIP",
         "ItemId": "ghemina_flagship_lord",
         "Undraftable": true
@@ -396,6 +413,7 @@
         "ItemId": "the_lady_and_the_lord",
         "AdditionalComponents": [
             "FLAGSHIP:ghemina_flagship_lord"
+            "HERO:gheminaherolord"
         ]
     },
     {
@@ -447,6 +465,11 @@
         ]
     },
     {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghoti",
+        "Undraftable": true
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "spawning_grounds",
         "Undraftable": true
@@ -461,7 +484,8 @@
         "ItemId": "abyssal_embrace",
         "AdditionalComponents": [
             "ABILITY:spawning_grounds",
-            "ABILITY:mobile_command"
+            "ABILITY:mobile_command",
+            "HOMESYSTEM:ghoti"
         ]
     },
     {
@@ -602,15 +626,21 @@
     {
         "ItemCategory": "TECH",
         "ItemId": "nivyn_mech2",
+        "Undraftable": true
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "nivyn_mech",
         "AdditionalComponents": [
             "ABILITY:singularity_point"
         ]
     },
     {
-        "ItemCategory": "TECH",
+        "ItemCategory": "MECH",
         "ItemId": "nivyn_mech2",
         "OptionalSwaps": [
-           "HERO:nivyn"
+           "HERO:nivyn",
+           "TECH:nivyn_mech2"
         ]
     },
     {

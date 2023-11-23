@@ -874,6 +874,20 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
             }
             
+            //("autoneticMemoryStep2
+        } else if (buttonID.startsWith("pickFromDiscard_")) {
+            ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
+            ButtonHelperAbilities.autoneticMemoryStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryDecline_")) {
+            ButtonHelperAbilities.autoneticMemoryDecline(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep3")) {
+            if(buttonID.contains("autoneticMemoryStep3a")){
+                ButtonHelperAbilities.autoneticMemoryStep3a(activeGame, player, event);
+            }else{
+                ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
+            }
+            
         } else if (buttonID.startsWith("assignHits_")) {
             
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
