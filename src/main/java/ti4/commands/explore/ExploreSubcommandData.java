@@ -249,7 +249,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     : "Drew 2 Actions cards";
                 int count = hasSchemingAbility ? 3 : 2;
                 if(player.hasAbility("autonetic_memory")){
-                    ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 2);
+                    ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);
                     message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
                 }else{
                     for (int i = 0; i < count; i++) {
