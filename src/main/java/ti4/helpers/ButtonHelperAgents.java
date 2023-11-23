@@ -408,8 +408,7 @@ public class ButtonHelperAgents {
             if (p2 == null) return;
             String successMessage = ident + " drew an AC.";
             String successMessage2 = ButtonHelper.getIdent(p2) + " drew an AC.";
-            activeGame.drawActionCard(player.getUserID());
-            activeGame.drawActionCard(p2.getUserID());
+            String message = "";
             if (player.hasAbility("scheming")) {
                 activeGame.drawActionCard(player.getUserID());
                 successMessage += " Drew another AC for scheming. Please discard 1";
@@ -417,8 +416,20 @@ public class ButtonHelperAgents {
             if (p2.hasAbility("scheming")) {
                 activeGame.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
-
             }
+            if(player.hasAbility("autonetic_memory")){
+                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+            }else{
+                activeGame.drawActionCard(player.getUserID());
+            }
+            if(p2.hasAbility("autonetic_memory")){
+                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, p2, 1);
+                message = ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
+            }else{
+                activeGame.drawActionCard(p2.getUserID());
+            }
+            
             ButtonHelper.checkACLimit(activeGame, event, player);
             ButtonHelper.checkACLimit(activeGame, event, p2);
             String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " you got an AC from Mentak Agent";

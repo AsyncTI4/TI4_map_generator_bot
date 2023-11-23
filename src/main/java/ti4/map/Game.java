@@ -2521,6 +2521,25 @@ public class Game {
         return false;
     }
 
+    public boolean pickActionCardFromPurged(String userID, Integer acIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            String acID = "";
+            for (Map.Entry<String, Integer> ac : purgedActionCards.entrySet()) {
+                if (ac.getValue().equals(acIDNumber)) {
+                    acID = ac.getKey();
+                    break;
+                }
+            }
+            if (!acID.isEmpty()) {
+                purgedActionCards.remove(acID);
+                player.setActionCard(acID);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean shuffleActionCardBackIntoDeck(Integer acIDNumber) {
         String acID = "";
         for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {

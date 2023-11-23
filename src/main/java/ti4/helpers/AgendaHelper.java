@@ -334,15 +334,21 @@ public class AgendaHelper {
                 } else {
                     winOrLose = getWinningVoters(winner, activeGame);
                     for (Player playerWL : winOrLose) {
-                        activeGame.drawActionCard(playerWL.getUserID());
-                        activeGame.drawActionCard(playerWL.getUserID());
-                        if (playerWL.hasAbility("scheming")) {
+                        String message = "";
+                        if(playerWL.hasAbility("autonetic_memory")){
+                            ButtonHelperAbilities.autoneticMemoryStep1(activeGame, playerWL, 2);
+                            message = ButtonHelper.getIdent(playerWL) + " Triggered Autonetic Memory Option";
+                        }else {
                             activeGame.drawActionCard(playerWL.getUserID());
-                            ACInfo.sendActionCardInfo(activeGame, playerWL, event);
-                            MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), ButtonHelper.getTrueIdentity(playerWL, activeGame) + " use buttons to discard",
-                                ACInfo.getDiscardActionCardButtons(activeGame, playerWL, false));
-                        } else {
-                            ACInfo.sendActionCardInfo(activeGame, playerWL, event);
+                            activeGame.drawActionCard(playerWL.getUserID());
+                            if (playerWL.hasAbility("scheming")) {
+                                activeGame.drawActionCard(playerWL.getUserID());
+                                ACInfo.sendActionCardInfo(activeGame, playerWL, event);
+                                MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), ButtonHelper.getTrueIdentity(playerWL, activeGame) + " use buttons to discard",
+                                    ACInfo.getDiscardActionCardButtons(activeGame, playerWL, false));
+                            } else {
+                                ACInfo.sendActionCardInfo(activeGame, playerWL, event);
+                            }
                         }
 
                         if (playerWL.getLeaderIDs().contains("yssarilcommander") && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
@@ -1347,13 +1353,20 @@ public class AgendaHelper {
                         if (specificVote.contains("Keleres Rider")) {
                             int currentTG = winningR.getTg();
                             winningR.setTg(currentTG + 2);
-                            activeGame.drawActionCard(winningR.getUserID());
-                            boolean scheming = winningR.hasAbility("scheming");
-                            if (scheming) {
+                            String message = "";
+                            Player player = winningR;
+                             boolean scheming = winningR.hasAbility("scheming");
+                            if(player.hasAbility("autonetic_memory")){
+                                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                            }else{
                                 activeGame.drawActionCard(winningR.getUserID());
+                               
+                                if (scheming) {
+                                    activeGame.drawActionCard(winningR.getUserID());
+                                }
+                                ButtonHelper.checkACLimit(activeGame, event, winningR);
+                                ACInfo.sendActionCardInfo(activeGame, winningR, event);
                             }
-                            ButtonHelper.checkACLimit(activeGame, event, winningR);
-                            ACInfo.sendActionCardInfo(activeGame, winningR, event);
 
                             StringBuilder sb = new StringBuilder(identity);
                             sb.append("due to having a winning **Keleres Rider**, you have been given");
@@ -1373,11 +1386,17 @@ public class AgendaHelper {
                                 amount = 4;
                                 activeGame.drawActionCard(winningR.getUserID());
                             }
-                            activeGame.drawActionCard(winningR.getUserID());
-                            activeGame.drawActionCard(winningR.getUserID());
-                            activeGame.drawActionCard(winningR.getUserID());
-                            ButtonHelper.checkACLimit(activeGame, event, winningR);
-                            ACInfo.sendActionCardInfo(activeGame, winningR, event);
+                            Player player = winningR;
+                             if(player.hasAbility("autonetic_memory")){
+                                ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 3);
+                             }else{
+                                activeGame.drawActionCard(winningR.getUserID());
+                                activeGame.drawActionCard(winningR.getUserID());
+                                activeGame.drawActionCard(winningR.getUserID());
+                                ButtonHelper.checkACLimit(activeGame, event, winningR);
+                                ACInfo.sendActionCardInfo(activeGame, winningR, event);
+                             }
+                            
                             activeGame.setSpeaker(winningR.getUserID());
                             MessageHelper.sendMessageToChannel(channel, identity + " due to having a winning **Politics Rider**, you have been given " + amount + " AC and the speaker token");
                         }

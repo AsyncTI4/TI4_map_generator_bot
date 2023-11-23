@@ -136,6 +136,7 @@ public class ACCardsCommand implements Command {
         subcommands.add(new ShowAllAC());
         subcommands.add(new ShowACRemainingCardCount());
         subcommands.add(new PickACFromDiscard());
+        subcommands.add(new PickACFromPurged());
         subcommands.add(new ShowDiscardActionCards());
         subcommands.add(new ShowPurgedActionCards());
         subcommands.add(new ShuffleACBackIntoDeck());
