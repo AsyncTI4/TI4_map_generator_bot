@@ -188,8 +188,15 @@ public class CombatRoll extends SpecialSubcommandData {
         // Check for temp mods
         CombatModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
         CombatModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
-        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
-                combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = new ArrayList<>(CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
+                combatOnHolder, false, rollType));
+        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
+        if(opponent != null){
+            tempOpponentMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
+                combatOnHolder, true, rollType);
+        }
+        
+        tempMods.addAll(tempOpponentMods);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat, rollType);

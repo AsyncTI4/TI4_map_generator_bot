@@ -73,12 +73,6 @@ public class PNInfo extends PNCardsSubcommandData {
                     transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
                             .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                 }
-                var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, promissoryNote.getAlias(),
-                        player.getNumberTurns());
-                if (posssibleCombatMod != null) {
-                    player.addNewTempCombatMod(posssibleCombatMod);
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
-                }
                 buttons.add(transact);
             }
         }
