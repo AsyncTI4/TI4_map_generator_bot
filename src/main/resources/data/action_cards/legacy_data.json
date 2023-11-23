@@ -367,5 +367,14 @@
     "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
     "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen plans.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "risky_jump_piloting",
+    "name": "Risky Jump",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-2, remove that ship from the game board, along with any units it is transporting.",
+    "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
+    "source": "action_deck_2"
   }
 ]
