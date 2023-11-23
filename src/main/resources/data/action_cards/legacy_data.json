@@ -322,5 +322,59 @@
     "text": "Gain trade goods equal to the resource or influence value of 1 of your planets that has a technology specialty.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "anti-gravity_drive",
+    "name": "Anti-Gravity Drive",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Choose 1 system that does not contain planets or anomalies. During this tactical action, you treat that system as if it contains each non-delta wormhole; you may also treat it as if it contains a gravity rift.",
+    "flavorText": "Rin had received multiple warnings to avoid working with the Cabal. However, existential threats to the galaxy had never done much to quell her curiosity.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "masterclass_logistics",
+    "name": "Masterclass Logistics",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units.",
+    "flavorText": "This was the last mission of the Admiral's long, decorated career. When he was asked to oversee the feat, he refused, breaking into such a rage that he threw the papers, along with the man who brought them, out of his office. Five sleepless days later, planning was complete.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "deflection_tactics",
+    "name": "Deflection Tactics",
+    "phase": "Strategy",
+    "window": "At the start of the strategy phase",
+    "text": "Choose 1 strategy card. Other players must spend 1 strategy token and 3 resources to choose that strategy card during this strategy phase, if they have another choice.",
+    "flavorText": "The Tribe elder's eyes flickered in the light of the campfire. \"The greatest form of persuasion lies in coercing another to believe the course of action you wish for them to take was their idea all along.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "psychological_operations",
+    "name": "Psychological Operations",
+    "phase": "Action",
+    "window": "When you perform a strategic action",
+    "text": "Choose 1 player. When that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "steal_prototype",
+    "name": "Stolen Prototype",
+    "phase": "Action",
+    "window": "After you destroy 1 of another player's units",
+    "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
+    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only as they cleared the blast radius did he loosen his grasp on the stolen plans.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "risky_jump_piloting",
+    "name": "Risky Jump",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-2, remove that ship from the game board, along with any units it is transporting.",
+    "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
+    "source": "action_deck_2"
   }
 ]

@@ -27,20 +27,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "anti-gravity_drive",
-    "name": "Anti-Gravity Drive",
-    "phase": "Action",
-    "window": "After you activate a system",
-    "text": "Choose 1 system that does not contain planets or anomalies. During this tactical action, you treat that system as if it contains each non-delta wormhole; you may also treat it as if it contains a gravity rift.",
-    "flavorText": "Rin had received multiple warnings to avoid working with the Cabal. However, existential threats to the galaxy had never done much to quell her curiosity.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "armistice",
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "End that player's turn. They return any of their command tokens in the active system to their tactic pool.",
+    "text": "If that system contains 1 of that player's command tokens, return it to their tactic pool. Then, end that player's turn.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she signed audibly.",
     "source": "action_deck_2"
   },
@@ -234,8 +225,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "deflection_tactics",
-    "name": "Deflection Tactics",
+    "alias": "deflection",
+    "name": "Deflection",
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
     "text": "Choose 1 strategy card. Other players must spend 1 strategy token and 3 resources to choose that strategy card during this strategy phase, if they have another choice.",
@@ -249,6 +240,15 @@
     "window": "After you activate a system",
     "text": "Choose 1 system that contains a frontier token. After your ships move out of, into, or through that system during this tactical action, explore that frontier token.",
     "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "discord",
+    "name": "Discord",
+    "phase": "Action",
+    "window": "When you perform a strategic action",
+    "text": "Choose 1 player. When that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
     "source": "action_deck_2"
   },
   {
@@ -369,6 +369,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "grand_operation",
+    "name": "Grand Operation",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units.",
+    "flavorText": "This was the last mission of the Admiral's long, decorated career. When he was asked to oversee the feat, he refused, breaking into such a rage that he threw the papers, along with the man who brought them, out of his office. Five sleepless days later, planning was complete.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "hostile_world",
     "name": "Hostile World",
     "phase": "Action",
@@ -429,15 +438,6 @@
     "window": "At the end of the agenda phase",
     "text": "Reveal and vote on the top card of the agenda deck. Then, each player readies 2 planets they control.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious is where Elder Junn thrived.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "masterclass_logistics",
-    "name": "Masterclass Logistics",
-    "phase": "Action",
-    "window": "After you activate a system",
-    "text": "Move any number of your ships from the active system into an adjacent system that does not contain another player's units.",
-    "flavorText": "This was the last mission of the Admiral's long, decorated career. When he was asked to oversee the feat, he refused, breaking into such a rage that he threw the papers, along with the man who brought them, out of his office. Five sleepless days later, planning was complete.",
     "source": "action_deck_2"
   },
   {
@@ -531,15 +531,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "psychological_operations",
-    "name": "Psychological Operations",
-    "phase": "Action",
-    "window": "When you perform a strategic action",
-    "text": "Choose 1 player. When that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
-    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "public_outcry",
     "name": "Public Outcry",
     "phase": "Agenda",
@@ -585,8 +576,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "risky_jump_piloting",
-    "name": "Risky Jump Piloting",
+    "alias": "risky_jump",
+    "name": "Risky Jump",
     "phase": "Action",
     "window": "After you activate a system",
     "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-2, remove that ship from the game board, along with any units it is transporting.",
@@ -693,8 +684,8 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "steal_prototype",
-    "name": "Steal Prototype",
+    "alias": "stolen_prototype",
+    "name": "Stolen Prototype",
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
     "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
@@ -752,7 +743,16 @@
     "phase": "Action",
     "window": "After your unit's BOMBARDMENT or SPACE CANNON ability produces a hit against another player's ground forces on a planet",
     "text": "Destroy half of that player's infantry on that planet, rounded up.",
-    "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a cannister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
+    "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "void_path",
+    "name": "Void Path",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Choose 1 system that does not contain planets or anomalies. During this tactical action, you treat that system as if it contains each non-delta wormhole; you may also treat it as if it contains a gravity rift.",
+    "flavorText": "Rin had received multiple warnings to avoid working with the Cabal. However, existential threats to the galaxy had never done much to quell her curiosity.",
     "source": "action_deck_2"
   }
 ]
