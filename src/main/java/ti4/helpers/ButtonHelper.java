@@ -5878,7 +5878,7 @@ public class ButtonHelper {
             String message = getTrueIdentity(player, activeGame) + " Use buttons choose which system to mahact diplo";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, owner));
         }
-        if (("rider".equalsIgnoreCase(id))) {
+        if (id.contains("rider")) {
             String riderName = "Keleres Rider";
             String finsFactionCheckerPrefix = "FFCC_"+player.getFaction()+"_";
 

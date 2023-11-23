@@ -874,6 +874,20 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
             }
             
+            //("autoneticMemoryStep2
+        } else if (buttonID.startsWith("pickFromDiscard_")) {
+            ButtonHelper.pickACardFromDiscardStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep2_")) {
+            ButtonHelperAbilities.autoneticMemoryStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryDecline_")) {
+            ButtonHelperAbilities.autoneticMemoryDecline(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("autoneticMemoryStep3")) {
+            if(buttonID.contains("autoneticMemoryStep3a")){
+                ButtonHelperAbilities.autoneticMemoryStep3a(activeGame, player, event);
+            }else{
+                ButtonHelperAbilities.autoneticMemoryStep3b(activeGame, player, event);
+            }
+            
         } else if (buttonID.startsWith("assignHits_")) {
             
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeGame, player, ident, buttonLabel);
@@ -2834,7 +2848,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         ButtonHelper.checkACLimit(activeGame, event, player);
                         ACInfo.sendActionCardInfo(activeGame, player, event);
-                     }
+                    }
                     
                     if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
@@ -3209,34 +3223,55 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "draw_1_AC" -> {
-                    activeGame.drawActionCard(player.getUserID());
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                     String message = "";
+                    if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    }else{
+                        activeGame.drawActionCard(player.getUserID());
+                        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                            ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                        }
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        message = "Drew 1 AC";
                     }
-                    ButtonHelper.addReaction(event, true, false, "Drew 1 AC", "");
+                    ButtonHelper.addReaction(event, true, false, message, "");
                     ButtonHelper.checkACLimit(activeGame, event, player);
                 }
                 case "drawStatusACs" -> ButtonHelper.drawStatusACs(activeGame, player, event);
                 case "draw_1_ACDelete" -> {
-                    activeGame.drawActionCard(player.getUserID());
-                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                    String message = "";
+                    if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    }else{
+                        activeGame.drawActionCard(player.getUserID());
+                        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                            ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                        }
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        message = "Drew 1 AC";
                     }
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                    ButtonHelper.addReaction(event, true, false, "Drew 1 AC", "");
+                    ButtonHelper.addReaction(event, true, false, message, "");
                     event.getMessage().delete().queue();
                     ButtonHelper.checkACLimit(activeGame, event, player);
                 }
 
                 case "draw_2_ACDelete" -> {
-                    activeGame.drawActionCard(player.getUserID());
-                    activeGame.drawActionCard(player.getUserID());
-                    if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                     String message = "";
+                    if(player.hasAbility("autonetic_memory")){
+                        ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 2);
+                        message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                    }else{
+                        activeGame.drawActionCard(player.getUserID());
+                        activeGame.drawActionCard(player.getUserID());
+                        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+                            ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
+                        }
+                        ACInfo.sendActionCardInfo(activeGame, player, event);
+                        message = "Drew 2 AC With Scheming. Please Discard An AC";
                     }
-                    ACInfo.sendActionCardInfo(activeGame, player, event);
-                    ButtonHelper.addReaction(event, true, false, "Drew 2 AC With Scheming. Please Discard An AC", "");
+                    ButtonHelper.addReaction(event, true, false, message, "");
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(activeGame, player, false));
 
