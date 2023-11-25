@@ -1,10 +1,12 @@
 package ti4.commands.explore;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.map.Game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -34,6 +36,16 @@ public class ShowRemainingRelics extends GenericRelicAction {
         if (override != null) {
            over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
+        showRemaining(event, over, activeGame, player);
+    }
+
+    public void showRemaining(GenericInteractionCreateEvent event, boolean over, Game activeGame, Player player){
+        List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
+       
+        Integer deckCount = allRelics.size();
+        Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
+        NumberFormat formatPercent = NumberFormat.getPercentInstance();
+        formatPercent.setMaximumFractionDigits(1);
         StringBuilder text;
         if (allRelics.isEmpty()) {
             text = new StringBuilder("**RELIC DECK IS EMPTY**");
@@ -47,10 +59,9 @@ public class ShowRemainingRelics extends GenericRelicAction {
         }
 
         if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
-                sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
-                sendMessage(text.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),text.toString());
         }
-
     }
 }

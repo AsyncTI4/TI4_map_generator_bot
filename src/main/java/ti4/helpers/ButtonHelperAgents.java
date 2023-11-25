@@ -224,7 +224,8 @@ public class ButtonHelperAgents {
             p2.setCommodities(p2.getCommoditiesTotal());
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, p2, event);
             cabalAgentInitiation(activeGame, p2);
-            message = "Refreshed " + p2.getColor() + "'s commodities";
+            message = "Refreshed " + ButtonHelper.getIdentOrColor(p2, activeGame) + "'s commodities";
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame)+ " your commodities were refreshed by hacan agent");
         }
         if (p2.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(p2, activeGame).size() > 1) {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to buy axis orders",

@@ -249,6 +249,7 @@ public class Setup extends PlayerSubcommandData {
             for (Player player2 : activeGame2.getRealPlayers()) {
                 if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                     player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+                    player.setPersonalPingInterval(player2.getPersonalPingInterval());
                 }
             }
         }

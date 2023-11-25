@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -122,6 +123,7 @@ public class Replace extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
+            MessageHelper.sendMessageToChannel(activeGame.getBotMapUpdatesThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " pinging you here for visibility");
         }
     }
 }
