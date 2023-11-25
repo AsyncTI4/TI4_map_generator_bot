@@ -404,6 +404,12 @@ public class CombatModHelper {
                 if (onTile.getPlanets().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
+                if(game.getTile(onTile.getId()) != null){
+                    if(ButtonHelper.isTileLegendary(game.getTile(onTile.getId()), game)){
+                        meetsCondition = true;
+                    }
+                }
+                
             }
             case Constants.MOD_HAS_FRAGILE -> meetsCondition = player.getAbilities().contains("fragile");
             case Constants.MOD_OPPONENT_NO_CC_FLEET ->

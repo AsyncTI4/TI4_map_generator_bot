@@ -76,6 +76,7 @@ public class Player {
     private int turnCount;
     private int tg;
     private int commodities;
+    private int personalPingInterval;
     private int commoditiesTotal;
     private int stasisInfantry;
     private int autoSaboPassMedian;
@@ -1341,6 +1342,12 @@ public class Player {
 
     public int getTg() {
         return tg;
+    }
+    public int getPersonalPingInterval() {
+        return personalPingInterval;
+    }
+    public void setPersonalPingInterval(int interval) {
+        personalPingInterval = interval;
     }
 
     public int getTurnCount() {

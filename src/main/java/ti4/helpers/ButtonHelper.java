@@ -46,6 +46,7 @@ import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
+import ti4.commands.explore.ShowRemainingRelics;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
@@ -763,8 +764,9 @@ public class ButtonHelper {
         buttons.add(Button.danger("showDeck_hazardous", "Hazardous").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("hazardous"))));
         buttons.add(Button.success("showDeck_industrial", "Industrial").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("industrial"))));
         buttons.add(Button.secondary("showDeck_all", "All Explores"));
-        buttons.add(Button.danger("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
-        buttons.add(Button.danger("showDeck_agenda", "Agenda Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("agenda"))));
+        buttons.add(Button.secondary("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
+        buttons.add(Button.secondary("showDeck_agenda", "Agenda Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("agenda"))));
+         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
     }
     public static void resolveDeckChoice(Game activeGame, ButtonInteractionEvent event, String buttonID, Player player){
@@ -785,6 +787,8 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }else if(type.equalsIgnoreCase("agenda")){
             new ShowDiscardedAgendas().showDiscards(activeGame, event);
+         }else if(type.equalsIgnoreCase("relic")){
+            new ShowRemainingRelics().showRemaining(event, false, activeGame, player);
         }else{
             types.add(type);
             new ExpInfo().secondHalfOfExpInfo(types, event, player, activeGame, false);
@@ -1365,7 +1369,14 @@ public class ButtonHelper {
                 }
             }
             case "nekro" -> {
-                if (player.getTechs().size() > 4) {
+                int count = 2;
+                if(player.hasTech("vax")){
+                    count++;
+                }
+                if(player.hasTech("vay")){
+                    count++;
+                }
+                if (player.getTechs().size() > count) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -2148,6 +2159,21 @@ public class ButtonHelper {
             if (t2 != null && t2.getPosition().equalsIgnoreCase(tile.getPosition())) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isTileLegendary(Tile tile, Game activeGame) {
+
+        for(UnitHolder planet : tile.getUnitHolders().values()){
+            if(planet instanceof Planet planetHolder){
+                boolean hasAbility = planetHolder.isHasAbility()
+            || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary") || token.contains("consulate"));
+                if(hasAbility){
+                    return true;
+                }
+            }
+            
         }
         return false;
     }

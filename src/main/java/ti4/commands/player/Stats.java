@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -21,6 +22,8 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -40,6 +43,7 @@ public class Stats extends PlayerSubcommandData {
 			.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player has passed y/n"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 			.addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_SABO_PASS_MEDIAN, "Median time in hours before player auto passes on sabo if they have none"))
+			.addOptions(new OptionData(OptionType.INTEGER, Constants.PERSONAL_PING_INTERVAL, "Overrides the games autoping inteveral system for your turn specifically"))
 			.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
 			.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
 			.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
@@ -152,6 +156,22 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
 		if (optionMedian != null) {
 			player.setAutoSaboPassMedian(optionMedian.getAsInt());
+		}
+
+		OptionMapping optionInterval = event.getOption(Constants.PERSONAL_PING_INTERVAL);
+		if (optionInterval != null) {
+			player.setPersonalPingInterval(optionInterval.getAsInt());
+			Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+			for (Game activeGame2 : mapList.values()) {
+				if (!activeGame2.isHasEnded()) {
+					for (Player player2 : activeGame2.getRealPlayers()) {
+						if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+							player2.setPersonalPingInterval(optionInterval.getAsInt());
+							GameSaveLoadManager.saveMap(activeGame2);
+						}
+					}
+				}
+			}
 		}
 
 		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);

@@ -220,7 +220,11 @@ public class MessageListener extends ListenerAdapter {
                                     AgendaHelper.pingMissingPlayers(activeGame);
                                 } else {
                                      long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
-                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int) activeGame.getAutoPingSpacer());
+                                     int autoPingSpacer = (int)activeGame.getAutoPingSpacer();
+                                     if(player != null && player.getPersonalPingInterval() > 0){
+                                        autoPingSpacer = player.getPersonalPingInterval();
+                                     }
+                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int) autoPingSpacer);
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*2) ){
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
