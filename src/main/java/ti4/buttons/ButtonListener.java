@@ -2093,6 +2093,13 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
             }
 
+            var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID,
+                        player.getNumberTurns());
+            if (posssibleCombatMod != null) {
+                player.addNewTempCombatMod(posssibleCombatMod);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
+            }
+
         } else if (buttonID.startsWith("send_")) {
             ButtonHelper.resolveSpecificTransButtonPress(activeGame, player, buttonID, event);
             event.getMessage().delete().queue();
