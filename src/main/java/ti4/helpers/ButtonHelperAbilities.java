@@ -10,6 +10,8 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.ds.TrapReveal;
+import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.special.SleeperToken;
@@ -43,6 +45,219 @@ public class ButtonHelperAbilities {
         activeGame.drawActionCard(player.getUserID(),count);
         ACInfo.sendActionCardInfo(activeGame, player, event);
         ButtonHelper.checkACLimit(activeGame, event, player);
+    }
+
+    public static List<String> getTrapNames(){
+        List<String> trapNames = new ArrayList<String>();
+        trapNames.add("Minefields");
+        trapNames.add("Interference Grid");
+        trapNames.add("Feint");
+        trapNames.add("Gravitic Inhibitor");
+        trapNames.add("Account Siphon");
+        trapNames.add("Saboteurs");
+        return trapNames;
+    }
+
+    public static void resolveGrace(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event){
+        String msg = ButtonHelper.getIdent(player) + " is resolving the grace ability";
+        int scPlayed = Integer.parseInt(buttonID.split("_")[1]);
+        if(!player.hasAbility("grace")){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "To "+ButtonHelper.getIdent(player)+": This button aint for you ");
+            return;
+        }
+        player.addExhaustedAbility("grace");
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to resolve grace, reminder you have to spend a strat CC if applicable, and that you can only do one of these.",getGraceButtons(activeGame, player, scPlayed));
+    }
+
+
+    public static List<Button> getGraceButtons(Game activeGame, Player edyn, int scPlayed) {
+        List<Button> scButtons = new ArrayList<>();
+        scButtons.add(Button.secondary("spendAStratCC", "Spend a Strategy CC"));
+        if (scPlayed > 1 && (activeGame.getScPlayed().get(1) == null || !activeGame.getScPlayed().get(1))) {
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Gain CCs"));
+            scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
+        }
+        if (scPlayed > 2 && (activeGame.getScPlayed().get(2) == null || !activeGame.getScPlayed().get(2))) {
+            scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
+        }
+        if (scPlayed > 3 && (activeGame.getScPlayed().get(3) == null || !activeGame.getScPlayed().get(3))) {
+            scButtons.add(Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+        }
+        if (scPlayed > 4 && (activeGame.getScPlayed().get(4) == null || !activeGame.getScPlayed().get(4))) {
+            scButtons.add(Button.success("construction_sd", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+        }
+        if (scPlayed > 5 && (activeGame.getScPlayed().get(5) == null || !activeGame.getScPlayed().get(5))) {
+            scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+        }
+        if (scPlayed > 6 && (activeGame.getScPlayed().get(6) == null || !activeGame.getScPlayed().get(6))) {
+            scButtons.add(Button.success("warfareBuild", "Build At Home"));
+        }
+        if (scPlayed > 7 && (activeGame.getScPlayed().get(7) == null || !activeGame.getScPlayed().get(7))) {
+            activeGame.setComponentAction(true);
+            scButtons.add(Button.success("acquireATech", "Get a Tech"));
+        }
+        if (scPlayed > 8 && (activeGame.getScPlayed().get(8) == null || !activeGame.getScPlayed().get(8))) {
+            scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+        }
+        scButtons.add(Button.danger("deleteButtons", "Done resolving"));
+
+        return scButtons;
+    }
+
+    public static void setTrapStep1(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("setTrapStep2_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("setTrapStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " tell the bot who's planet you want to put a trap on", buttons);
+    }
+
+    public static void setTrapStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : p2.getPlanets()){
+            buttons.add(Button.secondary("setTrapStep3_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " select the planet you want to put a trap on", buttons);
+    }
+    public static void setTrapStep3(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        List<Button> availableTraps = new ArrayList<>();
+        for(String availableTrap : getUnusedTraps(activeGame, player)){
+            availableTraps.add(Button.success("setTrapStep4_"+planet+"_"+availableTrap, availableTrap));
+        }
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " choose the trap you want to set on the planet "+Helper.getPlanetRepresentation(planet, activeGame);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
+    }
+
+    public static void removeTrapStep1(Game activeGame, Player player){
+        List<Button> availableTraps = new ArrayList<>();
+        for(String availableTrap : player.getTrapCardsPlanets().keySet()){
+            availableTrap = translateNameIntoTrapIDOrReverse(availableTrap);
+            availableTraps.add(Button.success("removeTrapStep2_"+availableTrap, availableTrap));
+        }
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " choose the trap you want to remove";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
+    }
+
+    public static void revealTrapStep1(Game activeGame, Player player){
+        List<Button> availableTraps = new ArrayList<>();
+        for(String availableTrap : player.getTrapCardsPlanets().keySet()){
+            availableTrap = translateNameIntoTrapIDOrReverse(availableTrap);
+            availableTraps.add(Button.success("revealTrapStep2_"+availableTrap, availableTrap));
+        }
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " choose the trap you want to reveal";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
+    }
+
+    public static void revealTrapStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String trap = buttonID.split("_")[1];
+        trap = translateNameIntoTrapIDOrReverse(trap);
+        String planet = player.getTrapCardsPlanets().get(trap);
+        new TrapReveal().revealTrapForPlanet(event, activeGame, planet, trap,player, true);
+        event.getMessage().delete().queue();
+    }
+
+    public static void removeTrapStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String trap = buttonID.split("_")[1];
+        trap = translateNameIntoTrapIDOrReverse(trap);
+        String planet = player.getTrapCardsPlanets().get(trap);
+        new TrapReveal().revealTrapForPlanet(event, activeGame, planet, trap,player, false);
+        event.getMessage().delete().queue();
+    }
+
+
+
+    public static void setTrapStep4(Game activeGame, Player player, ButtonInteractionEvent event,String buttonID){
+        String planet = buttonID.split("_")[1];
+        String trap = translateNameIntoTrapIDOrReverse(buttonID.split("_")[2]);
+        event.getMessage().delete().queue();
+        new TrapToken().setTrapForPlanet(event, activeGame, planet, trap, player);
+    }
+
+    public static List<String> getPlanetsWithTraps(Game activeGame){
+        List<String> trappedPlanets = new ArrayList<String>();
+        for(String trapName : getTrapNames()){
+            if(!activeGame.getFactionsThatReactedToThis(trapName).isEmpty()){
+                trappedPlanets.add(activeGame.getFactionsThatReactedToThis(trapName));
+            }
+        }
+        return trappedPlanets;
+    }
+    public static List<String> getUnusedTraps(Game activeGame, Player player){
+        List<String> unusedTraps = new ArrayList<String>();
+        for(String trapName : getTrapNames()){
+            if(!player.getTrapCardsPlanets().containsKey(translateNameIntoTrapIDOrReverse(trapName))){
+                unusedTraps.add(trapName);
+            }
+        }
+        return unusedTraps;
+    }
+
+    public static String translateNameIntoTrapIDOrReverse(String nameOrTrapID){
+        switch(nameOrTrapID){
+            case "Minefields"-> {return "dshc_3_lizho";}
+            case "Interference Grid" -> {return "dshc_1_lizho";}
+            case "Feint" -> {return "dshc_6_lizho";}
+            case "Gravitic Inhibitor"-> {return "dshc_4_lizho";}
+            case "Account Siphon"-> {return "dshc_2_lizho";}
+            case "Saboteurs" -> {return "dshc_5_lizho";}
+            case "dshc_3_lizho"-> {return "Minefields";}
+            case "dshc_1_lizho" -> {return "Interference Grid";}
+            case "dshc_6_lizho" -> {return "Feint";}
+            case "dshc_4_lizho"-> {return "Gravitic Inhibitor";}
+            case "dshc_2_lizho"-> {return "Account Siphon";}
+            case "dshc_5_lizho" -> {return "Saboteurs";}
+        }
+        return "nope";
+    }
+
+    public static void addATrapToken(Game activeGame, String planetName){
+        Tile tile = activeGame.getTileFromPlanet(planetName);
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+        boolean addedYet = false;
+        for(int x = 1; x < 7 && !addedYet; x++){
+            String tokenName = "attachment_lizhotrap"+x+".png";
+            if(!uH.getTokenList().contains(tokenName)){
+                addedYet = true;
+                tile.addToken(tokenName, uH.getName());
+            }
+        }
+    }
+
+    public static void removeATrapToken(Game activeGame, String planetName){
+        Tile tile = activeGame.getTileFromPlanet(planetName);
+        if(tile==null){
+            return;
+        }
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planetName, activeGame);
+        boolean removedYet = false;
+        for(int x = 1; x < 7 && !removedYet; x++){
+            String tokenName = "attachment_lizhotrap"+x+".png";
+            if(uH.getTokenList().contains(tokenName)){
+                removedYet = true;
+                tile.removeToken(tokenName, uH.getName());
+            }
+        }
+        if(!removedYet){
+            String tokenName = "attachment_lizhotrap.png";
+            if(uH.getTokenList().contains(tokenName)){
+                removedYet = true;
+                tile.removeToken(tokenName, uH.getName());
+            }
+        }
     }
 
 
@@ -604,10 +819,16 @@ public class ButtonHelperAbilities {
         String unit = unitNPlace.split("_")[0];
         String pos = unitNPlace.split("_")[1];
         Tile tile = activeGame.getTileByPosition(pos);
-        String successMessage = "Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + "->"
-            + (player.getStrategicCC() - 1) + ")";
-        player.setStrategicCC(player.getStrategicCC() - 1);
-        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+        String successMessage;
+        if(player.getStrategicCC() > 0) {
+            successMessage = "Reduced strategy pool CCs by 1 (" + (player.getStrategicCC()) + "->"
+                + (player.getStrategicCC() - 1) + ")";
+            player.setStrategicCC(player.getStrategicCC() - 1);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+        }else{
+            player.addExhaustedRelic("emelpar");
+            successMessage = "Exhausted scepter of emelpar";
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
         if ("destroyer".equals(unit)) {

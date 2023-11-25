@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -238,7 +239,12 @@ public class SCPlay extends PlayerSubcommandData {
         }
         conclusionButtons.add(deleteButton);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
-
+        if(!activeGame.isHomeBrewSCMode() && player.hasAbility("grace")&&!player.getExhaustedAbilities().contains("grace") && ButtonHelperAbilities.getGraceButtons(activeGame, player, scToPlay).size() > 2){
+            List<Button> graceButtons = new ArrayList<>();
+            graceButtons.add(Button.success("resolveGrace_"+scToPlay, "Resolve Grace Ability"));
+            graceButtons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can resolve grace with the buttons", graceButtons);
+        }
         if (player.ownsPromissoryNote("acq") && scToPlay != 1 && !winnuHero) {
             for (Player player2 : activeGame.getPlayers().values()) {
                 if (!player2.getPromissoryNotes().isEmpty()) {

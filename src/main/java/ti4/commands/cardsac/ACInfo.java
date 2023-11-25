@@ -197,6 +197,12 @@ public class ACInfo extends ACCardsSubcommandData {
                 Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
                 acButtons.add(nekroButton);
             }
+            if(player.hasAbility("cunning")){
+                acButtons.add(Button.success("setTrapStep1", "Set a Trap"));
+                acButtons.add(Button.danger("revealTrapStep1", "Reveal a Trap"));
+                acButtons.add(Button.secondary("removeTrapStep1", "Remove a Trap"));
+            }
+
             if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
                 String omenDice = "";
                 for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){

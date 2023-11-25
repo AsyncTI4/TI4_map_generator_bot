@@ -349,6 +349,12 @@ public class ButtonHelperAgents {
         if("mykomentoriagent".equalsIgnoreCase(agent)){
             ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
         }
+        if("lizhoagent".equalsIgnoreCase(agent)){
+            List<Button> buttons = new ArrayList<>();
+            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "2ff", "placeOneNDone_skipbuild"));
+            String message = "Use buttons to put 2 fighters with your ships";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        }
         
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
