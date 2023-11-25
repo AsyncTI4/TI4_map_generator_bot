@@ -127,10 +127,10 @@ public class ButtonHelperCommanders {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " You gained tech while having Nekro commander, use buttons to resolve. ", buttons);
             } else {
-                if (!player.hasAbility("technological_singularity")) {
-                    int count = 1;
+                if (player.hasAbility("technological_singularity")) {
+                    int count = 0;
                     for (String nekroTech : player.getTechs()) {
-                        if ("".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
+                        if (!"".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
                             count = count + 1;
                         }
                     }

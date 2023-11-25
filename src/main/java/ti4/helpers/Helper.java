@@ -1328,6 +1328,9 @@ public class Helper {
 
     private static void addGameRoleToMapPlayers(Guild guild, Game activeGame, Role role) {
         for (String playerID : activeGame.getPlayerIDs()) {
+            if(activeGame.getRound() > 1 && activeGame.getPlayer(playerID).getFaction() == null){
+                continue;
+            }
             Member member = guild.getMemberById(playerID);
             if (member != null && !member.getRoles().contains(role)) guild.addRoleToMember(member, role).queue();
         }
