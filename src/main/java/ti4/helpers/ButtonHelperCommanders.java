@@ -130,9 +130,13 @@ public class ButtonHelperCommanders {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
                     for (String nekroTech : player.getTechs()) {
+                        if(nekroTech.equalsIgnoreCase("vax") || nekroTech.equalsIgnoreCase("vay")){
+                            continue;
+                        }
                         if (!"".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
                             count = count + 1;
                         }
+                        
                     }
                     if (count > 2) {
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),

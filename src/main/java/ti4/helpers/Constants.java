@@ -477,6 +477,7 @@ public class Constants {
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
     public static final String TURN_COUNT = "turn_count";
     public static final String COMMODITIES = "commodities";
+    public static final String PERSONAL_PING_INTERVAL = "personal_ping_interval";
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
