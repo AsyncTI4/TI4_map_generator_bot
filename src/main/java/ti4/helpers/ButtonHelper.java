@@ -42,6 +42,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.SendFragments;
@@ -713,7 +714,9 @@ public class ButtonHelper {
         String trueIdentity = ButtonHelper.getTrueIdentity(player, activeGame);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
-        if (player.hasTechReady("aida")) {
+        String tech = buttonID.split("_")[1];
+        TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
+        if (techM.getType().toString().equalsIgnoreCase("unitupgrade") && player.hasTechReady("aida")) {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
             buttons.add(aiDEVButton);
         }
@@ -1281,6 +1284,11 @@ public class ButtonHelper {
             }
             case "edyn" -> {
                 if (activeGame.getLaws().size() > 0) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "lizho" -> {
+                if(player.getTrapCardsPlanets().size() > 2){
                     shouldBeUnlocked = true;
                 }
             }
@@ -2479,6 +2487,12 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
         }
 
+        if (player.hasUnexhaustedLeader("lizhoagent")) {
+            endButtons.add(Button.success(finChecker + "exhaustAgent_lizhoagent", "Use Lizho Agent on Yourself").withEmoji(Emoji.fromFormatted(Emojis.lizho)));
+        }
+
+        
+
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
     }
@@ -2650,22 +2664,22 @@ public class ButtonHelper {
 
         if ("corners".equalsIgnoreCase(ringNum)) {
             Tile tr = activeGame.getTileByPosition("tl");
-            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr)) {
+            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr) && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tr))) {
                 Button corners = Button.success(finChecker + "ringTile_tl", tr.getRepresentationForButtons(activeGame, player));
                 ringButtons.add(corners);
             }
             tr = activeGame.getTileByPosition("tr");
-            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr)) {
+            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr) && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tr))) {
                 Button corners = Button.success(finChecker + "ringTile_tr", tr.getRepresentationForButtons(activeGame, player));
                 ringButtons.add(corners);
             }
             tr = activeGame.getTileByPosition("bl");
-            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr)) {
+            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr) && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tr))) {
                 Button corners = Button.success(finChecker + "ringTile_bl", tr.getRepresentationForButtons(activeGame, player));
                 ringButtons.add(corners);
             }
             tr = activeGame.getTileByPosition("br");
-            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr)) {
+            if (tr != null && !AddCC.hasCC(event, player.getColor(), tr) && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tr))) {
                 Button corners = Button.success(finChecker + "ringTile_br", tr.getRepresentationForButtons(activeGame, player));
                 ringButtons.add(corners);
             }
@@ -2683,14 +2697,14 @@ public class ButtonHelper {
                     for (int x = totalTiles / 2; x < totalTiles + 1; x++) {
                         String pos = ringN + "" + x;
                         Tile tile = activeGame.getTileByPosition(pos);
-                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)) {
+                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile) && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tile))) {
                             Button corners = Button.success(finChecker + "ringTile_" + pos, tile.getRepresentationForButtons(activeGame, player));
                             ringButtons.add(corners);
                         }
                     }
                     String pos = ringN + "01";
                     Tile tile = activeGame.getTileByPosition(pos);
-                    if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)) {
+                    if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)  && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tile))) {
                         Button corners = Button.success(finChecker + "ringTile_" + pos, tile.getRepresentationForButtons(activeGame, player));
                         ringButtons.add(corners);
                     }
@@ -2701,7 +2715,7 @@ public class ButtonHelper {
                             pos = ringN + "0" + x;
                         }
                         Tile tile = activeGame.getTileByPosition(pos);
-                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)) {
+                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)  && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tile))) {
                             Button corners = Button.success(finChecker + "ringTile_" + pos, tile.getRepresentationForButtons(activeGame, player));
                             ringButtons.add(corners);
                         }
@@ -2716,7 +2730,7 @@ public class ButtonHelper {
                             pos = ringN + "0" + x;
                         }
                         Tile tile = activeGame.getTileByPosition(pos);
-                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)) {
+                        if (tile != null && !tile.getRepresentationForButtons(activeGame, player).contains("Hyperlane") && !AddCC.hasCC(event, player.getColor(), tile)  && (!activeGame.getNaaluAgent() || !ButtonHelper.isTileHomeSystem(tile))) {
                             Button corners = Button.success(finChecker + "ringTile_" + pos, tile.getRepresentationForButtons(activeGame, player));
                             ringButtons.add(corners);
                         }
@@ -2736,6 +2750,18 @@ public class ButtonHelper {
 
     public static String getTrueIdentity(Player player, Game activeGame) {
         return Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
+    }
+
+
+    public static int getNumberOfUnitUpgrades(Player player) {
+        int count = 0;
+        for (String tech : player.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (techM.getType().toString().equalsIgnoreCase("unitupgrade")) {
+               count++;
+            }
+        }
+        return count;
     }
 
     public static void exploreDET(Player player, Game activeGame, ButtonInteractionEvent event) {
@@ -3006,6 +3032,10 @@ public class ButtonHelper {
 
         if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            buttons.add(ghostButton);
+        }
+        if (player.hasTech("dslihb") && !ButtonHelper.isTileHomeSystem(activeGame.getTileByPosition(activeGame.getActiveSystem()))) {
+            Button ghostButton = Button.secondary("exhaustTech_dslihb", "Exhaust Wraith Engine").withEmoji(Emoji.fromFormatted(Emojis.lizho));
             buttons.add(ghostButton);
         }
         String planet = "eko";
@@ -4996,6 +5026,10 @@ public class ButtonHelper {
                 compButtons.add(tButton);
             }
         }
+        if (ButtonHelper.getNumberOfStarCharts(p1) > 1 ) {
+            Button tButton = Button.danger(finChecker + prefix + "doStarCharts_", "Purge 2 Starcharts ");
+            compButtons.add(tButton);
+        }
         //leaders
         for (Leader leader : p1.getLeaders()) {
             if (!leader.isExhausted() && !leader.isLocked()) {
@@ -5062,7 +5096,7 @@ public class ButtonHelper {
                 continue;
             }
 
-            if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE) || (relicData != null && relicData.getText().contains("Action:"))) {
+            if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE) || (!relic.contains("starchart") && relicData != null && (relicData.getText().contains("Action:") || relicData.getText().contains("ACTION:")))) {
                 Button rButton;
                 if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
                     if (!dontEnigTwice) {
@@ -5105,7 +5139,7 @@ public class ButtonHelper {
             }
         }
         //Abilities
-        if (p1.hasAbility("star_forge") && p1.getStrategicCC() > 0 && getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Warsun).size() > 0) {
+        if (p1.hasAbility("star_forge") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar")) && getTilesOfPlayersSpecificUnits(activeGame, p1, UnitType.Warsun).size() > 0) {
             Button abilityButton = Button.success(finChecker + prefix + "ability_starForge", "Starforge").withEmoji(Emoji.fromFormatted(Emojis.Muaat));
             compButtons.add(abilityButton);
         }
@@ -5547,6 +5581,9 @@ public class ButtonHelper {
                     if (relicModel.getName().contains("Nanoforge")) {
                         offerNanoforgeButtons(p1, activeGame, event);
                     }
+                    if (buttonID.contains("decrypted_cartoglyph")) {
+                        new DrawBlueBackTile().drawBlueBackTiles(event, activeGame, p1, 3, false);
+                    }
                     if ("dynamiscore".equals(buttonID) || "absol_dynamiscore".equals(buttonID)) {
                         int oldTg = p1.getTg();
                         p1.setTg(oldTg + p1.getCommoditiesTotal() + 2);
@@ -5712,6 +5749,10 @@ public class ButtonHelper {
                 }
 
             }
+            case "doStarCharts" ->{
+                ButtonHelper.purge2StarCharters(p1);
+                new DrawBlueBackTile().drawBlueBackTiles(event, activeGame, p1, 1, false);
+            }
         }
 
         if (!firstPart.contains("ability") && !firstPart.contains("getRelic")) {
@@ -5767,6 +5808,26 @@ public class ButtonHelper {
         String message = "Use buttons to select which planet to nanoforge";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
+    public static int getNumberOfStarCharts(Player player){
+        int count = 0;
+        for(String relic : player.getRelics()){
+            if(relic.contains("starchart")){
+                count++;
+            }
+        }
+        return count;
+    }
+    public static void purge2StarCharters(Player player){
+        List<String> relics = new ArrayList<>();
+        relics.addAll(player.getRelics());
+        int count = 0;
+        for(String relic : relics){
+            if(relic.contains("starchart") && count < 2){
+                count++;
+                player.removeRelic(relic);
+            }
+        }
+    }
 
     public static void resolvePNPlay(String id, Player player, Game activeGame, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
@@ -5814,6 +5875,11 @@ public class ButtonHelper {
             List<Button> buttons = ButtonHelperFactionSpecific.getGreyfireButtons(activeGame, player);
             String message = getTrueIdentity(player, activeGame) + " select planet you wish to use greyfire on";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, activeGame), message, buttons);
+        }
+        if("dspnlizh".equalsIgnoreCase(id)){
+            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "2 ff", activeGame);
+            String message = getTrueIdentity(player, activeGame) + " added 2 ff to the active system";
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));

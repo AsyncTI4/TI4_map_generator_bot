@@ -43,7 +43,13 @@ public class NaaluCommander extends SpecialSubcommandData {
         String agendaID = activeGame.lookAtTopAgenda(0);
         sb.append("1: ");
         if (activeGame.getSentAgendas().get(agendaID) != null) {
-            sb.append("This agenda is currently in somebody's hand.");
+            sb.append("This agenda is currently in somebody's hand. Showing the next agenda\n");
+            agendaID = activeGame.lookAtTopAgenda(1);
+            if (activeGame.getSentAgendas().get(agendaID) != null) {
+                sb.append("This agenda is currently in somebody's hand.");
+            } else if (agendaID != null) {
+                sb.append(Helper.getAgendaRepresentation(agendaID));
+            }
         } else if (agendaID != null) {
             sb.append(Helper.getAgendaRepresentation(agendaID));
         } else {

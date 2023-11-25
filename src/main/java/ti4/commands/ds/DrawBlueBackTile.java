@@ -106,7 +106,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         Collections.shuffle(tilesToPullFrom);
 
         if (tilesToPullFrom.size() < count) {
-            sendMessage("Not enough tiles to draw from");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Not enough tiles to draw from");
             return;
         }
 
@@ -117,6 +117,8 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
             tileEmbeds.add(tile.getHelpMessageEmbed(false));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /game add_tile to add it to the map.");
+
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
     }
     

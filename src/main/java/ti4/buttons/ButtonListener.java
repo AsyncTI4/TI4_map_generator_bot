@@ -43,6 +43,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
+import ti4.commands.ds.TrapReveal;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
@@ -627,7 +628,13 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(channel, "Hey, something went wrong leaving a react, please just hit the no follow button on the SC to do so.");
             }
             event.getMessage().delete().queue();
-
+        } else if(buttonID.startsWith("spendAStratCC")){
+            if (player.getStrategicCC() > 0) {
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, activeGame, event);
+                }
+            String message = deductCC(player, event);
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership"))
             && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeGame, player, event, "");
@@ -783,6 +790,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveArboHeroBuild(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("saarHeroResolution_")) {
             ButtonHelperHeroes.resolveSaarHero(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("resolveGrace_")) {
+            ButtonHelperAbilities.resolveGrace(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("increaseTGonSC_")) {
             String sc = buttonID.replace("increaseTGonSC_", "");
             int scNum = Integer.parseInt(sc);
@@ -1694,6 +1703,10 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)
                 + " Select which AC you would like to steal", buttons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("steal2tg_")) {
+            new TrapReveal().steal2Tg(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("steal3comm_")) {
+            new TrapReveal().steal3Comm(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("specialRex_")) {
             ButtonHelper.resolveSpecialRex(player, activeGame, buttonID, ident, event);
         } else if (buttonID.startsWith("doActivation_")) {
@@ -1830,6 +1843,16 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("setTrapStep2_")) {
+            ButtonHelperAbilities.setTrapStep2( activeGame,player, event, buttonID);
+        } else if (buttonID.startsWith("removeTrapStep2_")) {
+            ButtonHelperAbilities.removeTrapStep2(activeGame,player, event, buttonID);
+         } else if (buttonID.startsWith("revealTrapStep2_")) {
+            ButtonHelperAbilities.revealTrapStep2(activeGame,player, event, buttonID);
+        } else if (buttonID.startsWith("setTrapStep3_")) {
+            ButtonHelperAbilities.setTrapStep3(activeGame,player, event,buttonID);
+        } else if (buttonID.startsWith("setTrapStep4_")) {
+            ButtonHelperAbilities.setTrapStep4(activeGame,player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep1_")) {
             ButtonHelperFactionSpecific.resolveStymiePlayerStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep2_")) {
@@ -3138,6 +3161,15 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveUprisingStep1" -> {
                     ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
                 }
+                case "setTrapStep1" -> {
+                    ButtonHelperAbilities.setTrapStep1(activeGame, player);
+                }
+                case "revealTrapStep1" -> {
+                    ButtonHelperAbilities.revealTrapStep1(activeGame, player);
+                }
+                case "removeTrapStep1" -> {
+                    ButtonHelperAbilities.removeTrapStep1(activeGame, player);
+                }
                 case "offerDeckButtons" -> {
                     ButtonHelper.offerDeckButtons(activeGame, event);
                 }
@@ -3341,6 +3373,21 @@ public class ButtonListener extends ListenerAdapter {
                 case "doneWithTacticalAction" -> {
                     if(!activeGame.getL1Hero()){
                         ButtonHelper.exploreDET(player, activeGame, event);
+                        if(player.hasAbility("cunning")){
+                            List<Button> trapButtons = new ArrayList<>();
+                            for(UnitHolder uH : activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().values()){
+                                if(uH instanceof Planet){
+                                    String planet = uH.getName();
+                                    trapButtons.add(Button.secondary("setTrapStep3_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+
+                                }
+                            }
+                            trapButtons.add(Button.danger("deleteButtons", "Decline"));
+                            String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the buttons to place a trap on a planet";
+                            if(trapButtons.size() > 1){
+                                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, trapButtons);
+                            }
+                        }
                     }
                     
                     if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
@@ -3799,8 +3846,8 @@ public class ButtonListener extends ListenerAdapter {
                     Button sar2 = Button.success("titansCommanderUsage", "Use Titans Commander To Gain a TG");
                     buttons.add(sar2);
                 }
-                if (player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
-                    Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                if (ButtonHelper.getNumberOfUnitUpgrades(player) > 0 && player.hasTechReady("aida") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                    Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV ("+ButtonHelper.getNumberOfUnitUpgrades(player)+"r)");
                     buttons.add(aiDEVButton);
                 }
                 if (player.hasTechReady("st") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
@@ -3832,6 +3879,20 @@ public class ButtonListener extends ListenerAdapter {
             } 
             if (buttonID.contains("tacticalAction")) {
                 ButtonHelper.exploreDET(player, activeGame, event);
+                if(player.hasAbility("cunning")){
+                    List<Button> trapButtons = new ArrayList<>();
+                    for(UnitHolder uH : activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().values()){
+                        if(uH instanceof Planet){
+                            String planet = uH.getName();
+                            trapButtons.add(Button.secondary("setTrapStep3_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+                        }
+                    }
+                    trapButtons.add(Button.danger("deleteButtons", "Decline"));
+                    String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the buttons to place a trap on a planet";
+                    if(trapButtons.size() > 1){
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, trapButtons);
+                    }
+                }
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
                     String message = trueIdentity + " You can use the button to explore using crown of emphidia";
