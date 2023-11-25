@@ -129,8 +129,6 @@ public class ButtonHelperCommanders {
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
-                if (player.hasAbility("technological_singularity")) {
-                    int count = 0;
                     for (String nekroTech : player.getTechs()) {
                         if(nekroTech.equalsIgnoreCase("vax") || nekroTech.equalsIgnoreCase("vay")){
                             continue;
