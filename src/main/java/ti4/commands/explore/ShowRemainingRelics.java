@@ -40,7 +40,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
     }
 
     public void showRemaining(GenericInteractionCreateEvent event, boolean over, Game activeGame, Player player){
-        List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
+        List<String> allRelics = new ArrayList<>(activeGame.getAllRelics());
        
         Integer deckCount = allRelics.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
