@@ -435,8 +435,8 @@
     "alias": "last_minute_deliberation",
     "name": "Last Minute Deliberation",
     "phase": "Agenda",
-    "window": "At the end of the agenda phase",
-    "text": "Reveal and vote on the top card of the agenda deck. Then, each player readies 2 planets they control.",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Each player readies up to 2 planets they control. Then, reveal and vote on the top card of the agenda deck.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious is where Elder Junn thrived.",
     "source": "action_deck_2"
   },
