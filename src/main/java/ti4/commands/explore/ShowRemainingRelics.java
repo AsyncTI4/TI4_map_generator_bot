@@ -1,11 +1,13 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.message.MessageHelper;
 import ti4.map.Game;
 import java.text.NumberFormat;
@@ -60,7 +62,9 @@ public class ShowRemainingRelics extends GenericRelicAction {
 
         if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),text.toString());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),text.toString());
         }
     }
