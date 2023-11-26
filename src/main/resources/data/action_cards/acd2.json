@@ -32,7 +32,7 @@
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
     "text": "If that system contains 1 of that player's command tokens, return it to their tactic pool. Then, end that player's turn.",
-    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she signed audibly.",
+    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
     "source": "action_deck_2"
   },
   {
@@ -189,15 +189,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "dangerous_conditions",
-    "name": "Dangerous Conditions",
-    "phase": "Action",
-    "window": "After another player activates a system",
-    "text": "Choose 1 non-home anomaly. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
-    "flavorText": "\"Even those who tread lightly through the void are often lost,\" Acamar said coldly. \"Seal their fates, so others may be warned.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "defectors",
     "name": "Defectors",
     "phase": "Action",
@@ -276,6 +267,15 @@
     "window": "When 1 or more of your units use their PRODUCTION ability",
     "text": "Reduce the total PRODUCTION value of those units by any amount, to a minimum of 0. Then, gain trade goods equal to the amount you reduced it by.",
     "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11% - and with a little work, he was sure the enhancers could increase efficiency by another 4%.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "escape_route",
+    "name": "Escape Route",
+    "phase": "Action",
+    "window": "At the start of a space combat",
+    "text": "During this combat, you treat each system that contains 1 of your space docks as adjacent to this system when determining eligible systems to retreat to.",
+    "flavorText": "These were ancient routes, forgotten by time and kept secret by the Argent for use during their migration protocols. However, the Mahact remembered them well.",
     "source": "action_deck_2"
   },
   {
@@ -580,7 +580,7 @@
     "name": "Risky Jump",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-2, remove that ship from the game board, along with any units it is transporting.",
+    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1 or 2, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
     "source": "action_deck_2"
   },

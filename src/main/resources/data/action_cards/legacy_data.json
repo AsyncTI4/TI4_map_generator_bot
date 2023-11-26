@@ -376,5 +376,14 @@
     "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1-2, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "They were alive and ahead of schedule, but the captain had no intention of allowing the pilot to \"eyeball it\" ever again.",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "dangerous_conditions",
+    "name": "Dangerous Conditions",
+    "phase": "Action",
+    "window": "After another player activates a system",
+    "text": "Choose 1 non-home anomaly. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
+    "flavorText": "\"Even those who tread lightly through the void are often lost,\" Acamar said coldly. \"Seal their fates, so others may be warned.\"",
+    "source": "action_deck_2"
   }
 ]
