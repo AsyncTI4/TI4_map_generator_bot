@@ -35,7 +35,7 @@
     "alias": "impose_order_little_omega",
     "name": "Impose Order ω",
     "phase": "Status",
-    "text": "Have ships in 3 systems that contain a structure.",
+    "text": "Have non-fighter ships in 3 systems that contain a structure.",
     "points": 1,
     "source": "little_omega"
   },
@@ -107,7 +107,7 @@
     "alias": "dominate_cities_little_omega",
     "name": "Dominate Cities ω",
     "phase": "Status",
-    "text": "Have ships in 5 systems that contain a structure.",
+    "text": "Have non-fighter ships in 5 systems that contain a structure.",
     "points": 2,
     "source": "little_omega"
   },
