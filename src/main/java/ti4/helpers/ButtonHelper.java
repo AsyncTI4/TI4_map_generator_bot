@@ -4919,10 +4919,10 @@ public class ButtonHelper {
                 if (p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")) {
                     commanderUnlockCheck(p2, activeGame, "hacan", event);
                 }
-                //ButtonHelperAbilities.pillageCheck(p1, activeGame);
-                //ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms, event);
                  ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
+                 ButtonHelperAbilities.pillageCheck(p1, activeGame);
+                ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident;
             }
             case "shipOrders" -> {
@@ -5948,6 +5948,7 @@ public class ButtonHelper {
                 + player.getTg() + "tgs to -> " + (player.getTg() + comms) + "tgs). Please follow up with the player if this number seems off";
             player.setTg(player.getTg() + comms);
             ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, owner, player, owner.getCommoditiesTotal(), event);
+            ButtonHelperAbilities.pillageCheck(player, activeGame);
             MessageHelper.sendMessageToChannel(getCorrectChannel(owner, activeGame), reducedMsg);
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), reducedMsg2);
         }

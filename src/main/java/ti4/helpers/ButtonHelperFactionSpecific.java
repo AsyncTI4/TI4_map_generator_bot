@@ -944,9 +944,9 @@ public class ButtonHelperFactionSpecific {
                         channel = receiver.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
-                    ButtonHelperAbilities.pillageCheck(sender, activeGame);
+                   // ButtonHelperAbilities.pillageCheck(sender, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(sender, activeGame, 1);
-                    ButtonHelperAbilities.pillageCheck(receiver, activeGame);
+                   // ButtonHelperAbilities.pillageCheck(receiver, activeGame);
                     ButtonHelperAgents.resolveArtunoCheck(receiver, activeGame, 1);
                 }
             }
