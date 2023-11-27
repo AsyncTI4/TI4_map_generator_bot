@@ -292,7 +292,6 @@ public class TurnEnd extends PlayerSubcommandData {
         Player veldyr = Helper.getPlayerFromAbility(activeGame, "holding_company");
         if (veldyr != null) {
             ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, activeGame);
-
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");
 
