@@ -698,6 +698,9 @@ public class ButtonHelper {
         if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "nekro", event);
         }
+        if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "mirveda", event);
+        }
         if (StringUtils.countMatches(buttonID, "_") < 2) {
             if (activeGame.getComponentAction()) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
@@ -1283,6 +1286,11 @@ public class ButtonHelper {
         switch (faction) {
             case "yssaril" -> {
                 if (player.getActionCards().size() > 7 || (player.getExhaustedTechs().contains("mi") && player.getActionCards().size() > 6)) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mirveda"-> {
+                if(ButtonHelper.getNumberOfUnitUpgrades(player) > 1){
                     shouldBeUnlocked = true;
                 }
             }
@@ -2218,6 +2226,14 @@ public class ButtonHelper {
             }
         }
         return isHome;
+    }
+
+    public static void checkFleetInEveryTile(Player player, Game activeGame, GenericInteractionCreateEvent event){
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(FoWHelper.playerHasUnitsInSystem(player, tile)){
+                ButtonHelper.checkFleetAndCapacity(player, activeGame, tile, event);
+            }
+        }
     }
 
     public static void checkFleetAndCapacity(Player player, Game activeGame, Tile tile, GenericInteractionCreateEvent event) {
@@ -3215,7 +3231,11 @@ public class ButtonHelper {
         Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
         buttons.add(rift);
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
-            Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability");
+            Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability").withEmoji(Emoji.fromFormatted(Emojis.mirveda));
+            buttons.add(combatDrones);
+        }
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
+            Button combatDrones = Button.primary(finChecker + "offerMirvedaCommander", "Use Mirveda Commander").withEmoji(Emoji.fromFormatted(Emojis.mirveda));
             buttons.add(combatDrones);
         }
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "ghostcommander")) {
@@ -4921,8 +4941,8 @@ public class ButtonHelper {
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms, event);
                  ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
-                 ButtonHelperAbilities.pillageCheck(p1, activeGame);
-                ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                // ButtonHelperAbilities.pillageCheck(p1, activeGame);
+              //  ButtonHelperAbilities.pillageCheck(p2, activeGame);
                 message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident;
             }
             case "shipOrders" -> {
@@ -5369,7 +5389,9 @@ public class ButtonHelper {
         if (!skipReaction) {
             activeGame.getMainGameChannel().addReactionById(messageId, emojiToUse).queue();
             if(activeGame.getFactionsThatReactedToThis(messageId) != null){
-                activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+                if(!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
+                    activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+                }
             }else{
                 activeGame.setCurrentReacts(messageId, player.getFaction());
             }
@@ -5862,6 +5884,15 @@ public class ButtonHelper {
             fromHand = false;
             id = "bmf";
         }
+
+        if(id.contains("dspnflor")){
+            if(id.contains("Checked")){
+                id = "dspnflor";
+            }else{
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, ButtonHelper.getTrueIdentity(player, activeGame)+" this PN will be applied automatically the next time you draw a relic. It will not work if you play it before then, so I am stopping you here");
+                return;
+            }
+        }
         PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(id);
         String pnName = pn.getName();
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
@@ -5931,6 +5962,9 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), sb.toString());
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
+            if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "mirveda", event);
+            }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " acquired Warsun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeGame, activeGame.getGuild(), true) + " reduced your fleet cc by 1 due to fires being played";

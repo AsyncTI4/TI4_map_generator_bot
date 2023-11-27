@@ -76,6 +76,14 @@ public class MessageHelper {
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue();
 		}
+		String messageId = message.getId();
+		if(activeGame.getFactionsThatReactedToThis(messageId) != null && !activeGame.getFactionsThatReactedToThis(messageId).isEmpty()){
+			if(!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
+				activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+			}
+		}else{
+			activeGame.setCurrentReacts(messageId, player.getFaction());
+		}
 	}
 
 	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game activeGame, Player player, List<Button> buttons) {
@@ -87,6 +95,8 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(activeGame, player, msg);
 			activeGame.addMessageIDForSabo(msg.getId());
+			
+            
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}

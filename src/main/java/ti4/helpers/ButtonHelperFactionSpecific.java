@@ -121,6 +121,20 @@ public class ButtonHelperFactionSpecific {
         }
         return null;
     }
+    public static void delete(ButtonInteractionEvent event){
+        event.getMessage().delete().queue();
+    }
+
+
+
+    public static void placeSaarMech(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        String msg = ButtonHelper.getIdent(player)+" paid 1tg("+player.getTg()+"->"+(player.getTg()-1)+") to place a mech on "+Helper.getPlanetRepresentation(planet, activeGame);
+        delete(event);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "mech "+planet, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        player.setTg(player.getTg()-1);
+    }
 
     public static void offerKeleresStartingTech(Player player, Game activeGame, ButtonInteractionEvent event){
         List<String> techToGain = new ArrayList<>();
