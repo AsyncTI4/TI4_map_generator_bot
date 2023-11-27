@@ -82,6 +82,8 @@ import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 import ti4.selections.SelectionMenuListener;
 
+// why won't you run tests?
+
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
