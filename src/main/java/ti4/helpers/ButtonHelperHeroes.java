@@ -167,9 +167,12 @@ public class ButtonHelperHeroes {
         List<Button> empties = new ArrayList<>();
 
         List<Tile> tiles = new ArrayList<>();
-        activeGame.getRealPlayers().stream()
-            .filter(p -> p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2"))
-            .forEach(p -> tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock, UnitType.Spacedock)));
+        for(Player p : activeGame.getRealPlayers()){
+            if(p.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock") || player.getUnitsOwned().contains("cabal_spacedock2")){
+                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, p, UnitType.CabalSpacedock, UnitType.Spacedock));
+            }
+        }
+        
 
         List<Tile> adjTiles = new ArrayList<>();
         for (Tile tile : tiles) {
@@ -645,6 +648,22 @@ public class ButtonHelperHeroes {
         UnlockLeader.unlockLeader(event, hero, activeGame, player);
         event.getMessage().delete().queue();
 
+    }
+
+    public static void resolveBentorHero(Game activeGame, Player player){
+        for(String planet : player.getPlanetsAllianceMode()){
+            UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            if(unitHolder == null){
+                continue;
+            }
+            Planet planetReal = (Planet) unitHolder;
+            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
+            if (buttons != null && !buttons.isEmpty()) {
+                String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeGame);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+            }
+        }
+        
     }
 
     public static List<Button> getWinnuHeroSCButtons(Game activeGame, Player winnu) {

@@ -27,6 +27,34 @@ import ti4.message.MessageHelper;
 public class ButtonHelperCommanders {
 
 
+    public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<Button>();
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                    buttons
+                        .add(Button.success("yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(), "Remove Inf from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
+                }
+            }
+        }
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) +" use buttons to remove an infantry", buttons);
+    }
+
+    public static void resolveYinCommanderRemoval(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        String unitHName = buttonID.split("_")[2];
+        Tile tile = activeGame.getTileByPosition(pos);
+        UnitHolder unitHolder = tile.getUnitHolders().get(unitHName);
+        if (unitHName.equalsIgnoreCase("space")) {
+            unitHName = "";
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            ButtonHelper.getIdent(player) + " removed 1 infantry from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame) + " using Yin Commander");
+        new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, activeGame);
+        event.getMessage().delete().queue();
+    }
+
     public static void mykoCommanderUsage(Player player, Game activeGame, ButtonInteractionEvent event){
         String msg = ButtonHelper.getIdent(player)+ " spent 1 ";
         if(player.getCommodities() > 0){

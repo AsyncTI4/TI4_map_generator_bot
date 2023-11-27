@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.*;
 
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
@@ -223,6 +224,54 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
     }
 
+    public static List<Button> getKolleccAgentButtons(Game activeGame, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeGame, player);
+        for (String type : types) {
+            if ("industrial".equals(type)) {
+                buttons.add(Button.success("kolleccAgentResStep2_industrial", "Explore Industrials X 2"));
+            }
+            if ("cultural".equals(type)) {
+                buttons.add(Button.primary("kolleccAgentResStep2_cultural", "Explore Culturals X 2"));
+            }
+            if ("hazardous".equals(type)) {
+                buttons.add(Button.danger("kolleccAgentResStep2_hazardous", "Explore Hazardous X 2"));
+            }
+        }
+        return buttons;
+    }
+
+    public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        String msg2 = ButtonHelper.getIdent(player)+ " selected "+ButtonHelper.getIdent(p2)+" as user of Kollecc agent";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( player, activeGame), msg2);
+       List<Button> buttons = getKolleccAgentButtons(activeGame, p2);
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " use buttons to resolve",
+            buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void kolleccAgentResStep2(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String type = buttonID.split("_")[1];
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 2; i++) {
+            String cardID = activeGame.drawExplore(type);
+            sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
+            String card = Mapper.getExploreRepresentation(cardID);
+            String[] cardInfo = card.split(";");
+            String cardType = cardInfo[3];
+            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+                sb.append(ButtonHelper.getTrueIdentity(player, activeGame)).append(" Gained relic fragment\n");
+                player.addFragment(cardID);
+                activeGame.purgeExplore(cardID);
+            }
+        }
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
+        event.getMessage().delete().queue();
+    }
+
     public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
         Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
@@ -373,11 +422,14 @@ public class ButtonHelperAgents {
         
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
-
             String message = trueIdentity + " select faction you wish to use your agent on";
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "nekroAgentRes", null);
             MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
-
+        }
+        if ("kolleccagent".equalsIgnoreCase(agent)) {
+            String message = trueIdentity + " select faction you wish to use your agent on";
+            List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "kolleccAgentRes", null);
+            MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
         }
 
         if ("hacanagent".equalsIgnoreCase(agent)) {

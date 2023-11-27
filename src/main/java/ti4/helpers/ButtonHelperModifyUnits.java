@@ -49,6 +49,10 @@ public class ButtonHelperModifyUnits {
     public static List<Button> getRetreatSystemButtons(Player player, Game activeGame, String pos1, boolean skilled) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
+        String skilledS = "";
+        if(skilled){
+            skilledS = "_skilled";
+        }
         for (String pos2 : FoWHelper.getAdjacentTiles(activeGame, pos1, player, false)) {
             if (pos1.equalsIgnoreCase(pos2)) {
                 continue;
@@ -57,7 +61,7 @@ public class ButtonHelperModifyUnits {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, activeGame)) {
                 if(!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, activeGame) || skilled){
                     if(FoWHelper.playerIsInSystem(activeGame, tile2, player) || player.hasTech("det") || skilled){
-                        buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2, "Retreat to " + tile2.getRepresentationForButtons(activeGame, player)));
+                        buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2+skilledS, "Retreat to " + tile2.getRepresentationForButtons(activeGame, player)));
                     }
                 }
             }
@@ -200,7 +204,12 @@ public class ButtonHelperModifyUnits {
         Tile tile1 = activeGame.getTileByPosition(pos1);
         Tile tile2 = activeGame.getTileByPosition(pos2);
         tile2 = MoveUnits.flipMallice(event, tile2, activeGame);
-        AddCC.addCC(event, player.getColor(), tile2, true);
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled") && !AddCC.hasCC(event, player.getColor(), tile1)){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " did not place a cc in the retreat system due to kollecc commander");
+        }else{
+            AddCC.addCC(event, player.getColor(), tile2, true);
+        }
+        
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
