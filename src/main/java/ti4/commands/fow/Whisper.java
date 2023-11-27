@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -71,6 +72,17 @@ public class Whisper extends FOWSubcommandData {
             } else {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
+            MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, feedbackChannel, message, fail, success);
+        }else{
+            String fail = "Could not notify receiving player.";
+            String success;
+            String player2 = Emojis.getColourEmojis(player_.getColor());
+            if (message.startsWith("[REDACTED]")) {
+                success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
+            } else {
+                success = player1 + "(You) said: \"" + msg + "\" to " + player2;
+            }
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player) + " is whispering to "+ButtonHelper.getIdent(player_));
             MessageHelper.sendPrivateMessageToPlayer(player_, activeGame, feedbackChannel, message, fail, success);
         }
     }
