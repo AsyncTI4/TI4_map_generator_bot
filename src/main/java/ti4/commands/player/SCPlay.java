@@ -149,7 +149,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
         if (actionRow != null) baseMessageObject.addComponents(actionRow);
-
+        player.setWhetherPlayerShouldBeTenMinReminded(true);
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message_);
             if (reactionEmoji != null) {
@@ -189,7 +189,7 @@ public class SCPlay extends PlayerSubcommandData {
         });
 
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
-        if (scToPlay == 3) {
+        if (scToPlay == 3 && !activeGame.isHomeBrewSCMode()) {
             String assignSpeakerMessage = player.getRepresentation() + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker " + Emojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeGame);
@@ -204,6 +204,12 @@ public class SCPlay extends PlayerSubcommandData {
             drawAgendaButton.add(draw2Agenda);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage2, drawAgendaButton);
 
+        }
+
+        if (scToPlay == 5 && !activeGame.isHomeBrewSCMode()) {
+             String assignSpeakerMessage2 = player.getRepresentation() + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
+            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(activeGame, player);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), assignSpeakerMessage2, forceRefresh);
         }
 
         if(scToPlay != 1 ){
