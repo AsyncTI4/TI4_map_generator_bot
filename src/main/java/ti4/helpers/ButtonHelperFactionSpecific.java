@@ -1116,6 +1116,54 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void creussMechStep3(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
+        String tilePos = buttonID.split("_")[1];
+        String type = buttonID.split("_")[2];
+        String tokenName = "creuss" + type;
+        Tile tile = activeGame.getTileByPosition(tilePos);
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
+        sb.append(" moved ").append(Emojis.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentationForButtons(activeGame, player));
+        for (Tile tile_ : activeGame.getTileMap().values()) {
+            if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
+                sb.append(" (from ").append(tile_.getRepresentationForButtons(activeGame, player)).append(")");
+                break;
+            }
+        }
+        boolean removed = false;
+        for(UnitHolder uH : tile.getUnitHolders().values()){
+            if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0 && !removed){
+                removed = true;
+                String name = uH.getName();
+                if(name.equals("space")){
+                    name = "";
+                }
+                new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 mech "+name, activeGame);
+                sb.append("\n "+ButtonHelper.getIdent(player)+" removed 1 mech from "+tile.getRepresentation() + "("+uH.getName()+")");
+            }
+        }
+        String msg = sb.toString();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+     public static void creussMechStep2(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        String tilePos = buttonID.split("_")[1];
+        buttons.add(Button.success("creussMechStep3_"+tilePos+"_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
+        buttons.add(Button.danger("creussMechStep3_"+tilePos+"_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
+        buttons.add(Button.secondary("creussMechStep3_"+tilePos+"_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" choose the type of wormhole you wish to place in "+tilePos, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void creussMechStep1(Game activeGame, Player player, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Mech)){
+            buttons.add(Button.success("creussMechStep2_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame)+" choose the tile where you wish to remove a mech and place a creuss wormhole", buttons);
+    }
+
     public static void resolveWinnuPN(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         String scNum = buttonID.split("_")[1];
         int sc = Integer.parseInt(scNum);
@@ -1160,8 +1208,8 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveCreussIFF(Game activeGame, Player player, String buttonID, String ident, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
-        String tokenName = "creuss" + type;
         String pos = buttonID.split("_")[2];
+        String tokenName = "creuss" + type;
         Tile tile = activeGame.getTileByPosition(pos);
         String msg;
         if (activeGame.isFoWMode() && !isTileCreussIFFSuitable(activeGame, player, tile)) {

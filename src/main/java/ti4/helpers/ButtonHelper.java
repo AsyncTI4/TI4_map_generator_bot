@@ -42,6 +42,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
@@ -738,11 +739,52 @@ public class ButtonHelper {
             Button pT2 = Button.secondary("exhaustAgent_jolnaragent", "Exhaust Jol Nar Agent").withEmoji(Emoji.fromFormatted(Emojis.Jolnar));
             buttons.add(pT2);
         }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "yincommander")){
+             Button pT2 = Button.secondary("yinCommanderStep1_", "Remove Inf Via Yin Commander").withEmoji(Emoji.fromFormatted(Emojis.Yin));
+            buttons.add(pT2);
+        }
         Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         if (!player.hasAbility("technological_singularity")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         }
+    }
+
+    public static void forceARefresh(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String msg = ButtonHelper.getIdent(player) +" forced " +ButtonHelper.getIdentOrColor(p2, activeGame) + " to refresh";
+        String msg2 = ButtonHelper.getTrueIdentity(p2, activeGame) + " the trade holder has forced you to refresh";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), msg2);
+        ButtonHelper.deleteTheOneButton(event);
+        p2.addFollowedSC(5);
+        p2.setCommodities(p2.getCommoditiesTotal());
+        if (p2.getLeaderIDs().contains("mykomentoricommander") && !p2.hasLeaderUnlocked("mykomentoricommander")) {
+            ButtonHelper.commanderUnlockCheck(p2, activeGame, "mykomentori", event);
+        }
+        if (p2.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(p2, activeGame).size() > 1) {
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame),
+                ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(p2, activeGame));
+        }
+        ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, p2, event);
+    }
+    public static List<Button> getForcedRefreshButtons(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<Button>();
+        for (Player p2 : activeGame.getRealPlayers()) {
+            if (p2 == player) {
+                continue;
+            }
+            if (activeGame.isFoWMode()) {
+                buttons.add(Button.secondary("forceARefresh_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button = Button.secondary("forceARefresh_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        buttons.add(Button.danger("deleteButtons", "Done Resolving"));
+        return buttons;
     }
 
     public static void resolveTACheck(Game activeGame, Player player, GenericInteractionCreateEvent event) {
@@ -769,7 +811,8 @@ public class ButtonHelper {
         buttons.add(Button.secondary("showDeck_all", "All Explores"));
         buttons.add(Button.secondary("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("actioncard"))));
         buttons.add(Button.secondary("showDeck_agenda", "Agenda Discards").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("agenda"))));
-         buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        buttons.add(Button.secondary("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+        buttons.add(Button.secondary("showDeck_unscoredSO", "Unscored SOs").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick deck that you want", buttons);
     }
     public static void resolveDeckChoice(Game activeGame, ButtonInteractionEvent event, String buttonID, Player player){
@@ -790,8 +833,10 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }else if(type.equalsIgnoreCase("agenda")){
             new ShowDiscardedAgendas().showDiscards(activeGame, event);
-         }else if(type.equalsIgnoreCase("relic")){
+        }else if(type.equalsIgnoreCase("relic")){
             new ShowRemainingRelics().showRemaining(event, false, activeGame, player);
+        }else if(type.equalsIgnoreCase("unscoredSO")){
+            new ShowUnScoredSOs().showUnscored(activeGame, event);
         }else{
             types.add(type);
             new ExpInfo().secondHalfOfExpInfo(types, event, player, activeGame, false);
@@ -1043,6 +1088,20 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Mahact mech ability ", buttons);
                 }
             }
+            if (nonActivePlayer.hasTechReady("nf") && FoWHelper.playerHasShipsInSystem(player, activeSystem) && nonActivePlayer.getStrategicCC() > 0 ) {
+                if (justChecking) {
+                    if (!activeGame.isFoWMode()) {
+                        MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger an opportunity for nullification field to trigger");
+                    }
+                    numberOfAbilities++;
+                } else {
+                    Button gainTG = Button.success(fincheckerForNonActive + "nullificationField_" + activeSystem.getPosition() + "_" + player.getColor(),
+                        "Spend Strat CC and end their turn");
+                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
+                    List<Button> buttons = List.of(gainTG, Decline2);
+                    MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Nullfication field ", buttons);
+                }
+            }
             if (activeGame.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "yssarilcommander") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!activeGame.isFoWMode()) {
@@ -1291,6 +1350,16 @@ public class ButtonHelper {
             }
             case "mirveda"-> {
                 if(ButtonHelper.getNumberOfUnitUpgrades(player) > 1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "kollecc"-> {
+                if(player.getCrf() + player.getHrf() + player.getIrf()+player.getUrf() > 3){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "bentor"-> {
+                if(player.getNumberOfBluePrints() > 2){
                     shouldBeUnlocked = true;
                 }
             }
@@ -1630,6 +1699,28 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), message2, buttons);
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), ButtonHelper.getTrueIdentity(target, activeGame)
             + " You've been hit with the Mahact mech ability. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
+            conclusionButtons);
+        event.getMessage().delete().queue();
+
+    }
+
+    public static void resolveNullificationFieldUse(Player mahact, Player target, Game activeGame, Tile tile, ButtonInteractionEvent event) {
+        mahact.setStrategicCC(mahact.getStrategicCC()-1);
+        mahact.exhaustTech("nf");
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(mahact, activeGame, event);
+        target.setTacticalCC(target.getTacticalCC() - 1);
+        AddCC.addCC(event, target.getColor(), tile);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(mahact, activeGame),
+            ButtonHelper.getTrueIdentity(mahact, activeGame) + " you have spent a strat cc");
+        List<Button> conclusionButtons = new ArrayList<>();
+        Button endTurn = Button.danger("turnEnd", "End Turn");
+        conclusionButtons.add(endTurn);
+        if (getEndOfTurnAbilities(target, activeGame).size() > 1) {
+            conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(target, activeGame).size() - 1) + ")"));
+        }
+        
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(target, activeGame), ButtonHelper.getTrueIdentity(target, activeGame)
+            + " You've been hit with nullification field. A cc has been placed from your tactics in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
             conclusionButtons);
         event.getMessage().delete().queue();
 
@@ -2651,7 +2742,11 @@ public class ButtonHelper {
             startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent on yourself").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+            startButtons.add(nekroButton);
+        }
+        if (player.hasUnexhaustedLeader("kolleccagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent").withEmoji(Emoji.fromFormatted(Emojis.kollecc));
             startButtons.add(nekroButton);
         }
         if (activeGame.getLatestTransactionMsg() != null && !"".equalsIgnoreCase(activeGame.getLatestTransactionMsg())) {
@@ -3074,6 +3169,10 @@ public class ButtonHelper {
 
         if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(activeGame, activeGame.getActiveSystem(), player)) {
             Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            buttons.add(ghostButton);
+        }
+        if(player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0){
+            Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
         if (player.hasTech("dslihb") && !ButtonHelper.isTileHomeSystem(activeGame.getTileByPosition(activeGame.getActiveSystem()))) {
@@ -3861,6 +3960,8 @@ public class ButtonHelper {
                     name = "The Council Keleres";
                 }
                 buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(factionId))));
+                //buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name));
+
             }
         }
         return buttons;
@@ -3871,6 +3972,7 @@ public class ButtonHelper {
         String factionId = buttonID.split("_")[2];
         List<String> allColors = Mapper.getColors();
         for (String color : allColors) {
+            //System.out.println(color);
             if(activeGame.getPlayerFromColorOrFaction(color) == null){
                 buttons.add(Button.success("setupStep3_"+userId+"_"+factionId+"_"+color, color));
             }
@@ -3898,7 +4000,7 @@ public class ButtonHelper {
         event.getMessage().delete().queue();
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
-        int maxBefore = 0;
+        int maxBefore = -1;
         for (int x = 0; x < buttons.size(); x++) {
             if (x > maxBefore && x < (maxBefore + 23)) {
                 newButtons.add(buttons.get(x));
@@ -3943,7 +4045,7 @@ public class ButtonHelper {
     private static void offerColourSetupButtons(Game activeGame, GenericInteractionCreateEvent event, String buttonID, String userId, String factionId) {
         List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
-        int maxBefore = 0;
+        int maxBefore = -1;
         for(int x = 0; x < buttons.size(); x++){
             if(x > maxBefore && x < (maxBefore+23)){
                 newButtons.add(buttons.get(x));
@@ -5068,6 +5170,9 @@ public class ButtonHelper {
             String techText = techRep.getText();
 
             if (techText.contains("ACTION")) {
+                if(tech.equals("lgf") && !p1.getPlanets().contains("mr")){
+                    continue;
+                }
                 Button tButton = Button.danger(finChecker + prefix + "tech_" + tech, "Exhaust " + techName).withEmoji(Emoji.fromFormatted(techEmoji));
                 compButtons.add(tButton);
             }
@@ -5561,6 +5666,12 @@ public class ButtonHelper {
                 }
                 if ("pm".equalsIgnoreCase(buttonID)) {
                     ButtonHelperFactionSpecific.resolveProductionBiomesStep1(p1, activeGame, event, buttonID);
+                }
+                if ("lgf".equalsIgnoreCase(buttonID)) {
+                    if(p1.getPlanets().contains("mr")){
+                        new AddUnits().unitParsing(event, p1.getColor(), activeGame.getTileFromPlanet("mr"), "inf mr", activeGame);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), ButtonHelper.getIdent(p1)+ " added 1 infantry to Mecatol Rex using Laxax Gate Folding");
+                    }
                 }
                 if ("sr".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = new ArrayList<>();

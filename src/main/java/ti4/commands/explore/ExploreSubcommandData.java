@@ -514,6 +514,21 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             default -> MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
         }
 
+        if(player.hasAbility("fortune_seekers")){
+            List<Button> gainComm = new ArrayList<>();
+            gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm"));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " can use their fortune seekers ability");
+
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability", gainComm);
+        }
+
+        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
+        }
+        if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorccommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "bentor", event);
+        }
+
         if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName)) {
             Button gainCC = Button.success("putSleeperOnPlanet_" + planetName, "Put Sleeper on " + planetName);
             Button Decline3 = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");

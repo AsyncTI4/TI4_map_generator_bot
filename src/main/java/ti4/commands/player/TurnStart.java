@@ -39,7 +39,7 @@ public class TurnStart extends PlayerSubcommandData {
     }
 
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
-
+        player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount()+1);
         boolean goingToPass = false;
         if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
@@ -57,7 +57,7 @@ public class TurnStart extends PlayerSubcommandData {
         activeGame.updateActivePlayer(player);
         activeGame.setCurrentPhase("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);             
-        ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
+        
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
         
         if (isFowPrivateGame) {
@@ -76,6 +76,7 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
             }
+            ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             
 
@@ -96,6 +97,7 @@ public class TurnStart extends PlayerSubcommandData {
                     "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(activeGame, player));
             }
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
+            ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
         }
         if(goingToPass){
             player.setPassed(true);
