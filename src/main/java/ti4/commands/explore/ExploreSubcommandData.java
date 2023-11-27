@@ -518,7 +518,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " can use their fortune seekers ability");
-
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability", gainComm);
         }
 

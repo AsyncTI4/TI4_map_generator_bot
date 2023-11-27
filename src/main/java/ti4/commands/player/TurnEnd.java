@@ -26,6 +26,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -287,6 +288,10 @@ public class TurnEnd extends PlayerSubcommandData {
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(activeGame, arborec));
+        }
+        Player veldyr = Helper.getPlayerFromAbility(activeGame, "holding_company");
+        if (veldyr != null) {
+            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, activeGame);
 
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");
