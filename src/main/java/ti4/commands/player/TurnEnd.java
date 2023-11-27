@@ -119,6 +119,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
         ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         TurnStart.turnStart(event, activeGame, nextPlayer);
     }

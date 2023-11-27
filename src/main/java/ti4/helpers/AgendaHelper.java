@@ -1244,7 +1244,7 @@ public class AgendaHelper {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isFaction(faction)) {
                     Button button;
-                    if (!activeGame.isFoWMode()) {
+                    if (!activeGame.isFoWMode() && !faction.contains("franken")) {
                         if (rider != null) {
                             if (planetRes != null) {
                                 button = Button.secondary(planetRes + "_" + faction + "_" + rider, " ");

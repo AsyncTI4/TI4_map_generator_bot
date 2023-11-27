@@ -327,6 +327,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ButtonHelperAbilities.pillageCheck(player, activeGame);
                 }
 
+                if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+                    && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+                    List<Button> saarButton = new ArrayList<>();
+                    saarButton.add(Button.success("saarMechRes_"+planetName, "Pay 1tg for mech on "+Helper.getPlanetRepresentation(planetName, activeGame)));
+                    saarButton.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+                }
+
                 final String ministerOfExploration = "minister_exploration";
                 if (activeGame.getLaws().keySet().contains(ministerOfExploration)) {
                     if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction()) && event != null) {

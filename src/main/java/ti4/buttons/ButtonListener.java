@@ -443,6 +443,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.resolveStep2OfAxisAgent(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperAgents.hacanAgentRefresh(buttonID, event, activeGame, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("nekroAgentRes_")) {
+            ButtonHelperAgents.nekroAgentRes(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("getPsychoButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), trueIdentity + " use buttons to get a tg per planet exhausted.",
                 ButtonHelper.getPsychoTechPlanets(activeGame, player));
@@ -1333,6 +1335,8 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, activeGame, event, activeGame.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), trueIdentity + " select which unit you'd like to replace", buttons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("saarMechRes_")) {
+            ButtonHelperFactionSpecific.placeSaarMech(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("arboAgentPutShip_")) {
             ButtonHelperAgents.arboAgentPutShip(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("setAutoPassMedian_")) {
@@ -1843,6 +1847,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveReparationsStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("uprisingStep2_")) {
             ButtonHelperActionCards.resolveUprisingStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("drawRelicAtPosition_")) {
+            DrawRelic.resolveDrawRelicAtPosition(player, event, activeGame, buttonID);
         } else if (buttonID.startsWith("setTrapStep2_")) {
             ButtonHelperAbilities.setTrapStep2( activeGame,player, event, buttonID);
         } else if (buttonID.startsWith("removeTrapStep2_")) {
@@ -2086,6 +2092,9 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "nekro", event);
                 }
+                if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
+                    ButtonHelper.commanderUnlockCheck(player, activeGame, "mirveda", event);
+                }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
             }
             ButtonHelper.resolvePNPlay(pnID, player, activeGame, event);
@@ -2129,6 +2138,10 @@ public class ButtonListener extends ListenerAdapter {
             String ta = buttonID.replace("useTA_", "") + "_ta";
             ButtonHelper.resolvePNPlay(ta, player, activeGame, event);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("combatDroneConvert_")) {
+            ButtonHelperModifyUnits.resolvingCombatDrones(event, activeGame, player, ident, buttonID);
+         } else if (buttonID.startsWith("resolveMirvedaCommander_")) {
+            ButtonHelperModifyUnits.resolvingMirvedaCommander(event, activeGame, player, ident, buttonID);
         } else if (buttonID.startsWith("removeCCFromBoard_")) {
             ButtonHelper.resolveRemovingYourCC(player, activeGame, event, buttonID);
             event.getMessage().delete().queue();
@@ -2200,7 +2213,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
                 }
-                case "combatDrones" -> ButtonHelperModifyUnits.resolvingCombatDrones(event, activeGame, player, ident, buttonLabel);
+                case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, activeGame, player);
+                case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, activeGame, player);
                 case "acquireATech" -> {
 
                     List<Button> buttons = new ArrayList<>();
@@ -3578,6 +3592,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "turnEnd" -> {
                     TurnEnd.pingNextPlayer(event, activeGame, player);
                     event.getMessage().delete().queue();
+                    
                     ButtonHelper.updateMap(activeGame, event, "End of Turn "+player.getTurnCount()+", Round "+activeGame.getRound()+" for "+ButtonHelper.getIdent(player));
                 }
                 case "getDiplomatsButtons" -> {
