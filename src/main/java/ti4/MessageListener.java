@@ -484,9 +484,10 @@ public class MessageListener extends ListenerAdapter {
 
         if (messageToColor) {
             String gameName = event.getChannel().getName();
+            gameName = gameName.replace("Cards Info-","");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Game activeGame = GameManager.getInstance().getGame(gameName);
-            if (activeGame.isFoWMode()) {
+           if (activeGame != null) {
                 String msg3 = msg.getContentRaw();
                 String msg2 = msg3.substring(msg3.indexOf(" ") + 1);
                 Player player = activeGame.getPlayer(event.getAuthor().getId());

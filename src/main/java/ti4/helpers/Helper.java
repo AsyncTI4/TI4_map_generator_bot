@@ -741,7 +741,14 @@ public class Helper {
             unitButtons.add(DoneProducingUnits);
         }
         if(player.hasTech("yso")){
-             unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+            if("sling".equalsIgnoreCase(warfareNOtherstuff)){
+                 List<Button> unitButtons2 = new ArrayList<>();
+                unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can use this to Yin Spin", unitButtons2);
+            }else{
+                unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+            }
+             
         }
 
         return unitButtons;

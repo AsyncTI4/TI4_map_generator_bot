@@ -340,6 +340,9 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
+			if(!activeGame.isFoWMode()){
+				privateChannel = player.getCardsInfoThread();
+			}
 			if (privateChannel == null) {
 				sendMessageToUser(activeGame.getName() + " " + messageText, user);
 			} else {
