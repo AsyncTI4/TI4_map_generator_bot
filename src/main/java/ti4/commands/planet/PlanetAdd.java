@@ -135,6 +135,13 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
+        if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+                    && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+            List<Button> saarButton = new ArrayList<>();
+            saarButton.add(Button.success("saarMechRes_"+planet, "Pay 1tg for mech on "+Helper.getPlanetRepresentation(planet, activeGame)));
+            saarButton.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+        }
 
         if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2")) && !doubleCheck&& event != null) {
             List<Button> buttons = new ArrayList<>();

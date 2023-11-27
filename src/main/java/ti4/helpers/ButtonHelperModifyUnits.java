@@ -656,31 +656,66 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void resolvingCombatDrones(ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {
+    public static void offerCombatDroneButtons(ButtonInteractionEvent event, Game activeGame, Player player){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
         int numff = 0;
+        List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 continue;
             }
-
-            String colorID = Mapper.getColorID(player.getColor());
-            UnitKey ffKey = Mapper.getUnitKey("ff", colorID);
-            if (unitHolder.getUnits() != null) {
-                if (unitHolder.getUnits().get(ffKey) != null) {
-                    numff = unitHolder.getUnits().get(ffKey);
-                }
+            numff = unitHolder.getUnitCount(UnitType.Fighter, player.getColor());
+            for(int x = 1; x < numff+1;x++){
+                buttons.add(Button.success("combatDroneConvert_"+x,""+ x));
             }
         }
+        buttons.add(Button.danger("deleteButtons","Delete These"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose how many fighters you want to convert to infantry", buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void offerMirvedaCommanderButtons(ButtonInteractionEvent event, Game activeGame, Player player){
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        int numinf = 0;
+        List<Button> buttons = new ArrayList<>();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet) {
+                continue;
+            }
+            numinf = unitHolder.getUnitCount(UnitType.Infantry, player.getColor());
+            for(int x = 1; x < numinf+1;x++){
+                buttons.add(Button.success("resolveMirvedaCommander_"+x,""+ x));
+            }
+        }
+        buttons.add(Button.danger("deleteButtons","Delete These"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " choose how many infantry you wish to convert to fighters", buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void resolvingMirvedaCommander(ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonID) {
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        int numff = Integer.parseInt(buttonID.split("_")[1]);
+        if (numff > 0) {
+            new RemoveUnits().unitParsing(event, player.getColor(), tile, numff + " infantry", activeGame);
+            new AddUnits().unitParsing(event, player.getColor(), tile, numff + " fighters", activeGame);
+        }
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
+        String msg = ident + " Turned " + numff + " infantry into fighters using the combat drone ability";
+        event.getMessage().editMessage(msg)
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    public static void resolvingCombatDrones(ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonID) {
+        Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        int numff = Integer.parseInt(buttonID.split("_")[1]);
         if (numff > 0) {
             new RemoveUnits().unitParsing(event, player.getColor(), tile, numff + " fighters", activeGame);
             new AddUnits().unitParsing(event, player.getColor(), tile, numff + " infantry", activeGame);
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " Turned " + numff + " fighters into infantry using the combat drone ability");
-        event.getMessage().editMessage(event.getMessage().getContentRaw())
+        String msg = ident + " Turned " + numff + " fighters into infantry using the combat drone ability";
+        event.getMessage().editMessage(msg)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
-
     }
 
     public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String buttonLabel) {

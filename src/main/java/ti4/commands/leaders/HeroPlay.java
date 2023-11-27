@@ -110,6 +110,9 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
+            case "kollecchero" -> {
+                DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
+            }
             case "titanshero" -> {
                 String titanshero = Mapper.getTokenID("titanshero");
                 System.out.println(titanshero);

@@ -1,11 +1,17 @@
 package ti4.commands.explore;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -27,8 +33,39 @@ public class DrawRelic extends GenericRelicAction {
         drawRelicAndNotify(player, event, activeGame);
     }
 
+    public static void drawWithAdvantage(Player player, GenericInteractionCreateEvent event, Game activeGame, int advantage){
+        List<Button> buttons = new ArrayList<>();
+        List<String> relics = activeGame.getAllRelics();
+        String info = "";
+        for(int x = 0; x < advantage && x < relics.size(); x++){
+            RelicModel relicData = Mapper.getRelic(relics.get(x));
+            buttons.add(Button.success("drawRelicAtPosition_"+x, relicData.getName()));
+            info = info + relicData.getName() + ": "+relicData.getText()+"\n";
+        }
+        String msg = ButtonHelper.getTrueIdentity(player, activeGame)+" choose the relic that you want. The relic text is reproduced for your conveinenance";
+         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), info);
+    }
+    public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID){
+        int position = Integer.parseInt(buttonID.split("_")[1]);
+        if(player.getPromissoryNotes().keySet().contains("dspnflor") && activeGame.getPNOwner("dspnflor") != player){
+            ButtonHelper.resolvePNPlay("dspnflorChecked", player, activeGame, event);
+        }
+        drawRelicAndNotify(player, event, activeGame, position, true);
+        event.getMessage().delete().queue();
+    }
+
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame) {
-        String relicID = activeGame.drawRelic();
+        drawRelicAndNotify(player, event,  activeGame, 0, false);
+    }
+
+    public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame, int position, boolean checked) {
+        if(!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().keySet().contains("dspnflor") && activeGame.getPNOwner("dspnflor") != player))){
+            drawWithAdvantage(player, event, activeGame, 2);
+            return;
+        }
+
+        String relicID = activeGame.drawRelic(position);
         if (relicID.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
             return;
@@ -80,5 +117,8 @@ public class DrawRelic extends GenericRelicAction {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message.toString());
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
+        if(checked){
+            activeGame.shuffleRelics();
+        }
     }
 }

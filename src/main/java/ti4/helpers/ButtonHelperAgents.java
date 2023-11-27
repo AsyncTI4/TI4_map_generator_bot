@@ -208,6 +208,20 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
+    public static void nekroAgentRes(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+        p2.setTg(p2.getTg() + 2);
+        ButtonHelperAbilities.pillageCheck(p2, activeGame);
+        resolveArtunoCheck(p2, activeGame, 2);
+        String msg2 = ButtonHelper.getIdent(player)+ " selected "+ButtonHelper.getIdent(p2)+" as user of Nekro agent";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( player, activeGame), msg2);
+        String message = ButtonHelper.getTrueIdentity(p2, activeGame) + " increased your tgs by 2 (" + (p2.getTg() - 2) + "->" + p2.getTg() + "). Use buttons in your cards info thread to discard an AC, or lose a cc";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel( p2, activeGame), message);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), ButtonHelper.getTrueIdentity(p2, activeGame) + " use buttons to discard",
+            ACInfo.getDiscardActionCardButtons(activeGame, p2, false));
+        event.getMessage().delete().queue();
+    }
 
     public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String trueIdentity) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
@@ -359,13 +373,11 @@ public class ButtonHelperAgents {
         
         //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
-            player.setTg(player.getTg() + 2);
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
-            resolveArtunoCheck(player, activeGame, 2);
-            String message = trueIdentity + " increased your tgs by 2 (" + (player.getTg() - 2) + "->" + player.getTg() + "). Use buttons in your cards info thread to discard an AC";
-            MessageHelper.sendMessageToChannel(channel2, message);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), trueIdentity + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+
+            String message = trueIdentity + " select faction you wish to use your agent on";
+            List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "nekroAgentRes", null);
+            MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
+
         }
 
         if ("hacanagent".equalsIgnoreCase(agent)) {

@@ -2353,6 +2353,16 @@ public class Game {
         }
         return relics.remove(0);
     }
+    public String drawRelic(int location) {
+        if (relics.isEmpty()) {
+            return "";
+        }
+        return relics.remove(location);
+    }
+
+    public void shuffleRelics(){
+        Collections.shuffle(relics);
+    }
 
     public boolean shuffleRelicBack(String relicID) {
         if (!relics.contains(relicID)) {
