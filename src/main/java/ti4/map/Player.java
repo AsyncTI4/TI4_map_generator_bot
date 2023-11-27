@@ -863,6 +863,24 @@ public class Player {
         return enough;
     }
 
+    public int getNumberOfBluePrints(){
+        int count = 0;
+        if(hasFoundCulFrag){
+            count++;
+        }
+
+        if(hasFoundHazFrag){
+            count++;
+        }
+        if(hasFoundIndFrag){
+            count++;
+        }
+        if(hasFoundUnkFrag){
+            count++;
+        }
+        return count;
+    }
+
     public void setFragments(ArrayList<String> fragmentList) {
         fragments = fragmentList;
         updateFragments();

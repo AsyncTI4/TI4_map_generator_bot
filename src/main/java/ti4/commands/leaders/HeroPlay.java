@@ -163,6 +163,10 @@ public class HeroPlay extends LeaderAction {
                     + " use the button to pick which planet youd like to get a tech and tgs from (and kill any opponent units)",
                     buttons);
             }
+            case "bentorhero" -> {
+                ButtonHelperHeroes.resolveBentorHero(activeGame, player);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+ " offered buttons to explore all planets");
+            }
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(activeGame, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player)+ " sustained all units except their mechs");
