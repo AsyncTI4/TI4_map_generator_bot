@@ -739,6 +739,14 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
+    public static void offerHoldingCompanyButtons(Player player, Game activeGame) {
+        String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Resolve Holding Company comm gain using the buttons. Remember you get 1 comm per attachment you've given out. ";
+        Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button get2CommButton = Button.primary("gain_1_comm_from_MahactInf", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        List<Button> buttons = List.of(convert2CommButton, get2CommButton, Button.danger("deleteButtons", "Done resolving"));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+
     public static void offerNekrophageButtons(Player player, Game activeGame, ButtonInteractionEvent event) {
         String message = ButtonHelper.getTrueIdentity(player, activeGame) + " Resolve Necrophage ability using buttons. ";
         Button convert2CommButton = Button.success("convert_1_comms", "Convert 1 Commodity Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
