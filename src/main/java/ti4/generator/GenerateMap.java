@@ -398,8 +398,7 @@ public class GenerateMap {
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
-        String formatted = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-        return formatted;
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
     @Nullable
@@ -1838,14 +1837,7 @@ public class GenerateMap {
         return false;
     }
 
-    private static class Coord {
-        public final int x;
-        public final int y;
-
-        Coord(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+    private record Coord(int x, int y) {
     }
 
     private static Coord getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {

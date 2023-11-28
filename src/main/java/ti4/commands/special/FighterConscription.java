@@ -50,7 +50,7 @@ public class FighterConscription extends SpecialSubcommandData {
             boolean blockaded = false;
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 // player has a space dock in the system
-                Integer numSd = unitHolder.getUnitCount(UnitType.Spacedock, colorID);
+                int numSd = unitHolder.getUnitCount(UnitType.Spacedock, colorID);
                 numSd += unitHolder.getUnitCount(UnitType.CabalSpacedock, colorID);
                 numSd += unitHolder.getUnitCount(UnitType.PlenaryOrbital, colorID);
                 if (numSd > 0) {

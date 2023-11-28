@@ -166,10 +166,9 @@ abstract public class UnitHolder {
             colorIDofUnit = color;
         }
         String effinColor = colorIDofUnit;
-        Integer value = units.entrySet().stream()
+        return units.entrySet().stream()
             .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
-        return value;
     }
 
     @JsonIgnore
@@ -183,10 +182,9 @@ abstract public class UnitHolder {
 
     @NotNull
     public Integer getUnitDamageCount(UnitType unitType, String color) {
-      Integer value = unitsDamage.entrySet().stream()
-            .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(color))
-            .findFirst().map(Entry::getValue).orElse(0);
-        return value;
+        return unitsDamage.entrySet().stream()
+              .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(color))
+              .findFirst().map(Entry::getValue).orElse(0);
     }
 
     public HashSet<String> getCCList() {

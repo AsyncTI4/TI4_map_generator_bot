@@ -80,7 +80,6 @@ public class CombatHelper {
         case bombardment -> GetUnitsInBombardment(tile, player, event);
         case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
         case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
-        default -> GetUnitsInCombatRound(unitHolder, player, event, tile);
       };
     }
 
