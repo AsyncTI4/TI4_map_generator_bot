@@ -1,11 +1,19 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -28,16 +36,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -170,7 +168,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Alliance")) {
+                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                 }
             }
@@ -178,7 +176,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Political Secret")) {
+                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                     player.addOwnedPromissoryNoteByID("absol_" + pnID);
                 }

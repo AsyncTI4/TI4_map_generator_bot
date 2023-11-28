@@ -1,16 +1,10 @@
 package ti4.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.message.BotLogger;
-
-import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
 
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;

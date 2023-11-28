@@ -1,14 +1,12 @@
 package ti4.commands.player;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.cardsac.PlayAC;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -43,8 +41,7 @@ public class TurnStart extends PlayerSubcommandData {
         player.setTurnCount(player.getTurnCount()+1);
         boolean goingToPass = false;
         if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
-            Player p2 = player;
-            if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(p2.getFaction())&&!p2.isPassed()){
+          if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())&&!player.isPassed()){
                 activeGame.setCurrentReacts("Pre Pass "+player.getFaction(), "");
                 goingToPass = true;
             }
@@ -69,7 +66,7 @@ public class TurnStart extends PlayerSubcommandData {
             if(!goingToPass){
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
             }
-            if (getMissedSCFollowsText(activeGame, player) != null && !getMissedSCFollowsText(activeGame, player).equalsIgnoreCase("")) {
+            if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeGame, player));
             }
             if (player.getStasisInfantry() > 0) {
@@ -119,7 +116,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
                 if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
-                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc).replace("666fin", ":"));
+                    sb.append(" ").append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":"));
                 }
                 sb.append("\n");
                 sendReminder = true;

@@ -4,15 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.commands.player.AbilityInfo;
-import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -26,7 +21,6 @@ import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
-import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
@@ -119,19 +113,19 @@ public class CombatModHelper {
         tempMods = tempMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns())
                 .collect(Collectors.toList());
         for (TemporaryCombatModifierModel mod : tempMods) {
-            switch (mod.getModifier().getPersistenceType()) {
-                case Constants.MOD_TEMP_ONE_COMBAT:
-                    if (!mod.getUseInUnitHolder().equals(holder.getName())
-                            || !mod.getUseInSystem().equals(tile.getId())) {
-                        player.removeTempMod(mod);
-                    }
-                    break;
-                case Constants.MOD_TEMP_ONE_TACTICAL_ACTION:
-                    if (!mod.getUseInSystem().equals(tile.getId())) {
-                        player.removeTempMod(mod);
-                    }
-                    break;
+          switch (mod.getModifier().getPersistenceType()) {
+            case Constants.MOD_TEMP_ONE_COMBAT -> {
+              if (!mod.getUseInUnitHolder().equals(holder.getName())
+                  || !mod.getUseInSystem().equals(tile.getId())) {
+                player.removeTempMod(mod);
+              }
             }
+            case Constants.MOD_TEMP_ONE_TACTICAL_ACTION -> {
+              if (!mod.getUseInSystem().equals(tile.getId())) {
+                player.removeTempMod(mod);
+              }
+            }
+          }
         }
     }
 
@@ -172,40 +166,31 @@ public class CombatModHelper {
 
     public static String GetModfierRelatedDisplayName(Player player, String relatedID, String relatedType) {
         String displayName = "";
-        switch (relatedType) {
-            case Constants.AGENDA:
-                AgendaModel agenda = Mapper.getAgenda(relatedID);
-                displayName = Emojis.Agenda + " " + agenda.getName();
-                break;
-            case Constants.AC:
-                ActionCardModel actionCard = Mapper.getActionCard(relatedID);
-                displayName = actionCard.getRepresentation();
-                break;
-            case Constants.PROMISSORY_NOTES:
-                PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
-                displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
-                break;
-            case Constants.TECH:
-                displayName = Mapper.getTech(relatedID).getRepresentation(true);
-                break;
-            case Constants.RELIC:
-                displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
-                break;
-            case Constants.ABILITY:
-                displayName = Mapper.getAbility(relatedID).getRepresentation();
-                break;
-            case Constants.UNIT:
-                UnitModel unit = Mapper.getUnit(relatedID);
-                displayName = unit.getUnitEmoji() + " "
-                        + unit.getName() + " " + unit.getAbility();
-                break;
-            case Constants.LEADER:
-                displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
-                break;
-
-            default:
-                break;
+      switch (relatedType) {
+        case Constants.AGENDA -> {
+          AgendaModel agenda = Mapper.getAgenda(relatedID);
+          displayName = Emojis.Agenda + " " + agenda.getName();
         }
+        case Constants.AC -> {
+          ActionCardModel actionCard = Mapper.getActionCard(relatedID);
+          displayName = actionCard.getRepresentation();
+        }
+        case Constants.PROMISSORY_NOTES -> {
+          PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
+          displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
+        }
+        case Constants.TECH -> displayName = Mapper.getTech(relatedID).getRepresentation(true);
+        case Constants.RELIC -> displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
+        case Constants.ABILITY -> displayName = Mapper.getAbility(relatedID).getRepresentation();
+        case Constants.UNIT -> {
+          UnitModel unit = Mapper.getUnit(relatedID);
+          displayName = unit.getUnitEmoji() + " "
+              + unit.getName() + " " + unit.getAbility();
+        }
+        case Constants.LEADER -> displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
+        default -> {
+        }
+      }
         return displayName;
     }
 
@@ -330,7 +315,7 @@ public class CombatModHelper {
 
         List<CombatModifierModel> customAlwaysRelveantMods = combatModifiers.values().stream()
                 .filter(modifier -> modifier.isRelevantTo(Constants.CUSTOM, Constants.CUSTOM))
-                .collect(Collectors.toList());
+                .toList();
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
             if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
                     activeGame)) {
@@ -370,13 +355,13 @@ public class CombatModHelper {
         switch (condition) {
             case Constants.MOD_OPPONENT_TEKKLAR_PLAYER_OWNER -> {
                 if (opponent != null
-                        && player.getPromissoryNotesOwned().stream().anyMatch(pn -> pn.equals("tekklar"))) {
+                        && player.getPromissoryNotesOwned().stream().anyMatch("tekklar"::equals)) {
                     meetsCondition = opponent.getTempCombatModifiers().stream().anyMatch(
-                            mod -> mod.getRelatedID().equals("tekklar")
+                            mod -> "tekklar".equals(mod.getRelatedID())
                                     && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
                             ||
                             opponent.getNewTempCombatModifiers().stream().anyMatch(
-                                    mod -> mod.getRelatedID().equals("tekklar")
+                                    mod -> "tekklar".equals(mod.getRelatedID())
                                             && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
                 }
             }

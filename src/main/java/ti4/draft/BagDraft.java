@@ -1,5 +1,6 @@
 package ti4.draft;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -13,15 +14,13 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.util.List;
-
 public abstract class BagDraft {
-    protected Game owner;
+    protected final Game owner;
 
     public static BagDraft GenerateDraft(String draftType, Game game) {
-        if (draftType.equals("franken")) {
+        if ("franken".equals(draftType)) {
             return new FrankenDraft(game);
-        } else if (draftType.equals("powered_franken")) {
+        } else if ("powered_franken".equals(draftType)) {
             return new PoweredFrankenDraft(game);
         }
 
@@ -178,7 +177,6 @@ public abstract class BagDraft {
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
@@ -208,7 +206,6 @@ public abstract class BagDraft {
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;

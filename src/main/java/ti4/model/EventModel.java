@@ -4,12 +4,11 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
+import java.util.stream.Stream;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
@@ -41,7 +40,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isFaction(getCategoryDescription());
             }
             case "event" -> {
-                return List.of("immediate", "permanent", "temporary").stream().anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;

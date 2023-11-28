@@ -1,10 +1,12 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import java.util.*;
-
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -151,7 +153,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 1){
-                List<Button> b2s = new ArrayList<Button>();
+                List<Button> b2s = new ArrayList<>();
                 b2s.add(Button.success("returnFFToSpace_"+tile.getPosition(), "Return Fighters to Space"));
                 b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+ " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.");
@@ -623,7 +625,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = activeGame.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : tile.getUnitHolders().get("space").getUnits().keySet()) {
-            if (unit.getUnitType().equals(UnitType.Infantry) || unit.getUnitType().equals(UnitType.Mech)) {
+            if (unit.getUnitType() == UnitType.Infantry || unit.getUnitType() == UnitType.Mech) {
                 continue;
             }
             String unitName = ButtonHelper.getUnitName(unit.asyncID());
@@ -667,7 +669,7 @@ public class ButtonHelperModifyUnits {
 
     public static void offerCombatDroneButtons(ButtonInteractionEvent event, Game activeGame, Player player){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
-        int numff = 0;
+        int numff;
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -685,7 +687,7 @@ public class ButtonHelperModifyUnits {
 
     public static void offerMirvedaCommanderButtons(ButtonInteractionEvent event, Game activeGame, Player player){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
-        int numinf = 0;
+        int numinf;
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -782,8 +784,6 @@ public class ButtonHelperModifyUnits {
                 for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                     String name = entry.getKey();
                     String representation = planetRepresentations.get(name);
-                    if (representation == null) {
-                    }
                     UnitHolder unitHolder = entry.getValue();
                     HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
                     Map<UnitKey, Integer> units = new HashMap<>(units1);
@@ -792,7 +792,7 @@ public class ButtonHelperModifyUnits {
                         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                             if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                             UnitKey unitKey = unitEntry.getKey();
-                            if ((unitKey.getUnitType().equals(UnitType.Infantry) || unitKey.getUnitType().equals(UnitType.Mech))) {
+                            if ((unitKey.getUnitType() == UnitType.Infantry || unitKey.getUnitType() == UnitType.Mech)) {
                                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                                 int amount = unitEntry.getValue();
 
@@ -954,10 +954,7 @@ public class ButtonHelperModifyUnits {
                             String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                             int amount = unitEntry.getValue();
 
-                            boolean cabalMech = false;
-                            if(cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
-                                cabalMech = true;
-                            }
+                            boolean cabalMech = cabal != null && unitHolder.getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war");
 
                             new RemoveUnits().removeStuff(event, activeGame.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitKey, player.getColor(), false, activeGame);
                             if (cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName()) && ((!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech)  || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) ) {
@@ -969,7 +966,7 @@ public class ButtonHelperModifyUnits {
                             if (player.hasInf2Tech() && unitName.toLowerCase().contains("inf")) {
                                 ButtonHelper.resolveInfantryDeath(activeGame, player, amount);
                             }
-                            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
+                            if(unitKey.getUnitType() == UnitType.Mech && player.hasTech("sar")){
                                 for(int x = 0; x < amount; x++){
                                     player.setTg(player.getTg()+1);
                                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
@@ -977,7 +974,7 @@ public class ButtonHelperModifyUnits {
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                             }
-                            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")){
+                            if(unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")){
                                 for(int x = 0; x < amount; x++){
                                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                                 }
@@ -1038,14 +1035,11 @@ public class ButtonHelperModifyUnits {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
         } else {
-             boolean cabalMech = false;
-            if(cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")){
-                cabalMech = true;
-            }
+             boolean cabalMech = cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech") && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war");
             if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction())|| ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
-            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")){
+            if(unitKey.getUnitType() == UnitType.Mech && player.hasTech("sar")){
                 for(int x = 0; x < amount; x++){
                     player.setTg(player.getTg()+1);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg ("+(player.getTg()-1)+"->"+player.getTg()+") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain");
@@ -1053,7 +1047,7 @@ public class ButtonHelperModifyUnits {
                 }
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             }
-            if(unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")){
+            if(unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")){
                 for(int x = 0; x < amount; x++){
                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                 }

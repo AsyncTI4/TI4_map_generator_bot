@@ -4,11 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
 
 
@@ -67,15 +65,12 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder title = new StringBuilder();
-        title.append(getTypeEmoji());
-        title.append("__**").append(getName()).append("**__");
-        eb.setTitle(title.toString());
+      String title = getTypeEmoji() +
+          "__**" + getName() + "**__";
+        eb.setTitle(title);
 
         //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        description.append(getDescription());
-        eb.setDescription(description.toString());
+      eb.setDescription(getDescription());
 
         // // FIELDS
         // String cardList = getNewDeck().stream().collect(Collectors.joining("\n"));
@@ -96,9 +91,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
         
         //FOOTER
-        StringBuilder footer = new StringBuilder();
-        footer.append("ID: ").append(getAlias());
-        eb.setFooter(footer.toString());
+      eb.setFooter("ID: " + getAlias());
         
         eb.setColor(Color.BLACK);
         return eb.build();
@@ -111,9 +104,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[").append(getType()).append("] ").append(getName()).append(" --> ").append(getDescription());
-        return StringUtils.left(StringUtils.substringBefore(sb.toString(), "\n"), 100);
+      return StringUtils.left(StringUtils.substringBefore("[" + getType() + "] " + getName() + " --> " + getDescription(), "\n"), 100);
     }
 
     private String getTypeEmoji() {

@@ -24,11 +24,9 @@ public class SelectionMenuProvider {
     }
 
     private static String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("You selected:\n```\n");
-        sb.append("MenuID: ").append(event.getComponentId()).append("\n");
-        sb.append("Values: ").append(event.getValues()).append("\n");
-        sb.append("\n```");
-        return sb.toString();
+      return "You selected:\n```\n" +
+          "MenuID: " + event.getComponentId() + "\n" +
+          "Values: " + event.getValues() + "\n" +
+          "\n```";
     }
 }

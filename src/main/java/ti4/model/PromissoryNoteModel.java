@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 @Data
 public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
@@ -109,9 +106,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         if (justShowName) return eb.build();
 
         //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        description.append(getText());
-        eb.setDescription(description.toString());
+      eb.setDescription(getText());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();

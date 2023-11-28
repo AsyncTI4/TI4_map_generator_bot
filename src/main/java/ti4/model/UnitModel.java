@@ -3,7 +3,6 @@ package ti4.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -63,7 +62,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (!getFaction().isPresent() || Mapper.isFaction(getFaction().orElse("").toLowerCase()));
+            && (getFaction().isEmpty() || Mapper.isFaction(getFaction().orElse("").toLowerCase()));
     }
 
     public String getAlias() {
@@ -129,7 +128,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case AFB -> getAfbDieCount();
             case bombardment -> getBombardDieCount();
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount();
-            default -> getCombatDieCount();
         };
     }
 
@@ -139,7 +137,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case AFB -> getAfbHitsOn();
             case bombardment -> getBombardHitsOn();
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
-            default -> getCombatHitsOn();
         };
     }
 
@@ -257,7 +254,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         boolean fb = b.getFaction().isEmpty();
         if (fa && fb) return 0;
         if (!fa && !fb) return 0;
-        if (!fa && fb) return -1;
+        if (!fa) return -1;
         return 1;
     }
 

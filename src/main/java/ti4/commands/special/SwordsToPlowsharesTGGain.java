@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,10 +16,11 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.List;
 
 public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
     public SwordsToPlowsharesTGGain() {
@@ -67,13 +69,9 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         if (player.hasInf2Tech()) {
                             ButtonHelper.resolveInfantryDeath(activeGame, player, numTG);
                         }
-                        boolean cabalMech = false;
-                        Player p2 = player;
-                        if(p2.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && p2.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war")){
-                            cabalMech = true;
-                        }
-                        if (p2.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(p2, tile, unitHolder.getName())) {
-                            ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, p2, numTG, "infantry", event);
+                        boolean cabalMech = player.hasAbility("amalgamation") && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasUnit("cabal_mech") && !activeGame.getLaws().containsKey("articles_war");
+                        if (player.hasAbility("amalgamation") && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile) || cabalMech) && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
+                            ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, player, numTG, "infantry", event);
                         }
 
                     }

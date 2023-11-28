@@ -1,20 +1,18 @@
 package ti4.commands.admin;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Date;
-import java.util.HashMap;
 
 public class Statistics extends AdminSubcommandData {
 

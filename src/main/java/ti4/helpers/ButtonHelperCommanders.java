@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,7 +27,7 @@ public class ButtonHelperCommanders {
 
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
@@ -46,7 +45,7 @@ public class ButtonHelperCommanders {
         String unitHName = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(pos);
         UnitHolder unitHolder = tile.getUnitHolders().get(unitHName);
-        if (unitHName.equalsIgnoreCase("space")) {
+        if ("space".equalsIgnoreCase(unitHName)) {
             unitHName = "";
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -158,7 +157,7 @@ public class ButtonHelperCommanders {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
                     for (String nekroTech : player.getTechs()) {
-                        if(nekroTech.equalsIgnoreCase("vax") || nekroTech.equalsIgnoreCase("vay")){
+                        if("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)){
                             continue;
                         }
                         if (!"".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {

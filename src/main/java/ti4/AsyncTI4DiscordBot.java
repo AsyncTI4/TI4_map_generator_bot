@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -100,7 +99,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuaternary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static Set<Guild> guilds = new HashSet<>();
+    public static final Set<Guild> guilds = new HashSet<>();
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {

@@ -1,8 +1,6 @@
 package ti4.commands.franken;
 
 import java.util.List;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;

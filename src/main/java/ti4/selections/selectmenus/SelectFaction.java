@@ -3,15 +3,13 @@ package ti4.selections.selectmenus;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.apache.commons.collections4.ListUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
@@ -63,7 +61,7 @@ public class SelectFaction implements Selection {
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
                     .withDescription(faction.getAlias())
                     .withLabel(faction.getAutoCompleteName());
-                if (emojiToUse != null) option = option.withEmoji(emojiToUse);
+              option = option.withEmoji(emojiToUse);
                 menuBuilder.addOptions(option);
             }
             menuBuilder.setRequiredRange(1, 1);

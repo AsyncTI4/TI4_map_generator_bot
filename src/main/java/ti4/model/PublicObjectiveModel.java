@@ -4,12 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 @Data
 public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
@@ -74,16 +72,13 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder title = new StringBuilder();
-        title.append(Emojis.getEmojiFromDiscord("Public" + points + "alt"));
-        title.append("__**").append(getName()).append("**__");
-        title.append(getSourceEmoji());
-        eb.setTitle(title.toString());
+      String title = Emojis.getEmojiFromDiscord("Public" + points + "alt") +
+          "__**" + getName() + "**__" +
+          getSourceEmoji();
+        eb.setTitle(title);
 
         //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        description.append(getText());
-        eb.setDescription(description.toString());
+      eb.setDescription(getText());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -95,9 +90,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getSourceEmoji() {
-        return switch (getSource()) {
-            default -> "";
-        };
+        return "";
     }
 
     public Color getEmbedColour() {

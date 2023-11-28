@@ -6,12 +6,8 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -27,6 +23,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
@@ -257,8 +254,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         GameSaveLoadManager.saveMap(newGame, event);
 
         //AUTOCLOSE THREAD AFTER RUNNING COMMAND
-        if (event.getChannel() instanceof ThreadChannel) {
-            ThreadChannel thread = (ThreadChannel) event.getChannel();
+        if (event.getChannel() instanceof ThreadChannel thread) {
             thread.getManager().setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue();
             thread.getManager().setArchived(true).queue();
             thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);

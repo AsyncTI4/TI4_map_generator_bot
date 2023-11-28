@@ -2,7 +2,6 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -100,7 +99,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     public void resolvePrismStep1(Player player, Game activeGame) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -118,7 +117,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
     public void resolvePrismStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
        
             buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_AC", "Send AC"));
             buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_PN", "Send PN"));
@@ -129,18 +128,17 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
     public void resolvePrismStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons;
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player)+" chose to send a "+pnOrAC);
-        if(pnOrAC.equalsIgnoreCase("pn")){
+        if("pn".equalsIgnoreCase(pnOrAC)){
             buttons =  ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " resolve", buttons);
 
         }else{
             String buttonID2 = "transact_ACs_" + p2.getFaction();
             ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID2, event);
-            return;
         }
            
         

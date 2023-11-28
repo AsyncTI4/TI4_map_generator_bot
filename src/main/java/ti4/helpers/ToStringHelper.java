@@ -1,11 +1,9 @@
 package ti4.helpers;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Objects;
-
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 public class ToStringHelper {
 
@@ -163,8 +161,5 @@ public class ToStringHelper {
     Object value;
     @Nullable
     ValueHolder next;
-
-    private ValueHolder() {
-    }
   }
 }

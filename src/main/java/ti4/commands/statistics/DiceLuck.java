@@ -4,11 +4,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -69,7 +67,7 @@ public class DiceLuck extends StatisticsSubcommandData {
         
         int index = 1;
         Comparator<Entry<String, Entry<Double, Integer>>> comparator = (o1, o2) -> {
-            Double o1TurnCount = o1.getValue().getKey();
+            double o1TurnCount = o1.getValue().getKey();
             Double o2TurnCount = o2.getValue().getKey();
             int o1total = o1.getValue().getValue();
             int o2total = o2.getValue().getValue();
@@ -94,7 +92,7 @@ public class DiceLuck extends StatisticsSubcommandData {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
             sb.append(String.format("%.2f", averageDiceLuck));
             sb.append("` ").append(user.getEffectiveName());
-            sb.append("   [").append(actualHits).append("/"+String.format("%.1f", expectedHits)).append(" average/expected]");
+            sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" average/expected]");
             sb.append("\n");
             index++;     
         }

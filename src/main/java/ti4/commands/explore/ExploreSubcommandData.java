@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -18,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -336,7 +334,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
 
                 final String ministerOfExploration = "minister_exploration";
-                if (activeGame.getLaws().keySet().contains(ministerOfExploration)) {
+                if (activeGame.getLaws().containsKey(ministerOfExploration)) {
                     if (activeGame.getLawsInfo().get(ministerOfExploration).equalsIgnoreCase(player.getFaction()) && event != null) {
                         String fac = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -465,7 +463,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "seedyspaceport"->{
-                List<Button> buttons = new ArrayList<Button>();
+                List<Button> buttons = new ArrayList<>();
                 message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 for(Leader leader : player.getLeaders()){

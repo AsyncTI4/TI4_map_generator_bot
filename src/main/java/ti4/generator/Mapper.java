@@ -1,28 +1,57 @@
 package ti4.generator;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.model.*;
+import ti4.model.AbilityModel;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.AttachmentModel;
+import ti4.model.CombatModifierModel;
+import ti4.model.DeckModel;
+import ti4.model.DraftErrataModel;
+import ti4.model.EventModel;
+import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
+import ti4.model.LeaderModel;
+import ti4.model.ModelInterface;
+import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
+import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import ti4.model.TileModel;
+import ti4.model.UnitModel;
+import ti4.model.WormholeModel;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -189,7 +218,6 @@ public class Mapper {
         return decals.keySet().stream()
             .filter(decal -> decal instanceof String)
             .map(decal -> (String) decal)
-            .sorted()
             .collect(Collectors.toSet());
     }
 
@@ -290,7 +318,7 @@ public class Mapper {
     }
 
     public static List<String> getUnitSources() {
-        return units.values().stream().map(unit -> unit.getSource()).distinct().sorted().toList();
+        return units.values().stream().map(UnitModel::getSource).distinct().sorted().toList();
     }
 
     public static UnitModel getUnit(String unitID) {
@@ -341,7 +369,6 @@ public class Mapper {
     public static Set<String> getUnitIDList() {
         return getUnits().values().stream()
             .map(UnitModel::getAsyncId)
-            .sorted()
             .collect(Collectors.toSet());
     }
 
@@ -487,12 +514,12 @@ public class Mapper {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
         if (explore.get(id) != null) {
-            return (String) explore.get(id).getRepresentation();
+            return explore.get(id).getRepresentation();
         }
         id = id.replace("_", "");
 
         if (explore.get(id) != null) {
-            return (String) explore.get(id).getRepresentation();
+            return explore.get(id).getRepresentation();
         } else {
             BotLogger.log("Cannot find explore with ID: " + id);
             return null;
@@ -791,7 +818,6 @@ public class Mapper {
     public static List<String> getFactionIDs() {
         return factions.keySet().stream()
             .filter(token -> token instanceof String)
-            .map(token -> (String) token)
             .sorted()
             .collect(Collectors.toList());
     }

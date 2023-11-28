@@ -1,13 +1,12 @@
 package ti4.helpers;
 
 import java.util.concurrent.ThreadLocalRandom;
-
 import lombok.Data;
 import lombok.Getter;
 
 public class Units {
 
-    private static String emdash = "—";
+    private static final String emdash = "—";
 
     @Data
     public static class UnitKey {
@@ -31,7 +30,7 @@ public class Units {
         }
 
         public String getFileName() {
-            if (unitType.equals(UnitType.Destroyer) && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
+            if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
             return String.format("%s_%s.png", colorID, asyncID());

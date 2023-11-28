@@ -4,12 +4,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 @Data
 public class AbilityModel implements ModelInterface, EmbeddableModel {
@@ -64,11 +62,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder title = new StringBuilder();
-        title.append(getFactionEmoji());
-        title.append(" __**").append(getName()).append("**__");
-        title.append(getSourceEmoji());
-        eb.setTitle(title.toString());
+        String title = getFactionEmoji() +
+            " __**" + getName() + "**__" +
+            getSourceEmoji();
+        eb.setTitle(title);
 
         //DESCRIPTION
         if (getPermanentEffect().isPresent()) eb.setDescription(getPermanentEffect().get());
@@ -111,11 +108,9 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getName());
-        sb.append(" (").append(getFaction()).append(")");
-        sb.append(" [").append(getSource()).append("]");
-        return sb.toString();
+        return getName() +
+            " (" + getFaction() + ")" +
+            " [" + getSource() + "]";
     }
 
     public String getFactionEmoji() {

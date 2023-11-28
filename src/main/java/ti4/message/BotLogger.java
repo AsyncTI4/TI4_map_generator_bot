@@ -1,5 +1,6 @@
 package ti4.message;
 
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -8,14 +9,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.Helper;
-
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.Helper;
 
 public class BotLogger {
     /** Sends a message to the Primary Async Server's #bot-log channel
@@ -70,8 +68,7 @@ public class BotLogger {
         if (botLogChannel == null) {
             String name;
             if(event == null) {
-                name = "None";
-                System.out.println(e);
+              System.out.println(e);
                 return;
             } else {
                 name = event.getGuild().getName();

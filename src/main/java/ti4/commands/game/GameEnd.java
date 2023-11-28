@@ -1,13 +1,9 @@
 package ti4.commands.game;
 
 import java.util.Date;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -21,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -181,11 +178,7 @@ public class GameEnd extends GameSubcommandData {
 
         // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels == null) {
-            BotLogger.log(event, "`#bothelper-lounge` did not have any threads open - `/game end` cannot continue");
-            return;
-        }
-        String threadName = "game-starts-and-ends";
+      String threadName = "game-starts-and-ends";
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_,
