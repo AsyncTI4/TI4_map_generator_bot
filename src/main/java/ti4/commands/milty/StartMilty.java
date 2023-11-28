@@ -15,12 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -37,7 +35,6 @@ import ti4.generator.TileHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
@@ -435,7 +432,6 @@ public class StartMilty extends MiltySubcommandData {
                         draftTile.setHasBetaWH(true);
                     } else {
                         draftTile.setHasOtherWH(true);
-                        continue;
                     }
                 }
             }

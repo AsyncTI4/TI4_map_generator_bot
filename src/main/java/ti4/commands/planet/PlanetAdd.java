@@ -2,7 +2,6 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -16,7 +15,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -50,15 +48,13 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
             Planet mecatolRex = (Planet) unitHolder;
-            if (mecatolRex != null) {
-                PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
-                mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
-                mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
-            }
+            PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+            mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+            mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
         }
         String color = player.getColor();
         boolean moveTitanPN = false;
-        if (unitHolder != null && color != null && !"null".equals(color)) {
+        if (color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {
@@ -166,7 +162,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         int numMechs = 0;
         String colorID = Mapper.getColorID(player.getColor());
-        if (unitHolder != null && unitHolder.getUnits() != null) {
+        if (unitHolder.getUnits() != null) {
             numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
         }
         if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")&& !doubleCheck) {

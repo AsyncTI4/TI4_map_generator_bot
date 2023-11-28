@@ -1,13 +1,11 @@
 package ti4.draft.items;
 
+import java.util.List;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-
-import java.util.List;
 
 public class HeroDraftItem extends DraftItem {
     public HeroDraftItem(String itemId) {
@@ -15,7 +13,7 @@ public class HeroDraftItem extends DraftItem {
     }
 
     private FactionModel getFaction() {
-        if (ItemId.equals("keleres")) {
+        if ("keleres".equals(ItemId)) {
             return Mapper.getFaction("keleresa");
         }
         return Mapper.getFaction(ItemId);

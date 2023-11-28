@@ -1,15 +1,38 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
+import lombok.Getter;
+import lombok.Setter;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -20,28 +43,12 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
-import ti4.draft.DraftBag;
-import ti4.draft.DraftItem;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
-import ti4.model.TechnologyModel.TechnologyType;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.Map.Entry;
-import java.util.*;
 
 public class Player {
 
@@ -49,7 +56,7 @@ public class Player {
     private String userName;
 
     private String gameID;
-    private boolean tenMinReminderPing = false;
+    private boolean tenMinReminderPing;
 
     private boolean passed;
     private boolean readyToPassBag;
@@ -104,7 +111,7 @@ public class Player {
     private List<String> factionTechs = new ArrayList<>();
     private DraftBag draftHand = new DraftBag();
     private DraftBag currentDraftBag = new DraftBag();
-    private DraftBag draftItemQueue = new DraftBag();
+    private final DraftBag draftItemQueue = new DraftBag();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -139,7 +146,7 @@ public class Player {
     private List<String> exhaustedRelics = new ArrayList<>();
     private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
 
-    private List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
+    private final List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
     private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
 
     // BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"
@@ -176,7 +183,7 @@ public class Player {
 
     @JsonIgnore
     public Game getGame() {
-        return GameManager.getInstance().getGame(this.gameID);
+        return GameManager.getInstance().getGame(gameID);
     }
 
     @JsonIgnore
@@ -296,9 +303,9 @@ public class Player {
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode() || activeGame.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
-            if(actionsChannel == null){
-                actionsChannel = activeGame.getMainGameChannel();
-            }
+        if (actionsChannel == null){
+            actionsChannel = activeGame.getMainGameChannel();
+        }
         if (actionsChannel == null) {
             BotLogger.log(
                     "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
@@ -1155,12 +1162,9 @@ public class Player {
         if (hasLeader(leaderId)) {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         } else {
-            if (hasExternalAccessToLeader(leaderId)
-                    && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true)) {
-                return true;
-            }
+            return hasExternalAccessToLeader(leaderId)
+                && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true);
         }
-        return false;
     }
 
     public Optional<Leader> getLeaderByType(String leaderType) {
@@ -1606,7 +1610,7 @@ public class Player {
         for (String item : saveString) {
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.draftHand = newBag;
+        draftHand = newBag;
     }
 
     public void loadCurrentDraftBag(List<String> saveString) {
@@ -1614,7 +1618,7 @@ public class Player {
         for (String item : saveString) {
             newBag.Contents.add(DraftItem.GenerateFromAlias(item));
         }
-        this.currentDraftBag = newBag;
+        currentDraftBag = newBag;
     }
 
     public void loadItemsToDraft(List<String> saveString) {
@@ -1622,15 +1626,15 @@ public class Player {
         for (String item : saveString) {
             items.add(DraftItem.GenerateFromAlias(item));
         }
-        this.draftItemQueue.Contents = items;
+        draftItemQueue.Contents = items;
     }
 
     public void queueDraftItem(DraftItem item) {
-        this.draftItemQueue.Contents.add(item);
+        draftItemQueue.Contents.add(item);
     }
 
     public void resetDraftQueue() {
-        this.draftItemQueue.Contents.clear();
+        draftItemQueue.Contents.clear();
     }
 
     @JsonIgnore
@@ -2241,9 +2245,8 @@ public class Player {
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
-        return getUnitsByAsyncID(asyncID).stream()
-                .sorted(UnitModel::sortFactionUnitsFirst) // TODO: Maybe this sort can be better, idk
-                .findFirst().orElse(null);
+        // TODO: Maybe this sort can be better, idk
+        return getUnitsByAsyncID(asyncID).stream().min(UnitModel::sortFactionUnitsFirst).orElse(null);
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
@@ -2268,7 +2271,7 @@ public class Player {
     }
 
     public void setTempCombatModifiers(List<TemporaryCombatModifierModel> tempMods) {
-        tempCombatModifiers = new ArrayList<TemporaryCombatModifierModel>(tempMods);
+        tempCombatModifiers = new ArrayList<>(tempMods);
     }
 
     public void clearNewTempCombatModifiers() {

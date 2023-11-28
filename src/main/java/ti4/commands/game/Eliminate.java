@@ -1,12 +1,10 @@
 package ti4.commands.game;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -72,7 +70,7 @@ public class Eliminate extends AddRemovePlayer {
             User extraUser = option.getAsUser();
             Player player = activeGame.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
-            if (player != null  && player.getColor() != null && player.getFaction() != null && !player.getFaction().equalsIgnoreCase("null")&& player.isRealPlayer() && !player.getFaction().equalsIgnoreCase("")) {
+            if (player != null  && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction())&& player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
                 //send back all the PNs of others that the player was holding
                 Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
                 for (String pnID : pns) {
@@ -100,7 +98,7 @@ public class Eliminate extends AddRemovePlayer {
                 //Remove all of the players units and ccs from the board
                 for (Tile tile : activeGame.getTileMap().values()) {
                     tile.removeAllUnits(player.getColor());
-                    if (!player.getColor().equalsIgnoreCase("null") && AddCC.hasCC(event, player.getColor(), tile)) {
+                    if (!"null".equalsIgnoreCase(player.getColor()) && AddCC.hasCC(event, player.getColor(), tile)) {
                         RemoveCC.removeCC(event, player.getColor(), tile, activeGame);
                     }
                 }

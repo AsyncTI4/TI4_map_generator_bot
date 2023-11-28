@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -91,7 +89,7 @@ public class FactionModelTest {
     }
 
     private static boolean validateHomeSystem(FactionModel faction) {
-        if (TileHelper.getAllTiles().keySet().contains(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+        if (TileHelper.getAllTiles().containsKey(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
             return true;
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");

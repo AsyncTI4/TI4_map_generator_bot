@@ -3,7 +3,6 @@ package ti4.commands.ds;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -116,7 +115,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
             TileModel tile = TileHelper.getTile(tileID);
             tileEmbeds.add(tile.getHelpMessageEmbed(false));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /game add_tile to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();

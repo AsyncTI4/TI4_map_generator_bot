@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -191,7 +190,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             String codedName = "Plagiarize";
             String codedMessage = Helper.getPlayerRepresentation(player, activeGame, guild, false) + " After checking for sabos, use buttons to resolve ";
-            List<Button> codedButtons = new ArrayList<Button>();
+            List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("getPlagiarizeButtons", "Resolve Plagiarize"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage+codedName, codedButtons);
@@ -476,7 +475,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = ButtonHelper.getTrueIdentity(player, activeGame)+" you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
-                    List<Button> buttons2 = new ArrayList<Button>();
+                    List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Button.success("pay1tgforKeleres", "Pay 1tg to unlock Commander"));
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
@@ -485,8 +484,8 @@ public class PlayAC extends ACCardsSubcommandData {
                     if(p2 == player){
                         continue;
                     }
-                    if(p2.getActionCards().keySet().contains("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
-                        List<Button> reverseButtons = new ArrayList<Button>();
+                    if(p2.getActionCards().containsKey("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+                        List<Button> reverseButtons = new ArrayList<>();
                         String key = "reverse_engineer";
                         String ac_name = Mapper.getActionCardName(key);
                         if (ac_name != null) {

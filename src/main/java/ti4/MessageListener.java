@@ -11,10 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,6 +26,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.fow.Whisper;
@@ -41,9 +39,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.MapFileDeleter;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.MapFileDeleter;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -224,7 +222,7 @@ public class MessageListener extends ListenerAdapter {
                                      if(player != null && player.getPersonalPingInterval() > 0){
                                         autoPingSpacer = player.getPersonalPingInterval();
                                      }
-                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int) autoPingSpacer);
+                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* autoPingSpacer);
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeGame.getAutoPingSpacer()*2) ){
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
@@ -318,7 +316,7 @@ public class MessageListener extends ListenerAdapter {
                                         if (gameChannel != null) {
                                             MessageHelper.sendMessageToChannel(gameChannel, ping);
                                             if(ping != null && ping.contains("courtesy notice")){
-                                                List<Button> buttons = new ArrayList<Button>();
+                                                List<Button> buttons = new ArrayList<>();
                                                 buttons.add(Button.danger("temporaryPingDisable", "Disable Pings For Turn"));
                                                 buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
                                                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesnt annoy you. It will turn back on for the next turn.", buttons);
@@ -438,7 +436,7 @@ public class MessageListener extends ListenerAdapter {
                     || (event.getAuthor().isBot() && message2.contains("Total hits "))
                 )){
                 
-                String systemPos = "";
+                String systemPos;
                 if(StringUtils.countMatches(event.getChannel().getName(), "-") > 4){
                     systemPos=event.getChannel().getName().split("-")[4];
                 }else{

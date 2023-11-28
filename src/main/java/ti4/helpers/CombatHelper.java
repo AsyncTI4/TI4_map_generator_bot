@@ -1,16 +1,21 @@
 package ti4.helpers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -42,7 +47,7 @@ public class CombatHelper {
         List<String> dupes = output.keySet().stream()
                 .filter(unit -> !duplicates.add(unit.getAsyncId()))
                 .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
+                .toList();
         // List<String> missing =
         // unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
         // .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
@@ -52,8 +57,7 @@ public class CombatHelper {
         // .filter(unit -> !duplicates.add(unit.getAsyncId()))
         // .map(UnitModel::getBaseType)
         // .toList();
-        for (int x = 0; x < dupes.size(); x++) {
-            String dupe = dupes.get(x);
+        for (String dupe : dupes) {
             for (UnitModel mod : output.keySet()) {
                 if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
                     output.put(mod, 0);
@@ -70,20 +74,13 @@ public class CombatHelper {
         if (unitHolder instanceof Planet) {
             unitHolderPlanet = (Planet) unitHolder;
         }
-        switch (roleType) {
-            case combatround:
-                return GetUnitsInCombatRound(unitHolder, player, event, tile);
-            case AFB:
-                return GetUnitsInAFB(tile, player, event);
-            case bombardment:
-                return GetUnitsInBombardment(tile, player, event);
-            case SpaceCannonOffence:
-                return getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
-            case SpaceCannonDefence:
-                return getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
-            default:
-                return GetUnitsInCombatRound(unitHolder, player, event, tile);
-        }
+      return switch (roleType) {
+        case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
+        case AFB -> GetUnitsInAFB(tile, player, event);
+        case bombardment -> GetUnitsInBombardment(tile, player, event);
+        case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
+        case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
+      };
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player,
@@ -97,7 +94,7 @@ public class CombatHelper {
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
-            if (unitsByAsyncId.keySet().contains("fs") && player.hasUnit("nekro_flagship")) {
+            if (unitsByAsyncId.containsKey("fs") && player.hasUnit("nekro_flagship")) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()
                         .filter(entry -> entry.getKey() != null
                                 && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
@@ -389,8 +386,7 @@ public class CombatHelper {
 
         // Check for space cannon die on planets
         for (UnitHolder unitHolder : unitHolders) {
-            if (unitHolder instanceof Planet) {
-                Planet planet = (Planet) unitHolder;
+            if (unitHolder instanceof Planet planet) {
                 PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
                 if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
@@ -459,10 +455,10 @@ public class CombatHelper {
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
                 .filter(color -> !color.equals(playerColorID))
-                .map(color -> activeGame.getPlayerByColorID(color))
-                .filter(playerOptional -> playerOptional.isPresent())
-                .map(playerOptional -> playerOptional.get())
-                .collect(Collectors.toList());
+                .map(activeGame::getPlayerByColorID)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
 
         if (opponents.size() >= 1) {
             opponent = opponents.get(0);
@@ -535,7 +531,7 @@ public class CombatHelper {
             String unitRollsTextInfo = "";
             int totalRolls = unit.getCombatDieCountForAbility(rollType) + extraRollsForUnit;
             if (totalRolls > 1) {
-                unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType), toHit);
+                unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType));
                 if (extraRollsForUnit > 0 && unit.getCombatDieCountForAbility(rollType) > 1) {
                     unitRollsTextInfo = String.format("%s rolls (+%s rolls),",
                             unit.getCombatDieCountForAbility(rollType),
@@ -568,7 +564,7 @@ public class CombatHelper {
 
             List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo,
                     unitTypeHitsInfo);
-            String optionalText = optionalInfoParts.stream().filter(str -> StringUtils.isNotBlank(str))
+            String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
                     .collect(Collectors.joining(" "));
 
             String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());
@@ -577,9 +573,7 @@ public class CombatHelper {
         }
         result = resultBuilder.toString();
 
-        StringBuilder hitEmojis = new StringBuilder();
-        hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
-        result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
+        result += String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
         player.setActualHits(player.getActualHits() + totalHits);
         return result;
     }

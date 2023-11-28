@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DraftBag {
-    public DraftBag()
-    {}
 
     public List<DraftItem> Contents = new ArrayList<>();
 

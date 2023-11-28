@@ -4,18 +4,15 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 @Data
 public class LeaderModel implements ModelInterface, EmbeddableModel { 
@@ -91,15 +88,13 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder title = new StringBuilder();
-        title.append(getLeaderEmoji());
-        title.append(" __**").append(getName()).append("**__").append(" - ").append(getTitle());
-        title.append(getSourceEmoji());
-        eb.setTitle(title.toString());
+        String title = getLeaderEmoji() +
+            " __**" + getName() + "**__" + " - " + getTitle() +
+            getSourceEmoji();
+        eb.setTitle(title);
 
         Emoji emoji = Emoji.fromFormatted(getLeaderEmoji());
-        if (emoji instanceof CustomEmoji) {
-            CustomEmoji customEmoji = (CustomEmoji) emoji;
+        if (emoji instanceof CustomEmoji customEmoji) {
             eb.setThumbnail(customEmoji.getImageUrl());
         }
 

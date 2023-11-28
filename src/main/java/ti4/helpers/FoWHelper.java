@@ -8,14 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -618,7 +616,7 @@ public class FoWHelper {
 			if (p2 == player) {
 				continue;
 			}
-			if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+			if (playerHasShipsInSystem(p2, tile)) {
 				return true;
 			}
 		}
@@ -630,7 +628,7 @@ public class FoWHelper {
 			if (p2 == player) {
 				continue;
 			}
-			if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+			if (playerHasUnitsInSystem(p2, tile)) {
 				return true;
 			}
 		}
@@ -645,7 +643,7 @@ public class FoWHelper {
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType().equals(UnitType.Fighter)) {
+			if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Fighter) {
 				return true;
 			}
 		}
@@ -675,7 +673,7 @@ public class FoWHelper {
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType().equals(UnitType.Infantry)) {
+			if (unitKey != null && unitKey.getColorID().equals(colorID) && unitKey.getUnitType() == UnitType.Infantry) {
 				return true;
 			}
 		}

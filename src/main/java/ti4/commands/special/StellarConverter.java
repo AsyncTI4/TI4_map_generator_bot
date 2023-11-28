@@ -1,7 +1,6 @@
 package ti4.commands.special;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,7 +14,11 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class StellarConverter extends SpecialSubcommandData {
@@ -67,11 +70,7 @@ public class StellarConverter extends SpecialSubcommandData {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }
-        if (unitHolder == null) {
-            MessageHelper.replyToMessage(event, "Planet not found");
-            return;
-        }
-        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()) {
+      if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).size() > 0 && !activeGame.isFoWMode()) {
             TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("stellar-converter-watch-party", true).get(0);
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, "Moments before disaster in game " + activeGame.getName(), false);

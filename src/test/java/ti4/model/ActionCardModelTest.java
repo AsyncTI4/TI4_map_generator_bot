@@ -2,12 +2,11 @@ package ti4.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -25,7 +24,7 @@ public class ActionCardModelTest {
         Storage.init();
     }
 
-    ActionCardModel actionCardModel = new ActionCardModel();
+    final ActionCardModel actionCardModel = new ActionCardModel();
 
     @Test
     // test a specific card

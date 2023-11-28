@@ -1,20 +1,20 @@
 package ti4.commands.explore;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.Mapper;
-import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
-import ti4.map.Game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShowRemainingRelics extends GenericRelicAction {
 
@@ -27,7 +27,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
         Game activeGame = getActiveGame();
-        Integer deckCount = allRelics.size();
+        int deckCount = allRelics.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         formatPercent.setMaximumFractionDigits(1);

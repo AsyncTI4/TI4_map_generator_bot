@@ -1,6 +1,16 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -9,8 +19,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.cardsac.PlayAC;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.ButtonHelper;
@@ -24,9 +32,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
@@ -102,7 +107,7 @@ public class SCPick extends PlayerSubcommandData {
     }
 
     public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked){
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
         int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
         if(maxSCsPerPlayer < 1){
@@ -141,7 +146,7 @@ public class SCPick extends PlayerSubcommandData {
        
 		for (Player playerStats : activeGame.getRealPlayers()) {
 			if (playerStats.getSCs().contains(scPicked)) {
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scPicked+" is already picked.");
+				MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scPicked+" is already picked.");
 				return;
 			}
 		}
@@ -149,7 +154,7 @@ public class SCPick extends PlayerSubcommandData {
 		if (tgCount != null && tgCount != 0) {
 			int tg = player.getTg();
 			tg += tgCount;
-			MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),player.getRepresentation()+" gained "+tgCount +" tgs from picking SC #"+scPicked);
+			MessageHelper.sendMessageToChannel(event.getChannel(),player.getRepresentation()+" gained "+tgCount +" tgs from picking SC #"+scPicked);
 			if (activeGame.isFoWMode()) {
 				String messageToSend = Emojis.getColourEmojis(player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scPicked;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
@@ -249,7 +254,7 @@ public class SCPick extends PlayerSubcommandData {
             for(Player p2 : activeGame.getRealPlayers()){
                  ButtonHelperActionCards.checkForAssigningCoup(activeGame, p2);
                 if(activeGame.getFactionsThatReactedToThis("Play Naalu PN") != null && activeGame.getFactionsThatReactedToThis("Play Naalu PN").contains(p2.getFaction())){
-                    if(!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().keySet().contains("gift")){
+                    if(!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().containsKey("gift")){
                         ButtonHelper.resolvePNPlay("gift", p2, activeGame, event);
                     }
                 }
@@ -362,13 +367,13 @@ public class SCPick extends PlayerSubcommandData {
         }
         if(allPicked){
             for(Player p2: activeGame.getRealPlayers()){
-                List<Button> buttons = new ArrayList<Button>();
+                List<Button> buttons = new ArrayList<>();
                 if(p2.hasTechReady("qdn") && p2.getTg() >2 && p2.getStrategicCC() > 0){
                     buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
                 }
-                buttons = new ArrayList<Button>();
+                buttons = new ArrayList<>();
                 if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
                     buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));

@@ -1,5 +1,8 @@
 package ti4.commands.cardsac;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -18,9 +21,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class ACInfo extends ACCardsSubcommandData {
     public ACInfo() {
@@ -212,15 +212,15 @@ public class ACInfo extends ACCardsSubcommandData {
         }
 
         if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
-            String omenDice = "";
+            StringBuilder omenDice = new StringBuilder();
             for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
-                omenDice=omenDice+" "+omenDie;
+                omenDice.append(" ").append(omenDie);
             }
-            omenDice=omenDice.trim();
+            omenDice = new StringBuilder(omenDice.toString().trim());
             Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             acButtons.add(augers);
         }
-        if(actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && (actionCards.keySet().contains("coup") || actionCards.keySet().contains("disgrace")||actionCards.keySet().contains("investments")||actionCards.keySet().contains("summit"))){
+        if(actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")|| actionCards.containsKey("investments")|| actionCards.containsKey("summit"))){
                 acButtons.add(Button.secondary("checkForAllACAssignments","Pre assign ACs"));
         }
             
