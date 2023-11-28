@@ -78,7 +78,7 @@ public class ActionCardModelTest {
 
     @Test
     public void testSource() {
-        ComponentSource source = ComponentSource.testSource;
+        ComponentSource source = ComponentSource.testsource;
         actionCardModel.setSource(source);
         assertEquals(source, actionCardModel.getSource());
     }
@@ -100,7 +100,7 @@ public class ActionCardModelTest {
         actionCardModel.setWindow("testWindow");
         actionCardModel.setText("testText");
         actionCardModel.setFlavorText("testFlavorText");
-        actionCardModel.setSource(ComponentSource.testSource);
+        actionCardModel.setSource(ComponentSource.testsource);
         assertTrue(actionCardModel.isValid());
     }
 
@@ -114,7 +114,7 @@ public class ActionCardModelTest {
     @Test
     public void testAutoCompleteName() {
         String name = "testName";
-        ComponentSource source = ComponentSource.testSource;
+        ComponentSource source = ComponentSource.testsource;
         actionCardModel.setName(name);
         actionCardModel.setSource(source);
         assertEquals(name + " (" + source + ")", actionCardModel.getAutoCompleteName());

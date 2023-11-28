@@ -57,7 +57,7 @@ public class AgendaModelTest {
         ixthian.setText1("testText1");
         assertTrue(ixthian.isValid());
 
-        ixthian.setSource(ComponentSource.testSource);
+        ixthian.setSource(ComponentSource.testsource);
         assertTrue(ixthian.isValid());
     }
 
