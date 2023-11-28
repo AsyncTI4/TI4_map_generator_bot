@@ -3934,7 +3934,9 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         List<String> allFactions = FrankenDraft.getAllFactionIds(activeGame);
-        for (var factionId : allFactions) {
+        List<FactionModel> factionsOnMap = Mapper.getFactions().stream().filter(f -> activeGame.getTile(f.getHomeSystem()) != null).toList();
+
+        for (String factionId : allFactions) {
             FactionModel faction = Mapper.getFaction(factionId);
             if (faction != null && activeGame.getPlayerFromColorOrFaction(factionId) == null) {
                 String name = faction.getFactionName();
@@ -3943,9 +3945,9 @@ public class ButtonHelper {
                     factionId = "keleres";
                     name = "The Council Keleres";
                 }
-                buttons.add(Button.success("setupStep2_" + userId + "_" + factionId, name).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(factionId))));
+                Emoji factionEmoji = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(factionId));
+                buttons.add(Button.success("setupStep2_" + userId + "_" + factionId, name).withEmoji(factionEmoji));
                 //buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name));
-
             }
         }
         return buttons;
@@ -3986,6 +3988,7 @@ public class ButtonHelper {
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
+
         for (int x = 0; x < buttons.size(); x++) {
             if (x < maxBefore + 23) {
                 newButtons.add(buttons.get(x));

@@ -15,6 +15,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.model.Source.ComponentSource;
 
 public class AbilityModelTest {
 
@@ -88,7 +89,7 @@ public class AbilityModelTest {
         abilityModel.setId("testId");
         abilityModel.setName("testName");
         abilityModel.setFaction("testFaction");
-        abilityModel.setSource("testSource");
+        abilityModel.setSource(ComponentSource.testSource);
         assertTrue(abilityModel.isValid());
     }
 

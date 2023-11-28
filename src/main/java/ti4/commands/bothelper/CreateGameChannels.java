@@ -104,7 +104,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            sendMessage("Category: **" + categoryChannelName + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
 

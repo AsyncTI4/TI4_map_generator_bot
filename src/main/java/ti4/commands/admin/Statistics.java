@@ -92,7 +92,6 @@ public class Statistics extends AdminSubcommandData {
             }
         }
 
-
         sendStatistics(event, factionCount, "Faction played:");
         sendStatisticsColor(event, colorCount, "Color played:");
         sendStatistics(event, winnerFactionCount, "Winning Faction:");
@@ -104,8 +103,8 @@ public class Statistics extends AdminSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append(Emojis.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> sb.append(Emojis.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
@@ -113,8 +112,8 @@ public class Statistics extends AdminSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 }

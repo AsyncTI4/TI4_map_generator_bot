@@ -2088,7 +2088,7 @@ public class AgendaHelper {
 
     public static EmbedBuilder buildAgendaEmbed(AgendaModel agenda) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(agenda.getSourceEmoji() + " " + agenda.getName());
+        eb.setTitle(agenda.getSource().emoji() + " " + agenda.getName());
 
         StringBuilder desc = new StringBuilder("**").append(agenda.getType()).append(":** *").append(agenda.getTarget()).append("*\n");
         desc.append("> ").append(agenda.getText1().replace("For:", "**For:**")).append("\n");

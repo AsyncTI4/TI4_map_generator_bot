@@ -14,7 +14,7 @@ public class StrategyCardModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return cardValues.size() > 0 
+        return cardValues.size() > 0
             && StringUtils.isNotBlank(name)
             && StringUtils.isNotBlank(alias);
     }

@@ -8,6 +8,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class AbilityModel implements ModelInterface, EmbeddableModel {
@@ -19,18 +20,15 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String permanentEffect;
     private String window;
     private String windowEffect;
-    private String source;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     @Override
     public boolean isValid() {
         return id != null
-                && name != null
-                && faction != null
-                // && permanentEffect != null
-                // && window != null
-                // && windowEffect != null
-                && source != null;
+            && name != null
+            && faction != null
+            && source != null;
     }
 
     @Override
@@ -62,9 +60,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = getFactionEmoji() +
-            " __**" + getName() + "**__" +
-            getSourceEmoji();
+        String title = getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         //DESCRIPTION
@@ -77,7 +73,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
-        
+
         eb.setColor(Color.black);
         return eb.build();
     }
@@ -100,10 +96,10 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getId().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getFaction().toLowerCase().contains(searchString)
-                || getSource().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+            || getName().toLowerCase().contains(searchString)
+            || getFaction().toLowerCase().contains(searchString)
+            || getSource().toString().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     @Override
@@ -115,12 +111,5 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     public String getFactionEmoji() {
         return Emojis.getFactionIconFromDiscord(getFaction());
-    }
-
-    private String getSourceEmoji() {
-        return switch (source) {
-            case "ds" -> Emojis.DiscordantStars;
-            default -> "";
-        };
     }
 }

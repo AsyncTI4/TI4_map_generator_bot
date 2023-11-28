@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -18,7 +19,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String requirements;
     private String faction;
     private String baseUpgrade;
-    private String source;
+    private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
@@ -105,7 +106,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techFaction = getFaction().orElse("");
         if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
         String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
-        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
+        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSource().emoji());
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
@@ -133,14 +134,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         };
     }
 
-    private String getSourceEmoji() {
-        return switch (getSource()) {
-            case "absol" -> Emojis.Absol;
-            case "ds" -> Emojis.DiscordantStars;
-            default -> "";
-        };
-    }
-
     public String getRequirementsEmoji() {
         if (getRequirements().isPresent()) {
             String requirements = getRequirements().get();
@@ -149,12 +142,13 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             requirements = requirements.replace("G", Emojis.BioticTech);
             requirements = requirements.replace("R", Emojis.WarfareTech);
             return requirements;
-        } 
+        }
         return "None";
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

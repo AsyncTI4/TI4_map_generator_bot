@@ -5,7 +5,7 @@
         "type": "CYBERNETIC",
         "requirements": "Y",
         "faction": "admins",
-        "source": "homebrew",
+        "source": "admins",
         "text": "Systems that contain a planet with one of your Space Docks on it are considered adjacent to each other for all game effects."
     },
     {
@@ -15,7 +15,7 @@
         "requirements": "YY",
         "faction": "admins",
         "baseUpgrade": "sd2",
-        "source": "homebrew",
+        "source": "admins",
         "text": "Up to 4 fighters in this system do not count towards your ships' capacity. PRODUCTION 7, DEEP SPACE CANNON 7"
     }
 ]

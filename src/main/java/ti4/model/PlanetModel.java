@@ -57,7 +57,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-        
+
         EmbedBuilder eb = new EmbedBuilder();
 
         StringBuilder sb = new StringBuilder();
@@ -70,13 +70,13 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             case CULTURAL -> eb.setColor(Color.blue);
             default -> eb.setColor(Color.white);
         }
-        
+
         TileModel tile = TileHelper.getTile(getTileId());
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
-        if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet +  getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
         sb = new StringBuilder();
@@ -127,6 +127,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
+                default -> sb.append("");
             }
         }
         return sb.toString();

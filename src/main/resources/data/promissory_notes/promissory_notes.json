@@ -4,7 +4,7 @@
         "name": "Ceasefire",
         "colour": "splitgold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitgold** player activates a system that contains 1 or more of your units: The **splitgold** player cannot move units to the active system. Then return this card to the **splitgold** player."
     },
     {
@@ -12,7 +12,7 @@
         "name": "Political Secret",
         "colour": "splitgold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitgold** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitgold** player."
     },
     {
@@ -20,7 +20,7 @@
         "name": "Support for the Throne",
         "colour": "splitgold",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitgold** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitgold** player's units, or if the **splitgold** player is eliminated, lose 1 victory point and return this card to the **splitgold** player."
     },
     {
@@ -28,7 +28,7 @@
         "name": "Trade Agreement",
         "colour": "splitgold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitgold** player replenishes commodities: The **splitgold** player gives you all of their commodities. Then, return this card to the **splitgold** player."
     },
     {
@@ -36,7 +36,7 @@
         "name": "Alliance",
         "colour": "splitgold",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitgold** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgold** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgold** player's units, return this card to the **splitgold** player."
     },
     {
@@ -44,7 +44,7 @@
         "name": "Ceasefire",
         "colour": "splitlime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitlime** player activates a system that contains 1 or more of your units: The **splitlime** player cannot move units to the active system. Then return this card to the **splitlime** player."
     },
     {
@@ -52,7 +52,7 @@
         "name": "Political Secret",
         "colour": "splitlime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitlime** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitlime** player."
     },
     {
@@ -60,7 +60,7 @@
         "name": "Support for the Throne",
         "colour": "splitlime",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitlime** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitlime** player's units, or if the **splitlime** player is eliminated, lose 1 victory point and return this card to the **splitlime** player."
     },
     {
@@ -68,7 +68,7 @@
         "name": "Trade Agreement",
         "colour": "splitlime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitlime** player replenishes commodities: The **splitlime** player gives you all of their commodities. Then, return this card to the **splitlime** player."
     },
     {
@@ -76,7 +76,7 @@
         "name": "Alliance",
         "colour": "splitlime",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitlime** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitlime** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitlime** player's units, return this card to the **splitlime** player."
     },
     {
@@ -84,7 +84,7 @@
         "name": "Ceasefire",
         "colour": "splittan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splittan** player activates a system that contains 1 or more of your units: The **splittan** player cannot move units to the active system. Then return this card to the **splittan** player."
     },
     {
@@ -92,7 +92,7 @@
         "name": "Political Secret",
         "colour": "splittan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splittan** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splittan** player."
     },
     {
@@ -100,7 +100,7 @@
         "name": "Support for the Throne",
         "colour": "splittan",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splittan** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splittan** player's units, or if the **splittan** player is eliminated, lose 1 victory point and return this card to the **splittan** player."
     },
     {
@@ -108,7 +108,7 @@
         "name": "Trade Agreement",
         "colour": "splittan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splittan** player replenishes commodities: The **splittan** player gives you all of their commodities. Then, return this card to the **splittan** player."
     },
     {
@@ -116,7 +116,7 @@
         "name": "Alliance",
         "colour": "splittan",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splittan** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splittan** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splittan** player's units, return this card to the **splittan** player."
     },
     {
@@ -124,7 +124,7 @@
         "name": "Ceasefire",
         "colour": "splitteal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitteal** player activates a system that contains 1 or more of your units: The **splitteal** player cannot move units to the active system. Then return this card to the **splitteal** player."
     },
     {
@@ -132,7 +132,7 @@
         "name": "Political Secret",
         "colour": "splitteal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitteal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitteal** player."
     },
     {
@@ -140,7 +140,7 @@
         "name": "Support for the Throne",
         "colour": "splitteal",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitteal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitteal** player's units, or if the **splitteal** player is eliminated, lose 1 victory point and return this card to the **splitteal** player."
     },
     {
@@ -148,7 +148,7 @@
         "name": "Trade Agreement",
         "colour": "splitteal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitteal** player replenishes commodities: The **splitteal** player gives you all of their commodities. Then, return this card to the **splitteal** player."
     },
     {
@@ -156,7 +156,7 @@
         "name": "Alliance",
         "colour": "splitteal",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitteal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitteal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitteal** player's units, return this card to the **splitteal** player."
     },
     {
@@ -164,7 +164,7 @@
         "name": "Ceasefire",
         "colour": "splitturquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitturquoise** player activates a system that contains 1 or more of your units: The **splitturquoise** player cannot move units to the active system. Then return this card to the **splitturquoise** player."
     },
     {
@@ -172,7 +172,7 @@
         "name": "Political Secret",
         "colour": "splitturquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitturquoise** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitturquoise** player."
     },
     {
@@ -180,7 +180,7 @@
         "name": "Support for the Throne",
         "colour": "splitturquoise",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitturquoise** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitturquoise** player's units, or if the **splitturquoise** player is eliminated, lose 1 victory point and return this card to the **splitturquoise** player."
     },
     {
@@ -188,7 +188,7 @@
         "name": "Trade Agreement",
         "colour": "splitturquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitturquoise** player replenishes commodities: The **splitturquoise** player gives you all of their commodities. Then, return this card to the **splitturquoise** player."
     },
     {
@@ -196,7 +196,7 @@
         "name": "Alliance",
         "colour": "splitturquoise",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitturquoise** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitturquoise** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitturquoise** player's units, return this card to the **splitturquoise** player."
     },
     {
@@ -204,7 +204,7 @@
         "name": "Ceasefire",
         "colour": "splitbloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitbloodred** player activates a system that contains 1 or more of your units: The **splitbloodred** player cannot move units to the active system. Then return this card to the **splitbloodred** player."
     },
     {
@@ -212,7 +212,7 @@
         "name": "Political Secret",
         "colour": "splitbloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitbloodred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitbloodred** player."
     },
     {
@@ -220,7 +220,7 @@
         "name": "Support for the Throne",
         "colour": "splitbloodred",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitbloodred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitbloodred** player's units, or if the **splitbloodred** player is eliminated, lose 1 victory point and return this card to the **splitbloodred** player."
     },
     {
@@ -228,7 +228,7 @@
         "name": "Trade Agreement",
         "colour": "splitbloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitbloodred** player replenishes commodities: The **splitbloodred** player gives you all of their commodities. Then, return this card to the **splitbloodred** player."
     },
     {
@@ -236,7 +236,7 @@
         "name": "Alliance",
         "colour": "splitbloodred",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitbloodred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitbloodred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitbloodred** player's units, return this card to the **splitbloodred** player."
     },
     {
@@ -244,7 +244,7 @@
         "name": "Ceasefire",
         "colour": "splitchocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitchocolate** player activates a system that contains 1 or more of your units: The **splitchocolate** player cannot move units to the active system. Then return this card to the **splitchocolate** player."
     },
     {
@@ -252,7 +252,7 @@
         "name": "Political Secret",
         "colour": "splitchocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitchocolate** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitchocolate** player."
     },
     {
@@ -260,7 +260,7 @@
         "name": "Support for the Throne",
         "colour": "splitchocolate",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitchocolate** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitchocolate** player's units, or if the **splitchocolate** player is eliminated, lose 1 victory point and return this card to the **splitchocolate** player."
     },
     {
@@ -268,7 +268,7 @@
         "name": "Trade Agreement",
         "colour": "splitchocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitchocolate** player replenishes commodities: The **splitchocolate** player gives you all of their commodities. Then, return this card to the **splitchocolate** player."
     },
     {
@@ -276,7 +276,7 @@
         "name": "Alliance",
         "colour": "splitchocolate",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitchocolate** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitchocolate** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitchocolate** player's units, return this card to the **splitchocolate** player."
     },
     {
@@ -284,7 +284,7 @@
         "name": "Ceasefire",
         "colour": "splitemerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitemerald** player activates a system that contains 1 or more of your units: The **splitemerald** player cannot move units to the active system. Then return this card to the **splitemerald** player."
     },
     {
@@ -292,7 +292,7 @@
         "name": "Political Secret",
         "colour": "splitemerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitemerald** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitemerald** player."
     },
     {
@@ -300,7 +300,7 @@
         "name": "Support for the Throne",
         "colour": "splitemerald",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitemerald** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitemerald** player's units, or if the **splitemerald** player is eliminated, lose 1 victory point and return this card to the **splitemerald** player."
     },
     {
@@ -308,7 +308,7 @@
         "name": "Trade Agreement",
         "colour": "splitemerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitemerald** player replenishes commodities: The **splitemerald** player gives you all of their commodities. Then, return this card to the **splitemerald** player."
     },
     {
@@ -316,7 +316,7 @@
         "name": "Alliance",
         "colour": "splitemerald",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitemerald** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitemerald** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitemerald** player's units, return this card to the **splitemerald** player."
     },
     {
@@ -324,7 +324,7 @@
         "name": "Ceasefire",
         "colour": "splitnavy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitnavy** player activates a system that contains 1 or more of your units: The **splitnavy** player cannot move units to the active system. Then return this card to the **splitnavy** player."
     },
     {
@@ -332,7 +332,7 @@
         "name": "Political Secret",
         "colour": "splitnavy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitnavy** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitnavy** player."
     },
     {
@@ -340,7 +340,7 @@
         "name": "Support for the Throne",
         "colour": "splitnavy",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitnavy** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitnavy** player's units, or if the **splitnavy** player is eliminated, lose 1 victory point and return this card to the **splitnavy** player."
     },
     {
@@ -348,7 +348,7 @@
         "name": "Trade Agreement",
         "colour": "splitnavy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitnavy** player replenishes commodities: The **splitnavy** player gives you all of their commodities. Then, return this card to the **splitnavy** player."
     },
     {
@@ -356,7 +356,7 @@
         "name": "Alliance",
         "colour": "splitnavy",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitnavy** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitnavy** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitnavy** player's units, return this card to the **splitnavy** player."
     },
     {
@@ -364,7 +364,7 @@
         "name": "Ceasefire",
         "colour": "splitpetrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitpetrol** player activates a system that contains 1 or more of your units: The **splitpetrol** player cannot move units to the active system. Then return this card to the **splitpetrol** player."
     },
     {
@@ -372,7 +372,7 @@
         "name": "Political Secret",
         "colour": "splitpetrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitpetrol** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpetrol** player."
     },
     {
@@ -380,7 +380,7 @@
         "name": "Support for the Throne",
         "colour": "splitpetrol",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitpetrol** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpetrol** player's units, or if the **splitpetrol** player is eliminated, lose 1 victory point and return this card to the **splitpetrol** player."
     },
     {
@@ -388,7 +388,7 @@
         "name": "Trade Agreement",
         "colour": "splitpetrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitpetrol** player replenishes commodities: The **splitpetrol** player gives you all of their commodities. Then, return this card to the **splitpetrol** player."
     },
     {
@@ -396,7 +396,7 @@
         "name": "Alliance",
         "colour": "splitpetrol",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitpetrol** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpetrol** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpetrol** player's units, return this card to the **splitpetrol** player."
     },
     {
@@ -404,7 +404,7 @@
         "name": "Ceasefire",
         "colour": "splitrainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitrainbow** player activates a system that contains 1 or more of your units: The **splitrainbow** player cannot move units to the active system. Then return this card to the **splitrainbow** player."
     },
     {
@@ -412,7 +412,7 @@
         "name": "Political Secret",
         "colour": "splitrainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitrainbow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitrainbow** player."
     },
     {
@@ -420,7 +420,7 @@
         "name": "Support for the Throne",
         "colour": "splitrainbow",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitrainbow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitrainbow** player's units, or if the **splitrainbow** player is eliminated, lose 1 victory point and return this card to the **splitrainbow** player."
     },
     {
@@ -428,7 +428,7 @@
         "name": "Trade Agreement",
         "colour": "splitrainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitrainbow** player replenishes commodities: The **splitrainbow** player gives you all of their commodities. Then, return this card to the **splitrainbow** player."
     },
     {
@@ -436,7 +436,7 @@
         "name": "Alliance",
         "colour": "splitrainbow",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitrainbow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitrainbow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitrainbow** player's units, return this card to the **splitrainbow** player."
     },
     {
@@ -444,7 +444,7 @@
         "name": "Ceasefire",
         "colour": "splitred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitred** player activates a system that contains 1 or more of your units: The **splitred** player cannot move units to the active system. Then return this card to the **splitred** player."
     },
     {
@@ -452,7 +452,7 @@
         "name": "Political Secret",
         "colour": "splitred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitred** player."
     },
     {
@@ -460,7 +460,7 @@
         "name": "Support for the Throne",
         "colour": "splitred",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitred** player's units, or if the **splitred** player is eliminated, lose 1 victory point and return this card to the **splitred** player."
     },
     {
@@ -468,7 +468,7 @@
         "name": "Trade Agreement",
         "colour": "splitred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitred** player replenishes commodities: The **splitred** player gives you all of their commodities. Then, return this card to the **splitred** player."
     },
     {
@@ -476,7 +476,7 @@
         "name": "Alliance",
         "colour": "splitred",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitred** player's units, return this card to the **splitred** player."
     },
 {
@@ -484,7 +484,7 @@
         "name": "Ceasefire",
         "colour": "splitblue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitblue** player activates a system that contains 1 or more of your units: The **splitblue** player cannot move units to the active system. Then return this card to the **splitblue** player."
     },
     {
@@ -492,7 +492,7 @@
         "name": "Political Secret",
         "colour": "splitblue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitblue** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitblue** player."
     },
     {
@@ -500,7 +500,7 @@
         "name": "Support for the Throne",
         "colour": "splitblue",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitblue** player's units, or if the **splitblue** player is eliminated, lose 1 victory point and return this card to the **splitblue** player."
     },
     {
@@ -508,7 +508,7 @@
         "name": "Trade Agreement",
         "colour": "splitblue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitblue** player replenishes commodities: The **splitblue** player gives you all of their commodities. Then, return this card to the **splitblue** player."
     },
     {
@@ -516,7 +516,7 @@
         "name": "Alliance",
         "colour": "splitblue",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitblue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitblue** player's units, return this card to the **splitblue** player."
     },
 {
@@ -524,7 +524,7 @@
         "name": "Ceasefire",
         "colour": "splitgreen",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitgreen** player activates a system that contains 1 or more of your units: The **splitgreen** player cannot move units to the active system. Then return this card to the **splitgreen** player."
     },
     {
@@ -532,7 +532,7 @@
         "name": "Political Secret",
         "colour": "splitgreen",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitgreen** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitgreen** player."
     },
     {
@@ -540,7 +540,7 @@
         "name": "Support for the Throne",
         "colour": "splitgreen",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitgreen** player's units, or if the **splitgreen** player is eliminated, lose 1 victory point and return this card to the **splitgreen** player."
     },
     {
@@ -548,7 +548,7 @@
         "name": "Trade Agreement",
         "colour": "splitgreen",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitgreen** player replenishes commodities: The **splitgreen** player gives you all of their commodities. Then, return this card to the **splitgreen** player."
     },
     {
@@ -556,7 +556,7 @@
         "name": "Alliance",
         "colour": "splitgreen",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgreen** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgreen** player's units, return this card to the **splitgreen** player."
     },
 {
@@ -564,7 +564,7 @@
         "name": "Ceasefire",
         "colour": "splityellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splityellow** player activates a system that contains 1 or more of your units: The **splityellow** player cannot move units to the active system. Then return this card to the **splityellow** player."
     },
     {
@@ -572,7 +572,7 @@
         "name": "Political Secret",
         "colour": "splityellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splityellow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splityellow** player."
     },
     {
@@ -580,7 +580,7 @@
         "name": "Support for the Throne",
         "colour": "splityellow",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splityellow** player's units, or if the **splityellow** player is eliminated, lose 1 victory point and return this card to the **splityellow** player."
     },
     {
@@ -588,7 +588,7 @@
         "name": "Trade Agreement",
         "colour": "splityellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splityellow** player replenishes commodities: The **splityellow** player gives you all of their commodities. Then, return this card to the **splityellow** player."
     },
     {
@@ -596,7 +596,7 @@
         "name": "Alliance",
         "colour": "splityellow",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splityellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splityellow** player's units, return this card to the **splityellow** player."
     },
 {
@@ -604,7 +604,7 @@
         "name": "Ceasefire",
         "colour": "splitorange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitorange** player activates a system that contains 1 or more of your units: The **splitorange** player cannot move units to the active system. Then return this card to the **splitorange** player."
     },
     {
@@ -612,7 +612,7 @@
         "name": "Political Secret",
         "colour": "splitorange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitorange** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitorange** player."
     },
     {
@@ -620,7 +620,7 @@
         "name": "Support for the Throne",
         "colour": "splitorange",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitorange** player's units, or if the **splitorange** player is eliminated, lose 1 victory point and return this card to the **splitorange** player."
     },
     {
@@ -628,7 +628,7 @@
         "name": "Trade Agreement",
         "colour": "splitorange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitorange** player replenishes commodities: The **splitorange** player gives you all of their commodities. Then, return this card to the **splitorange** player."
     },
     {
@@ -636,7 +636,7 @@
         "name": "Alliance",
         "colour": "splitorange",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitorange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitorange** player's units, return this card to the **splitorange** player."
     },
 {
@@ -644,7 +644,7 @@
         "name": "Ceasefire",
         "colour": "splitpurple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitpurple** player activates a system that contains 1 or more of your units: The **splitpurple** player cannot move units to the active system. Then return this card to the **splitpurple** player."
     },
     {
@@ -652,7 +652,7 @@
         "name": "Political Secret",
         "colour": "splitpurple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitpurple** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpurple** player."
     },
     {
@@ -660,7 +660,7 @@
         "name": "Support for the Throne",
         "colour": "splitpurple",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpurple** player's units, or if the **splitpurple** player is eliminated, lose 1 victory point and return this card to the **splitpurple** player."
     },
     {
@@ -668,7 +668,7 @@
         "name": "Trade Agreement",
         "colour": "splitpurple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitpurple** player replenishes commodities: The **splitpurple** player gives you all of their commodities. Then, return this card to the **splitpurple** player."
     },
     {
@@ -676,7 +676,7 @@
         "name": "Alliance",
         "colour": "splitpurple",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpurple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpurple** player's units, return this card to the **splitpurple** player."
     },
 {
@@ -684,7 +684,7 @@
         "name": "Ceasefire",
         "colour": "splitpink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **splitpink** player activates a system that contains 1 or more of your units: The **splitpink** player cannot move units to the active system. Then return this card to the **splitpink** player."
     },
     {
@@ -692,7 +692,7 @@
         "name": "Political Secret",
         "colour": "splitpink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **splitpink** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpink** player."
     },
     {
@@ -700,7 +700,7 @@
         "name": "Support for the Throne",
         "colour": "splitpink",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpink** player's units, or if the **splitpink** player is eliminated, lose 1 victory point and return this card to the **splitpink** player."
     },
     {
@@ -708,7 +708,7 @@
         "name": "Trade Agreement",
         "colour": "splitpink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **splitpink** player replenishes commodities: The **splitpink** player gives you all of their commodities. Then, return this card to the **splitpink** player."
     },
     {
@@ -716,7 +716,7 @@
         "name": "Alliance",
         "colour": "splitpink",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpink** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpink** player's units, return this card to the **splitpink** player."
     },
         {
@@ -724,7 +724,7 @@
         "name": "Ceasefire",
         "colour": "orca",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **orca** player activates a system that contains 1 or more of your units: The **orca** player cannot move units to the active system. Then return this card to the **orca** player."
     },
     {
@@ -732,7 +732,7 @@
         "name": "Political Secret",
         "colour": "orca",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **orca** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **orca** player."
     },
     {
@@ -740,7 +740,7 @@
         "name": "Support for the Throne",
         "colour": "orca",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **orca** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **orca** player's units, or if the **orca** player is eliminated, lose 1 victory point and return this card to the **orca** player."
     },
     {
@@ -748,7 +748,7 @@
         "name": "Trade Agreement",
         "colour": "orca",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **orca** player replenishes commodities: The **orca** player gives you all of their commodities. Then, return this card to the **orca** player."
     },
     {
@@ -756,7 +756,7 @@
         "name": "Alliance",
         "colour": "orca",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **orca** player, you must place it faceup in your play area. While this card is in your play area, you can use the **orca** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **orca** player's units, return this card to the **orca** player."
     },
     {
@@ -764,7 +764,7 @@
         "name": "Ceasefire",
         "colour": "rainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **rainbow** player activates a system that contains 1 or more of your units: The **rainbow** player cannot move units to the active system. Then return this card to the **rainbow** player."
     },
     {
@@ -772,7 +772,7 @@
         "name": "Political Secret",
         "colour": "rainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **rainbow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rainbow** player."
     },
     {
@@ -780,7 +780,7 @@
         "name": "Support for the Throne",
         "colour": "rainbow",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rainbow** player's units, or if the **rainbow** player is eliminated, lose 1 victory point and return this card to the **rainbow** player."
     },
     {
@@ -788,7 +788,7 @@
         "name": "Trade Agreement",
         "colour": "rainbow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **rainbow** player replenishes commodities: The **rainbow** player gives you all of their commodities. Then, return this card to the **rainbow** player."
     },
     {
@@ -796,7 +796,7 @@
         "name": "Alliance",
         "colour": "rainbow",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rainbow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rainbow** player's units, return this card to the **rainbow** player."
     },
     {
@@ -804,7 +804,7 @@
         "name": "Ceasefire",
         "colour": "lime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **lime** player activates a system that contains 1 or more of your units: The **lime** player cannot move units to the active system. Then return this card to the **lime** player."
     },
     {
@@ -812,7 +812,7 @@
         "name": "Political Secret",
         "colour": "lime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **lime** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lime** player."
     },
     {
@@ -820,7 +820,7 @@
         "name": "Support for the Throne",
         "colour": "lime",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lime** player's units, or if the **lime** player is eliminated, lose 1 victory point and return this card to the **lime** player."
     },
     {
@@ -828,7 +828,7 @@
         "name": "Trade Agreement",
         "colour": "lime",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **lime** player replenishes commodities: The **lime** player gives you all of their commodities. Then, return this card to the **lime** player."
     },
     {
@@ -836,7 +836,7 @@
         "name": "Alliance",
         "colour": "lime",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lime** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lime** player's units, return this card to the **lime** player."
     },
     {
@@ -844,7 +844,7 @@
         "name": "Ceasefire",
         "colour": "lavender",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **lavender** player activates a system that contains 1 or more of your units: The **lavender** player cannot move units to the active system. Then return this card to the **lavender** player."
     },
     {
@@ -852,7 +852,7 @@
         "name": "Political Secret",
         "colour": "lavender",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **lavender** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lavender** player."
     },
     {
@@ -860,7 +860,7 @@
         "name": "Support for the Throne",
         "colour": "lavender",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lavender** player's units, or if the **lavender** player is eliminated, lose 1 victory point and return this card to the **lavender** player."
     },
     {
@@ -868,7 +868,7 @@
         "name": "Trade Agreement",
         "colour": "lavender",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **lavender** player replenishes commodities: The **lavender** player gives you all of their commodities. Then, return this card to the **lavender** player."
     },
     {
@@ -876,7 +876,7 @@
         "name": "Alliance",
         "colour": "lavender",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lavender** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lavender** player's units, return this card to the **lavender** player."
     },
     {
@@ -884,7 +884,7 @@
         "name": "Ceasefire",
         "colour": "bloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **bloodred** player activates a system that contains 1 or more of your units: The **bloodred** player cannot move units to the active system. Then return this card to the **bloodred** player."
     },
     {
@@ -892,7 +892,7 @@
         "name": "Political Secret",
         "colour": "bloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **bloodred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **bloodred** player."
     },
     {
@@ -900,7 +900,7 @@
         "name": "Support for the Throne",
         "colour": "bloodred",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **bloodred** player's units, or if the **bloodred** player is eliminated, lose 1 victory point and return this card to the **bloodred** player."
     },
     {
@@ -908,7 +908,7 @@
         "name": "Trade Agreement",
         "colour": "bloodred",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **bloodred** player replenishes commodities: The **bloodred** player gives you all of their commodities. Then, return this card to the **bloodred** player."
     },
     {
@@ -916,7 +916,7 @@
         "name": "Alliance",
         "colour": "bloodred",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **bloodred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **bloodred** player's units, return this card to the **bloodred** player."
     },
     {
@@ -924,7 +924,7 @@
         "name": "Ceasefire",
         "colour": "chocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **chocolate** player activates a system that contains 1 or more of your units: The **chocolate** player cannot move units to the active system. Then return this card to the **chocolate** player."
     },
     {
@@ -932,7 +932,7 @@
         "name": "Political Secret",
         "colour": "chocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **chocolate** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chocolate** player."
     },
     {
@@ -940,7 +940,7 @@
         "name": "Support for the Throne",
         "colour": "chocolate",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chocolate** player's units, or if the **chocolate** player is eliminated, lose 1 victory point and return this card to the **chocolate** player."
     },
     {
@@ -948,7 +948,7 @@
         "name": "Trade Agreement",
         "colour": "chocolate",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **chocolate** player replenishes commodities: The **chocolate** player gives you all of their commodities. Then, return this card to the **chocolate** player."
     },
     {
@@ -956,7 +956,7 @@
         "name": "Alliance",
         "colour": "chocolate",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chocolate** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chocolate** player's units, return this card to the **chocolate** player."
     },
     {
@@ -964,7 +964,7 @@
         "name": "Ceasefire",
         "colour": "emerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **emerald** player activates a system that contains 1 or more of your units: The **emerald** player cannot move units to the active system. Then return this card to the **emerald** player."
     },
     {
@@ -972,7 +972,7 @@
         "name": "Political Secret",
         "colour": "emerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **emerald** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **emerald** player."
     },
     {
@@ -980,7 +980,7 @@
         "name": "Support for the Throne",
         "colour": "emerald",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **emerald** player's units, or if the **emerald** player is eliminated, lose 1 victory point and return this card to the **emerald** player."
     },
     {
@@ -988,7 +988,7 @@
         "name": "Trade Agreement",
         "colour": "emerald",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **emerald** player replenishes commodities: The **emerald** player gives you all of their commodities. Then, return this card to the **emerald** player."
     },
     {
@@ -996,7 +996,7 @@
         "name": "Alliance",
         "colour": "emerald",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area. While this card is in your play area, you can use the **emerald** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **emerald** player's units, return this card to the **emerald** player."
     },
     {
@@ -1004,7 +1004,7 @@
         "name": "Ceasefire",
         "colour": "navy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **navy** player activates a system that contains 1 or more of your units: The **navy** player cannot move units to the active system. Then return this card to the **navy** player."
     },
     {
@@ -1012,7 +1012,7 @@
         "name": "Political Secret",
         "colour": "navy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **navy** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **navy** player."
     },
     {
@@ -1020,7 +1020,7 @@
         "name": "Support for the Throne",
         "colour": "navy",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **navy** player's units, or if the **navy** player is eliminated, lose 1 victory point and return this card to the **navy** player."
     },
     {
@@ -1028,7 +1028,7 @@
         "name": "Trade Agreement",
         "colour": "navy",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **navy** player replenishes commodities: The **navy** player gives you all of their commodities. Then, return this card to the **navy** player."
     },
     {
@@ -1036,7 +1036,7 @@
         "name": "Alliance",
         "colour": "navy",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area. While this card is in your play area, you can use the **navy** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **navy** player's units, return this card to the **navy** player."
     },
     {
@@ -1044,7 +1044,7 @@
         "name": "Ceasefire",
         "colour": "rose",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **rose** player activates a system that contains 1 or more of your units: The **rose** player cannot move units to the active system. Then return this card to the **rose** player."
     },
     {
@@ -1052,7 +1052,7 @@
         "name": "Political Secret",
         "colour": "rose",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **rose** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rose** player."
     },
     {
@@ -1060,7 +1060,7 @@
         "name": "Support for the Throne",
         "colour": "rose",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rose** player's units, or if the **rose** player is eliminated, lose 1 victory point and return this card to the **rose** player."
     },
     {
@@ -1068,7 +1068,7 @@
         "name": "Trade Agreement",
         "colour": "rose",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **rose** player replenishes commodities: The **rose** player gives you all of their commodities. Then, return this card to the **rose** player."
     },
     {
@@ -1076,7 +1076,7 @@
         "name": "Alliance",
         "colour": "rose",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rose** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rose** player's units, return this card to the **rose** player."
     },
     {
@@ -1084,7 +1084,7 @@
         "name": "Ceasefire",
         "colour": "spring",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **spring** player activates a system that contains 1 or more of your units: The **spring** player cannot move units to the active system. Then return this card to the **spring** player."
     },
     {
@@ -1092,7 +1092,7 @@
         "name": "Political Secret",
         "colour": "spring",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **spring** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **spring** player."
     },
     {
@@ -1100,7 +1100,7 @@
         "name": "Support for the Throne",
         "colour": "spring",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **spring** player's units, or if the **spring** player is eliminated, lose 1 victory point and return this card to the **spring** player."
     },
     {
@@ -1108,7 +1108,7 @@
         "name": "Trade Agreement",
         "colour": "spring",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **spring** player replenishes commodities: The **spring** player gives you all of their commodities. Then, return this card to the **spring** player."
     },
     {
@@ -1116,7 +1116,7 @@
         "name": "Alliance",
         "colour": "spring",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area. While this card is in your play area, you can use the **spring** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **spring** player's units, return this card to the **spring** player."
     },
     {
@@ -1124,7 +1124,7 @@
         "name": "Ceasefire",
         "colour": "teal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **teal** player activates a system that contains 1 or more of your units: The **teal** player cannot move units to the active system. Then return this card to the **teal** player."
     },
     {
@@ -1132,7 +1132,7 @@
         "name": "Political Secret",
         "colour": "teal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **teal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **teal** player."
     },
     {
@@ -1140,7 +1140,7 @@
         "name": "Support for the Throne",
         "colour": "teal",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **teal** player's units, or if the **teal** player is eliminated, lose 1 victory point and return this card to the **teal** player."
     },
     {
@@ -1148,7 +1148,7 @@
         "name": "Trade Agreement",
         "colour": "teal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **teal** player replenishes commodities: The **teal** player gives you all of their commodities. Then, return this card to the **teal** player."
     },
     {
@@ -1156,7 +1156,7 @@
         "name": "Alliance",
         "colour": "teal",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **teal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **teal** player's units, return this card to the **teal** player."
     },
     {
@@ -1164,7 +1164,7 @@
         "name": "Ceasefire",
         "colour": "brown",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **brown** player activates a system that contains 1 or more of your units: The **brown** player cannot move units to the active system. Then return this card to the **brown** player."
     },
     {
@@ -1172,7 +1172,7 @@
         "name": "Political Secret",
         "colour": "brown",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **brown** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **brown** player."
     },
     {
@@ -1180,7 +1180,7 @@
         "name": "Support for the Throne",
         "colour": "brown",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **brown** player's units, or if the **brown** player is eliminated, lose 1 victory point and return this card to the **brown** player."
     },
     {
@@ -1188,7 +1188,7 @@
         "name": "Trade Agreement",
         "colour": "brown",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **brown** player replenishes commodities: The **brown** player gives you all of their commodities. Then, return this card to the **brown** player."
     },
     {
@@ -1196,7 +1196,7 @@
         "name": "Alliance",
         "colour": "brown",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area. While this card is in your play area, you can use the **brown** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **brown** player's units, return this card to the **brown** player."
     },
     {
@@ -1204,7 +1204,7 @@
         "name": "Ceasefire",
         "colour": "chrome",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **chrome** player activates a system that contains 1 or more of your units: The **chrome** player cannot move units to the active system. Then return this card to the **chrome** player."
     },
     {
@@ -1212,7 +1212,7 @@
         "name": "Political Secret",
         "colour": "chrome",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **chrome** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chrome** player."
     },
     {
@@ -1220,7 +1220,7 @@
         "name": "Support for the Throne",
         "colour": "chrome",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chrome** player's units, or if the **chrome** player is eliminated, lose 1 victory point and return this card to the **chrome** player."
     },
     {
@@ -1228,7 +1228,7 @@
         "name": "Trade Agreement",
         "colour": "chrome",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **chrome** player replenishes commodities: The **chrome** player gives you all of their commodities. Then, return this card to the **chrome** player."
     },
     {
@@ -1236,7 +1236,7 @@
         "name": "Alliance",
         "colour": "chrome",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chrome** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chrome** player's units, return this card to the **chrome** player."
     },
     {
@@ -1244,7 +1244,7 @@
         "name": "Ceasefire",
         "colour": "forest",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **forest** player activates a system that contains 1 or more of your units: The **forest** player cannot move units to the active system. Then return this card to the **forest** player."
     },
     {
@@ -1252,7 +1252,7 @@
         "name": "Political Secret",
         "colour": "forest",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **forest** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **forest** player."
     },
     {
@@ -1260,7 +1260,7 @@
         "name": "Support for the Throne",
         "colour": "forest",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **forest** player's units, or if the **forest** player is eliminated, lose 1 victory point and return this card to the **forest** player."
     },
     {
@@ -1268,7 +1268,7 @@
         "name": "Trade Agreement",
         "colour": "forest",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **forest** player replenishes commodities: The **forest** player gives you all of their commodities. Then, return this card to the **forest** player."
     },
     {
@@ -1276,7 +1276,7 @@
         "name": "Alliance",
         "colour": "forest",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area. While this card is in your play area, you can use the **forest** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **forest** player's units, return this card to the **forest** player."
     },
     {
@@ -1284,7 +1284,7 @@
         "name": "Ceasefire",
         "colour": "gold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **gold** player activates a system that contains 1 or more of your units: The **gold** player cannot move units to the active system. Then return this card to the **gold** player."
     },
     {
@@ -1292,7 +1292,7 @@
         "name": "Political Secret",
         "colour": "gold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **gold** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gold** player."
     },
     {
@@ -1300,7 +1300,7 @@
         "name": "Support for the Throne",
         "colour": "gold",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gold** player's units, or if the **gold** player is eliminated, lose 1 victory point and return this card to the **gold** player."
     },
     {
@@ -1308,7 +1308,7 @@
         "name": "Trade Agreement",
         "colour": "gold",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **gold** player replenishes commodities: The **gold** player gives you all of their commodities. Then, return this card to the **gold** player."
     },
     {
@@ -1316,7 +1316,7 @@
         "name": "Alliance",
         "colour": "gold",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gold** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gold** player's units, return this card to the **gold** player."
     },
     {
@@ -1324,7 +1324,7 @@
         "name": "Ceasefire",
         "colour": "lightgray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **lightgray** player activates a system that contains 1 or more of your units: The **lightgray** player cannot move units to the active system. Then return this card to the **lightgray** player."
     },
     {
@@ -1332,7 +1332,7 @@
         "name": "Political Secret",
         "colour": "lightgray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **lightgray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lightgray** player."
     },
     {
@@ -1340,7 +1340,7 @@
         "name": "Support for the Throne",
         "colour": "lightgray",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lightgray** player's units, or if the **lightgray** player is eliminated, lose 1 victory point and return this card to the **lightgray** player."
     },
     {
@@ -1348,7 +1348,7 @@
         "name": "Trade Agreement",
         "colour": "lightgray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **lightgray** player replenishes commodities: The **lightgray** player gives you all of their commodities. Then, return this card to the **lightgray** player."
     },
     {
@@ -1356,7 +1356,7 @@
         "name": "Alliance",
         "colour": "lightgray",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lightgray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lightgray** player's units, return this card to the **lightgray** player."
     },
     {
@@ -1364,7 +1364,7 @@
         "name": "Ceasefire",
         "colour": "petrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **petrol** player activates a system that contains 1 or more of your units: The **petrol** player cannot move units to the active system. Then return this card to the **petrol** player."
     },
     {
@@ -1372,7 +1372,7 @@
         "name": "Political Secret",
         "colour": "petrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **petrol** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **petrol** player."
     },
     {
@@ -1380,7 +1380,7 @@
         "name": "Support for the Throne",
         "colour": "petrol",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **petrol** player's units, or if the **petrol** player is eliminated, lose 1 victory point and return this card to the **petrol** player."
     },
     {
@@ -1388,7 +1388,7 @@
         "name": "Trade Agreement",
         "colour": "petrol",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **petrol** player replenishes commodities: The **petrol** player gives you all of their commodities. Then, return this card to the **petrol** player."
     },
     {
@@ -1396,7 +1396,7 @@
         "name": "Alliance",
         "colour": "petrol",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area. While this card is in your play area, you can use the **petrol** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **petrol** player's units, return this card to the **petrol** player."
     },
     {
@@ -1404,7 +1404,7 @@
         "name": "Ceasefire",
         "colour": "sunset",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **sunset** player activates a system that contains 1 or more of your units: The **sunset** player cannot move units to the active system. Then return this card to the **sunset** player."
     },
     {
@@ -1412,7 +1412,7 @@
         "name": "Political Secret",
         "colour": "sunset",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **sunset** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **sunset** player."
     },
     {
@@ -1420,7 +1420,7 @@
         "name": "Support for the Throne",
         "colour": "sunset",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **sunset** player's units, or if the **sunset** player is eliminated, lose 1 victory point and return this card to the **sunset** player."
     },
     {
@@ -1428,7 +1428,7 @@
         "name": "Trade Agreement",
         "colour": "sunset",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **sunset** player replenishes commodities: The **sunset** player gives you all of their commodities. Then, return this card to the **sunset** player."
     },
     {
@@ -1436,7 +1436,7 @@
         "name": "Alliance",
         "colour": "sunset",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area. While this card is in your play area, you can use the **sunset** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **sunset** player's units, return this card to the **sunset** player."
     },
     {
@@ -1444,7 +1444,7 @@
         "name": "Ceasefire",
         "colour": "tan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **tan** player activates a system that contains 1 or more of your units: The **tan** player cannot move units to the active system. Then return this card to the **tan** player."
     },
     {
@@ -1452,7 +1452,7 @@
         "name": "Political Secret",
         "colour": "tan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **tan** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **tan** player."
     },
     {
@@ -1460,7 +1460,7 @@
         "name": "Support for the Throne",
         "colour": "tan",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **tan** player's units, or if the **tan** player is eliminated, lose 1 victory point and return this card to the **tan** player."
     },
     {
@@ -1468,7 +1468,7 @@
         "name": "Trade Agreement",
         "colour": "tan",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **tan** player replenishes commodities: The **tan** player gives you all of their commodities. Then, return this card to the **tan** player."
     },
     {
@@ -1476,7 +1476,7 @@
         "name": "Alliance",
         "colour": "tan",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area. While this card is in your play area, you can use the **tan** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **tan** player's units, return this card to the **tan** player."
     },
     {
@@ -1484,7 +1484,7 @@
         "name": "Ceasefire",
         "colour": "turquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **turquoise** player activates a system that contains 1 or more of your units: The **turquoise** player cannot move units to the active system. Then return this card to the **turquoise** player."
     },
     {
@@ -1492,7 +1492,7 @@
         "name": "Political Secret",
         "colour": "turquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **turquoise** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **turquoise** player."
     },
     {
@@ -1500,7 +1500,7 @@
         "name": "Support for the Throne",
         "colour": "turquoise",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **turquoise** player's units, or if the **turquoise** player is eliminated, lose 1 victory point and return this card to the **turquoise** player."
     },
     {
@@ -1508,7 +1508,7 @@
         "name": "Trade Agreement",
         "colour": "turquoise",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **turquoise** player replenishes commodities: The **turquoise** player gives you all of their commodities. Then, return this card to the **turquoise** player."
     },
     {
@@ -1516,7 +1516,7 @@
         "name": "Alliance",
         "colour": "turquoise",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area. While this card is in your play area, you can use the **turquoise** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **turquoise** player's units, return this card to the **turquoise** player."
     },
     {
@@ -1524,7 +1524,7 @@
         "name": "Ceasefire",
         "colour": "purple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **purple** player activates a system that contains 1 or more of your units: The **purple** player cannot move units to the active system. Then return this card to the **purple** player."
     },
     {
@@ -1532,7 +1532,7 @@
         "name": "Political Secret",
         "colour": "purple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **purple** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **purple** player."
     },
     {
@@ -1540,7 +1540,7 @@
         "name": "Support for the Throne",
         "colour": "purple",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **purple** player's units, or if the **purple** player is eliminated, lose 1 victory point and return this card to the **purple** player."
     },
     {
@@ -1548,7 +1548,7 @@
         "name": "Trade Agreement",
         "colour": "purple",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **purple** player replenishes commodities: The **purple** player gives you all of their commodities. Then, return this card to the **purple** player."
     },
     {
@@ -1556,7 +1556,7 @@
         "name": "Alliance",
         "colour": "purple",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **purple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **purple** player's units, return this card to the **purple** player."
     },
     {
@@ -1564,7 +1564,7 @@
         "name": "Ceasefire",
         "colour": "pink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **pink** player activates a system that contains 1 or more of your units: The **pink** player cannot move units to the active system. Then return this card to the **pink** player."
     },
     {
@@ -1572,7 +1572,7 @@
         "name": "Political Secret",
         "colour": "pink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **pink** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **pink** player."
     },
     {
@@ -1580,7 +1580,7 @@
         "name": "Support for the Throne",
         "colour": "pink",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **pink** player's units, or if the **pink** player is eliminated, lose 1 victory point and return this card to the **pink** player."
     },
     {
@@ -1588,7 +1588,7 @@
         "name": "Trade Agreement",
         "colour": "pink",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the pink player replenishes commodities: The **pink** player gives you all of their commodities. Then, return this card to the **pink** player."
     },
     {
@@ -1596,7 +1596,7 @@
         "name": "Alliance",
         "colour": "pink",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area. While this card is in your play area, you can use the pink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **pink** player's units, return this card to the **pink** player."
     },
     {
@@ -1604,7 +1604,7 @@
         "name": "Ceasefire",
         "colour": "blue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **blue** player activates a system that contains 1 or more of your units: The **blue** player cannot move units to the active system. Then return this card to the **blue** player."
     },
     {
@@ -1612,7 +1612,7 @@
         "name": "Political Secret",
         "colour": "blue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **blue** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **blue** player."
     },
     {
@@ -1620,7 +1620,7 @@
         "name": "Support for the Throne",
         "colour": "blue",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **blue** player's units, or if the **blue** player is eliminated, lose 1 victory point and return this card to the **blue** player."
     },
     {
@@ -1628,7 +1628,7 @@
         "name": "Trade Agreement",
         "colour": "blue",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **blue** player replenishes commodities: The **blue** player gives you all of their commodities. Then, return this card to the **blue** player."
     },
     {
@@ -1636,7 +1636,7 @@
         "name": "Alliance",
         "colour": "blue",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **blue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **blue** player's units, return this card to the **blue** player."
     },
     {
@@ -1644,7 +1644,7 @@
         "name": "Ceasefire",
         "colour": "green",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **green** player activates a system that contains 1 or more of your units: The **green** player cannot move units to the active system. Then return this card to the **green** player."
     },
     {
@@ -1652,7 +1652,7 @@
         "name": "Political Secret",
         "colour": "green",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **green** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **green** player."
     },
     {
@@ -1660,7 +1660,7 @@
         "name": "Support for the Throne",
         "colour": "green",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **green** player's units, or if the **green** player is eliminated, lose 1 victory point and return this card to the **green** player."
     },
     {
@@ -1668,7 +1668,7 @@
         "name": "Trade Agreement",
         "colour": "green",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **green** player replenishes commodities: The **green** player gives you all of their commodities. Then, return this card to the **green** player."
     },
     {
@@ -1676,7 +1676,7 @@
         "name": "Alliance",
         "colour": "green",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area. While this card is in your play area, you can use the **green** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **green** player's units, return this card to the **green** player."
     },
     {
@@ -1684,7 +1684,7 @@
         "name": "Ceasefire",
         "colour": "gray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **gray** player activates a system that contains 1 or more of your units: The **gray** player cannot move units to the active system. Then return this card to the **gray** player."
     },
     {
@@ -1692,7 +1692,7 @@
         "name": "Political Secret",
         "colour": "gray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **gray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gray** player."
     },
     {
@@ -1700,7 +1700,7 @@
         "name": "Support for the Throne",
         "colour": "gray",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gray** player's units, or if the **gray** player is eliminated, lose 1 victory point and return this card to the **gray** player."
     },
     {
@@ -1708,7 +1708,7 @@
         "name": "Trade Agreement",
         "colour": "gray",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **gray** player replenishes commodities: The **gray** player gives you all of their commodities. Then, return this card to the **gray** player."
     },
     {
@@ -1716,7 +1716,7 @@
         "name": "Alliance",
         "colour": "gray",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gray** player's units, return this card to the **gray** player."
     },
     {
@@ -1724,7 +1724,7 @@
         "name": "Ceasefire",
         "colour": "red",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **red** player activates a system that contains 1 or more of your units: The **red** player cannot move units to the active system. Then return this card to the **red** player."
     },
     {
@@ -1732,7 +1732,7 @@
         "name": "Political Secret",
         "colour": "red",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **red** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **red** player."
     },
     {
@@ -1740,7 +1740,7 @@
         "name": "Support for the Throne",
         "colour": "red",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **red** player's units, or if the **red** player is eliminated, lose 1 victory point and return this card to the **red** player."
     },
     {
@@ -1748,7 +1748,7 @@
         "name": "Trade Agreement",
         "colour": "red",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **red** player replenishes commodities: The **red** player gives you all of their commodities. Then, return this card to the **red** player."
     },
     {
@@ -1756,7 +1756,7 @@
         "name": "Alliance",
         "colour": "red",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area. While this card is in your play area, you can use the **red** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **red** player's units, return this card to the **red** player."
     },
     {
@@ -1764,7 +1764,7 @@
         "name": "Ceasefire",
         "colour": "yellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **yellow** player activates a system that contains 1 or more of your units: The **yellow** player cannot move units to the active system. Then return this card to the **yellow** player."
     },
     {
@@ -1772,7 +1772,7 @@
         "name": "Political Secret",
         "colour": "yellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **yellow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **yellow** player."
     },
     {
@@ -1780,7 +1780,7 @@
         "name": "Support for the Throne",
         "colour": "yellow",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **yellow** player's units, or if the **yellow** player is eliminated, lose 1 victory point and return this card to the **yellow** player."
     },
     {
@@ -1788,7 +1788,7 @@
         "name": "Trade Agreement",
         "colour": "yellow",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **yellow** player replenishes commodities: The **yellow** player gives you all of their commodities. Then, return this card to the **yellow** player."
     },
     {
@@ -1796,7 +1796,7 @@
         "name": "Alliance",
         "colour": "yellow",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **yellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **yellow** player's units, return this card to the **yellow** player."
     },
     {
@@ -1804,7 +1804,7 @@
         "name": "Ceasefire",
         "colour": "black",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **black** player activates a system that contains 1 or more of your units: The **black** player cannot move units to the active system. Then return this card to the **black** player."
     },
     {
@@ -1812,7 +1812,7 @@
         "name": "Political Secret",
         "colour": "black",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **black** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **black** player."
     },
     {
@@ -1820,7 +1820,7 @@
         "name": "Support for the Throne",
         "colour": "black",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **black** player's units, or if the **black** player is eliminated, lose 1 victory point and return this card to the **black** player."
     },
     {
@@ -1828,7 +1828,7 @@
         "name": "Trade Agreement",
         "colour": "black",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **black** player replenishes commodities: The **black** player gives you all of their commodities. Then, return this card to the **black** player."
     },
     {
@@ -1836,7 +1836,7 @@
         "name": "Alliance",
         "colour": "black",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area. While this card is in your play area, you can use the **black** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **black** player's units, return this card to the **black** player."
     },
     {
@@ -1844,7 +1844,7 @@
         "name": "Ceasefire",
         "colour": "orange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **orange** player activates a system that contains 1 or more of your units: The **orange** player cannot move units to the active system. Then return this card to the **orange** player."
     },
     {
@@ -1852,7 +1852,7 @@
         "name": "Political Secret",
         "colour": "orange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **orange** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **orange** player."
     },
     {
@@ -1860,7 +1860,7 @@
         "name": "Support for the Throne",
         "colour": "orange",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **orange** player's units, or if the **orange** player is eliminated, lose 1 victory point and return this card to the **orange** player."
     },
     {
@@ -1868,7 +1868,7 @@
         "name": "Trade Agreement",
         "colour": "orange",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **orange** player replenishes commodities: The **orange** player gives you all of their commodities. Then, return this card to the **orange** player."
     },
     {
@@ -1876,7 +1876,7 @@
         "name": "Alliance",
         "colour": "orange",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **orange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **orange** player's units, return this card to the **orange** player."
     },
     {
@@ -1885,7 +1885,7 @@
         "faction": "argent",
         "colour": "",
         "playArea": "false",
-        "source": "PoK",
+        "source": "pok",
         "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player."
     },
     {
@@ -1894,7 +1894,7 @@
         "faction": "letnev",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After you and your opponent roll dice during space combat: You may reroll all of your opponent's dice. You may reroll any number of your dice. Then, return this card to the Letnev player."
     },
     {
@@ -1903,7 +1903,7 @@
         "faction": "saar",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After you commit 1 or more units to land on a planet: Remove all of the Saar player's ground forces from that planet and place them on a planet controlled by the Saar player. Then, return this card to the Saar player."
     },
     {
@@ -1912,7 +1912,7 @@
         "faction": "muaat",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player."
     },
     {
@@ -1921,7 +1921,7 @@
         "faction": "hacan",
         "colour": "",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "Action: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
     },
     {
@@ -1930,7 +1930,7 @@
         "faction": "empyrean",
         "colour": "",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "Action: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
@@ -1939,7 +1939,7 @@
         "faction": "sol",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of the Sol player's turn: Remove 1 token from the Sol player's strategy pool, if able, and return it to their reinforcements. Then, you may place 2 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
     },
     {
@@ -1948,7 +1948,7 @@
         "faction": "ghost",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of your turn during the action phase: Place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships. Then, return this card to the Creuss player."
     },
     {
@@ -1957,7 +1957,7 @@
         "faction": "l1z1x",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player."
     },
     {
@@ -1966,7 +1966,7 @@
         "faction": "mahact",
         "colour": "",
         "playArea": "false",
-        "source": "PoK",
+        "source": "pok",
         "text": "At the start of the strategy phase: Choose 1 non-home system that contains your units, each other player who has a token on the Mahact player's command sheet places a token from their reinforcements in that system. Then, return this card to the Mahact player."
     },
     {
@@ -1975,7 +1975,7 @@
         "faction": "mentak",
         "colour": "",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
     },
     {
@@ -1984,7 +1984,7 @@
         "faction": "naalu",
         "colour": "",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card, you are the first in initiative order. The Naalu player cannot use his Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
     },
     {
@@ -1993,7 +1993,7 @@
         "faction": "naaz",
         "colour": "",
         "playArea": "false",
-        "source": "PoK",
+        "source": "pok",
         "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player."
     },
     {
@@ -2002,7 +2002,7 @@
         "faction": "nekro",
         "colour": "",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of a combat: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player."
     },
     {
@@ -2011,7 +2011,7 @@
         "faction": "nomad",
         "colour": "",
         "playArea": "false",
-        "source": "PoK",
+        "source": "pok",
         "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the Sustain Damage ability, combat value, and Anti-Fighter Barrage value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
     },
     {
@@ -2020,7 +2020,7 @@
         "faction": "sardakk",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of an invasion combat: Apply +1 to the result of each of your unit's combat rolls during this combat. If your opponent is the N'orr player, apply -1 to the result of each of their unit's combat rolls during this combat. Then, return this card to the N'orr player."
     },
     {
@@ -2030,7 +2030,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "titanspn",
-        "source": "PoK",
+        "source": "pok",
         "text": "Action: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
     },
     {
@@ -2039,7 +2039,7 @@
         "faction": "jolnar",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the Jol-Nar player researches a technology that is not a faction technology: Gain that technology. Then, return this card to the Jol-Nar player."
     },
     {
@@ -2048,7 +2048,7 @@
         "faction": "cabal",
         "colour": "",
         "playArea": "false",
-        "source": "PoK",
+        "source": "pok",
         "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player."
     },
     {
@@ -2057,7 +2057,7 @@
         "faction": "winnu",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
     },
     {
@@ -2066,7 +2066,7 @@
         "faction": "xxcha",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: Remove 1 token from the Xxcha player's strategy pool and return it to their reinforcements. Then, discard the revealed agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead. Then, return this card to the Xxcha player."
     },
     {
@@ -2075,7 +2075,7 @@
         "faction": "yin",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of a ground combat against 2 or more ground forces that are not controlled by the Yin player: Replace 1 of your opponent's infantry with 1 infantry from your reinforcements. Then, return this card to the Yin player."
     },
     {
@@ -2084,7 +2084,7 @@
         "faction": "yssaril",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "At the start of your turn: Look at the Yssaril player's hand of action cards. Choose 1 of those cards and add it to your hand. Then, return this card to the Yssaril player."
     },
     {
@@ -2093,7 +2093,7 @@
         "faction": "arborec",
         "colour": "",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After another player moves ships into a system that contains 1 or more of your units: You may place 1 command token from that player's reinforcements in any non-home system. Then, return this card to the Arborec player."
     },
     {
@@ -2102,7 +2102,7 @@
         "faction": "empyrean",
         "colour": "",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "Action: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
@@ -2111,7 +2111,7 @@
         "faction": "keleres",
         "colour": "",
         "playArea": "false",
-        "source": "Codex III",
+        "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
     {
@@ -2120,7 +2120,7 @@
         "faction": "keleresa",
         "colour": "",
         "playArea": "false",
-        "source": "Codex III",
+        "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
     {
@@ -2129,7 +2129,7 @@
         "faction": "keleresm",
         "colour": "",
         "playArea": "false",
-        "source": "Codex III",
+        "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
     {
@@ -2138,7 +2138,7 @@
         "faction": "keleresx",
         "colour": "",
         "playArea": "false",
-        "source": "Codex III",
+        "source": "codex3",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
     },
     {
@@ -2147,7 +2147,7 @@
         "faction": "admins",
         "colour": "",
         "playArea": "false",
-        "source": "Admins",
+        "source": "admins",
         "text": "Action: move one of your structures to another eligible area that contains one or more of your units and place a command token from you reinforcements in that system. Then, return this card to the Admins player."
     },
     {
@@ -2156,7 +2156,7 @@
         "faction": "augers",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Place this face up in your play area.While this card is in your play area, you may look at the public objective card on the Ilyxum player's faction sheet.If you activate a system that contains 1 or more of the Ilyxum player's units, return this card to the Ilyxum player."
     },
     {
@@ -2165,7 +2165,7 @@
         "faction": "axis",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When 1 or more of your units use PRODUCTION:Place this card face up in your play area to apply +4 to the PRODUCTION value of those units and reduce the combined cost of the produced units by 1 for this use of PRODUCTION.At the beginning of the status phase, return this card to the Axis player."
     },
     {
@@ -2175,7 +2175,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "encryptionkey",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Attach this card to a non-home planet you control.This planet has 1 technology specialty of any color."
     },
     {
@@ -2184,7 +2184,7 @@
         "faction": "blex",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of a ground combat against a player other than the Blex player: Apply -1 to the result of each of your opponent's unit's combat rolls during this combat.Then, return this card to the Blex player."
     },
     {
@@ -2193,7 +2193,7 @@
         "faction": "celdauri",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you receive this card, if you are not the Celdauri player, you must place it face up in your play area. While this card is in your play area, you can use the Celdauri player's commander ability, if it is unlocked. If you activate a system that contains 1 or more of the Celdauri player's units, return this card to the Celdauri player."
     },
     {
@@ -2202,7 +2202,7 @@
         "faction": "cheiran",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.At the end of that combat, return this card to the Cheiran Hordes player."
     },
     {
@@ -2211,7 +2211,7 @@
         "faction": "cymiae",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.Then, purge this card."
     },
     {
@@ -2220,7 +2220,7 @@
         "faction": "dihmohn",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When 1 of your ships would be destroyed: Instead of destroying that ship, place this card face up in your play area.Return this card to the Dih-Mohn player at the start of the status phase."
     },
     {
@@ -2229,7 +2229,7 @@
         "faction": "edyn",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a system that contains your units. Then, return this card to the Edyn player."
     },
     {
@@ -2238,7 +2238,7 @@
         "faction": "florzen",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you would gain a relic:You may draw 1 additional card.  Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.Then, return this card to the Florzen player."
     },
     {
@@ -2247,7 +2247,7 @@
         "faction": "freesystems",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you gain control of a planet during a tactical action:If the active system does not contain another player's ships, you may produce up to 2 ships in that system.Then, return this card to the Free Systems player."
     },
     {
@@ -2256,7 +2256,7 @@
         "faction": "ghemina",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After you activate a system:Choose 1 non-fighter ship you control.  During this action, that unit gains BOMBARDMENT 5(x2) and a capacity value of 2.Return this card to the Ghemina player at the end of this action."
     },
     {
@@ -2265,7 +2265,7 @@
         "faction": "ghoti",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of your turn: Place this card in your play area to produce up to 2 ships in a system that contains 1 or more of your ships.At the start of the status phase, return this card to the Ghoti Player."
     },
     {
@@ -2275,7 +2275,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "gledgebase",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Attach this card to a non-home planet you control. This planet's resource value is increased by 2."
     },
     {
@@ -2284,7 +2284,7 @@
         "faction": "khrask",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "During a tactical action, when you produce 1 or more hits during a BOMBARDMENT roll:For each hit you produced, you may instead place 1 infantry from your reinforcements on the planet being bombarded.Then, return this card to the L'tokk Khrask player."
     },
     {
@@ -2293,7 +2293,7 @@
         "faction": "kjalengard",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of combat:Apply +1 to the results of each of your fighters' combat rolls during this combat. The Kjalengard player captures each of your fighters destroyed during this combat.Then, return this card to the Kjalengard player."
     },
     {
@@ -2302,7 +2302,7 @@
         "faction": "kollecc",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of your turn:You may look at either the top card of the cultural, hazardous, and industrial exploration decks, or the top card of the relic deck.Then, return this card to the Kollecc player."
     },
     {
@@ -2311,7 +2311,7 @@
         "faction": "kolume",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of invasion, place this card in your play area.During this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.At the start of your next turn, return this card to the Kolume player."
     },
     {
@@ -2320,7 +2320,7 @@
         "faction": "kortali",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.At the start of the status phase, return this card to the Kortali player."
     },
     {
@@ -2329,7 +2329,7 @@
         "faction": "kyro",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 3 infantry from your reinforcements on a planet you control. Then, return this card to the Kyro player."
     },
     {
@@ -2338,7 +2338,7 @@
         "faction": "lanefir",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After you win a combat: Place this card face-up in your play area to explore 1 planet you control.At the start of the Lanefir player's turn, return this card to the Lanefir player."
     },
     {
@@ -2347,7 +2347,7 @@
         "faction": "lizho",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of a space combat you are participating in:You may place up to 2 fighters from your reinforcements into the space area of the active system.Then, return this card to the Li-Zho player."
     },
     {
@@ -2356,7 +2356,7 @@
         "faction": "mirveda",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of your turn:You may move up to 2 PDS units you control to a planet you control. Then, return this card to the Mirveda player."
     },
     {
@@ -2365,7 +2365,7 @@
         "faction": "mortheus",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of a space combat while you are the defender:You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system. Then, return this card to the Mortheus player."
     },
     {
@@ -2374,7 +2374,7 @@
         "faction": "mykomentori",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Place this card face up in your play area.While this card is in your play area, once per turn, after you roll a die, you may reroll that die.If you activate a system that contains 1 or more of the Myko-Mentori player's units, return this card to the Myko-Mentori player."
     },
     {
@@ -2383,7 +2383,7 @@
         "faction": "nivyn",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After you activate a system:During this activation, you may ignore the effects of each anomaly.Return this card to the Nivyn player at the end of this activation."
     },
     {
@@ -2392,7 +2392,7 @@
         "faction": "nokar",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of a space combat:During this combat, the active system is adjacent to each system that contains a planet you control for the purposes of announcing and resolving retreats.At the end of this combat, return this card to the Nokar player."
     },
     {
@@ -2401,7 +2401,7 @@
         "faction": "olradin",
         "colour": "",
         "playArea": "true",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "Action: Place this card face up in your play area to choose and exhaust 1 planet you control. Then, ready 1 non-home planet you control other than Mecatol Rex.At the start of the status phase, return this card to the Olradin player."
     },
     {
@@ -2411,7 +2411,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "automatons",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex. This planet has PRODUCTION 3 as if it were a unit."
     },
     {
@@ -2420,7 +2420,7 @@
         "faction": "tnelis",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck.  Shuffle that deck. Then, return this card to the Tnelis player."
     },
     {
@@ -2429,7 +2429,7 @@
         "faction": "vaden",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "After you activate a system:You may spend any number of trade goods. For each trade good spent, apply +1 to the move value of 1 non-fighter ship you control during this activation.Return this card to the Vaden player at the end of this activation."
     },
     {
@@ -2438,7 +2438,7 @@
         "faction": "vaylerian",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "At the start of a round of space combat:The Vaylerian player discards 1 action card. Then, move all of your ships from the active system to an adjacent system that does not contain another player's ships.  The space combat ends in a draw.Then, place a command token from your reinforcements in that system and return this card to the Vaylerian player."
     },
     {
@@ -2448,7 +2448,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "veldyr1",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
     },
     {
@@ -2458,7 +2458,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "veldyr2",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
     },
     {
@@ -2468,7 +2468,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "veldyr3",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
     },
     {
@@ -2478,7 +2478,7 @@
         "colour": "",
         "playArea": "true",
         "attachment": "veldyr4",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
     },
     {
@@ -2487,7 +2487,7 @@
         "faction": "zealots",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.Then, return this card to the Rhodun player."
     },
     {
@@ -2496,7 +2496,7 @@
         "faction": "zelian",
         "colour": "",
         "playArea": "false",
-        "source": "Discordant Stars",
+        "source": "ds",
         "text": "When 1 or more of your units would make a BOMBARDMENT roll:If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.Then, return this card to the Zelian player."
     },
     {
@@ -2504,7 +2504,7 @@
         "name": "Absol's Political Secret",
         "colour": "purple",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the purple player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the purple player."
     },
     {
@@ -2512,7 +2512,7 @@
         "name": "Absol's Political Secret",
         "colour": "pink",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the pink player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the pink player."
     },
     {
@@ -2520,7 +2520,7 @@
         "name": "Absol's Political Secret",
         "colour": "blue",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the blue player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the blue player."
     },
     {
@@ -2528,7 +2528,7 @@
         "name": "Absol's Political Secret",
         "colour": "green",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the green player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the green player."
     },
     {
@@ -2536,7 +2536,7 @@
         "name": "Absol's Political Secret",
         "colour": "gray",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the gray player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the gray player."
     },
     {
@@ -2544,7 +2544,7 @@
         "name": "Absol's Political Secret",
         "colour": "red",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the red player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the red player."
     },
     {
@@ -2552,7 +2552,7 @@
         "name": "Absol's Political Secret",
         "colour": "yellow",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the yellow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the yellow player."
     },
     {
@@ -2560,7 +2560,7 @@
         "name": "Absol's Political Secret",
         "colour": "black",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the black player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the black player."
     },
     {
@@ -2568,7 +2568,7 @@
         "name": "Absol's Political Secret",
         "colour": "orange",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the orange player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the orange player."
     },
     {
@@ -2576,7 +2576,7 @@
         "name": "Absol's Political Secret",
         "colour": "rainbow",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the rainbow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the rainbow player."
     },
     {
@@ -2584,7 +2584,7 @@
         "name": "Absol's Political Secret",
         "colour": "lime",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lime player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lime player."
     },
     {
@@ -2592,7 +2592,7 @@
         "name": "Absol's Political Secret",
         "colour": "lavender",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lavender player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lavender player."
     },
     {
@@ -2600,7 +2600,7 @@
         "name": "Absol's Political Secret",
         "colour": "bloodred",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the bloodred player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the bloodred player."
     },
     {
@@ -2608,7 +2608,7 @@
         "name": "Absol's Political Secret",
         "colour": "chocolate",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the chocolate player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the chocolate player."
     },
     {
@@ -2616,7 +2616,7 @@
         "name": "Absol's Political Secret",
         "colour": "emerald",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the emerald player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the emerald player."
     },
     {
@@ -2624,7 +2624,7 @@
         "name": "Absol's Political Secret",
         "colour": "navy",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the navy player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the navy player."
     },
     {
@@ -2632,7 +2632,7 @@
         "name": "Absol's Political Secret",
         "colour": "rose",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the rose player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the rose player."
     },
     {
@@ -2640,7 +2640,7 @@
         "name": "Absol's Political Secret",
         "colour": "spring",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the spring player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the spring player."
     },
     {
@@ -2648,7 +2648,7 @@
         "name": "Absol's Political Secret",
         "colour": "teal",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the teal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the teal player."
     },
     {
@@ -2656,7 +2656,7 @@
         "name": "Absol's Political Secret",
         "colour": "brown",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the brown player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the brown player."
     },
     {
@@ -2664,7 +2664,7 @@
         "name": "Absol's Political Secret",
         "colour": "chrome",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the chrome player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the chrome player."
     },
     {
@@ -2672,7 +2672,7 @@
         "name": "Absol's Political Secret",
         "colour": "forest",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the forest player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the forest player."
     },
     {
@@ -2680,7 +2680,7 @@
         "name": "Absol's Political Secret",
         "colour": "gold",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the gold player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the gold player."
     },
     {
@@ -2688,7 +2688,7 @@
         "name": "Absol's Political Secret",
         "colour": "lightgray",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lightgray player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lightgray player."
     },
     {
@@ -2696,7 +2696,7 @@
         "name": "Absol's Political Secret",
         "colour": "petrol",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the petrol player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the petrol player."
     },
     {
@@ -2704,7 +2704,7 @@
         "name": "Absol's Political Secret",
         "colour": "sunset",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the sunset player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the sunset player."
     },
     {
@@ -2712,7 +2712,7 @@
         "name": "Absol's Political Secret",
         "colour": "tan",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the tan player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the tan player."
     },
     {
@@ -2720,7 +2720,7 @@
         "name": "Absol's Political Secret",
         "colour": "turquoise",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the turquoise player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the turquoise player."
     },
     {
@@ -2728,7 +2728,7 @@
         "name": "Ceasefire",
         "colour": "ethereal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "After the **ethereal** player activates a system that contains 1 or more of your units: The **ethereal** player cannot move units to the active system. Then return this card to the **ethereal** player."
     },
     {
@@ -2736,7 +2736,7 @@
         "name": "Political Secret",
         "colour": "ethereal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When an agenda is revealed: The **ethereal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **ethereal** player."
     },
     {
@@ -2744,7 +2744,7 @@
         "name": "Support for the Throne",
         "colour": "ethereal",
         "playArea": "true",
-        "source": "Base Game",
+        "source": "base",
         "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **ethereal** player's units, or if the **ethereal** player is eliminated, lose 1 victory point and return this card to the **ethereal** player."
     },
     {
@@ -2752,7 +2752,7 @@
         "name": "Trade Agreement",
         "colour": "ethereal",
         "playArea": "false",
-        "source": "Base Game",
+        "source": "base",
         "text": "When the **ethereal** player replenishes commodities: The **ethereal** player gives you all of their commodities. Then, return this card to the **ethereal** player."
     },
     {
@@ -2760,7 +2760,7 @@
         "name": "Alliance",
         "colour": "ethereal",
         "playArea": "true",
-        "source": "PoK",
+        "source": "pok",
         "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **ethereal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **ethereal** player's units, return this card to the **ethereal** player."
     },
     {
@@ -2768,7 +2768,7 @@
         "name": "Absol's Political Secret",
         "colour": "ethereal",
         "playArea": "false",
-        "source": "Absol",
+        "source": "absol",
         "text": "When you cast votes: You may exhaust up to 3 of the ethereal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the ethereal player."
     },
     {
