@@ -80,7 +80,7 @@ public class ActionCardModelTest {
     public void testSource() {
         ComponentSource source = ComponentSource.testsource;
         actionCardModel.setSource(source);
-        assertEquals("testsource", actionCardModel.getSource());
+        assertEquals(ComponentSource.testsource, actionCardModel.getSource());
     }
 
     @Test
