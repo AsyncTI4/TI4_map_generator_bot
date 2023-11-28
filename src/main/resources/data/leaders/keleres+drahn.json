@@ -8,7 +8,7 @@
         "abilityWindow": "After you resolve a tactical action:",
         "abilityText": "You may spend 3 trade goods to move 1 of your ships from the active system to an adjacent system that does not contain another player’s ships.",
         "unlockCondition": "Half of the other players, rounded down, have unlocked their commanders.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroarborec",
@@ -20,7 +20,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Use the PRODUCTION value of each unit you control, reducing the total cost of the produced units by 12. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherosaar",
@@ -32,7 +32,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Remove each of your structures from the game board; place each of those structures on a planet you control; for each structure you place, replenish your commodities or convert all of your commodities to trade goods. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheromuaat",
@@ -44,7 +44,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Gain your war sun unit upgrade technology, if able. Then produce up to 1 war sun in your home system and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroempyrean",
@@ -56,7 +56,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each command token in your tactics pool, explore the frontier exploration deck once in a system that contains your ships and no planets. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroflorzen",
@@ -68,7 +68,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each of up to 4 ships you control, you may move that ship to an adjacent system that does not contain another player’s ships. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherofsc",
@@ -80,7 +80,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Choose up to 3 planets, for each of those planets, roll a die; destroy a number of ground forces on that planet equal to or less than the value you roll. Then, place 1 infantry from your reinforcements on each planet you control and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroghemina",
@@ -92,7 +92,7 @@
         "abilityWindow": "After you resolve the primary ability of a strategy card:",
         "abilityText": "You may spend 1 command token from your strategy pool and purge this card to resolve the primary ability of that strategy card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherocreuss",
@@ -104,7 +104,7 @@
         "abilityWindow": "After you activate a system that contains or is adjacent to a wormhole:",
         "abilityText": "Place this card face-up near the game board. Until the end of this tactical action, you may treat each of your units as adjacent to the active system. At the end of this tactical action, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroghoti",
@@ -116,7 +116,7 @@
         "abilityWindow": "At any time:",
         "abilityText": "Purge this card and 1 of your unscored secret objectives, if able, to gain 1 victory point.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherogledge",
@@ -128,7 +128,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust any number of your planets. For each planet you exhaust, gain a number of trade goods equal to 1 more than that planet’s resource or influence value. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroglimmer",
@@ -140,7 +140,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card near the game board. Until the end of this game round, systems that contain anomalies and no other player’s ships gain PRODUCTION 2 as if they were units you control. At the start of the strategy phase, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherokollecc",
@@ -152,7 +152,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to draw up to 1 secret objective for each other player in the game, choose 1 to keep, reveal and return the rest to the secret objective deck, and shuffle that deck.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherokortali",
@@ -164,7 +164,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each secret objective you’ve scored, remove 1 of your command tokens from the game board and gain that command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherokyro",
@@ -176,7 +176,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust your and any number of other players’ strategy cards, if able, without resolving any of their abilities, then purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherolanefir",
@@ -188,7 +188,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each relic fragment purged or in another player’s play area, gain 2 trade goods. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherolzd",
@@ -200,7 +200,7 @@
         "abilityWindow": "At any time:",
         "abilityText": "Choose 1 system that contains a planet you control, destroy any number of units in that system. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheromahact",
@@ -212,7 +212,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each other player in the game, place 1 of that player’s command tokens in 1 system that contains 1 or more of your units. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheronaalu",
@@ -224,7 +224,7 @@
         "abilityWindow": "At the start of the status phase:",
         "abilityText": "Purge this card and spend 1 command token from your strategy pool to score 1 public objective, if you fulfill its requirements.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheronekro",
@@ -236,7 +236,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For every 2 players in the game, choose and research up to 1 non-faction technology 1 of those players owns. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheronokar",
@@ -248,7 +248,7 @@
         "abilityWindow": "At the end of the strategy phase:",
         "abilityText": "For each of your non-fighter ships on the game board, you may destroy that ship to gain a number of trade goods equal to that unit’s cost value, and produce up to 2 units in a system that contains a planet you control. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheronivyn",
@@ -260,7 +260,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "After you move units into a non-home system other than Mecatol Rex: You may replace that system tile with 1 unused system tile with a red-colored back of your choice. If you do, purge this card and each planet card that corresponds to the replaced system tile.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroolradin",
@@ -272,7 +272,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to gain 1 of the Olradin policy cards and exhaust up to 1 planet on the game board.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherocymiae",
@@ -284,7 +284,7 @@
         "abilityWindow": "At the start of your turn:",
         "abilityText": "Purge this card to choose and gain up to 3 cards from the action card discard pile.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherotnelis",
@@ -296,7 +296,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Each other player shows you 1 of their unscored secret objectives, you may choose 1 of those secret objectives to take; if you do, that player draws 2 secret objectives. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherovaden",
@@ -308,7 +308,7 @@
         "abilityWindow": "At the end of your strategic action:",
         "abilityText": "Each player that resolved the secondary ability of your strategy card must give you 2 trade goods and 2 promissory notes, if able. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherovaylerian",
@@ -320,7 +320,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card near the game board. Until the end of that game round, players cannot retreat from a combat you are participating in unless you allow it. At the end of that game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherovr",
@@ -332,7 +332,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Attach this card to your faction sheet. While this card is attached, each of your space docks and each gravity rift gains SPACE CANNON 6 as if it were a unit you control with the ability text \"You may use this unit's SPACE CANNON against ships adjacent to this system.\"",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroyin",
@@ -344,7 +344,7 @@
         "abilityWindow": "After you lose a combat:",
         "abilityText": "Purge this card to force your opponent to destroy half of their units that participated in that combat, rounded down.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnheroyssaril",
@@ -356,7 +356,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Draw 7 action cards, for every 2 action cards you must discard, draw 1 secret objective or gain 1 command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "drahnherozelian",
@@ -368,7 +368,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each system that is adjacent to or contains an asteroid field on the game board, produce up to 1 hit and assign it to 1 non-carrier unit in that system. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroargent",
@@ -380,7 +380,7 @@
         "abilityWindow": "At the start of a round of space combat in a system that contains a planet you control:",
         "abilityText": "Place your flagship, up to 2 mechs, and up to 2 cruisers and/or destroyers in the active system. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroaugurs",
@@ -392,7 +392,7 @@
         "abilityWindow": "When an objective is revealed:",
         "abilityText": "You may purge this card to discard that objective and reveal a new objective from the corresponding objective deck instead.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroletnev",
@@ -404,7 +404,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place up to 1 cruiser or 1 destroyer from your reinforcements in each system that contains a planet you control and your ships. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herobentor",
@@ -416,7 +416,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card face-up near the game board. Until the end of this game round, when you would explore, you may choose to resolve 1 card from the corresponding discard pile instead. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroberserkers",
@@ -428,7 +428,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card face-up near the game board. Until the end of this game round, you may reroll up to 2 of your fighter or infantry unit combat rolls during each round of combat, applying +1 to the results. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroceldauri",
@@ -440,7 +440,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place this card face-up near the game board. Until the end of this round, apply +2 to the PRODUCTION value of each of your units with PRODUCTION. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herocheiran",
@@ -452,7 +452,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Gather units from your reinforcements up to equal to your starting units. Place these units, in any combination, in the space area of any systems that contain 1 of your structures and no other players’ ships, or on planets you control. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herodihmohn",
@@ -464,7 +464,7 @@
         "abilityWindow": "At the start of a space combat:",
         "abilityText": "Place this card face-up near the game board. Until the end of this combat, your non-fighter ships gain SUSTAIN DAMAGE, if able. At the end of that combat, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroedyn",
@@ -476,7 +476,7 @@
         "abilityWindow": "Before players vote on an agenda:",
         "abilityText": "Purge this card to resolve that agenda as if you cast 1 vote for an outcome of your choice. Other players may not vote on this agenda or resolve abilities affecting its outcome.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herohacan",
@@ -488,7 +488,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Attach this card to your faction sheet. While this card is attached to your faction sheet, your commodity value is increased by 3.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herosol",
@@ -500,7 +500,7 @@
         "abilityWindow": "After you perform an action:",
         "abilityText": "You may purge this card to remove 1 of your command tokens from the game board, gain that token, and perform 1 additional action.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herokhrask",
@@ -512,7 +512,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to ready 1 planet you control in each of up to 4 systems.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herol1z1x",
@@ -524,7 +524,7 @@
         "abilityWindow": "At the start of invasion:",
         "abilityText": "Purge this card to allow each of your non-fighter ships in the active system to gain a BOMBARDMENT value equal to its combat value until the end of this tactical action.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heromentak",
@@ -536,7 +536,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Reveal cards from the action card deck until you reveal 3 action cards that have component actions. Draw those cards and shuffle the rest back into the action card deck. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heromirveda",
@@ -548,7 +548,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to place up to 3 structures on planets you control.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heromykomentori",
@@ -560,7 +560,7 @@
         "abilityWindow": "After a unit you control is destroyed, roll a die, on a result of 6 or greater, place it on this card. These units are also in your reinforcements. \n \n ACTION:",
         "abilityText": "Purge this card to place each unit on this card in the space area of a system that contains your ships.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herokolume",
@@ -572,7 +572,7 @@
         "abilityWindow": "After 1 or more of your units makes a SPACE CANNON roll:",
         "abilityText": "Purge this card to apply +4 to the result of each of those rolls.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heronra",
@@ -584,7 +584,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to explore each planet that contains 2 or more of your infantry, in any order.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heronomad",
@@ -596,7 +596,7 @@
         "abilityWindow": "When another player scores a secret objective:",
         "abilityText": "If you fulfill the requirements of that objective, you may purge this card to gain 1 victory point.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herorohdhna",
@@ -608,7 +608,7 @@
         "abilityWindow": "After an agenda is resolved:",
         "abilityText": "You may purge this card to produce 1 unit in each system that contains 1 of your units with PRODUCTION.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heronorr",
@@ -620,7 +620,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Place 3 infantry from your reinforcements on each planet that contains 1 or more of your structures, then purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroaxis",
@@ -632,7 +632,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "For each unit upgrade technology you own, you may use the PRODUCTION value of 1 of your units. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroul",
@@ -644,7 +644,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to replace up to 4 of your infantry with Mechs, and then up to 4 of your mechs with PDS units.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herojolnar",
@@ -656,7 +656,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Spend any number command tokens from your strategy pool. For each command token spent, you may spend 3 resources or influence to research 1 technology. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroveldyr",
@@ -668,7 +668,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to gain 2 unit upgrade technologies.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herowinnu",
@@ -680,7 +680,7 @@
         "abilityWindow": "During the action phase:",
         "abilityText": "Draw 2 secret objectives and gain up to 3 command tokens. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+heroxxcha",
@@ -692,7 +692,7 @@
         "abilityWindow": "After an agenda is revealed:",
         "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome for this agenda. For each player that abstains or votes for another outcome, gain 2 trade goods and 1 command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     },
     {
         "id": "keleres+herozealots",
@@ -704,6 +704,6 @@
         "abilityWindow": "When researching a technology:",
         "abilityText": "You may purge this card to ignore each prerequisite on the technology card you are researching.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "keleres+drahn"
+        "source": "keleresplus"
     }
 ]

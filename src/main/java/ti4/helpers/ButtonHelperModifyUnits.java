@@ -941,7 +941,7 @@ public class ButtonHelperModifyUnits {
         String pos = rest.substring(0, rest.indexOf("_"));
         Tile tile = activeGame.getTileByPosition(pos);
         rest = rest.replace(pos + "_", "");
-        Player cabal = Helper.getPlayerFromAbility(activeGame, "amalgamation");
+        Player cabal = Helper.getPlayerFromAbility(activeGame, "devour");
         if (rest.contains("All")) {
             String cID = Mapper.getColorID(player.getColor());
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {

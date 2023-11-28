@@ -10,6 +10,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CombatRollType;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -20,7 +21,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
-    private String source;
+    private ComponentSource source;
     private String faction;
     private int moveValue;
     private int productionValue;
@@ -87,7 +88,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         String factionEmoji = Emojis.getEmojiFromDiscord(getFaction().orElse(""));
         String unitEmoji = Emojis.getEmojiFromDiscord(getBaseType());
 
-        return unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
+        String unitString = unitEmoji + " " + getName() + factionEmoji;
+        if (getAbility().isPresent()) {
+            unitString += ": " + getAbility().get();
+        }
+        return unitString;
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -95,7 +100,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-
         String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
         String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
 
@@ -115,11 +119,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getSourceEmoji() {
-        return switch (getSource()) {
-            case "absol" -> Emojis.Absol;
-            case "ds" -> Emojis.DiscordantStars;
-            default -> "";
-        };
+        return source.emoji();
     }
 
     public int getCombatDieCountForAbility(CombatRollType rollType) {
@@ -318,7 +318,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     public Optional<String> getAbility() {
         return Optional.ofNullable(ability);
     }
-    
+
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
     }

@@ -6,7 +6,7 @@
         "target": "Elect Player",
         "text1": "The elected player place command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",
         "text2": "",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "articles_war",
@@ -16,7 +16,7 @@
         "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
         "text2": "Against: Each player that voted \"For\" gets 3 trade goods.",
         "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "checks",
@@ -26,7 +26,7 @@
         "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 in a three- or four-player game), if able.",
         "text2": "Against: Each player readies only 3 of their planets at the end of this agenda phase.",
         "mapText": "When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (2 in 3p and 4p games), if able.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "cladenstine",
@@ -35,7 +35,7 @@
         "target": "For/Against",
         "text1": "For: Each player removes 2 command tokens from their command sheet and returns those tokens to their reinforcements.",
         "text2": "Against: Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "covert",
@@ -44,7 +44,7 @@
         "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.). The other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
         "text1": "",
         "text2": "",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "crisis",
@@ -53,7 +53,7 @@
         "target": "Elect Strategy Card",
         "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token - command tokens placed by the ability are placed from a player's reinforcements instead.",
         "text2": "",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "minister_antiquities",
@@ -62,7 +62,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains 1 relic.",
         "text2": "",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "nexus",
@@ -72,7 +72,7 @@
         "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect during movement.",
         "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.",
         "mapText": "Alpha and beta wormholes in the wormhole nexus have no effect during movement.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "censure",
@@ -82,7 +82,7 @@
         "text1": "The elected player gains this card and 1 victory point. The elected player cannot play action cards. If the owner of this card loses this card, they lose 1 victory point.",
         "text2": "",
         "mapText": "Gain this card and 1 victory point. You cannot play action cards. If you lose this card, you lose 1 victory point.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "rearmament",
@@ -91,7 +91,7 @@
         "target": "For/Against",
         "text1": "For: Each player places 1 mech from their reinforcements on a planet they control in their home system.",
         "text2": "Against: Each player replaces each of their mechs with 1 infantry from their reinforcements.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "rep_govt",
@@ -101,7 +101,7 @@
         "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
         "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
         "mapText": "Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "grant_reallocation",
@@ -110,7 +110,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains any 1 technology of their choice. Then, for each prerequisite on that technology, they remove 1 token from their fleet pool and return it to their reinforcements.",
         "text2": "",
-        "source": "PoK"
+        "source": "pok"
     },
     {
         "alias": "warrant",
@@ -120,6 +120,6 @@
         "text1": "The elected player gains this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
         "text2": "",
         "mapText": "You play with your secret objectives revealed.",
-        "source": "PoK"
+        "source": "pok"
     }
 ]

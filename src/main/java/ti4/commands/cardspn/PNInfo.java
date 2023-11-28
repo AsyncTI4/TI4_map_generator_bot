@@ -20,6 +20,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.Source.ComponentSource;
 
 public class PNInfo extends PNCardsSubcommandData {
     public PNInfo() {
@@ -193,7 +194,7 @@ public class PNInfo extends PNCardsSubcommandData {
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
         }
 
-        if (longFormat || Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) || "Absol".equalsIgnoreCase(pnModel.getSource())) sb.append("      ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) || pnModel.getSource() == ComponentSource.absol) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }

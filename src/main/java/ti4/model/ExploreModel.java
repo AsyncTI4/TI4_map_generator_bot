@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class ExploreModel implements ModelInterface, EmbeddableModel {
@@ -18,24 +19,23 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     private String resolution;
     private String text;
     private String attachmentId;
-    private String source;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     @Override
     public boolean isValid() {
-        return id != null 
-            && name != null 
-            && type != null 
+        return id != null
+            && name != null
+            && type != null
             && resolution != null
             && List.of("Fragment", "Attach", "Instant", "Token").contains(resolution)
-            && text != null 
-            // && attachmentId != null 
+            && text != null
             && source != null;
     }
 
     @Override
     public String getAlias() {
-        return  getId();
+        return getId();
     }
 
     public Optional<String> getAttachmentId() {
@@ -48,20 +48,21 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         searchString = searchString.toLowerCase();
-        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString) || getId().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
         return getName() + " (" + getType() + ") (" + getSource() + ")";
     }
-    
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSourceEmoji(), null);
+        eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
         eb.setColor(getEmbedColour());
         eb.setDescription(getText());
 
@@ -91,13 +92,6 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             case "hazardous" -> Emojis.Hazardous;
             case "industrial" -> Emojis.Industrial;
             case "frontier" -> Emojis.Frontier;
-            default -> "";
-        };
-    }
-
-    private String getSourceEmoji() {
-        return switch (getSource()) {
-            case "ds" -> Emojis.DiscordantStars;
             default -> "";
         };
     }
