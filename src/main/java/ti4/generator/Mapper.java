@@ -178,12 +178,12 @@ public class Mapper {
                 + String.join("\n> ", badObjects));
     }
 
-    public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
+    public static List<String> getColorFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (isColorValid(color) && isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
-                if (pn.getColour().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
+                if (pn.getColor().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
@@ -483,7 +483,7 @@ public class Mapper {
             return promStr;
         }
         return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
-            + promissoryNotes.get(id).getColour();
+            + promissoryNotes.get(id).getColor();
     }
 
     public static String getPromissoryNoteOwner(String id) {

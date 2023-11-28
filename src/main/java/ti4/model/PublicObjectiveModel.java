@@ -61,11 +61,11 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
-        eb.setColor(getEmbedColour());
+        eb.setColor(getEmbedColor());
         return eb.build();
     }
 
-    public Color getEmbedColour() {
+    public Color getEmbedColor() {
         return switch (getPoints()) {
             case 1 -> Color.ORANGE;
             case 2 -> Color.BLUE;

@@ -74,10 +74,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return "_" + getAsyncId() + ".png";
     }
 
-    public String getColourAsyncID(String colour) {
-        colour = AliasHandler.resolveColor(colour);
-        colour = Mapper.getColorID(colour);
-        return colour + getImageFileSuffix();
+    public String getColorAsyncID(String color) {
+        color = AliasHandler.resolveColor(color);
+        color = Mapper.getColorID(color);
+        return color + getImageFileSuffix();
     }
 
     public String getUnitEmoji() {

@@ -3935,12 +3935,13 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         List<FactionModel> factionsOnMap = Mapper.getFactions().stream()
             .filter(f -> activeGame.getTile(f.getHomeSystem()) != null)
+            .filter(f -> activeGame.getPlayerFromColorOrFaction(f.getAlias()) == null)
             .toList();
         List<FactionModel> allFactions = Mapper.getFactions().stream()
             .filter(f -> activeGame.isDiscordantStarsMode() ? f.getSource().isDs() : f.getSource().isPok())
+            .filter(f -> activeGame.getPlayerFromColorOrFaction(f.getAlias()) == null)
             .sorted((f1, f2) -> factionsOnMap.contains(f1) ? (factionsOnMap.contains(f2) ? 0 : -1) : (factionsOnMap.contains(f2) ? 1 : 0))
             .toList();
-        List<FactionModel> test = allFactions.stream().filter(f -> factionsOnMap.contains(f)).toList();
 
         Set<String> factionsComplete = new HashSet<>();
         for (FactionModel faction : allFactions) {
@@ -3967,9 +3968,9 @@ public class ButtonHelper {
         String factionId = buttonID.split("_")[2];
         List<String> allColors = Mapper.getColors();
         for (String color : allColors) {
-            //System.out.println(color);
             if (activeGame.getPlayerFromColorOrFaction(color) == null) {
-                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color));
+                Emoji colorEmoji = Emoji.fromFormatted(Emojis.getColorEmoji(color));
+                buttons.add(Button.success("setupStep3_" + userId + "_" + factionId + "_" + color, color).withEmoji(colorEmoji));
             }
         }
         return buttons;
@@ -3996,7 +3997,10 @@ public class ButtonHelper {
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
-        long numberOfHomes = Mapper.getFactions().stream().filter(f -> activeGame.getTile(f.getHomeSystem()) != null).count();
+        long numberOfHomes = Mapper.getFactions().stream()
+            .filter(f -> activeGame.getTile(f.getHomeSystem()) != null)
+            .filter(f -> activeGame.getPlayerFromColorOrFaction(f.getAlias()) == null)
+            .count();
         if (numberOfHomes <= 0) numberOfHomes = 22;
 
         for (int x = 0; x < buttons.size(); x++) {
@@ -4036,11 +4040,11 @@ public class ButtonHelper {
             return;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: " + Mapper.getFaction(factionId).getFactionName());
-        offerColourSetupButtons(activeGame, event, buttonID, userId, factionId);
+        offerColorSetupButtons(activeGame, event, buttonID, userId, factionId);
 
     }
 
-    private static void offerColourSetupButtons(Game activeGame, GenericInteractionCreateEvent event, String buttonID, String userId, String factionId) {
+    private static void offerColorSetupButtons(Game activeGame, GenericInteractionCreateEvent event, String buttonID, String userId, String factionId) {
         List<Button> buttons = getColorSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
@@ -5991,7 +5995,7 @@ public class ButtonHelper {
         //Handle AbsolMode Political Secret
         if (activeGame.isAbsolMode() && id.endsWith("_ps")) {
             pnText = "Political Secret" + Emojis.Absol
-                + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
+                + ":  *When you cast votes:* You may exhaust up to 3 of the {color} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {color} player.";
         } else {
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }

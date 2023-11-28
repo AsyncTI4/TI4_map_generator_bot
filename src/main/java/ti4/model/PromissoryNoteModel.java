@@ -17,7 +17,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String faction;
-    private String colour;
+    private String color;
     private Boolean playArea;
     private String attachment;
     private ComponentSource source;
@@ -27,7 +27,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return alias != null
             && name != null
-            && (faction != null || colour != null)
+            && (faction != null || color != null)
             && text != null
             && source != null;
     }
@@ -36,14 +36,14 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(faction);
     }
 
-    public Optional<String> getColour() {
-        return Optional.ofNullable(colour);
+    public Optional<String> getColor() {
+        return Optional.ofNullable(color);
     }
 
-    public String getFactionOrColour() {
+    public String getFactionOrColor() {
         if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
-        if (!StringUtils.isBlank(getColour().orElse(""))) return colour;
-        return faction + "_" + colour;
+        if (!StringUtils.isBlank(getColor().orElse(""))) return color;
+        return faction + "_" + color;
     }
 
     public Optional<String> getAttachment() {
@@ -51,7 +51,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getOwner() {
-        if (faction == null || faction.isEmpty()) return colour;
+        if (faction == null || faction.isEmpty()) return color;
         return faction;
     }
 
@@ -80,7 +80,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         title.append(Emojis.PN);
         if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
-        if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
+        if (!StringUtils.isBlank(getColor().orElse(""))) title.append(" (").append(getColor()).append(")");
         title.append(getSource().emoji());
         eb.setTitle(title.toString());
 
@@ -113,12 +113,12 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString)
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColor().toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFactionOrColour() + ") (" + getSource() + ")";
+        return getName() + " (" + getFactionOrColor() + ") (" + getSource() + ")";
     }
 
 }

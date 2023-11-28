@@ -71,7 +71,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         for (Player player_ : player.getNeighbouringPlayers()) {
             sb.append("_ _\n**__");
             sb.append(player_.getFactionEmoji());
-            sb.append(Emojis.getColourEmojis(player_.getColor())).append(" ");
+            sb.append(Emojis.getColorEmojiWithName(player_.getColor())).append(" ");
             sb.append(player_.getUserName()).append("'s Promissory Notes:__**\n");
             sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false));
         }

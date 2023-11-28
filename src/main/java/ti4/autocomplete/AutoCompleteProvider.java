@@ -54,8 +54,8 @@ public class AutoCompleteProvider {
         String optionName = event.getFocusedOption().getName();
 
         //boolean showAllChoicesInGame = false;
-        //OptionMapping factionOrColourOption = event.getOption(Constants.FACTION_COLOR);
-        //if (factionOrColourOption != null) showAllChoicesInGame = true;
+        //OptionMapping factionOrColorOption = event.getOption(Constants.FACTION_COLOR);
+        //if (factionOrColorOption != null) showAllChoicesInGame = true;
 
         String userID = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());

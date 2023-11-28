@@ -238,7 +238,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/game setup` to set player count and additional options\n" +
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
             "> `/game set_order` to set the starting speaker order\n" +
-            "> `/player setup` to set player faction and colour\n" +
+            "> `/player setup` to set player faction and color\n" +
             "> `/tech add` for factions who need to add tech\n" +
             "\n" +
             "### __Other helpful commands:__\n" +

@@ -1896,9 +1896,9 @@ public class GameSaveLoadManager {
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();
                     while (debtToken.hasMoreTokens()) {
                         StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
-                        String colour = debtInfo.nextToken();
+                        String color = debtInfo.nextToken();
                         Integer count = Integer.parseInt(debtInfo.nextToken());
-                        debtTokens.put(colour, count);
+                        debtTokens.put(color, count);
                     }
                     player.setDebtTokens(debtTokens);
                 }

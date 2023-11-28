@@ -155,7 +155,7 @@ public class SCPick extends PlayerSubcommandData {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scPicked);
             if (activeGame.isFoWMode()) {
-                String messageToSend = Emojis.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scPicked;
+                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scPicked;
                 FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
             }
             player.setTg(tg);
