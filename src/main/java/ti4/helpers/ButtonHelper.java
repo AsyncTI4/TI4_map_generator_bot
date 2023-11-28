@@ -3933,22 +3933,30 @@ public class ButtonHelper {
     public static List<Button> getFactionSetupButtons(Game activeGame, String buttonID) {
         String userId = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
-        List<String> allFactions = FrankenDraft.getAllFactionIds(activeGame);
-        List<FactionModel> factionsOnMap = Mapper.getFactions().stream().filter(f -> activeGame.getTile(f.getHomeSystem()) != null).toList();
+        List<FactionModel> factionsOnMap = Mapper.getFactions().stream()
+            .filter(f -> activeGame.getTile(f.getHomeSystem()) != null)
+            .toList();
+        List<FactionModel> allFactions = Mapper.getFactions().stream()
+            .filter(f -> activeGame.isDiscordantStarsMode() ? f.getSource().isDs() : f.getSource().isPok())
+            .sorted((f1, f2) -> factionsOnMap.contains(f1) ? (factionsOnMap.contains(f2) ? 0 : -1) : (factionsOnMap.contains(f2) ? 1 : 0))
+            .toList();
+        List<FactionModel> test = allFactions.stream().filter(f -> factionsOnMap.contains(f)).toList();
 
-        for (String factionId : allFactions) {
-            FactionModel faction = Mapper.getFaction(factionId);
-            if (faction != null && activeGame.getPlayerFromColorOrFaction(factionId) == null) {
+        Set<String> factionsComplete = new HashSet<>();
+        for (FactionModel faction : allFactions) {
+            String factionId = faction.getAlias();
+            if (activeGame.getPlayerFromColorOrFaction(factionId) == null) {
                 String name = faction.getFactionName();
-
                 if (factionId.contains("keleres")) {
                     factionId = "keleres";
                     name = "The Council Keleres";
                 }
+                if (factionsComplete.contains(factionId)) continue;
                 Emoji factionEmoji = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(factionId));
                 buttons.add(Button.success("setupStep2_" + userId + "_" + factionId, name).withEmoji(factionEmoji));
-                //buttons.add(Button.success("setupStep2_"+userId+"_"+factionId, name));
             }
+
+            factionsComplete.add(factionId);
         }
         return buttons;
     }
@@ -3988,13 +3996,15 @@ public class ButtonHelper {
         List<Button> buttons = getFactionSetupButtons(activeGame, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
+        long numberOfHomes = Mapper.getFactions().stream().filter(f -> activeGame.getTile(f.getHomeSystem()) != null).count();
+        if (numberOfHomes <= 0) numberOfHomes = 22;
 
         for (int x = 0; x < buttons.size(); x++) {
-            if (x < maxBefore + 23) {
+            if (x <= maxBefore + numberOfHomes) {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
+        newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get more factions"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
     }
 
