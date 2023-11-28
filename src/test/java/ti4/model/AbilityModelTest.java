@@ -69,7 +69,7 @@ public class AbilityModelTest {
     @Test
     public void testSource() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
-        String source = "testSource";
+        String source = "testsource";
         assertEquals(source, abilityModel.getSource());
     }
 
@@ -89,7 +89,7 @@ public class AbilityModelTest {
         abilityModel.setId("testId");
         abilityModel.setName("testName");
         abilityModel.setFaction("testFaction");
-        abilityModel.setSource(ComponentSource.testSource);
+        abilityModel.setSource(ComponentSource.testsource);
         assertTrue(abilityModel.isValid());
     }
 
