@@ -2,13 +2,11 @@ package ti4.commands.explore;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -48,7 +46,7 @@ public class DrawRelic extends GenericRelicAction {
     }
     public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID){
         int position = Integer.parseInt(buttonID.split("_")[1]);
-        if(player.getPromissoryNotes().keySet().contains("dspnflor") && activeGame.getPNOwner("dspnflor") != player){
+        if(player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player){
             ButtonHelper.resolvePNPlay("dspnflorChecked", player, activeGame, event);
         }
         drawRelicAndNotify(player, event, activeGame, position, true);
@@ -60,7 +58,7 @@ public class DrawRelic extends GenericRelicAction {
     }
 
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame, int position, boolean checked) {
-        if(!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().keySet().contains("dspnflor") && activeGame.getPNOwner("dspnflor") != player))){
+        if(!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player))){
             drawWithAdvantage(player, event, activeGame, 2);
             return;
         }

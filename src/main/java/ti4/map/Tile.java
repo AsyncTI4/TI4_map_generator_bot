@@ -1,12 +1,20 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -18,12 +26,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
-
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Tile {
     private final String tileID;
@@ -70,7 +72,7 @@ public class Tile {
         if (unitID == null) return null;
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
-            BotLogger.log("Could not find unit: " + unitID.toString());
+            BotLogger.log("Could not find unit: " + unitID);
             return null;
         }
         return unitPath;
@@ -247,7 +249,7 @@ public class Tile {
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
-        if ((tileID.equals("44") || (tileID.equals("45")))
+        if (("44".equals(tileID) || ("45".equals(tileID)))
                 && (ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0)) {
             tileName = "S15_Cucumber.png";
         }
@@ -262,7 +264,7 @@ public class Tile {
         Boolean hasFog = fog.get(player);
 
         Game activeGame = player.getGame();
-        if(activeGame.isLightFogMode() && player.getFogTiles().keySet().contains(getPosition())){
+        if(activeGame.isLightFogMode() && player.getFogTiles().containsKey(getPosition())){
             return false;
         }
         //default all tiles to being foggy to prevent unintended info leaks
@@ -405,7 +407,7 @@ public class Tile {
                 return true;
             }
             for (UnitKey unit : unitHolder.getUnits().keySet()) {
-                if (unit.getUnitType().equals(UnitType.CabalSpacedock)) {
+                if (unit.getUnitType() == UnitType.CabalSpacedock) {
                     return true;
                 }
             }

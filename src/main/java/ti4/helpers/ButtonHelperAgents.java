@@ -1,5 +1,10 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -8,8 +13,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import java.util.*;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.units.AddUnits;
@@ -309,7 +312,7 @@ public class ButtonHelperAgents {
         String unit = buttonID.split("_")[4];
         UnitHolder uH = tile.getUnitHolders().get(planetRemoval);
         String message = "";
-        if(planetRemoval.equalsIgnoreCase("space")){
+        if("space".equalsIgnoreCase(planetRemoval)){
             message = ident + " moved 1 " + unit + " from space area of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame);
             planetRemoval = "";
         }else{
@@ -318,12 +321,12 @@ public class ButtonHelperAgents {
         }
         new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " " + planetRemoval, activeGame);
         new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planetDestination), unit + " " + planetDestination, activeGame);
-        if(unit.equalsIgnoreCase("mech")){
+        if("mech".equalsIgnoreCase(unit)){
             if(uH.getUnitCount(UnitType.Mech,player.getColor())< 1){
                 ButtonHelper.deleteTheOneButton(event);
             }
         }else{
-            if(unit.equalsIgnoreCase("pds")){
+            if("pds".equalsIgnoreCase(unit)){
                 if(uH.getUnitCount(UnitType.Pds,player.getColor())< 1){
                     ButtonHelper.deleteTheOneButton(event);
                 }
@@ -394,11 +397,11 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         }
         if ("cabalagent".equalsIgnoreCase(agent)) {
-            ButtonHelperAgents.startCabalAgent(player, activeGame, rest.replace("cabalagent_", ""), event);
+            startCabalAgent(player, activeGame, rest.replace("cabalagent_", ""), event);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String msg = ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the buttons to remove infantry.";
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, ButtonHelperAgents.getJolNarAgentButtons(player, activeGame));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, getJolNarAgentButtons(player, activeGame));
         }
 
         if ("empyreanagent".equalsIgnoreCase(agent)) {
@@ -821,7 +824,7 @@ public class ButtonHelperAgents {
         String unitHName = buttonID.split("_")[2];
         Tile tile = activeGame.getTileByPosition(pos);
         UnitHolder unitHolder = tile.getUnitHolders().get(unitHName);
-        if (unitHName.equalsIgnoreCase("space")) {
+        if ("space".equalsIgnoreCase(unitHName)) {
             unitHName = "";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),

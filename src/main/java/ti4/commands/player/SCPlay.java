@@ -1,9 +1,9 @@
 package ti4.commands.player;
 
-import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -81,7 +82,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         if(!winnuHero && activeGame.getFactionsThatReactedToThis("Coup")!= null &&  activeGame.getFactionsThatReactedToThis("Coup").contains("_"+scToPlay)){
             for(Player p2: activeGame.getRealPlayers()){
-                if(activeGame.getFactionsThatReactedToThis("Coup").contains(p2.getFaction())&&p2.getActionCards().keySet().contains("coup")){
+                if(activeGame.getFactionsThatReactedToThis("Coup").contains(p2.getFaction())&& p2.getActionCards().containsKey("coup")){
                     if(p2 == player){
                         continue;
                     }

@@ -29,19 +29,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.concurrent.ThreadLocalRandom;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -49,6 +43,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -79,8 +76,8 @@ import ti4.model.EventModel;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.UnitModel;
 
 public class GenerateMap {
 
@@ -436,8 +433,7 @@ public class GenerateMap {
     private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null) return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-        if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji) {
-            CustomEmoji factionCustomEmoji = (CustomEmoji) factionEmoji;
+        if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji factionCustomEmoji) {
             int urlImagePadding = 5;
             return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
         }
@@ -1276,7 +1272,7 @@ public class GenerateMap {
             if (count == null) {
                 count = 0;
             }
-            if (unitKey.getUnitType().equals(UnitType.Infantry) || unitKey.getUnitType().equals(UnitType.Fighter)) {
+            if (unitKey.getUnitType() == UnitType.Infantry || unitKey.getUnitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) {
                     continue;
                 }
@@ -1320,7 +1316,7 @@ public class GenerateMap {
 
         for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
             UnitKey id = entry.getKey();
-            if (id.getUnitType().equals(UnitType.Mech)) {
+            if (id.getUnitType() == UnitType.Mech) {
                 units.put(id, entry.getValue());
             }
         }
@@ -1364,10 +1360,10 @@ public class GenerateMap {
                 try {
                     String unitPath = Tile.getUnitPath(unitKey);
                     if (unitPath != null) {
-                        if (unitKey.getUnitType().equals(UnitType.Fighter)) {
+                        if (unitKey.getUnitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
                             bulkUnitCount = unitCount;
-                        } else if (unitKey.getUnitType().equals(UnitType.Infantry)) {
+                        } else if (unitKey.getUnitType() == UnitType.Infantry) {
                             unitPath = unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
                             bulkUnitCount = unitCount;
                         }
@@ -3523,7 +3519,7 @@ public class GenerateMap {
         int spaceY = unitOffsetValue != null ? unitOffsetValue.y : -7;
         for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
             UnitKey id = entry.getKey();
-            if (id != null && id.getUnitType().equals(UnitType.Mech)) {
+            if (id != null && id.getUnitType() == UnitType.Mech) {
                 units.put(id, entry.getValue());
             }
         }
@@ -3564,10 +3560,10 @@ public class GenerateMap {
             try {
                 String unitPath = Tile.getUnitPath(unitKey);
                 if (unitPath != null) {
-                    if (unitKey.getUnitType().equals(UnitType.Fighter)) {
+                    if (unitKey.getUnitType() == UnitType.Fighter) {
                         unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
                         bulkUnitCount = unitCount;
-                    } else if (unitKey.getUnitType().equals(UnitType.Infantry)) {
+                    } else if (unitKey.getUnitType() == UnitType.Infantry) {
                         unitPath = unitPath.replace(Constants.COLOR_GF, Constants.BULK_GF);
                         bulkUnitCount = unitCount;
                     }
@@ -3598,7 +3594,7 @@ public class GenerateMap {
             }
 
             BufferedImage spoopy = null;
-            if ((unitKey.getUnitType().equals(UnitType.Warsun)) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
+            if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
 
                 String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                 spoopy = ImageHelper.read(spoopypath);
@@ -3659,8 +3655,8 @@ public class GenerateMap {
                 if (bulkUnitCount != null) {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
-                    int scaledNumberPositionX = (int) (numberPositionPoint.x);
-                    int scaledNumberPositionY = (int) (numberPositionPoint.y);
+                    int scaledNumberPositionX = numberPositionPoint.x;
+                    int scaledNumberPositionY = numberPositionPoint.y;
                     tileGraphics.drawString(Integer.toString(bulkUnitCount), TILE_PADDING + imageX + scaledNumberPositionX, TILE_PADDING + imageY + scaledNumberPositionY);
                 }
 
@@ -3691,7 +3687,7 @@ public class GenerateMap {
                     if (isMirage) {
                         imageDmgX = imageX;
                         imageDmgY = imageY;
-                    } else if (unitKey.getUnitType().equals(UnitType.Mech)) {
+                    } else if (unitKey.getUnitType() == UnitType.Mech) {
                         imageDmgX = position != null ? position.x : xOriginal - (dmgImage.getWidth());
                         imageDmgY = position != null ? position.y : yOriginal - (dmgImage.getHeight());
 

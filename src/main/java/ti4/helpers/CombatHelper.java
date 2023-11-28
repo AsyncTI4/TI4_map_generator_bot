@@ -1,16 +1,21 @@
 package ti4.helpers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -97,7 +102,7 @@ public class CombatHelper {
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
         if (unitHolder.getName().equals(Constants.SPACE)) {
-            if (unitsByAsyncId.keySet().contains("fs") && player.hasUnit("nekro_flagship")) {
+            if (unitsByAsyncId.containsKey("fs") && player.hasUnit("nekro_flagship")) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()
                         .filter(entry -> entry.getKey() != null
                                 && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
@@ -389,8 +394,7 @@ public class CombatHelper {
 
         // Check for space cannon die on planets
         for (UnitHolder unitHolder : unitHolders) {
-            if (unitHolder instanceof Planet) {
-                Planet planet = (Planet) unitHolder;
+            if (unitHolder instanceof Planet planet) {
                 PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
                 if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
@@ -577,9 +581,7 @@ public class CombatHelper {
         }
         result = resultBuilder.toString();
 
-        StringBuilder hitEmojis = new StringBuilder();
-        hitEmojis.append(":boom:".repeat(Math.max(0, totalHits)));
-        result += String.format("\n**Total hits %s** %s\n", totalHits, hitEmojis);
+        result += String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
         player.setActualHits(player.getActualHits() + totalHits);
         return result;
     }

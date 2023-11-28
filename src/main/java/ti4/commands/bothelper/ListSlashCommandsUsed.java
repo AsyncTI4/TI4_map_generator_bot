@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -81,7 +80,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg);
     }
 
-    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, final boolean order) {
+    private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
         // Sorting the list based on values

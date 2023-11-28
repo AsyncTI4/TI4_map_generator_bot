@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -62,8 +61,7 @@ public class DiscordantStarsHelper {
 
             for (Tile tile : activeMap.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder != null && unitHolder instanceof Planet) {
-                        Planet planet = (Planet) unitHolder;
+                    if (unitHolder != null && unitHolder instanceof Planet planet) {
                         if (planet != null && player.getPlanets().contains(planet.getName())) {
                             if (!oneMechCheck(planet.getName(), activeMap, player)
                                 && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {

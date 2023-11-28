@@ -13,11 +13,6 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -30,6 +25,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
@@ -51,7 +49,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
-import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
 public class AgendaHelper {
@@ -131,7 +128,7 @@ public class AgendaHelper {
                 }
                 if ("absol_checks".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
-                        AgendaHelper.resolveAbsolAgainstChecksNBalances(activeGame);
+                        resolveAbsolAgainstChecksNBalances(activeGame);
                     } 
                 }
                 if ("conventions".equalsIgnoreCase(agID)) {
@@ -281,7 +278,7 @@ public class AgendaHelper {
                     Tile tile = activeGame.getTileFromPlanet("mr");
                     if (tile != null) {
                         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, 1, tile.getPosition(), event);
-                        String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + AgendaHelper.getSummaryOfVotes(activeGame, true);
+                        String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n" + getSummaryOfVotes(activeGame, true);
                         MessageHelper.sendMessageToChannel(watchParty, message);
                         MessageHelper.sendMessageWithFile(watchParty, systemWithContext, "Surrounding Mecatol Rex In " + activeGame.getName(), false);
                     }
@@ -760,7 +757,7 @@ public class AgendaHelper {
                 ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, activeGame);
             } else {
                 winner = getWinner(activeGame);
-                if (!winner.equalsIgnoreCase("") && !winner.contains("*")) {
+                if (!"".equalsIgnoreCase(winner) && !winner.contains("*")) {
                     resolveTime = true;
                 } else {
                     Player speaker;
@@ -770,7 +767,7 @@ public class AgendaHelper {
                         speaker = activeGame.getRealPlayers().get(0);
                     }
                     List<Button> tiedWinners = new ArrayList<>();
-                    if (!winner.equalsIgnoreCase("")) {
+                    if (!"".equalsIgnoreCase(winner)) {
                         StringTokenizer winnerInfo = new StringTokenizer(winner, "*");
                         while (winnerInfo.hasMoreTokens()) {
                             String tiedWinner = winnerInfo.nextToken();
@@ -1293,7 +1290,7 @@ public class AgendaHelper {
         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) { // TODO: same booleans?
-            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
+            outcomeActionRow = getUnitUpgradeOutcomeButtons(activeGame, ridername, prefix);
         } else {
             outcomeActionRow = getLawOutcomeButtons(activeGame, ridername, prefix);
         }

@@ -2,7 +2,6 @@ package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -133,14 +132,13 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player)+" chose to send a "+pnOrAC);
-        if(pnOrAC.equalsIgnoreCase("pn")){
+        if("pn".equalsIgnoreCase(pnOrAC)){
             buttons =  ButtonHelper.getForcedPNSendButtons(activeGame, p2, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " resolve", buttons);
 
         }else{
             String buttonID2 = "transact_ACs_" + p2.getFaction();
             ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID2, event);
-            return;
         }
            
         

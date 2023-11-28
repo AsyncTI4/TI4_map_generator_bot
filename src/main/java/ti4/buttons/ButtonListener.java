@@ -1682,7 +1682,7 @@ public class ButtonListener extends ListenerAdapter {
                     if(p2 == player){
                         continue;
                     }
-                    if(activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction())&&p2.getActionCards().keySet().contains("disgrace")){
+                    if(activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction())&& p2.getActionCards().containsKey("disgrace")){
                         PlayAC.playAC(event, activeGame, p2, "disgrace", activeGame.getMainGameChannel(), event.getGuild());
                         activeGame.setCurrentReacts("Public Disgrace", "");
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" you have been public disgraced because someone preset it to occur when the number "+scpick+" was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
@@ -3722,8 +3722,9 @@ public class ButtonListener extends ListenerAdapter {
                         if (activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
                             boolean showGame = false;
                             for(String buttonString2 : activeGame.getSavedButtons()){
-                                if(buttonString2.contains("Show Game")){
+                                if (buttonString2.contains("Show Game")) {
                                     showGame = true;
+                                    break;
                                 }
                             }
                             if (player != activeGame.getPlayerFromColorOrFaction(buttonString.split(";")[0]) && !showGame) {

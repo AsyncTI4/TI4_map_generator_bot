@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-
 import ti4.helpers.Emojis;
 
 @Data
@@ -45,7 +43,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     }
 
     public static final Comparator<TechnologyModel> sortByTechRequirements = (tech1, tech2) -> {
-        return TechnologyModel.sortTechsByRequirements(tech1, tech2);
+        return sortTechsByRequirements(tech1, tech2);
     };
 
     public static int sortTechsByRequirements(TechnologyModel t1, TechnologyModel t2) {

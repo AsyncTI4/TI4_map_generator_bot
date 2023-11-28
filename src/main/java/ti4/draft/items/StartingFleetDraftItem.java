@@ -5,7 +5,6 @@ import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 
 public class StartingFleetDraftItem extends DraftItem {
@@ -15,7 +14,7 @@ public class StartingFleetDraftItem extends DraftItem {
 
 
     private FactionModel getFaction() {
-        if (ItemId.equals("keleres")) {
+        if ("keleres".equals(ItemId)) {
             return Mapper.getFaction("keleresa");
         }
         return Mapper.getFaction(ItemId);

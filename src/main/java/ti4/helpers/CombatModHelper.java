@@ -4,15 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.commands.player.AbilityInfo;
-import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -26,7 +21,6 @@ import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
-import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
@@ -370,13 +364,13 @@ public class CombatModHelper {
         switch (condition) {
             case Constants.MOD_OPPONENT_TEKKLAR_PLAYER_OWNER -> {
                 if (opponent != null
-                        && player.getPromissoryNotesOwned().stream().anyMatch(pn -> pn.equals("tekklar"))) {
+                        && player.getPromissoryNotesOwned().stream().anyMatch(pn -> "tekklar".equals(pn))) {
                     meetsCondition = opponent.getTempCombatModifiers().stream().anyMatch(
-                            mod -> mod.getRelatedID().equals("tekklar")
+                            mod -> "tekklar".equals(mod.getRelatedID())
                                     && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
                             ||
                             opponent.getNewTempCombatModifiers().stream().anyMatch(
-                                    mod -> mod.getRelatedID().equals("tekklar")
+                                    mod -> "tekklar".equals(mod.getRelatedID())
                                             && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
                 }
             }

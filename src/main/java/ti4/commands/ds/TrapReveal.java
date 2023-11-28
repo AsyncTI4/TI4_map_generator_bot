@@ -1,7 +1,10 @@
 package ti4.commands.ds;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -15,13 +18,9 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class TrapReveal extends DiscordantStarsSubcommandData {
 
@@ -98,7 +97,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                         String sb = "__**" + "Trap: " + trapName + "**__" + " - " + trapText + "\n" +
                                 "__**" + "Has been revealed on planet: " + representation + "**__";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb);
-                        if(trapName.equalsIgnoreCase("Minefields")){
+                        if("Minefields".equalsIgnoreCase(trapName)){
                             for(Player p2: activeGame.getRealPlayers()){
                                 if(p2 == player){
                                     continue;
@@ -107,7 +106,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                             }
                             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Destroyed up to 2 enemy infantry from "+representation);
                         }
-                        if(trapName.equalsIgnoreCase("Account Siphon")){
+                        if("Account Siphon".equalsIgnoreCase(trapName)){
                             for(Player p2: activeGame.getRealPlayers()){
                                 if(p2 == player){
                                     continue;

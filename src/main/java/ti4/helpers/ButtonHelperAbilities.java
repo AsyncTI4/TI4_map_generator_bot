@@ -1,14 +1,13 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import java.util.*;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
@@ -443,9 +442,10 @@ public class ButtonHelperAbilities {
                     for (Player player_ : activeGame.getPlayers().values()) {
                         if (player_.getPlanets().contains(planet)) {
                             alreadyOwned = true;
+                            break;
                         }
                     }
-                    if(!alreadyOwned && !planet.equalsIgnoreCase("mr")){
+                    if(!alreadyOwned && !"mr".equalsIgnoreCase(planet)){
                         unitHolder.addToken("token_freepeople.png");
                     }
                 }
@@ -561,7 +561,7 @@ public class ButtonHelperAbilities {
             if (tile == null) {
                 continue;
             }
-            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !planetName.equalsIgnoreCase("mr") && !ButtonHelper.isTileHomeSystem(tile)) {
+            if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG) && !"mr".equalsIgnoreCase(planetName) && !ButtonHelper.isTileHomeSystem(tile)) {
                 buttons.add(Button.secondary("mantleCrack_" + planetName, Helper.getPlanetRepresentation(planetName, activeGame)));
             } else {
                 if (planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
@@ -781,18 +781,16 @@ public class ButtonHelperAbilities {
     public static void giveKeleresCommsNTg(Game activeGame, GenericInteractionCreateEvent event) {
         for (Player player : activeGame.getRealPlayers()) {
             if(player.hasAbility("divination")){
-                ButtonHelperAbilities.rollOmenDiceAtStartOfStrat(activeGame, player);
+                rollOmenDiceAtStartOfStrat(activeGame, player);
             }
             if (!player.hasAbility("council_patronage")) continue;
             MessageChannel channel = activeGame.getActionsChannel();
             if (activeGame.isFoWMode()) {
                 channel = player.getPrivateChannel();
             }
-            StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
-            sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm).append(" commodities have been replenished and you have gained 1 ").append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" trade good (").append(player.getTg()).append(" -> ").append((player.getTg() + 1)).append(")");
             player.setTg(player.getTg() + 1);
             player.setCommodities(player.getCommoditiesTotal());
-            MessageHelper.sendMessageToChannel(channel, sb.toString());
+            MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " your **Council Patronage** ability was triggered. Your " + Emojis.comm + " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade good (" + player.getTg() + " -> " + (player.getTg() + 1) + ")");
             pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
@@ -889,7 +887,7 @@ public class ButtonHelperAbilities {
 
     public static void resolvePeaceAccords(String buttonID, String ident, Player player, Game activeGame, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        if(planet.equalsIgnoreCase("lockedmallice")){
+        if("lockedmallice".equalsIgnoreCase(planet)){
             planet = "mallice";
             Tile tile = activeGame.getTileFromPlanet("lockedmallice");
             tile = MoveUnits.flipMallice(event, tile, activeGame);

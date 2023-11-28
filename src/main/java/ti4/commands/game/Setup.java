@@ -212,12 +212,11 @@ public class Setup extends GameSubcommandData {
     }
 
     private static void sendTIGLSetupText(Game activeGame) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("# ").append(Emojis.TIGL).append("TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n");
-        sb.append("Please ensure you have all:\n");
-        sb.append("- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n");
-        sb.append("- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n");
-        sb.append("For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360");
-        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb.toString());
+      String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
+          "Please ensure you have all:\n" +
+          "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
+          "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
+          "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb);
     }
 }

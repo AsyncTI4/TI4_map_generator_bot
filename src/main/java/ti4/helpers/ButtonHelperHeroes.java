@@ -1,5 +1,9 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -9,9 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-
-import java.util.*;
-
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
@@ -32,7 +33,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -135,7 +135,7 @@ public class ButtonHelperHeroes {
         } else {
             techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
         }
-        if (techType.equalsIgnoreCase("none")) {
+        if ("none".equalsIgnoreCase(techType)) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "No tech skips found");
             return;
         }
@@ -286,7 +286,7 @@ public class ButtonHelperHeroes {
                             damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                         }
                         int totalUnits = unitEntry.getValue() - damagedUnits;
-                        if (totalUnits > 0 && unitModel.getSustainDamage() && (player != nivyn || !unitModel.getBaseType().equalsIgnoreCase("mech"))) {
+                        if (totalUnits > 0 && unitModel.getSustainDamage() && (player != nivyn || !"mech".equalsIgnoreCase(unitModel.getBaseType()))) {
                             tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
                         }
                     }
@@ -297,7 +297,7 @@ public class ButtonHelperHeroes {
 
     public static void augersHeroSwap(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         int num = Integer.parseInt(buttonID.split("_")[2]);
-        if (buttonID.split("_")[1].equalsIgnoreCase("1")) {
+        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
             activeGame.swapStage1(1, num);
         } else {
             activeGame.swapStage2(1, num);
@@ -310,7 +310,7 @@ public class ButtonHelperHeroes {
 
     public static void augersHeroResolution(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<Button>();
-        if (buttonID.split("_")[1].equalsIgnoreCase("1")) {
+        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
             int size = activeGame.getPublicObjectives1Peakable().size() - 2;
             for (int x = size; x < size + 3; x++) {
                 new PeakAtStage1().secondHalfOfPeak(event, activeGame, player, x);
@@ -487,7 +487,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!techM.getType().toString().equalsIgnoreCase("unitupgrade")) {
+            if (!"unitupgrade".equalsIgnoreCase(techM.getType().toString())) {
                 buttons.add(Button.secondary(finChecker + "jnHeroSwapOut_" + tech, techM.getName()));
             }
         }
@@ -518,7 +518,7 @@ public class ButtonHelperHeroes {
         player.addTech(techIn);
         player.removeTech(techOut);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-            ButtonHelper.getIdent(player) + " swapped the tech \'" + techM1.getName() + "\' for the tech \'" + techM2.getName() + "\'");
+            ButtonHelper.getIdent(player) + " swapped the tech '" + techM1.getName() + "' for the tech '" + techM2.getName() + "'");
         event.getMessage().delete().queue();
     }
 
@@ -615,7 +615,7 @@ public class ButtonHelperHeroes {
 
                 UnitKey unitKey = unitEntry.getKey();
                 int totalUnits = unitEntry.getValue();
-                if (!unitKey.getUnitType().equals(UnitType.Infantry) && !unitKey.getUnitType().equals(UnitType.Mech)) {
+                if (unitKey.getUnitType() != UnitType.Infantry && unitKey.getUnitType() != UnitType.Mech) {
                     new RemoveUnits().removeStuff(event, tile1, totalUnits, "space", unitKey, player.getColor(), false, activeGame);
                 }
             }

@@ -15,13 +15,11 @@ public interface Selection {
 
     default void postExecute(StringSelectInteractionEvent event) {
         // DO NOTHING
-        return;
     }
 
     default String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(event.getComponentId()).append("\n");
-        sb.append("Values: ").append(event.getValues()).append("\n");
-        return sb.toString();
+      String sb = event.getComponentId() + "\n" +
+          "Values: " + event.getValues() + "\n";
+        return sb;
     }
 }

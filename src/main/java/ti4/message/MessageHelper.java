@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -30,6 +26,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.DiscordWebhook;
@@ -149,7 +147,7 @@ public class MessageHelper {
 			}
 		}
 		FileUpload fileUpload = FileUpload.fromData(file);
-		final MessageChannel finalChannel = channel;
+		MessageChannel finalChannel = channel;
 		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
@@ -164,7 +162,7 @@ public class MessageHelper {
 				}
 			}
 		}
-		final MessageChannel finalChannel = channel;
+		MessageChannel finalChannel = channel;
 		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
@@ -586,7 +584,7 @@ public class MessageHelper {
 		List<String> badButtonIDsAndReason = new ArrayList<>();
 		for (Button button : buttons) {
 			if (button == null) continue;
-			if (button.getId() == null && !button.getStyle().equals(ButtonStyle.LINK)) continue;
+			if (button.getId() == null && button.getStyle() != ButtonStyle.LINK) continue;
 
 			// REMOVE DUPLICATE IDs
 			if (goodButtonIDs.contains(button.getId())) {
@@ -596,8 +594,7 @@ public class MessageHelper {
 			goodButtonIDs.add(button.getId());
 
 			// REMOVE EMOJIS IF EMOJI NOT
-			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji) {
-				CustomEmoji emoji = (CustomEmoji) button.getEmoji();
+			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					badButtonIDsAndReason.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
 					button = button.withEmoji(null);

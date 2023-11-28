@@ -35,8 +35,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String legendaryAbilityText;
     private String flavourText;
     private UnitTokenPosition unitPositions;
-    private int spaceCannonDieCount = 0;
-    private int spaceCannonHitsOn = 0;
+    private int spaceCannonDieCount;
+    private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
@@ -128,8 +128,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
-                default -> sb.append("");
-                
+                default ->
             }
         }
         return sb.toString();
@@ -145,8 +144,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     public String getEmojiURL() {
         Emoji emoji = Emoji.fromFormatted(getEmoji());
-        if (emoji instanceof CustomEmoji) {
-            CustomEmoji customEmoji = (CustomEmoji) emoji;
+        if (emoji instanceof CustomEmoji customEmoji) {
             return customEmoji.getImageUrl();
         }
         return null;

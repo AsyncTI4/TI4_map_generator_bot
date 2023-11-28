@@ -1,5 +1,11 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -7,13 +13,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
@@ -37,7 +38,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void checkForStymie(Game activeGame, Player activePlayer, Tile tile){
         for(Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, activeGame, tile)){
-            if(p2.getPromissoryNotes().keySet().contains("stymie") && activeGame.getPNOwner("stymie") != p2){
+            if(p2.getPromissoryNotes().containsKey("stymie") && activeGame.getPNOwner("stymie") != p2){
                 String msg = ButtonHelper.getTrueIdentity(p2, activeGame)+ " you have the opportunity to stymie "+ButtonHelper.getIdentOrColor(activePlayer,activeGame);
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("stymiePlayerStep1_"+activePlayer.getFaction(), "Play Stymie"));
@@ -251,7 +252,7 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile ) {
         List<Button> buttons = new ArrayList<Button>();
-        if (!player.getPromissoryNotes().keySet().contains("ragh")) {
+        if (!player.getPromissoryNotes().containsKey("ragh")) {
             return buttons;
         }
         Player saar = activeGame.getPNOwner("ragh");
@@ -441,7 +442,7 @@ public class ButtonHelperFactionSpecific {
         }
         Integer player1SC = Integer.parseInt(buttonID.split("_")[4]);
         Integer player2SC = Integer.parseInt(buttonID.split("_")[3]);
-        if (type.equalsIgnoreCase("qdn")) {
+        if ("qdn".equalsIgnoreCase(type)) {
             int oldTg = player2.getTg();
             player2.setTg(oldTg + 3);
             ButtonHelperAbilities.pillageCheck(player2, activeGame);
@@ -544,7 +545,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
                 ButtonHelper.getTrueIdentity(player, activeGame) + " a " + unit + " of yours was released from prison.");
         }
-        if (!cabal.getNomboxTile().getUnitHolders().get("space").getUnits().keySet().contains(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
+        if (!cabal.getNomboxTile().getUnitHolders().get("space").getUnits().containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
             ButtonHelper.deleteTheOneButton(event);
         }
 
@@ -1143,7 +1144,7 @@ public class ButtonHelperFactionSpecific {
             if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0 && !removed){
                 removed = true;
                 String name = uH.getName();
-                if(name.equals("space")){
+                if("space".equals(name)){
                     name = "";
                 }
                 new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 mech "+name, activeGame);

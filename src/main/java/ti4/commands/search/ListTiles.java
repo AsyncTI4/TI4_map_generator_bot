@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -22,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.ListUtils;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -46,7 +44,7 @@ public class ListTiles extends SearchSubcommandData {
         //     return;
         // }
 
-        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> TileHelper.isValidTile(searchString) ? searchString.equals(tile.getId()) : true)
+        List<TileModel> tiles = TileHelper.getAllTiles().values().stream().filter(tile -> !TileHelper.isValidTile(searchString) || searchString.equals(tile.getId()))
             .sorted(Comparator.comparing(TileModel::getId)).toList();
         MessageChannel channel = event.getMessageChannel();
 

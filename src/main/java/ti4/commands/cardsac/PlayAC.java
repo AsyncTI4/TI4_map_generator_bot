@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -485,7 +484,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     if(p2 == player){
                         continue;
                     }
-                    if(p2.getActionCards().keySet().contains("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
+                    if(p2.getActionCards().containsKey("reverse_engineer") && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
                         List<Button> reverseButtons = new ArrayList<Button>();
                         String key = "reverse_engineer";
                         String ac_name = Mapper.getActionCardName(key);

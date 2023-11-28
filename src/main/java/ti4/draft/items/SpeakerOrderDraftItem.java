@@ -2,7 +2,6 @@ package ti4.draft.items;
 
 import ti4.draft.DraftItem;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 
 public class SpeakerOrderDraftItem extends DraftItem {
     public SpeakerOrderDraftItem(String itemId) {
@@ -16,7 +15,7 @@ public class SpeakerOrderDraftItem extends DraftItem {
 
     @Override
     public String getLongDescriptionImpl() {
-        if (ItemId.equals("1")) {
+        if ("1".equals(ItemId)) {
             return "Speaker Token + Table Position 1";
         }
         return "Table Position " + ItemId;
@@ -24,7 +23,7 @@ public class SpeakerOrderDraftItem extends DraftItem {
 
     @Override
     public String getItemEmoji() {
-        if (ItemId.equals("1")) {
+        if ("1".equals(ItemId)) {
             return Emojis.SpeakerToken;
         }
         return Emojis.getResourceEmoji(Integer.parseInt(ItemId));
