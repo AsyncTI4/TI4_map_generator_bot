@@ -69,7 +69,8 @@ public class AbilityModelTest {
     @Test
     public void testSource() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
-        String source = "testsource";
+        ComponentSource source = ComponentSource.base;
+        abilityModel.setSource(source);
         assertEquals(source, abilityModel.getSource());
     }
 
