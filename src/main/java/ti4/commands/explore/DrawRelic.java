@@ -31,22 +31,23 @@ public class DrawRelic extends GenericRelicAction {
         drawRelicAndNotify(player, event, activeGame);
     }
 
-    public static void drawWithAdvantage(Player player, GenericInteractionCreateEvent event, Game activeGame, int advantage){
+    public static void drawWithAdvantage(Player player, GenericInteractionCreateEvent event, Game activeGame, int advantage) {
         List<Button> buttons = new ArrayList<>();
         List<String> relics = activeGame.getAllRelics();
         StringBuilder info = new StringBuilder();
-        for(int x = 0; x < advantage && x < relics.size(); x++){
+        for (int x = 0; x < advantage && x < relics.size(); x++) {
             RelicModel relicData = Mapper.getRelic(relics.get(x));
-            buttons.add(Button.success("drawRelicAtPosition_"+x, relicData.getName()));
+            buttons.add(Button.success("drawRelicAtPosition_" + x, relicData.getName()));
             info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
-        String msg = ButtonHelper.getTrueIdentity(player, activeGame)+" choose the relic that you want. The relic text is reproduced for your conveinenance";
-         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        String msg = player.getRepresentation(true, true) + " choose the relic that you want. The relic text is reproduced for your conveinenance";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), info.toString());
     }
-    public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID){
+
+    public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID) {
         int position = Integer.parseInt(buttonID.split("_")[1]);
-        if(player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player){
+        if (player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player) {
             ButtonHelper.resolvePNPlay("dspnflorChecked", player, activeGame, event);
         }
         drawRelicAndNotify(player, event, activeGame, position, true);
@@ -54,11 +55,11 @@ public class DrawRelic extends GenericRelicAction {
     }
 
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame) {
-        drawRelicAndNotify(player, event,  activeGame, 0, false);
+        drawRelicAndNotify(player, event, activeGame, 0, false);
     }
 
     public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game activeGame, int position, boolean checked) {
-        if(!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player))){
+        if (!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().containsKey("dspnflor") && activeGame.getPNOwner("dspnflor") != player))) {
             drawWithAdvantage(player, event, activeGame, 2);
             return;
         }
@@ -68,27 +69,28 @@ public class DrawRelic extends GenericRelicAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
             return;
         }
-        relicID = relicID.replace("extra1","");
-        relicID = relicID.replace("extra2","");
+        relicID = relicID.replace("extra1", "");
+        relicID = relicID.replace("extra2", "");
         player.addRelic(relicID);
         RelicModel relicData = Mapper.getRelic(relicID);
         StringBuilder message = new StringBuilder();
-        message.append(player.getRepresentation()).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText()).append("\n");
+        message.append(player.getRepresentation()).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData.getName()).append("**__\n> ").append(relicData.getText())
+            .append("\n");
 
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
             case "nanoforge" -> message.append("Run the following commands to use Nanoforge:\n")
-                   .append("     `/explore relic_purge relic: nanoforge`\n")
-                   .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
+                .append("     `/explore relic_purge relic: nanoforge`\n")
+                .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
                 activeGame.drawSecretObjective(player.getUserID());
-                
+
                 if (activeGame.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "Drew SO");
                 }
-                
+
                 message.append("\nAn SO has been automatically drawn");
-                if(player.hasAbility("plausible_deniability")){
+                if (player.hasAbility("plausible_deniability")) {
                     activeGame.drawSecretObjective(player.getUserID());
                     message.append(". Drew a second SO due to plausible deniability");
                 }
@@ -99,7 +101,7 @@ public class DrawRelic extends GenericRelicAction {
                 activeGame.scorePublicObjective(player.getUserID(), poIndex);
                 Helper.checkEndGame(activeGame, player);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
-                       .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
+                    .append(player.getRepresentation()).append(" scored 'Shard of the Throne'");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -115,7 +117,7 @@ public class DrawRelic extends GenericRelicAction {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, message.toString());
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
-        if(checked){
+        if (checked) {
             activeGame.shuffleRelics();
         }
     }

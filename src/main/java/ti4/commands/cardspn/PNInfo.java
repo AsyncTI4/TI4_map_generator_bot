@@ -42,7 +42,7 @@ public class PNInfo extends PNCardsSubcommandData {
     public static void sendPromissoryNoteInfo(Game activeGame, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(activeGame, player);
         activeGame.checkPromissoryNotes();
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Heads up, someone used some command";
+        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendPromissoryNoteInfo(activeGame, player, longFormat);
     }
@@ -53,22 +53,21 @@ public class PNInfo extends PNCardsSubcommandData {
 
         //BUTTONS
         List<Button> buttons = new ArrayList<>();
-        for(String pnShortHand : player.getPromissoryNotes().keySet())
-        {
-            if(player.getPromissoryNotesInPlayArea().contains(pnShortHand)){
+        for (String pnShortHand : player.getPromissoryNotes().keySet()) {
+            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
             if (owner != player) {
                 Button transact;
-                if(activeGame.isFoWMode()){
+                if (activeGame.isFoWMode()) {
                     transact = Button.success("resolvePNPlay_" + pnShortHand,
-                            "Play " + owner.getColor() + " " + promissoryNote.getName());
+                        "Play " + owner.getColor() + " " + promissoryNote.getName());
 
                 } else {
                     transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
-                            .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                        .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                 }
                 buttons.add(transact);
             }
@@ -77,21 +76,21 @@ public class PNInfo extends PNCardsSubcommandData {
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
         buttons.add(modify);
-        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")){
+        if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             Button naalu = Button.secondary("naaluCommander", "Do Naalu Commander").withEmoji(Emoji.fromFormatted(Emojis.Naalu));
             buttons.add(naalu);
         }
-        if(player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")){
+        if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             Button augers = Button.secondary("initialPeak", "Peek At Next Objective").withEmoji(Emoji.fromFormatted(Emojis.augers));
             buttons.add(augers);
         }
-        if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
+        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
             StringBuilder omenDice = new StringBuilder();
-            for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
+            for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
                 omenDice.append(" ").append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
-            Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(augers);
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
@@ -106,19 +105,17 @@ public class PNInfo extends PNCardsSubcommandData {
             Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Emojis.Cabal));
             buttons.add(release);
         }
-        if(player.hasRelicReady("e6-g0_network")){
+        if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(activeGame, player).size() > 1) {
-                Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
-                psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-                buttons.add(psycho);
+            Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
+            psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+            buttons.add(psycho);
         }
-        
+
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
-
-   
 
     public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat) {
         StringBuilder sb = new StringBuilder();
@@ -195,7 +192,7 @@ public class PNInfo extends PNCardsSubcommandData {
             // if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
         }
-        
+
         if (longFormat || Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) || "Absol".equalsIgnoreCase(pnModel.getSource())) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
@@ -219,7 +216,7 @@ public class PNInfo extends PNCardsSubcommandData {
         promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
         promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
         promissoryNotes.removeAll(activeGame.getPurgedPN());
-        
+
         // Any remaining PNs are missing from the game and can be re-added to the player's hand
         if (!promissoryNotes.isEmpty()) {
             for (String promissoryNote : promissoryNotes) {

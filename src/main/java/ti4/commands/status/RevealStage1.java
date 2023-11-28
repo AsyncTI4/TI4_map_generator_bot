@@ -28,7 +28,7 @@ public class RevealStage1 extends StatusSubcommandData {
         Map.Entry<String, Integer> objective = activeGame.revealState1();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 1 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 
@@ -40,7 +40,7 @@ public class RevealStage1 extends StatusSubcommandData {
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
-        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 1 Public Objectives Revealed**");
+        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 1 Public Objectives Revealed**");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed())).queue(m -> m.pin().queue());
     }
 

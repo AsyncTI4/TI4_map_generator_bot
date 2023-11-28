@@ -33,13 +33,13 @@ public class EventInfo extends EventSubcommandData {
     }
 
     public static void sendEventInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendEventInfo(activeGame, player);
     }
 
     public static void sendEventInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used something";
+        String headerText = player.getRepresentation(true, true) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendEventInfo(activeGame, player);
     }
@@ -58,7 +58,6 @@ public class EventInfo extends EventSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
 
-
         //ACTION CARDS
         sb.append("**Event Cards in hand:**").append("\n");
         int index = 1;
@@ -71,14 +70,14 @@ public class EventInfo extends EventSubcommandData {
                 for (Map.Entry<String, Integer> event : eventCards.entrySet()) {
                     Integer value = event.getValue();
                     EventModel eventModel = Mapper.getEvent(event.getKey());
-                    
+
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if(eventModel == null){
+                    if (eventModel == null) {
                         sb.append("Something broke here");
-                    }else{
+                    } else {
                         sb.append(eventModel.getRepresentation(value));
                     }
-                    
+
                     index++;
                 }
             }

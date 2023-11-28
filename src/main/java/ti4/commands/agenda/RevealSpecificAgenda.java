@@ -67,7 +67,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
 
         //EMERGENCY SESSION
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
-            MessageHelper.sendMessageToChannel(channel, "# " + Helper.getGamePing(activeGame.getGuild(), activeGame)
+            MessageHelper.sendMessageToChannel(channel, "# " + activeGame.getPing()
                 + " Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
             agendaID = activeGame.revealAgenda(false);
             revealAgenda(event, activeGame, channel, agendaID);
@@ -77,7 +77,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         //ELECT LAW BUT NO LAWS IN PLAY
         if (agendaTarget.contains("Law") && (activeGame.getLaws().isEmpty() || activeGame.getLaws().size() == 0)) {
             MessageHelper.sendMessageToChannel(channel,
-                Helper.getGamePing(activeGame.getGuild(), activeGame) + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
+                activeGame.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
             agendaID = activeGame.revealAgenda(false);
             revealAgenda(event, activeGame, channel, agendaID);
             return;
@@ -90,12 +90,12 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             while (!notEmergency) {
                 if ("Emergency Session".equalsIgnoreCase(agendaName)) {
                     activeGame.revealAgenda(false);
-                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeGame.getGuild(), activeGame) + " Emergency Session revealed underneath Covert Legislation, discarding it.");
+                    MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
                 if (agendaTarget.toLowerCase().contains("elect law") && activeGame.getLaws().size() < 1) {
                     activeGame.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(channel,
-                        Helper.getGamePing(activeGame.getGuild(), activeGame) + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
+                        activeGame.getPing() + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
                 }
                 String id2 = activeGame.getNextAgenda(false);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
@@ -120,7 +120,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                         Map.Entry<String, Integer> entry = activeGame.drawAgenda();
                         sb.append("-----------\n");
                         sb.append("Game: ").append(activeGame.getName()).append("\n");
-                        sb.append(ButtonHelper.getTrueIdentity(speaker, activeGame)).append("\n");
+                        sb.append(speaker.getRepresentation(true, true)).append("\n");
                         sb.append("Drawn Agendas:\n");
                         sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                         sb.append("\n");
@@ -138,7 +138,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         activeGame.setLatestWhenMsg("");
         activeGame.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
-        String text = Helper.getGamePing(event, activeGame)
+        String text = activeGame.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
 
         Date newTime = new Date();
@@ -161,12 +161,12 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
-                "# " + Helper.getGamePing(activeGame.getGuild(), activeGame) + " the agenda target is " + agendaTarget + ". Sent the agenda to the speakers cards info");
+                "# " + activeGame.getPing() + " the agenda target is " + agendaTarget + ". Sent the agenda to the speakers cards info");
         }
         for (Player player : activeGame.getRealPlayers()) {
             if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame).size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getTrueIdentity(player, activeGame) + " you have Florzen commander and can thus explore and ready a planet",
+                    player.getRepresentation(true, true) + " you have Florzen commander and can thus explore and ready a planet",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, activeGame));
             }
         }

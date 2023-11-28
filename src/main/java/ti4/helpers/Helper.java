@@ -105,7 +105,7 @@ public class Helper {
             if (roles.contains(player.getRoleForCommunity())) {
                 return player;
             }
-            if(player.getTeamMateIDs().contains(member.getUser().getId())){
+            if (player.getTeamMateIDs().contains(member.getUser().getId())) {
                 return player;
             }
         }
@@ -589,21 +589,21 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
-            String techType;
-            if(planet.contains("custodia") || planet.contains("ghoti")){
+            String techType = "none";
+            if (planet.contains("custodia") || planet.contains("ghoti")) {
                 Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
                 continue;
             }
-            if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
+            if (Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) {
                 techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
-            }else{
+            } else {
                 techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
             }
-            if("none".equalsIgnoreCase(techType)){
+            if (techType.equalsIgnoreCase("none")) {
                 Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
-            }else{
+            } else {
                 Button techB = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 switch (techType) {
                     case "propulsion" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
@@ -613,7 +613,7 @@ public class Helper {
                 }
                 planetButtons.add(techB);
             }
-           
+
         }
         return planetButtons;
     }
@@ -743,15 +743,15 @@ public class Helper {
             Button DoneProducingUnits = Button.danger("deleteButtons_" + warfareNOtherstuff, "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
         }
-        if(player.hasTech("yso")){
-            if("sling".equalsIgnoreCase(warfareNOtherstuff)){
-                 List<Button> unitButtons2 = new ArrayList<>();
+        if (player.hasTech("yso")) {
+            if ("sling".equalsIgnoreCase(warfareNOtherstuff)) {
+                List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " you can use this to Yin Spin", unitButtons2);
-            }else{
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you can use this to Yin Spin", unitButtons2);
+            } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders").withEmoji(Emoji.fromFormatted(Emojis.Yin)));
             }
-             
+
         }
 
         return unitButtons;
@@ -799,38 +799,6 @@ public class Helper {
             Planet planet = (Planet) unitHolder;
             return planet.getInfluence();
         }
-    }
-
-    /**
-     * Deprecated - use game.getPing() instead
-     */
-    @Deprecated
-    public static String getGamePing(SlashCommandInteractionEvent event, Game activeGame) {
-        return getGamePing(event.getGuild(), activeGame);
-    }
-
-    /**
-     * Deprecated - use game.getPing() instead
-     */
-    @Deprecated
-    public static String getGamePing(GenericInteractionCreateEvent event, Game activeGame) {
-        return getGamePing(activeGame.getGuild(), activeGame);
-    }
-
-    /**
-     * Deprecated - use game.getPing() instead
-     */
-    @Deprecated
-    public static String getGamePing(Guild guild, Game activeGame) {
-        return activeGame.getPing();
-    }
-
-    /**
-     * Deprecated - use player.getRepresentation(overrideFow:true, includePing:true) instead
-     */
-    @Deprecated
-    public static String getPlayerRepresentation(Player player, Game activeGame, Guild guild, boolean overrideFow) {
-        return player.getRepresentation(overrideFow, true);
     }
 
     @Deprecated
@@ -934,7 +902,7 @@ public class Helper {
                 }
             }
 
-            String msg = getGamePing(event, activeGame) + " ";
+            String msg = activeGame.getPing() + " ";
             if (!activeGame.isFoWMode()) {
                 if (player != null) {
                     msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
@@ -1338,7 +1306,7 @@ public class Helper {
 
     private static void addGameRoleToMapPlayers(Guild guild, Game activeGame, Role role) {
         for (String playerID : activeGame.getPlayerIDs()) {
-            if(activeGame.getRound() > 1 && activeGame.getPlayer(playerID).getFaction() == null){
+            if (activeGame.getRound() > 1 && activeGame.getPlayer(playerID).getFaction() == null) {
                 continue;
             }
             Member member = guild.getMemberById(playerID);
@@ -1375,10 +1343,10 @@ public class Helper {
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
             String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
-            if (!"nope".equalsIgnoreCase(jolNarHeroTech)) {
-                if("nekro".equalsIgnoreCase(jolNarHeroTech)){
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName+"_nopay";
-                }else{
+            if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
+                if (jolNarHeroTech.equalsIgnoreCase("nekro")) {
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName + "_nopay";
+                } else {
                     buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
                 }
             }
@@ -1447,30 +1415,26 @@ public class Helper {
     public static List<TechnologyModel> getAllTechOfAType(Game activeGame, String techType, String playerfaction, Player player) {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
-                .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
-                .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
-                .filter(tech -> !player.hasTech(tech.getAlias()))
-                .filter(tech -> {
-                    if (tech.getFaction().isEmpty()) {
-                        return true;
-                    }
-                    tech.getFaction().get();
-                    return "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias());
-                })
-                .forEach(techs::add);
+            .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
+            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
+            .filter(tech -> !player.hasTech(tech.getAlias()))
+            .filter(tech -> tech.getFaction().isEmpty() || tech.getFaction().get() == null || tech.getFaction().get().equalsIgnoreCase("")
+                || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+            .forEach(tech -> techs.add(tech));
 
         List<TechnologyModel> techs2 = new ArrayList<>();
-        for(TechnologyModel tech : techs){
+        for (TechnologyModel tech : techs) {
             boolean addTech = true;
-            if("unitupgrade".equalsIgnoreCase(tech.getType().toString())){
-                for(String factionTech : player.getNotResearchedFactionTechs()){
+            if (tech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")) {
+                for (String factionTech : player.getNotResearchedFactionTechs()) {
                     TechnologyModel fTech = Mapper.getTech(factionTech);
-                    if(fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && "unitupgrade".equalsIgnoreCase(fTech.getType().toString()) && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getAlias())) {
+                    if (fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias()) && fTech.getType().toString().toLowerCase().equalsIgnoreCase("unitupgrade")
+                        && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getAlias())) {
                         addTech = false;
                     }
                 }
             }
-            if(addTech){
+            if (addTech) {
                 techs2.add(tech);
             }
         }
@@ -1540,7 +1504,7 @@ public class Helper {
             }
             int scoredObjectiveCount = scoredPOCount + scoredSOCount;
             if (scoredObjectiveCount >= 3) {
-                UnlockLeader ul = new UnlockLeader();
+                //UnlockLeader ul = new UnlockLeader();
                 UnlockLeader.unlockLeader(event, "hero", activeGame, player);
             }
         }
@@ -1562,7 +1526,8 @@ public class Helper {
             if (tile == null) {
                 tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
             }
-            boolean ghosty = player.getPlayerStatsAnchorPosition() != null && activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null && "17".equals(activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID());
+            boolean ghosty = player.getPlayerStatsAnchorPosition() != null && activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null
+                && "17".equals(activeGame.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID());
             if ((player.getFaction().contains("ghost") && activeGame.getTile("17") != null) || ghosty) {
                 tile = activeGame.getTile("17");
             }
@@ -1577,11 +1542,11 @@ public class Helper {
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
         LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
-        StringBuilder msg = new StringBuilder(getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n");
+        String msg = activeGame.getPing() + " set order in the following way: \n";
         try {
             for (Player player : sortedPlayers) {
                 new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
-                msg.append(ButtonHelper.getTrueIdentity(player, activeGame)).append(" \n");
+                msg = msg + player.getRepresentation(true, true) + " \n";
             }
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
@@ -1590,9 +1555,8 @@ public class Helper {
         } catch (Exception e) {
             activeGame.setPlayers(playersBackup);
         }
-        msg.append("Note: the first player is not necesarily speaker/first pick. This is the general speaker order.");
+        msg += "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg.toString());
-
     }
 
     public static void checkEndGame(Game activeGame, Player player) {
@@ -1601,7 +1565,7 @@ public class Helper {
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
-                getGamePing(activeGame.getGuild(), activeGame) + " it seems like " + ButtonHelper.getIdentOrColor(player, activeGame)
+                activeGame.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, activeGame)
                     + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
         }

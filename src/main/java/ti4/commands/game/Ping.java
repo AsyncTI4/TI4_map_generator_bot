@@ -19,6 +19,6 @@ public class Ping extends GameSubcommandData {
     }
 
     public void pingGame(GenericInteractionCreateEvent event, Game activeGame) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Ping Game: " + Helper.getGamePing(event.getGuild(), activeGame));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Ping Game: " + activeGame.getPing());
     }
 }

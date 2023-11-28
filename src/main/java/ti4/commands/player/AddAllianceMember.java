@@ -30,41 +30,41 @@ public class AddAllianceMember extends PlayerSubcommandData {
             return;
         }
         String currentMembers = player_.getAllianceMembers();
-        if(!player_.getAllianceMembers().contains(player.getFaction())){
-            player_.addAllianceMember(player.getFaction()+player.getAllianceMembers());
+        if (!player_.getAllianceMembers().contains(player.getFaction())) {
+            player_.addAllianceMember(player.getFaction() + player.getAllianceMembers());
         }
-        if(!player.getAllianceMembers().contains(player_.getFaction())){
-            player.addAllianceMember(player_.getFaction()+currentMembers);
+        if (!player.getAllianceMembers().contains(player_.getFaction())) {
+            player.addAllianceMember(player_.getFaction() + currentMembers);
         }
-        
-        for (String leaderID : player_.getLeaderIDs() ){
+
+        for (String leaderID : player_.getLeaderIDs()) {
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
-                if (!leaderID.contains("mahact") && !player.hasAbility("edict")){
+                if (!leaderID.contains("mahact") && !player.hasAbility("edict")) {
                     player.addLeader(leaderID);
                     player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
                 }
                 player_.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
-        for (String leaderID : player.getLeaderIDs() ){
+        for (String leaderID : player.getLeaderIDs()) {
             if (leaderID.contains("commander") && !player_.hasLeader(leaderID)) {
-                if(!leaderID.contains("mahact")&&!player_.hasAbility("edict")){
+                if (!leaderID.contains("mahact") && !player_.hasAbility("edict")) {
                     player_.addLeader(leaderID);
                     player_.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
                 }
                 player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
-        if(player.hasAbility("edict")){
+        if (player.hasAbility("edict")) {
             player.addMahactCC(player_.getColor());
         }
-        if(player_.hasAbility("edict")){
+        if (player_.hasAbility("edict")) {
             player_.addMahactCC(player.getColor());
         }
-        String msg = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + Helper.getPlayerRepresentation(player_, activeGame, activeGame.getGuild(), true) + " pinging you into this";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),msg);
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(),msg);
-        
-        sendMessage("Added "+player_.getFaction() + " as part of "+player.getFaction()+"'s alliance. This works 2 ways");
+        String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true) + " pinging you into this";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), msg);
+
+        sendMessage("Added " + player_.getFaction() + " as part of " + player.getFaction() + "'s alliance. This works 2 ways");
     }
 }

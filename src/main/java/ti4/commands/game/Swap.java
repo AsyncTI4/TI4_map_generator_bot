@@ -58,11 +58,11 @@ public class Swap extends GameSubcommandData {
         if (removeOption != null && addOption != null) {
             Player removedPlayer = Helper.getPlayer(activeGame, null, event);
             Player swapperPlayer = activeGame.getPlayer(addOption.getAsUser().getId());
-            if (removedPlayer == null){
+            if (removedPlayer == null) {
                 MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
                 return;
             }
-            if (swapperPlayer == null || swapperPlayer.getFaction() == null){
+            if (swapperPlayer == null || swapperPlayer.getFaction() == null) {
                 MessageHelper.replyToMessage(event, "Could not find faction/player to swap");
                 return;
             }
@@ -76,63 +76,62 @@ public class Swap extends GameSubcommandData {
         GameSaveLoadManager.reload(activeGame);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
-     public void secondHalfOfSwap(Game activeGame, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+
+    public void secondHalfOfSwap(Game activeGame, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
         String message;
         Collection<Player> players = activeGame.getPlayers().values();
-            if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
-                 message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
-                Player player = activeGame.getPlayer(removedPlayer.getUserID());
-                LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
-                for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
-                    List<String> value = poEntry.getValue();
-                    boolean removed = value.remove(removedPlayer.getUserID());
-                    boolean removed2 = value.remove(swapperPlayer.getUserID());
-                    if (removed){
-                        value.add(addedUser.getId());
-                    }
-                    if (removed2){
-                        value.add(removedPlayer.getUserID());
-                    }
+        if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
+            message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
+            Player player = activeGame.getPlayer(removedPlayer.getUserID());
+            LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+            for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
+                List<String> value = poEntry.getValue();
+                boolean removed = value.remove(removedPlayer.getUserID());
+                boolean removed2 = value.remove(swapperPlayer.getUserID());
+                if (removed) {
+                    value.add(addedUser.getId());
                 }
-                if(player.isDummy()){
-                    player.setDummy(false);
-                    swapperPlayer.setDummy(true);
+                if (removed2) {
+                    value.add(removedPlayer.getUserID());
                 }
-                LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
-                player.setSCs(swapperPlayer.getSCs());
-                swapperPlayer.setSCs(holder);
-                swapperPlayer.setUserName(removedPlayer.getUserName());
-                swapperPlayer.setUserID(removedPlayer.getUserID());
-                player.setUserName(addedUser.getName());
-                player.setUserID(addedUser.getId());
-                
-                if(activeGame.getActivePlayer() != null && activeGame.getActivePlayer().equalsIgnoreCase(player.getUserID())){
-                    if(!activeGame.isFoWMode())
-                    {
-                        try {
-                            if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
-                                activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
-                                activeGame.setLatestTransactionMsg("");
-                            }
-                        }
-                        catch(Exception e) {
-                            //  Block of code to handle errors
-                        }
-                    }
-                    String text = "# " + Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " UP NEXT";
-                    String buttonText = "Use buttons to do your turn. ";
-                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
-                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
-                    MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
-                }
-            } else {
-                MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
-                return;
             }
+            if (player.isDummy()) {
+                player.setDummy(false);
+                swapperPlayer.setDummy(true);
+            }
+            LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
+            player.setSCs(swapperPlayer.getSCs());
+            swapperPlayer.setSCs(holder);
+            swapperPlayer.setUserName(removedPlayer.getUserName());
+            swapperPlayer.setUserID(removedPlayer.getUserID());
+            player.setUserName(addedUser.getName());
+            player.setUserID(addedUser.getId());
+
+            if (activeGame.getActivePlayer() != null && activeGame.getActivePlayer().equalsIgnoreCase(player.getUserID())) {
+                if (!activeGame.isFoWMode()) {
+                    try {
+                        if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
+                            activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
+                            activeGame.setLatestTransactionMsg("");
+                        }
+                    } catch (Exception e) {
+                        //  Block of code to handle errors
+                    }
+                }
+                String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+                String buttonText = "Use buttons to do your turn. ";
+                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
+                MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
+                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
+            }
+        } else {
+            MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
+            return;
+        }
         GameSaveLoadManager.saveMap(activeGame, event);
         GameSaveLoadManager.reload(activeGame);
-       // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
-       // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
+        // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
+        // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 }
