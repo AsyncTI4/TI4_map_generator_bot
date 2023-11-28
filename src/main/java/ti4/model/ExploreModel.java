@@ -63,7 +63,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(getTypeEmoji() + "__" + getName() + "__" + getSource().emoji(), null);
-        eb.setColor(getEmbedColour());
+        eb.setColor(getEmbedColor());
         eb.setDescription(getText());
 
         if (includeID) {
@@ -76,7 +76,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
-    private Color getEmbedColour() {
+    private Color getEmbedColor() {
         return switch (getType().toLowerCase()) {
             case "cultural" -> Color.blue;
             case "hazardous" -> Color.red;

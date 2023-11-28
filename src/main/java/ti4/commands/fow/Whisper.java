@@ -53,7 +53,7 @@ public class Whisper extends FOWSubcommandData {
     public static void sendWhisper(Game activeGame, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
-        String player1 = Emojis.getColourEmojis(player.getColor());
+        String player1 = Emojis.getColorEmojiWithName(player.getColor());
 
         if (anonY.compareToIgnoreCase("y") == 0) {
             message = "[REDACTED] says: " + msg;
@@ -63,7 +63,7 @@ public class Whisper extends FOWSubcommandData {
         if (activeGame.isFoWMode()) {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Emojis.getColourEmojis(player_.getColor());
+            String player2 = Emojis.getColorEmojiWithName(player_.getColor());
             if (message.startsWith("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
@@ -73,7 +73,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Emojis.getColourEmojis(player_.getColor());
+            String player2 = Emojis.getColorEmojiWithName(player_.getColor());
             if (message.startsWith("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {

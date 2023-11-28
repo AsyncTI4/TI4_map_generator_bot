@@ -40,7 +40,7 @@ public class SendDebt extends PlayerSubcommandData {
                 }
             }
         }
-        
+
         if (sendingPlayer == null) {
             sendMessage("Player could not be found");
             return;
@@ -53,18 +53,18 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         int debtCountToSend = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
-        if (debtCountToSend <= 0 ) {
+        if (debtCountToSend <= 0) {
             sendMessage("Debt count must be a positive integer");
             return;
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
         sendMessage(sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
-        
+
     }
 
     public static void sendDebt(Player sendingPlayer, Player receivingPlayer, int debtCountToSend) {
-        String sendingPlayerColour = sendingPlayer.getColor();
-        receivingPlayer.addDebtTokens(sendingPlayerColour, debtCountToSend);
+        String sendingPlayerColor = sendingPlayer.getColor();
+        receivingPlayer.addDebtTokens(sendingPlayerColor, debtCountToSend);
     }
 }

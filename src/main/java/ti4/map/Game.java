@@ -3528,8 +3528,8 @@ public class Game {
 
     @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
-        String colourID = StringUtils.substringBefore(imageName, "_");
-        Player player = getPlayerFromColorOrFaction(colourID);
+        String colorID = StringUtils.substringBefore(imageName, "_");
+        Player player = getPlayerFromColorOrFaction(colorID);
         if (player == null) return null;
         return player.getUnitFromImageName(imageName);
     }
@@ -3542,9 +3542,9 @@ public class Game {
 
     @Deprecated
     public String getUnitNameFromImageName(String imageName) {
-        String colourID = StringUtils.substringBefore(imageName, "_");
-        String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);
-        Player player = getPlayerFromColorOrFaction(colourID);
+        String colorID = StringUtils.substringBefore(imageName, "_");
+        String imageFileSuffix = StringUtils.substringAfter(imageName, colorID);
+        Player player = getPlayerFromColorOrFaction(colorID);
         if (player == null) return null;
 
         return player.getUnitModels().stream()

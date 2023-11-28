@@ -44,11 +44,10 @@ public class AddCC extends AddRemoveToken {
     public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile) {
         addCC(event, color, tile, true);
     }
+
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) {
         addCC(event, color, tile, true);
     }
-
-
 
     public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
         String gameName = event.getChannel().getName();
@@ -58,14 +57,15 @@ public class AddCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode() && ping) {
-            String colorMention = Emojis.getColourEmojis(color);
+            String colorMention = Emojis.getColorEmojiWithName(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
     }
+
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
@@ -74,7 +74,7 @@ public class AddCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (activeGame.isFoWMode() && ping) {
-            String colorMention = Emojis.getColourEmojis(color);
+            String colorMention = Emojis.getColorEmojiWithName(color);
             FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
         tile.addCC(ccID);
@@ -106,7 +106,6 @@ public class AddCC extends AddRemoveToken {
             Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true))
-        );
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true)));
     }
 }

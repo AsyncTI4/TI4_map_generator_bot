@@ -119,11 +119,11 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
-        eb.setColor(getEmbedColour());
+        eb.setColor(getEmbedColor());
         return eb.build();
     }
 
-    private Color getEmbedColour() {
+    private Color getEmbedColor() {
         return switch (getType()) {
             case PROPULSION -> Color.blue; //Color.decode("#00FF00");
             case CYBERNETIC -> Color.yellow;
