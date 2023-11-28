@@ -137,10 +137,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
     public void steal2Tg(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        int count = 2; 
-        if(p2.getTg() < 2){
-            count = p2.getTg();
-        }
+        int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg()-count);
         player.setTg(player.getTg()+count);
         String msg1 = ButtonHelper.getTrueIdentity(p2, activeGame) + " you had "+count+" tgs stolen by a trap";
@@ -151,10 +148,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
     }
     public void steal3Comm(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        int count = 3; 
-        if(p2.getCommodities() < 3){
-            count = p2.getCommodities();
-        }
+        int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities()-count);
         player.setTg(player.getTg()+count);
         String msg1 = ButtonHelper.getTrueIdentity(p2, activeGame) + " you had "+count+" comms stolen by a trap";

@@ -32,7 +32,7 @@ public class StartingFleetDraftItem extends DraftItem {
         for (String desc: fleetDesc) {
             String[] split = desc.trim().split(" ");
             String alias;
-            int count = 0;
+            int count;
             if (StringUtils.isNumeric(split[0])) {
                 count = Integer.parseInt(split[0]);
                 alias = split[1];
