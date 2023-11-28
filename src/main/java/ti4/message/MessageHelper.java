@@ -75,11 +75,11 @@ public class MessageHelper {
 			message.addReaction(reactionEmoji).queue();
 		}
 		String messageId = message.getId();
-		if(activeGame.getFactionsThatReactedToThis(messageId) != null && !activeGame.getFactionsThatReactedToThis(messageId).isEmpty()){
-			if(!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())){
-				activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId)+"_"+player.getFaction());
+		if (activeGame.getFactionsThatReactedToThis(messageId) != null && !activeGame.getFactionsThatReactedToThis(messageId).isEmpty()) {
+			if (!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())) {
+				activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId) + "_" + player.getFaction());
 			}
-		}else{
+		} else {
 			activeGame.setCurrentReacts(messageId, player.getFaction());
 		}
 	}
@@ -93,8 +93,7 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(activeGame, player, msg);
 			activeGame.addMessageIDForSabo(msg.getId());
-			
-            
+
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
@@ -108,14 +107,14 @@ public class MessageHelper {
 				}
 				activeGame.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoWhen(), "_");
-			} else if ("after".equalsIgnoreCase(whenOrAfter)){
+			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
 				if (activeGame.getLatestAfterMsg() != null && !"".equals(activeGame.getLatestAfterMsg())) {
 					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestAfterMsg()).queue();
 				}
 				activeGame.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoAfter(), "_");
-			}else {
-				if(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null){
+			} else {
+				if (activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null) {
 					activeGame.setCurrentReacts("Pass On Shenanigans", "");
 				}
 				players = new StringTokenizer(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans"), "_");
@@ -338,7 +337,7 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
-			if(!activeGame.isFoWMode()){
+			if (!activeGame.isFoWMode()) {
 				privateChannel = player.getCardsInfoThread();
 			}
 			if (privateChannel == null) {
@@ -358,7 +357,7 @@ public class MessageHelper {
 	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, MessageChannel feedbackChannel, String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
-			String playerRepresentation = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
+			String playerRepresentation = player.getRepresentation(true, true);
 			boolean success = sendPrivateMessageToPlayer(player, activeGame, feedbackChannel, playerRepresentation + message, failText, successText);
 			if (success) count++;
 		}
@@ -594,7 +593,8 @@ public class MessageHelper {
 			// REMOVE EMOJIS IF EMOJI NOT
 			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
-					badButtonIDsAndReason.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
+					badButtonIDsAndReason
+						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
 					button = button.withEmoji(null);
 				}
 			}

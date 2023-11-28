@@ -40,18 +40,19 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static void sendSecretObjectiveInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendSecretObjectiveInfo(activeGame, player);
     }
+
     public static void sendSecretObjectiveInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used something";
+        String headerText = player.getRepresentation(true, true) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendSecretObjectiveInfo(activeGame, player);
     }
 
     public static void sendSecretObjectiveInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " pressed button: " + event.getButton().getLabel();
+        String headerText = player.getRepresentation(true, true) + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendSecretObjectiveInfo(activeGame, player);
     }
@@ -70,11 +71,10 @@ public class SOInfo extends SOCardsSubcommandData {
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             buttons.add(scoreB);
             buttons.add(discardB);
-            if(activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0){
+            if (activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
                 buttons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
             }
             MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
-
 
         }
     }
@@ -159,6 +159,7 @@ public class SOInfo extends SOCardsSubcommandData {
         }
         return soButtons;
     }
+
     public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game activeGame, Player player) {
         LinkedHashMap<String, Integer> secretObjective = activeGame.getSecretObjective(player.getUserID());
         List<Button> soButtons = new ArrayList<>();

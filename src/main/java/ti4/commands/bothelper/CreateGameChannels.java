@@ -123,7 +123,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
+            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName()
+                + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
             TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             if (bothelperLoungeChannel != null) {
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
@@ -328,8 +329,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static Guild getNextAvailableServer() {
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda.getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
-        
+        Guild guild = AsyncTI4DiscordBot.jda
+            .getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
+
         // CURRENT SET GUILD HAS ROOM
         if (serverHasRoomForNewFullCategory(guild)) return guild;
 
@@ -374,7 +376,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
-        
+
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > 225) {

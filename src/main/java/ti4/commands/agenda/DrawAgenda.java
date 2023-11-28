@@ -45,8 +45,8 @@ public class DrawAgenda extends AgendaSubcommandData {
                 sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                 index++;
                 sb.append("\n");
-                Button top = Button.primary("topAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the top of the agenda deck.");
-                Button bottom = Button.danger("bottomAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the bottom of the agenda deck.");
+                Button top = Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck.");
+                Button bottom = Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck.");
                 buttons.add(top);
                 buttons.add(bottom);
             }
@@ -54,13 +54,13 @@ public class DrawAgenda extends AgendaSubcommandData {
         sb.append("-----------\n");
 
         player = Helper.getGamePlayer(activeGame, player, event, null);
-        if (player == null){
+        if (player == null) {
             MessageHelper.sendMessageToUser(sb.toString(), event);
         } else {
             User userById = event.getJDA().getUserById(player.getUserID());
             if (userById != null) {
                 if (activeGame.isCommunityMode() && player.getPrivateChannel() != null) {
-                   // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
+                    // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), sb.toString(), buttons);
                 } else {
                     //MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
@@ -76,7 +76,7 @@ public class DrawAgenda extends AgendaSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeGame.getName()).append("\n");
-        sb.append(ButtonHelper.getTrueIdentity(player, activeGame)).append("\n");
+        sb.append(player.getRepresentation(true, true)).append("\n");
         sb.append("Drawn Agendas:\n");
         int index = 1;
         List<Button> buttons = new ArrayList<>();
@@ -86,8 +86,8 @@ public class DrawAgenda extends AgendaSubcommandData {
                 sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                 index++;
                 sb.append("\n");
-                Button top = Button.primary("topAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the top of the agenda deck.");
-                Button bottom = Button.danger("bottomAgenda_"+entry.getValue(), "Put agenda "+entry.getValue()+" on the bottom of the agenda deck.");
+                Button top = Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck.");
+                Button bottom = Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck.");
                 buttons.add(top);
                 buttons.add(bottom);
             }
@@ -114,4 +114,3 @@ public class DrawAgenda extends AgendaSubcommandData {
         drawAgenda(event, count, fromBottom, activeGame, player);
     }
 }
-
