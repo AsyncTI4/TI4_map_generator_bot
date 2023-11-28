@@ -7,9 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
@@ -184,8 +182,7 @@ public class TurnEnd extends PlayerSubcommandData {
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
-            List<String> relics = new ArrayList<>();
-            relics.addAll(player.getRelics());
+          List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
                     player.removeRelic(relic);

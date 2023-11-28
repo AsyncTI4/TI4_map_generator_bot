@@ -83,8 +83,7 @@ public class ButtonHelperHeroes {
                 String name = unitHolder.getName().replace("space", "");
                 if(tile.containsPlayersUnits(p2)){
                     if (p2.hasInf2Tech()) {
-                        UnitHolder uH = unitHolder;
-                        int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+                      int amount = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                         ButtonHelper.resolveInfantryDeath(activeGame, p2, amount);
                     }
                     new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf " + name, activeGame);
@@ -129,7 +128,7 @@ public class ButtonHelperHeroes {
     public static void resolveNekroHeroStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
-        String techType = "none";
+        String techType;
         if (Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) {
             techType = Mapper.getPlanet(planet).getTechSpecialties().get(0).toString().toLowerCase();
         } else {
@@ -229,7 +228,7 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), "Could not resolve second player, please resolve manually.");
             return;
         }
-        String message2 = "";
+        String message2;
         // String ident = Helper.getPlayerRepresentation(p1, activeGame, activeGame.getGuild(), false);
         String ident2 = Helper.getPlayerRepresentation(p2, activeGame, activeGame.getGuild(), false);
         String id = null;
@@ -309,7 +308,7 @@ public class ButtonHelperHeroes {
     }
 
     public static void augersHeroResolution(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
             int size = activeGame.getPublicObjectives1Peakable().size() - 2;
             for (int x = size; x < size + 3; x++) {
@@ -390,20 +389,17 @@ public class ButtonHelperHeroes {
                         threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                         threadChannel.queue(m5 -> {
                             List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                            if (threadChannels != null) {
-                                for (ThreadChannel threadChannel_ : threadChannels) {
-                                    if (threadChannel_.getName().equals(threadName)) {
-                                        MessageHelper.sendMessageToChannel(threadChannel_,
-                                            Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)
-                                                + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
-                                                + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
-                                        int context = 0;
-                                        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
-                                        MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
-                                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
-                                        MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
-
-                                    }
+                            for (ThreadChannel threadChannel_ : threadChannels) {
+                                if (threadChannel_.getName().equals(threadName)) {
+                                    MessageHelper.sendMessageToChannel(threadChannel_,
+                                        Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true)
+                                            + Helper.getPlayerRepresentation(player2, activeGame, activeGame.getGuild(), true)
+                                            + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
+                                    int context = 0;
+                                    FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
+                                    MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
+                                    List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
+                                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }
                         });
@@ -418,7 +414,7 @@ public class ButtonHelperHeroes {
     }
 
     public static List<Button> getGhostHeroTilesStep1(Game activeGame, Player player) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Tile tile : activeGame.getTileMap().values()) {
             if (tile.getPosition().contains("t") || tile.getPosition().contains("b")) {
                 continue;
@@ -499,8 +495,7 @@ public class ButtonHelperHeroes {
         String tech = buttonID.split("_")[1];
         TechnologyModel techM = Mapper.getTech(tech);
         List<TechnologyModel> techs = Helper.getAllTechOfAType(activeGame, techM.getType().toString(), player.getFaction(), player);
-        List<Button> buttons = Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
-        return buttons;
+      return Helper.getTechButtons(techs, techM.getType().toString(), player, tech);
     }
 
     public static void resolveAJolNarSwapStep1(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
@@ -588,7 +583,7 @@ public class ButtonHelperHeroes {
 
     public static void getGhostHeroTilesStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos1 = buttonID.split("_")[1];
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         Tile tile1 = activeGame.getTileByPosition(pos1);
         for (Tile tile : activeGame.getTileMap().values()) {
             if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1) {

@@ -74,9 +74,8 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game activeGame, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
-        Integer scToDisplay = scToPlay;
 
-        if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
+      if (activeGame.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
             return;
         }
@@ -120,7 +119,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message += "Indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String scName = Helper.getSCName(scToDisplay, activeGame).toLowerCase();
+        String scName = Helper.getSCName(scToPlay, activeGame).toLowerCase();
         if(winnuHero){
             scName = scName + "WinnuHero";
         }
@@ -138,14 +137,14 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         if (activeGame.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeGame), true);
+            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, activeGame), true);
         }
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
 
         // GET BUTTONS
         ActionRow actionRow = null;
-        List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeGame));
-        if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
+        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, activeGame));
+        if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
         if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
@@ -170,20 +169,18 @@ public class SCPlay extends PlayerSubcommandData {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                 threadChannel.queue(m5 -> {
                     List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                    if (threadChannels != null) {
-                        // SEARCH FOR EXISTING OPEN THREAD
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                if (scToPlay == 5) {
-                                    Button transaction = Button.primary("transaction", "Transaction");
-                                    scButtons.add(transaction);
-                                    scButtons.add(Button.success("sendTradeHolder_tg", "Send 1tg"));
-                                    scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
-                                }
-                                MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
-                            }
-                        }
-                    }
+                  // SEARCH FOR EXISTING OPEN THREAD
+                  for (ThreadChannel threadChannel_ : threadChannels) {
+                      if (threadChannel_.getName().equals(threadName)) {
+                          if (scToPlay == 5) {
+                              Button transaction = Button.primary("transaction", "Transaction");
+                              scButtons.add(transaction);
+                              scButtons.add(Button.success("sendTradeHolder_tg", "Send 1tg"));
+                              scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
+                          }
+                          MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
+                      }
+                  }
                 });
 
             }

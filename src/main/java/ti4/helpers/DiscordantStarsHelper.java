@@ -50,7 +50,7 @@ public class DiscordantStarsHelper {
 
     public static void checkOlradinMech(Game activeMap) {
         for (Player player : activeMap.getPlayers().values()) {
-            String tokenToAdd = null;
+            String tokenToAdd;
             if (player.ownsUnit("olradin_mech_positive")) {
                 tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
             } else if (player.ownsUnit("olradin_mech_negative")) {
@@ -61,8 +61,8 @@ public class DiscordantStarsHelper {
 
             for (Tile tile : activeMap.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder != null && unitHolder instanceof Planet planet) {
-                        if (planet != null && player.getPlanets().contains(planet.getName())) {
+                    if (unitHolder instanceof Planet planet) {
+                        if (player.getPlanets().contains(planet.getName())) {
                             if (!oneMechCheck(planet.getName(), activeMap, player)
                                 && ((planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) || (planet.getTokenList().contains(Constants.OLRADIN_MECH_RES_PNG)))) {
                                 planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
@@ -140,7 +140,7 @@ public class DiscordantStarsHelper {
     private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, StringBuilder sb) {
         if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect")) {
             player.setHasUsedPeopleConnectAbility(true);
-            sb.append("> **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on " + planetModel.getName() + " to another planet you control.\n");
+            sb.append("> **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on ").append(planetModel.getName()).append(" to another planet you control.\n");
         }
     }
 
@@ -156,8 +156,7 @@ public class DiscordantStarsHelper {
             player.setHasUsedEnvironmentPreserveAbility(true);
             String planetType = planetModel.getPlanetType().toString();
             String fragmentType = Emojis.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
-            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the " + Emojis.getEmojiFromDiscord(planetType) + planetType + " deck; if it is a " + fragmentType
-                + " relic fragment, gain it, otherwise discard that card.\n");
+            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the ").append(Emojis.getEmojiFromDiscord(planetType)).append(planetType).append(" deck; if it is a ").append(fragmentType).append(" relic fragment, gain it, otherwise discard that card.\n");
         }
     }
 }

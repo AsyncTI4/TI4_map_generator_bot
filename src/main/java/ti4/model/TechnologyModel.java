@@ -42,9 +42,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             && text != null;
     }
 
-    public static final Comparator<TechnologyModel> sortByTechRequirements = (tech1, tech2) -> {
-        return sortTechsByRequirements(tech1, tech2);
-    };
+    public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
 
     public static int sortTechsByRequirements(TechnologyModel t1, TechnologyModel t2) {
         int r1 = t1.getRequirements().orElse("").length();
@@ -57,8 +55,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public static int sortFactionTechsFirst(TechnologyModel t1, TechnologyModel t2) {
         if (t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 0;
-        if (!t1.getFaction().isEmpty() && !t2.getFaction().isEmpty()) return 0;
-        if (!t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 1;
+        if (t1.getFaction().isPresent() && t2.getFaction().isPresent()) return 0;
+        if (t1.getFaction().isPresent() && t2.getFaction().isEmpty()) return 1;
         return -1;
     }
 

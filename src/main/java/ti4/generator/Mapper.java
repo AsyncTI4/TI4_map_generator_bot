@@ -218,7 +218,6 @@ public class Mapper {
         return decals.keySet().stream()
             .filter(decal -> decal instanceof String)
             .map(decal -> (String) decal)
-            .sorted()
             .collect(Collectors.toSet());
     }
 
@@ -319,7 +318,7 @@ public class Mapper {
     }
 
     public static List<String> getUnitSources() {
-        return units.values().stream().map(unit -> unit.getSource()).distinct().sorted().toList();
+        return units.values().stream().map(UnitModel::getSource).distinct().sorted().toList();
     }
 
     public static UnitModel getUnit(String unitID) {
@@ -370,7 +369,6 @@ public class Mapper {
     public static Set<String> getUnitIDList() {
         return getUnits().values().stream()
             .map(UnitModel::getAsyncId)
-            .sorted()
             .collect(Collectors.toSet());
     }
 
@@ -820,7 +818,6 @@ public class Mapper {
     public static List<String> getFactionIDs() {
         return factions.keySet().stream()
             .filter(token -> token instanceof String)
-            .map(token -> token)
             .sorted()
             .collect(Collectors.toList());
     }

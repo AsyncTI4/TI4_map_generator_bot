@@ -3,7 +3,6 @@ package ti4.commands.game;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -71,7 +70,7 @@ public class GameCreate extends GameSubcommandData {
         TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).stream().findFirst().orElse(null);
         if (bothelperLoungeChannel == null) return;
         List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-        if (threadChannels == null || threadChannels.isEmpty()) return;
+        if (threadChannels.isEmpty()) return;
         String threadName = "game-starts-and-ends";
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {

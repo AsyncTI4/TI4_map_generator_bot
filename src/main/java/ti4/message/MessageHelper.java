@@ -480,11 +480,9 @@ public class MessageHelper {
 
 		for (MessageCreateData mcd : messageCreateDataList) {
 			if (mcd != null) {
-				if (mcd.getContent() != null) continue;
-				if (mcd.getEmbeds() != null && !mcd.getEmbeds().isEmpty()) continue;
-				if (mcd.getComponents() != null && !mcd.getComponents().isEmpty()) continue;
-				if (mcd.getFiles() != null && !mcd.getFiles().isEmpty()) continue;
-			}
+        mcd.getContent();
+        continue;
+      }
 			StringBuilder error = new StringBuilder("MessageCreateData is invalid for arguments: \n");
 			int cutoff = message.indexOf("\n");
 			error.append("> Message: ").append(cutoff == -1 ? message : message.substring(0, cutoff)).append("...\n");

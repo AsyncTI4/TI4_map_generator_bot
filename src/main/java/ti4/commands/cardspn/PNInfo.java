@@ -3,7 +3,6 @@ package ti4.commands.cardspn;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import java.util.Map;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +12,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.CombatModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -62,13 +60,12 @@ public class PNInfo extends PNCardsSubcommandData {
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
             Player owner = activeGame.getPNOwner(pnShortHand);
-            if(owner == player){
-            }else{
+            if (owner != player) {
                 Button transact;
                 if(activeGame.isFoWMode()){
                     transact = Button.success("resolvePNPlay_" + pnShortHand,
                             "Play " + owner.getColor() + " " + promissoryNote.getName());
-                    
+
                 } else {
                     transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
                             .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
@@ -89,11 +86,11 @@ public class PNInfo extends PNCardsSubcommandData {
             buttons.add(augers);
         }
         if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
-            String omenDice = "";
+            StringBuilder omenDice = new StringBuilder();
             for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
-                omenDice=omenDice+" "+omenDie;
+                omenDice.append(" ").append(omenDie);
             }
-            omenDice=omenDice.trim();
+            omenDice = new StringBuilder(omenDice.toString().trim());
             Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(augers);
         }

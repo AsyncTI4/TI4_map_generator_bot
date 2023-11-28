@@ -37,7 +37,7 @@ public class ListButtons extends BothelperSubcommandData {
         Message msg = null;
         if (channel != null) {
             msg = channel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
-        } else if (threadChannel != null) {
+        } else {
             msg = threadChannel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
         }
 

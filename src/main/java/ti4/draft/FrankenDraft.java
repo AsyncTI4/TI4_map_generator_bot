@@ -1,5 +1,10 @@
 package ti4.draft;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
@@ -8,8 +13,6 @@ import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-
-import java.util.*;
 
 public class FrankenDraft extends BagDraft {
     public FrankenDraft(Game owner) {
@@ -62,7 +65,7 @@ public class FrankenDraft extends BagDraft {
     private static final String[] excludedFactions = {"lazax", "admins", "franken", "keleresm", "keleresx"};
     public static List<String> getAllFactionIds(Game activeGame) {
         Map<String, String> factionSet = Mapper.getFactionRepresentations();
-        List<String> factionIds = new ArrayList<String>();
+        List<String> factionIds = new ArrayList<>();
         factionSet.forEach((String id, String name) -> {
             if (name.contains("(DS)") && !activeGame.isDiscordantStarsMode()) {
                 return;
@@ -140,7 +143,7 @@ public class FrankenDraft extends BagDraft {
 
     public static List<DraftItem> buildGenericFactionItemSet(DraftItem.Category category, Game activeGame) {
         List<String> factionIds = getAllFactionIds(activeGame);
-        List<DraftItem> allItems = new ArrayList<DraftItem>();
+        List<DraftItem> allItems = new ArrayList<>();
         for (String factionId: factionIds) {
             allItems.add(DraftItem.Generate(category, factionId));
         }
@@ -150,7 +153,7 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public List<DraftBag> generateBags(Game activeGame) {
-        Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<DraftItem.Category, List<DraftItem>>();
+        Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
         for (DraftItem.Category category: genericDraftableTypes) {
             allDraftableItems.put(category, buildGenericFactionItemSet(category, activeGame));
         }

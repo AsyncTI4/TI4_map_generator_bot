@@ -216,7 +216,7 @@ public class ButtonListener extends ListenerAdapter {
             if (acID.contains("reverse_")) {
                 String actionCardTitle = acID.split("_")[2];
                 acID = acID.split("_")[0];
-                List<Button> scButtons = new ArrayList<Button>();
+                List<Button> scButtons = new ArrayList<>();
                 scButtons.add(Button.success("resolveReverse_" + actionCardTitle, "Pick up " + actionCardTitle + " from the discard"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                     Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), false) + " After checking for sabos, use buttons to resolve reverse engineer", scButtons);
@@ -715,13 +715,11 @@ public class ButtonListener extends ListenerAdapter {
             new ExpPlanet().explorePlanet(event, activeGame.getTileFromPlanet(info[1]), info[1], info[2], player, false, activeGame, 1, false);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolveExp_Look_")) {
-            String bID = buttonID.replace("resolveExp_Look_", "");
-            String trait = bID;
-            ArrayList<String> deck = activeGame.getExploreDeck(trait);
-            ArrayList<String> discardPile = activeGame.getExploreDiscard(trait);
-            ButtonHelper.addReaction(event, true, false, "Looked at top of the " + trait + " deck.", "");
+            ArrayList<String> deck = activeGame.getExploreDeck(buttonID.replace("resolveExp_Look_", ""));
+            ArrayList<String> discardPile = activeGame.getExploreDiscard(buttonID.replace("resolveExp_Look_", ""));
+            ButtonHelper.addReaction(event, true, false, "Looked at top of the " + buttonID.replace("resolveExp_Look_", "") + " deck.", "");
             event.getMessage().delete().queue();
-            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+            String traitNameWithEmoji = Emojis.getEmojiFromDiscord(buttonID.replace("resolveExp_Look_", "")) + buttonID.replace("resolveExp_Look_", "");
             String playerFactionNameWithEmoji = Emojis.getFactionIconFromDiscord(player.getFaction());
             if (deck.isEmpty() && discardPile.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
@@ -930,7 +928,7 @@ public class ButtonListener extends ListenerAdapter {
             player.addExhaustedRelic("prophetstears");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " Chose to exhaust The Prophets Tears");
             if (buttonID.contains("AC")) {
-                String message = "";
+                String message;
                 if (player.hasAbility("scheming")) {
                     activeGame.drawActionCard(player.getUserID());
                     activeGame.drawActionCard(player.getUserID());
@@ -1775,7 +1773,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             if (!activeGame.isFoWMode() && playersWithPds2.size() > 0 && !activeGame.getL1Hero()) {
                 StringBuilder pdsMessage = new StringBuilder(trueIdentity + " this is a courtesy notice that the selected system is in range of space cannon units owned by");
-                List<Button> buttons2 = new ArrayList<Button>();
+                List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(Button.secondary("combatRoll_" + pos + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
                 buttons2.add(Button.danger("declinePDS", "Decline PDS"));
                 for (Player playerWithPds : playersWithPds2) {
@@ -1902,9 +1900,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("setupStep3_")) {
             ButtonHelper.resolveSetupStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("setupStep4_")) {
-            ButtonHelper.resolveSetupStep4And5(player, activeGame, event, buttonID);
+            ButtonHelper.resolveSetupStep4And5(activeGame, event, buttonID);
         } else if (buttonID.startsWith("setupStep5_")) {
-            ButtonHelper.resolveSetupStep4And5(player, activeGame, event, buttonID);
+            ButtonHelper.resolveSetupStep4And5(activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep2_")) {
             ButtonHelperActionCards.resolveSignalJammingStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("signalJammingStep3_")) {
@@ -2809,9 +2807,8 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "startYinSpinner" -> {
-                    List<Button> buttons = new ArrayList<Button>();
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player)+" Chose to Use Yin Spinner");
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
                     String message = "Use buttons to drop 2 infantry on a planet. Technically you can also drop 2 infantry with your ships, but this aint supported yet via button. ";
                     ButtonHelper.deleteTheOneButton(event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -2979,7 +2976,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "exhauste6g0network" -> {
                     player.addExhaustedRelic("e6-g0_network");
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " Chose to exhaust e6-g0_network");
-                    String message = "";
+                    String message;
                     if (player.hasAbility("scheming")) {
                         activeGame.drawActionCard(player.getUserID());
                         activeGame.drawActionCard(player.getUserID());
@@ -3302,7 +3299,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "draw_1_AC" -> {
-                     String message = "";
+                     String message;
                     if(player.hasAbility("autonetic_memory")){
                         ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
                         message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
@@ -3319,7 +3316,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawStatusACs" -> ButtonHelper.drawStatusACs(activeGame, player, event);
                 case "draw_1_ACDelete" -> {
-                    String message = "";
+                    String message;
                     if(player.hasAbility("autonetic_memory")){
                         ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 1);
                         message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
@@ -3337,7 +3334,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
                 case "draw_2_ACDelete" -> {
-                     String message = "";
+                     String message;
                     if(player.hasAbility("autonetic_memory")){
                         ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, 2);
                         message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
@@ -3565,7 +3562,7 @@ public class ButtonListener extends ListenerAdapter {
                             outcomeActionRow = AgendaHelper.getSecretOutcomeButtons(activeGame, null, "outcome");
                         } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
                             outcomeActionRow = AgendaHelper.getStrategyOutcomeButtons(null, "outcome");
-                        } else if (agendaDetails.contains("unit upgrade") || agendaDetails.contains("unit upgrade")) {
+                        } else if (agendaDetails.contains("unit upgrade")) {
                             outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(activeGame, null, "outcome");
                         } else {
                             outcomeActionRow = AgendaHelper.getLawOutcomeButtons(activeGame, null, "outcome");

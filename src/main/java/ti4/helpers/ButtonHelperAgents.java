@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -157,13 +158,13 @@ public class ButtonHelperAgents {
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitName + "damaged";
                     Button validTile2 = Button.danger(buttonID, "Remove A Damaged " + prettyName);
-                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
+                    validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Button.danger(finChecker + "arboAgentOn_" + tile.getPosition() + "_" + unitName, "Remove " + x + " " + prettyName);
-                    if (emoji != null) validTile2 = validTile2.withEmoji(emoji);
+                    validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
             }
@@ -188,8 +189,7 @@ public class ButtonHelperAgents {
 
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
 
-        List<String> allowedUnits = List.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun)
-            .stream().map(UnitType::getValue).toList();
+        List<String> allowedUnits = Stream.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun).map(UnitType::getValue).toList();
         UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
@@ -311,7 +311,7 @@ public class ButtonHelperAgents {
         String planetRemoval = buttonID.split("_")[3];
         String unit = buttonID.split("_")[4];
         UnitHolder uH = tile.getUnitHolders().get(planetRemoval);
-        String message = "";
+        String message;
         if("space".equalsIgnoreCase(planetRemoval)){
             message = ident + " moved 1 " + unit + " from space area of " + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetDestination, activeGame);
             planetRemoval = "";
@@ -417,8 +417,7 @@ public class ButtonHelperAgents {
             ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
         }
         if("lizhoagent".equalsIgnoreCase(agent)){
-            List<Button> buttons = new ArrayList<>();
-            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "2ff", "placeOneNDone_skipbuild"));
+            List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "2ff", "placeOneNDone_skipbuild"));
             String message = "Use buttons to put 2 fighters with your ships";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         }
@@ -633,7 +632,7 @@ public class ButtonHelperAgents {
         }
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
-                List<Button> buttons2 = new ArrayList<Button>();
+                List<Button> buttons2 = new ArrayList<>();
                 buttons2.add(Button.success("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust TCS to Ready " + agent));
                 buttons2.add(Button.danger("deleteButtons", "Decline"));
                 String msg = ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to exhaust your TCS tech to ready " + agent + " and potentially resolve a transaction.";
@@ -760,7 +759,7 @@ public class ButtonHelperAgents {
 
     public static void resolveStep2OfAxisAgent(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        String message = "";
+        String message;
         if ("cruiser".equalsIgnoreCase(buttonID.split("_")[1])) {
             MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " Chose to place 1 cruiser with their ships from Axis Agent");
             buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, activeGame, "cruiser", "placeOneNDone_skipbuild"));
@@ -776,7 +775,7 @@ public class ButtonHelperAgents {
 
     public static void resolveArtunoCheck(Player player, Game activeGame, int tg) {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
-            List<Button> buttons = new ArrayList<Button>();
+            List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg, "Exhaust Artuno with " + tg + " tg"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -788,7 +787,7 @@ public class ButtonHelperAgents {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeGame, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " Use buttons to select faction to give agent to.", buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
-        if (exhaustedMessage == null || exhaustedMessage.length() < 1) {
+        if (exhaustedMessage.length() < 1) {
             exhaustedMessage = "Combat";
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
@@ -806,7 +805,7 @@ public class ButtonHelperAgents {
     }
 
     public static List<Button> getJolNarAgentButtons(Player player, Game activeGame) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {

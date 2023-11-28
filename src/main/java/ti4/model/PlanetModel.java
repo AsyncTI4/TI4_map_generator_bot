@@ -1,6 +1,11 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.awt.Color;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -9,13 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {
@@ -75,7 +74,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         TileModel tile = TileHelper.getTile(getTileId());
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
-        if (tile != null) sb.append("\nSystem: " + tile.getName());
+        if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet +  getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
@@ -128,7 +127,6 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
-                default ->
             }
         }
         return sb.toString();

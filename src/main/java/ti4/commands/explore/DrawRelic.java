@@ -34,15 +34,15 @@ public class DrawRelic extends GenericRelicAction {
     public static void drawWithAdvantage(Player player, GenericInteractionCreateEvent event, Game activeGame, int advantage){
         List<Button> buttons = new ArrayList<>();
         List<String> relics = activeGame.getAllRelics();
-        String info = "";
+        StringBuilder info = new StringBuilder();
         for(int x = 0; x < advantage && x < relics.size(); x++){
             RelicModel relicData = Mapper.getRelic(relics.get(x));
             buttons.add(Button.success("drawRelicAtPosition_"+x, relicData.getName()));
-            info = info + relicData.getName() + ": "+relicData.getText()+"\n";
+            info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
         String msg = ButtonHelper.getTrueIdentity(player, activeGame)+" choose the relic that you want. The relic text is reproduced for your conveinenance";
          MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), info);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), info.toString());
     }
     public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game activeGame, String buttonID){
         int position = Integer.parseInt(buttonID.split("_")[1]);

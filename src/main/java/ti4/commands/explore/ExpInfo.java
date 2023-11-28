@@ -1,11 +1,19 @@
 package ti4.commands.explore;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -14,15 +22,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 public class ExpInfo extends ExploreSubcommandData {
 
@@ -94,8 +93,8 @@ public class ExpInfo extends ExploreSubcommandData {
     }
 
     private String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
-        Integer deckCount = deck.size();
-        Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
+        int deckCount = deck.size();
+        double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         formatPercent.setMaximumFractionDigits(1);
 
@@ -104,8 +103,8 @@ public class ExpInfo extends ExploreSubcommandData {
             sb.append("> there is nothing here\n");
         }
 
-        Map<String, List<ExploreModel>> explores = deck.stream().map(Mapper::getExplore).filter(e -> e != null)
-            .collect(Collectors.groupingBy(exp -> exp.getName()));
+        Map<String, List<ExploreModel>> explores = deck.stream().map(Mapper::getExplore).filter(Objects::nonNull)
+            .collect(Collectors.groupingBy(ExploreModel::getName));
         List<Map.Entry<String, List<ExploreModel>>> orderedExplores = explores.entrySet().stream()
             .sorted(Comparator.comparingInt(e -> 15 - e.getValue().size())).toList();
         for (Map.Entry<String, List<ExploreModel>> entry : orderedExplores) {

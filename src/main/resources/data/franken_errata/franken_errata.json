@@ -412,7 +412,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "the_lady_and_the_lord",
         "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lord"
+            "FLAGSHIP:ghemina_flagship_lord",
             "HERO:gheminaherolord"
         ]
     },

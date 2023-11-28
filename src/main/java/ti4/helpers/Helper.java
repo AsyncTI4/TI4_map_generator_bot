@@ -249,8 +249,7 @@ public class Helper {
     }
 
     public static void checkAllSaboWindows(Game activeGame) {
-        List<String> messageIDs = new ArrayList<>();
-        messageIDs.addAll(activeGame.getMessageIDsForSabo());
+        List<String> messageIDs = new ArrayList<>(activeGame.getMessageIDsForSabo());
         for (Player player : activeGame.getRealPlayers()) {
             if (player.getAutoSaboPassMedian() == 0) {
                 continue;
@@ -476,17 +475,17 @@ public class Helper {
     }
 
     public static String getBasicTileRep(String tileID) {
-        String name = TileHelper.getTile(tileID).getName();
+        StringBuilder name = new StringBuilder(TileHelper.getTile(tileID).getName());
         if (TileHelper.getTile(tileID).getPlanets().size() > 0) {
-            name = name + " (";
+            name.append(" (");
         }
         for (String planet : TileHelper.getTile(tileID).getPlanets()) {
-            name = name + Mapper.getPlanet(planet).getResources() + "/" + Mapper.getPlanet(planet).getInfluence() + ", ";
+            name.append(Mapper.getPlanet(planet).getResources()).append("/").append(Mapper.getPlanet(planet).getInfluence()).append(", ");
         }
         if (TileHelper.getTile(tileID).getPlanets().size() > 0) {
-            name = name.substring(0, name.length() - 2) + ")";
+            name = new StringBuilder(name.substring(0, name.length() - 2) + ")");
         }
-        return name;
+        return name.toString();
     }
 
     public static String getPlanetRepresentation(String planet, Game activeGame) {
@@ -590,7 +589,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
-            String techType = "none";
+            String techType;
             if(planet.contains("custodia") || planet.contains("ghoti")){
                 Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
@@ -1451,8 +1450,14 @@ public class Helper {
                 .filter(tech -> activeGame.getTechnologyDeck().contains(tech.getAlias()))
                 .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType))
                 .filter(tech -> !player.hasTech(tech.getAlias()))
-                .filter(tech -> tech.getFaction().isEmpty() ||tech.getFaction().get() == null || "".equalsIgnoreCase(tech.getFaction().get()) ||  player.getNotResearchedFactionTechs().contains(tech.getAlias()))
-                .forEach(tech -> techs.add(tech));
+                .filter(tech -> {
+                    if (tech.getFaction().isEmpty()) {
+                        return true;
+                    }
+                    tech.getFaction().get();
+                    return "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias());
+                })
+                .forEach(techs::add);
 
         List<TechnologyModel> techs2 = new ArrayList<>();
         for(TechnologyModel tech : techs){
@@ -1565,18 +1570,18 @@ public class Helper {
             unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
         }
         Collections.sort(hsLocations);
-        List<Player> sortedPlayers = new ArrayList<Player>();
+        List<Player> sortedPlayers = new ArrayList<>();
         for (Integer location : hsLocations) {
             sortedPlayers.add(unsortedPlayers.get(location));
         }
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeGame.getPlayers());
         LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeGame.getPlayers());
-        String msg = getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n";
+        StringBuilder msg = new StringBuilder(getGamePing(activeGame.getGuild(), activeGame) + " set order in the following way: \n");
         try {
             for (Player player : sortedPlayers) {
                 new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
-                msg = msg + ButtonHelper.getTrueIdentity(player, activeGame) + " \n";
+                msg.append(ButtonHelper.getTrueIdentity(player, activeGame)).append(" \n");
             }
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
@@ -1585,14 +1590,14 @@ public class Helper {
         } catch (Exception e) {
             activeGame.setPlayers(playersBackup);
         }
-        msg = msg + "Note: the first player is not necesarily speaker/first pick. This is the general speaker order.";
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg);
+        msg.append("Note: the first player is not necesarily speaker/first pick. This is the general speaker order.");
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), msg.toString());
 
     }
 
     public static void checkEndGame(Game activeGame, Player player) {
         if (player.getTotalVictoryPoints() >= activeGame.getVp()) {
-            List<Button> buttons = new ArrayList<Button>();
+            List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("gameEnd", "End Game"));
             buttons.add(Button.danger("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(),
@@ -1735,12 +1740,11 @@ public class Helper {
         // sb.append(String.format("%d:", days));
         // sb.append(String.format("%02dh:", hours));
         // sb.append(String.format("%02dm:", minutes));
-        String sb = String.format("%02ds:", seconds) +
+
+        return String.format("%02ds:", seconds) +
             String.format("%03d:", milleSeconds) +
             String.format("%03d:", microSeconds) +
             String.format("%03d", nanoSeconds);
-
-        return sb;
     }
 
     public static long median(List<Long> turnTimes) {

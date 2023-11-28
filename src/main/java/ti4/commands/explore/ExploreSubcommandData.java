@@ -463,7 +463,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "seedyspaceport"->{
-                List<Button> buttons = new ArrayList<Button>();
+                List<Button> buttons = new ArrayList<>();
                 message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 for(Leader leader : player.getLeaders()){

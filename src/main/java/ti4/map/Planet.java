@@ -16,6 +16,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
+import ti4.model.UnitModel;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -73,7 +74,7 @@ public class Planet extends UnitHolder {
             .map(UnitKey::asyncID)
             .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
             .filter(Objects::nonNull)
-            .anyMatch(u -> u.getIsGroundForce());
+            .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override

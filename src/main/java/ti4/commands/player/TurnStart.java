@@ -41,8 +41,7 @@ public class TurnStart extends PlayerSubcommandData {
         player.setTurnCount(player.getTurnCount()+1);
         boolean goingToPass = false;
         if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
-            Player p2 = player;
-            if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(p2.getFaction())&&!p2.isPassed()){
+          if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())&&!player.isPassed()){
                 activeGame.setCurrentReacts("Pre Pass "+player.getFaction(), "");
                 goingToPass = true;
             }
@@ -117,7 +116,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
                 if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
-                    sb.append(" "+activeGame.getFactionsThatReactedToThis("scPlay"+sc).replace("666fin", ":"));
+                    sb.append(" ").append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":"));
                 }
                 sb.append("\n");
                 sendReminder = true;

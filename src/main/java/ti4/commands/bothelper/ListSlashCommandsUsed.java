@@ -36,8 +36,8 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         int largestAmountOfButtonsIn1Game = 0;
         String largestGame = "";
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        HashMap<String, Integer> slashCommands = new HashMap<String, Integer>();
-        HashMap<String, Integer> actionCards = new HashMap<String, Integer>();
+        HashMap<String, Integer> slashCommands = new HashMap<>();
+        HashMap<String, Integer> actionCards = new HashMap<>();
         for (Game activeGame : mapList.values()) {
             if (useOnlyLastMonth && Helper.getDateDifference(activeGame.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
@@ -66,18 +66,18 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 actionCards.put(command, numUsed + numUsed2);
             }
         }
-        String longMsg = "The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is "+largestAmountOfButtonsIn1Game+" in game "+largestGame+". The number of slash commands used is " + slashCommandsUsed
-            + ". The number of ACs sabod is " + acsSabod +". The following is the recorded frequency of slash commands \n";
+        StringBuilder longMsg = new StringBuilder("The number of button pressed so far recorded is " + buttonsPressed + ". The largest number of buttons pressed in a single game is " + largestAmountOfButtonsIn1Game + " in game " + largestGame + ". The number of slash commands used is " + slashCommandsUsed
+            + ". The number of ACs sabod is " + acsSabod + ". The following is the recorded frequency of slash commands \n");
         Map<String, Integer> sortedMapAsc = sortByValue(slashCommands, false);
         for (String command : sortedMapAsc.keySet()) {
-            longMsg = longMsg + command + ": " + sortedMapAsc.get(command) + " \n";
+            longMsg.append(command).append(": ").append(sortedMapAsc.get(command)).append(" \n");
         }
-        longMsg = longMsg + "\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n";
+        longMsg.append("\n The number of times an AC has been sabod is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
-            longMsg = longMsg + command + ": " + sortedMapAscACs.get(command) + " \n";
+            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" \n");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), longMsg);
+        MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
     private static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {

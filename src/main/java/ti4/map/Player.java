@@ -303,9 +303,9 @@ public class Player {
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode() || activeGame.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
-            if(actionsChannel == null){
-                actionsChannel = activeGame.getMainGameChannel();
-            }
+        if (actionsChannel == null){
+            actionsChannel = activeGame.getMainGameChannel();
+        }
         if (actionsChannel == null) {
             BotLogger.log(
                     "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
@@ -2245,9 +2245,8 @@ public class Player {
     }
 
     public UnitModel getUnitFromAsyncID(String asyncID) {
-        return getUnitsByAsyncID(asyncID).stream()
-                .sorted(UnitModel::sortFactionUnitsFirst) // TODO: Maybe this sort can be better, idk
-                .findFirst().orElse(null);
+        // TODO: Maybe this sort can be better, idk
+        return getUnitsByAsyncID(asyncID).stream().min(UnitModel::sortFactionUnitsFirst).orElse(null);
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
@@ -2272,7 +2271,7 @@ public class Player {
     }
 
     public void setTempCombatModifiers(List<TemporaryCombatModifierModel> tempMods) {
-        tempCombatModifiers = new ArrayList<TemporaryCombatModifierModel>(tempMods);
+        tempCombatModifiers = new ArrayList<>(tempMods);
     }
 
     public void clearNewTempCombatModifiers() {

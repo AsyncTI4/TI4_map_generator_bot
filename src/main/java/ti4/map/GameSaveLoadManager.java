@@ -1,5 +1,8 @@
 package ti4.map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,21 +24,15 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -201,18 +198,17 @@ public class GameSaveLoadManager {
                     for(Player p1 : loadedGame.getRealPlayers()){
                         Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
                         if(p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()){
-                            Player player = p1;
-                            String headerText = Helper.getPlayerRepresentation(player, activeGame, loadedGame.getGuild(), true) + " here is your cards info";
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, loadedGame, headerText);
-                            SOInfo.sendSecretObjectiveInfo(loadedGame, player);
-                            ACInfo.sendActionCardInfo(loadedGame, player);
-                            PNInfo.sendPromissoryNoteInfo(loadedGame, player, false);
+                            String headerText = Helper.getPlayerRepresentation(p1, activeGame, loadedGame.getGuild(), true) + " here is your cards info";
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(p1, loadedGame, headerText);
+                            SOInfo.sendSecretObjectiveInfo(loadedGame, p1);
+                            ACInfo.sendActionCardInfo(loadedGame, p1);
+                            PNInfo.sendPromissoryNoteInfo(loadedGame, p1, false);
                         }
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     try{
-                        if (loadedGame != null && loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
+                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     }catch(Exception e){

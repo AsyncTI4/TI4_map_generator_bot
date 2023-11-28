@@ -108,10 +108,9 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        String sb = getName() +
+        return getName() +
             " (" + getFaction() + ")" +
             " [" + getSource() + "]";
-        return sb;
     }
 
     public String getFactionEmoji() {

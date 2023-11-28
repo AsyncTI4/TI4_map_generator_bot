@@ -18,8 +18,7 @@ public interface Selection {
     }
 
     default String getSelectionMenuDebugText(StringSelectInteractionEvent event) {
-      String sb = event.getComponentId() + "\n" +
+      return event.getComponentId() + "\n" +
           "Values: " + event.getValues() + "\n";
-        return sb;
     }
 }

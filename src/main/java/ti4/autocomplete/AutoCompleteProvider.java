@@ -734,7 +734,7 @@ public class AutoCompleteProvider {
                     List<GlobalSettings.ImplementedSettings> settings = new ArrayList<>(
                         List.of(GlobalSettings.ImplementedSettings.values()));
                     List<Command.Choice> options = settings.stream()
-                        .map(setting -> setting.toString())
+                        .map(GlobalSettings.ImplementedSettings::toString)
                         .filter(setting -> setting.contains(enteredValue))
                         .limit(25)
                         .map(setting -> new Command.Choice(setting, setting))
@@ -946,7 +946,7 @@ public class AutoCompleteProvider {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                         Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
                         List<Command.Choice> options = techs.entrySet().stream()
-                            .filter(entry -> entry.getValue().getFaction() != null)
+                            .filter(entry -> entry.getValue().getFaction().isPresent())
                             .filter(entry -> entry.getValue().search(enteredValue))
                             .limit(25)
                             .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))

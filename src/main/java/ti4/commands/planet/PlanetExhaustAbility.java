@@ -99,7 +99,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     public void resolvePrismStep1(Player player, Game activeGame) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -117,7 +117,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
     public void resolvePrismStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
        
             buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_AC", "Send AC"));
             buttons.add(Button.secondary("prismStep3_" + player.getFaction()+"_PN", "Send PN"));
@@ -128,7 +128,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
     public void resolvePrismStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons;
         String pnOrAC = buttonID.split("_")[2];
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),ButtonHelper.getIdent(player)+" chose to send a "+pnOrAC);

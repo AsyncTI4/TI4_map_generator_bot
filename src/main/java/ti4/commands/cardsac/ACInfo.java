@@ -212,11 +212,11 @@ public class ACInfo extends ACCardsSubcommandData {
         }
 
         if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
-            String omenDice = "";
+            StringBuilder omenDice = new StringBuilder();
             for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
-                omenDice=omenDice+" "+omenDie;
+                omenDice.append(" ").append(omenDie);
             }
-            omenDice=omenDice.trim();
+            omenDice = new StringBuilder(omenDice.toString().trim());
             Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             acButtons.add(augers);
         }

@@ -47,7 +47,7 @@ public class CombatHelper {
         List<String> dupes = output.keySet().stream()
                 .filter(unit -> !duplicates.add(unit.getAsyncId()))
                 .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
+                .toList();
         // List<String> missing =
         // unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
         // .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
@@ -57,8 +57,7 @@ public class CombatHelper {
         // .filter(unit -> !duplicates.add(unit.getAsyncId()))
         // .map(UnitModel::getBaseType)
         // .toList();
-        for (int x = 0; x < dupes.size(); x++) {
-            String dupe = dupes.get(x);
+        for (String dupe : dupes) {
             for (UnitModel mod : output.keySet()) {
                 if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
                     output.put(mod, 0);
@@ -75,20 +74,14 @@ public class CombatHelper {
         if (unitHolder instanceof Planet) {
             unitHolderPlanet = (Planet) unitHolder;
         }
-        switch (roleType) {
-            case combatround:
-                return GetUnitsInCombatRound(unitHolder, player, event, tile);
-            case AFB:
-                return GetUnitsInAFB(tile, player, event);
-            case bombardment:
-                return GetUnitsInBombardment(tile, player, event);
-            case SpaceCannonOffence:
-                return getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
-            case SpaceCannonDefence:
-                return getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
-            default:
-                return GetUnitsInCombatRound(unitHolder, player, event, tile);
-        }
+      return switch (roleType) {
+        case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
+        case AFB -> GetUnitsInAFB(tile, player, event);
+        case bombardment -> GetUnitsInBombardment(tile, player, event);
+        case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
+        case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
+        default -> GetUnitsInCombatRound(unitHolder, player, event, tile);
+      };
     }
 
     public static HashMap<UnitModel, Integer> GetUnitsInCombatRound(UnitHolder unitHolder, Player player,
@@ -463,10 +456,10 @@ public class CombatHelper {
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
                 .filter(color -> !color.equals(playerColorID))
-                .map(color -> activeGame.getPlayerByColorID(color))
-                .filter(playerOptional -> playerOptional.isPresent())
-                .map(playerOptional -> playerOptional.get())
-                .collect(Collectors.toList());
+                .map(activeGame::getPlayerByColorID)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
 
         if (opponents.size() >= 1) {
             opponent = opponents.get(0);
@@ -539,7 +532,7 @@ public class CombatHelper {
             String unitRollsTextInfo = "";
             int totalRolls = unit.getCombatDieCountForAbility(rollType) + extraRollsForUnit;
             if (totalRolls > 1) {
-                unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType), toHit);
+                unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType));
                 if (extraRollsForUnit > 0 && unit.getCombatDieCountForAbility(rollType) > 1) {
                     unitRollsTextInfo = String.format("%s rolls (+%s rolls),",
                             unit.getCombatDieCountForAbility(rollType),
@@ -572,7 +565,7 @@ public class CombatHelper {
 
             List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo,
                     unitTypeHitsInfo);
-            String optionalText = optionalInfoParts.stream().filter(str -> StringUtils.isNotBlank(str))
+            String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
                     .collect(Collectors.joining(" "));
 
             String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());

@@ -153,7 +153,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if(unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 1){
-                List<Button> b2s = new ArrayList<Button>();
+                List<Button> b2s = new ArrayList<>();
                 b2s.add(Button.success("returnFFToSpace_"+tile.getPosition(), "Return Fighters to Space"));
                 b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame)+ " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.");
@@ -669,7 +669,7 @@ public class ButtonHelperModifyUnits {
 
     public static void offerCombatDroneButtons(ButtonInteractionEvent event, Game activeGame, Player player){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
-        int numff = 0;
+        int numff;
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -687,7 +687,7 @@ public class ButtonHelperModifyUnits {
 
     public static void offerMirvedaCommanderButtons(ButtonInteractionEvent event, Game activeGame, Player player){
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
-        int numinf = 0;
+        int numinf;
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -784,8 +784,6 @@ public class ButtonHelperModifyUnits {
                 for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                     String name = entry.getKey();
                     String representation = planetRepresentations.get(name);
-                    if (representation == null) {
-                    }
                     UnitHolder unitHolder = entry.getValue();
                     HashMap<UnitKey, Integer> units1 = unitHolder.getUnits();
                     Map<UnitKey, Integer> units = new HashMap<>(units1);

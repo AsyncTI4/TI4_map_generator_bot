@@ -27,7 +27,7 @@ public class ButtonHelperCommanders {
 
 
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {

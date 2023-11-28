@@ -316,7 +316,7 @@ public class MessageListener extends ListenerAdapter {
                                         if (gameChannel != null) {
                                             MessageHelper.sendMessageToChannel(gameChannel, ping);
                                             if(ping != null && ping.contains("courtesy notice")){
-                                                List<Button> buttons = new ArrayList<Button>();
+                                                List<Button> buttons = new ArrayList<>();
                                                 buttons.add(Button.danger("temporaryPingDisable", "Disable Pings For Turn"));
                                                 buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
                                                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesnt annoy you. It will turn back on for the next turn.", buttons);
@@ -436,7 +436,7 @@ public class MessageListener extends ListenerAdapter {
                     || (event.getAuthor().isBot() && message2.contains("Total hits "))
                 )){
                 
-                String systemPos = "";
+                String systemPos;
                 if(StringUtils.countMatches(event.getChannel().getName(), "-") > 4){
                     systemPos=event.getChannel().getName().split("-")[4];
                 }else{

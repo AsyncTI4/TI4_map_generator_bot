@@ -15,7 +15,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public abstract class BagDraft {
-    protected Game owner;
+    protected final Game owner;
 
     public static BagDraft GenerateDraft(String draftType, Game game) {
         if ("franken".equals(draftType)) {
@@ -177,7 +177,6 @@ public abstract class BagDraft {
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;
@@ -207,7 +206,6 @@ public abstract class BagDraft {
         try {
             if (bagInfoThread != null && !bagInfoThread.isBlank() && !bagInfoThread.isEmpty() && !"null".equals(bagInfoThread)) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-                if (threadChannels == null) return null;
 
                 ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(bagInfoThread);
                 if (threadChannel != null) return threadChannel;

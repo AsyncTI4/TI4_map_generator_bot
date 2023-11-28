@@ -103,23 +103,23 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame) {
-        commonUnitParsing(event, color, tile, unitList, activeGame, Constants.SPACE);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing(event, color, tile, unitList, activeGame, planetName);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll(event, tile, color, activeGame);
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing(event, color, tile, unitList, activeGame, planetName);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-        commonUnitParsing(event, color, tile, unitList, activeGame, Constants.SPACE);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll(event, tile, color, activeGame);
     }
 
@@ -127,7 +127,7 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
+    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
 
@@ -139,7 +139,7 @@ abstract public class AddRemoveUnits implements Command {
             boolean numberIsSet = false;
 
             String originalUnit = "";
-            String resolvedUnit = "";
+            String resolvedUnit;
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String ifNumber = unitInfoTokenizer.nextToken();
                 try {
@@ -162,6 +162,7 @@ abstract public class AddRemoveUnits implements Command {
 
             // RESOLVE PLANET NAME
             String originalPlanetName = "";
+            String planetName;
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String planetToken = unitInfoTokenizer.nextToken();
                 if (unitInfoTokenizer.hasMoreTokens()) {

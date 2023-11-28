@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
@@ -60,7 +61,7 @@ public class ListTiles extends SearchSubcommandData {
         if (tileEmbeds.size() > 3) {
             if (event.getChannel() instanceof TextChannel) {
                 String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
-                futureThread = ((TextChannel) channel).createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).submitAfter(1, TimeUnit.SECONDS);
+                futureThread = ((IThreadContainer) channel).createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).submitAfter(1, TimeUnit.SECONDS);
             }
         }
 

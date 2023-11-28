@@ -107,7 +107,7 @@ public class SCPick extends PlayerSubcommandData {
     }
 
     public List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game activeGame, int scPicked){
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         List<Player> activePlayers = activeGame.getRealPlayers();
         int maxSCsPerPlayer = activeGame.getSCList().size() / activePlayers.size();
         if(maxSCsPerPlayer < 1){
@@ -367,13 +367,13 @@ public class SCPick extends PlayerSubcommandData {
         }
         if(allPicked){
             for(Player p2: activeGame.getRealPlayers()){
-                List<Button> buttons = new ArrayList<Button>();
+                List<Button> buttons = new ArrayList<>();
                 if(p2.hasTechReady("qdn") && p2.getTg() >2 && p2.getStrategicCC() > 0){
                     buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), ButtonHelper.getTrueIdentity(p2, activeGame) + " you have the opportunity to use QDN", buttons);
                 }
-                buttons = new ArrayList<Button>();
+                buttons = new ArrayList<>();
                 if(activeGame.getLaws().containsKey("arbiter") && activeGame.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())){
                     buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));

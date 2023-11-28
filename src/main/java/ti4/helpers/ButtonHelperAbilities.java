@@ -47,7 +47,7 @@ public class ButtonHelperAbilities {
     }
 
     public static List<String> getTrapNames(){
-        List<String> trapNames = new ArrayList<String>();
+        List<String> trapNames = new ArrayList<>();
         trapNames.add("Minefields");
         trapNames.add("Interference Grid");
         trapNames.add("Feint");
@@ -107,7 +107,7 @@ public class ButtonHelperAbilities {
     }
 
     public static void setTrapStep1(Game activeGame, Player player){
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for (Player p2 : activeGame.getRealPlayers()) {
             if (activeGame.isFoWMode()) {
                 buttons.add(Button.secondary("setTrapStep2_" + p2.getFaction(), p2.getColor()));
@@ -123,7 +123,7 @@ public class ButtonHelperAbilities {
 
     public static void setTrapStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
         Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         for(String planet : p2.getPlanets()){
             buttons.add(Button.secondary("setTrapStep3_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
         }
@@ -187,7 +187,7 @@ public class ButtonHelperAbilities {
     }
 
     public static List<String> getPlanetsWithTraps(Game activeGame){
-        List<String> trappedPlanets = new ArrayList<String>();
+        List<String> trappedPlanets = new ArrayList<>();
         for(String trapName : getTrapNames()){
             if(!activeGame.getFactionsThatReactedToThis(trapName).isEmpty()){
                 trappedPlanets.add(activeGame.getFactionsThatReactedToThis(trapName));
@@ -196,7 +196,7 @@ public class ButtonHelperAbilities {
         return trappedPlanets;
     }
     public static List<String> getUnusedTraps(Game activeGame, Player player){
-        List<String> unusedTraps = new ArrayList<String>();
+        List<String> unusedTraps = new ArrayList<>();
         for(String trapName : getTrapNames()){
             if(!player.getTrapCardsPlanets().containsKey(translateNameIntoTrapIDOrReverse(trapName))){
                 unusedTraps.add(trapName);
@@ -253,7 +253,6 @@ public class ButtonHelperAbilities {
         if(!removedYet){
             String tokenName = "attachment_lizhotrap.png";
             if(uH.getTokenList().contains(tokenName)){
-                removedYet = true;
                 tile.removeToken(tokenName, uH.getName());
             }
         }
@@ -287,7 +286,7 @@ public class ButtonHelperAbilities {
 
 
     public static void addOmenDie(Game activeGame, int omenDie){
-        String omenDice = "";
+        String omenDice;
         if(!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()){
             omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
             omenDice = omenDice + "_"+omenDie;
@@ -297,7 +296,7 @@ public class ButtonHelperAbilities {
         }
     }
     public static void removeOmenDie(Game activeGame, int omenDie){
-        String omenDice = "";
+        String omenDice;
         if(!activeGame.getFactionsThatReactedToThis("OmenDice").isEmpty()){
             omenDice = activeGame.getFactionsThatReactedToThis("OmenDice");
             omenDice = omenDice.replaceFirst(""+omenDie,"");
@@ -340,13 +339,13 @@ public class ButtonHelperAbilities {
     }
     public static void rollOmenDiceAtStartOfStrat(Game activeGame, Player myko){
          activeGame.setCurrentReacts("OmenDice", "");
-        String msg = ButtonHelper.getTrueIdentity(myko,activeGame)+" rolled 4 omen dice and rolled the following numbers: ";
+        StringBuilder msg = new StringBuilder(ButtonHelper.getTrueIdentity(myko, activeGame) + " rolled 4 omen dice and rolled the following numbers: ");
         for(int x= 0; x < 4;x++){
             Die d1 = new Die(6);
-            msg = msg+ d1.getResult()+" ";
+            msg.append(d1.getResult()).append(" ");
             addOmenDie(activeGame, d1.getResult());
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, activeGame), msg);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, activeGame), msg.toString());
     }
 
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident, String finsFactionCheckerPrefix) {
@@ -547,7 +546,7 @@ public class ButtonHelperAbilities {
     }
 
     public static List<Button> getMantleCrackingButtons(Player player, Game activeGame) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         int coreCount = 0;
         for (String planetName : player.getPlanetsAllianceMode()) {
             if (planetName.contains("custodia")|| planetName.contains("ghoti")) {
@@ -570,7 +569,7 @@ public class ButtonHelperAbilities {
             }
         }
         if (coreCount > 2) {
-            return new ArrayList<Button>();
+            return new ArrayList<>();
         }
         return buttons;
     }
@@ -620,7 +619,7 @@ public class ButtonHelperAbilities {
     }
 
     public static List<Button> getBuyableAxisOrders(Player player, Game activeGame) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         int maxCost = player.getCommodities();
 
         String relicName = "axisorderdd";

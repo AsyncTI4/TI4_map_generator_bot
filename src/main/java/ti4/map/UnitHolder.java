@@ -160,7 +160,7 @@ abstract public class UnitHolder {
 
     @NotNull
     public Integer getUnitCount(UnitType unitType, String color) {
-        if (units == null || unitType == null || color == null) return 0;
+        if (unitType == null || color == null) return 0;
         String colorIDofUnit = Mapper.getColorID(color);
         if (colorIDofUnit == null) {
             colorIDofUnit = color;
@@ -169,7 +169,7 @@ abstract public class UnitHolder {
         Integer value = units.entrySet().stream()
             .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
-        return value == null ? 0 : value;
+        return value;
     }
 
     @JsonIgnore
@@ -183,11 +183,10 @@ abstract public class UnitHolder {
 
     @NotNull
     public Integer getUnitDamageCount(UnitType unitType, String color) {
-        if (unitsDamage == null) return 0;
-        Integer value = unitsDamage.entrySet().stream()
+      Integer value = unitsDamage.entrySet().stream()
             .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(color))
             .findFirst().map(Entry::getValue).orElse(0);
-        return value == null ? 0 : value;
+        return value;
     }
 
     public HashSet<String> getCCList() {

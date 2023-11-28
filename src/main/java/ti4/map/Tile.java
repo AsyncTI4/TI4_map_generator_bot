@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -441,8 +442,8 @@ public class Tile {
             .flatMap(uh -> uh.getUnits().entrySet().stream())
             .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
             .map(Map.Entry::getKey)
-            .map(key -> p.getUnitFromUnitKey(key))
-            .filter(unit -> unit != null)
+            .map(p::getUnitFromUnitKey)
+            .filter(Objects::nonNull)
             .anyMatch(condition);
     }
 
@@ -452,7 +453,7 @@ public class Tile {
             .flatMap(uh -> uh.getUnits().entrySet().stream())
             .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
             .map(Map.Entry::getKey)
-            .filter(x -> x != null)
+            .filter(Objects::nonNull)
             .anyMatch(condition);
     }
 
