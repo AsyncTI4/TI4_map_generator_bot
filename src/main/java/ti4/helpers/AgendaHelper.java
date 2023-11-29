@@ -36,6 +36,8 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
+import ti4.commands.status.RevealStage1;
+import ti4.commands.status.RevealStage2;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
@@ -317,6 +319,13 @@ public class AgendaHelper {
                     for (Player playerB : activeGame.getRealPlayers()) {
                         new RiseOfMessiah().doRise(playerB, event, activeGame);
                     }
+                }
+            }
+            if ("incentive".equalsIgnoreCase(agID)) {
+                if ("for".equalsIgnoreCase(winner)) {
+                    new RevealStage1().revealS1(event, actionsChannel);
+                } else {
+                    new RevealStage2().revealS2(event, actionsChannel);
                 }
             }
             if ("unconventional".equalsIgnoreCase(agID)) {
@@ -1639,8 +1648,10 @@ public class AgendaHelper {
             for (int x = 0; x < 6; x++) {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
-                    if (player != null && !player.isDummy() && player.isRealPlayer()) {
+                    if (player != null && player.isRealPlayer()) {
                         return player;
+                    }else{
+                        BotLogger.log("Hit a null or nontreal player in game "+activeGame.getName()+" on player "+player.getUserName());
                     }
                 }
 

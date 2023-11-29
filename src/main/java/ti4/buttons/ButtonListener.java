@@ -1039,7 +1039,6 @@ public class ButtonListener extends ListenerAdapter {
             Player player2 = activeGame.getPlayerFromColorOrFaction(player2Color);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             ButtonHelperAbilities.pillageCheck(player2, activeGame);
-            ButtonHelper.checkTransactionLegality(activeGame, player, player2);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("sabotage_")) {
             String typeNName = buttonID.replace("sabotage_", "");
@@ -1399,6 +1398,8 @@ public class ButtonListener extends ListenerAdapter {
             deleteButtons(event, buttonID, buttonLabel, activeGame, player, actionsChannel, trueIdentity);
         } else if (buttonID.startsWith("reverse_")) {
             AgendaHelper.reverseRider(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("moveGlory_")) {
+            ButtonHelperAgents.moveGlory(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("rider_")) {
             AgendaHelper.placeRider(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("startToScuttleAUnit_")) {
@@ -2010,6 +2011,7 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation()
                 + " Use the buttons to select what you want to transact";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            ButtonHelper.checkTransactionLegality(activeGame, player, p2);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("transact_")) {
             ButtonHelper.resolveSpecificTransButtons(activeGame, player, buttonID, event);

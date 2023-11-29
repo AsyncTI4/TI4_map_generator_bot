@@ -1066,6 +1066,9 @@ public class Game {
     public String getActivePlayer() {
         return activePlayer;
     }
+    public Player getActivePlayerObject() {
+        return getPlayer(activePlayer);
+    }
 
     public String getActiveSystem() {
         return activeSystem;
@@ -2975,6 +2978,10 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayers() {
         return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+    }
+     @JsonIgnore
+    public List<Player> getRealPlayersNDummies() {
+        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isDummy())).collect(Collectors.toList());
     }
 
     @JsonIgnore
