@@ -56,8 +56,9 @@ public class BotLogger {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
         
-        Logger logger = LoggerFactory.getLogger(BotLogger.class);
-        logger.info(msg);
+        // Logger logger = LoggerFactory.getLogger(BotLogger.class);
+        // logger.info(msg);
+        System.out.println("[BOT-LOG] " + msg);
 
         //Adding so we dont cause an exception by attempting to log 
         if (msg.length() > 2000){
