@@ -53,16 +53,16 @@ public class Replace extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Only game players or Bothelpers can replace a player.");
             return;
         }
-        
+
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if (removeOption == null || addOption == null) {
             MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
             return;
         }
-        
+
         Player removedPlayer = Helper.getPlayer(activeGame, null, event);
-        if (removedPlayer == null){
+        if (removedPlayer == null) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
         }
@@ -73,7 +73,7 @@ public class Replace extends GameSubcommandData {
                 activeGame.removePlayer(addedUser.getId());
             }
         }
-        
+
         //REMOVE ROLE
         Guild guild = event.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
@@ -81,26 +81,26 @@ public class Replace extends GameSubcommandData {
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
         }
-        
+
         //ADD ROLE
         Member addedMember = guild.getMemberById(addedUser.getId());
         if (roles.size() == 1) {
             guild.addRoleToMember(addedMember, roles.get(0)).queue();
         }
-        
+
         String message;
         if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) || players.stream().anyMatch(player -> player.getUserID().equals(addedUser.getId()))) {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
             return;
         }
-            
+
         message = "Game: " + activeGame.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
         Player player = activeGame.getPlayer(removedPlayer.getUserID());
         LinkedHashMap<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());
-            if (removed){
+            if (removed) {
                 value.add(addedUser.getId());
             }
         }
@@ -123,7 +123,7 @@ public class Replace extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message);
-            MessageHelper.sendMessageToChannel(activeGame.getBotMapUpdatesThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " pinging you here for visibility");
+            MessageHelper.sendMessageToChannel(activeGame.getBotMapUpdatesThread(), player.getRepresentation(true, true) + " pinging you here for visibility");
         }
     }
 }

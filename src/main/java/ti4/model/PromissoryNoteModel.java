@@ -10,76 +10,57 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
+
 @Data
 public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String faction;
-    private String colour;
+    private String color;
     private Boolean playArea;
     private String attachment;
-    private String source;
+    private ComponentSource source;
     private String text;
     private List<String> searchTags = new ArrayList<>();
 
-  public boolean isValid() {
+    public boolean isValid() {
         return alias != null
             && name != null
-            && (faction != null || colour != null)
-            // && attachment != null
+            && (faction != null || color != null)
             && text != null
             && source != null;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-    
-    public String getName() {
-        return name;
-    }
-    
     public Optional<String> getFaction() {
         return Optional.ofNullable(faction);
     }
 
-    public Optional<String> getColour() {
-        return Optional.ofNullable(colour);
+    public Optional<String> getColor() {
+        return Optional.ofNullable(color);
     }
 
-    public String getFactionOrColour() {
+    public String getFactionOrColor() {
         if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
-        if (!StringUtils.isBlank(getColour().orElse(""))) return colour;
-        return faction + "_" + colour;
-    }
-
-    public Boolean getPlayArea() {
-        return playArea;
+        if (!StringUtils.isBlank(getColor().orElse(""))) return color;
+        return faction + "_" + color;
     }
 
     public Optional<String> getAttachment() {
         return Optional.ofNullable(attachment);
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
     public String getOwner() {
-        if (faction == null || faction.isEmpty()) return colour;
+        if (faction == null || faction.isEmpty()) return color;
         return faction;
     }
 
     public boolean isPlayedDirectlyToPlayArea() {
-        if(playArea == null){
+        if (playArea == null) {
             return false;
         }
         List<String> pnIDsToHoldInHandBeforePlayArea = Arrays.asList(
-            "gift", "antivirus", "convoys", "dark_pact", "blood_pact", 
+            "gift", "antivirus", "convoys", "dark_pact", "blood_pact",
             "pop", "terraform", "dspnauge", "dspnaxis", "dspnbent",
             "dspndihm", "dspnghot", "dspngled", "dspnkolu", "dspnkort",
             "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
@@ -99,14 +80,14 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         title.append(Emojis.PN);
         if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
-        if (!StringUtils.isBlank(getColour().orElse(""))) title.append(" (").append(getColour()).append(")");
-        title.append(getSourceEmoji());
+        if (!StringUtils.isBlank(getColor().orElse(""))) title.append(" (").append(getColor()).append(")");
+        title.append(getSource().emoji());
         eb.setTitle(title.toString());
 
         if (justShowName) return eb.build();
 
         //DESCRIPTION
-      eb.setDescription(getText());
+        eb.setDescription(getText());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
@@ -126,25 +107,18 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
             footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource()).append("\n");
         }
         eb.setFooter(footer.toString());
-        
+
         eb.setColor(Color.blue);
         return eb.build();
     }
 
-    private String getSourceEmoji() {
-        return switch (getSource()) {
-            case "Discordant Stars" -> Emojis.DiscordantStars;
-            case "Absol" -> Emojis.Absol;
-            default -> "";
-        };
-    }
-
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColour().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColor().toLowerCase().contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFactionOrColour() + ") (" + getSource() + ")";
+        return getName() + " (" + getFactionOrColor() + ") (" + getSource() + ")";
     }
 
 }

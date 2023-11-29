@@ -20,7 +20,7 @@
         "faction": "keleres",
         "window": "At the start of the strategy phase",
         "windowEffect": "Replenish your commodities, then gain 1 trade good.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "laws_order",
@@ -28,13 +28,13 @@
         "faction": "keleres",
         "window": "At the start of your turn",
         "windowEffect": "You may spend 1 influence to treat all laws as blank until the end of your turn.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "the_tribuni",
         "name": "The Tribuni",
         "faction": "keleres",
         "permanentEffect": "During setup, choose an unplayed faction from among the Mentak, the Xxcha and The Argent Flight; take that faction's home system, command tokens and control markers. Additionally, take the Keleres Hero that corresponds to that faction",
-        "source": "codexiii"
+        "source": "codex3"
     }
 ]

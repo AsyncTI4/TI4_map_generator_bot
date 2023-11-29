@@ -105,7 +105,7 @@ public class Game {
     @ExportableField
     private boolean naaluAgent;
     @ExportableField
-      private boolean l1Hero;
+    private boolean l1Hero;
     @ExportableField
     private boolean nomadCoin;
     @ExportableField
@@ -239,7 +239,8 @@ public class Game {
     private List<String> events = new ArrayList<>();
     @Getter
     private LinkedHashMap<String, Integer> discardedEvents = new LinkedHashMap<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     private LinkedHashMap<String, Integer> eventsInEffect = new LinkedHashMap<>();
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
@@ -270,7 +271,9 @@ public class Game {
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
     private final ArrayList<String> runDataMigrations = new ArrayList<>();
     private BagDraft activeDraft;
-    @JsonIgnore @Getter @Setter
+    @JsonIgnore
+    @Getter
+    @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
 
     public Game() {
@@ -624,6 +627,7 @@ public class Game {
     public boolean isSpinMode() {
         return spinMode;
     }
+
     public void setHomeBrewSCMode(boolean homeBrewSCMode) {
         homebrewSCMode = homeBrewSCMode;
     }
@@ -864,12 +868,12 @@ public class Game {
     }
 
     public String getFactionsThatReactedToThis(String messageID) {
-        if(checkingForAllReacts.get(messageID) != null){
+        if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
-        }else{
+        } else {
             return "";
         }
-        
+
     }
 
     public void resetCurrentAgendaVotes() {
@@ -881,20 +885,20 @@ public class Game {
         return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toSet());
     }
 
-    public List<Integer> getPlayedSCsInOrder(Player player){
+    public List<Integer> getPlayedSCsInOrder(Player player) {
         Set<Integer> playedSCs = getPlayedSCs();
 
         List<Integer> orderedSCsBasic = new ArrayList<>(playedSCs);
         Collections.sort(orderedSCsBasic);
         List<Integer> orderedSCs = new ArrayList<>();
         int playerSC = player.getLowestSC();
-        for(int sc : orderedSCsBasic){
-            if(sc > playerSC){
+        for (int sc : orderedSCsBasic) {
+            if (sc > playerSC) {
                 orderedSCs.add(sc);
             }
         }
-        for(int sc : orderedSCsBasic){
-            if(sc < playerSC){
+        for (int sc : orderedSCsBasic) {
+            if (sc < playerSC) {
                 orderedSCs.add(sc);
             }
         }
@@ -934,12 +938,15 @@ public class Game {
     public boolean getNaaluAgent() {
         return naaluAgent;
     }
+
     public boolean getL1Hero() {
         return l1Hero;
     }
+
     public boolean getNomadCoin() {
         return nomadCoin;
     }
+
     public boolean getTemporaryPingDisable() {
         return temporaryPingDisable;
     }
@@ -959,12 +966,15 @@ public class Game {
     public void setNaaluAgent(boolean onStatus) {
         naaluAgent = onStatus;
     }
+
     public void setL1Hero(boolean onStatus) {
         l1Hero = onStatus;
     }
+
     public void setNomadCoin(boolean onStatus) {
         nomadCoin = onStatus;
     }
+
     public void setTemporaryPingDisable(boolean onStatus) {
         temporaryPingDisable = onStatus;
     }
@@ -976,6 +986,7 @@ public class Game {
     public void setComponentAction(boolean onStatus) {
         componentAction = onStatus;
     }
+
     public void setJustPlayedComponentAC(boolean onStatus) {
         justPlayedComponentAC = onStatus;
     }
@@ -995,9 +1006,11 @@ public class Game {
     public void setCurrentReacts(String messageID, String factionsWhoReacted) {
         checkingForAllReacts.put(messageID, factionsWhoReacted);
     }
+
     public void removeMessageIDFromCurrentReacts(String messageID) {
         checkingForAllReacts.remove(messageID);
     }
+
     public void removeOutcomeAgendaVote(String outcome) {
         currentAgendaVotes.remove(outcome);
     }
@@ -1233,12 +1246,15 @@ public class Game {
     public void addMessageIDForSabo(String messageID) {
         messageIDsForSaboReacts.add(messageID);
     }
+
     public void removeMessageIDForSabo(String messageID) {
         messageIDsForSaboReacts.remove(messageID);
     }
-     public void setMessageIDForSabo(List<String> messageIDs) {
+
+    public void setMessageIDForSabo(List<String> messageIDs) {
         messageIDsForSaboReacts = messageIDs;
     }
+
     public List<String> getMessageIDsForSabo() {
         return messageIDsForSaboReacts;
     }
@@ -1838,7 +1854,7 @@ public class Game {
         }
         return false;
     }
-    
+
     public boolean addLaw(Integer idNumber, String optionalText) {
         String id = "";
         for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -2192,12 +2208,12 @@ public class Game {
         return agendas.get(index);
     }
 
-     @Nullable
     public void drawActionCard(String userID, int count) {
-        for(int x = 0; x < count; x++){
+        for (int x = 0; x < count; x++) {
             drawActionCard(userID);
         }
     }
+
     @Nullable
     public LinkedHashMap<String, Integer> drawActionCard(String userID) {
         if (!actionCards.isEmpty()) {
@@ -2354,6 +2370,7 @@ public class Game {
         }
         return relics.remove(0);
     }
+
     public String drawRelic(int location) {
         if (relics.isEmpty()) {
             return "";
@@ -2361,7 +2378,7 @@ public class Game {
         return relics.remove(location);
     }
 
-    public void shuffleRelics(){
+    public void shuffleRelics() {
         Collections.shuffle(relics);
     }
 
@@ -2451,6 +2468,7 @@ public class Game {
         }
         discardActionCards.put(id, identifier);
     }
+
     public void setPurgedActionCard(String id) {
         Collection<Integer> values = purgedActionCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -2481,7 +2499,7 @@ public class Game {
         return false;
     }
 
-     public boolean purgedActionCard(String userID, Integer acIDNumber) {
+    public boolean purgedActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
             LinkedHashMap<String, Integer> actionCards = player.getActionCards();
@@ -2847,7 +2865,6 @@ public class Game {
         this.discardActionCards = discardActionCards;
     }
 
-    
     public void setPurgedActionCards(LinkedHashMap<String, Integer> purgedActionCards) {
         this.purgedActionCards = purgedActionCards;
     }
@@ -2993,6 +3010,7 @@ public class Game {
     public void setBotFactionReactions(boolean limit) {
         botFactionReacts = limit;
     }
+
     public void setHasHadAStatusPhase(boolean limit) {
         hasHadAStatusPhase = limit;
     }
@@ -3033,7 +3051,7 @@ public class Game {
     @JsonIgnore
     public List<String> getRealPlayerIDs() {
         List<String> pIDs = new ArrayList<>();
-        for(Player player : getRealPlayers()){
+        for (Player player : getRealPlayers()) {
             pIDs.add(player.getUserID());
         }
         return pIDs;
@@ -3517,8 +3535,8 @@ public class Game {
 
     @Deprecated
     public UnitModel getUnitFromImageName(String imageName) {
-        String colourID = StringUtils.substringBefore(imageName, "_");
-        Player player = getPlayerFromColorOrFaction(colourID);
+        String colorID = StringUtils.substringBefore(imageName, "_");
+        Player player = getPlayerFromColorOrFaction(colorID);
         if (player == null) return null;
         return player.getUnitFromImageName(imageName);
     }
@@ -3531,9 +3549,11 @@ public class Game {
 
     @Deprecated
     public String getUnitNameFromImageName(String imageName) {
-        String colourID = StringUtils.substringBefore(imageName, "_");
-        String imageFileSuffix = StringUtils.substringAfter(imageName, colourID);
-        Player player = getPlayerFromColorOrFaction(colourID);
+        String colorID = StringUtils.substringBefore(imageName, "_");
+        String imageFileSuffix = StringUtils.substringAfter(imageName, colorID);
+        Player player = getPlayerFromColorOrFaction(colorID);
+        if (player == null) return null;
+
         return player.getUnitModels().stream()
             .filter(unit -> unit.getImageFileSuffix().equals(imageFileSuffix))
             .map(UnitModel::getName)
@@ -3547,8 +3567,8 @@ public class Game {
             List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
-                    if (   (variantUnit.getHomebrewReplacesID().isPresent() && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
-                        || (playerUnit.getHomebrewReplacesID().isPresent()  &&  playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
+                    if ((variantUnit.getHomebrewReplacesID().isPresent() && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
+                        || (playerUnit.getHomebrewReplacesID().isPresent() && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
                     ) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
@@ -3595,7 +3615,7 @@ public class Game {
 
             for (TechnologyModel tech : techsToReplace) {
                 String replacedTechID = tech.getAlias();
-                String replacingTechID =  tech.getHomebrewReplacesID().get();
+                String replacingTechID = tech.getHomebrewReplacesID().get();
                 if (player.hasTech(replacedTechID)) {
                     if (!player.hasTechReady(replacedTechID)) {
                         player.refreshTech(replacedTechID);

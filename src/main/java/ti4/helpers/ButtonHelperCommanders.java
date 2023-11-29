@@ -25,19 +25,19 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperCommanders {
 
-
     public static void yinCommanderStep1(Player player, Game activeGame, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Infantry)) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons
-                        .add(Button.success("yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(), "Remove Inf from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
+                        .add(
+                            Button.success("yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(), "Remove Inf from " + ButtonHelper.getUnitHolderRep(unitHolder, tile, activeGame)));
                 }
             }
         }
         ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) +" use buttons to remove an infantry", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true) + " use buttons to remove an infantry", buttons);
     }
 
     public static void resolveYinCommanderRemoval(Player player, Game activeGame, String buttonID, ButtonInteractionEvent event) {
@@ -54,18 +54,19 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
-    public static void mykoCommanderUsage(Player player, Game activeGame, ButtonInteractionEvent event){
-        String msg = ButtonHelper.getIdent(player)+ " spent 1 ";
-        if(player.getCommodities() > 0){
-            msg = msg + "commoditity ("+player.getCommodities()+"->"+(player.getCommodities()-1)+") ";
-            player.setCommodities(player.getCommodities()-1);
-        }else{
-            msg = msg + "tg ("+player.getTg()+"->"+(player.getTg()-1)+") ";
-            player.setTg(player.getTg()-1);
+    public static void mykoCommanderUsage(Player player, Game activeGame, ButtonInteractionEvent event) {
+        String msg = ButtonHelper.getIdent(player) + " spent 1 ";
+        if (player.getCommodities() > 0) {
+            msg = msg + "commoditity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
+            player.setCommodities(player.getCommodities() - 1);
+        } else {
+            msg = msg + "tg (" + player.getTg() + "->" + (player.getTg() - 1) + ") ";
+            player.setTg(player.getTg() - 1);
         }
         msg = msg + " to cancel one hit";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
+
     public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
@@ -96,7 +97,7 @@ public class ButtonHelperCommanders {
             int old = player.getTg();
             int newTg = player.getTg() + 1;
             player.setTg(player.getTg() + 1);
-            String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Since you have Barony commander unlocked, 1tg has been added automatically (" + old
+            String mMessage = player.getRepresentation(true, true) + " Since you have Barony commander unlocked, 1tg has been added automatically (" + old
                 + "->" + newTg + ")";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             ButtonHelperAbilities.pillageCheck(player, activeGame);
@@ -129,7 +130,7 @@ public class ButtonHelperCommanders {
             int old = player.getTg();
             int newTg = player.getTg() + 1;
             player.setTg(player.getTg() + 1);
-            String mMessage = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
+            String mMessage = player.getRepresentation(true, true) + " Since you have Muaat commander unlocked, 1tg has been added automatically (" + old
                 + "->" + newTg + ")";
             if (activeGame.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), mMessage);
@@ -152,22 +153,22 @@ public class ButtonHelperCommanders {
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " You gained tech while having Nekro commander, use buttons to resolve. ", buttons);
+                    player.getRepresentation(true, true) + " You gained tech while having Nekro commander, use buttons to resolve. ", buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     int count = 0;
                     for (String nekroTech : player.getTechs()) {
-                        if("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)){
+                        if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                             continue;
                         }
                         if (!"".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
                             count = count + 1;
                         }
-                        
+
                     }
                     if (count > 2) {
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            "# " + ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
+                            "# " + player.getRepresentation(true, true) + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
                     }
                 }
             }

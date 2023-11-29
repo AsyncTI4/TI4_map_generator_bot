@@ -38,32 +38,33 @@ public class TurnStart extends PlayerSubcommandData {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game activeGame, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
-        player.setTurnCount(player.getTurnCount()+1);
+        player.setTurnCount(player.getTurnCount() + 1);
         boolean goingToPass = false;
-        if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction())!= null &&  activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())){
-          if(activeGame.getFactionsThatReactedToThis("Pre Pass "+player.getFaction()).contains(player.getFaction())&&!player.isPassed()){
-                activeGame.setCurrentReacts("Pre Pass "+player.getFaction(), "");
+        if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
+            && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+            if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+                activeGame.setCurrentReacts("Pre Pass " + player.getFaction(), "");
                 goingToPass = true;
             }
         }
-        String text = "# " + Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " UP NEXT (Turn #"+player.getTurnCount()+")";
+        String text = "# " + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeGame, false, event);
         MessageChannel gameChannel = activeGame.getMainGameChannel() == null ? event.getMessageChannel() : activeGame.getMainGameChannel();
-        
+
         activeGame.updateActivePlayer(player);
         activeGame.setCurrentPhase("action");
-        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);             
-        
+        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, activeGame);
+
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(activeGame, event);
-        
+
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, "started turn");
 
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(player, activeGame, event, text, fail, success);
-            if(!goingToPass){
+            if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
             }
             if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
@@ -75,7 +76,6 @@ public class TurnStart extends PlayerSubcommandData {
             }
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
-            
 
             activeGame.setPingSystemCounter(0);
             for (int x = 0; x < 10; x++) {
@@ -83,7 +83,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             MessageHelper.sendMessageToChannel(gameChannel, text);
-            if(!goingToPass){
+            if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
             }
             if (getMissedSCFollowsText(activeGame, player) != null && !"".equalsIgnoreCase(getMissedSCFollowsText(activeGame, player))) {
@@ -96,7 +96,7 @@ public class TurnStart extends PlayerSubcommandData {
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, activeGame);
             ButtonHelperFactionSpecific.resolveKolleccAbilities(player, activeGame);
         }
-        if(goingToPass){
+        if (goingToPass) {
             player.setPassed(true);
             String text2 = player.getRepresentation() + " PASSED";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
@@ -109,13 +109,13 @@ public class TurnStart extends PlayerSubcommandData {
         boolean sendReminder = false;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true));
+        sb.append(player.getRepresentation(true, true));
         sb.append(" Please react to the following strategy cards before doing anything else:\n");
         int count = 0;
         for (int sc : activeGame.getPlayedSCsInOrder(player)) {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(activeGame, sc));
-                if(!activeGame.getFactionsThatReactedToThis("scPlay"+sc).isEmpty()){
+                if (!activeGame.getFactionsThatReactedToThis("scPlay" + sc).isEmpty()) {
                     sb.append(" ").append(activeGame.getFactionsThatReactedToThis("scPlay" + sc).replace("666fin", ":"));
                 }
                 sb.append("\n");

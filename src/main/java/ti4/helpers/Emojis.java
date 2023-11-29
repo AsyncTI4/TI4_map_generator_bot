@@ -454,7 +454,7 @@ public class Emojis {
     // LIST OF SEM-LORES
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor, SemLore);
 
-    // EMOJI FARM 9 - SC COLOURS
+    // EMOJI FARM 9 - SC COLORS
     public static final String sc_1_1 = "<:sc_1_1:1164316518390190140>";
     public static final String sc_1_2 = "<:sc_1_2:1164316520986464267>";
     public static final String sc_1_3 = "<:sc_1_3:1164316522689339392>";
@@ -509,7 +509,7 @@ public class Emojis {
     public static final String SC8Mention = sc_8_1 + sc_8_2 + sc_8_3 + sc_8_4 + sc_8_5;
     // END EMOJI FARM 9
 
-    // EMOJI FARM 10 - COLOUR UNITS
+    // EMOJI FARM 10 - COLOR UNITS
     public static final String black = "<:black:1165031264743600250>";
     public static final String bloodred = "<:bloodred:1165031267532804277>";
     public static final String blue = "<:blue:1165031268950482974>";
@@ -641,11 +641,11 @@ public class Emojis {
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
-            warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
-            CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
-            tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
-            PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-            BortWindow);
+        warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
+        CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
+        tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
+        PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
+        BortWindow);
 
     // private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
@@ -892,8 +892,8 @@ public class Emojis {
         };
     }
 
-    public static String getColourEmojis(String colour) {
-        return switch (colour) {
+    public static String getColorEmojiWithName(String color) {
+        return switch (color) {
             case "gray" -> gray + "**Gray**";
             case "black" -> black + "**Black**";
             case "blue" -> blue + "**Blue**";
@@ -942,7 +942,62 @@ public class Emojis {
             case "splitnavy" -> splitnavy + "**Splitnavy**";
             case "splitpetrol" -> splitpetrol + "**Splitpetrol**";
             case "splitrainbow" -> splitrainbow + "**Splitrainbow**";
-            default -> colour;
+            default -> color;
+        };
+    }
+
+    public static String getColorEmoji(String color) {
+        return switch (color) {
+            case "gray" -> gray;
+            case "black" -> black;
+            case "blue" -> blue;
+            case "green" -> green;
+            case "orange" -> orange;
+            case "pink" -> pink;
+            case "purple" -> purple;
+            case "red" -> red;
+            case "yellow" -> yellow;
+            case "petrol" -> petrol;
+            case "brown" -> brown;
+            case "tan" -> tan;
+            case "forest" -> forest;
+            case "chrome" -> chrome;
+            case "sunset" -> sunset;
+            case "turquoise" -> turquoise;
+            case "gold" -> gold;
+            case "lightgray" -> lightgray;
+            case "teal" -> teal;
+            case "bloodred" -> bloodred;
+            case "emerald" -> emerald;
+            case "navy" -> navy;
+            case "rose" -> rose;
+            case "lime" -> lime;
+            case "lavender" -> lavender;
+            case "spring" -> spring;
+            case "chocolate" -> chocolate;
+            case "rainbow" -> rainbow;
+            case "ethereal" -> ethereal;
+            case "orca" -> orca;
+            case "splitred" -> splitred;
+            case "splitblue" -> splitblue;
+            case "splitgreen" -> splitgreen;
+            case "splitpurple" -> splitpurple;
+            case "splitorange" -> splitorange;
+            case "splityellow" -> splityellow;
+            case "splitpink" -> splitpink;
+            case "splitgold" -> splitgold;
+            case "splitlime" -> splitlime;
+            case "splittan" -> splittan;
+            case "splitteal" -> splitteal;
+            case "splitturquoise" -> splittorquoise;
+            case "splitbloodred" -> splitbloodred;
+            case "splitchocolate" -> splitchocolate;
+            case "splitemerald" -> splitemerald;
+            case "splitnavy" -> splitnavy;
+            case "splitpetrol" -> splitpetrol;
+            case "splitrainbow" -> splitrainbow;
+
+            default -> getRandomGoodDog();
         };
     }
 

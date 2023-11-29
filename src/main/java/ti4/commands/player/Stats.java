@@ -124,7 +124,7 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionS);
 		if (optionMappings.isEmpty()) return;
 
-		sendMessage(Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true) + " player stats changed:");
+		sendMessage(player.getRepresentation(true, true) + " player stats changed:");
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
@@ -132,8 +132,8 @@ public class Stats extends PlayerSubcommandData {
 			setValue(event, activeGame, player, optionTG, player::setTg, player::getTg);
 			if (optionTG.getAsString().contains("+")) {
 				ButtonHelperAbilities.pillageCheck(player, activeGame);
-			}else{
-				if(player.getTg() > oldTg){
+			} else {
+				if (player.getTg() > oldTg) {
 					ButtonHelperAbilities.pillageCheck(player, activeGame);
 				}
 			}
@@ -146,7 +146,7 @@ public class Stats extends PlayerSubcommandData {
 			setValue(event, activeGame, player, optionC, player::setCommodities, player::getCommodities);
 			if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
 				MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-					ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+					player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
 			}
 			if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
 				ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
@@ -169,7 +169,7 @@ public class Stats extends PlayerSubcommandData {
 						GameSaveLoadManager.saveMap(activeGame2);
 					}
 				}
-				
+
 			}
 		}
 
@@ -185,7 +185,7 @@ public class Stats extends PlayerSubcommandData {
 
 		Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
 		if (turnCount != null) {
-			
+
 			player.setTurnCount(turnCount);
 			String message = ">  set **Turn Count** to " + turnCount;
 			sendMessage(message);
@@ -299,7 +299,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
 		sb.append("> Alliance Members: ").append(player.getAllianceMembers()).append("\n");
 		sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
-		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10()/10.0)).append("`\n");
+		sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
 		sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
 		sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 		Guild guild = activeGame.getGuild();
@@ -340,12 +340,12 @@ public class Stats extends PlayerSubcommandData {
 
 		player.addSC(scNumber);
 		if (activeGame.isFoWMode()) {
-			String messageToSend = Emojis.getColourEmojis(player.getColor()) + " picked SC #" + scNumber;
+			String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " picked SC #" + scNumber;
 			FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 		}
 
-		if(scNumber == 5 && !activeGame.isHomeBrewSCMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")){
-			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " heads up, you just picked trade but dont currently hold your Trade Agreement");
+		if (scNumber == 5 && !activeGame.isHomeBrewSCMode() && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+			MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " heads up, you just picked trade but dont currently hold your Trade Agreement");
 		}
 
 		Integer tgCount = scTradeGoods.get(scNumber);
@@ -354,7 +354,7 @@ public class Stats extends PlayerSubcommandData {
 			tg += tgCount;
 			MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
 			if (activeGame.isFoWMode()) {
-				String messageToSend = Emojis.getColourEmojis(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
+				String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " tgs from picking SC #" + scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, messageToSend);
 			}
 			player.setTg(tg);

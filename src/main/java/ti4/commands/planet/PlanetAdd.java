@@ -36,14 +36,14 @@ public class PlanetAdd extends PlanetAddRemove {
     public void doAction(Player player, String planet, Game activeGame, GenericInteractionCreateEvent event) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(activeGame, planet, player);
         player.addPlanet(planet);
-        
+
         player.exhaustPlanet(planet);
         if ("mirage".equals(planet)) {
             activeGame.clearPlanetsCache();
         }
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
 
-        if(unitHolder.getTokenList().contains("token_freepeople.png")){
+        if (unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
         if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
@@ -70,7 +70,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
-                String message2 = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
+                String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
@@ -89,7 +89,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                     alreadyOwned = true;
                     player_.removePlanet(planet);
-                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_)&& !doubleCheck) {
+                    if (player_.hasRelic("shard") && ButtonHelper.isPlanetLegendaryOrHome(planet, activeGame, true, player_) && !doubleCheck) {
                         String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. " + player.getRepresentation()
                             + " gained shard and a victory point.";
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2);
@@ -113,8 +113,8 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir")) && player.hasTech("dxa")&& !doubleCheck) {
-            String msg10 = ButtonHelper.getTrueIdentity(player, activeGame) + " you may have an opportunity to use Dacxive Animators on " + Helper.getPlanetRepresentation(planet, activeGame)
+        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir")) && player.hasTech("dxa") && !doubleCheck) {
+            String msg10 = player.getRepresentation(true, true) + " you may have an opportunity to use Dacxive Animators on " + Helper.getPlanetRepresentation(planet, activeGame)
                 + ". Click to confirm a combat occurred and to add an infantry or delete these buttons";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg10, ButtonHelper.getDacxiveButtons(activeGame, player, planet));
         }
@@ -122,7 +122,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
             alreadyOwned = false;
         }
-        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck&& event != null) {
+        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
@@ -132,24 +132,28 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
         if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
-                    && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+            && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
-            saarButton.add(Button.success("saarMechRes_"+planet, "Pay 1tg for mech on "+Helper.getPlanetRepresentation(planet, activeGame)));
+            saarButton.add(Button.success("saarMechRes_" + planet, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, activeGame)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
         }
 
-        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2")) && !doubleCheck&& event != null) {
+        if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
+            && !doubleCheck && event != null) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("deployMykoSD_"+planet, "Deploy Dock "+planet));
+            buttons.add(Button.success("deployMykoSD_" + planet, "Deploy Dock " + planet));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd") < 3){
-                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a spacedock on "+planet+" using the buttons.", buttons);
+            if (ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "sd") < 3) {
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                    player.getRepresentation(true, true) + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a spacedock on " + planet + " using the buttons.",
+                    buttons);
 
             }
         }
         for (String law : activeGame.getLaws().keySet()) {
-            if ("minister_exploration".equalsIgnoreCase(law)&& !doubleCheck) {
+            if ("minister_exploration".equalsIgnoreCase(law) && !doubleCheck) {
                 if (activeGame.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -165,7 +169,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (unitHolder.getUnits() != null) {
             numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
         }
-        if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech")&& !doubleCheck) {
+        if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech") && !doubleCheck) {
 
             Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
             sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
@@ -177,7 +181,7 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(pdsButton);
             buttons.add(tgButton);
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getTrueIdentity(player, activeGame) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
+                player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
 
         }
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !activeGame.isBaseGameMode()) {

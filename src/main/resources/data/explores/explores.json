@@ -612,7 +612,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain 1 command token and 1 trade good.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "ent",
@@ -620,7 +620,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain 1 command token and 2 trade goods.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "majent",
@@ -628,7 +628,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain 1 command token and 3 trade goods.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "kel1",
@@ -636,7 +636,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain 2 command tokens.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "kel2",
@@ -644,7 +644,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Gain 2 command tokens.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "dw",
@@ -652,7 +652,7 @@
         "type": "Frontier",
         "resolution": "Instant",
         "text": "Draw 1 relic.",
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "id": "starchartcultural",

@@ -174,7 +174,7 @@ abstract public class AddRemoveUnits implements Command {
                 planetName = Constants.SPACE;
             }
             planetName = getPlanet(event, tile, planetName);
-            
+
             boolean isValidCount = count > 0;
             boolean isValidUnit = unitPath != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
@@ -215,7 +215,7 @@ abstract public class AddRemoveUnits implements Command {
                 }
             }
             if (!pingedAlready) {
-                String colorMention = Emojis.getColourEmojis(color);
+                String colorMention = Emojis.getColorEmojiWithName(color);
                 String message = colorMention + " has modified units in the system. ";
                 if (getActionDescription().contains("add_units")) {
                     message = message + " Specific units modified include: " + unitList;
@@ -282,9 +282,9 @@ abstract public class AddRemoveUnits implements Command {
     public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
         if (tile.isSpaceHolderValid(planetName)) return planetName;
         return tile.getUnitHolders().keySet().stream()
-                .filter(id -> !Constants.SPACE.equals(planetName))
-                .filter(unitHolderID -> unitHolderID.startsWith(planetName))
-                .findFirst().orElse(planetName);
+            .filter(id -> !Constants.SPACE.equals(planetName))
+            .filter(unitHolderID -> unitHolderID.startsWith(planetName))
+            .findFirst().orElse(planetName);
     }
 
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame);
@@ -311,7 +311,8 @@ abstract public class AddRemoveUnits implements Command {
         commands.addCommands(
             Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
+                .addOptions(
+                    new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
     }

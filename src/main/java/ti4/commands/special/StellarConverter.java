@@ -80,7 +80,7 @@ public class StellarConverter extends SpecialSubcommandData {
         for (Player p2 : activeGame.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
-                    ButtonHelper.getTrueIdentity(p2, activeGame) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+                    p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been stellar converted");
             }
         }
         activeGame.removePlanet(unitHolder);
