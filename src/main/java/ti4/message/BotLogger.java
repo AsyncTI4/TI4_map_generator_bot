@@ -60,15 +60,15 @@ public class BotLogger {
         logger.info(msg);
 
         //Adding so we dont cause an exception by attempting to log 
-        if(msg.length() > 2000){
+        if (msg.length() > 2000){
             String ellipses = "...(log message too long)";
             msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
         }
 
         if (botLogChannel == null) {
             String name;
-            if(event == null) {
-              System.out.println(e);
+            if (event == null) {
+                // System.out.println(e);
                 return;
             } else {
                 name = event.getGuild().getName();
