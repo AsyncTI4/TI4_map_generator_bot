@@ -135,14 +135,6 @@ public class AsyncTI4DiscordBot {
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-        SelectionManager.init();
-        initializeWhitelistedRoles();
-
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new RemoveUnits());
@@ -264,8 +256,19 @@ public class AsyncTI4DiscordBot {
             }
         }
 
+        // LOAD DATA
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+        SelectionManager.init();
+        initializeWhitelistedRoles();
+
         // LOAD GAMES
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadMaps();
 
