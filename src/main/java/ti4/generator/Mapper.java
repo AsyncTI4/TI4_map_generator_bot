@@ -52,6 +52,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
+import ti4.model.Source.ComponentSource;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -64,11 +65,11 @@ public class Mapper {
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
-    
+
     //TODO: Finish moving all files over from properties to json
     private static final Map<String, DeckModel> decks = new HashMap<>();
     private static final Map<String, ExploreModel> explore = new HashMap<>();
-    private static final Map<String, AbilityModel>  abilities = new HashMap<>();
+    private static final Map<String, AbilityModel> abilities = new HashMap<>();
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, EventModel> events = new HashMap<>();
@@ -177,18 +178,16 @@ public class Mapper {
                 + String.join("\n> ", badObjects));
     }
 
-    public static List<String> getColourFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
+    public static List<String> getColorFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (isColorValid(color) && isFaction(faction)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
-                if (pn.getColour().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
-                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
-                        && !"Absol".equalsIgnoreCase(pn.getSource())) {
+                if (pn.getColor().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
+                    if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
-                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps")
-                        && "Absol".equalsIgnoreCase(pn.getSource())) {
+                    if (!activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
                         continue;
                     }
                     pnList.add(pn.getAlias());
@@ -259,7 +258,7 @@ public class Mapper {
     }
 
     public static String getTileID(String tileID) {
-        if(TileHelper.getAllTiles().get(tileID) == null){
+        if (TileHelper.getAllTiles().get(tileID) == null) {
             return null;
         }
         return TileHelper.getAllTiles().get(tileID).getImagePath();
@@ -318,7 +317,7 @@ public class Mapper {
     }
 
     public static List<String> getUnitSources() {
-        return units.values().stream().map(UnitModel::getSource).distinct().sorted().toList();
+        return units.values().stream().map(unit -> unit.getSource().toString()).distinct().sorted().toList();
     }
 
     public static UnitModel getUnit(String unitID) {
@@ -484,7 +483,7 @@ public class Mapper {
             return promStr;
         }
         return promissoryNotes.get(id).getName() + ";" + promissoryNotes.get(id).getFaction()
-            + promissoryNotes.get(id).getColour();
+            + promissoryNotes.get(id).getColor();
     }
 
     public static String getPromissoryNoteOwner(String id) {

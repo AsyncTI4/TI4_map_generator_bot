@@ -13,9 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
-public class LeaderModel implements ModelInterface, EmbeddableModel { 
+public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String ID;
     private String type;
     private String faction;
@@ -28,7 +29,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String unlockCondition;
     private String flavourText;
     private String emoji;
-    private String source;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     @Override
@@ -38,12 +39,9 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             && faction != null
             && name != null
             && title != null
-            // && abilityName != null
             && abilityWindow != null
             && abilityText != null
             && unlockCondition != null
-            // && flavourText != null
-            // && emoji != null
             && source != null;
     }
 
@@ -71,7 +69,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public String getRepresentation(boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         StringBuilder representation = new StringBuilder();
         representation.append(getLeaderEmoji()).append(" **").append(getName()).append("**");
-        
+
         if (includeTitle) representation.append(": ").append(getTitle()); //add title
         if (includeAbility && Constants.HERO.equals(getType())) representation.append(" - ").append("__**").append(getAbilityName()).append("**__"); //add hero ability name
         if (includeAbility) representation.append(" - *").append(getAbilityWindow()).append("* ").append(getAbilityText()); //add ability
@@ -90,7 +88,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         //TITLE
         String title = getLeaderEmoji() +
             " __**" + getName() + "**__" + " - " + getTitle() +
-            getSourceEmoji();
+            getSource().emoji();
         eb.setTitle(title);
 
         Emoji emoji = Emoji.fromFormatted(getLeaderEmoji());
@@ -120,28 +118,19 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
-        
+
         eb.setColor(Color.black);
         return eb.build();
-    }
-
-    private String getSourceEmoji() {
-        return switch (getSource()) {
-            case "ds" -> Emojis.DiscordantStars;
-            case "cryppter" -> "";
-            case "baldrick" -> Emojis.IgnisAurora;
-            default -> "";
-        };
     }
 
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
         return getID().toLowerCase().contains(searchString)
-            || getName().toLowerCase().contains(searchString) 
-            || getTitle().toLowerCase().contains(searchString) 
-            || getAbilityName().orElse("").toLowerCase().contains(searchString) 
-            || getAbilityWindow().toLowerCase().contains(searchString) 
+            || getName().toLowerCase().contains(searchString)
+            || getTitle().toLowerCase().contains(searchString)
+            || getAbilityName().orElse("").toLowerCase().contains(searchString)
+            || getAbilityWindow().toLowerCase().contains(searchString)
             || getAbilityText().toLowerCase().contains(searchString)
             || getUnlockCondition().toLowerCase().contains(searchString)
             || getAutoCompleteName().toLowerCase().contains(searchString)
@@ -151,5 +140,5 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         return getName() + " (" + getFaction() + " " + getType() + ")";
     }
-    
+
 }

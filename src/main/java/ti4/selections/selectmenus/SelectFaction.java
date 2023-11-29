@@ -34,15 +34,15 @@ public class SelectFaction implements Selection {
     public void execute(StringSelectInteractionEvent event) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
         if (activeGame == null) {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
-			return;
-		}
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
+            return;
+        }
         Player player = activeGame.getPlayer(event.getUser().getId());
-		player = Helper.getGamePlayer(activeGame, player, event, null);
-		if (player == null) {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-			return;
-		}
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            return;
+        }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().get(0).getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().get(0);
@@ -53,7 +53,7 @@ public class SelectFaction implements Selection {
         List<FactionModel> factions = Mapper.getFactions().stream().sorted(Comparator.comparing(FactionModel::getFactionName)).sorted(Comparator.comparing(FactionModel::getSource)).toList();
         List<List<FactionModel>> factionPages = ListUtils.partition(factions, 25);
         List<StringSelectMenu> menus = new ArrayList<>();
-        
+
         for (List<FactionModel> factionPage : factionPages) {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
@@ -71,6 +71,4 @@ public class SelectFaction implements Selection {
             event.getMessageChannel().sendMessage("").addComponents(ActionRow.of(menu)).queue();
         }
     }
-
-    
 }

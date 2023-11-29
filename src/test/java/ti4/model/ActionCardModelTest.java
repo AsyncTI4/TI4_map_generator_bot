@@ -12,6 +12,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.model.Source.ComponentSource;
 
 public class ActionCardModelTest {
 
@@ -77,9 +78,9 @@ public class ActionCardModelTest {
 
     @Test
     public void testSource() {
-        String source = "testSource";
+        ComponentSource source = ComponentSource.testsource;
         actionCardModel.setSource(source);
-        assertEquals(source, actionCardModel.getSource());
+        assertEquals(ComponentSource.testsource, actionCardModel.getSource());
     }
 
     @Test
@@ -99,7 +100,7 @@ public class ActionCardModelTest {
         actionCardModel.setWindow("testWindow");
         actionCardModel.setText("testText");
         actionCardModel.setFlavorText("testFlavorText");
-        actionCardModel.setSource("testSource");
+        actionCardModel.setSource(ComponentSource.testsource);
         assertTrue(actionCardModel.isValid());
     }
 
@@ -113,7 +114,7 @@ public class ActionCardModelTest {
     @Test
     public void testAutoCompleteName() {
         String name = "testName";
-        String source = "testSource";
+        ComponentSource source = ComponentSource.testsource;
         actionCardModel.setName(name);
         actionCardModel.setSource(source);
         assertEquals(name + " (" + source + ")", actionCardModel.getAutoCompleteName());

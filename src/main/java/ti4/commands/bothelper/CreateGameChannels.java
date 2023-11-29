@@ -104,7 +104,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            sendMessage("Category: **" + categoryChannelName + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
 
@@ -123,7 +123,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
+            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName()
+                + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
             TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             if (bothelperLoungeChannel != null) {
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
@@ -237,7 +238,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/game setup` to set player count and additional options\n" +
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
             "> `/game set_order` to set the starting speaker order\n" +
-            "> `/player setup` to set player faction and colour\n" +
+            "> `/player setup` to set player faction and color\n" +
             "> `/tech add` for factions who need to add tech\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
@@ -328,8 +329,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static Guild getNextAvailableServer() {
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda.getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
-        
+        Guild guild = AsyncTI4DiscordBot.jda
+            .getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
+
         // CURRENT SET GUILD HAS ROOM
         if (serverHasRoomForNewFullCategory(guild)) return guild;
 
@@ -374,7 +376,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
-        
+
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > 225) {

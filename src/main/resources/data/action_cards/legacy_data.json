@@ -78,7 +78,7 @@
     "window": "After you gain control of a planet",
     "text": "Ready that planet and gain 2 commodities.",
     "flavorText": "Cabal cultists were known to quell threats of rebellion with stories of their penal colonies on the other side of the rift.",
-    "source": "action_deck_2_asteroid"
+    "source": "action_deck_2_old"
   },
   {
     "alias": "corporate_lobbying2",

@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.model.Source.ComponentSource;
+
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Data;
+
+@Data
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
@@ -20,7 +25,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> leaders;
     private List<String> promissoryNotes;
     private List<String> units;
-    private String source;
+    private ComponentSource source;
 
     public boolean isValid() {
         return alias != null
@@ -37,32 +42,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && source != null;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getFactionName() {
-        return factionName;
-    }
-
     public String getShortTag() {
         return StringUtils.left(Optional.ofNullable(shortTag).orElse(getAlias()), 3).toUpperCase();
-    }
-
-    public String getHomeSystem() {
-        return homeSystem;
-    }
-
-    public String getStartingFleet() {
-        return startingFleet;
-    }
-
-    public int getCommodities() {
-        return commodities;
-    }
-
-    public String getSource() {
-        return source;
     }
 
     public List<String> getFactionTech() {

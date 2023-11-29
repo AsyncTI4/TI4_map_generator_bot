@@ -150,7 +150,7 @@ public class GenerateMap {
             int mostObjs = Math.max(Math.max(stage1, stage2), other);
             int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
-            int playerCountForMap = activeGame.getRealPlayers().size()+activeGame.getDummies().size();
+            int playerCountForMap = activeGame.getRealPlayers().size() + activeGame.getDummies().size();
             int playerHeight = 340;
             int playerY = playerCountForMap * playerHeight;
 
@@ -691,7 +691,7 @@ public class GenerateMap {
                 // SECOND ROW RIGHT SIDE
                 xDeltaSecondRowFromRightSide = reinforcements(player, activeGame, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
-                
+
                 xDeltaSecondRowFromRightSide = speakerToken(activeGame, player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
 
                 if (player.hasAbility("ancient_blueprints")) {
@@ -779,23 +779,21 @@ public class GenerateMap {
     private int omenDice(Game activeGame, Player player, int x, int y) {
         int deltaX = 0;
         if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
-            
+
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(new BasicStroke(2));
- 
+
             for (int i = 0; i < ButtonHelperAbilities.getAllOmenDie(activeGame).size(); i++) {
-                String omen = "pa_ds_myko_omen_"+ButtonHelperAbilities.getAllOmenDie(activeGame).get(i)+".png";
-                omen = omen.replace("10","0");
+                String omen = "pa_ds_myko_omen_" + ButtonHelperAbilities.getAllOmenDie(activeGame).get(i) + ".png";
+                omen = omen.replace("10", "0");
                 graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
-                    
+
                 drawPAImage(x + deltaX, y, omen);
                 deltaX += 56;
             }
             return x + deltaX + 20;
         }
         return x + deltaX;
-            
-
 
     }
 
@@ -1402,11 +1400,11 @@ public class GenerateMap {
 
                 BufferedImage decal = null;
                 try {
-                    String colour = AliasHandler.resolveColor(unitKey.getColorID());
-                    Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(colour);
+                    String color = AliasHandler.resolveColor(unitKey.getColorID());
+                    Player decalPlayer = player.getGame().getPlayerFromColorOrFaction(color);
                     if (decalPlayer != null && !"null".equals(decalPlayer.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
                         String decalFileName = String.format("%s_%s%s", decalPlayer.getDecalSet(), unitKey.asyncID(), getBlackWhiteFileSuffix(
-                                Mapper.getColorID(decalPlayer.getColor())));
+                            Mapper.getColorID(decalPlayer.getColor())));
                         String decalPath = ResourceHelper.getInstance().getDecalFile(decalFileName);
                         decal = ImageHelper.read(decalPath);
                     }
@@ -1419,7 +1417,7 @@ public class GenerateMap {
 
                     String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                     spoopy = ImageHelper.read(spoopypath);
-               //     BotLogger.log("SPOOPY TIME: " + spoopypath);
+                    //     BotLogger.log("SPOOPY TIME: " + spoopypath);
                 }
 
                 if (justNumber) {
@@ -1435,7 +1433,7 @@ public class GenerateMap {
                     if (spoopy != null) {
                         graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
                     }
-                                                                                      
+
                     deltaY += 14;
                 }
             }
@@ -3144,8 +3142,8 @@ public class GenerateMap {
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
                 if (tileImage == null) break;
 
-                BufferedImage distanceColour = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColourFilterForDistance(distance)));
-                tileGraphics.drawImage(distanceColour, TILE_PADDING, TILE_PADDING, null);
+                BufferedImage distanceColor = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
+                tileGraphics.drawImage(distanceColor, TILE_PADDING, TILE_PADDING, null);
                 tileGraphics.setColor(Color.WHITE);
                 drawCenteredString(tileGraphics, distance.toString(), new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()), Storage.getFont100());
             }
@@ -3153,7 +3151,7 @@ public class GenerateMap {
         return tileOutput;
     }
 
-    public static String getColourFilterForDistance(int distance) {
+    public static String getColorFilterForDistance(int distance) {
         return "Distance" + distance + ".png";
     }
 
@@ -3567,8 +3565,8 @@ public class GenerateMap {
             if (unitImage == null) continue;
 
             BufferedImage decal = null;
-            String colour = AliasHandler.resolveColor(unitKey.getColorID());
-            Player player = activeGame.getPlayerFromColorOrFaction(colour);
+            String color = AliasHandler.resolveColor(unitKey.getColorID());
+            Player player = activeGame.getPlayerFromColorOrFaction(color);
             try {
                 if (player != null && !"null".equals(player.getDecalSet()) && Mapper.isValidDecalSet(player.getDecalSet())) {
                     String decalFileName = String.format("%s_%s%s", player.getDecalSet(), unitKey.asyncID(), getBlackWhiteFileSuffix(Mapper.getColorID(player.getColor())));
@@ -3589,7 +3587,7 @@ public class GenerateMap {
 
                 String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                 spoopy = ImageHelper.read(spoopypath);
-              //  BotLogger.log("SPOOPY TIME: " + spoopypath);
+                //  BotLogger.log("SPOOPY TIME: " + spoopypath);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             // DRAW UNITS

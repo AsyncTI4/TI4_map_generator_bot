@@ -50,19 +50,20 @@ public class FrankenDraft extends BagDraft {
 
     // All the generic types of draftable items (i.e. things like "Argent Starting Tech"
     private static final DraftItem.Category[] genericDraftableTypes = {
-            DraftItem.Category.AGENT,
-            DraftItem.Category.COMMANDER,
-            DraftItem.Category.HERO,
-            DraftItem.Category.COMMODITIES,
-            DraftItem.Category.PN,
-            DraftItem.Category.MECH,
-            DraftItem.Category.FLAGSHIP,
-            DraftItem.Category.HOMESYSTEM,
-            DraftItem.Category.STARTINGFLEET,
-            DraftItem.Category.STARTINGTECH
+        DraftItem.Category.AGENT,
+        DraftItem.Category.COMMANDER,
+        DraftItem.Category.HERO,
+        DraftItem.Category.COMMODITIES,
+        DraftItem.Category.PN,
+        DraftItem.Category.MECH,
+        DraftItem.Category.FLAGSHIP,
+        DraftItem.Category.HOMESYSTEM,
+        DraftItem.Category.STARTINGFLEET,
+        DraftItem.Category.STARTINGTECH
     };
 
-    private static final String[] excludedFactions = {"lazax", "admins", "franken", "keleresm", "keleresx"};
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx" };
+
     public static List<String> getAllFactionIds(Game activeGame) {
         Map<String, String> factionSet = Mapper.getFactionRepresentations();
         List<String> factionIds = new ArrayList<>();
@@ -83,8 +84,8 @@ public class FrankenDraft extends BagDraft {
 
     public static List<DraftItem> buildDraftOrderSet(Game activeGame) {
         List<DraftItem> allItems = new ArrayList<>();
-        for(int i = 0; i < activeGame.getRealPlayers().size(); i++){
-            allItems.add(DraftItem.Generate(DraftItem.Category.DRAFTORDER, Integer.toString(i+1)));
+        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
+            allItems.add(DraftItem.Generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
         }
         filterUndraftablesAndShuffle(allItems, DraftItem.Category.DRAFTORDER);
         return allItems;
@@ -101,9 +102,9 @@ public class FrankenDraft extends BagDraft {
             allTiles = draftManager.getRed();
         }
         DraftItem.Category category = blue ? DraftItem.Category.BLUETILE : DraftItem.Category.REDTILE;
-        for(MiltyDraftTile tile : allTiles) {
+        for (MiltyDraftTile tile : allTiles) {
             allItems.add(DraftItem.Generate(category,
-                    tile.getTile().getTileID()));
+                tile.getTile().getTileID()));
         }
         filterUndraftablesAndShuffle(allItems, category);
         return allItems;
@@ -113,15 +114,15 @@ public class FrankenDraft extends BagDraft {
         List<String> allFactions = getAllFactionIds(activeGame);
         List<DraftItem> allAbilityItems = new ArrayList<>();
         for (var factionId : allFactions) {
-            FactionModel faction  = Mapper.getFaction(factionId);
-            if(faction != null){
+            FactionModel faction = Mapper.getFaction(factionId);
+            if (faction != null) {
                 for (var ability : faction.getAbilities()) {
-                    allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY,ability));
+                    allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
                 }
-            }else{
-                BotLogger.log("Franken faction returned null on this id"+factionId);
+            } else {
+                BotLogger.log("Franken faction returned null on this id" + factionId);
             }
-            
+
         }
 
         filterUndraftablesAndShuffle(allAbilityItems, DraftItem.Category.ABILITY);
@@ -133,7 +134,7 @@ public class FrankenDraft extends BagDraft {
         List<DraftItem> allDraftableTechs = new ArrayList<>();
         for (var factionId : allFactions) {
             FactionModel faction = Mapper.getFaction(factionId);
-            for(var tech : faction.getFactionTech()) {
+            for (var tech : faction.getFactionTech()) {
                 allDraftableTechs.add(DraftItem.Generate(DraftItem.Category.TECH, tech));
             }
         }
@@ -144,7 +145,7 @@ public class FrankenDraft extends BagDraft {
     public static List<DraftItem> buildGenericFactionItemSet(DraftItem.Category category, Game activeGame) {
         List<String> factionIds = getAllFactionIds(activeGame);
         List<DraftItem> allItems = new ArrayList<>();
-        for (String factionId: factionIds) {
+        for (String factionId : factionIds) {
             allItems.add(DraftItem.Generate(category, factionId));
         }
         filterUndraftablesAndShuffle(allItems, category);
@@ -154,7 +155,7 @@ public class FrankenDraft extends BagDraft {
     @Override
     public List<DraftBag> generateBags(Game activeGame) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
-        for (DraftItem.Category category: genericDraftableTypes) {
+        for (DraftItem.Category category : genericDraftableTypes) {
             allDraftableItems.put(category, buildGenericFactionItemSet(category, activeGame));
         }
 
@@ -174,7 +175,7 @@ public class FrankenDraft extends BagDraft {
             DraftBag bag = new DraftBag();
 
             // Walk through each type of draftable...
-            for (Map.Entry<DraftItem.Category, List<DraftItem>> draftableCollection:allDraftableItems.entrySet()) {
+            for (Map.Entry<DraftItem.Category, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
                 DraftItem.Category category = draftableCollection.getKey();
                 int categoryLimit = getItemLimitForCategory(category);
                 // ... and pull out the appropriate number of items from its collection...

@@ -124,7 +124,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         String card = Mapper.getExploreRepresentation(cardID);
         String[] cardInfo = card.split(";");
-        if (tile == null){
+        if (tile == null) {
             tile = activeGame.getTileFromPlanet(planetName);
             // if (tile == null) {
             //     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Tile could not be found");
@@ -246,10 +246,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand"
                     : "Drew 2 Actions cards";
                 int count = hasSchemingAbility ? 3 : 2;
-                if(player.hasAbility("autonetic_memory")){
+                if (player.hasAbility("autonetic_memory")) {
                     ButtonHelperAbilities.autoneticMemoryStep1(activeGame, player, count);
                     message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
-                }else{
+                } else {
                     for (int i = 0; i < count; i++) {
                         activeGame.drawActionCard(player.getUserID());
                     }
@@ -259,9 +259,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     ACInfo.sendActionCardInfo(activeGame, player, event);
                 }
-                
+
                 if (hasSchemingAbility) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), ButtonHelper.getTrueIdentity(player, activeGame) + " use buttons to discard",
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(activeGame, player, false));
                 }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
@@ -294,7 +294,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
                 if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1) {
                     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                        ButtonHelper.getTrueIdentity(player, activeGame) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+                        player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                 }
                 if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "mykomentori", event);
@@ -328,9 +328,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
                     && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
-                    saarButton.add(Button.success("saarMechRes_"+planetName, "Pay 1tg for mech on "+Helper.getPlanetRepresentation(planetName, activeGame)));
+                    saarButton.add(Button.success("saarMechRes_" + planetName, "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planetName, activeGame)));
                     saarButton.add(Button.danger("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        player.getRepresentation(true, true) + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when", saarButton);
                 }
 
                 final String ministerOfExploration = "minister_exploration";
@@ -372,7 +373,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (tile != null && planetName != null) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeGame, planetName);
                 }
-                message = Emojis.getColourEmojis(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
+                message = Emojis.getColorEmojiWithName(player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)
                     + ". This placement is optional though.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + "\n" + message);
             }
@@ -415,9 +416,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-                String trueIdentity = Helper.getPlayerRepresentation(player, activeGame, event.getGuild(), true);
+                String trueIdentity = player.getRepresentation(true, true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
-                
+
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
             }
@@ -453,53 +454,53 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
-            case "warforgeruins"->{
+            case "warforgeruins" -> {
                 message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
-                Button ruinsInf = Button.success("ruins_"+planetName+"_2inf", "Remove Inf Or Have Mech To Place 2 Infantry on " + Mapper.getPlanet(planetName).getName());
-                Button ruinsMech = Button.success("ruins_"+planetName+"_mech", "Remove Inf Or Have Mech To Place Mech on " + Mapper.getPlanet(planetName).getName());
+                Button ruinsInf = Button.success("ruins_" + planetName + "_2inf", "Remove Inf Or Have Mech To Place 2 Infantry on " + Mapper.getPlanet(planetName).getName());
+                Button ruinsMech = Button.success("ruins_" + planetName + "_mech", "Remove Inf Or Have Mech To Place Mech on " + Mapper.getPlanet(planetName).getName());
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ruinsInf, ruinsMech, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
-            case "seedyspaceport"->{
+            case "seedyspaceport" -> {
                 List<Button> buttons = new ArrayList<>();
                 message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
-                for(Leader leader : player.getLeaders()){
-                    if(leader.isExhausted()&& leader.getId().contains("agent")){
-                        buttons.add(Button.success("seedySpace_"+leader.getId()+"_"+planetName, "Remove Inf Or Have Mech To Refresh " + Mapper.getLeader(leader.getId()).getName()));
+                for (Leader leader : player.getLeaders()) {
+                    if (leader.isExhausted() && leader.getId().contains("agent")) {
+                        buttons.add(Button.success("seedySpace_" + leader.getId() + "_" + planetName, "Remove Inf Or Have Mech To Refresh " + Mapper.getLeader(leader.getId()).getName()));
                     }
                 }
-                buttons.add(Button.primary("seedySpace_AC_"+planetName, "Remove Inf Or Have Mech Draw AC "));
+                buttons.add(Button.primary("seedySpace_AC_" + planetName, "Remove Inf Or Have Mech Draw AC "));
                 buttons.add(Button.danger("decline_explore", "Decline Explore"));
-                
+
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
-            case "hiddenlaboratory"->{
+            case "hiddenlaboratory" -> {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, activeGame);
                 new ExpFrontier().expFront(event, tile, activeGame, player);
             }
-            case "ancientshipyard"->{
+            case "ancientshipyard" -> {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
                 List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
-                if(colors.size() == 0 || colors.contains(player.getColorID())){
+                if (colors.size() == 0 || colors.contains(player.getColorID())) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", activeGame);
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Cruiser added to the system automatically.");
-                }else{
+                } else {
                     MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Someone else's ships were in the system, no cruiser added");
                 }
-                
+
             }
-            case "forgottentradestation"->{
+            case "forgottentradestation" -> {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText);
-                int tgGain = tile.getUnitHolders().size()-1;
+                int tgGain = tile.getUnitHolders().size() - 1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getIdentOrColor(player, activeGame) + " gained "+tgGain+"tg due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
+                    ButtonHelper.getIdentOrColor(player, activeGame) + " gained " + tgGain + "tg due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, activeGame);
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, tgGain);
             }
@@ -512,11 +513,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             default -> MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), messageText + "\n" + message);
         }
 
-        if(player.hasAbility("fortune_seekers")){
+        if (player.hasAbility("fortune_seekers")) {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " can use their fortune seekers ability");
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ButtonHelper.getTrueIdentity(player, activeGame) + " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability", gainComm);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                player.getRepresentation(true, true) + " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability", gainComm);
         }
 
         if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
