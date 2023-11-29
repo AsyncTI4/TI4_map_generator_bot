@@ -398,6 +398,24 @@ public class ButtonHelperAgents {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         }
+        if ("kjalengardagent".equalsIgnoreCase(agent)) {
+            Player activePlayer = activeGame.getActivePlayerObject();
+            if(activePlayer != null){
+                int oldComms = activePlayer.getCommodities();
+                int newComms = oldComms + activePlayer.getNeighbourCount();
+                if(newComms > activePlayer.getCommoditiesTotal()){
+                    newComms = activePlayer.getCommoditiesTotal();
+                }
+                activePlayer.setCommodities(newComms);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " exhausted kjal agent to potentially move a glory token into the system. "+ButtonHelper.getIdent(activePlayer)+" comms went from "+oldComms+" -> "+newComms+".");
+            }
+            if(getGloryTokenTiles(activeGame).size() > 0){
+                offerMoveGloryOptions(activeGame, player, event);
+            }else{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " there were no glory tokens on the board to move. Go win some battles and earn some, or your ancestors will laugh at ya when you reach Valhalla");
+
+            }
+        }
         if ("cabalagent".equalsIgnoreCase(agent)) {
             startCabalAgent(player, activeGame, rest.replace("cabalagent_", ""), event);
         }
@@ -641,6 +659,41 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), msg, buttons2);
             }
         }
+    }
+    public static void offerMoveGloryOptions(Game activeGame, Player player, ButtonInteractionEvent event){
+
+        String msg = player.getRepresentation(true, true) +" use buttons to select system to move glory from";
+        Tile tileAS = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : getGloryTokenTiles(activeGame)){
+            buttons.add(Button.success("moveGlory_"+tile.getPosition()+"_"+tileAS.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+    public static void moveGlory(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        
+        Tile tileAS = activeGame.getTileByPosition(buttonID.split("_")[2]);
+        Tile tile = activeGame.getTileByPosition(buttonID.split("_")[1]);
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        UnitHolder spaceAS = tileAS.getUnitHolders().get(Constants.SPACE);
+        if (space.getTokenList().contains("token_ds_glory.png")) {
+            space.removeToken("token_ds_glory.png");
+        }
+        spaceAS.addToken("token_ds_glory.png");
+        String msg = ButtonHelper.getIdent(player) +" moved glory token from "+tile.getRepresentation() + " to "+tileAS.getRepresentation();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        event.getMessage().delete().queue();
+
+    }
+
+    public static List<Tile> getGloryTokenTiles(Game activeGame){
+        List<Tile> gloryTiles = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory.png")){
+                gloryTiles.add(tile);
+            }
+        }
+        return gloryTiles;
     }
 
     public static List<Button> getSardakkAgentButtons(Game activeGame, Player player) {

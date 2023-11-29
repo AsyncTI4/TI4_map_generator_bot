@@ -173,14 +173,24 @@ public class ButtonHelper {
         return stuffToTransButtons;
     }
 
-    public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
+    public static boolean canTheseTwoTransact(Game activeGame, Player player, Player player2){
         if (player == player2 || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player.hasAbility("guild_ships") || player.getPromissoryNotes().containsKey("convoys")
             || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships") || player2.getNeighbouringPlayers().contains(player)
             || player.getNeighbouringPlayers().contains(player2)) {
-            return;
+            return true;
+        }else{
+            return false;
         }
-        MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
+    }
+
+    public static void checkTransactionLegality(Game activeGame, Player player, Player player2) {
+        if (canTheseTwoTransact(activeGame, player, player2)) {
+            return;
+        }else{
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
             player.getRepresentation(true, true) + " this is a friendly reminder that you are not neighbors with " + player2.getColor());
+        }
+        
     }
 
     public static void riftUnitsButton(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
@@ -2038,6 +2048,7 @@ public class ButtonHelper {
             addReaction(event, false, false, message, "");
         }
     }
+    
 
     public static List<Button> getButtonsForPictureCombats(Game activeGame, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = activeGame.getTileByPosition(pos);
@@ -2057,6 +2068,12 @@ public class ButtonHelper {
         if (!activeGame.isFoWMode() && titans != null && titans.hasUnexhaustedLeader("titansagent")) {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent", "Titans Agent").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
+        }
+
+        Player khal = Helper.getPlayerFromUnlockedLeader(activeGame, "kjalengardagent");
+        if (!activeGame.isFoWMode() && titans != null && titans.hasUnexhaustedLeader("kjalengardagent")) {
+            String finChecker = "FFCC_" + titans.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_kjalengardagent", "Kjalengard Agent").withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
         }
 
         Player sol = Helper.getPlayerFromUnlockedLeader(activeGame, "solagent");
@@ -2618,6 +2635,16 @@ public class ButtonHelper {
         }
         return shipOrders;
     }
+    public static List<String> getPlayersStarCharts(Player player) {
+        List<String> shipOrders = new ArrayList<>();
+        for (String relic : player.getRelics()) {
+            if (relic.toLowerCase().contains("starchart")) {
+                shipOrders.add(relic);
+            }
+        }
+        return shipOrders;
+    }
+
 
     public static List<Button> getStartOfTurnButtons(Player player, Game activeGame, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -4742,7 +4769,12 @@ public class ButtonHelper {
                 if (faction != null && Mapper.isFaction(faction)) {
                     Button button;
                     if (!activeGame.isFoWMode()) {
-                        button = Button.secondary(finChecker + "transactWith_" + faction, " ");
+                        String label = " ";
+                        if(!ButtonHelper.canTheseTwoTransact(activeGame, p, player))
+                        {
+                            label = "(Not Neighbors)";
+                        }
+                        button = Button.secondary(finChecker + "transactWith_" + faction, label);
 
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
@@ -4775,6 +4807,10 @@ public class ButtonHelper {
         }
         if (getPlayersShipOrders(p1).size() > 0) {
             Button transact = Button.secondary(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
+            stuffToTransButtons.add(transact);
+        }
+        if (getNumberOfStarCharts(p1) > 0) {
+            Button transact = Button.secondary(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts");
             stuffToTransButtons.add(transact);
         }
         if ((p1.hasAbility("arbiters") || p2.hasAbility("arbiters")) && p1.getAc() > 0) {
@@ -4866,6 +4902,14 @@ public class ButtonHelper {
                 String message = "Click the axis order you would like to send";
                 for (String shipOrder : getPlayersShipOrders(p1)) {
                     Button transact = Button.success(finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder, "" + Mapper.getRelic(shipOrder).getName());
+                    stuffToTransButtons.add(transact);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "starCharts" -> {
+                String message = "Click the star chart you would like to send";
+                for (String shipOrder : getPlayersStarCharts(p1)) {
+                    Button transact = Button.success(finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder, "" + Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -5014,9 +5058,8 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p1, p2, oldP1Comms, event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
                 // ButtonHelperAbilities.pillageCheck(p1, activeGame);
-                //  ButtonHelperAbilities.pillageCheck(p2, activeGame);
-                message2 = ident + " washed their " + (oldP1Comms - newP1Comms) + " Commodities with " + ident2 + "\n" + ident2 + " washed their " + (oldP2Comms - newP2Comms) + " Commodities with "
-                    + ident;
+              //  ButtonHelperAbilities.pillageCheck(p2, activeGame);
+                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident;
             }
             case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
@@ -6150,7 +6193,7 @@ public class ButtonHelper {
                 }
                 Button transact2 = Button.danger(finChecker + "drawRelicFromFrag", "Finish Purging and Draw Relic");
                 purgeFragButtons.add(transact2);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, purgeFragButtons);
             }
         }
     }

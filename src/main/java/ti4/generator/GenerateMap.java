@@ -998,7 +998,7 @@ public class GenerateMap {
         if (player.hasAbility("imperia")) {
             deltaX += 5;
             List<String> mahactCCs = player.getMahactCC();
-            Collection<Player> players = activeGame.getRealPlayers();
+            Collection<Player> players = activeGame.getRealPlayersNDummies();
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();
@@ -3338,7 +3338,7 @@ public class GenerateMap {
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     scale = 0.6f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 0.8f;
+                    scale = 1.25f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didnt previous get changed for custodians
                 }
@@ -3349,6 +3349,8 @@ public class GenerateMap {
                     position = new Point(125, 115); // 70, 45
                 } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
                     position = new Point(position.x + 10, position.y + 10);
+                } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
+                    position = new Point(position.x, position.y + 10);
                 }
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
@@ -3400,7 +3402,11 @@ public class GenerateMap {
                     tokenPath.contains(Constants.WORLD_DESTROYED) ||
                     tokenPath.contains(Constants.CONSULATE_TOKEN) ||
                     tokenPath.contains(Constants.GLEDGE_CORE) || tokenPath.contains("freepeople")) {
-                    tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
+                        if(tokenPath.contains(Constants.WORLD_DESTROYED)){
+                            tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
+                        }else{
+                            tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
+                        }
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);
                 } else {
