@@ -287,7 +287,7 @@ public class AsyncTI4DiscordBot {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "# ` SHUTDOWN PROCESS STARTED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
