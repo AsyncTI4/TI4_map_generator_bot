@@ -486,6 +486,10 @@ public class GenerateMap {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_Absol.png");
             deltaX += 100;
         }
+        if (activeGame.isMiltyModMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
+            deltaX += 100;
+        }
         if (activeGame.isDiscordantStarsMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
             deltaX += 100;
