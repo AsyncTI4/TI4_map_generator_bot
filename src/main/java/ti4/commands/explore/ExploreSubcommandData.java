@@ -522,7 +522,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "kollecc", event);
         }
-        if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorccommander")) {
+        if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "bentor", event);
         }
 

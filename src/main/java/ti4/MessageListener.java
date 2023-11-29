@@ -405,6 +405,7 @@ public class MessageListener extends ListenerAdapter {
         }
         
         List<String> colors = Mapper.getColors();
+        colors.addAll(Mapper.getFactionIDs());
         String message = msg.getContentRaw().toLowerCase();
         boolean messageToColor = false;
         for (String color : colors) {

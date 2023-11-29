@@ -90,7 +90,7 @@ public class SendFragments extends ExploreSubcommandData {
 		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
             ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
         }
-		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorccommander")) {
+		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
             ButtonHelper.commanderUnlockCheck(receiver, activeGame, "bentor", event);
         }
 		if (activeGame.isFoWMode()) {
@@ -101,5 +101,6 @@ public class SendFragments extends ExploreSubcommandData {
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeGame, event, sender, receiver, fragString, null);
 		}
+		ButtonHelper.checkTransactionLegality(activeGame, sender, receiver);
 	}
 }
