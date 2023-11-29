@@ -643,7 +643,7 @@ public class DataMigrationManager {
         replacements.put("magen_engineers", "double_agents");
         replacements.put("production_rider", "foreign_policy");
         replacements.put("rigged_explosives", "mechanized_workforce");
-        replacements.put("shock_and_awe", "classified_weapons");
+        replacements.put("shock_and_awe", "classified_weapons_acd2");
         replacements.put("space_mines", "dangerous_conditions");
         replacements.put("transference_protocol", "masterclass_logistics");
         replacements.put("virulent_gas_canisters", "virulent_gas");
