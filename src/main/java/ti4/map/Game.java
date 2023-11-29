@@ -647,6 +647,14 @@ public class Game {
         this.absolMode = absolMode;
     }
 
+    public boolean isMiltyModMode() {
+        return miltyModMode;
+    }
+
+    public void setMiltyModMode(boolean miltyModMode) {
+        this.miltyModMode = miltyModMode;
+    }
+
     public boolean isDiscordantStarsMode() {
         return discordantStarsMode;
     }
