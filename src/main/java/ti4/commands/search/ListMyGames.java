@@ -61,6 +61,7 @@ public class ListMyGames extends SearchSubcommandData {
         String gameNameAndChannelLink = playerGame.getActionsChannel() == null ? playerGame.getName() : playerGame.getActionsChannel().getAsMention();
         StringBuilder sb = new StringBuilder();
         sb.append(player.getFactionEmoji());
+        if (player.getColor() != null && !"null".equals(player.getColor())) sb.append(Emojis.getColorEmoji(player.getColor()));
         sb.append("**").append(gameNameAndChannelLink).append("**");
         if (playerGame.getActivePlayer() != null && playerGame.getActivePlayer().equals(userID)) sb.append("  **[__IT IS YOUR TURN__]**");
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
