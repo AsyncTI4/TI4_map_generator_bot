@@ -188,7 +188,7 @@ public class ButtonHelper {
             return;
         }else{
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame),
-            Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " this is a friendly reminder that you are not neighbors with " + player2.getColor());
+            player.getRepresentation(true, true) + " this is a friendly reminder that you are not neighbors with " + player2.getColor());
         }
         
     }

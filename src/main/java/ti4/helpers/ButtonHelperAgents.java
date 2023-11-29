@@ -662,7 +662,7 @@ public class ButtonHelperAgents {
     }
     public static void offerMoveGloryOptions(Game activeGame, Player player, ButtonInteractionEvent event){
 
-        String msg = ButtonHelper.getTrueIdentity(player, activeGame) +" use buttons to select system to move glory from";
+        String msg = player.getRepresentation(true, true) +" use buttons to select system to move glory from";
         Tile tileAS = activeGame.getTileByPosition(activeGame.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for(Tile tile : getGloryTokenTiles(activeGame)){
