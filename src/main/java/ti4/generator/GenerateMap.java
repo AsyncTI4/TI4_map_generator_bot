@@ -3557,7 +3557,7 @@ public class GenerateMap {
                         bulkUnitCount = unitCount;
                     }
                 }
-                if(activeGame.getPlayerByColorID(unitKey.getColorID()) != null){
+                if(activeGame.getPlayerByColorID(unitKey.getColorID()).or(null) != null){
                     Player p = activeGame.getPlayerByColorID(unitKey.getColorID()).get();
                     if((p.ownsUnit("cabal_spacedock") || p.ownsUnit("cabal_spacedock2")) && unitKey.getUnitType() == UnitType.Spacedock){
                         unitPath = unitPath.replace("sd", "csd");
