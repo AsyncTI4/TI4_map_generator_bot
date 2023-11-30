@@ -1889,6 +1889,12 @@ public class ButtonHelper {
             }
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
         }
+
+        if((p1.hasTech("dslaner") && p1.getAtsCount() > 0) || (p2.hasTech("dslaner") && p2.getAtsCount() > 0)) {
+            List<Button> buttons3 = new ArrayList<>();
+            buttons3.addAll(ButtonHelperFactionSpecific.getLanefirATSButtons(p1, p2));
+            MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to remove commodities from ATS Armaments", buttons3);
+        }
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event) {
