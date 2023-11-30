@@ -164,5 +164,9 @@ public class ExpPlanet extends ExploreSubcommandData {
             activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
         }
+        if(player.hasTech("dslaner")){
+            player.setAtsCount(player.getAtsCount()+numExplores);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+        }
     }
 }

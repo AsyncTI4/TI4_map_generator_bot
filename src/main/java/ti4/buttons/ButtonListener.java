@@ -1854,6 +1854,12 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+
+            if(player.hasTech("dslaner")){
+                player.setAtsCount(player.getAtsCount()+1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            }
+
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperModifyUnits.movingUnitsInTacticalAction(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {

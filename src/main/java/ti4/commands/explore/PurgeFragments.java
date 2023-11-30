@@ -74,6 +74,11 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
+		
+		if(activePlayer.hasTech("dslaner")){
+			activePlayer.setAtsCount(activePlayer.getAtsCount()+1);
+			sendMessage(activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
+		}
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {
