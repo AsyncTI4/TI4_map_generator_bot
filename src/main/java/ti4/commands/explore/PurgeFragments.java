@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -65,10 +66,23 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
+			activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
 		}
 
+		Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
+				p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")
+			).findFirst().orElse(null);
+
+		if (lanefirPlayer != null){
+			ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, "lanefir", event);
+		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
+		
+		if(activePlayer.hasTech("dslaner")){
+			activePlayer.setAtsCount(activePlayer.getAtsCount()+1);
+			sendMessage(activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
+		}
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {

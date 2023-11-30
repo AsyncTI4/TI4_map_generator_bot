@@ -155,6 +155,11 @@ public class Player {
     private boolean hasFoundIndFrag;
     private boolean hasFoundUnkFrag;
 
+    // LANEFIR TECH "ATS Armaments"
+    @Getter
+    @Setter
+    private int atsCount = 0;
+
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     @Setter
     private boolean hasUsedEconomyEmpowerAbility;
@@ -1743,6 +1748,11 @@ public class Player {
     }
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
+        // Set ATS Armaments to 0 when adding tech (if it was removed we reset it)
+        if ("dslaner".equalsIgnoreCase(techID)) {
+            setAtsCount(0);
+        }
+
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             addPlanet("custodiavigilia");

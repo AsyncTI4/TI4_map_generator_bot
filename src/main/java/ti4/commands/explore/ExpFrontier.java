@@ -44,6 +44,11 @@ public class ExpFrontier extends ExploreSubcommandData {
           String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
               displayExplore(cardID);
             resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+            
+            if(player.hasTech("dslaner")){
+                player.setAtsCount(player.getAtsCount()+1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
@@ -56,6 +61,11 @@ public class ExpFrontier extends ExploreSubcommandData {
           String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":\n" +
               displayExplore(cardID);
             resolveExplore(event, cardID, tile, null, messageText, checkIfEngimaticDevice(player, cardID), player, activeGame);
+
+            if(player.hasTech("dslaner")){
+                player.setAtsCount(player.getAtsCount()+1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
