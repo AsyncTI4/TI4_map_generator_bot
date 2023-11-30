@@ -69,7 +69,9 @@ public class PurgeFragments extends ExploreSubcommandData {
 			activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
 		}
 
-		ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, activePlayer.getFaction(), event);
+		if (activePlayer.getLeaderIDs().contains("lanefircommander") && !activePlayer.hasLeaderUnlocked("lanefircommander")){
+			ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, activePlayer.getFaction(), event);
+		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
 
