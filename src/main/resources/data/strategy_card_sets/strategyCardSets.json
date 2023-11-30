@@ -221,5 +221,20 @@
       "10": "Imperial"
     },
     "description": "A set of 10 strategy cards by Luminous"
+  },
+  {
+    "name": "MiltyMod Strategy Cards",
+    "alias": "miltymod",
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Imperial"
+    },
+    "description": "MiltyMod strategy cards, featuring updated Construction"
   }
 ]

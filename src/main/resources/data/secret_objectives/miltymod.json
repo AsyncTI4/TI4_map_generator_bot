@@ -1,0 +1,26 @@
+[
+  {
+    "alias": "miltymod_btgk",
+    "name": "Become the Gatekeeper",
+    "phase": "Status",
+    "text": "Have 1 or more ships in 2 systems that contain different non-delta wormholes.",
+    "points": 1,
+    "source": "miltymod"
+  },
+  {
+    "alias": "miltymod_mew",
+    "name": "Make an Example of their World",
+    "phase": "Action",
+    "text": "Destroy the last of another player's ground forces on a planet during the Bombardment step.",
+    "points": 1,
+    "source": "miltymod"
+  },
+  {
+    "alias": "miltymod_ttfd",
+    "name": "Turn Their Fleets to Dust",
+    "phase": "Action",
+    "text": "Destroy the last of another player's non-fighter ships in a system during the Space Cannon Offense step.",
+    "points": 1,
+    "source": "miltymod"
+  }
+]
