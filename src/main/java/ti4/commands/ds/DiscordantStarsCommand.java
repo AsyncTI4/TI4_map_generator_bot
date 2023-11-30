@@ -112,6 +112,7 @@ public class DiscordantStarsCommand implements Command {
         subcommands.add(new SetPolicy());
         subcommands.add(new DrawBlueBackTile());
         subcommands.add(new AddOmenDie());
+        subcommands.add(new ATS());
 
         return subcommands;
     }
