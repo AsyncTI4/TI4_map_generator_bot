@@ -917,10 +917,14 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void cabalEatsUnit(Player player, Game activeGame, Player cabal, int amount, String unit, GenericInteractionCreateEvent event) {
+        cabalEatsUnit(player, activeGame, cabal, amount, unit, event, false);
+    }
+
+    public static void cabalEatsUnit(Player player, Game activeGame, Player cabal, int amount, String unit, GenericInteractionCreateEvent event, boolean cabalAgent) {
         String msg = cabal.getRepresentation(true, true) + " has failed to eat " + amount + " of the " + unit + "s owned by "
             + player.getRepresentation() + " because they were blockaded. Wah-wah.";
         String unitP = AliasHandler.resolveUnit(unit);
-        if (unitP.contains("sd") || unitP.contains("pd") || cabal.getAllianceMembers().contains(player.getFaction())) {
+        if (unitP.contains("sd") || unitP.contains("pd") || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
             return;
         }
         if (!isCabalBlockadedByPlayer(player, activeGame, cabal)) {
