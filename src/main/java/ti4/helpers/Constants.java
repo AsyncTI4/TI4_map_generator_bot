@@ -868,6 +868,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
+    public static final String LANEFIR_ATS_COUNT = "ats_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";

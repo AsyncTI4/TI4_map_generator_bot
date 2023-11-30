@@ -687,6 +687,10 @@ public class GameSaveLoadManager {
             writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
             writer.write(System.lineSeparator());
 
+            //LANEFIR ATS Armaments count
+            writer.write(Constants.LANEFIR_ATS_COUNT + " " + player.getAtsCount());
+            writer.write(System.lineSeparator());
+
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
@@ -2077,6 +2081,7 @@ public class GameSaveLoadManager {
                 case Constants.BENTOR_HAS_FOUND_HFRAG -> player.setHasFoundHazFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.LANEFIR_ATS_COUNT -> player.setAtsCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
                 case Constants.PLAYER_NEW_TEMP_MODS -> {
