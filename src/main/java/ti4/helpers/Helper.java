@@ -661,6 +661,11 @@ public class Helper {
                 wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.warsun));
                 unitButtons.add(wsButton);
             }
+            if (player.ownsUnit("ghemina_flagship_lady")) {
+                Button wsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_lady_" + tp, "Produce The Lady");
+                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
+                unitButtons.add(wsButton);
+            }
             Button fsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp, "Produce Flagship");
             fsButton = fsButton.withEmoji(Emoji.fromFormatted(Emojis.flagship));
             unitButtons.add(fsButton);

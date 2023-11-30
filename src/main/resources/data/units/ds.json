@@ -524,7 +524,7 @@
     {
         "id": "ghemina_flagship_lady",
         "baseType": "flagship",
-        "asyncId": "fs",
+        "asyncId": "lady",
         "name": "The Lady",
         "source": "ds",
         "faction": "Ghemina",

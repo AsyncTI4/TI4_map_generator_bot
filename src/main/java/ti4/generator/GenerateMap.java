@@ -3557,6 +3557,19 @@ public class GenerateMap {
                         bulkUnitCount = unitCount;
                     }
                 }
+                if(activeGame.getPlayerByColorID(unitKey.getColorID()) != null){
+                    Player p = activeGame.getPlayerByColorID(unitKey.getColorID()).get();
+                    if((p.ownsUnit("cabal_spacedock") || p.ownsUnit("cabal_spacedock2")) && unitKey.getUnitType() == UnitType.Spacedock){
+                        unitPath = unitPath.replace("sd", "csd");
+                    }
+                    if(unitKey.getUnitType() == UnitType.TyrantsLament){
+                        unitPath = unitPath.replace("tyrantslament", "fs");
+                    }
+                    if(unitKey.getUnitType() == UnitType.Lady){
+                        unitPath = unitPath.replace("lady", "fs");
+                    }
+                }
+                
                 unitImage = ImageHelper.read(unitPath);
             } catch (Exception e) {
                 BotLogger.log("Could not parse unit file for: " + unitKey, e);
@@ -3588,6 +3601,22 @@ public class GenerateMap {
                 String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
                 spoopy = ImageHelper.read(spoopypath);
                 //  BotLogger.log("SPOOPY TIME: " + spoopypath);
+            }
+            if(unitKey.getUnitType() == UnitType.TyrantsLament){
+                String name = "units_ds_ghemina_lord_wht.png";
+                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                spoopy = ImageHelper.read(spoopyPath);
+                BotLogger.log("SPOOPY TIME: " + spoopyPath);
+            }
+            if(unitKey.getUnitType() == UnitType.Lady){
+                String name = "units_ds_ghemina_lady_wht.png";
+                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                spoopy = ImageHelper.read(spoopyPath);
+            }
+            if(unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")){
+                String name = "units_ds_ghemina_lord_wht.png";
+                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);     
+                spoopy = ImageHelper.read(spoopyPath);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             // DRAW UNITS

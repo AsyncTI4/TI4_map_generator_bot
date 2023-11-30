@@ -1287,7 +1287,9 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.infiltratePlanet(player, activeGame, uH, event);
             ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("letnevMechRes_")) {
-            ButtonHelperFactionSpecific.resolveLetnevMech(player, activeGame, buttonID, event);
+            ButtonHelperFactionSpecific.resolveLetnevMech(player, activeGame, buttonID, event);//winnuPNPlay
+         } else if (buttonID.startsWith("winnuPNPlay_")) {
+            ButtonHelperFactionSpecific.resolveWinnuPN(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("initialIndoctrination_")) {
             ButtonHelperAbilities.resolveInitialIndoctrinationQuestion(player, activeGame, buttonID, event);
         } else if (buttonID.startsWith("utilizeSolCommander_")) {
