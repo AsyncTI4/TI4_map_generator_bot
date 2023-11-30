@@ -1,0 +1,388 @@
+[
+    {
+        "alias": "miltymod_fl",
+        "name": "Fleet Logistics",
+        "type": "PROPULSION",
+        "requirements": "BB",
+        "source": "miltymod",
+        "text": "During each of your turns of the action phase, after you perform an action, you may perform an additional tactical action.",
+        "homebrewReplacesID": "fl"
+    },
+    {
+        "alias": "miltymod_nm",
+        "name": "Neural Motivator",
+        "type": "BIOTIC",
+        "source": "miltymod",
+        "text": "At the end of your turn, you may exhaust this card to draw 1 action card.",
+        "homebrewReplacesID": "nm"
+    },
+    {
+        "alias": "miltymod_dxa",
+        "name": "Dacxive Animators",
+        "type": "BIOTIC",
+        "requirements": "G",
+        "source": "miltymod",
+        "text": "After 1 of your ground forces is destroyed during ground combat, you may place that unit on this card.\n \n At the end of your turn, you may exhaust this card to place any number of units from it onto a planet you control.",
+        "homebrewReplacesID": "dxa"
+    },
+    {
+        "alias": "miltymod_hm",
+        "name": "Hyper Metabolism",
+        "type": "BIOTIC",
+        "requirements": "GG",
+        "source": "miltymod",
+        "text": "At the end of your turn, you may exhaust this card to gain 1 command token.",
+        "homebrewReplacesID": "hm"
+    },
+    {
+        "alias": "miltymod_x89",
+        "name": "X-89 Bacterial Weapon",
+        "type": "BIOTIC",
+        "requirements": "GGG",
+        "source": "miltymod",
+        "text": "After 1 or more of your units use BOMBARDMENT against a planet, if at least 1 hit was produced, you may exhaust this card; if you do, destroy all other player's ground forces on that planet.",
+        "homebrewReplacesID": "x89"
+    },
+    {
+        "alias": "miltymod_st",
+        "name": "Sarween Tools",
+        "type": "CYBERNETIC",
+        "source": "miltymod",
+        "text": "When you produce 1 or more units, reduce the combined cost of the produced units by 1.",
+        "homebrewReplacesID": "st"
+    },
+    {
+        "alias": "miltymod_gls",
+        "name": "Graviton Laser System",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "source": "miltymod",
+        "text": "You may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.\n \n You may exhaust this card at the start of a space combat round; hits produced by your units this round must be assigned to non-fighter ships if able.",
+        "homebrewReplacesID": "gls"
+    },
+    {
+        "alias": "miltymod_ie",
+        "name": "Integrated Economy",
+        "type": "CYBERNETIC",
+        "requirements": "YYY",
+        "source": "miltymod",
+        "text": "After you gain control of a planet, you may produce any number of units on that planet that have a combined cost equal or less than the sum of that planet's resource and influence values.",
+        "homebrewReplacesID": "ie"
+    },
+    {
+        "alias": "miltymod_ps",
+        "name": "Plasma Scoring",
+        "type": "WARFARE",
+        "source": "miltymod",
+        "text": "When 1 or more of your units make a roll for a unit ability, you may choose 1 of those units to roll 1 additional die.",
+        "homebrewReplacesID": "ps"
+    },
+    {
+        "alias": "miltymod_md",
+        "name": "Magen Defense Grid",
+        "type": "WARFARE",
+        "requirements": "R",
+        "source": "miltymod",
+        "text": "You may exhaust this card at the start of a round of ground combat on a planet you control; your opponent cannot make combat rolls during this combat round.",
+        "homebrewReplacesID": "md"
+    },
+    {
+        "alias": "miltymod_da",
+        "name": "Duranium Armor",
+        "type": "WARFARE",
+        "requirements": "RR",
+        "source": "miltymod",
+        "text": "During each combat round, after you assign hits to your units, repair 1 of your participating damaged units that did not use SUSTAIN DAMAGE during this combat round.",
+        "homebrewReplacesID": "da"
+    },
+    {
+        "alias": "miltymod_sd2",
+        "name": "Space Dock II",
+        "type": "UNITUPGRADE",
+        "requirements": "YY",
+        "source": "miltymod",
+        "text": "This unit's Production value is equal to 5 more than the resource value of this planet.\n \n Up to 5 fighters in this system do not count against your ships' capacity.\n \nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.\n \n PRODUCTION X",
+        "homebrewReplacesID": "sd2"
+    },
+    {
+        "alias": "miltymod_inf2",
+        "name": "Infantry II",
+        "type": "UNITUPGRADE",
+        "requirements": "GG",
+        "source": "miltymod",
+        "text": "COST: 1(x2); COMBAT 7\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
+        "homebrewReplacesID": "inf2"
+    },
+    {
+        "alias": "miltymod_ff2",
+        "name": "Fighter II",
+        "type": "UNITUPGRADE",
+        "requirements": "BY",
+        "source": "miltymod",
+        "text": "COST: 1(x2); COMBAT 8; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "homebrewReplacesID": "ff2"
+    },
+    {
+        "alias": "miltymod_cr2",
+        "name": "Cruiser II",
+        "type": "UNITUPGRADE",
+        "requirements": "GYR",
+        "source": "miltymod",
+        "text": "COST 2; COMBAT 6; MOVE 3; CAPACITY 1\n \n When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
+        "homebrewReplacesID": "cr2"
+    },
+    {
+        "alias": "miltymod_cv2",
+        "name": "Carrier II",
+        "type": "UNITUPGRADE",
+        "requirements": "GB",
+        "source": "miltymod",
+        "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 6",
+        "homebrewReplacesID": "cv2"
+    },
+    {
+        "alias": "miltymod_dn2",
+        "name": "Dreadnought II",
+        "type": "UNITUPGRADE",
+        "requirements": "RBY",
+        "source": "miltymod",
+        "text": "COST 4; COMBAT 4; MOVE 2; CAPACITY 1\n \n SUSTAIN DAMAGE, BOMBARDMENT 4",
+        "homebrewReplacesID": "dn2"
+    },
+    {
+        "alias": "miltymod_ws",
+        "name": "War Sun",
+        "type": "UNITUPGRADE",
+        "requirements": "GYRR",
+        "source": "miltymod",
+        "text": "COST 12; COMBAT 3(x3); MOVE 2; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
+        "homebrewReplacesID": "ws"
+    },
+    {
+        "alias": "miltymod_pm",
+        "name": "Production Biomes",
+        "type": "BIOTIC",
+        "requirements": "GG",
+        "faction": "hacan",
+        "source": "miltymod",
+        "text": "Exhaust this card to gain 3 trade goods and choose 1 other player; that player gains 2 trade goods.",
+        "homebrewReplacesID": "pm"
+    },
+    {
+        "alias": "miltymod_ac2",
+        "name": "Advanced Carrier II",
+        "type": "UNITUPGRADE",
+        "requirements": "GB",
+        "faction": "sol",
+        "baseUpgrade": "miltymod_cv2",
+        "source": "miltymod",
+        "text": "COST 3; COMBAT 9; MOVE 2; CAPACITY 8\n \n SUSTAIN DAMAGE",
+        "homebrewReplacesID": "ac2"
+    },
+    {
+        "alias": "miltymod_so2",
+        "name": "Spec Ops II",
+        "type": "UNITUPGRADE",
+        "requirements": "GG",
+        "faction": "sol",
+        "baseUpgrade": "miltymod_inf2",
+        "source": "miltymod",
+        "text": "COST: 1(x2); COMBAT 6\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource or influence value, gain that planet readied.",
+        "homebrewReplacesID": "so2"
+    },
+    {
+        "alias": "miltymod_l4",
+        "name": "L4 Disruptors",
+        "type": "CYBERNETIC",
+        "requirements": "",
+        "faction": "letnev",
+        "source": "miltymod",
+        "text": "During an invasion, units cannot use Space Cannon against your units.",
+        "homebrewReplacesID": "l4"
+    },
+    {
+        "alias": "miltymod_it",
+        "name": "Instinct Training",
+        "type": "BIOTIC",
+        "requirements": "GG",
+        "faction": "xxcha",
+        "source": "miltymod",
+        "text": "You may exhaust this card when another player plays an action card; cancel that action card.",
+        "homebrewReplacesID": "it"
+    },
+    {
+        "alias": "miltymod_ers",
+        "name": "E-Res Siphons",
+        "type": "CYBERNETIC",
+        "requirements": "YY",
+        "faction": "jol-nar",
+        "source": "miltymod",
+        "text": "After another player activates a system that contains 1 or more of your ships, gain 2 trade goods.",
+        "homebrewReplacesID": "ers"
+    },
+    {
+        "alias": "miltymod_vpw",
+        "name": "Valkyrie Particle Weave",
+        "type": "WARFARE",
+        "requirements": "R",
+        "faction": "sardakk",
+        "source": "miltymod",
+        "text": "After making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
+        "homebrewReplacesID": "vpw"
+    },
+    {
+        "alias": "miltymod_exo2",
+        "name": "Exotrireme II",
+        "type": "UNITUPGRADE",
+        "requirements": "RBY",
+        "faction": "sardakk",
+        "baseUpgrade": "miltymod_dn2",
+        "source": "miltymod",
+        "text": "COST 4; COMBAT 4; MOVE 2; CAPACITY 1After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x2)",
+        "homebrewReplacesID": "exo2"
+    },
+    {
+        "alias": "miltymod_is",
+        "name": "Inheritance Systems",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "faction": "l1z1x",
+        "source": "miltymod",
+        "text": "You may exhaust this card when you research a technology; ignore all of that technology's prerequisites.",
+        "homebrewReplacesID": "is"
+    },
+    {
+        "alias": "miltymod_sdn2",
+        "name": "Super-Dreadnought II",
+        "type": "UNITUPGRADE",
+        "requirements": "RBY",
+        "faction": "l1z1x",
+        "baseUpgrade": "miltymod_dn2",
+        "source": "miltymod",
+        "text": "COST 4; COMBAT 3; MOVE 2; CAPACITY 2\n \n SUSTAIN DAMAGE, BOMBARDMENT 3",
+        "homebrewReplacesID": "sdn2"
+    },
+    {
+        "alias": "miltymod_hcf2",
+        "name": "Hybrid Crystal Fighter II",
+        "type": "UNITUPGRADE",
+        "requirements": "BY",
+        "faction": "naalu",
+        "baseUpgrade": "miltymod_ff2",
+        "source": "miltymod",
+        "text": "COST: 1(x2); COMBAT 7; MOVE 2\n \n This unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
+        "homebrewReplacesID": "hcf2"
+    },
+    {
+        "alias": "miltymod_lgf",
+        "name": "Lazax Gate Folding",
+        "type": "PROPULSION",
+        "requirements": "B",
+        "faction": "winnu",
+        "source": "miltymod",
+        "text": "During your tactical actions, treat the Mecatol Rex system as if it contains each non-delta wormhole.\n \n ACTION: If you control Mecatol Rex, exhaust this card to place 1 infantry from your reinforcements on Mecatol Rex.",
+        "homebrewReplacesID": "lgf"
+    },
+    {
+        "alias": "miltymod_htp",
+        "name": "Hegemonic Trade Policy",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "faction": "winnu",
+        "source": "miltymod",
+        "text": "Exhaust this card when 1 or more of your units use Production; swap the resource and influence values of 1 planet you control during that use of Production.",
+        "homebrewReplacesID": "htp"
+    },
+    {
+        "alias": "miltymod_mr",
+        "name": "Magmus Reactor",
+        "type": "WARFARE",
+        "requirements": "RR",
+        "faction": "muaat",
+        "source": "miltymod",
+        "text": "Your ships can move into supernovas.\n \n After you place 1 or more units in a system that either contains a war sun or is adjacent to a supernova, gain 1 trade good.",
+        "homebrewReplacesID": "mr"
+    },
+    {
+        "alias": "miltymod_pws2",
+        "name": "Prototype Warsun II",
+        "type": "UNITUPGRADE",
+        "requirements": "GYRR",
+        "faction": "muaat",
+        "source": "miltymod",
+        "text": "COST 10; COMBAT 3(x3); MOVE 3; CAPACITY 6\n \n Other player's units in this system lose PLANETARY SHIELD.\n \n SUSTAIN DAMAGE, BOMBARDMENT 3(x3)",
+        "homebrewReplacesID": "pws2"
+    },
+    {
+        "alias": "miltymod_yso",
+        "name": "Yin Spinner",
+        "type": "BIOTIC",
+        "requirements": "G",
+        "faction": "yin",
+        "source": "miltymod",
+        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
+        "homebrewReplacesID": "yso"
+    },
+    {
+        "alias": "miltymod_ic",
+        "name": "Impulse Core",
+        "type": "CYBERNETIC",
+        "requirements": "Y",
+        "faction": "yin",
+        "source": "miltymod",
+        "text": "At the start of a space combat, you may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships.",
+        "homebrewReplacesID": "ic"
+    },
+    {
+        "alias": "miltymod_cm",
+        "name": "Chaos Mapping",
+        "type": "PROPULSION",
+        "requirements": "BBB",
+        "faction": "saar",
+        "source": "miltymod",
+        "text": "Other players cannot move ships into asteroid fields that contain 1 or more of your ships.\n \n At the start of your turn during the action phase, you may produce 1 unit in a system that contains at least 1 of your units that has Production.",
+        "homebrewReplacesID": "cm"
+    },
+    {
+        "alias": "miltymod_ffac2",
+        "name": "Floating Factory II",
+        "type": "UNITUPGRADE",
+        "requirements": "YY",
+        "faction": "saar",
+        "baseUpgrade": "miltymod_sd2",
+        "source": "miltymod",
+        "text": "MOVE 2; CAPACITY 6\n \n This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.\n \n PRODUCTION 7",
+        "homebrewReplacesID": "ff2"
+    },
+    {
+        "alias": "miltymod_wg",
+        "name": "Wormhole Generator",
+        "type": "PROPULSION",
+        "requirements": "B",
+        "faction": "ghosts",
+        "source": "miltymod",
+        "text": "Action: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships.",
+        "homebrewReplacesID": "wg"
+    },
+    {
+        "alias": "miltymod_bio",
+        "name": "Bioplasmosis",
+        "type": "BIOTIC",
+        "requirements": "G",
+        "faction": "arborec",
+        "source": "miltymod",
+        "text": "ACTION: You may exhaust this card to remove any number of ground forces from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
+        "homebrewReplacesID": "bio"
+    },
+    {
+        "alias": "miltymod_lw2",
+        "name": "Letani Warrior II",
+        "type": "UNITUPGRADE",
+        "requirements": "GG",
+        "faction": "arborec",
+        "baseUpgrade": "miltymod_inf2",
+        "source": "miltymod",
+        "text": "COST: 1(x2); COMBAT 7\n \n When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.\n \n PRODUCTION 2",
+        "homebrewReplacesID": "lw2"
+    }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "alias": "miltymod_diversify",
+    "name": "Diversify Research",
+    "phase": "Status",
+    "text": "Own 3 technologies other than your starting technologies.",
+    "points": 1,
+    "source": "miltymod"
+  },
+  {
+    "alias": "miltymod_bestow",
+    "name": "Bestow a Keleres Fleet",
+    "phase": "Status",
+    "text": "Remove 1 of your carriers, 1 of your cruisers and 1 of your destroyers from the game board.",
+    "points": 1,
+    "source": "miltymod"
+  },
+  {
+    "alias": "miltymod_master_science",
+    "name": "Master the Sciences",
+    "phase": "Status",
+    "text": "Own 6 technologies other than your starting technologies.",
+    "points": 2,
+    "source": "miltymod"
+  },
+  {
+    "alias": "miltymod_establish",
+    "name": "Establish Imperial Navy",
+    "phase": "Status",
+    "text": "Remove 2 of your carriers, 2 of your cruisers and 2 of your destroyers from the game board.",
+    "points": 2,
+    "source": "miltymod"
+  }
+]
