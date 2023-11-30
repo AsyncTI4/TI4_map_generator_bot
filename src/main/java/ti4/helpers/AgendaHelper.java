@@ -421,11 +421,13 @@ public class AgendaHelper {
             }
 
         }
-        String voteMessage = "Resolving vote for " + StringUtils.capitalize(winner) + ". Click the buttons for next steps after you're done resolving riders.";
+        String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
+        String voteMessage =  "Click the buttons for next steps after you're done resolving riders.";
         Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda");
         Button proceedToStrategyPhase = Button.success("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
         List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
         }
 
