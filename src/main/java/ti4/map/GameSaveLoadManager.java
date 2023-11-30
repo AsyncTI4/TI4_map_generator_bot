@@ -529,6 +529,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
         writer.write(System.lineSeparator());
+        writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
         writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
@@ -1626,6 +1628,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setNomadCoin(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.PURGED_FRAGMENTS -> {
+                    try {
+                        int value = Integer.parseInt(info);
+                        activeGame.setNumberOfPurgedFragments(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

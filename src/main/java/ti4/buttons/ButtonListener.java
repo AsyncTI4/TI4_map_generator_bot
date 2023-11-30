@@ -1848,9 +1848,14 @@ public class ButtonListener extends ListenerAdapter {
                 activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
             }
 
-            if (player.getLeaderIDs().contains("lanefircommander") && !player.hasLeaderUnlocked("lanefircommander")){
+            Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
+                    p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")
+                ).findFirst().orElse(null);
+            
+            if (lanefirPlayer != null){
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "lanefir", event);
             }
+            
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
