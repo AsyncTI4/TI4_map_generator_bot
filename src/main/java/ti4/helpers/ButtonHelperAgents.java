@@ -121,7 +121,7 @@ public class ButtonHelperAgents {
             p2.getRepresentation(true, true) + " a " + unit + " of yours has been captured by a cabal agent. Any comms you had have been washed.");
         p2.setTg(p2.getTg() + p2.getCommodities());
         p2.setCommodities(0);
-        ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, player, 1, unit, event);
+        ButtonHelperFactionSpecific.cabalEatsUnit(p2, activeGame, player, 1, unit, event, true);
         event.getMessage().delete().queue();
     }
 

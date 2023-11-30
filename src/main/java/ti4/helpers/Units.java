@@ -33,6 +33,10 @@ public class Units {
             if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
+            if(UnitType.TyrantsLament == unitType || UnitType.Lady == unitType){
+                return String.format("%s_%s.png", colorID, "fs");
+            }
+            
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
@@ -57,7 +61,7 @@ public class Units {
     public enum UnitType {
         Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
-        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"); //relics
+        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"); //relics
 
         @Getter
         public final String value;
@@ -82,6 +86,7 @@ public class Units {
                 case "ws" -> "War Sun";
                 case "plenaryorbital" -> "Plenary Orbital";
                 case "tyrantslament" -> "Tyrant's Lament";
+                case "lady" -> "The Lady";
                 default -> null;
             };
         }
@@ -101,7 +106,8 @@ public class Units {
                 case "fs" -> "flagship";
                 case "ws" -> "warsun";
                 case "plenaryorbital" -> null;
-                case "tyrantslament" -> null;
+                case "tyrantslament" -> "tyrantslament";
+                case "lady" -> "lady";
                 default -> null;
             };
         }
@@ -117,7 +123,7 @@ public class Units {
                 case "ca" -> Emojis.cruiser;
                 case "cv" -> Emojis.carrier;
                 case "dn" -> Emojis.dreadnought;
-                case "fs", "tyrantslament" -> Emojis.flagship;
+                case "fs", "tyrantslament", "lady" -> Emojis.flagship;
                 case "ws" -> Emojis.warsun;
                 default -> null;
             };

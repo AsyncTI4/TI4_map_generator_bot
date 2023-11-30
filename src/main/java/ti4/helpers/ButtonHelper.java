@@ -2188,12 +2188,12 @@ public class ButtonHelper {
             String nameOfHolder = "Space";
             if (unitH instanceof Planet) {
                 nameOfHolder = Helper.getPlanetRepresentation(unitH.getName(), activeGame);
-                if (activeGame.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && "ground".equalsIgnoreCase(groundOrSpace)) {
+                if (p1 != activeGame.getActivePlayerObject() && activeGame.playerHasLeaderUnlockedOrAlliance(p1, "solcommander") && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
-                if (activeGame.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeGame.isFoWMode() && "ground".equalsIgnoreCase(groundOrSpace)) {
+                if (p2 != activeGame.getActivePlayerObject() &&activeGame.playerHasLeaderUnlockedOrAlliance(p2, "solcommander") && !activeGame.isFoWMode() && "ground".equalsIgnoreCase(groundOrSpace)) {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button.secondary(finChecker + "utilizeSolCommander_" + unitH.getName(), "Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
@@ -3612,6 +3612,7 @@ public class ButtonHelper {
     public static String getUnitName(String id) {
         return switch (id) {
             case "fs" -> "flagship";
+            case "tyrantslament" -> "tyrantslament";
             case "ws" -> "warsun";
             case "gf" -> "infantry";
             case "mf" -> "mech";
@@ -3623,6 +3624,7 @@ public class ButtonHelper {
             case "dd" -> "destroyer";
             case "cv" -> "carrier";
             case "dn" -> "dreadnought";
+            case "lady" -> "lady";
             default -> "";
         };
     }
@@ -3730,6 +3732,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     String unitName = getUnitName(unitKey.asyncID());
+                    System.out.println(unitKey.asyncID());
                     int totalUnits = unitEntry.getValue();
                     int damagedUnits = 0;
 
@@ -4188,6 +4191,12 @@ public class ButtonHelper {
                 .filter(tile -> tile.containsPlayersUnits(player))
                 .toList();
             tilesWithProduction.addAll(tilesWithNovaAndUnits);
+        }
+        if(player.hasTech("iihq") && player.hasPlanet("mr")){
+            Tile mr = activeGame.getTileFromPlanet("mr");
+            if(!tilesWithProduction.contains(mr)){
+                tilesWithProduction.add(mr);
+            }
         }
         return tilesWithProduction;
     }
