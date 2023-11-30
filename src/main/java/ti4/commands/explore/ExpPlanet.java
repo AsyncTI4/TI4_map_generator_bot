@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
@@ -157,6 +158,11 @@ public class ExpPlanet extends ExploreSubcommandData {
             new PlanetRefresh().doAction(player, planetName, activeGame);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
             ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
+        }
+        if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+            UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+            activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
         }
     }
 }
