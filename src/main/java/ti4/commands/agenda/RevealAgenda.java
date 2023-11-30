@@ -139,9 +139,12 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeGame.setLatestWhenMsg("");
         activeGame.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(id, uniqueID));
+    
         String text = activeGame.getPing()
             + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
-
+        if(action){
+            text = " You can play afters during this agenda";
+        }
         Date newTime = new Date();
         activeGame.setLastActivePlayerPing(newTime);
         List<Button> whenButtons = AgendaHelper.getWhenButtons(activeGame);

@@ -624,7 +624,17 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
     }
 
-    public static void checkForMykoHero(Game activeGame, String hero) {
+    public static void checkForMykoHero(Game activeGame, String hero, Player player) {
+
+        if(player.hasLeaderUnlocked("mykomentorihero")){
+            List<Leader> leaders = new ArrayList<>();
+            leaders.addAll(player.getLeaders());
+            for(Leader leader : leaders){
+                if(leader.getId().contains("hero")){
+                    player.removeLeader(leader);
+                }
+            }
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("mykoheroSteal_" + hero, "Copy " + hero));
         buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -639,7 +649,7 @@ public class ButtonHelperHeroes {
     public static void resolveMykoHero(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
         HeroPlay.playHero(event, activeGame, player, player.unsafeGetLeader("mykomentorihero"));
-        new LeaderAdd().addLeader(player, hero);
+        new LeaderAdd().addLeader(player, hero, activeGame);
         UnlockLeader.unlockLeader(event, hero, activeGame, player);
         event.getMessage().delete().queue();
 

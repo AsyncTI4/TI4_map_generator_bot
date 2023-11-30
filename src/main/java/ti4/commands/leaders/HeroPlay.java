@@ -97,7 +97,11 @@ public class HeroPlay extends LeaderAction {
             sb.append("\nLeader will be PURGED after status cleanup");
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
         } else {
-            boolean purged = player.removeLeader(playerLeader);
+            boolean purged = true;
+            if(!"mykomentorihero".equals(playerLeader.getId())){
+                purged = player.removeLeader(playerLeader);
+            }
+            
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Leader " + playerLeader.getId() + " has been purged");
