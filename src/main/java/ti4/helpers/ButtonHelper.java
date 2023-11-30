@@ -1511,6 +1511,11 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            case "lanefir" -> {
+                if (activeGame.getNumberOfPurgedFragments() > 6) {
+                    shouldBeUnlocked = true;
+                }
+            }
             // missing: yin, ghost, cabal, naalu,letnev
         }
         if (shouldBeUnlocked) {

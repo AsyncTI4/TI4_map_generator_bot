@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -65,8 +66,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
+			activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
 		}
 
+		ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, activePlayer.getFaction(), event);
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		sendMessage(message);
 
