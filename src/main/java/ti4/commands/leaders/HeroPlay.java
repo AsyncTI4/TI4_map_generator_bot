@@ -105,7 +105,7 @@ public class HeroPlay extends LeaderAction {
 
             if (purged) {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Leader " + playerLeader.getId() + " has been purged");
-                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId());
+                ButtonHelperHeroes.checkForMykoHero(activeGame, playerLeader.getId(), player);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Leader was not purged - something went wrong");
                 return;
