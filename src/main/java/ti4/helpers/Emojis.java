@@ -1114,6 +1114,8 @@ public class Emojis {
             case "mech" -> mech;
             case "infantry" -> infantry;
             case "flagship" -> flagship;
+            case "lady" -> flagship;
+            case "tyrantslament" -> flagship;
             case "fighter" -> fighter;
             case "dreadnought" -> dreadnought;
             case "destroyer" -> destroyer;

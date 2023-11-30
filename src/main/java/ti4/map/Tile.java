@@ -71,6 +71,7 @@ public class Tile {
     @Nullable
     public static String getUnitPath(UnitKey unitID) {
         if (unitID == null) return null;
+        
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID);
