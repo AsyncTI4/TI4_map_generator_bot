@@ -5045,13 +5045,17 @@ public class ButtonHelper {
             }
             case "WashComms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
+                int oldP1Tg = p1.getTg();
+                int oldP2tg = p2.getTg();
                 int oldP1Comms = p1.getCommodities();
                 int newP1Comms = 0;
                 int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
                 int totalWashPowerP2 = p2.getCommodities() + p2.getTg();
-
+                // 6 comms, 4tg hacan -- p2
+                //4 comms, 1 tg empy -- p1
                 if (oldP1Comms > totalWashPowerP2) {
                     newP1Comms = oldP1Comms - totalWashPowerP2;
+                    
                 }
                 int oldP2Comms = p2.getCommodities();
                 int newP2Comms = 0;
@@ -5069,7 +5073,7 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, p2, p1, oldP2Comms, event);
                 // ButtonHelperAbilities.pillageCheck(p1, activeGame);
               //  ButtonHelperAbilities.pillageCheck(p2, activeGame);
-                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident;
+                message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"  ("+ident+" tg went from ("+oldP1Tg+"->"+p1.getTg()+")\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident +" ("+ident2+" tg went from ("+oldP2tg+"->"+p2.getTg()+")";
             }
             case "shipOrders" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
