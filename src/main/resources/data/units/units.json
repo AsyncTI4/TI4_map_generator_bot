@@ -22,7 +22,7 @@
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Letani Warrior I",
-        "upgradesToUnitId": "arborec_infantry",
+        "upgradesToUnitId": "arborec_infantry2",
         "source": "base",
         "faction": "Arborec",
         "productionValue": 1,

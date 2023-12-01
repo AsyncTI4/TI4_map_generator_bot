@@ -479,7 +479,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitred** player's units, return this card to the **splitred** player."
     },
-{
+    {
         "alias": "splitblue_cf",
         "name": "Ceasefire",
         "colour": "splitblue",
@@ -519,7 +519,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitblue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitblue** player's units, return this card to the **splitblue** player."
     },
-{
+    {
         "alias": "splitgreen_cf",
         "name": "Ceasefire",
         "colour": "splitgreen",
@@ -559,7 +559,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgreen** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgreen** player's units, return this card to the **splitgreen** player."
     },
-{
+    {
         "alias": "splityellow_cf",
         "name": "Ceasefire",
         "colour": "splityellow",
@@ -599,7 +599,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splityellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splityellow** player's units, return this card to the **splityellow** player."
     },
-{
+    {
         "alias": "splitorange_cf",
         "name": "Ceasefire",
         "colour": "splitorange",
@@ -639,7 +639,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitorange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitorange** player's units, return this card to the **splitorange** player."
     },
-{
+    {
         "alias": "splitpurple_cf",
         "name": "Ceasefire",
         "colour": "splitpurple",
@@ -679,7 +679,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpurple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpurple** player's units, return this card to the **splitpurple** player."
     },
-{
+    {
         "alias": "splitpink_cf",
         "name": "Ceasefire",
         "colour": "splitpink",
@@ -719,7 +719,7 @@
         "source": "PoK",
         "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpink** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpink** player's units, return this card to the **splitpink** player."
     },
-        {
+    {
         "alias": "orca_cf",
         "name": "Ceasefire",
         "colour": "orca",
@@ -2787,5 +2787,86 @@
         "playArea": "true",
         "source": "oath_of_kings",
         "text": "When you receive this card, you must place it face-up in your play area, you are now the \"Viceroy\". Take 1 relic from the Emperor's play area if available. Anytime you score a Public Objective, the Emperor also scores this objective. Both the Emperor and you are considered in control of Mecatol Rex while it is under either's control. Place the \"Galactic Consulate\" token onto a non-home, non-Mecatol Rex planet you control, this planet becomes a Legendary Planet. Any player who controls this planet gains 1 Victory Point while this planet is under their control. This planet can never be invaded by the Emperor player.\n\nIf the Viceroy activates a system that contains 1 or more of the Emperor player's units, or if the Emperor player is eliminated, remove this card from the play area and the \"Galactic Consulate\" token and return it to the Emperor player."
+    },
+    {
+        "alias": "miltymod_war_funding",
+        "name": "War Funding",
+        "faction": "letnev",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a round of space combat: During this combat round, reroll any number of your dice. Then, return this card to the Letnev player."
+    },
+    {
+        "alias": "miltymod_tekklar",
+        "name": "Tekklar Legion",
+        "faction": "sardakk",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a ground combat against a player other than the N'orr: Apply +1 to the result of each of your unit's combat rolls during this combat. Then, return this card to the N'orr player."
+    },
+    {
+        "alias": "miltymod_ms",
+        "name": "Military Support",
+        "faction": "sol",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of the Sol player's turn: You may place 1 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
+    },
+    {
+        "alias": "miltymod_favor",
+        "name": "Political Favor",
+        "faction": "xxcha",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you may produce 1 ship in any system that contains 1 or more of your space docks. Then, return this card to the Xxcha player."
+    },
+    {
+        "alias": "miltymod_ce",
+        "name": "Cybernetic Enhancements",
+        "faction": "l1z1x",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "When the Primary ability of Leadership is resolved: You may spend 2 influence to gain command tokens instead of 3 influence this round. Then, return this card to the L1Z1X player."
+    },
+    {
+        "alias": "miltymod_greyfire",
+        "name": "Greyfire Mutagen",
+        "faction": "yin",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a ground combat against a player other than the Yin: Roll 1 die for each enemy ground force on that planet. For each result of 8-10, destroy that ground force. Then, return this card to the Yin player."
+    },
+    {
+        "alias": "miltymod_stymie",
+        "name": "Stymie",
+        "faction": "arborec",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a combat against a player other than the Arborec: Your opponent cannot make combat rolls during this combat round. Then, return this card to the Arborec player."
+    },
+    {
+        "alias": "miltymod_antivirus",
+        "name": "Antivirus",
+        "faction": "nekro",
+        "colour": "",
+        "playArea": "true",
+        "source": "miltymod",
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player."
+    },
+    {
+        "alias": "miltymod_iff",
+        "name": "Creuss Iff",
+        "faction": "ghost",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "After you activate a system: During this tactical action, systems that contain non-delta wormholes are adjacent to each other. Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole. Then, return this card to the Creuss player."
     }
 ]

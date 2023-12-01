@@ -1,7 +1,6 @@
 [
     {
         "id": "miltymod_mitosis",
-        "homebrewReplacesID": "mitosis",
         "name": "Mitosis",
         "faction": "arborec",
         "permanentEffect": "Your space docks cannot produce ground forces.",
@@ -11,7 +10,6 @@
     },
     {
         "id": "miltymod_quantum_entanglement",
-        "homebrewReplacesID": "quantum_entanglement",
         "name": "Quantum Entanglement",
         "faction": "ghost",
         "permanentEffect": "You treat all systems that contain a non-delta wormhole as adjacent to each other. Game effects cannot prevent you from using this ability.",
@@ -19,7 +17,6 @@
     },
     {
         "id": "miltymod_slipstream",
-        "homebrewReplacesID": "slipstream",
         "name": "Slipstream",
         "faction": "ghost",
         "window": "During your tactical actions",
@@ -28,7 +25,6 @@
     },
     {
         "id": "miltymod_munitions",
-        "homebrewReplacesID": "munitions",
         "name": "Munitions Reserves",
         "faction": "letnev",
         "window": "At the start of each round of space combat",
@@ -37,7 +33,6 @@
     },
     {
         "id": "miltymod_ambush",
-        "homebrewReplacesID": "ambush",
         "name": "Ambush",
         "faction": "mentak",
         "window": "At the start of a space combat",
@@ -46,7 +41,6 @@
     },
     {
         "id": "miltymod_star_forge",
-        "homebrewReplacesID": "star_forge",
         "name": "Star Forge",
         "faction": "muaat",
         "window": "ACTION",
@@ -55,7 +49,6 @@
     },
     {
         "id": "miltymod_galactic_threat",
-        "homebrewReplacesID": "galactic_threat",
         "name": "Galactic Threat",
         "faction": "nekro",
         "permanentEffect": "You cannot vote on agendas",
@@ -65,7 +58,6 @@
     },
     {
         "id": "miltymod_reclamation",
-        "homebrewReplacesID": "reclamation",
         "name": "Reclamation",
         "faction": "winnu",
         "window": "After you gain control of Mecatol Rex",
