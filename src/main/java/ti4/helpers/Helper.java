@@ -702,7 +702,7 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                if ("warfare".equalsIgnoreCase(warfareNOtherstuff)) {
+                if ("warfare".equalsIgnoreCase(warfareNOtherstuff) && !unitHolder.getName().equalsIgnoreCase("mr")) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1 && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
                         && !player.hasUnit("saar_spacedock") && !player.hasUnit("saar_spacedock2")) {
                         continue;
