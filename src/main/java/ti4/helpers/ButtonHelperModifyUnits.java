@@ -157,8 +157,8 @@ public class ButtonHelperModifyUnits {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Button.success("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
                 b2s.add(Button.danger("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)
-                    + " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.");
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, true)
+                    + " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.", b2s);
             }
         }
         List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);

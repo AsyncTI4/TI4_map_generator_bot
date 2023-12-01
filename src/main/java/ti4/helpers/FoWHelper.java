@@ -182,22 +182,12 @@ public class FoWHelper {
 			return false;
 		}
 
-		List<String> hsIDs = new ArrayList<>();
-		if ("keleres".equals(faction)) {
-			hsIDs.add("92");
-			hsIDs.add("93");
-			hsIDs.add("94");
-		} else if ("ghost".equals(faction)) {
-			hsIDs.add("51");
-		} else {
-			FactionModel playerSetup = Mapper.getFaction(faction);
-			if (playerSetup != null) {
-				hsIDs.add(playerSetup.getHomeSystem());
-			}
-		}
 
 		for (Tile tile : activeGame.getTileMap().values()) {
-			if (hsIDs.contains(tile.getTileID()) && !tile.hasFog(viewingPlayer)) {
+			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
+				return true;
+			}
+			if(player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null && (faction.contains("ghost") || faction.contains("franken")) &&!tile.hasFog(viewingPlayer)){
 				return true;
 			}
 		}
@@ -207,13 +197,10 @@ public class FoWHelper {
 
 	private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
 		boolean hasPromInPA = false;
-		String playerColor = player.getColor();
-		String playerFaction = player.getFaction();
+		Game activeGame = player.getGame();
 		List<String> promissoriesInPlayArea = viewingPlayer.getPromissoryNotesInPlayArea();
 		for (String prom_ : promissoriesInPlayArea) {
-			String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(prom_);
-			if (playerColor != null && playerColor.equals(promissoryNoteOwner)
-				|| playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+			if (activeGame.getPNOwner(prom_) == player){
 				hasPromInPA = true;
 				break;
 			}

@@ -1542,6 +1542,9 @@ public class Player {
         if (comms > commoditiesTotal && commoditiesTotal > 0) {
             comms = commoditiesTotal;
         }
+        if(comms < 0){
+            comms = 0;
+        }
         commodities = comms;
     }
 
