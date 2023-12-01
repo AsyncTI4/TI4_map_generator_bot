@@ -610,6 +610,16 @@ public class Emojis {
     public static final String EightToes = "<:EightToes:1082312762572685352>";
     public static final String NineToes = "<:NineToes:1082312788241817661>";
 
+    // FRANKEN
+    public static final String Franken1 = "<:Franken1:1180167512965533726>";
+    public static final String Franken2 = "<:Franken2:1180167515276582992>";
+    public static final String Franken3 = "<:Franken3:1180167516392276048>";
+    public static final String Franken4 = "<:Franken4:1180167517608615936>";
+    public static final String Franken5 = "<:Franken5:1180167519114383460>";
+    public static final String Franken6 = "<:Franken6:1180167520079065239>";
+    public static final String Franken7 = "<:Franken7:1180167520821452931>";
+    public static final String Franken8 = "<:Franken8:1180167522176213062>";
+
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -748,14 +758,14 @@ public class Emojis {
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
 
-            case "franken1" -> OneToe;
-            case "franken2" -> TwoToes;
-            case "franken3" -> ThreeToes;
-            case "franken4" -> FourToes;
-            case "franken5" -> FiveToes;
-            case "franken6" -> SixToes;
-            case "franken7" -> SevenToes;
-            case "franken8" -> EightToes;
+            case "franken1" -> Franken1;
+            case "franken2" -> Franken2;
+            case "franken3" -> Franken3;
+            case "franken4" -> Franken4;
+            case "franken5" -> Franken5;
+            case "franken6" -> Franken6;
+            case "franken7" -> Franken7;
+            case "franken8" -> Franken8;
 
             default -> getRandomizedEmoji(0, null);
         };
