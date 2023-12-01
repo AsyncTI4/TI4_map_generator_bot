@@ -14,7 +14,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
-        "text2": "Against: Each player that voted \"For\" gets 3 trade goods.",
+        "text2": "Against: Each player that voted \"For\" gains 3 trade goods.",
         "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
         "source": "pok"
     },
