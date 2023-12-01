@@ -311,8 +311,6 @@ public class Emojis {
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
     // PLANETS
-    public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
-
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
