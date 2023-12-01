@@ -54,7 +54,7 @@ public class FlagshipDraftItem extends DraftItem {
                 .append("x").append(unit.getAfbDieCount())
                 .append(" ");
         }
-        sb.append(unit.getAbility());
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
     }
 

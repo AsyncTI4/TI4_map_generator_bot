@@ -20,7 +20,7 @@ public class AbilityDraftItem extends DraftItem {
         if (abilityModel.getPermanentEffect().isPresent()) {    
             return abilityModel.getPermanentEffect().get();
         } else if (abilityModel.getWindow().isPresent() && abilityModel.getWindowEffect().isPresent()) {
-            return "*" + abilityModel.getWindow() + ":* " + abilityModel.getWindowEffect();
+            return "*" + abilityModel.getWindow().get() + ":* " + abilityModel.getWindowEffect().get();
         }
         return "";
     }

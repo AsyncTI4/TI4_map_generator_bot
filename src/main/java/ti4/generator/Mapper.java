@@ -61,7 +61,6 @@ public class Mapper {
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties faction_representation = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties ds_handcards = new Properties();
@@ -96,7 +95,6 @@ public class Mapper {
         readData("tokens.properties", tokens, "Could not read token name file");
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
-        readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
@@ -607,14 +605,6 @@ public class Mapper {
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanets().values().stream()
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
-    }
-
-    public static Map<String, String> getFactionRepresentations() {
-        Map<String, String> factions = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : faction_representation.entrySet()) {
-            factions.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return factions;
     }
 
     public static HashMap<String, LeaderModel> getLeaders() {
