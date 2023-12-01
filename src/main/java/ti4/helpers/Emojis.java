@@ -627,17 +627,19 @@ public class Emojis {
     public static final String winemaking = "<:winemaking:1064244730000584754>";
     public static final String BortWindow = "<:bortwindow:1032312829585399880>";
     public static final String SpoonAbides = "<:TheSpoonAbides:1003482035953860699>";
-    public static final String Absol = "<:Absol:1079473959248068701>";
-    public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
-
+    
     // HOMEBREW
-    public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; // Symbol for Will's Action Deck 2 mod
-    public static final String Eronous = "<:eronous:1157307622920290444>"; // Symbol for Eronous' stuff
-    public static final String IgnisAurora = "<:ignis_aurora:1165445236957388800>"; // Symbol for Ignis Aurora's stuff
+    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
+    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
+    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
+    public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
+    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
+    public static final String ProjectPi = "";
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
