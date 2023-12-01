@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.AliasHandler;
 import ti4.model.Source.ComponentSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -82,8 +83,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        searchString = searchString.toLowerCase();
+        return getFactionName().contains(searchString)
+            || getAlias().contains(searchString)
+            || getShortTag().contains(searchString)
+            || getSource().toString().contains(searchString)
+            || getAlias().equals(AliasHandler.resolveFaction(searchString));
     }
 
     @Override
