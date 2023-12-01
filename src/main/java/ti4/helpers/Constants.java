@@ -55,6 +55,7 @@ public class Constants {
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
+    public static final String PURGED_FRAGMENTS = "purged_fragment";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
@@ -868,6 +869,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
+    public static final String LANEFIR_ATS_COUNT = "ats_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";

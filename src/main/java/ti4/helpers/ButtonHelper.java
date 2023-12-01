@@ -1511,6 +1511,11 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            case "lanefir" -> {
+                if (activeGame.getNumberOfPurgedFragments() > 6) {
+                    shouldBeUnlocked = true;
+                }
+            }
             // missing: yin, ghost, cabal, naalu,letnev
         }
         if (shouldBeUnlocked) {
@@ -1883,6 +1888,12 @@ public class ButtonHelper {
                 buttons2.add(Button.danger("declinePDS", "Decline PDS"));
             }
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to roll AFB or Space Cannon Offence", buttons2);
+        }
+
+        if((p1.hasTech("dslaner") && p1.getAtsCount() > 0) || (p2.hasTech("dslaner") && p2.getAtsCount() > 0)) {
+            List<Button> buttons3 = new ArrayList<>();
+            buttons3.addAll(ButtonHelperFactionSpecific.getLanefirATSButtons(p1, p2));
+            MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to remove commodities from ATS Armaments", buttons3);
         }
     }
 
