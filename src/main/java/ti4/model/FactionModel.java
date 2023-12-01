@@ -88,6 +88,6 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        return getFactionName();
+        return getFactionName() + " [" + source + "]";
     }
 }

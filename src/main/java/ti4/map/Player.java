@@ -2046,7 +2046,7 @@ public class Player {
             if (faction == null || "null".equals(faction)) {
                 faction = "No Faction";
             } else {
-                faction = Mapper.getFactionRepresentations().get(faction);
+                faction = getFactionModel().getFactionName();
             }
 
             String color = getColor();
