@@ -13,13 +13,13 @@ public class Source {
         ds, absol, franken,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega,
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, projectpi,
 
         // async homebrew
         admins, pbd100, testsource,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings;
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -44,8 +44,11 @@ public class Source {
                 case base, pok, codex1, codex2, codex3 -> "";
                 case absol -> Emojis.Absol;
                 case ds -> Emojis.DiscordantStars;
+                case eronous -> Emojis.Eronous;
                 case admins -> Emojis.AdminsFaction;
                 case ignis_aurora -> Emojis.IgnisAurora;
+                case keleresplus -> Emojis.KeleresPlus;
+                case projectpi -> Emojis.ProjectPi;
                 case lazax -> Emojis.Lazax;
                 default -> "";
             };
