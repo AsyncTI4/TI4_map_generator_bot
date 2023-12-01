@@ -126,7 +126,7 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "classified_weapons",
+    "alias": "classified_weapons_acd2",
     "name": "Classified Weapons",
     "phase": "Action",
     "window": "When 1 of your units makes a roll for a unit ability",
@@ -175,8 +175,8 @@
     "name": "Crisis Management",
     "phase": "Action",
     "window": "After you pass",
-    "text": "Perform the secondary ability of 1 readied strategy card.",
-    "flavorText": "\"The others have stretched themselves to the brink of destruction. Even now, with every imaginable incarnation of death on our doorsteps, they reach for more,\" Elder Junn shook his head. \"We must remain focused. Slow and steady.\"",
+    "text": "Perform the secondary ability of 1 readied strategy card in a player's play area.",
+    "flavorText": "\"The others have stretched themselves to the brink of destruction. Even now, with every imaginable incarnation of death on our doorsteps, they reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
   {
@@ -184,7 +184,7 @@
     "name": "Custodian Support",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Pass. Then, if you were the first to pass, immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 1 secret objective.",
+    "text": "Pass. Then, if you were the first to pass, immediately score 1 secret objective if you fulfill its requirements; otherwise, draw 2 action cards.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
     "source": "action_deck_2"
   },
@@ -490,7 +490,7 @@
     "name": "Pivoted Plan",
     "phase": "Action",
     "window": "Action",
-    "text": "You may draw 1 action card; otherwise, return 1 of your unscored secret objectives to the secret objective deck and shuffle it to draw 1 secret objective.",
+    "text": "You may draw 1 action card; otherwise, draw 1 secret objective and then return 1 of your unscored secret objectives to the deck and shuffle it. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect.]",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
     "source": "action_deck_2"
   },

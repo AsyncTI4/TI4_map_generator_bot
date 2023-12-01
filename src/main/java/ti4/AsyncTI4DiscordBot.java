@@ -135,14 +135,6 @@ public class AsyncTI4DiscordBot {
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-        SelectionManager.init();
-        initializeWhitelistedRoles();
-
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new RemoveUnits());
@@ -264,8 +256,19 @@ public class AsyncTI4DiscordBot {
             }
         }
 
+        // LOAD DATA
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+        SelectionManager.init();
+        initializeWhitelistedRoles();
+
         // LOAD GAMES
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadMaps();
 
@@ -284,7 +287,7 @@ public class AsyncTI4DiscordBot {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "# ` SHUTDOWN PROCESS STARTED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
@@ -328,6 +331,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
         adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
+        adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES

@@ -1348,4 +1348,33 @@ public class ButtonHelperFactionSpecific {
         return false;
     }
 
+    public static List<Button> getLanefirATSButtons(Player p1, Player p2) {
+        List<Button> ats = new ArrayList<>();
+
+        for (int i = 0; i < p1.getAtsCount(); i++) {
+            ats.add(Button.secondary("FFCC_" + p1.getFaction() + "_"+"lanefirATS_" + (i+1), String.valueOf(i+1)));
+        }
+
+        for (int i = 0; i < p2.getAtsCount(); i++) {
+            ats.add(Button.secondary("FFCC_" + p2.getFaction() + "_"+"lanefirATS_" + (i+1), String.valueOf(i+1)));
+        }
+
+        return ats;
+    }
+
+    public static void resolveLanefirATS(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String count = buttonID.split("_")[1];
+        int origATS = player.getAtsCount();
+
+        if(player.getAtsCount() < Integer.parseInt(count)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                player.getRepresentation(true, false) + " does not have " + count + " commodities to remove from ATS Armaments. Current count: " + player.getAtsCount());
+            return;
+        }
+
+        player.setAtsCount(player.getAtsCount() - Integer.parseInt(count));
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            player.getRepresentation(true, false) + " removed " + count + " commodities from ATS Armaments ("+origATS+"->"+player.getAtsCount()+")");
+    }
 }

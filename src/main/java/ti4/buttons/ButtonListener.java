@@ -1845,10 +1845,26 @@ public class ButtonListener extends ListenerAdapter {
 
             for (String fragid : fragmentsToPurge) {
                 player.removeFragment(fragid);
+                activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
             }
+
+            Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
+                    p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")
+                ).findFirst().orElse(null);
+            
+            if (lanefirPlayer != null){
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "lanefir", event);
+            }
+            
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+
+            if(player.hasTech("dslaner")){
+                player.setAtsCount(player.getAtsCount()+1);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+            }
+
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperModifyUnits.movingUnitsInTacticalAction(buttonID, event, activeGame, player, ident, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
@@ -1885,6 +1901,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.setTrapStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("setTrapStep4_")) {
             ButtonHelperAbilities.setTrapStep4(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("lanefirATS_")) {
+            ButtonHelperFactionSpecific.resolveLanefirATS(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep1_")) {
             ButtonHelperFactionSpecific.resolveStymiePlayerStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep2_")) {

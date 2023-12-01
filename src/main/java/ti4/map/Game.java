@@ -275,6 +275,9 @@ public class Game {
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
+    @Getter
+    @Setter
+    private int numberOfPurgedFragments = 0;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
