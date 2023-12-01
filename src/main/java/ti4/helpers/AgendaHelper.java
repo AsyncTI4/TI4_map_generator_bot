@@ -309,7 +309,7 @@ public class AgendaHelper {
                     }
                 }
                 if ("for".equalsIgnoreCase(winner)) {
-                    Button ixthianButton = Button.success("rollIxthian", "Roll Ixthian Artifact").withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
+                    Button ixthianButton = Button.success("rollIxthian", "Roll Ixthian Artifact").withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
                     String msg = activeGame.getPing() + "Click this button to roll ixthian artifact! 🥁";
                     MessageHelper.sendMessageToChannelWithButtons(actionsChannel, msg, ixthianButton);
                 } else {

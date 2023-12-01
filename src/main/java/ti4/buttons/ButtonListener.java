@@ -2202,7 +2202,7 @@ public class ButtonListener extends ListenerAdapter {
                 AgendaHelper.rollIxthian(activeGame);
             } else {
                 Button ixthianButton = Button.success("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact")
-                    .withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
+                    .withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
                 String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), msg, ixthianButton);
             }
