@@ -32,6 +32,7 @@ import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.FactionModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
@@ -92,20 +93,20 @@ public class AutoCompleteProvider {
             }
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                Map<String, String> factions = Mapper.getFactionRepresentations();
+                List<FactionModel> factions = Mapper.getFactions();
                 List<Command.Choice> options;
                 if (activeGame != null && activeGame.isDiscordantStarsMode()) {
-                    options = factions.entrySet().stream()
-                        .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                    options = factions.stream()
+                        .filter(faction -> faction.search(enteredValue))
                         .limit(25)
-                        .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                        .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))
                         .collect(Collectors.toList());
                 } else {
-                    options = factions.entrySet().stream()
-                        .filter(Predicate.not(token -> token.getValue().toUpperCase().endsWith("(DS)")))
-                        .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                    options = factions.stream()
+                        .filter(faction -> !"ds".equals(faction.getSource()))
+                        .filter(faction -> faction.search(enteredValue))
                         .limit(25)
-                        .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                        .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))
                         .collect(Collectors.toList());
                 }
                 event.replyChoices(options).queue();
