@@ -321,7 +321,7 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         String timeStamp = getTimeStamp();
-        graphics.drawString(activeGame.getName() + " " + timeStamp, 0, 34);
+        graphics.drawString(activeGame.getName() + " " +activeGame.getCreationDate()+" - "+ timeStamp, 0, 34);
 
         if (debug) debugTime = System.nanoTime();
         gameInfo(activeGame, displayType);

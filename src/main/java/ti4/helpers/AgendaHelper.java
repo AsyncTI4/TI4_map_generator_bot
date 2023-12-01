@@ -143,6 +143,18 @@ public class AgendaHelper {
                         MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Discarded the ACs of those who voted against");
                     }
                 }
+                if ("articles_war".equalsIgnoreCase(agID)) {
+                    List<Player> winOrLose;
+                    if (!"for".equalsIgnoreCase(winner)) {
+                        winOrLose = getLosingVoters(winner, activeGame);
+                        for (Player playerWL : winOrLose) {
+                            playerWL.setTg(playerWL.getTg()+3);
+                            ButtonHelperAbilities.pillageCheck(playerWL, activeGame);
+                            ButtonHelperAgents.resolveArtunoCheck(playerWL, activeGame, 3);
+                        }
+                        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Added 3tg to those who voted for");
+                    }
+                }
                 if ("sanctions".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player playerWL : activeGame.getRealPlayers()) {
@@ -217,6 +229,18 @@ public class AgendaHelper {
                     new DiscardACRandom().discardRandomAC(event, activeGame, player2, player2.getAc());
                     for (String planet : player2.getPlanets()) {
                         player2.exhaustPlanet(planet);
+                    }
+                    if(activeGame.getSpeaker().equalsIgnoreCase(player2.getUserID())){
+                        message = message + ". Also passed the speaker token";
+                        boolean foundSpeaker = false;
+                        for(Player p4 : activeGame.getRealPlayers()){
+                            if(foundSpeaker){
+                                activeGame.setSpeaker(p4.getUserID());
+                            }
+                            if(p4 == player2){
+                                foundSpeaker = true;
+                            }
+                        }
                     }
                     MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), message);
                 }
