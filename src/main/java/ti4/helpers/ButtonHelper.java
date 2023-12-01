@@ -4667,7 +4667,7 @@ public class ButtonHelper {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
                     }
-                    if (isTileHomeSystem(activeGame.getTileFromPlanet(planet))) {
+                    if (isTileHomeSystem(activeGame.getTileFromPlanet(planet)) && isPlanetLegendaryOrHome(planet, activeGame, true, p2)) {
                         p2.exhaustPlanet(planet);
                     }
                 }
