@@ -581,5 +581,20 @@
             }
         ],
         "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "miltymod_cruiser2_bonus_hits_9_10",
+        "type": "bonus_hits",
+        "value": "+1",
+        "valueScalingType": "raw_rolls_gt_8",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "miltymod_cruiser2"
+            }
+        ]
     }
 ]
