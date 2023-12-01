@@ -36,17 +36,17 @@ public class FrankenCommand implements Command {
         if (event.getName().equals(getActionID())) {
             User user = event.getUser();
             String userID = user.getId();
-            if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
-                Member member = event.getMember();
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
-                }
-                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
-                return false;
-            }
+            // if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
+            //     Member member = event.getMember();
+            //     List<Role> roles = member.getRoles();
+            //     for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+            //         if (roles.contains(role)) {
+            //             return true;
+            //         }
+            //     }
+            //     MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
+            //     return false;
+            // }
 
             GameManager gameManager = GameManager.getInstance();
             if (!gameManager.isUserWithActiveGame(userID)) {
