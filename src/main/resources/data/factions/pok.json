@@ -107,6 +107,6 @@
         "leaders": ["titansagent", "titanscommander", "titanshero"],
         "promissoryNotes": ["terraform"],
         "units": ["fighter", "destroyer", "titans_cruiser", "carrier", "dreadnought", "titans_flagship", "infantry", "titans_mech", "titans_pds", "spacedock"],
-        "source": "base"
-      },
+        "source": "pok"
+      }
 ]
