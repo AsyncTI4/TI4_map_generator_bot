@@ -11,7 +11,7 @@
       "abilities": ["miltymod_mitosis"],
       "leaders": ["arborecagent", "arboreccommander", "arborechero"],
       "promissoryNotes": ["miltymod_stymie"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_arborec_flagship", "arborec_infantry", "arborec_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_arborec_flagship", "miltymod_arborec_infantry", "arborec_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -27,7 +27,7 @@
       "abilities": ["miltymod_quantum_entanglement", "miltymod_slipstream", "creuss_gate"],
       "leaders": ["ghostagent", "ghostcommander", "ghosthero"],
       "promissoryNotes": ["miltymod_iff"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_ghost_flagship", "infantry", "ghost_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_ghost_flagship", "miltymod_infantry", "ghost_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -42,7 +42,7 @@
       "abilities": ["master_of_trade", "guild_ships", "arbiters"],
       "leaders": ["hacanagent", "hacancommander", "hacanhero"],
       "promissoryNotes": ["convoys"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_hacan_flagship", "infantry", "hacan_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_hacan_flagship", "miltymod_infantry", "hacan_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -58,7 +58,7 @@
       "abilities": ["fragile", "brilliant", "analytical"],
       "leaders": ["jolnaragent", "jolnarcommander", "jolnarhero"],
       "promissoryNotes": ["ra"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "jolnar_flagship", "infantry", "jolnar_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "jolnar_flagship", "miltymod_infantry", "jolnar_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -74,7 +74,7 @@
       "abilities": ["assimilate", "harrow"],
       "leaders": ["l1z1xagent", "l1z1xcommander", "l1z1xhero"],
       "promissoryNotes": ["miltymod_ce"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "l1z1x_dreadnought", "l1z1x_flagship", "infantry", "l1z1x_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_l1z1x_dreadnought", "l1z1x_flagship", "miltymod_infantry", "l1z1x_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -89,7 +89,7 @@
       "abilities": ["miltymod_munitions", "armada"],
       "leaders": ["letnevagent", "letnevcommander", "letnevhero"],
       "promissoryNotes": ["miltymod_war_funding"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "letnev_flagship", "infantry", "letnev_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "letnev_flagship", "miltymod_infantry", "letnev_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -105,7 +105,7 @@
       "abilities": ["miltymod_ambush", "pillage"],
       "leaders": ["mentakagent", "mentakcommander", "mentakhero"],
       "promissoryNotes": ["pop"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mentak_flagship", "infantry", "mentak_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "mentak_flagship", "miltymod_infantry", "mentak_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -120,7 +120,7 @@
       "abilities": ["miltymod_star_forge", "gashlai_physiology"],
       "leaders": ["muaatagent", "muaatcommander", "muaathero"],
       "promissoryNotes": ["fires"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_muaat_flagship", "muaat_warsun", "infantry", "muaat_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_muaat_flagship", "miltymod_muaat_warsun", "miltymod_infantry", "muaat_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -135,7 +135,7 @@
       "abilities": ["telepathic", "foresight"],
       "leaders": ["naaluagent", "naalucommander", "naaluhero"],
       "promissoryNotes": ["gift"],
-      "units": ["naalu_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naalu_flagship", "infantry", "naalu_mech_omega", "pds", "spacedock"],
+      "units": ["miltymod_naalu_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "naalu_flagship", "miltymod_infantry", "naalu_mech_omega", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -151,7 +151,7 @@
       "abilities": ["miltymod_galactic_threat", "technological_singularity", "propagation"],
       "leaders": ["nekroagent", "nekrocommander", "nekrohero"],
       "promissoryNotes": ["miltymod_antivirus"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "nekro_flagship", "infantry", "nekro_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "nekro_flagship", "miltymod_infantry", "nekro_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -166,7 +166,7 @@
       "abilities": ["scavenge", "nomadic"],
       "leaders": ["saaragent", "saarcommander", "saarhero"],
       "promissoryNotes": ["ragh"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "saar_flagship", "infantry", "saar_mech", "pds", "saar_spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "saar_flagship", "miltymod_infantry", "saar_mech", "pds", "miltymod_saar_spacedock"],
       "source": "miltymod"
     },
     {
@@ -182,7 +182,7 @@
       "abilities": ["unrelenting"],
       "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"],
       "promissoryNotes": ["miltymod_tekklar"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "sardakk_dreadnought", "sardakk_flagship", "infantry", "sardakk_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_sardakk_dreadnought", "sardakk_flagship", "miltymod_infantry", "sardakk_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -197,7 +197,7 @@
       "abilities": ["orbital_drop", "versatile"],
       "leaders": ["solagent", "solcommander", "solhero"],
       "promissoryNotes": ["miltymod_ms"],
-      "units": ["fighter", "destroyer", "cruiser", "sol_carrier", "dreadnought", "sol_flagship", "sol_infantry", "sol_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "sol_carrier", "miltymod_dreadnought", "sol_flagship", "miltymod_sol_infantry", "sol_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
 
@@ -213,7 +213,7 @@
       "abilities": ["blood_ties", "miltymod_reclamation"],
       "leaders": ["winnuagent", "winnucommander", "winnuhero"],
       "promissoryNotes": ["acq"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_winnu_flagship", "infantry", "winnu_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_winnu_flagship", "miltymod_infantry", "winnu_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -228,7 +228,7 @@
       "abilities": ["peace_accords", "quash"],
       "leaders": ["xxchaagent", "xxchacommander", "xxchahero"],
       "promissoryNotes": ["miltymod_favor"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "xxcha_flagship", "infantry", "xxcha_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "xxcha_flagship", "miltymod_infantry", "xxcha_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -243,7 +243,7 @@
       "abilities": ["indoctrination", "devotion"],
       "leaders": ["yinagent", "yincommander", "yinhero"],
       "promissoryNotes": ["miltymod_greyfire"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "yin_flagship", "infantry", "yin_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "yin_flagship", "miltymod_infantry", "yin_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     },
     {
@@ -258,7 +258,7 @@
       "abilities": ["stall_tactics", "scheming", "crafty"],
       "leaders": ["yssarilagent", "yssarilcommander", "yssarilhero"],
       "promissoryNotes": ["spynet"],
-      "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "miltymod_yssaril_flagship", "infantry", "yssaril_mech", "pds", "spacedock"],
+      "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_yssaril_flagship", "miltymod_infantry", "yssaril_mech", "pds", "miltymod_spacedock"],
       "source": "miltymod"
     }
 ]
