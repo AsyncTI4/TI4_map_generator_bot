@@ -2868,5 +2868,14 @@
         "playArea": "false",
         "source": "miltymod",
         "text": "After you activate a system: During this tactical action, systems that contain non-delta wormholes are adjacent to each other. Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole. Then, return this card to the Creuss player."
-    }
+    },
+    {
+        "alias": "miltymod_acq",
+        "name": "Acquiescence",
+        "faction": "winnu",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
+    },
 ]

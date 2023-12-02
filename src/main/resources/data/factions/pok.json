@@ -92,5 +92,21 @@
         "promissoryNotes": ["bmf"],
         "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naaz_flagship", "infantry", "naaz_mech", "naaz_mech_space", "pds", "spacedock"],
         "source": "pok"
-    }
+    },
+    {
+        "alias": "titans",
+        "factionName": "The Titans of Ul",
+        "shortTag": "UL",
+        "homeSystem": "55",
+        "startingFleet": "dn,2 cr,2 ff,3 inf elysium,sd elysium",
+        "commodities": 2,
+        "factionTech": ["ht2", "se2"],
+        "startingTech": ["amd", "sdn"],
+        "homePlanets": ["elysium"],
+        "abilities": ["terragenesis", "awaken", "coalescence"],
+        "leaders": ["titansagent", "titanscommander", "titanshero"],
+        "promissoryNotes": ["terraform"],
+        "units": ["fighter", "destroyer", "titans_cruiser", "carrier", "dreadnought", "titans_flagship", "infantry", "titans_mech", "titans_pds", "spacedock"],
+        "source": "base"
+      },
 ]
