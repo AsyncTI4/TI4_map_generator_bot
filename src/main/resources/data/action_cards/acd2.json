@@ -49,7 +49,7 @@
     "name": "Artifact Hunters",
     "phase": "Action",
     "window": "Action",
-    "text": "Explore 1 planet you control; if you draw a relic fragment, you may exhaust that planet and purge that relic fragment to gain 1 relic.",
+    "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may exhaust that planet and purge that relic fragment to gain 1 relic.",
     "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
     "source": "action_deck_2"
   },
@@ -68,7 +68,7 @@
     "phase": "Action",
     "window": "Action",
     "text": "Purge 2 of your relic fragments to gain 1 relic.",
-    "flavorText": "Carth breathed in the familiar air of the Golden Sands. Home. Were it that she never had to leave. Were it that she was not here on such dark business.",
+    "flavorText": "Carth breathed in the familiar air of the Golden Sands - home. If only she never had to leave. If only she were not here for such dark business.",
     "source": "action_deck_2"
   },
   {
@@ -94,8 +94,8 @@
     "name": "Brilliant Tactician",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Either redistribute any number of your command tokens on your command sheet or draw 1 action card.",
-    "flavorText": "Suffi An watched from a safe distance as the payload fell, the glow from the bombardment illuminating her cockpit. Eventually, it would become too dangerous to remain, but for now.. for now she would observe.",
+    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your tactic pool.",
+    "flavorText": "Suffi An watched from a safe distance as the payload fell, the glow from the bombardment illuminating her cockpit. Eventually, it would become too dangerous to remain, but for now... for now she would observe.",
     "source": "action_deck_2"
   },
   {
@@ -256,7 +256,7 @@
     "name": "Early Voting",
     "phase": "Action",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player. That player votes first on this agenda. [Note: Argent Flight still votes first.]",
+    "text": "Choose 1 player. That player votes first on this agenda. After this agenda is resolved, if that player cast votes on the resolved outcome, they may place 1 command token from their reinforcements in their strategy pool. [Note: Voting continues in the normal order. They do not vote again.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -410,7 +410,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order. Then, draw 1 action card.",
-    "flavorText": "They had cleverly buried these issues away. Ciel would make sure they saw the light of day.",
+    "flavorText": "Ne Ruk had reflected on hundreds of hours of private conversations between the various representatives. Undermining their schemes would be a treat well worth the effort.",
     "source": "action_deck_2"
   },
   {
@@ -535,7 +535,7 @@
     "name": "Public Outcry",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "During this agenda, players cannot abstain if they are able to cast votes. You vote first on this agenda. After a player casts votes for a different outcome than the outcome you voted for, they must discard 1 random action card.",
+    "text": "During this agenda, players must vote, if able. You vote first on this agenda. After a player casts votes for a different outcome than the outcome you voted for or predicted, they must discard 1 random action card. [Note: Voting continues in the normal order. You do not vote again.]",
     "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects towards those accessing the building, Ciel smiled, \"Nice dodge, Junn, quite agile for your age.\"",
     "source": "action_deck_2"
   },
