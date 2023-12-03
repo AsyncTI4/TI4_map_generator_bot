@@ -273,7 +273,7 @@
         "name": "Unconventional Measures ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player draws 1 action card for every 5 votes they cast during this agenda.",
+        "text1": "For: Each player draws 1 action card. Then, they draw 1 additional action card for every 5 votes they cast during this agenda.",
         "text2": "Against: Each player may discard 2 action cards to gain 1 command token; they may repeat this effect any number of times.",
         "source": "little_omega"
     },
