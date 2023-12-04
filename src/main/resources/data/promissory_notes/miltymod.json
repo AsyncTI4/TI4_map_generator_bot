@@ -6,7 +6,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "At the start of a round of space combat: During this combat round, reroll any number of your dice. Then, return this card to the Letnev player."
+        "text": "At the start of a round of space combat: During this combat round, reroll any number of your dice. Then, return this card to the Letnev player.",
+        "homebrewReplacesID": "war_funding"
     },
     {
         "alias": "miltymod_tekklar",
@@ -15,7 +16,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "At the start of a ground combat against a player other than the N'orr: Apply +1 to the result of each of your unit's combat rolls during this combat. Then, return this card to the N'orr player."
+        "text": "At the start of a ground combat against a player other than the N'orr: Apply +1 to the result of each of your unit's combat rolls during this combat. Then, return this card to the N'orr player.",
+        "homebrewReplacesID": "tekklar"
     },
     {
         "alias": "miltymod_ms",
@@ -24,7 +26,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "At the start of the Sol player's turn: You may place 1 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
+        "text": "At the start of the Sol player's turn: You may place 1 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player.",
+        "homebrewReplacesID": "ms"
     },
     {
         "alias": "miltymod_favor",
@@ -33,7 +36,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you may produce 1 ship in any system that contains 1 or more of your space docks. Then, return this card to the Xxcha player."
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you may produce 1 ship in any system that contains 1 or more of your space docks. Then, return this card to the Xxcha player.",
+        "homebrewReplacesID": "favor"
     },
     {
         "alias": "miltymod_ce",
@@ -42,7 +46,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "When the Primary ability of Leadership is resolved: You may spend 2 influence to gain command tokens instead of 3 influence this round. Then, return this card to the L1Z1X player."
+        "text": "When the Primary ability of Leadership is resolved: You may spend 2 influence to gain command tokens instead of 3 influence this round. Then, return this card to the L1Z1X player.",
+        "homebrewReplacesID": "ce"
     },
     {
         "alias": "miltymod_greyfire",
@@ -51,7 +56,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "At the start of a ground combat against a player other than the Yin: Roll 1 die for each enemy ground force on that planet. For each result of 8-10, destroy that ground force. Then, return this card to the Yin player."
+        "text": "At the start of a ground combat against a player other than the Yin: Roll 1 die for each enemy ground force on that planet. For each result of 8-10, destroy that ground force. Then, return this card to the Yin player.",
+        "homebrewReplacesID": "greyfire"
     },
     {
         "alias": "miltymod_stymie",
@@ -60,7 +66,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "At the start of a combat against a player other than the Arborec: Your opponent cannot make combat rolls during this combat round. Then, return this card to the Arborec player."
+        "text": "At the start of a combat against a player other than the Arborec: Your opponent cannot make combat rolls during this combat round. Then, return this card to the Arborec player.",
+        "homebrewReplacesID": "stymie"
     },
     {
         "alias": "miltymod_antivirus",
@@ -69,7 +76,8 @@
         "color": "",
         "playArea": "true",
         "source": "miltymod",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player."
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player.",
+        "homebrewReplacesID": "antivirus"
     },
     {
         "alias": "miltymod_iff",
@@ -78,7 +86,8 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "After you activate a system: During this tactical action, systems that contain non-delta wormholes are adjacent to each other. Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole. Then, return this card to the Creuss player."
+        "text": "After you activate a system: During this tactical action, systems that contain non-delta wormholes are adjacent to each other. Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole. Then, return this card to the Creuss player.",
+        "homebrewReplacesID": "iff"
     },
     {
         "alias": "miltymod_acq",
@@ -87,6 +96,7 @@
         "color": "",
         "playArea": "false",
         "source": "miltymod",
-        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
+        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player.",
+        "homebrewReplacesID": "acq"
     }
 ]
