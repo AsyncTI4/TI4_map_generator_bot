@@ -130,8 +130,10 @@ public class Game {
     @Getter
     @Setter
     private String textSize = "medium";
-    @ExportableField
+    @ExportableField @Getter @Setter
     private boolean absolMode;
+    @Getter @Setter
+    private boolean miltyModMode;
     @Getter
     @Setter
     private boolean showUnitTags;
@@ -169,7 +171,7 @@ public class Game {
     @Setter
     @ExportableField
     private String scSetID = "pok";
-    @ExportableField
+    @ExportableField @Getter @Setter
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
@@ -645,30 +647,6 @@ public class Game {
 
     public void setStratPings(boolean stratPings) {
         this.stratPings = stratPings;
-    }
-
-    public boolean isAbsolMode() {
-        return absolMode;
-    }
-
-    public void setAbsolMode(boolean absolMode) {
-        this.absolMode = absolMode;
-    }
-
-    public boolean isMiltyModMode() {
-        return miltyModMode;
-    }
-
-    public void setMiltyModMode(boolean miltyModMode) {
-        this.miltyModMode = miltyModMode;
-    }
-
-    public boolean isDiscordantStarsMode() {
-        return discordantStarsMode;
-    }
-
-    public void setDiscordantStarsMode(boolean discordantStarsMode) {
-        this.discordantStarsMode = discordantStarsMode;
     }
 
     public String getOutputVerbosity() {
