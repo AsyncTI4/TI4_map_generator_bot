@@ -588,8 +588,12 @@ public class Helper {
         }
         return scButtons;
     }
-
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame) {
+        return getPlanetExhaustButtons(event, player, activeGame, "both");
+    }
+
+    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, String whatIsItFor) {
+        player.resetSpentThings();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
@@ -605,10 +609,10 @@ public class Helper {
                 techType = ButtonHelper.getTechSkipAttachments(activeGame, planet);
             }
             if (techType.equalsIgnoreCase("none")) {
-                Button button = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                Button button = Button.danger("spend_" + planet +"_"+whatIsItFor, getPlanetRepresentation(planet, activeGame));
                 planetButtons.add(button);
             } else {
-                Button techB = Button.danger("spend_" + planet, getPlanetRepresentation(planet, activeGame));
+                Button techB = Button.danger("spend_" + planet+ "_"+whatIsItFor, getPlanetRepresentation(planet, activeGame));
                 switch (techType) {
                     case "propulsion" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
                     case "warfare" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
@@ -652,6 +656,84 @@ public class Helper {
             }
         }
         return planetButtons;
+    }
+
+    public static String buildSpentThingsMessage(Player player, Game activeGame, String resOrInfOrBoth){
+        List<String> spentThings = player.getSpentThingsThisWindow();
+        String msg = ButtonHelper.getIdent(player)+" exhausted the following: \n";
+        int res = 0;
+        int inf = 0;
+        int tg = player.getSpentTgsThisWindow();
+        boolean xxcha = player.hasLeaderUnlocked("xxchahero");
+        for(String thing : spentThings){
+            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander")){
+                UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
+                msg = msg + "> ";
+                if (unitHolder == null) {
+                    msg = msg + thing + "\n";
+                } else {
+                    Planet planet = (Planet) unitHolder;
+                    if(resOrInfOrBoth.equalsIgnoreCase("res")){
+                        if(xxcha){
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            res = res+planet.getSumResourcesInfluence();
+                        }else{
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResources(thing, activeGame) +"\n";
+                            res = res+ planet.getResources();
+                        }
+                    }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
+                        if(xxcha){
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            inf = inf +planet.getSumResourcesInfluence();
+                        }else{
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, activeGame) +"\n";
+                            inf = inf + planet.getInfluence();
+                        }
+                    }else{
+                        if(xxcha){
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            inf = inf + planet.getSumResourcesInfluence();
+                            res = res+planet.getSumResourcesInfluence();
+                        }else{
+                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
+                            inf = inf +planet.getInfluence();
+                            res = res+planet.getResources();
+                        }
+                    }
+                }
+            }else{
+                if(thing.contains("sarween")){
+                    msg = msg + "> Used Sarween Tools "+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                    res = res+1;
+                }
+                if(thing.contains("aida")){
+                    msg = msg + "> Exhausted AIDEV ";
+                    if(thing.contains("_")){
+                        res = res + ButtonHelper.getNumberOfUnitUpgrades(player);
+                        msg = msg + " for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources ";
+                    }else{
+                       msg =  msg + " for a tech skip on a unit upgrade ";
+                    }
+                    msg = msg+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                }
+                if(thing.contains("commander")){
+                     msg = msg + thing + "\n";
+                }
+            }
+        }
+        res = res + tg;
+        inf = inf + tg;
+        if(tg > 0){
+            msg = msg + "> Spent "+tg+" tgs "+Emojis.getTGorNomadCoinEmoji(activeGame) +" ("+(player.getTg()+tg)+"->"+player.getTg()+") \n";
+        }
+        if(resOrInfOrBoth.equalsIgnoreCase("res")){
+            msg = msg + "For a total spend of **"+res+" Resources**";
+        }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
+            msg = msg + "For a total spend of **"+inf+" Influence**";
+        }else{
+            msg = msg + "For a total spend of **"+res+" Resources** or **"+inf+" Influence**";
+        }
+        return msg;
     }
 
     public static String buildProducedUnitsMessage(Player player, Game activeGame){
