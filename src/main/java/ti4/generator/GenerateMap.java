@@ -406,8 +406,13 @@ public class GenerateMap {
         if ("null".equals(factionID) || StringUtils.isBlank(factionID)) {
             return null;
         }
-        String factionFileName = Mapper.getFactionFileName(factionID);
-        String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
+        String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
+        if (factionFile == null) {
+            // Handle homebrew factions based on real factions
+            if (Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
+                factionFile = ResourceHelper.getInstance().getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
+            }
+        }
         if (factionFile == null) {
             BotLogger.log("Could not find image file for faction icon: " + factionID);
         }
