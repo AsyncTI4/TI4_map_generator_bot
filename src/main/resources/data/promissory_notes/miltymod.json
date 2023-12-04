@@ -1,0 +1,92 @@
+[
+    {
+        "alias": "miltymod_war_funding",
+        "name": "War Funding",
+        "faction": "letnev",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a round of space combat: During this combat round, reroll any number of your dice. Then, return this card to the Letnev player."
+    },
+    {
+        "alias": "miltymod_tekklar",
+        "name": "Tekklar Legion",
+        "faction": "sardakk",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a ground combat against a player other than the N'orr: Apply +1 to the result of each of your unit's combat rolls during this combat. Then, return this card to the N'orr player."
+    },
+    {
+        "alias": "miltymod_ms",
+        "name": "Military Support",
+        "faction": "sol",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of the Sol player's turn: You may place 1 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
+    },
+    {
+        "alias": "miltymod_favor",
+        "name": "Political Favor",
+        "faction": "xxcha",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you may produce 1 ship in any system that contains 1 or more of your space docks. Then, return this card to the Xxcha player."
+    },
+    {
+        "alias": "miltymod_ce",
+        "name": "Cybernetic Enhancements",
+        "faction": "l1z1x",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "When the Primary ability of Leadership is resolved: You may spend 2 influence to gain command tokens instead of 3 influence this round. Then, return this card to the L1Z1X player."
+    },
+    {
+        "alias": "miltymod_greyfire",
+        "name": "Greyfire Mutagen",
+        "faction": "yin",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a ground combat against a player other than the Yin: Roll 1 die for each enemy ground force on that planet. For each result of 8-10, destroy that ground force. Then, return this card to the Yin player."
+    },
+    {
+        "alias": "miltymod_stymie",
+        "name": "Stymie",
+        "faction": "arborec",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "At the start of a combat against a player other than the Arborec: Your opponent cannot make combat rolls during this combat round. Then, return this card to the Arborec player."
+    },
+    {
+        "alias": "miltymod_antivirus",
+        "name": "Antivirus",
+        "faction": "nekro",
+        "colour": "",
+        "playArea": "true",
+        "source": "miltymod",
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their Technological Singularity faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player."
+    },
+    {
+        "alias": "miltymod_iff",
+        "name": "Creuss Iff",
+        "faction": "ghost",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "After you activate a system: During this tactical action, systems that contain non-delta wormholes are adjacent to each other. Apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains a non-delta wormhole. Then, return this card to the Creuss player."
+    },
+    {
+        "alias": "miltymod_acq",
+        "name": "Acquiescence",
+        "faction": "winnu",
+        "colour": "",
+        "playArea": "false",
+        "source": "miltymod",
+        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
+    }
+]
