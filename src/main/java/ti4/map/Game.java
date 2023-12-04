@@ -130,8 +130,10 @@ public class Game {
     @Getter
     @Setter
     private String textSize = "medium";
-    @ExportableField
+    @ExportableField @Getter @Setter
     private boolean absolMode;
+    @Getter @Setter
+    private boolean miltyModMode;
     @Getter
     @Setter
     private boolean showUnitTags;
@@ -169,7 +171,7 @@ public class Game {
     @Setter
     @ExportableField
     private String scSetID = "pok";
-    @ExportableField
+    @ExportableField @Getter @Setter
     private boolean discordantStarsMode;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode;
@@ -647,22 +649,6 @@ public class Game {
         this.stratPings = stratPings;
     }
 
-    public boolean isAbsolMode() {
-        return absolMode;
-    }
-
-    public void setAbsolMode(boolean absolMode) {
-        this.absolMode = absolMode;
-    }
-
-    public boolean isDiscordantStarsMode() {
-        return discordantStarsMode;
-    }
-
-    public void setDiscordantStarsMode(boolean discordantStarsMode) {
-        this.discordantStarsMode = discordantStarsMode;
-    }
-
     public String getOutputVerbosity() {
         return outputVerbosity;
     }
@@ -685,8 +671,9 @@ public class Game {
     public String getGameModesText() {
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put("Normal", isNormalGame());
-                put("Base Game", isBaseGameMode());
+                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
+                put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Alliance", isAllianceMode());
@@ -701,7 +688,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame() || isMiltyModMode());
     }
 
     public boolean isFrankenGame() {
