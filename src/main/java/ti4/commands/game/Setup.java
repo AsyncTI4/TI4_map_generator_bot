@@ -101,11 +101,11 @@ public class Setup extends GameSubcommandData {
         boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, activeGame.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, activeGame.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, activeGame.isBaseGameMode(), OptionMapping::getAsBoolean);
-        return setGameMode(event, activeGame, baseGameMode, absolMode, discordantStarsMode, isTIGLGame);
+        return setGameMode(event, activeGame, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame);
     }
 
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean discordantStarsMode, boolean isTIGLGame) {
-
+    // TODO: find a better way to handle this - this is annoying
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game activeGame, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame) {
         if (isTIGLGame
             && (baseGameMode || absolMode || discordantStarsMode || activeGame.isHomeBrewSCMode() || activeGame.isFoWMode() || activeGame.isAllianceMode() || activeGame.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
@@ -116,9 +116,38 @@ public class Setup extends GameSubcommandData {
             return true;
         }
 
+        if (miltyModMode && !baseGameMode) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Milty Mod Mode can only be combined with Base Game Mode. Please set the game to Base Game Mode first.");
+            return false;
+        }
+
         if (baseGameMode && (absolMode || discordantStarsMode)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
             return false;
+        } else if (baseGameMode && miltyModMode) {
+            if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_miltymod"))) return false;
+            if (!activeGame.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_miltymod"))) return false;
+            if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_base"))) return false;
+            if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_base"))) return false;
+
+            for (Player player : activeGame.getPlayers().values()) {
+                player.setLeaders(new ArrayList<>());
+                if (player.getUnitByBaseType("mech") != null) player.removeOwnedUnitByID(player.getUnitByBaseType("mech").getId());
+            }
+
+            activeGame.setScSetID("miltymod");
+
+            activeGame.setTechnologyDeckID("techs_miltymod");
+            activeGame.swapInVariantTechs();
+            activeGame.swapInVariantUnits("miltymod");
+            activeGame.setBaseGameMode(true);
+            activeGame.setMiltyModMode(true);
+            activeGame.setAbsolMode(false);
+            activeGame.setDiscordantStarsMode(false);
+            return true;
         } else if (baseGameMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_base_game"))) return false;
             if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_base"))) return false;
@@ -142,6 +171,7 @@ public class Setup extends GameSubcommandData {
             return true;
         }
         activeGame.setBaseGameMode(false);
+        activeGame.setMiltyModMode(false);
 
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (absolMode && discordantStarsMode) {

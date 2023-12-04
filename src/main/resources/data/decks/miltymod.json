@@ -210,20 +210,6 @@
         ]
     },
     {
-        "alias": "relics_miltymod",
-        "name": "MiltyMod Relics (An Empty Deck)",
-        "type": "relic",
-        "description": "An empty Deck to handle MiltyMod",
-        "cardIDs": []
-    },
-    {
-        "alias": "explores_miltymod",
-        "name": "MiltyMod Explore Cards (an Empty Deck)",
-        "type": "explore",
-        "description": "An empty Deck to handle MiltyMod",
-        "cardIDs": []
-    },
-    {
         "alias": "techs_miltymod",
         "name": "miltymod Techs",
         "type": "technology",
