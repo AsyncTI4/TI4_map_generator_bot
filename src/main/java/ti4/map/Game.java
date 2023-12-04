@@ -673,6 +673,7 @@ public class Game {
             {
                 put("Normal", isNormalGame());
                 put("Base Game", isBaseGameMode());
+                put("MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Alliance", isAllianceMode());
@@ -687,7 +688,7 @@ public class Game {
     }
 
     public boolean isNormalGame() {
-        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame());
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode() || isSpinMode() || isHomeBrewSCMode() || isFrankenGame() || isMiltyModMode());
     }
 
     public boolean isFrankenGame() {
