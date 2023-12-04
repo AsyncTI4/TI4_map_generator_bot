@@ -671,9 +671,9 @@ public class Game {
     public String getGameModesText() {
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put("Normal", isNormalGame());
-                put("Base Game", isBaseGameMode());
-                put("MiltyMod", isMiltyModMode());
+                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
+                put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
                 put("Community", isCommunityMode());
                 put("Alliance", isAllianceMode());
