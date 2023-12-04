@@ -139,7 +139,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Trade\" strategy card, they gain 4 trade goods. When the owner of this card ends their turn, they may discard this card to replenish their commodities or to convert their commodities to trade goods.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Trade, gain 4 TGs. When you end your turn, you may discard this card to replenish or convert your commodities.",
+        "mapText": "After you resolve Trade, gain 4 TGs. When you end your turn, you may discard this card to replenish or convert your commodities.",
         "source": "little_omega"
     },
     {
@@ -159,7 +159,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may use the Production ability of 1 of their space docks. When the owner of this card resolves 1 of their Production abilities, they may discard this card to resolve an additional 1 of their Production abilities.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Construction, you may use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
+        "mapText": "After you resolve Construction, you may use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
         "source": "little_omega"
     },
     {
@@ -169,7 +169,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Diplomacy\" strategy card, they ready 1 planet they control. After a player activates a system that contains a different player's units, the owner of this card may discard this card to end the active player's turn.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Diplomacy, you ready 1 planet you control. After a player activates a system that contains a different player's units, you may discard this card to end that player's turn.",
+        "mapText": "After you resolve Diplomacy, you ready 1 planet you control. After a player activates a system that contains a different player's units, you may discard this card to end that player's turn.",
         "source": "little_omega"
     },
     {
@@ -189,7 +189,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. When the owner of this card ends their turn, they may discard this card to research 1 technology.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Technology, you do not need to spend resources. When you end your turn, you may discard this card to research 1 technology.",
+        "mapText": "After you resolve Technology, you do not need to spend resources. When you end your turn, you may discard this card to research 1 technology.",
         "source": "little_omega"
     },
     {
@@ -199,7 +199,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they may move 1 of their ships to any system that contains their ships. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and perform a tactical action.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Warfare, you may move 1 ship to a system that contains your ships. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
+        "mapText": "After you resolve Warfare, you may move 1 ship to a system that contains your ships. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
         "source": "little_omega"
     },
     {
@@ -332,7 +332,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Imperial\" strategy card, they look at the top 3 cards of the relic deck and place each card on top of the deck in any order. When the owner of this card ends their turn, they may discard this card to gain 1 relic.",
         "text2": "",
-        "mapText": "After you resolve the primary or secondary of Imperial, look at the top 3 of the relic deck and place each on top in any order. When you end your turn, you may discard this card to gain 1 relic.",
+        "mapText": "After you resolve Imperial, look at the top 3 of the relic deck and place each on top in any order. When you end your turn, you may discard this card to gain 1 relic.",
         "source": "little_omega"
     },
     {
