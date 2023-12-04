@@ -208,14 +208,18 @@ public class GameSaveLoadManager {
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     try {
-                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
+                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
+                    String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
+                    if(loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel){
+                       msg = "Undoing the last saved command:\n> [CLASSIFIED]"; 
+                    }
 
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -760,6 +764,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.TOTAL_EXPENSES + " " + player.getTotalExpenses());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TURN_COUNT + " " + player.getTurnCount());
@@ -1906,6 +1913,7 @@ public class GameSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TOTAL_EXPENSES -> player.setTotalExpenses(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TURN_COUNT -> player.setTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");

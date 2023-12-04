@@ -191,6 +191,10 @@ public class ACInfo extends ACCardsSubcommandData {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             acButtons.add(nekroButton);
         }
+        if (player.hasUnexhaustedLeader("vaylerianagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_vaylerianagent", "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian));
+            acButtons.add(nekroButton);
+        }
         if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
             Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             acButtons.add(ghostButton);
