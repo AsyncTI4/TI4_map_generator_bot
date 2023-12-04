@@ -1459,7 +1459,7 @@ public class ButtonListener extends ListenerAdapter {
             String unit = buttonID.replace("winnuStructure_", "").split("_")[0];
             String planet = buttonID.replace("winnuStructure_", "").split("_")[1];
             new AddUnits().unitParsing(event, player.getColor(), activeGame.getTile(AliasHandler.resolveTile(planet)), unit + " " + planet, activeGame);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, activeGame));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player)+" Placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, activeGame));
 
         } else if (buttonID.startsWith("produceOneUnitInTile_")) {
             buttonID = buttonID.replace("produceOneUnitInTile_", "");

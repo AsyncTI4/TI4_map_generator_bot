@@ -254,8 +254,9 @@ public class ButtonHelperModifyUnits {
         String unitNPlanet = buttonID.replace("place_", "");
         String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
         String planetName = unitNPlanet.replace(unitLong + "_", "");
-        String unit = AliasHandler.resolveUnit(unitLong);
-
+        String unit = AliasHandler.resolveUnit(unitLong.replace("2",""));
+        String spaceOrPlanet = "";
+        
         String successMessage;
         String playerRep = player.getRepresentation();
         if ("sd".equalsIgnoreCase(unit)) {
@@ -266,7 +267,7 @@ public class ButtonHelperModifyUnits {
                     + Helper.getPlanetRepresentation(planetName, activeGame) + " system.";
             } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
-                    activeGame.getTile(AliasHandler.resolveTile(planetName)), "csd " + planetName, activeGame);
+                    activeGame.getTile(AliasHandler.resolveTile(planetName)), "sd " + planetName, activeGame);
                 successMessage = "Placed a cabal space dock on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                 if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
@@ -291,12 +292,21 @@ public class ButtonHelperModifyUnits {
             if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong)) {
                 if ("2gf".equalsIgnoreCase(unitLong)) {
                     if (!planetName.contains("space")) {
+                        spaceOrPlanet = planetName;
+                        tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
+                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        player.produceUnit(producedInput);
+                        player.produceUnit(producedInput);
                         new AddUnits().unitParsing(event, player.getColor(),
                             activeGame.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
                             activeGame);
                         successMessage = producedOrPlaced + " 2 " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
+                        spaceOrPlanet = "space";
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
+                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        player.produceUnit(producedInput);
+                        player.produceUnit(producedInput);
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, "2 gf",
                             activeGame);
@@ -305,13 +315,19 @@ public class ButtonHelperModifyUnits {
                 } else {
 
                     if (!planetName.contains("space")) {
+                        spaceOrPlanet = planetName;
                         tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
+                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        player.produceUnit(producedInput);
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit + " " + planetName,
                             activeGame);
                         successMessage = producedOrPlaced + " a " + Emojis.getEmojiFromDiscord(unitLong) + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
+                        spaceOrPlanet = "space";
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
+                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        player.produceUnit(producedInput);
                         new AddUnits().unitParsing(event, player.getColor(),
                             tile, unit,
                             activeGame);
@@ -320,21 +336,29 @@ public class ButtonHelperModifyUnits {
 
                 }
             } else {
+                spaceOrPlanet = "space";
+                tile = activeGame.getTileByPosition(planetName);
+                String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                player.produceUnit(producedInput);
                 if ("2ff".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 ff", activeGame);
                     successMessage = "Produced 2 " + Emojis.fighter + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
+                     player.produceUnit(producedInput);
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         "2 destroyer", activeGame);
                     successMessage = "Produced 2 " + Emojis.destroyer + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
+                        player.produceUnit(producedInput);
+                        
                 } else {
                     new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(planetName),
                         unit, activeGame);
                     successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile "
                         + AliasHandler.resolveTile(planetName) + ".";
+                        
                 }
 
             }
@@ -398,7 +422,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
             } else {
-                event.getMessage().editMessage(editedMessage).queue();
+                event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, activeGame)).queue();
             }
 
         }

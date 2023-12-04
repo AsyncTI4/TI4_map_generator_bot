@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -55,6 +57,7 @@ import ti4.commands.milty.StartMilty;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -71,6 +74,7 @@ import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 public class Helper {
 
@@ -650,8 +654,76 @@ public class Helper {
         return planetButtons;
     }
 
+    public static String buildProducedUnitsMessage(Player player, Game activeGame){
+        HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        String msg = "";
+        List<String> uniquePlaces = new ArrayList<>();
+        for(String unit : producedUnits.keySet()){
+            String tilePos = unit.split("_")[1];
+            String planetOrSpace = unit.split("_")[2];
+            if(!uniquePlaces.contains(tilePos+"_"+planetOrSpace)){
+                uniquePlaces.add(tilePos+"_"+planetOrSpace);
+            }
+        }
+        for(String uniquePlace : uniquePlaces){
+            String tilePos2 = uniquePlace.split("_")[0];
+            String planetOrSpace2 = uniquePlace.split("_")[1];
+            Tile tile = activeGame.getTileByPosition(tilePos2);
+            String localPlace = "__**In "+tile.getRepresentationForButtons(activeGame, player) +" ";
+            if(planetOrSpace2.equalsIgnoreCase("space")){
+                localPlace = localPlace + " in the space area:**__ \n";
+            }else{
+                localPlace = localPlace + " on the planet "+Helper.getPlanetRepresentation(planetOrSpace2, activeGame)+":**__ \n";
+            }
+            for(String unit : producedUnits.keySet()){
+                String tilePos = unit.split("_")[1];
+                String planetOrSpace = unit.split("_")[2];
+                String un = unit.split("_")[0];
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(un), player.getColor());
+                UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+                if(uniquePlace.contains(tilePos+"_"+planetOrSpace)){
+                    localPlace = localPlace + ButtonHelper.getIdent(player) + " produced "+producedUnits.get(unit)+ " "+removedUnit.getUnitEmoji() + "\n";
+                }
+            }
+            msg = msg + localPlace;
+        }
+        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" resources** (not counting discounts).";
+        return msg;
+    }
+
+    public static int calculateCostOfProducedUnits(Player player, Game activeGame){
+        HashMap<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        int cost = 0;
+        int numInf = 0;
+        int numFF = 0;
+        boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
+        for(String unit : producedUnits.keySet()){
+            String unit2 = unit.split("_")[0];
+            if(unit.contains("gf")){
+                numInf = numInf + producedUnits.get(unit);
+            }else if(unit.contains("ff")){
+                numFF = numFF + producedUnits.get(unit);
+            }else {
+                UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
+                UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+                cost = cost + (int)removedUnit.getCost() * producedUnits.get(unit);
+            }
+        }
+        if(regulated){
+            cost = cost + numInf + numFF;
+        }else{
+            cost = cost + (int)((numInf+1)/2);
+            cost = cost + (int)((numFF+1)/2);
+        }
+
+        return cost;
+    }
+
+
+
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Game activeGame, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
+        player.resetProducedUnits();
         boolean regulated = activeGame.getLaws().containsKey("conscription") || activeGame.getLaws().containsKey("absol_conscription");
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();

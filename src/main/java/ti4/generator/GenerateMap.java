@@ -715,9 +715,9 @@ public class GenerateMap {
                     xDelta = pnInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
-                if (!player.getTechs().isEmpty()) {
+               // if (player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
-                }
+              //  }
 
                 if (!player.getNotResearchedFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
@@ -1650,9 +1650,9 @@ public class GenerateMap {
     private int techInfo(Player player, int x, int y, Game activeGame) {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
-        if (techs.isEmpty()) {
-            return y;
-        }
+    //    if (techs.isEmpty()) {
+     //       return y;
+      //  }
 
         Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
