@@ -112,7 +112,7 @@
         "asyncId": "dn",
         "name": "Super Dreadnought II",
         "upgradesFromUnitId": "miltymod_l1z1x_dreadnought",
-        "requiredTechId": "miltymod_miltymod_sdn2",
+        "requiredTechId": "miltymod_sdn2",
         "source": "miltymod",
         "faction": "L1Z1X",
         "moveValue": 2,
