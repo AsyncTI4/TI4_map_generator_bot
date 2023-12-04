@@ -1,0 +1,150 @@
+[
+    {
+        "alias": "miltymod_travel_ban",
+        "name": "Enforced Travel Ban",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Non-delta wormholes have no effect during movement.",
+        "text2": "Against: Each player destroys 1 PDS in or adjacent to a system that contains a wormhole.",
+        "mapText": "Alpha and beta wormholes have no effect during movement.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_artifact",
+        "name": "Ixthian Artifact",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
+        "text2": "Against: Place this agenda on top of the agenda deck and shuffle the agenda deck.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_minister_policy",
+        "name": "Minister of Policy",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.\n \n When you draw 1 or more action cards, draw 1 additional action card.",
+        "text2": "",
+        "mapText": "When you draw 1 or more action cards, draw 1 additional action card.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_constitution",
+        "name": "New Constitution",
+        "type": "Directive",
+        "target": "For/Against (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system.",
+        "text2": "Against: Reveal another agenda from the top of the deck and vote on it.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_execution",
+        "name": "Public Execution",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player discards all of their action cards. If they have the speaker token, they give it to the player on their right. The elected player cannot vote on any agendas during this agenda phase.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_conscription",
+        "name": "Regulated Conscription",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
+        "text2": "Against: Each player removes 1 infantry from a planet they control.",
+        "mapText": "When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_wormhole_recon",
+        "name": "Wormhole Reconstruction",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: All systems that contain a non-delta wormhole are adjacent to each other.",
+        "text2": "Against: Each player places a command token from their reinforcements in each system that contains a non-delta wormhole and 1 or more of their ships.",
+        "mapText": "All systems that contain either a non-delta wormhole are adjacent to each other.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_wormhole_research",
+        "name": "Wormhole Research",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who has 1 or more ships in a system that contains a wormhole may research 1 technology. Then, each player with ships in a system with a non-delta wormhole destroys 3 of their ships in each of those systems.",
+        "text2": "Against: Each player that voted \"Against\" removes 1 command token from their command sheet and returns it to their reinforcements.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_holy_planet_of_ixth",
+        "name": "Holy Planet of Ixth",
+        "type": "Law",
+        "target": "Elect Planet",
+        "text1": "Attach this card to the elected planet. Units on this planet cannot use Production. When a player gains control of this card, they gain 1 victory point. When a player loses control of this card, they lose 1 victory point.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_rt_biotic",
+        "name": "Research Team: Biotic",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player may immediately research a technology, ignoring any number of green prerequisites.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_rt_cybernetic",
+        "name": "Research Team: Cybernetic",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player may immediately research a technology, ignoring any number of yellow prerequisites.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_rt_propulsion",
+        "name": "Research Team: Propulsion",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player may immediately research a technology, ignoring any number of blue prerequisites.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_rt_warfare",
+        "name": "Research Team: Warfare",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player may immediately research a technology, ignoring any number of red prerequisites.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_shard_of_the_throne",
+        "name": "Shard of the Throne",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and 1 victory point.\n \n A player gains this card and 1 victory point when they win a combat against the owner of this card.\n \n If the owner of this card loses this card, they lose 1 victory point.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_crown_of_emphidia",
+        "name": "The Crown of Emphidia",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and 1 victory point.\n \n A player gains this card and 1 victory point after he gains control of a planet in the home system of this card's owner.\n \n If the owner of this card loses this card, they lose 1 victory point.",
+        "text2": "",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_crown_of_thalnos",
+        "name": "The Crown of Thalnos",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The owner of this card applies +1 to the result of their combat rolls. During each combat round, the owner of this card may reroll any number of combat roll dice; any units that reroll dice but do not produce at least 1 hit are destroyed.",
+        "text2": "",
+        "source": "miltymod"
+    }
+]

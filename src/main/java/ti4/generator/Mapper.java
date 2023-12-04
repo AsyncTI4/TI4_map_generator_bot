@@ -302,10 +302,6 @@ public class Mapper {
             .collect(Collectors.toSet());
     }
 
-    public static String getFactionFileName(String factionID) {
-        return factionID + ".png";
-    }
-
     public static String getGeneralFileName(String id) {
         return general.getProperty(id);
     }

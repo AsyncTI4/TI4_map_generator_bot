@@ -25,11 +25,11 @@ public class UnitModelTest {
     @Test
     public void testUnitModels() {
         for (UnitModel unitModel : Mapper.getUnits().values()) {
-            assertTrue(validateBaseType(unitModel));
-            assertTrue(validateRequiredTechId(unitModel));
-            assertTrue(validateUpgradesToUnitId(unitModel));
-            assertTrue(validateUpgradesFromUnitId(unitModel));
-            assertTrue(validateHomebrewReplacesID(unitModel));
+            assertTrue(validateBaseType(unitModel), unitModel.getAlias() + ": invalid BaseType");
+            assertTrue(validateRequiredTechId(unitModel), unitModel.getAlias() + ": invalid RequiredTechId");
+            assertTrue(validateUpgradesToUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesToUnitId");
+            assertTrue(validateUpgradesFromUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesFromUnitId");
+            assertTrue(validateHomebrewReplacesID(unitModel), unitModel.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
     
