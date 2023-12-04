@@ -6,12 +6,8 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -27,8 +23,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
+import ti4.commands.game.GameEnd;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
@@ -106,7 +104,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK IF CATEGORY EXISTS
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            sendMessage("Category: **" + categoryChannelName + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         }
 
@@ -125,7 +123,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
+            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName()
+                + "**.\n[DEBUG] Bot will try to create a new category when the time comes. Don't create one manually.\n";
             TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             if (bothelperLoungeChannel != null) {
                 MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
@@ -239,7 +238,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/game setup` to set player count and additional options\n" +
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
             "> `/game set_order` to set the starting speaker order\n" +
-            "> `/player setup` to set player faction and colour\n" +
+            "> `/player setup` to set player faction and color\n" +
             "> `/tech add` for factions who need to add tech\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
@@ -256,8 +255,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         GameSaveLoadManager.saveMap(newGame, event);
 
         //AUTOCLOSE THREAD AFTER RUNNING COMMAND
-        if (event.getChannel() instanceof ThreadChannel) {
-            ThreadChannel thread = (ThreadChannel) event.getChannel();
+        if (event.getChannel() instanceof ThreadChannel thread) {
             thread.getManager().setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue();
             thread.getManager().setArchived(true).queue();
             thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
@@ -331,8 +329,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static Guild getNextAvailableServer() {
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda.getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
-        
+        Guild guild = AsyncTI4DiscordBot.jda
+            .getGuildById(GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class, AsyncTI4DiscordBot.guildPrimary.getId()));
+
         // CURRENT SET GUILD HAS ROOM
         if (serverHasRoomForNewFullCategory(guild)) return guild;
 
@@ -384,6 +383,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
+
+        // CLEAN UP IN-LIMBO FIRST
+        GameEnd.cleanUpInLimboCategory(guild, 50);
 
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();

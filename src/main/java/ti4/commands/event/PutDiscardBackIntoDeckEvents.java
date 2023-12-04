@@ -25,7 +25,7 @@ public class PutDiscardBackIntoDeckEvents extends EventSubcommandData {
         }
 
         boolean shuffleEvents = event.getOption(Constants.SHUFFLE_EVENTS, true, OptionMapping::getAsBoolean);
-        boolean success = false;
+        boolean success;
         if (shuffleEvents) {
             success = activeGame.shuffleEventBackIntoDeck(option.getAsInt());
         } else {

@@ -4,7 +4,9 @@
     "aliases": [
         "ulon",
         "ulongamma",
-        "ulonrho"
+        "ulonrho",
+        "urho"
+
     ],
     "imagePath": "ER09_ulongamma.png",
     "planetIds": [

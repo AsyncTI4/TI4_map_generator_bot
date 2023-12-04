@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -100,7 +99,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuaternary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
-    public static Set<Guild> guilds = new HashSet<>();
+    public static final Set<Guild> guilds = new HashSet<>();
     public static boolean readyToReceiveCommands;
 
     public static void main(String[] args) {
@@ -135,14 +134,6 @@ public class AsyncTI4DiscordBot {
         userID = args[1]; 
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
-
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-        SelectionManager.init();
-        initializeWhitelistedRoles();
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddUnits());
@@ -199,20 +190,20 @@ public class AsyncTI4DiscordBot {
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildPrimary.getName());
         guilds.add(guildPrimary);
 
         // Community Plays TI
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
             if (guildCommunityPlays != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildCommunityPlays.getName());
                 CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
                 commandsC.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildCommunityPlays.getName());
                 guilds.add(guildCommunityPlays);
             }
         }
@@ -221,10 +212,10 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             if (guildFogOfWar != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
                 CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildFogOfWar.getName());
                 guilds.add(guildFogOfWar);
             }
         }
@@ -233,10 +224,10 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
             if (guildSecondary != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildSecondary.getName());
                 CommandListUpdateAction commandsD = guildSecondary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildSecondary.getName());
                 guilds.add(guildSecondary);
             }
         }
@@ -245,28 +236,39 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 7) {
             guildTertiary = jda.getGuildById(args[6]);
             if (guildTertiary != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildTertiary.getName());
                 CommandListUpdateAction commandsD = guildTertiary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildTertiary.getName());
                 guilds.add(guildTertiary);
             }
         }
 
-        // Fourth Server
+        // Async: War Sun Tzu
         if (args.length >= 8) {
             guildQuaternary = jda.getGuildById(args[7]);
             if (guildQuaternary != null) {
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuaternary.getName());
                 CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
                 commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
                 commandsD.queue();
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  BOT STARTED UP: " + guildQuaternary.getName());
                 guilds.add(guildQuaternary);
             }
         }
 
+        // LOAD DATA
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING DATA");
+        jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+        SelectionManager.init();
+        initializeWhitelistedRoles();
+
         // LOAD GAMES
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES: " + guildPrimary.getName());
+        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameSaveLoadManager.loadMaps();
 
@@ -285,7 +287,7 @@ public class AsyncTI4DiscordBot {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "# ` SHUTDOWN PROCESS STARTED");
+                BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` SHUTDOWN PROCESS STARTED");
                 readyToReceiveCommands = false;
                 BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "` NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
@@ -316,9 +318,10 @@ public class AsyncTI4DiscordBot {
      */
     private static void initializeWhitelistedRoles() {
         //ADMIN ROLES
-        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server (Hub)
-        adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
-        adminRoles.add(jda.getRoleById("1146511484264906814")); // Async 3rd Server
+        adminRoles.add(jda.getRoleById("943596173896323072")); // Async Primary (Hub)
+        adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary (Stroter's Paradise)
+        adminRoles.add(jda.getRoleById("1146511484264906814")); // Async Tertiary (Dreadn't)
+        adminRoles.add(jda.getRoleById("1176104225978204167")); // Async Quaternary (War Sun Tzu)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
@@ -328,21 +331,24 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
         adminRoles.add(jda.getRoleById("336194595501244417")); // tedw4rd's Server
         adminRoles.add(jda.getRoleById("1149705227625316352")); // who dis
+        adminRoles.add(jda.getRoleById("1178659621225889875")); // Jepp2078's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
-        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
-        developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
-        developerRoles.add(jda.getRoleById("1146529125184581733")); // Async 3rd server
+        developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
+        developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
+        developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
+        developerRoles.add(jda.getRoleById("1176104225978204166")); // Async Quaternary (War Sun Tzu)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
-        bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async TI4 Server (Hub)
-        bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
-        bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async 3rd server
+        bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
+        bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)
+        bothelperRoles.add(jda.getRoleById("1146539257725464666")); // Async Tertiary (Dreadn't)
+        bothelperRoles.add(jda.getRoleById("1176104225978204164")); // Async Quaternary (War Sun Tzu)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server

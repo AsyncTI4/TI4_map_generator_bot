@@ -22,7 +22,7 @@ public class PeakAtStage2 extends CustomSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
-         Player player = activeGame.getPlayer(getUser().getId());
+        Player player = activeGame.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
@@ -30,14 +30,15 @@ public class PeakAtStage2 extends CustomSubcommandData {
         }
         OptionMapping loc1 = event.getOption(Constants.LOCATION1);
         secondHalfOfPeak(event, activeGame, player, loc1.getAsInt());
-        
+
     }
-    public void secondHalfOfPeak(GenericInteractionCreateEvent event, Game activeGame, Player player, int loc1){
+
+    public void secondHalfOfPeak(GenericInteractionCreateEvent event, Game activeGame, Player player, int loc1) {
         String obj = activeGame.peakAtStage2(loc1);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-      String sb = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) +
-          " **Stage 2 Public Objective at location " + loc1 + "**" + "\n" +
-          po.getRepresentation() + "\n";
+        String sb = player.getRepresentation(true, true) +
+            " **Stage 2 Public Objective at location " + loc1 + "**" + "\n" +
+            po.getRepresentation() + "\n";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
     }
 }

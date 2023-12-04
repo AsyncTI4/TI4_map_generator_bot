@@ -2,7 +2,6 @@ package ti4.commands.bothelper;
 
 import java.text.NumberFormat;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -19,7 +18,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
         Guild guild = event.getGuild();
 
         int memberCount = guild.getMemberCount();
-        int roomForGames = 250;
+        int roomForGames;
         int memberMax = guild.getMaxMembers();
         int boostCount = guild.getBoostCount();
         int roleCount = guild.getRoles().size(); //250

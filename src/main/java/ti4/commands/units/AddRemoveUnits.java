@@ -1,11 +1,17 @@
 package ti4.commands.units;
 
+import com.amazonaws.util.CollectionUtils;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
@@ -14,20 +20,16 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.FoWHelper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.amazonaws.util.CollectionUtils;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -101,23 +103,23 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame) {
-        commonUnitParsing((GenericInteractionCreateEvent) event, color, tile, unitList, activeGame, Constants.SPACE);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing(event, color, tile, unitList, activeGame, planetName);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll(event, tile, color, activeGame);
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
-        commonUnitParsing((GenericInteractionCreateEvent) event, color, tile, unitList, activeGame, planetName);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, activeGame);
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-        commonUnitParsing(event, color, tile, unitList, activeGame, Constants.SPACE);
+        commonUnitParsing(event, color, tile, unitList, activeGame);
         actionAfterAll(event, tile, color, activeGame);
     }
 
@@ -125,7 +127,7 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame, String planetName) {
+    public void commonUnitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game activeGame) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
 
@@ -137,7 +139,7 @@ abstract public class AddRemoveUnits implements Command {
             boolean numberIsSet = false;
 
             String originalUnit = "";
-            String resolvedUnit = "";
+            String resolvedUnit;
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String ifNumber = unitInfoTokenizer.nextToken();
                 try {
@@ -160,6 +162,7 @@ abstract public class AddRemoveUnits implements Command {
 
             // RESOLVE PLANET NAME
             String originalPlanetName = "";
+            String planetName;
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String planetToken = unitInfoTokenizer.nextToken();
                 if (unitInfoTokenizer.hasMoreTokens()) {
@@ -171,29 +174,26 @@ abstract public class AddRemoveUnits implements Command {
                 planetName = Constants.SPACE;
             }
             planetName = getPlanet(event, tile, planetName);
-            
+
             boolean isValidCount = count > 0;
             boolean isValidUnit = unitPath != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
             if (event instanceof SlashCommandInteractionEvent && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Could not parse this section of the command: `" + unitListToken + "`\n> ");
 
-                sb.append(isValidCount ? "✅" : "❌");
-                sb.append(" Count = `").append(count).append("`");
-                sb.append(isValidCount ? "" : " -> Count must be a positive integer");
-                sb.append("\n> ");
-
-                sb.append(isValidUnit ? "✅" : "❌");
-                sb.append(" Unit = `").append(originalUnit).append("`");
-                sb.append(isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`");
-                sb.append("\n> ");
-
-                sb.append(isValidUnitHolder ? "✅" : "❌");
-                sb.append(" Planet = ` ").append(originalPlanetName).append("`");
-                sb.append(isValidUnitHolder ? " -> `" + planetName + "`" : " -> Planets in this system are: `" + CollectionUtils.join(tile.getUnitHolders().keySet(), ", ") + "`");
-                sb.append("\n");
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                String sb = "Could not parse this section of the command: `" + unitListToken + "`\n> " +
+                    (isValidCount ? "✅" : "❌") +
+                    " Count = `" + count + "`" +
+                    (isValidCount ? "" : " -> Count must be a positive integer") +
+                    "\n> " +
+                    (isValidUnit ? "✅" : "❌") +
+                    " Unit = `" + originalUnit + "`" +
+                    (isValidUnit ? " -> `" + resolvedUnit + "`" : " ->  UnitID or Alias not found. Try something like: `inf, mech, dn, car, cru, des, fs, ws, sd, pds`") +
+                    "\n> " +
+                    (isValidUnitHolder ? "✅" : "❌") +
+                    " Planet = ` " + originalPlanetName + "`" +
+                    (isValidUnitHolder ? " -> `" + planetName + "`" : " -> Planets in this system are: `" + CollectionUtils.join(tile.getUnitHolders().keySet(), ", ") + "`") +
+                    "\n";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
                 continue;
             }
 
@@ -215,7 +215,7 @@ abstract public class AddRemoveUnits implements Command {
                 }
             }
             if (!pingedAlready) {
-                String colorMention = Emojis.getColourEmojis(color);
+                String colorMention = Emojis.getColorEmojiWithName(color);
                 String message = colorMention + " has modified units in the system. ";
                 if (getActionDescription().contains("add_units")) {
                     message = message + " Specific units modified include: " + unitList;
@@ -282,9 +282,9 @@ abstract public class AddRemoveUnits implements Command {
     public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
         if (tile.isSpaceHolderValid(planetName)) return planetName;
         return tile.getUnitHolders().keySet().stream()
-                .filter(id -> !Constants.SPACE.equals(planetName))
-                .filter(unitHolderID -> unitHolderID.startsWith(planetName))
-                .findFirst().orElse(planetName);
+            .filter(id -> !Constants.SPACE.equals(planetName))
+            .filter(unitHolderID -> unitHolderID.startsWith(planetName))
+            .findFirst().orElse(planetName);
     }
 
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, UnitKey unitID, String color, Game activeGame);
@@ -311,7 +311,8 @@ abstract public class AddRemoveUnits implements Command {
         commands.addCommands(
             Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
+                .addOptions(
+                    new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
     }

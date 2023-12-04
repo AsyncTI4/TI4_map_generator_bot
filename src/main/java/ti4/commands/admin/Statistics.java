@@ -1,20 +1,18 @@
 package ti4.commands.admin;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Date;
-import java.util.HashMap;
 
 public class Statistics extends AdminSubcommandData {
 
@@ -94,7 +92,6 @@ public class Statistics extends AdminSubcommandData {
             }
         }
 
-
         sendStatistics(event, factionCount, "Faction played:");
         sendStatisticsColor(event, colorCount, "Color played:");
         sendStatistics(event, winnerFactionCount, "Winning Faction:");
@@ -106,8 +103,8 @@ public class Statistics extends AdminSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append(Emojis.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> sb.append(Emojis.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
@@ -115,8 +112,8 @@ public class Statistics extends AdminSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(text).append("\n");
         factionCount.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 }

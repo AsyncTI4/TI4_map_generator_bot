@@ -1,14 +1,12 @@
 package ti4;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
-
-import org.jetbrains.annotations.Nullable;
-
-import java.io.File;
-import java.util.HashMap;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;
@@ -120,7 +118,20 @@ public class ResourceHelper {
     public String getSpoopyFile() {
         // overlay_jackolantern_1
         int face = ThreadLocalRandom.current().nextInt(1, 4);
-        String name = "overlay_jackolantern_" + String.valueOf(face) + ".png";
+        String name = "overlay_jackolantern_" + face + ".png";
+        String spoopyPath = spoopyCache.get(name);
+        if (spoopyPath != null) {
+            return spoopyPath;
+        }
+        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
+        spoopyCache.put(name, unit);
+        return unit;
+    }
+
+    @Nullable
+    public String getNonSpoopyFinFile(String name) {
+        // overlay_jackolantern_1
+       
         String spoopyPath = spoopyCache.get(name);
         if (spoopyPath != null) {
             return spoopyPath;
@@ -220,4 +231,5 @@ public class ResourceHelper {
     public String getHelpFile(String name) {
         return getResourceFromFolder("help/", name, "Could not find alias file");
     }
+
 }

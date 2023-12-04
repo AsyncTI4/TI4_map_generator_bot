@@ -6,11 +6,7 @@ import java.util.stream.Collectors;
 
 public class PlanetTypeModel {
     public enum PlanetType {
-        CULTURAL,
-        HAZARDOUS,
-        INDUSTRIAL,
-        FACTION,
-        NONE;
+        CULTURAL, HAZARDOUS, INDUSTRIAL, FACTION, NONE;
 
         @Override
         public String toString() {
@@ -23,14 +19,10 @@ public class PlanetTypeModel {
             return PlanetType.NONE;
         }
         Map<String, PlanetType> allTypes = Arrays.stream(PlanetType.values())
-                .collect(
-                        Collectors.toMap(
-                                PlanetType::toString,
-                                (t -> t)
-                        )
-                );
-        if (allTypes.containsKey(type.toLowerCase()))
+            .collect(Collectors.toMap(PlanetType::toString, (t -> t)));
+        if (allTypes.containsKey(type.toLowerCase())) {
             return allTypes.get(type.toLowerCase());
+        }
         return PlanetType.NONE;
     }
 }

@@ -31,7 +31,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         Player player = activeGame.getPlayer(user.getId());
         player = Helper.getGamePlayer(activeGame, player, event, null);
         if (player == null) {
-           sendMessage("Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         String leaderInfo = getLeaderInfo(activeGame, player);
@@ -97,9 +97,9 @@ public class LeaderInfo extends LeaderSubcommandData {
                     if (pnData.contains("Alliance")) {
                         String[] split = pnData.split(";");
                         if (split.length < 2) continue;
-                        String colour = split[1];
+                        String color = split[1];
                         for (Player player_ : activeGame.getPlayers().values()) {
-                            if (player_.getColor().equalsIgnoreCase(colour)) {
+                            if (player_.getColor().equalsIgnoreCase(color)) {
                                 Leader playerLeader = player_.unsafeGetLeader(Constants.COMMANDER);
                                 if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");

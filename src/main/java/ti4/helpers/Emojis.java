@@ -6,9 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.map.Game;
 import ti4.map.Leader;
 
@@ -313,8 +311,6 @@ public class Emojis {
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
     // PLANETS
-    public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
-
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
@@ -456,7 +452,7 @@ public class Emojis {
     // LIST OF SEM-LORES
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor, SemLore);
 
-    // EMOJI FARM 9 - SC COLOURS
+    // EMOJI FARM 9 - SC COLORS
     public static final String sc_1_1 = "<:sc_1_1:1164316518390190140>";
     public static final String sc_1_2 = "<:sc_1_2:1164316520986464267>";
     public static final String sc_1_3 = "<:sc_1_3:1164316522689339392>";
@@ -511,7 +507,7 @@ public class Emojis {
     public static final String SC8Mention = sc_8_1 + sc_8_2 + sc_8_3 + sc_8_4 + sc_8_5;
     // END EMOJI FARM 9
 
-    // EMOJI FARM 10 - COLOUR UNITS
+    // EMOJI FARM 10 - COLOR UNITS
     public static final String black = "<:black:1165031264743600250>";
     public static final String bloodred = "<:bloodred:1165031267532804277>";
     public static final String blue = "<:blue:1165031268950482974>";
@@ -612,6 +608,16 @@ public class Emojis {
     public static final String EightToes = "<:EightToes:1082312762572685352>";
     public static final String NineToes = "<:NineToes:1082312788241817661>";
 
+    // FRANKEN
+    public static final String Franken1 = "<:Franken1:1180167512965533726>";
+    public static final String Franken2 = "<:Franken2:1180167515276582992>";
+    public static final String Franken3 = "<:Franken3:1180167516392276048>";
+    public static final String Franken4 = "<:Franken4:1180167517608615936>";
+    public static final String Franken5 = "<:Franken5:1180167519114383460>";
+    public static final String Franken6 = "<:Franken6:1180167520079065239>";
+    public static final String Franken7 = "<:Franken7:1180167520821452931>";
+    public static final String Franken8 = "<:Franken8:1180167522176213062>";
+
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -629,25 +635,27 @@ public class Emojis {
     public static final String winemaking = "<:winemaking:1064244730000584754>";
     public static final String BortWindow = "<:bortwindow:1032312829585399880>";
     public static final String SpoonAbides = "<:TheSpoonAbides:1003482035953860699>";
-    public static final String Absol = "<:Absol:1079473959248068701>";
-    public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
     public static final String TIGL = "<:TIGL:1111086048974475305>";
     public static final String RollDice = "<a:rolldice:1131416916330811392>";
     public static final String BLT = "<:BLT:1080954650339065866>";
-
+    
     // HOMEBREW
-    public static final String ActionDeck2 = "<:actiondeck2:1156988842331623506>"; // Symbol for Will's Action Deck 2 mod
-    public static final String Eronous = "<:eronous:1157307622920290444>"; // Symbol for Eronous' stuff
-    public static final String IgnisAurora = "<:ignis_aurora:1165445236957388800>"; // Symbol for Ignis Aurora's stuff
+    public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
+    public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
+    public static final String Eronous = "<:eronous:1180154997359509504>"; // Symbol for Eronous' stuff https://discord.com/channels/743629929484386395/1096820095470272582
+    public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
+    public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
+    public static final String ProjectPi = "";
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
-            warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
-            CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
-            tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
-            PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-            BortWindow);
+        warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
+        CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
+        tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
+        PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
+        BortWindow);
 
     // private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
@@ -662,14 +670,14 @@ public class Emojis {
     }
 
     public static String getRandomSemLore() {
-        List<String> semLores = new ArrayList<>(Emojis.SemLores);
+        List<String> semLores = new ArrayList<>(SemLores);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
         return semLores.get(0);
     }
 
     public static String getRandomGoodDog() {
-        List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
+        List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(goodDogs, seed);
         return goodDogs.get(0);
@@ -681,81 +689,81 @@ public class Emojis {
             return getRandomizedEmoji(0, null);
         }
         return switch (faction.toLowerCase()) {
-            case "arborec" -> Emojis.Arborec;
-            case "argent" -> Emojis.Argent;
-            case "cabal" -> Emojis.Cabal;
-            case "empyrean" -> Emojis.Empyrean;
-            case "ghost", "creuss" -> Emojis.Ghost;
-            case "hacan" -> Emojis.Hacan;
-            case "jolnar" -> Emojis.Jolnar;
-            case "l1z1x" -> Emojis.L1Z1X;
-            case "letnev" -> Emojis.Letnev;
-            case "yssaril" -> Emojis.Yssaril;
-            case "mahact" -> Emojis.Mahact;
-            case "mentak" -> Emojis.Mentak;
-            case "muaat" -> Emojis.Muaat;
-            case "naalu" -> Emojis.Naalu;
-            case "naaz" -> Emojis.Naaz;
-            case "nekro" -> Emojis.Nekro;
-            case "nomad" -> Emojis.Nomad;
-            case "saar" -> Emojis.Saar;
-            case "sardakk" -> Emojis.Sardakk;
-            case "sol" -> Emojis.Sol;
-            case "titans" -> Emojis.Titans;
-            case "winnu" -> Emojis.Winnu;
-            case "xxcha" -> Emojis.Xxcha;
-            case "yin" -> Emojis.Yin;
+            case "arborec" -> Arborec;
+            case "argent" -> Argent;
+            case "cabal" -> Cabal;
+            case "empyrean" -> Empyrean;
+            case "ghost", "creuss" -> Ghost;
+            case "hacan" -> Hacan;
+            case "jolnar" -> Jolnar;
+            case "l1z1x" -> L1Z1X;
+            case "letnev" -> Letnev;
+            case "yssaril" -> Yssaril;
+            case "mahact" -> Mahact;
+            case "mentak" -> Mentak;
+            case "muaat" -> Muaat;
+            case "naalu" -> Naalu;
+            case "naaz" -> Naaz;
+            case "nekro" -> Nekro;
+            case "nomad" -> Nomad;
+            case "saar" -> Saar;
+            case "sardakk" -> Sardakk;
+            case "sol" -> Sol;
+            case "titans" -> Titans;
+            case "winnu" -> Winnu;
+            case "xxcha" -> Xxcha;
+            case "yin" -> Yin;
 
-            case "lazax" -> Emojis.Lazax;
+            case "lazax" -> Lazax;
 
-            case "keleres", "keleresx", "keleresm", "keleresa" -> Emojis.Keleres;
+            case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
 
-            case "augers" -> Emojis.augers;
-            case "axis" -> Emojis.axis;
-            case "bentor" -> Emojis.bentor;
-            case "blex", "kyro" -> Emojis.blex;
-            case "celdauri" -> Emojis.celdauri;
-            case "cheiran" -> Emojis.cheiran;
-            case "cymiae" -> Emojis.cymiae;
-            case "dihmohn" -> Emojis.dihmohn;
-            case "edyn" -> Emojis.edyn;
-            case "florzen" -> Emojis.florzen;
-            case "freesystems" -> Emojis.freesystems;
-            case "ghemina" -> Emojis.ghemina;
-            case "ghoti" -> Emojis.ghoti;
-            case "gledge" -> Emojis.gledge;
-            case "khrask" -> Emojis.khrask;
-            case "kjalengard" -> Emojis.kjalengard;
-            case "kollecc" -> Emojis.kollecc;
-            case "kolume" -> Emojis.kolume;
-            case "kortali" -> Emojis.kortali;
-            case "lanefir" -> Emojis.lanefir;
-            case "lizho" -> Emojis.lizho;
-            case "mirveda" -> Emojis.mirveda;
-            case "mortheus" -> Emojis.mortheus;
-            case "mykomentori" -> Emojis.mykomentori;
-            case "nivyn" -> Emojis.nivyn;
-            case "nokar" -> Emojis.nokar;
-            case "olradin" -> Emojis.olradin;
-            case "rohdhna" -> Emojis.rohdhna;
-            case "tnelis" -> Emojis.tnelis;
-            case "vaden" -> Emojis.vaden;
-            case "vaylerian" -> Emojis.vaylerian;
-            case "veldyr" -> Emojis.veldyr;
-            case "zealots" -> Emojis.zealots;
-            case "zelian" -> Emojis.zelian;
+            case "augers" -> augers;
+            case "axis" -> axis;
+            case "bentor" -> bentor;
+            case "blex", "kyro" -> blex;
+            case "celdauri" -> celdauri;
+            case "cheiran" -> cheiran;
+            case "cymiae" -> cymiae;
+            case "dihmohn" -> dihmohn;
+            case "edyn" -> edyn;
+            case "florzen" -> florzen;
+            case "freesystems" -> freesystems;
+            case "ghemina" -> ghemina;
+            case "ghoti" -> ghoti;
+            case "gledge" -> gledge;
+            case "khrask" -> khrask;
+            case "kjalengard" -> kjalengard;
+            case "kollecc" -> kollecc;
+            case "kolume" -> kolume;
+            case "kortali" -> kortali;
+            case "lanefir" -> lanefir;
+            case "lizho" -> lizho;
+            case "mirveda" -> mirveda;
+            case "mortheus" -> mortheus;
+            case "mykomentori" -> mykomentori;
+            case "nivyn" -> nivyn;
+            case "nokar" -> nokar;
+            case "olradin" -> olradin;
+            case "rohdhna" -> rohdhna;
+            case "tnelis" -> tnelis;
+            case "vaden" -> vaden;
+            case "vaylerian" -> vaylerian;
+            case "veldyr" -> veldyr;
+            case "zealots" -> zealots;
+            case "zelian" -> zelian;
 
-            case "admins" -> Emojis.AdminsFaction;
-            case "qulane" -> Emojis.Qulane;
+            case "admins" -> AdminsFaction;
+            case "qulane" -> Qulane;
 
-            case "franken1" -> Emojis.OneToe;
-            case "franken2" -> Emojis.TwoToes;
-            case "franken3" -> Emojis.ThreeToes;
-            case "franken4" -> Emojis.FourToes;
-            case "franken5" -> Emojis.FiveToes;
-            case "franken6" -> Emojis.SixToes;
-            case "franken7" -> Emojis.SevenToes;
-            case "franken8" -> Emojis.EightToes;
+            case "franken1" -> Franken1;
+            case "franken2" -> Franken2;
+            case "franken3" -> Franken3;
+            case "franken4" -> Franken4;
+            case "franken5" -> Franken5;
+            case "franken6" -> Franken6;
+            case "franken7" -> Franken7;
+            case "franken8" -> Franken8;
 
             default -> getRandomizedEmoji(0, null);
         };
@@ -763,236 +771,291 @@ public class Emojis {
 
     public static String getPlanetEmoji(String planet) {
         return switch (planet.toLowerCase()) {
-            case "0.0.0" -> Emojis.Planet000;
-            case "abaddon" -> Emojis.Abaddon;
-            case "abyz" -> Emojis.Abyz;
-            case "accoen" -> Emojis.Accoen;
-            case "acheron" -> Emojis.Acheron;
-            case "alioprima" -> Emojis.AlioPrima;
-            case "ang" -> Emojis.Ang;
-            case "arcprime" -> Emojis.ArcPrime;
-            case "archonren", "archonrenk" -> Emojis.ArchonRen;
-            case "archontau", "archontauk" -> Emojis.ArchonTau;
-            case "archonvail" -> Emojis.ArchonVail;
-            case "arcturus" -> Emojis.Arcturus;
-            case "arinam" -> Emojis.Arinam;
-            case "arnor" -> Emojis.Arnor;
-            case "arretze" -> Emojis.Arretze;
-            case "ashtroth" -> Emojis.Ashtroth;
-            case "atlas" -> Emojis.Atlas;
-            case "avar", "avark" -> Emojis.Avar;
-            case "bakal" -> Emojis.Bakal;
-            case "bereg" -> Emojis.Bereg;
-            case "cealdri" -> Emojis.Cealdri;
-            case "centauri" -> Emojis.Centauri;
-            case "cormund" -> Emojis.Cormund;
-            case "corneeq" -> Emojis.Corneeq;
-            case "creuss" -> Emojis.Creuss;
-            case "dalbootha" -> Emojis.DalBootha;
-            case "darien" -> Emojis.Darien;
-            case "druaa" -> Emojis.Druaa;
-            case "elysium" -> Emojis.Elysium;
-            case "everra" -> Emojis.Everra;
-            case "fria" -> Emojis.Fria;
-            case "gral" -> Emojis.Gral;
-            case "hercant" -> Emojis.Hercant;
-            case "hopesend" -> Emojis.HopesEnd;
-            case "ixth" -> Emojis.Ixth;
-            case "jeolir" -> Emojis.JeolIr;
-            case "jol" -> Emojis.Jol;
-            case "jord" -> Emojis.Jord;
-            case "kamdorn" -> Emojis.Kamdorn;
-            case "kraag" -> Emojis.Kraag;
-            case "lazar" -> Emojis.Lazar;
-            case "lirtaiv" -> Emojis.LirtaIV;
-            case "lisis" -> Emojis.Lisis;
-            case "lisisii" -> Emojis.LisisII;
-            case "lodor" -> Emojis.Lodor;
-            case "loki" -> Emojis.Loki;
-            case "lor" -> Emojis.Lor;
-            case "maaluuk" -> Emojis.Maaluuk;
-            case "mallice" -> Emojis.Mallice;
-            case "mr" -> Emojis.Mecatol;
-            case "meer" -> Emojis.Meer;
-            case "meharxull" -> Emojis.MeharXull;
-            case "mellon" -> Emojis.Mellon;
-            case "mollprimus", "mollprimusk" -> Emojis.MollPrimus;
-            case "mordai" -> Emojis.Mordai;
-            case "muaat" -> Emojis.PlanetMuaat;
-            case "naazir" -> Emojis.Naazir;
-            case "nar" -> Emojis.Nar;
-            case "nestphar" -> Emojis.Nestphar;
-            case "newalbion" -> Emojis.NewAlbion;
-            case "perimeter" -> Emojis.Perimeter;
-            case "primor" -> Emojis.Primor;
-            case "quann" -> Emojis.Quann;
-            case "qucenn" -> Emojis.Qucenn;
-            case "quinarra" -> Emojis.Quinarra;
-            case "rahg" -> Emojis.Rahg;
-            case "rarron" -> Emojis.Rarron;
-            case "resculon" -> Emojis.Resculon;
-            case "retillon" -> Emojis.Retillon;
-            case "rigeli" -> Emojis.RigelI;
-            case "rigelii" -> Emojis.RigelII;
-            case "rigeliii" -> Emojis.RigelIII;
-            case "rokha" -> Emojis.Rokha;
-            case "sakulag" -> Emojis.Sakulag;
-            case "saudor" -> Emojis.Saudor;
+            case "0.0.0" -> Planet000;
+            case "abaddon" -> Abaddon;
+            case "abyz" -> Abyz;
+            case "accoen" -> Accoen;
+            case "acheron" -> Acheron;
+            case "alioprima" -> AlioPrima;
+            case "ang" -> Ang;
+            case "arcprime" -> ArcPrime;
+            case "archonren", "archonrenk" -> ArchonRen;
+            case "archontau", "archontauk" -> ArchonTau;
+            case "archonvail" -> ArchonVail;
+            case "arcturus" -> Arcturus;
+            case "arinam" -> Arinam;
+            case "arnor" -> Arnor;
+            case "arretze" -> Arretze;
+            case "ashtroth" -> Ashtroth;
+            case "atlas" -> Atlas;
+            case "avar", "avark" -> Avar;
+            case "bakal" -> Bakal;
+            case "bereg" -> Bereg;
+            case "cealdri" -> Cealdri;
+            case "centauri" -> Centauri;
+            case "cormund" -> Cormund;
+            case "corneeq" -> Corneeq;
+            case "creuss" -> Creuss;
+            case "dalbootha" -> DalBootha;
+            case "darien" -> Darien;
+            case "druaa" -> Druaa;
+            case "elysium" -> Elysium;
+            case "everra" -> Everra;
+            case "fria" -> Fria;
+            case "gral" -> Gral;
+            case "hercant" -> Hercant;
+            case "hopesend" -> HopesEnd;
+            case "ixth" -> Ixth;
+            case "jeolir" -> JeolIr;
+            case "jol" -> Jol;
+            case "jord" -> Jord;
+            case "kamdorn" -> Kamdorn;
+            case "kraag" -> Kraag;
+            case "lazar" -> Lazar;
+            case "lirtaiv" -> LirtaIV;
+            case "lisis" -> Lisis;
+            case "lisisii" -> LisisII;
+            case "lodor" -> Lodor;
+            case "loki" -> Loki;
+            case "lor" -> Lor;
+            case "maaluuk" -> Maaluuk;
+            case "mallice" -> Mallice;
+            case "mr" -> Mecatol;
+            case "meer" -> Meer;
+            case "meharxull" -> MeharXull;
+            case "mellon" -> Mellon;
+            case "mollprimus", "mollprimusk" -> MollPrimus;
+            case "mordai" -> Mordai;
+            case "muaat" -> PlanetMuaat;
+            case "naazir" -> Naazir;
+            case "nar" -> Nar;
+            case "nestphar" -> Nestphar;
+            case "newalbion" -> NewAlbion;
+            case "perimeter" -> Perimeter;
+            case "primor" -> Primor;
+            case "quann" -> Quann;
+            case "qucenn" -> Qucenn;
+            case "quinarra" -> Quinarra;
+            case "rahg" -> Rahg;
+            case "rarron" -> Rarron;
+            case "resculon" -> Resculon;
+            case "retillon" -> Retillon;
+            case "rigeli" -> RigelI;
+            case "rigelii" -> RigelII;
+            case "rigeliii" -> RigelIII;
+            case "rokha" -> Rokha;
+            case "sakulag" -> Sakulag;
+            case "saudor" -> Saudor;
             case "semlore" -> getRandomSemLore();
-            case "shalloq" -> Emojis.Shalloq;
-            case "siig" -> Emojis.Siig;
-            case "starpoint" -> Emojis.Starpoint;
-            case "tarmann" -> Emojis.Tarmann;
-            case "tequran" -> Emojis.Tequran;
-            case "thedark" -> Emojis.TheDark;
-            case "thibah" -> Emojis.Thibah;
-            case "torkan" -> Emojis.Torkan;
-            case "trenlak" -> Emojis.Trenlak;
-            case "valk", "valkk" -> Emojis.Valk;
-            case "vefut" -> Emojis.Vefut;
-            case "vegamajor" -> Emojis.VegaMajor;
-            case "vegaminor" -> Emojis.VegaMinor;
-            case "velnor" -> Emojis.Velnor;
-            case "vorhal" -> Emojis.Vorhal;
-            case "wellon" -> Emojis.Wellon;
-            case "winnu" -> Emojis.PlanetWinnu;
-            case "wrenterra" -> Emojis.WrenTerra;
-            case "xanhact" -> Emojis.Xanhact;
-            case "xxehan" -> Emojis.Xxehan;
-            case "ylir", "ylirk" -> Emojis.Ylir;
-            case "zohbat" -> Emojis.Zohbat;
+            case "shalloq" -> Shalloq;
+            case "siig" -> Siig;
+            case "starpoint" -> Starpoint;
+            case "tarmann" -> Tarmann;
+            case "tequran" -> Tequran;
+            case "thedark" -> TheDark;
+            case "thibah" -> Thibah;
+            case "torkan" -> Torkan;
+            case "trenlak" -> Trenlak;
+            case "valk", "valkk" -> Valk;
+            case "vefut" -> Vefut;
+            case "vegamajor" -> VegaMajor;
+            case "vegaminor" -> VegaMinor;
+            case "velnor" -> Velnor;
+            case "vorhal" -> Vorhal;
+            case "wellon" -> Wellon;
+            case "winnu" -> PlanetWinnu;
+            case "wrenterra" -> WrenTerra;
+            case "xanhact" -> Xanhact;
+            case "xxehan" -> Xxehan;
+            case "ylir", "ylirk" -> Ylir;
+            case "zohbat" -> Zohbat;
 
-            case "derbrae", "debrbrae" -> Emojis.Derbrae;
-            case "detic" -> Emojis.Detic;
-            case "domna" -> Emojis.Domna;
-            case "dorvok" -> Emojis.Dorvok;
-            case "echo" -> Emojis.Echo;
-            case "etirv" -> Emojis.EtirV;
-            case "fakrenn" -> Emojis.Fakrenn;
-            case "gwiyun" -> Emojis.Gwiyun;
-            case "inan" -> Emojis.Inan;
-            case "larred" -> Emojis.Larred;
-            case "lliot" -> Emojis.Lliot;
-            case "lodran" -> Emojis.Lodran;
-            case "mandle" -> Emojis.Mandle;
-            case "moln" -> Emojis.Moln;
-            case "nairb" -> Emojis.Nairb;
-            case "prism" -> Emojis.Prism;
-            case "qaak" -> Emojis.Qaak;
-            case "regnem" -> Emojis.Regnem;
-            case "rysaa" -> Emojis.Rysaa;
-            case "salin" -> Emojis.Salin;
-            case "sanvit" -> Emojis.Sanvit;
-            case "sierpen" -> Emojis.Sierpen;
-            case "silence" -> Emojis.Silence;
-            case "swog" -> Emojis.Swog;
-            case "tarrock" -> Emojis.Tarrock;
-            case "troac" -> Emojis.Troac;
-            case "vioss" -> Emojis.Vioss;
+            case "derbrae", "debrbrae" -> Derbrae;
+            case "detic" -> Detic;
+            case "domna" -> Domna;
+            case "dorvok" -> Dorvok;
+            case "echo" -> Echo;
+            case "etirv" -> EtirV;
+            case "fakrenn" -> Fakrenn;
+            case "gwiyun" -> Gwiyun;
+            case "inan" -> Inan;
+            case "larred" -> Larred;
+            case "lliot" -> Lliot;
+            case "lodran" -> Lodran;
+            case "mandle" -> Mandle;
+            case "moln" -> Moln;
+            case "nairb" -> Nairb;
+            case "prism" -> Prism;
+            case "qaak" -> Qaak;
+            case "regnem" -> Regnem;
+            case "rysaa" -> Rysaa;
+            case "salin" -> Salin;
+            case "sanvit" -> Sanvit;
+            case "sierpen" -> Sierpen;
+            case "silence" -> Silence;
+            case "swog" -> Swog;
+            case "tarrock" -> Tarrock;
+            case "troac" -> Troac;
+            case "vioss" -> Vioss;
 
-            default -> Emojis.SemLore;
+            default -> SemLore;
         };
     }
 
-    public static String getColourEmojis(String colour) {
-        return switch (colour) {
-            case "gray" -> Emojis.gray + "**Gray**";
-            case "black" -> Emojis.black + "**Black**";
-            case "blue" -> Emojis.blue + "**Blue**";
-            case "green" -> Emojis.green + "**Green**";
-            case "orange" -> Emojis.orange + "**Orange**";
-            case "pink" -> Emojis.pink + "**Pink**";
-            case "purple" -> Emojis.purple + "**Purple**";
-            case "red" -> Emojis.red + "**Red**";
-            case "yellow" -> Emojis.yellow + "**Yellow**";
-            case "petrol" -> Emojis.petrol + "**Petrol**";
-            case "brown" -> Emojis.brown + "**Brown**";
-            case "tan" -> Emojis.tan + "**Tan**";
-            case "forest" -> Emojis.forest + "**Forest**";
-            case "chrome" -> Emojis.chrome + "**Chrome**";
-            case "sunset" -> Emojis.sunset + "**Sunset**";
-            case "turquoise" -> Emojis.turquoise + "**Turquoise**";
-            case "gold" -> Emojis.gold + "**Gold**";
-            case "lightgray" -> Emojis.lightgray + "**Lightgray**";
-            case "teal" -> Emojis.teal + "**Teal**";
-            case "bloodred" -> Emojis.bloodred + "**Bloodred**";
-            case "emerald" -> Emojis.emerald + "**Emerald**";
-            case "navy" -> Emojis.navy + "**Navy**";
-            case "rose" -> Emojis.rose + "**Rose**";
-            case "lime" -> Emojis.lime + "**Lime**";
-            case "lavender" -> Emojis.lavender + "**Lavender**";
-            case "spring" -> Emojis.spring + "**Spring**";
-            case "chocolate" -> Emojis.chocolate + "**Chocolate**";
-            case "rainbow" -> Emojis.rainbow + "**Rainbow**";
-            case "ethereal" -> Emojis.ethereal + "**Ethereal**";
-            case "orca" -> Emojis.orca + "**Orca**";
-            case "splitred" -> Emojis.splitred + "**Splitred**";
-            case "splitblue" -> Emojis.splitblue + "**Splitblue**";
-            case "splitgreen" -> Emojis.splitgreen + "**Splitgreen**";
-            case "splitpurple" -> Emojis.splitpurple + "**Splitpurple**";
-            case "splitorange" -> Emojis.splitorange + "**Splitorange**";
-            case "splityellow" -> Emojis.splityellow + "**Splityellow**";
-            case "splitpink" -> Emojis.splitpink + "**Splitpink**";
-            case "splitgold" -> Emojis.splitgold + "**Splitgold**";
-            case "splitlime" -> Emojis.splitlime + "**Splitlime**";
-            case "splittan" -> Emojis.splittan + "**Splittan**";
-            case "splitteal" -> Emojis.splitteal + "**Splitteal**";
-            case "splitturquoise" -> Emojis.splittorquoise + "**Splitturquoise**";
-            case "splitbloodred" -> Emojis.splitbloodred + "**Splitbloodred**";
-            case "splitchocolate" -> Emojis.splitchocolate + "**Splitchocolate**";
-            case "splitemerald" -> Emojis.splitemerald + "**Splitemerald**";
-            case "splitnavy" -> Emojis.splitnavy + "**Splitnavy**";
-            case "splitpetrol" -> Emojis.splitpetrol + "**Splitpetrol**";
-            case "splitrainbow" -> Emojis.splitrainbow + "**Splitrainbow**";
-            default -> colour;
+    public static String getColorEmojiWithName(String color) {
+        return switch (color) {
+            case "gray" -> gray + "**Gray**";
+            case "black" -> black + "**Black**";
+            case "blue" -> blue + "**Blue**";
+            case "green" -> green + "**Green**";
+            case "orange" -> orange + "**Orange**";
+            case "pink" -> pink + "**Pink**";
+            case "purple" -> purple + "**Purple**";
+            case "red" -> red + "**Red**";
+            case "yellow" -> yellow + "**Yellow**";
+            case "petrol" -> petrol + "**Petrol**";
+            case "brown" -> brown + "**Brown**";
+            case "tan" -> tan + "**Tan**";
+            case "forest" -> forest + "**Forest**";
+            case "chrome" -> chrome + "**Chrome**";
+            case "sunset" -> sunset + "**Sunset**";
+            case "turquoise" -> turquoise + "**Turquoise**";
+            case "gold" -> gold + "**Gold**";
+            case "lightgray" -> lightgray + "**Lightgray**";
+            case "teal" -> teal + "**Teal**";
+            case "bloodred" -> bloodred + "**Bloodred**";
+            case "emerald" -> emerald + "**Emerald**";
+            case "navy" -> navy + "**Navy**";
+            case "rose" -> rose + "**Rose**";
+            case "lime" -> lime + "**Lime**";
+            case "lavender" -> lavender + "**Lavender**";
+            case "spring" -> spring + "**Spring**";
+            case "chocolate" -> chocolate + "**Chocolate**";
+            case "rainbow" -> rainbow + "**Rainbow**";
+            case "ethereal" -> ethereal + "**Ethereal**";
+            case "orca" -> orca + "**Orca**";
+            case "splitred" -> splitred + "**Splitred**";
+            case "splitblue" -> splitblue + "**Splitblue**";
+            case "splitgreen" -> splitgreen + "**Splitgreen**";
+            case "splitpurple" -> splitpurple + "**Splitpurple**";
+            case "splitorange" -> splitorange + "**Splitorange**";
+            case "splityellow" -> splityellow + "**Splityellow**";
+            case "splitpink" -> splitpink + "**Splitpink**";
+            case "splitgold" -> splitgold + "**Splitgold**";
+            case "splitlime" -> splitlime + "**Splitlime**";
+            case "splittan" -> splittan + "**Splittan**";
+            case "splitteal" -> splitteal + "**Splitteal**";
+            case "splitturquoise" -> splittorquoise + "**Splitturquoise**";
+            case "splitbloodred" -> splitbloodred + "**Splitbloodred**";
+            case "splitchocolate" -> splitchocolate + "**Splitchocolate**";
+            case "splitemerald" -> splitemerald + "**Splitemerald**";
+            case "splitnavy" -> splitnavy + "**Splitnavy**";
+            case "splitpetrol" -> splitpetrol + "**Splitpetrol**";
+            case "splitrainbow" -> splitrainbow + "**Splitrainbow**";
+            default -> color;
+        };
+    }
+
+    public static String getColorEmoji(String color) {
+        return switch (color) {
+            case "gray" -> gray;
+            case "black" -> black;
+            case "blue" -> blue;
+            case "green" -> green;
+            case "orange" -> orange;
+            case "pink" -> pink;
+            case "purple" -> purple;
+            case "red" -> red;
+            case "yellow" -> yellow;
+            case "petrol" -> petrol;
+            case "brown" -> brown;
+            case "tan" -> tan;
+            case "forest" -> forest;
+            case "chrome" -> chrome;
+            case "sunset" -> sunset;
+            case "turquoise" -> turquoise;
+            case "gold" -> gold;
+            case "lightgray" -> lightgray;
+            case "teal" -> teal;
+            case "bloodred" -> bloodred;
+            case "emerald" -> emerald;
+            case "navy" -> navy;
+            case "rose" -> rose;
+            case "lime" -> lime;
+            case "lavender" -> lavender;
+            case "spring" -> spring;
+            case "chocolate" -> chocolate;
+            case "rainbow" -> rainbow;
+            case "ethereal" -> ethereal;
+            case "orca" -> orca;
+            case "splitred" -> splitred;
+            case "splitblue" -> splitblue;
+            case "splitgreen" -> splitgreen;
+            case "splitpurple" -> splitpurple;
+            case "splitorange" -> splitorange;
+            case "splityellow" -> splityellow;
+            case "splitpink" -> splitpink;
+            case "splitgold" -> splitgold;
+            case "splitlime" -> splitlime;
+            case "splittan" -> splittan;
+            case "splitteal" -> splitteal;
+            case "splitturquoise" -> splittorquoise;
+            case "splitbloodred" -> splitbloodred;
+            case "splitchocolate" -> splitchocolate;
+            case "splitemerald" -> splitemerald;
+            case "splitnavy" -> splitnavy;
+            case "splitpetrol" -> splitpetrol;
+            case "splitrainbow" -> splitrainbow;
+
+            default -> getRandomGoodDog();
         };
     }
 
     public static String getInfluenceEmoji(int count) {
         return switch (count) {
-            case 0 -> Emojis.Influence_0;
-            case 1 -> Emojis.Influence_1;
-            case 2 -> Emojis.Influence_2;
-            case 3 -> Emojis.Influence_3;
-            case 4 -> Emojis.Influence_4;
-            case 5 -> Emojis.Influence_5;
-            case 6 -> Emojis.Influence_6;
-            case 7 -> Emojis.Influence_7;
-            case 8 -> Emojis.Influence_8;
-            case 9 -> Emojis.Influence_9;
-            default -> Emojis.influence + count;
+            case 0 -> Influence_0;
+            case 1 -> Influence_1;
+            case 2 -> Influence_2;
+            case 3 -> Influence_3;
+            case 4 -> Influence_4;
+            case 5 -> Influence_5;
+            case 6 -> Influence_6;
+            case 7 -> Influence_7;
+            case 8 -> Influence_8;
+            case 9 -> Influence_9;
+            default -> influence + count;
         };
     }
 
     public static String getResourceEmoji(int count) {
         return switch (count) {
-            case 0 -> Emojis.Resources_0;
-            case 1 -> Emojis.Resources_1;
-            case 2 -> Emojis.Resources_2;
-            case 3 -> Emojis.Resources_3;
-            case 4 -> Emojis.Resources_4;
-            case 5 -> Emojis.Resources_5;
-            case 6 -> Emojis.Resources_6;
-            case 7 -> Emojis.Resources_7;
-            case 8 -> Emojis.Resources_8;
-            case 9 -> Emojis.Resources_9;
-            default -> Emojis.resources + count;
+            case 0 -> Resources_0;
+            case 1 -> Resources_1;
+            case 2 -> Resources_2;
+            case 3 -> Resources_3;
+            case 4 -> Resources_4;
+            case 5 -> Resources_5;
+            case 6 -> Resources_6;
+            case 7 -> Resources_7;
+            case 8 -> Resources_8;
+            case 9 -> Resources_9;
+            default -> resources + count;
         };
     }
 
     public static String getToesEmoji(int count) {
         return switch (count) {
-            case 0 -> Emojis.NoToes;
-            case 1 -> Emojis.OneToe;
-            case 2 -> Emojis.TwoToes;
-            case 3 -> Emojis.ThreeToes;
-            case 4 -> Emojis.FourToes;
-            case 5 -> Emojis.FiveToes;
-            case 6 -> Emojis.SixToes;
-            case 7 -> Emojis.SevenToes;
-            case 8 -> Emojis.EightToes;
-            case 9 -> Emojis.NineToes;
-            default -> Emojis.NoToes + count;
+            case 0 -> NoToes;
+            case 1 -> OneToe;
+            case 2 -> TwoToes;
+            case 3 -> ThreeToes;
+            case 4 -> FourToes;
+            case 5 -> FiveToes;
+            case 6 -> SixToes;
+            case 7 -> SevenToes;
+            case 8 -> EightToes;
+            case 9 -> NineToes;
+            default -> NoToes + count;
         };
     }
 
@@ -1009,216 +1072,218 @@ public class Emojis {
     public static String getEmojiFromDiscord(String emojiName) {
         return switch (emojiName.toLowerCase()) {
             // EXPLORATION
-            case "hfrag" -> Emojis.HFrag;
-            case "cfrag" -> Emojis.CFrag;
-            case "ifrag" -> Emojis.IFrag;
-            case "ufrag" -> Emojis.UFrag;
-            case "relic" -> Emojis.Relic;
-            case "cultural" -> Emojis.Cultural;
-            case "industrial" -> Emojis.Industrial;
-            case "hazardous" -> Emojis.Hazardous;
-            case "frontier" -> Emojis.Frontier;
+            case "hfrag" -> HFrag;
+            case "cfrag" -> CFrag;
+            case "ifrag" -> IFrag;
+            case "ufrag" -> UFrag;
+            case "relic" -> Relic;
+            case "cultural" -> Cultural;
+            case "industrial" -> Industrial;
+            case "hazardous" -> Hazardous;
+            case "frontier" -> Frontier;
 
             // CARDS
-            case "sc1" -> Emojis.SC1;
-            case "sc2" -> Emojis.SC2;
-            case "sc3" -> Emojis.SC3;
-            case "sc4" -> Emojis.SC4;
-            case "sc5" -> Emojis.SC5;
-            case "sc6" -> Emojis.SC6;
-            case "sc7" -> Emojis.SC7;
-            case "sc8" -> Emojis.SC8;
-            case "sc1back" -> Emojis.SC1Back;
-            case "sc2back" -> Emojis.SC2Back;
-            case "sc3back" -> Emojis.SC3Back;
-            case "sc4back" -> Emojis.SC4Back;
-            case "sc5back" -> Emojis.SC5Back;
-            case "sc6back" -> Emojis.SC6Back;
-            case "sc7back" -> Emojis.SC7Back;
-            case "sc8back" -> Emojis.SC8Back;
-            case "actioncard" -> Emojis.ActionCard;
-            case "agenda" -> Emojis.Agenda;
-            case "pn" -> Emojis.PN;
+            case "sc1" -> SC1;
+            case "sc2" -> SC2;
+            case "sc3" -> SC3;
+            case "sc4" -> SC4;
+            case "sc5" -> SC5;
+            case "sc6" -> SC6;
+            case "sc7" -> SC7;
+            case "sc8" -> SC8;
+            case "sc1back" -> SC1Back;
+            case "sc2back" -> SC2Back;
+            case "sc3back" -> SC3Back;
+            case "sc4back" -> SC4Back;
+            case "sc5back" -> SC5Back;
+            case "sc6back" -> SC6Back;
+            case "sc7back" -> SC7Back;
+            case "sc8back" -> SC8Back;
+            case "actioncard" -> ActionCard;
+            case "agenda" -> Agenda;
+            case "pn" -> PN;
 
             // OBJECTIVES
-            case "secretobjective" -> Emojis.SecretObjective;
-            case "public1" -> Emojis.Public1;
-            case "public2" -> Emojis.Public2;
-            case "public1alt" -> Emojis.Public1alt;
-            case "public2alt" -> Emojis.Public2alt;
-            case "secretobjectivealt" -> Emojis.SecretObjectiveAlt;
+            case "secretobjective" -> SecretObjective;
+            case "public1" -> Public1;
+            case "public2" -> Public2;
+            case "public1alt" -> Public1alt;
+            case "public2alt" -> Public2alt;
+            case "secretobjectivealt" -> SecretObjectiveAlt;
 
             // COMPONENTS
-            case "tg" -> Emojis.tg;
-            case "comm" -> Emojis.comm;
-            case "sleeper" -> Emojis.Sleeper;
-            case "sleeperb" -> Emojis.SleeperB;
+            case "tg" -> tg;
+            case "comm" -> comm;
+            case "sleeper" -> Sleeper;
+            case "sleeperb" -> SleeperB;
 
             // UNITS
-            case "warsun" -> Emojis.warsun;
-            case "spacedock" -> Emojis.spacedock;
-            case "pds" -> Emojis.pds;
-            case "mech" -> Emojis.mech;
-            case "infantry" -> Emojis.infantry;
-            case "flagship" -> Emojis.flagship;
-            case "fighter" -> Emojis.fighter;
-            case "dreadnought" -> Emojis.dreadnought;
-            case "destroyer" -> Emojis.destroyer;
-            case "carrier" -> Emojis.carrier;
-            case "cruiser" -> Emojis.cruiser;
+            case "warsun" -> warsun;
+            case "spacedock" -> spacedock;
+            case "pds" -> pds;
+            case "mech" -> mech;
+            case "infantry" -> infantry;
+            case "flagship" -> flagship;
+            case "lady" -> flagship;
+            case "tyrantslament" -> flagship;
+            case "fighter" -> fighter;
+            case "dreadnought" -> dreadnought;
+            case "destroyer" -> destroyer;
+            case "carrier" -> carrier;
+            case "cruiser" -> cruiser;
 
             // LEADERS - AGENTS
-            case "arborecagent" -> Emojis.ArborecAgent;
-            case "argentagent" -> Emojis.ArgentAgent;
-            case "cabalagent" -> Emojis.CabalAgent;
-            case "ghostagent", "creussagent" -> Emojis.CreussAgent;
-            case "empyreanagent" -> Emojis.EmpyreanAgent;
-            case "hacanagent" -> Emojis.HacanAgent;
-            case "jolnaragent" -> Emojis.JolNarAgent;
-            case "keleresagent" -> Emojis.KeleresAgent;
-            case "l1z1xagent" -> Emojis.L1Z1XAgent;
-            case "letnevagent" -> Emojis.LetnevAgent;
-            case "mahactagent" -> Emojis.MahactAgent;
-            case "mentakagent" -> Emojis.MentakAgent;
-            case "muaatagent" -> Emojis.MuaatAgent;
-            case "naaluagent" -> Emojis.NaaluAgent;
-            case "naazagent" -> Emojis.NaazAgent;
-            case "nekroagent" -> Emojis.NekroAgent;
-            case "nomadagentartuno" -> Emojis.NomadAgentArtuno;
-            case "nomadagentmercer" -> Emojis.NomadAgentMercer;
-            case "nomadagentthundarian" -> Emojis.NomadAgentThundarian;
-            case "sardakkagent" -> Emojis.SardakkAgent;
-            case "saaragent" -> Emojis.SaarAgent;
-            case "solagent" -> Emojis.SolAgent;
-            case "titansagent" -> Emojis.TitansAgent;
-            case "winnuagent" -> Emojis.WinnuAgent;
-            case "xxchaagent" -> Emojis.XxchaAgent;
-            case "yinagent" -> Emojis.YinAgent;
-            case "yssarilagent" -> Emojis.YssarilAgent;
+            case "arborecagent" -> ArborecAgent;
+            case "argentagent" -> ArgentAgent;
+            case "cabalagent" -> CabalAgent;
+            case "ghostagent", "creussagent" -> CreussAgent;
+            case "empyreanagent" -> EmpyreanAgent;
+            case "hacanagent" -> HacanAgent;
+            case "jolnaragent" -> JolNarAgent;
+            case "keleresagent" -> KeleresAgent;
+            case "l1z1xagent" -> L1Z1XAgent;
+            case "letnevagent" -> LetnevAgent;
+            case "mahactagent" -> MahactAgent;
+            case "mentakagent" -> MentakAgent;
+            case "muaatagent" -> MuaatAgent;
+            case "naaluagent" -> NaaluAgent;
+            case "naazagent" -> NaazAgent;
+            case "nekroagent" -> NekroAgent;
+            case "nomadagentartuno" -> NomadAgentArtuno;
+            case "nomadagentmercer" -> NomadAgentMercer;
+            case "nomadagentthundarian" -> NomadAgentThundarian;
+            case "sardakkagent" -> SardakkAgent;
+            case "saaragent" -> SaarAgent;
+            case "solagent" -> SolAgent;
+            case "titansagent" -> TitansAgent;
+            case "winnuagent" -> WinnuAgent;
+            case "xxchaagent" -> XxchaAgent;
+            case "yinagent" -> YinAgent;
+            case "yssarilagent" -> YssarilAgent;
 
             // LEADERS - COMMANDERS
-            case "arboreccommander" -> Emojis.ArborecCommander;
-            case "argentcommander" -> Emojis.ArgentCommander;
-            case "cabalcommander" -> Emojis.CabalCommander;
-            case "ghostcommander", "creusscommander" -> Emojis.CreussCommander;
-            case "empyreancommander" -> Emojis.EmpyreanCommander;
-            case "hacancommander" -> Emojis.HacanCommander;
-            case "jolnarcommander" -> Emojis.JolNarCommander;
-            case "kelerescommander" -> Emojis.MentakAgent;
-            case "l1z1xcommander" -> Emojis.L1Z1XCommander;
-            case "letnevcommander" -> Emojis.LetnevCommander;
-            case "mahactcommander" -> Emojis.MahactCommander;
-            case "mentakcommander" -> Emojis.MentakCommander;
-            case "muaatcommander" -> Emojis.MuaatCommander;
-            case "naalucommander" -> Emojis.NaaluCommander;
-            case "naazcommander" -> Emojis.NaazCommander;
-            case "nekrocommander" -> Emojis.NekroCommander;
-            case "nomadcommander" -> Emojis.NomadCommander;
-            case "sardakkcommander" -> Emojis.SardakkCommander;
-            case "saarcommander" -> Emojis.SaarCommander;
-            case "solcommander" -> Emojis.SolCommander;
-            case "titanscommander" -> Emojis.TitansCommander;
-            case "winnucommander" -> Emojis.WinnuCommander;
-            case "xxchacommander" -> Emojis.XxchaCommander;
-            case "yincommander" -> Emojis.YinCommander;
-            case "yssarilcommander" -> Emojis.YssarilCommander;
+            case "arboreccommander" -> ArborecCommander;
+            case "argentcommander" -> ArgentCommander;
+            case "cabalcommander" -> CabalCommander;
+            case "ghostcommander", "creusscommander" -> CreussCommander;
+            case "empyreancommander" -> EmpyreanCommander;
+            case "hacancommander" -> HacanCommander;
+            case "jolnarcommander" -> JolNarCommander;
+            case "kelerescommander" -> MentakAgent;
+            case "l1z1xcommander" -> L1Z1XCommander;
+            case "letnevcommander" -> LetnevCommander;
+            case "mahactcommander" -> MahactCommander;
+            case "mentakcommander" -> MentakCommander;
+            case "muaatcommander" -> MuaatCommander;
+            case "naalucommander" -> NaaluCommander;
+            case "naazcommander" -> NaazCommander;
+            case "nekrocommander" -> NekroCommander;
+            case "nomadcommander" -> NomadCommander;
+            case "sardakkcommander" -> SardakkCommander;
+            case "saarcommander" -> SaarCommander;
+            case "solcommander" -> SolCommander;
+            case "titanscommander" -> TitansCommander;
+            case "winnucommander" -> WinnuCommander;
+            case "xxchacommander" -> XxchaCommander;
+            case "yincommander" -> YinCommander;
+            case "yssarilcommander" -> YssarilCommander;
 
             // LEADERS - HEROES
-            case "arborechero" -> Emojis.ArborecHero;
-            case "argenthero" -> Emojis.ArgentHero;
-            case "cabalhero" -> Emojis.CabalHero;
-            case "ghosthero", "creusshero" -> Emojis.CreussHero;
-            case "empyreanhero" -> Emojis.EmpyreanHero;
-            case "hacanhero" -> Emojis.HacanHero;
-            case "jolnarhero" -> Emojis.JolNarHero;
-            case "keleresherokuuasi" -> Emojis.KeleresHeroKuuasi;
-            case "keleresheroodlynn" -> Emojis.KeleresHeroOdlynn;
-            case "keleresheroharka" -> Emojis.KeleresHeroHarka;
-            case "l1z1xhero" -> Emojis.L1Z1XHero;
-            case "letnevhero" -> Emojis.LetnevHero;
-            case "mahacthero" -> Emojis.MahactHero;
-            case "mentakhero" -> Emojis.MentakHero;
-            case "muaathero" -> Emojis.MuaatHero;
-            case "naaluhero" -> Emojis.NaaluHero;
-            case "naazhero" -> Emojis.NaazHero;
-            case "nekrohero" -> Emojis.NekroHero;
-            case "nomadhero" -> Emojis.NomadHero;
-            case "sardakkhero" -> Emojis.SardakkHero;
-            case "saarhero" -> Emojis.SaarHero;
-            case "solhero" -> Emojis.SolHero;
-            case "titanshero" -> Emojis.TitansHero;
-            case "winnuhero" -> Emojis.WinnuHero;
-            case "xxchahero" -> Emojis.XxchaHero;
-            case "yinhero" -> Emojis.YinHero;
-            case "yssarilhero" -> Emojis.YssarilHero;
+            case "arborechero" -> ArborecHero;
+            case "argenthero" -> ArgentHero;
+            case "cabalhero" -> CabalHero;
+            case "ghosthero", "creusshero" -> CreussHero;
+            case "empyreanhero" -> EmpyreanHero;
+            case "hacanhero" -> HacanHero;
+            case "jolnarhero" -> JolNarHero;
+            case "keleresherokuuasi" -> KeleresHeroKuuasi;
+            case "keleresheroodlynn" -> KeleresHeroOdlynn;
+            case "keleresheroharka" -> KeleresHeroHarka;
+            case "l1z1xhero" -> L1Z1XHero;
+            case "letnevhero" -> LetnevHero;
+            case "mahacthero" -> MahactHero;
+            case "mentakhero" -> MentakHero;
+            case "muaathero" -> MuaatHero;
+            case "naaluhero" -> NaaluHero;
+            case "naazhero" -> NaazHero;
+            case "nekrohero" -> NekroHero;
+            case "nomadhero" -> NomadHero;
+            case "sardakkhero" -> SardakkHero;
+            case "saarhero" -> SaarHero;
+            case "solhero" -> SolHero;
+            case "titanshero" -> TitansHero;
+            case "winnuhero" -> WinnuHero;
+            case "xxchahero" -> XxchaHero;
+            case "yinhero" -> YinHero;
+            case "yssarilhero" -> YssarilHero;
 
             // DS LEADERS
-            case "augersagent" -> Emojis.AugersAgent;
-            case "augerscommander" -> Emojis.AugersCommander;
-            case "augershero" -> Emojis.AugersHero;
-            case "axisagent" -> Emojis.AxisAgent;
-            case "axiscommander" -> Emojis.AxisCommander;
-            case "axishero" -> Emojis.AxisHero;
-            case "bentoragent" -> Emojis.BentorAgent;
-            case "bentorcommander" -> Emojis.BentorCommander;
-            case "bentorhero" -> Emojis.BentorHero;
-            case "blexagent" -> Emojis.BlexAgent;
-            case "blexcommander" -> Emojis.BlexCommander;
-            case "blexhero" -> Emojis.BlexHero;
-            case "celdauriagent" -> Emojis.CeldauriAgent;
-            case "celdauricommander" -> Emojis.CeldauriCommander;
-            case "celdaurihero" -> Emojis.CeldauriHero;
-            case "cheiranagent" -> Emojis.CheiranAgent;
-            case "cheirancommander" -> Emojis.CheiranCommander;
-            case "cheiranhero" -> Emojis.CheiranHero;
-            case "gheminaagent" -> Emojis.GheminaAgent;
-            case "gheminacommander" -> Emojis.GheminaCommander;
-            case "gheminaherolady" -> Emojis.GheminaHeroLady;
-            case "gheminaherolord" -> Emojis.GheminaHeroLord;
-            case "cymiaeagent" -> Emojis.CymiaeAgent;
-            case "cymiaecommander" -> Emojis.CymiaeCommander;
-            case "cymiaehero" -> Emojis.CymiaeHero;
-            case "dihmohnagent" -> Emojis.DihmohnAgent;
-            case "dihmohncommander" -> Emojis.DihmohnCommander;
-            case "dihmohnhero" -> Emojis.DihmohnHero;
-            case "edynagent" -> Emojis.EdynAgent;
-            case "edyncommander" -> Emojis.EdynCommander;
-            case "edynhero" -> Emojis.EdynHero;
-            case "florzenagent" -> Emojis.FlorzenAgent;
-            case "florzencommander" -> Emojis.FlorzenCommander;
-            case "florzenhero" -> Emojis.FlorzenHero;
-            case "freesystemcommander" -> Emojis.FreesystemCommander;
-            case "freesystemhero" -> Emojis.FreesystemHero;
-            case "freesystemsagent" -> Emojis.FreesystemsAgent;
-            case "ghotiagent" -> Emojis.GhotiAgent;
-            case "ghoticommander" -> Emojis.GhotiCommander;
-            case "ghotihero" -> Emojis.GhotiHero;
-            case "gledgeagent" -> Emojis.GledgeAgent;
-            case "gledgecommander" -> Emojis.GledgeCommander;
-            case "gledgehero" -> Emojis.GledgeHero;
-            case "khraskagent" -> Emojis.KhraskAgent;
-            case "khraskcommander" -> Emojis.KhraskCommander;
-            case "khraskhero" -> Emojis.KhraskHero;
-            case "kjalengardagent" -> Emojis.KjalengardAgent;
-            case "kjalengardcommander" -> Emojis.KjalengardCommander;
-            case "kjalengardhero" -> Emojis.KjalengardHero;
+            case "augersagent" -> AugersAgent;
+            case "augerscommander" -> AugersCommander;
+            case "augershero" -> AugersHero;
+            case "axisagent" -> AxisAgent;
+            case "axiscommander" -> AxisCommander;
+            case "axishero" -> AxisHero;
+            case "bentoragent" -> BentorAgent;
+            case "bentorcommander" -> BentorCommander;
+            case "bentorhero" -> BentorHero;
+            case "blexagent" -> BlexAgent;
+            case "blexcommander" -> BlexCommander;
+            case "blexhero" -> BlexHero;
+            case "celdauriagent" -> CeldauriAgent;
+            case "celdauricommander" -> CeldauriCommander;
+            case "celdaurihero" -> CeldauriHero;
+            case "cheiranagent" -> CheiranAgent;
+            case "cheirancommander" -> CheiranCommander;
+            case "cheiranhero" -> CheiranHero;
+            case "gheminaagent" -> GheminaAgent;
+            case "gheminacommander" -> GheminaCommander;
+            case "gheminaherolady" -> GheminaHeroLady;
+            case "gheminaherolord" -> GheminaHeroLord;
+            case "cymiaeagent" -> CymiaeAgent;
+            case "cymiaecommander" -> CymiaeCommander;
+            case "cymiaehero" -> CymiaeHero;
+            case "dihmohnagent" -> DihmohnAgent;
+            case "dihmohncommander" -> DihmohnCommander;
+            case "dihmohnhero" -> DihmohnHero;
+            case "edynagent" -> EdynAgent;
+            case "edyncommander" -> EdynCommander;
+            case "edynhero" -> EdynHero;
+            case "florzenagent" -> FlorzenAgent;
+            case "florzencommander" -> FlorzenCommander;
+            case "florzenhero" -> FlorzenHero;
+            case "freesystemcommander" -> FreesystemCommander;
+            case "freesystemhero" -> FreesystemHero;
+            case "freesystemsagent" -> FreesystemsAgent;
+            case "ghotiagent" -> GhotiAgent;
+            case "ghoticommander" -> GhotiCommander;
+            case "ghotihero" -> GhotiHero;
+            case "gledgeagent" -> GledgeAgent;
+            case "gledgecommander" -> GledgeCommander;
+            case "gledgehero" -> GledgeHero;
+            case "khraskagent" -> KhraskAgent;
+            case "khraskcommander" -> KhraskCommander;
+            case "khraskhero" -> KhraskHero;
+            case "kjalengardagent" -> KjalengardAgent;
+            case "kjalengardcommander" -> KjalengardCommander;
+            case "kjalengardhero" -> KjalengardHero;
 
             // OTHER
-            case "whalpha" -> Emojis.WHalpha;
-            case "grift" -> Emojis.GravityRift;
-            case "whbeta" -> Emojis.WHbeta;
-            case "whgamma" -> Emojis.WHgamma;
-            case "creussalpha" -> Emojis.CreussAlpha;
-            case "creussbeta" -> Emojis.CreussBeta;
-            case "creussgamma" -> Emojis.CreussGamma;
-            case "influence" -> Emojis.influence;
-            case "resources" -> Emojis.resources;
-            case "legendaryplanet" -> Emojis.LegendaryPlanet;
-            case "cybernetictech" -> Emojis.CyberneticTech;
-            case "propulsiontech" -> Emojis.PropulsionTech;
-            case "biotictech" -> Emojis.BioticTech;
-            case "warfaretech" -> Emojis.WarfareTech;
-            case "unitupgradetech" -> Emojis.UnitUpgradeTech;
+            case "whalpha" -> WHalpha;
+            case "grift" -> GravityRift;
+            case "whbeta" -> WHbeta;
+            case "whgamma" -> WHgamma;
+            case "creussalpha" -> CreussAlpha;
+            case "creussbeta" -> CreussBeta;
+            case "creussgamma" -> CreussGamma;
+            case "influence" -> influence;
+            case "resources" -> resources;
+            case "legendaryplanet" -> LegendaryPlanet;
+            case "cybernetictech" -> CyberneticTech;
+            case "propulsiontech" -> PropulsionTech;
+            case "biotictech" -> BioticTech;
+            case "warfaretech" -> WarfareTech;
+            case "unitupgradetech" -> UnitUpgradeTech;
 
             default -> getRandomGoodDog();
         };
@@ -1235,7 +1300,7 @@ public class Emojis {
     }
 
     public static String getTGorNomadCoinEmoji(Game activeGame) {
-        if (activeGame == null) return Emojis.tg;
-        return activeGame.getNomadCoin() ? Emojis.nomadcoin : Emojis.tg;
+        if (activeGame == null) return tg;
+        return activeGame.getNomadCoin() ? nomadcoin : tg;
     }
 }

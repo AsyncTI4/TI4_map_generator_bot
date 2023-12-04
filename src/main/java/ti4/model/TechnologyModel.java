@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-
 import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class TechnologyModel implements ModelInterface, EmbeddableModel {
@@ -20,7 +19,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String requirements;
     private String faction;
     private String baseUpgrade;
-    private String source;
+    private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
@@ -44,9 +43,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             && text != null;
     }
 
-    public static final Comparator<TechnologyModel> sortByTechRequirements = (tech1, tech2) -> {
-        return TechnologyModel.sortTechsByRequirements(tech1, tech2);
-    };
+    public static final Comparator<TechnologyModel> sortByTechRequirements = TechnologyModel::sortTechsByRequirements;
 
     public static int sortTechsByRequirements(TechnologyModel t1, TechnologyModel t2) {
         int r1 = t1.getRequirements().orElse("").length();
@@ -59,8 +56,8 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
     public static int sortFactionTechsFirst(TechnologyModel t1, TechnologyModel t2) {
         if (t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 0;
-        if (!t1.getFaction().isEmpty() && !t2.getFaction().isEmpty()) return 0;
-        if (!t1.getFaction().isEmpty() && t2.getFaction().isEmpty()) return 1;
+        if (t1.getFaction().isPresent() && t2.getFaction().isPresent()) return 0;
+        if (t1.getFaction().isPresent() && t2.getFaction().isEmpty()) return 1;
         return -1;
     }
 
@@ -109,7 +106,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techFaction = getFaction().orElse("");
         if (!techFaction.isBlank()) factionEmoji = Emojis.getFactionIconFromDiscord(techFaction);
         String techEmoji = Emojis.getEmojiFromDiscord(getType().toString().toLowerCase() + "tech");
-        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSourceEmoji());
+        eb.setTitle(techEmoji + "**__" + getName() + "__**" + factionEmoji + getSource().emoji());
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
@@ -122,11 +119,11 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
-        eb.setColor(getEmbedColour());
+        eb.setColor(getEmbedColor());
         return eb.build();
     }
 
-    private Color getEmbedColour() {
+    private Color getEmbedColor() {
         return switch (getType()) {
             case PROPULSION -> Color.blue; //Color.decode("#00FF00");
             case CYBERNETIC -> Color.yellow;
@@ -134,14 +131,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             case WARFARE -> Color.red;
             case UNITUPGRADE -> Color.black;
             default -> Color.white;
-        };
-    }
-
-    private String getSourceEmoji() {
-        return switch (getSource()) {
-            case "absol" -> Emojis.Absol;
-            case "ds" -> Emojis.DiscordantStars;
-            default -> "";
         };
     }
 
@@ -153,12 +142,13 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             requirements = requirements.replace("G", Emojis.BioticTech);
             requirements = requirements.replace("R", Emojis.WarfareTech);
             return requirements;
-        } 
+        }
         return "None";
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFaction().orElse("").contains(searchString)
+            || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

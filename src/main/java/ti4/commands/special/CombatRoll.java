@@ -1,21 +1,18 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -110,16 +107,16 @@ public class CombatRoll extends SpecialSubcommandData {
 
         CombatRollType rollType = CombatRollType.combatround;
         if (rollTypeOption != null) {
-            if (rollTypeOption.getAsString().toLowerCase().equals("afb")) {
+            if ("afb".equalsIgnoreCase(rollTypeOption.getAsString())) {
                 rollType = CombatRollType.AFB;
             }
-            if (rollTypeOption.getAsString().toLowerCase().equals("bombardment")) {
+            if ("bombardment".equalsIgnoreCase(rollTypeOption.getAsString())) {
                 rollType = CombatRollType.bombardment;
             }
-            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannonoffence")) {
+            if ("spacecannonoffence".equalsIgnoreCase(rollTypeOption.getAsString())) {
                 rollType = CombatRollType.SpaceCannonOffence;
             }
-            if (rollTypeOption.getAsString().toLowerCase().equals("spacecannondefence")) {
+            if ("spacecannondefence".equalsIgnoreCase(rollTypeOption.getAsString())) {
                 rollType = CombatRollType.SpaceCannonDefence;
             }
         }
@@ -169,7 +166,7 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
 
-        List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(Arrays.asList(combatOnHolder));
+        List<UnitHolder> combatHoldersForOpponent = new ArrayList<>(List.of(combatOnHolder));
         if (rollType == CombatRollType.SpaceCannonDefence || rollType == CombatRollType.SpaceCannonOffence) {
             // Including space for finding opponents for pds - since people will fire before
             // landing sometimes
@@ -188,8 +185,15 @@ public class CombatRoll extends SpecialSubcommandData {
         // Check for temp mods
         CombatModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
         CombatModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
-        List<NamedCombatModifierModel> tempMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
-                combatOnHolder);
+        List<NamedCombatModifierModel> tempMods = new ArrayList<>(CombatModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
+                combatOnHolder, false, rollType));
+        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
+        if(opponent != null){
+            tempOpponentMods = CombatModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
+                combatOnHolder, true, rollType);
+        }
+        
+        tempMods.addAll(tempOpponentMods);
 
         List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
         customMods = CombatModHelper.FilterRelevantMods(customMods, unitsInCombat, rollType);

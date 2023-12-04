@@ -38,8 +38,9 @@ public class SendCommodities extends PlayerSubcommandData {
             sendMessage("Player to send TG/Commodities could not be found");
             return;
         }
-        if(player.hasAbility("military_industrial_complex")){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getTrueIdentity(player, activeGame) + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+        if (player.hasAbility("military_industrial_complex")) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)
+                + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
             return;
         }
 
@@ -49,32 +50,32 @@ public class SendCommodities extends PlayerSubcommandData {
         commodities -= sendCommodities;
         player.setCommodities(commodities);
 
-        if(!player.isPlayerMemberOfAlliance(player_)){
+        if (!player.isPlayerMemberOfAlliance(player_)) {
             int targetTG = player_.getTg();
             targetTG += sendCommodities;
             player_.setTg(targetTG);
-        }else{
+        } else {
             int targetTG = player_.getCommodities();
             targetTG += sendCommodities;
-            if(targetTG > player_.getCommoditiesTotal()){
+            if (targetTG > player_.getCommoditiesTotal()) {
                 targetTG = player_.getCommoditiesTotal();
             }
             player_.setCommodities(targetTG);
         }
-        
+
         String p1 = player.getRepresentation();
         String p2 = player_.getRepresentation();
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
-        String message =  p1 + " sent " + commString + " to " + p2;
+        String message = p1 + " sent " + commString + " to " + p2;
         sendMessage(message);
+        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities, event);
         ButtonHelperAbilities.pillageCheck(player_, activeGame);
         ButtonHelperAbilities.pillageCheck(player, activeGame);
-        ButtonHelperFactionSpecific.resolveDarkPactCheck(activeGame, player, player_, sendCommodities, event);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
-			ClearDebt.clearDebt(player_, player, sendCommodities);
-			sendMessage(player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
-		}
+            ClearDebt.clearDebt(player_, player, sendCommodities);
+            sendMessage(player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
+        }
 
         if (activeGame.isFoWMode()) {
             String fail = "Could not notify receiving player.";
@@ -84,6 +85,6 @@ public class SendCommodities extends PlayerSubcommandData {
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, commString, null);
         }
-        
+        ButtonHelper.checkTransactionLegality(activeGame, player, player_);
     }
 }

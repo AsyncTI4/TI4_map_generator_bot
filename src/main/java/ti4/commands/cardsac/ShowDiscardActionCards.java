@@ -27,7 +27,10 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
         int index = 1;
         for (Map.Entry<String, Integer> ac : activeGame.getDiscardActionCards().entrySet()) {
             sb.append("`").append(index).append(".").append(Helper.leftpad("("+ac.getValue(), 4)).append(")` - ");
-            sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
+            if(Mapper.getActionCard(ac.getKey()) != null){
+                sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
+            }
+            
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

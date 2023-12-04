@@ -4,14 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
+import java.util.stream.Stream;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class EventModel implements ModelInterface, EmbeddableModel {
@@ -23,7 +22,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text;
     private String mapText;
-    private String source;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
@@ -41,7 +40,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isFaction(getCategoryDescription());
             }
             case "event" -> {
-                return List.of("immediate", "permanent", "temporary").stream().anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -81,17 +80,6 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(mapText).orElse(getText());
     }
 
-    public String getSource() {
-        return Optional.ofNullable(source).orElse("");
-    }
-
-    public String getSourceEmoji() {
-      return switch (source.toLowerCase()) {
-        case "ignis_aurora" -> Emojis.IgnisAurora;
-        default -> "";
-      };
-    }
-
     public String getRepresentation() {
         return getRepresentation(null);
     }
@@ -104,7 +92,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        sb.append(getSourceEmoji());
+        sb.append(getSource().emoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -123,7 +111,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = getName() == null ? "" : getName();
-        eb.setTitle("__" + name + "__" + getSourceEmoji(), null);
+        eb.setTitle("__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.black);
         eb.setDescription(getType() + "\n" + getTarget());
         eb.addField("", getText(), false);

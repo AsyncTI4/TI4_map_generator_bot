@@ -1,11 +1,10 @@
 package ti4.commands.franken;
 
 import java.util.List;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -31,7 +30,7 @@ public class LeaderAdd extends LeaderAddRemove {
         sendMessage(sb.toString());
     }
 
-    public void addLeader(Player player, String leaderID) {
+    public void addLeader(Player player, String leaderID, Game activeGame) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
 
         if (player.hasLeader(leaderID)) {
@@ -43,6 +42,6 @@ public class LeaderAdd extends LeaderAddRemove {
         sb.append("\n");
         player.addLeader(leaderID);
         
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, getActiveGame()), sb.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), sb.toString());
     }
 }

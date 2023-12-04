@@ -1,8 +1,8 @@
 package ti4.commands.search;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -31,7 +31,7 @@ public class ListLeaders extends SearchSubcommandData {
             return;
         }
 
-        for (LeaderModel model : Mapper.getLeaders().values().stream().sorted((o1, o2) -> o1.getID().compareTo(o2.getID())).toList()) {
+        for (LeaderModel model : Mapper.getLeaders().values().stream().sorted(Comparator.comparing(LeaderModel::getID)).toList()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(true, true, true, true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }

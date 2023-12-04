@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -30,6 +26,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.DiscordWebhook;
@@ -76,6 +74,14 @@ public class MessageHelper {
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue();
 		}
+		String messageId = message.getId();
+		if (activeGame.getFactionsThatReactedToThis(messageId) != null && !activeGame.getFactionsThatReactedToThis(messageId).isEmpty()) {
+			if (!activeGame.getFactionsThatReactedToThis(messageId).contains(player.getFaction())) {
+				activeGame.setCurrentReacts(messageId, activeGame.getFactionsThatReactedToThis(messageId) + "_" + player.getFaction());
+			}
+		} else {
+			activeGame.setCurrentReacts(messageId, player.getFaction());
+		}
 	}
 
 	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Game activeGame, Player player, List<Button> buttons) {
@@ -87,6 +93,7 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> {
 			addFactionReactToMessage(activeGame, player, msg);
 			activeGame.addMessageIDForSabo(msg.getId());
+
 		};
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
@@ -100,14 +107,14 @@ public class MessageHelper {
 				}
 				activeGame.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoWhen(), "_");
-			} else if ("after".equalsIgnoreCase(whenOrAfter)){
+			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
 				if (activeGame.getLatestAfterMsg() != null && !"".equals(activeGame.getLatestAfterMsg())) {
 					activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestAfterMsg()).queue();
 				}
 				activeGame.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeGame.getPlayersWhoHitPersistentNoAfter(), "_");
-			}else {
-				if(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null){
+			} else {
+				if (activeGame.getFactionsThatReactedToThis("Pass On Shenanigans") == null) {
 					activeGame.setCurrentReacts("Pass On Shenanigans", "");
 				}
 				players = new StringTokenizer(activeGame.getFactionsThatReactedToThis("Pass On Shenanigans"), "_");
@@ -139,7 +146,7 @@ public class MessageHelper {
 			}
 		}
 		FileUpload fileUpload = FileUpload.fromData(file);
-		final MessageChannel finalChannel = channel;
+		MessageChannel finalChannel = channel;
 		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
@@ -154,7 +161,7 @@ public class MessageHelper {
 				}
 			}
 		}
-		final MessageChannel finalChannel = channel;
+		MessageChannel finalChannel = channel;
 		channel.sendFiles(fileUpload).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(finalChannel, "Failed to send File to Channel", error)));
 	}
 
@@ -330,6 +337,9 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
+			if (!activeGame.isFoWMode()) {
+				privateChannel = player.getCardsInfoThread();
+			}
 			if (privateChannel == null) {
 				sendMessageToUser(activeGame.getName() + " " + messageText, user);
 			} else {
@@ -347,7 +357,7 @@ public class MessageHelper {
 	public static boolean privatelyPingPlayerList(List<Player> players, Game activeGame, MessageChannel feedbackChannel, String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
-			String playerRepresentation = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true);
+			String playerRepresentation = player.getRepresentation(true, true);
 			boolean success = sendPrivateMessageToPlayer(player, activeGame, feedbackChannel, playerRepresentation + message, failText, successText);
 			if (success) count++;
 		}
@@ -469,11 +479,9 @@ public class MessageHelper {
 
 		for (MessageCreateData mcd : messageCreateDataList) {
 			if (mcd != null) {
-				if (mcd.getContent() != null) continue;
-				if (mcd.getEmbeds() != null && !mcd.getEmbeds().isEmpty()) continue;
-				if (mcd.getComponents() != null && !mcd.getComponents().isEmpty()) continue;
-				if (mcd.getFiles() != null && !mcd.getFiles().isEmpty()) continue;
-			}
+        mcd.getContent();
+        continue;
+      }
 			StringBuilder error = new StringBuilder("MessageCreateData is invalid for arguments: \n");
 			int cutoff = message.indexOf("\n");
 			error.append("> Message: ").append(cutoff == -1 ? message : message.substring(0, cutoff)).append("...\n");
@@ -573,7 +581,7 @@ public class MessageHelper {
 		List<String> badButtonIDsAndReason = new ArrayList<>();
 		for (Button button : buttons) {
 			if (button == null) continue;
-			if (button.getId() == null && !button.getStyle().equals(ButtonStyle.LINK)) continue;
+			if (button.getId() == null && button.getStyle() != ButtonStyle.LINK) continue;
 
 			// REMOVE DUPLICATE IDs
 			if (goodButtonIDs.contains(button.getId())) {
@@ -583,10 +591,10 @@ public class MessageHelper {
 			goodButtonIDs.add(button.getId());
 
 			// REMOVE EMOJIS IF EMOJI NOT
-			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji) {
-				CustomEmoji emoji = (CustomEmoji) button.getEmoji();
+			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
-					badButtonIDsAndReason.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
+					badButtonIDsAndReason
+						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
 					button = button.withEmoji(null);
 				}
 			}

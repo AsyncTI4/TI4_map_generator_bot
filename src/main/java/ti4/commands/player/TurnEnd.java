@@ -7,9 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,12 +17,14 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -83,6 +82,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
         activeGame.setComponentAction(false);
         activeGame.setTemporaryPingDisable(false);
+        mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         if (activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
@@ -119,9 +119,11 @@ public class TurnEnd extends PlayerSubcommandData {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
         ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
         TurnStart.turnStart(event, activeGame, nextPlayer);
     }
+
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
         return getScoreObjectiveButtons(event, activeGame, "");
     }
@@ -156,13 +158,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Button.success(prefix+Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
+                    objectiveButton = Button.success(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Button.primary(prefix+ Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
+                    objectiveButton = Button.primary(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
-                    objectiveButton = Button.secondary(prefix+Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    objectiveButton = Button.secondary(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                     poButtonsCustom.add(objectiveButton);
                 }
             }
@@ -176,13 +178,12 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game activeGame, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeGame);
+        String message = "All players passed. Please score objectives. " + activeGame.getPing();
 
         activeGame.setCurrentPhase("status");
         for (Player player : activeGame.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(activeGame, player);
-            List<String> relics = new ArrayList<>();
-            relics.addAll(player.getRelics());
+          List<String> relics = new ArrayList<>(player.getRelics());
             for (String relic : relics) {
                 if (player.getExhaustedRelics().contains(relic) && relic.contains("axisorder")) {
                     player.removeRelic(relic);
@@ -228,13 +229,13 @@ public class TurnEnd extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), pnModel.getName() + " was returned");
                 }
             }
-            if(player.hasTech("dsauguy") && player.getTg() > 2){
+            if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 activeGame.setComponentAction(true);
                 Button getTech = Button.success("acquireATech", "Get a tech");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", buttons);
+                    player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", buttons);
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
@@ -247,30 +248,23 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder != null && unitHolder.getTokenList() != null
                         && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
 
-                            if(player.hasRelic("emphidia")){
-                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                        if (player.hasRelic("emphidia")) {
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                 player.getRepresentation()
                                     + "Reminder this is not the window to use Crown of Emphidia. You can purge crown of emphidia in the status homework phase, which is when buttons will appear");
-                            }else{
-                                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                    player.getRepresentation()
-                                        + "Reminder this is the window to use Crown of Emphidia.");
-                                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                    player.getRepresentation()
-                                        + " You can use these buttons to resolve Crown of Emphidia",
-                                    ButtonHelper.getCrownButtons());
-                            }
-                        
+                        } else {
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                player.getRepresentation()
+                                    + "Reminder this is the window to use Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                                player.getRepresentation()
+                                    + " You can use these buttons to resolve Crown of Emphidia",
+                                ButtonHelper.getCrownButtons());
+                        }
+
                     }
                 }
             }
-
-
-
-
-
-
-
 
         }
 
@@ -283,9 +277,12 @@ public class TurnEnd extends PlayerSubcommandData {
 
         Player arborec = Helper.getPlayerFromAbility(activeGame, "mitosis");
         if (arborec != null) {
-            String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeGame, event.getGuild(), true) + " reminder to do mitosis!";
+            String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(activeGame, arborec));
-
+        }
+        Player veldyr = Helper.getPlayerFromAbility(activeGame, "holding_company");
+        if (veldyr != null) {
+            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, activeGame);
         }
         Player solPlayer = Helper.getPlayerFromUnit(activeGame, "sol_flagship");
 
@@ -297,7 +294,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder.getUnits() != null) {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeGame, event.getGuild(), true)
+                            String genesisMessage = solPlayer.getRepresentation(true, true)
                                 + " an infantry was added to the space area of your flagship automatically.";
                             if (activeGame.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);

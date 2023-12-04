@@ -111,7 +111,7 @@ public class Setup extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
-            activeGame.setCompetitiveTIGLGame(isTIGLGame);
+            activeGame.setCompetitiveTIGLGame(true);
             sendTIGLSetupText(activeGame);
             return true;
         }
@@ -136,12 +136,12 @@ public class Setup extends GameSubcommandData {
             activeGame.setScSetID("base_game");
 
             activeGame.setTechnologyDeckID("techs_base");
-            activeGame.setBaseGameMode(baseGameMode);
+            activeGame.setBaseGameMode(true);
             activeGame.setAbsolMode(false);
             activeGame.setDiscordantStarsMode(false);
             return true;
         }
-        activeGame.setBaseGameMode(baseGameMode);
+        activeGame.setBaseGameMode(false);
 
         // BOTH ABSOL & DS, and/or if either was set before the other
         if (absolMode && discordantStarsMode) {
@@ -153,8 +153,8 @@ public class Setup extends GameSubcommandData {
             if (!activeGame.validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol_ds"))) return false;
             if (!activeGame.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"))) return false;
             activeGame.setTechnologyDeckID("techs_ds_absol");
-            activeGame.setAbsolMode(absolMode);
-            activeGame.setDiscordantStarsMode(discordantStarsMode);
+            activeGame.setAbsolMode(true);
+            activeGame.setDiscordantStarsMode(true);
             activeGame.setBaseGameMode(false);
             activeGame.swapInVariantUnits("absol");
             activeGame.swapInVariantTechs();
@@ -162,7 +162,7 @@ public class Setup extends GameSubcommandData {
         }
 
         // JUST DS
-        if (discordantStarsMode && !absolMode) {
+        if (discordantStarsMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
@@ -177,7 +177,7 @@ public class Setup extends GameSubcommandData {
         activeGame.setDiscordantStarsMode(discordantStarsMode);
 
         // JUST ABSOL
-        if (absolMode && !discordantStarsMode) {
+        if (absolMode) {
             if (!activeGame.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"))) return false;
             if (!activeGame.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!activeGame.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
@@ -213,12 +213,11 @@ public class Setup extends GameSubcommandData {
     }
 
     private static void sendTIGLSetupText(Game activeGame) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("# ").append(Emojis.TIGL).append("TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n");
-        sb.append("Please ensure you have all:\n");
-        sb.append("- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n");
-        sb.append("- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n");
-        sb.append("For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360");
-        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb.toString());
+      String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
+          "Please ensure you have all:\n" +
+          "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
+          "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
+          "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
+        MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), sb);
     }
 }

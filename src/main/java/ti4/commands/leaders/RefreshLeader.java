@@ -32,7 +32,7 @@ public class RefreshLeader extends LeaderAction {
                 .append(Helper.getLeaderShortRepresentation(playerLeader));
             if (tgCount > 0) {
                 message.append(" - ").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" transferred from leader to player");
-                
+
             }
             String msg = message.toString();
             sendMessage(msg);
@@ -49,7 +49,7 @@ public class RefreshLeader extends LeaderAction {
             tg += tgCount;
             player.setTg(tg);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                ButtonHelper.getTrueIdentity(player, activeGame) + " you gained " + tgCount + " tgs (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
+                player.getRepresentation(true, true) + " you gained " + tgCount + " tgs (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
             ButtonHelperAbilities.pillageCheck(player, activeGame);
             playerLeader.setTgCount(0);
         }

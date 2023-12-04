@@ -27,7 +27,7 @@ public class ClearDebt extends PlayerSubcommandData {
         Game activeGame = getActiveGame();
         Player clearingPlayer = activeGame.getPlayer(getUser().getId());
         clearingPlayer = Helper.getGamePlayer(activeGame, clearingPlayer, event, null);
-        
+
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
@@ -40,7 +40,7 @@ public class ClearDebt extends PlayerSubcommandData {
                 }
             }
         }
-        
+
         if (clearingPlayer == null) {
             sendMessage("Player could not be found");
             return;
@@ -53,7 +53,7 @@ public class ClearDebt extends PlayerSubcommandData {
         }
 
         int debtCountToClear = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
-        if (debtCountToClear <= 0 ) {
+        if (debtCountToClear <= 0) {
             sendMessage("Debt count must be a positive integer");
             return;
         }
@@ -68,7 +68,7 @@ public class ClearDebt extends PlayerSubcommandData {
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {
-        String clearedPlayerColour = clearedPlayer.getColor();
-        clearingPlayer.removeDebtTokens(clearedPlayerColour, debtCountToClear);
+        String clearedPlayerColor = clearedPlayer.getColor();
+        clearingPlayer.removeDebtTokens(clearedPlayerColor, debtCountToClear);
     }
 }

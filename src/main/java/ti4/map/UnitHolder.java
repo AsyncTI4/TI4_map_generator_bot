@@ -1,21 +1,18 @@
 package ti4.map;
 
-import java.awt.Point;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -163,16 +160,15 @@ abstract public class UnitHolder {
 
     @NotNull
     public Integer getUnitCount(UnitType unitType, String color) {
-        if (units == null || unitType == null || color == null) return 0;
+        if (unitType == null || color == null) return 0;
         String colorIDofUnit = Mapper.getColorID(color);
         if (colorIDofUnit == null) {
             colorIDofUnit = color;
         }
-        final String effinColor = colorIDofUnit;
-        Integer value = units.entrySet().stream()
-            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(effinColor))
+        String effinColor = colorIDofUnit;
+        return units.entrySet().stream()
+            .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(effinColor))
             .findFirst().map(Entry::getValue).orElse(0);
-        return value == null ? 0 : value;
     }
 
     @JsonIgnore
@@ -186,11 +182,9 @@ abstract public class UnitHolder {
 
     @NotNull
     public Integer getUnitDamageCount(UnitType unitType, String color) {
-        if (unitsDamage == null) return 0;
-        Integer value = unitsDamage.entrySet().stream()
-            .filter(e -> e.getKey().getUnitType().equals(unitType) && e.getKey().getColorID().equals(color))
-            .findFirst().map(Entry::getValue).orElse(0);
-        return value == null ? 0 : value;
+        return unitsDamage.entrySet().stream()
+              .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(color))
+              .findFirst().map(Entry::getValue).orElse(0);
     }
 
     public HashSet<String> getCCList() {

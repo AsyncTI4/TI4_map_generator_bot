@@ -1,20 +1,21 @@
 package ti4.helpers;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import ti4.draft.BagDraft;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.draft.DraftBag;
-import ti4.draft.DraftItem;
 
 public class FrankenDraftHelper {
 
@@ -38,12 +39,7 @@ public class FrankenDraftHelper {
                 default -> ButtonStyle.SUCCESS;
             };
             Button b = Button.of(style, ActionName + item.getAlias(), item.getShortDescription()).withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
-            if(b != null){
-                buttons.add(b);
-            }else{
-                BotLogger.log("Tried to build a null button in getSelectionButtons with "+item.getAlias());
-            }
-            
+            buttons.add(b);
         }
         return buttons;
     }
@@ -54,59 +50,56 @@ public class FrankenDraftHelper {
 
         if (!action.contains(":")) {
             switch (action) {
-                case "reset_queue":
+                case "reset_queue" -> {
                     player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     showPlayerBag(activeGame, player);
-
                     GameSaveLoadManager.saveMap(activeGame);
                     return;
-                case "confirm_draft":
+                }
+                case "confirm_draft" -> {
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);
-
                     GameSaveLoadManager.saveMap(activeGame);
-
                     draft.findExistingBagChannel(player).delete().queue();
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + getBagReceipt(player.getCurrentDraftBag()));
                     displayPlayerHand(activeGame, player);
-
                     if (draft.isDraftStageComplete()) {
-                        String categoryForPlayers = Helper.getGamePing(event, activeGame);
+                        String categoryForPlayers = activeGame.getPing();
                         MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
                             categoryForPlayers + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
                         return;
                     }
-
                     int passCounter = 0;
                     while (draft.allPlayersReadyToPass()) {
                         passBags(activeGame);
                         passCounter++;
                         if (passCounter > activeGame.getRealPlayers().size()) {
-                            String categoryForPlayers = Helper.getGamePing(event, activeGame);
+                            String categoryForPlayers = activeGame.getPing();
                             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(),
                                 categoryForPlayers + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
                             break;
                         }
                     }
                     return;
-                case "show_bag":
+                }
+                case "show_bag" -> {
                     showPlayerBag(activeGame, player);
                     return;
+                }
             }
         }
-        String selectedAlias = action;
         DraftBag currentBag = player.getCurrentDraftBag();
-        DraftItem selectedItem = DraftItem.GenerateFromAlias(selectedAlias);
+        DraftItem selectedItem = DraftItem.GenerateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription() + " right now. Please select another item.");
             return;
         }
-        currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(selectedAlias));
-        player.queueDraftItem(DraftItem.GenerateFromAlias(selectedAlias));
+        currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
+        player.queueDraftItem(DraftItem.GenerateFromAlias(action));
 
         if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
             draft.setPlayerReadyToPass(player, true);
@@ -138,10 +131,10 @@ public class FrankenDraftHelper {
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
         boolean isQueueFull = draftQueueCount >= 2 && !isFirstDraft || draftQueueCount >= 3;
         if (draftables.isEmpty()) {
-            MessageHelper.sendMessageToChannel(bagChannel, ButtonHelper.getTrueIdentity(player, activeGame) + " you cannot legally draft anything from this bag right now.");
+            MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentation(true, true) + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel,
-                ButtonHelper.getTrueIdentity(player, activeGame) + " please select an item to draft:", getSelectionButtons(draftables));
+                player.getRepresentation(true, true) + " please select an item to draft:", getSelectionButtons(draftables));
         }
 
         if (draftQueueCount > 0) {
@@ -155,7 +148,7 @@ public class FrankenDraftHelper {
 
             if (isQueueFull || draftables.isEmpty()) {
                 MessageHelper.sendMessageToChannel(bagChannel,
-                    ButtonHelper.getTrueIdentity(player, activeGame) + " please confirm or reset your draft picks.");
+                    player.getRepresentation(true, true) + " please confirm or reset your draft picks.");
             }
         }
 
@@ -194,10 +187,10 @@ public class FrankenDraftHelper {
 
             undraftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
             for (DraftItem item : undraftables) {
-                if(item != null && item.getItemEmoji() != null){
+                if (item != null && item.getItemEmoji() != null) {
                     sb.append(item.getItemEmoji()).append(" ");
                 }
-                if(item != null &&item.getShortDescription() != null){
+                if (item != null && item.getShortDescription() != null) {
                     sb.append("**").append(item.getShortDescription()).append("**\n");
                 }
                 sb.append("\n");
@@ -228,7 +221,7 @@ public class FrankenDraftHelper {
             sb.append(item.getShortDescription()).append("\n - ");
             sb.append(item.getLongDescription());
         } catch (Exception e) {
-            sb.append("ERROR BUILDING DESCRIPTION FOR " + item.getAlias());
+            sb.append("ERROR BUILDING DESCRIPTION FOR ").append(item.getAlias());
         }
     }
 
@@ -250,7 +243,7 @@ public class FrankenDraftHelper {
             showPlayerBag(activeGame, player);
         }
 
-        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), Helper.getGamePing(activeGame.getGuild(), activeGame)
+        MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), activeGame.getPing()
             + " draft started. As a reminder, for the first bag you pick 3 items, and for " +
             "all the bags after that you pick 2 items. New buttons will generate after each pick. The first few picks, the buttons overflow discord button limitations, so while some buttons will get"
             +

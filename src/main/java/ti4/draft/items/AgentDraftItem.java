@@ -3,7 +3,6 @@ package ti4.draft.items;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 
@@ -13,7 +12,7 @@ public class AgentDraftItem extends DraftItem {
     }
 
     private FactionModel getFaction() {
-        if (ItemId.equals("keleres")) {
+        if ("keleres".equals(ItemId)) {
             return Mapper.getFaction("keleresa");
         }
         return Mapper.getFaction(ItemId);

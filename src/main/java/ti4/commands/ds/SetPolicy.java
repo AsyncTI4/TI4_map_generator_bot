@@ -168,7 +168,7 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         player.removeOwnedUnitByID("olradin_mech");
         player.removeOwnedUnitByID("olradin_mech_positive");
         player.removeOwnedUnitByID("olradin_mech_negative");
-        String unitModelID = null;
+        String unitModelID;
         if (positivePolicies >= 2) {
             unitModelID = "olradin_mech_positive";
         } else if (negativePolicies > 2) {

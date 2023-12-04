@@ -72,6 +72,7 @@ public class SendTG extends PlayerSubcommandData {
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeGame, event, player, player_, tgString, null);
 		}
+		ButtonHelper.checkTransactionLegality(activeGame, player, player_);
 
 	}
 }

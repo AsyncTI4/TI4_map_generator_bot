@@ -41,6 +41,7 @@ public class GlobalSettings {
 
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, val);
+        saveSettings();
     }
 
     public static void saveSettings() {

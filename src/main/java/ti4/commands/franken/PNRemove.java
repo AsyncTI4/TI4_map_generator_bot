@@ -1,9 +1,7 @@
 package ti4.commands.franken;
 
 import java.util.List;
-
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Player;
 
 public class PNRemove extends PNAddRemove {

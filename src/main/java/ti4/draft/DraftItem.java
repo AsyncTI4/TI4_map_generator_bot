@@ -1,12 +1,26 @@
 package ti4.draft;
 
-import ti4.draft.items.*;
-import ti4.generator.Mapper;
-import ti4.map.Player;
-import ti4.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import ti4.draft.items.AbilityDraftItem;
+import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.CommanderDraftItem;
+import ti4.draft.items.CommoditiesDraftItem;
+import ti4.draft.items.FlagshipDraftItem;
+import ti4.draft.items.HeroDraftItem;
+import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.MechDraftItem;
+import ti4.draft.items.PNDraftItem;
+import ti4.draft.items.RedTileDraftItem;
+import ti4.draft.items.SpeakerOrderDraftItem;
+import ti4.draft.items.StartingFleetDraftItem;
+import ti4.draft.items.StartingTechDraftItem;
+import ti4.draft.items.TechDraftItem;
+import ti4.generator.Mapper;
+import ti4.map.Player;
+import ti4.model.DraftErrataModel;
+import ti4.model.ModelInterface;
 
 public abstract class DraftItem implements ModelInterface {
     @Override
@@ -37,10 +51,10 @@ public abstract class DraftItem implements ModelInterface {
         DRAFTORDER
     }
 
-    public Category ItemCategory;
+    public final Category ItemCategory;
 
     // The system ID of the item. Only convert this to player-readable text when necessary
-    public String ItemId;
+    public final String ItemId;
 
     public DraftErrataModel Errata;
 

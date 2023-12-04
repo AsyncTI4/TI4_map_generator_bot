@@ -273,7 +273,7 @@
         "name": "Unconventional Measures ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player returns 1 command token from their command sheet to their reinforcements and draws 4 action cards.",
+        "text1": "For: Each player draws 1 action card. Then, they draw 1 additional action card for every 5 votes they cast during this agenda.",
         "text2": "Against: Each player may discard 2 action cards to gain 1 command token; they may repeat this effect any number of times.",
         "source": "little_omega"
     },
@@ -292,8 +292,8 @@
         "name": "Wormhole Research ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 1 blue technology. If the result is 1-5, each player destroys 3 of their ships in each system that contains a non-delta wormhole; they must choose non-fighter ships, if able.",
-        "text2": "Against: Each player draws 1 action card for each system that contains a wormhole and their units.",
+        "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 1 technology. If the result is 1-5, each player destroys 2 of their ships in each system that contains a non-delta wormhole; they must choose non-fighter ships, if able.",
+        "text2": "Against: Each player may spend 1 strategy token to research 1 technology that has no prerequisites.",
         "source": "little_omega"
     },
     {

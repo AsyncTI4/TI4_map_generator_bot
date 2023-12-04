@@ -12,7 +12,7 @@
         "leaders": ["keleresagent", "kelerescommander", "keleresheroharka"],
         "promissoryNotes": ["riderm"],
         "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"],
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "alias": "keleresx",
@@ -27,7 +27,7 @@
         "leaders": ["keleresagent", "kelerescommander", "keleresheroodlynn"],
         "promissoryNotes": ["riderx"],
         "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"],
-        "source": "codexiii"
+        "source": "codex3"
     },
     {
         "alias": "keleresa",
@@ -42,6 +42,6 @@
         "leaders": ["keleresagent", "kelerescommander", "keleresherokuuasi"],
         "promissoryNotes": ["ridera"],
         "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"],
-        "source": "codexiii"
+        "source": "codex3"
     }
 ]

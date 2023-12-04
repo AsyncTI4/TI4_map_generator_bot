@@ -3,15 +3,13 @@ package ti4.selections.selectmenus;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.apache.commons.collections4.ListUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
@@ -36,15 +34,15 @@ public class SelectFaction implements Selection {
     public void execute(StringSelectInteractionEvent event) {
         Game activeGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
         if (activeGame == null) {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
-			return;
-		}
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
+            return;
+        }
         Player player = activeGame.getPlayer(event.getUser().getId());
-		player = Helper.getGamePlayer(activeGame, player, event, null);
-		if (player == null) {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-			return;
-		}
+        player = Helper.getGamePlayer(activeGame, player, event, null);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            return;
+        }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().get(0).getLabel());
         String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().get(0);
@@ -55,7 +53,7 @@ public class SelectFaction implements Selection {
         List<FactionModel> factions = Mapper.getFactions().stream().sorted(Comparator.comparing(FactionModel::getFactionName)).sorted(Comparator.comparing(FactionModel::getSource)).toList();
         List<List<FactionModel>> factionPages = ListUtils.partition(factions, 25);
         List<StringSelectMenu> menus = new ArrayList<>();
-        
+
         for (List<FactionModel> factionPage : factionPages) {
             StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
             for (FactionModel faction : factionPage) {
@@ -63,7 +61,7 @@ public class SelectFaction implements Selection {
                 SelectOption option = SelectOption.of(faction.getFactionName(), faction.getAlias())
                     .withDescription(faction.getAlias())
                     .withLabel(faction.getAutoCompleteName());
-                if (emojiToUse != null) option = option.withEmoji(emojiToUse);
+              option = option.withEmoji(emojiToUse);
                 menuBuilder.addOptions(option);
             }
             menuBuilder.setRequiredRange(1, 1);
@@ -73,6 +71,4 @@ public class SelectFaction implements Selection {
             event.getMessageChannel().sendMessage("").addComponents(ActionRow.of(menu)).queue();
         }
     }
-
-    
 }

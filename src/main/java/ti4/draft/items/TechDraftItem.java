@@ -3,7 +3,6 @@ package ti4.draft.items;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.model.TechnologyModel;
 
 public class TechDraftItem extends DraftItem {

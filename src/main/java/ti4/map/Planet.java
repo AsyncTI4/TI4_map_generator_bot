@@ -1,24 +1,22 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
+import ti4.model.UnitModel;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -32,8 +30,8 @@ public class Planet extends UnitHolder {
     private final ArrayList<String> planetType = new ArrayList<>();
     private final ArrayList<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility;
-    private int spaceCannonHitsOn = 0;
-    private int spaceCannonDieCount = 0;
+    private int spaceCannonHitsOn;
+    private int spaceCannonDieCount;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -76,7 +74,7 @@ public class Planet extends UnitHolder {
             .map(UnitKey::asyncID)
             .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
             .filter(Objects::nonNull)
-            .anyMatch(u -> u.getIsGroundForce());
+            .anyMatch(UnitModel::getIsGroundForce);
     }
 
     @Override

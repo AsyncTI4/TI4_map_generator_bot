@@ -1,11 +1,19 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetAdd;
@@ -28,16 +36,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -74,21 +72,19 @@ public class Setup extends PlayerSubcommandData {
 
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
-         String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
+        String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
-
-
-    public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker){
+    public void secondHalfOfPlayerSetup(Player player, Game activeGame, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
         LinkedHashMap<String, Player> players = activeGame.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
-                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player:" + playerInfo.getUserName() + " already uses color:" + color);
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
-                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
             }
@@ -109,7 +105,7 @@ public class Setup extends PlayerSubcommandData {
 
         // HOME SYSTEM
         if (!PositionMapper.isTilePositionValid(positionHS)) {
-             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Tile position: `" + positionHS + "` is not valid. Stopping Setup.");
             return;
         }
 
@@ -170,7 +166,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Alliance")) {
+                if (pnID.endsWith("_an") && "Alliance".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                 }
             }
@@ -178,7 +174,7 @@ public class Setup extends PlayerSubcommandData {
         if (activeGame.isAbsolMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
             for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps") && Mapper.getPromissoryNoteByID(pnID).getName().equals("Political Secret")) {
+                if (pnID.endsWith("_ps") && "Political Secret".equals(Mapper.getPromissoryNoteByID(pnID).getName())) {
                     player.removeOwnedPromissoryNoteByID(pnID);
                     player.addOwnedPromissoryNoteByID("absol_" + pnID);
                 }
@@ -196,63 +192,67 @@ public class Setup extends PlayerSubcommandData {
         UnitInfo.sendUnitInfo(activeGame, player, event);
         PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
-            if(player.getFaction().contains("keleres")){
+            if (player.getFaction().contains("keleres")) {
                 Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getTrueIdentity(player, activeGame) + " after every other faction gets their tech, press this button to resolve Keleres tech", buttons);
-            } else if(player.getFaction().contains("winnu")){
+                    player.getRepresentation(true, true) + " after every other faction gets their tech, press this button to resolve Keleres tech", buttons);
+            } else if (player.getFaction().contains("winnu")) {
                 ButtonHelperFactionSpecific.offerWinnuStartingTech(player, activeGame);
-            }else if(player.getFaction().contains("argent")){
-                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
-            }else{
+            } else if (player.getFaction().contains("argent")) {
+                ButtonHelperFactionSpecific.offerArgentStartingTech(player, activeGame);
+            } else {
                 activeGame.setComponentAction(true);
                 Button getTech = Button.success("acquireATech", "Get a tech");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                    ButtonHelper.getTrueIdentity(player, activeGame) + " you can use the button to get your starting tech", buttons);
+                    player.getRepresentation(true, true) + " you can use the button to get your starting tech", buttons);
             }
         }
 
-        if(player.hasAbility("diplomats")){
+        if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(activeGame);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up free people ability markers. "+  ButtonHelper.getTrueIdentity(player, activeGame) + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up free people ability markers. " + player.getRepresentation(true, true)
+                + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
-        if(player.hasAbility("private_fleet")){
+        if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for "+player.getRepresentation() +" due to the private fleet ability");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
-        if(player.hasAbility("teeming")){
+        if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
             player.setUnitCap(unitID, 7);
             unitID = AliasHandler.resolveUnit("mech");
             player.setUnitCap(unitID, 5);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set dread unit max to 7 and mech unit max to 5 for "+player.getRepresentation() +" due to the teeming ability");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation() + " due to the teeming ability");
         }
         if (player.hasAbility("oracle_ai")) {
             activeGame.setUpPeakableObjectives(10);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up peekable objective decks due to auger player. "+  ButtonHelper.getTrueIdentity(player, activeGame) + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up peekable objective decks due to auger player. " + player.getRepresentation(true, true)
+                + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN.");
             GameSaveLoadManager.saveMap(activeGame, event);
         }
 
         if (!activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), "Player: " + player.getRepresentation() + " has been set up");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player was set up.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game activeGame2 : mapList.values()) {
             for (Player player2 : activeGame2.getRealPlayers()) {
                 if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                     player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+                    if (player2.getPersonalPingInterval() > 0) {
+                        player.setPersonalPingInterval(player2.getPersonalPingInterval());
+                    }
                 }
             }
         }
-
 
     }
 
@@ -282,7 +282,7 @@ public class Setup extends PlayerSubcommandData {
             UnitKey unitID = Mapper.getUnitKey(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Unit: " + unit + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unit: " + unit + " is not valid and not supported.");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {

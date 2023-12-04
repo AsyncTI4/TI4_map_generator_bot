@@ -1,11 +1,11 @@
 package ti4.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.Objects;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.CombatRollType;
 
 @Data
@@ -23,6 +23,7 @@ public class CombatModifierModel implements ModelInterface {
     private String condition;
     private String forCombatAbility;
     private Boolean applyEachForQuantity = false;
+    private Boolean applyToOpponent = false;
 
     public boolean isValid() {
         return type != null
@@ -51,8 +52,8 @@ public class CombatModifierModel implements ModelInterface {
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
                 sortedAllUnits.sort(
-                        (a, b) -> a.getCombatDieHitsOnForAbility(rollType) - b.getCombatDieHitsOnForAbility(rollType));
-                isInScope = sortedAllUnits.get(0).getAsyncId() == unit.getAsyncId();
+                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType)));
+                isInScope = Objects.equals(sortedAllUnits.get(0).getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {
                 isInScope = unit.getIsShip();
