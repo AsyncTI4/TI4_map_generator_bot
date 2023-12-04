@@ -22,7 +22,8 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True if want Community Mode for map, False to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True if want FoW Mode for map, False to disable it").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to "));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with Base Game Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
