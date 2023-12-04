@@ -1356,14 +1356,14 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Galactic Threat Rider using the buttons",
                                 ButtonHelperAbilities.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeGame));
                         }
-                        if (specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")) {
+                        if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
                             activeGame.setComponentAction(true);
                             Button getTech = Button.success("acquireATech", "Get a tech");
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(getTech);
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity + " resolve Technology Rider by using the button to get a tech", buttons);
                         }
-                        if (specificVote.contains("Leadership Rider") || (specificVote.contains("Technology Rider") && winningR.hasAbility("technological_singularity"))) {
+                        if (specificVote.contains("Leadership Rider") || (specificVote.contains("Technology Rider") && winningR.hasAbility("propagation"))) {
                             Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                             Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                             Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");

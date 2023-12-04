@@ -106,6 +106,9 @@ public class PlayAC extends ACCardsSubcommandData {
         if ("Action".equalsIgnoreCase(actionCardWindow) && activeGame.getPlayer(activePlayerID) != player) {
             return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
         }
+        if(ButtonHelper.isPlayerOverLimit(activeGame, player)){
+            return player.getRepresentation(true, true)+" The bot thinks you are over the limit and thus will not allow you to play ACs at this time. Ping Fin if this is an error";
+        }
 
         if (player.hasAbility("cybernetic_madness")) {
             activeGame.purgedActionCard(player.getUserID(), acIndex);
