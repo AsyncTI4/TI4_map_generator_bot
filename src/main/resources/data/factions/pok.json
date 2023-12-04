@@ -19,7 +19,7 @@
         "factionName": "The Vuil'raith Cabal",
         "shortTag": "VRC",
         "homeSystem": "54",
-        "startingFleet": "dn,cv,cr,3 ff,3 inf a,csd a",
+        "startingFleet": "dn,cv,cr,3 ff,3 inf a,sd a",
         "commodities": 2,
         "factionTech": ["dt2", "vtx"],
         "startingTech": ["sar"],

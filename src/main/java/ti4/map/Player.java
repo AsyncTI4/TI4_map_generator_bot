@@ -106,6 +106,7 @@ public class Player {
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
+    private HashMap<String, Integer> producedUnits = new HashMap<>();
     @Getter
     @Setter
     private List<String> factionTechs = new ArrayList<>();
@@ -206,6 +207,31 @@ public class Player {
 
     public void setMahactCC(List<String> mahactCC) {
         this.mahactCC = mahactCC;
+    }
+
+    public void resetProducedUnits(){
+        producedUnits = new HashMap<>(); 
+    }
+
+    public HashMap<String, Integer> getCurrentProducedUnits() {
+        return producedUnits;
+    }
+    public void setProducedUnit(String unit, int count) {
+        producedUnits.put(unit, count);
+    }
+    public int getProducedUnit(String unit) {
+        if(producedUnits.get(unit) == null){
+            return 0;
+        }else{
+            return producedUnits.get(unit);
+        }
+    }
+    public void produceUnit(String unit){
+        int amount = getProducedUnit(unit)+1;
+        producedUnits.put(unit, amount);
+    }
+    public void setProducedUnits(HashMap<String, Integer> displacedUnits) {
+        producedUnits = displacedUnits;
     }
 
     public void addMahactCC(String cc) {

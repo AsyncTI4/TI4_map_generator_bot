@@ -1101,7 +1101,7 @@ public class ButtonHelper {
                 } else {
                     Button gainTG = Button.success(fincheckerForNonActive + "nullificationField_" + activeSystem.getPosition() + "_" + player.getColor(),
                         "Spend Strat CC and end their turn");
-                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
+                    Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Nullification Field");
                     List<Button> buttons = List.of(gainTG, Decline2);
                     MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Nullfication field ", buttons);
                 }
@@ -1244,9 +1244,9 @@ public class ButtonHelper {
         }
     }
 
-    public static void checkACLimit(Game activeGame, GenericInteractionCreateEvent event, Player player) {
+    public static boolean isPlayerOverLimit(Game activeGame, Player player){
         if (player.hasAbility("crafty")) {
-            return;
+            return false;
         }
         int limit = 7;
         if (activeGame.getLaws().containsKey("sanctions") && !activeGame.isAbsolMode()) {
@@ -1265,6 +1265,31 @@ public class ButtonHelper {
             limit = limit + 2;
         }
         if (player.getAc() > limit) {
+            return true;
+        }
+        return false;
+
+
+    }
+
+    public static void checkACLimit(Game activeGame, GenericInteractionCreateEvent event, Player player) {
+        int limit = 7;
+        if (activeGame.getLaws().containsKey("sanctions") && !activeGame.isAbsolMode()) {
+            limit = 3;
+        }
+        if (activeGame.getLaws().containsKey("absol_sanctions")) {
+            limit = 3;
+            if (activeGame.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
+                limit = 5;
+            }
+        }
+        if (player.getRelics().contains("absol_codex")) {
+            limit = limit + 5;
+        }
+        if (player.getRelics().contains("e6-g0_network")) {
+            limit = limit + 2;
+        }
+        if (isPlayerOverLimit(activeGame, player)) {
             MessageChannel channel = activeGame.getMainGameChannel();
             if (activeGame.isFoWMode()) {
                 channel = player.getPrivateChannel();

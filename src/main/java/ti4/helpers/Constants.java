@@ -494,6 +494,7 @@ public class Constants {
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
+    public static final String PRODUCED_UNITS = "produced_units";
     public static final String MESSAGEID_FOR_SABOS = "messageid_for_sabos";
     public static final String SECRET_OBJECTIVE = "secret_objective";
     public static final String SO_DECK = "so_deck";
