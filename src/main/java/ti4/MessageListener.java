@@ -314,7 +314,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
 
                                     int maxSoFar = 25;
-                                    if (pingNumber > maxSoFar) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * maxSoFar)) {
                                         ping = realIdentity + " Rumors of the bot running out of stamina are greatly exagerrated. The bot will win this stare-down, it is simply a matter of time. ";
                                     }
                                     if (pingNumber > maxSoFar + 1 && !activeGame.isFoWMode()) {

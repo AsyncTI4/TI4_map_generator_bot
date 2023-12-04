@@ -797,6 +797,8 @@ public class GameSaveLoadManager {
 
             writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
             writer.write(System.lineSeparator());
+            writer.write(Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
+            writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
 
@@ -2057,6 +2059,15 @@ public class GameSaveLoadManager {
                         String id = secretInfo.nextToken();
                         Integer index = Integer.parseInt(secretInfo.nextToken());
                         player.setSecret(id, index);
+                    }
+                }
+                case Constants.PRODUCED_UNITS -> {
+                    StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (secrets.hasMoreTokens()) {
+                        StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                        String id = secretInfo.nextToken();
+                        Integer amount = Integer.parseInt(secretInfo.nextToken());
+                        player.setProducedUnit(id, amount);
                     }
                 }
                 case Constants.UNIT_CAP -> {
