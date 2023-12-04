@@ -71,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " scored custodians!");
                 String message2 = player.getRepresentation(true, true) + " Click the names of the planets you wish to exhaust to spend 6i.";
-                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
                 if (!player.hasAbility("reclamation")) {

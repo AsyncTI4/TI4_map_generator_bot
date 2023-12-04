@@ -737,6 +737,8 @@ public class GameSaveLoadManager {
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
+             writer.write(System.lineSeparator());
+            writer.write(Constants.SPENT_THINGS + " " + String.join(",", player.getSpentThingsThisWindow()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
@@ -2000,6 +2002,7 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.SPENT_THINGS -> player.setSpentThings(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
