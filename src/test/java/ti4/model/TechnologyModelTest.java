@@ -26,10 +26,10 @@ public class TechnologyModelTest {
     @Test
     public void testTechnologies() {
         for (TechnologyModel techModel : Mapper.getTechs().values()) {
-            assertTrue(techModel.isValid());
+            assertTrue(techModel.isValid(), techModel.getAlias() + ": invalid");
             assertTrue(validateFaction(techModel), techModel.getAlias() + ": invalid FactionID");
-            assertTrue(validateBaseUpgrade(techModel));
-            assertTrue(validateHomebrewReplacesID(techModel));
+            assertTrue(validateBaseUpgrade(techModel), techModel.getAlias() + ": invalid BaseUpgrade");
+            assertTrue(validateHomebrewReplacesID(techModel), techModel.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
 

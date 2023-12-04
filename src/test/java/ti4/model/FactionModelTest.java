@@ -27,16 +27,16 @@ public class FactionModelTest {
     @Test
     public void testFactions() {
         for (FactionModel faction : Mapper.getFactions()) {
-            assertTrue(faction.isValid());
-            assertTrue(validateAbilities(faction));
-            assertTrue(validateFactionTech(faction));
-            assertTrue(validateHomeSystem(faction));
-            assertTrue(validateHomePlanets(faction));
-            assertTrue(validateStartingTech(faction));
-            assertTrue(validateLeaders(faction));
-            assertTrue(validatePromissoryNotes(faction));
-            assertTrue(validateUnits(faction));
-            assertTrue(validateHomebrewReplacesID(faction));
+            assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
+            assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
+            assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech");
+            assertTrue(validateHomeSystem(faction), faction.getAlias() + ": invalid HomeSystem");
+            assertTrue(validateHomePlanets(faction), faction.getAlias() + ": invalid HomePlanets");
+            assertTrue(validateStartingTech(faction), faction.getAlias() + ": invalid StartingTech");
+            assertTrue(validateLeaders(faction), faction.getAlias() + ": invalid Leaders");
+            assertTrue(validatePromissoryNotes(faction), faction.getAlias() + ": invalid PromissoryNotes");
+            assertTrue(validateUnits(faction), faction.getAlias() + ": invalid Units");
+            assertTrue(validateHomebrewReplacesID(faction), faction.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
 

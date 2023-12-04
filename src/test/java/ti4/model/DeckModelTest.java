@@ -28,7 +28,7 @@ public class DeckModelTest {
     @Test
     public void testDeckModels() {
         for (DeckModel deckModel : Mapper.getDecks().values()) {
-            assertTrue(deckModel.isValid());
+            assertTrue(deckModel.isValid(), deckModel.getAlias() + "[" + deckModel.getType() + "]: invalid");
             assertTrue(validateCardIDs(deckModel), deckModel.getAlias() + "[" + deckModel.getType() + "]: Invalid CardIDs");
         }
     }
