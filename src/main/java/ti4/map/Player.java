@@ -106,6 +106,7 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> spentThingsThisWindow = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
     private HashMap<String, Integer> producedUnits = new HashMap<>();
     @Getter
@@ -213,9 +214,41 @@ public class Player {
     public void resetProducedUnits(){
         producedUnits = new HashMap<>(); 
     }
+    public void resetSpentThings(){
+        spentThingsThisWindow = new ArrayList<>();
+    }
 
     public HashMap<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
+    }
+    public List<String> getSpentThingsThisWindow(){
+        return spentThingsThisWindow;
+    }
+    public void addSpentThing(String thing){
+        spentThingsThisWindow.add(thing);
+    }
+    public void removeSpentThing(String thing){
+        spentThingsThisWindow.remove(thing);
+    }
+    public int getSpentTgsThisWindow(){
+        for(String thing : spentThingsThisWindow){
+            if(thing.contains("tg_")){
+                int tgs = Integer.parseInt(thing.split("_")[1]);
+                return tgs;
+            }
+        }
+        return 0;
+    }
+    public void increaseTgsSpentThisWindow(int amount){
+        int oldTgSpent = getSpentTgsThisWindow();
+        int newTgSpent = oldTgSpent+amount;
+        if(oldTgSpent != 0){
+            removeSpentThing("tg_"+oldTgSpent);
+        }
+        addSpentThing("tg_"+newTgSpent);
+    }
+    public void setSpentThings(List<String> things){
+        spentThingsThisWindow = things;
     }
     public void setProducedUnit(String unit, int count) {
         producedUnits.put(unit, count);

@@ -547,7 +547,7 @@ public class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
         Button DoneExhausting;
         if (!buttonID.contains("deleteButtons")) {
             DoneExhausting = Button.danger("deleteButtons_" + buttonID, "Done Exhausting Planets");

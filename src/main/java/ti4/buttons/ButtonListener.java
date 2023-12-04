@@ -803,7 +803,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getPlagiarizeButtons")) {
             activeGame.setComponentAction(true);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the tech you want", ButtonHelperActionCards.getPlagiarizeButtons(activeGame, player));
-            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
             Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence", buttons);
@@ -1017,8 +1017,13 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("takeAC_")) {
             ButtonHelperFactionSpecific.mageon(buttonID, event, activeGame, player, ident, trueIdentity);
         } else if (buttonID.startsWith("spend_")) {
-            String planetName = buttonID.substring(buttonID.indexOf("_") + 1);
+            String planetName = buttonID.split("_")[1];
+            String whatIsItFor = "both";
+            if(buttonID.split("_").length > 2){
+                whatIsItFor = buttonID.split("_")[2];
+            }
             new PlanetExhaust().doAction(player, planetName, activeGame);
+            player.addSpentThing(planetName);
             List<ActionRow> actionRow2 = new ArrayList<>();
             for (ActionRow row : event.getMessage().getActionRows()) {
                 List<ItemComponent> buttonRow = row.getComponents();
@@ -1031,13 +1036,14 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             String exhaustedMessage = event.getMessage().getContentRaw();
-            if (!exhaustedMessage.contains("Click the names")) {
-                exhaustedMessage = exhaustedMessage + ", exhausted "
-                    + Helper.getPlanetRepresentation(planetName, activeGame);
-            } else {
-                exhaustedMessage = ident + " exhausted "
-                    + Helper.getPlanetRepresentation(planetName, activeGame);
-            }
+            // if (!exhaustedMessage.contains("Click the names")) {
+            //     exhaustedMessage = exhaustedMessage + ", exhausted "
+            //         + Helper.getPlanetRepresentation(planetName, activeGame);
+            // } else {
+            //     exhaustedMessage = ident + " exhausted "
+            //         + Helper.getPlanetRepresentation(planetName, activeGame);
+            // }
+            exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         } else if (buttonID.startsWith("finishTransaction_")) {
             String player2Color = buttonID.split("_")[1];
@@ -1104,45 +1110,50 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), message + "\n" + activeGame.getPing());
             }
         } else if (buttonID.startsWith("reduceTG_")) {
-            int tgLoss = Integer.parseInt(buttonID.replace("reduceTG_", ""));
+            int tgLoss = Integer.parseInt(buttonID.split("_")[1]);
+            
+            String whatIsItFor = "both";
+            if(buttonID.split("_").length > 2){
+                whatIsItFor = buttonID.split("_")[2];
+            }
             String message = ident + " reduced tgs by " + tgLoss + " (" + player.getTg() + "->"
                 + (player.getTg() - tgLoss) + ")";
             if (tgLoss > player.getTg()) {
                 message = "You dont have " + tgLoss + " tgs. No change made.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             } else {
                 player.setTg(player.getTg() - tgLoss);
+                player.increaseTgsSpentThisWindow(tgLoss);
             }
-            String editedMessage = event.getMessage().getContentRaw() + " " + message;
-            if (editedMessage.contains("Click the names")) {
-                editedMessage = message;
+            if(tgLoss > player.getTg()){
+                ButtonHelper.deleteTheOneButton(event);
             }
+            String editedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
             event.getMessage().editMessage(editedMessage).queue();
         } else if (buttonID.startsWith("reduceComm_")) {
-            int tgLoss = Integer.parseInt(buttonID.replace("reduceComm_", ""));
+            int tgLoss = Integer.parseInt(buttonID.split("_")[1]);
+             String whatIsItFor = "both";
+            if(buttonID.split("_").length > 2){
+                whatIsItFor = buttonID.split("_")[2];
+            }
             String message = ident + " reduced comms by " + tgLoss + " (" + player.getCommodities() + "->"
                 + (player.getCommodities() - tgLoss) + ")";
 
             if (tgLoss > player.getCommodities()) {
                 message = "You dont have " + tgLoss + " comms. No change made.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             } else {
                 player.setCommodities(player.getCommodities() - tgLoss);
+                player.addSpentThing(message);
             }
-            String editedMessage = event.getMessage().getContentRaw() + " " + message;
-
-            if (editedMessage.contains("Click the names")) {
-                editedMessage = message;
-            }
-
+            String editedMessage = Helper.buildSpentThingsMessage(player, activeGame, whatIsItFor);
             Leader playerLeader = player.getLeader("keleresagent").orElse(null);
             if (playerLeader != null && !playerLeader.isExhausted()) {
                 playerLeader.setExhausted(true);
                 StringBuilder messageText = new StringBuilder(player.getRepresentation())
                     .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                if (activeGame.isFoWMode()) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), messageText.toString());
-                } else {
-                    MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), messageText.toString());
-                }
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), messageText.toString());
+                
             }
             event.getMessage().editMessage(editedMessage).queue();
 
@@ -1222,27 +1233,16 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player, event);
                 }
                 if ("aida".equals(tech) || "sar".equals(tech) || "htp".equals(tech)) {
-                    if (!activeGame.isFoWMode() && event.getMessageChannel() != activeGame.getActionsChannel()) {
-                        String msg = " exhausted tech: " + techRepresentation;
-                        String exhaustedMessage = event.getMessage().getContentRaw();
-                        List<ActionRow> actionRow2 = new ArrayList<>();
-                        for (ActionRow row : event.getMessage().getActionRows()) {
-                            List<ItemComponent> buttonRow = row.getComponents();
-                            int buttonIndex = buttonRow.indexOf(event.getButton());
-                            if (buttonIndex > -1) {
-                                buttonRow.remove(buttonIndex);
-                            }
-                            if (buttonRow.size() > 0) {
-                                actionRow2.add(ActionRow.of(buttonRow));
-                            }
-                        }
-                        if (!exhaustedMessage.contains("Click the names")) {
-                            exhaustedMessage = exhaustedMessage + ", " + msg;
-                        } else {
-                            exhaustedMessage = ident + msg;
-                        }
-                        event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                    String exhaustedMessage = event.getMessage().getContentRaw();
+                    ButtonHelper.deleteTheOneButton(event);
+                    if(buttonLabel.contains("(")){
+                        player.addSpentThing(tech+"_");
+                    }else{
+                        player.addSpentThing(tech);
                     }
+                    exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                    event.getMessage().editMessage(exhaustedMessage).queue();
+                    
                 }
                 player.exhaustTech(tech);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
@@ -1256,25 +1256,10 @@ public class ButtonListener extends ListenerAdapter {
                         fowIdentity + " use buttons to redistribute", redistributeButton);
                 }
             } else {
-                String msg = " used tech: " + techRepresentation;
-                String exhaustedMessage = event.getMessage().getContentRaw();
-                List<ActionRow> actionRow2 = new ArrayList<>();
-                for (ActionRow row : event.getMessage().getActionRows()) {
-                    List<ItemComponent> buttonRow = row.getComponents();
-                    int buttonIndex = buttonRow.indexOf(event.getButton());
-                    if (buttonIndex > -1) {
-                        buttonRow.remove(buttonIndex);
-                    }
-                    if (buttonRow.size() > 0) {
-                        actionRow2.add(ActionRow.of(buttonRow));
-                    }
-                }
-                if (!exhaustedMessage.contains("Click the names")) {
-                    exhaustedMessage = exhaustedMessage + ", " + msg;
-                } else {
-                    exhaustedMessage = ident + msg;
-                }
-                event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+                player.addSpentThing("sarween");
+                String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                ButtonHelper.deleteTheOneButton(event);
+                event.getMessage().editMessage(exhaustedMessage).queue();
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
@@ -2387,7 +2372,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "leadershipExhaust" -> {
                     ButtonHelper.addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeGame.isFoWMode()) {
@@ -2398,7 +2383,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "nekroTechExhaust" -> {
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
                     Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeGame.isFoWMode()) {
@@ -3734,7 +3719,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "startChaosMapping" -> ButtonHelperFactionSpecific.firstStepOfChaos(activeGame, player, event);
                 case "useLawsOrder" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), ident + " is paying 1 influence to ignore laws for the turn.");
-                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
                     Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 1 influence", buttons);
@@ -3937,7 +3922,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.setTotalExpenses(player.getTotalExpenses()+Helper.calculateCostOfProducedUnits(player, activeGame));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
-                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
                     buttons.add(sar);

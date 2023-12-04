@@ -565,7 +565,7 @@ public class ButtonHelperAbilities {
 
     public static void oribtalDropExhaust(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
         Button DoneExhausting = Button.danger("finishComponentAction", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -949,7 +949,7 @@ public class ButtonHelperAbilities {
                 new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, activeGame);
             }
         }
-        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
+        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "inf");
         if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "yin", event);
         }
