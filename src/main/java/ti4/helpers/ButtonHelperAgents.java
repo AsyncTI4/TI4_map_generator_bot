@@ -367,6 +367,16 @@ public class ButtonHelperAgents {
             player.getRepresentation(true, true) + " use buttons to place ground forces via argent agent", unitButtons);
     }
 
+    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player){
+        Player p2 = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String message = ButtonHelper.resolveACDraw(p2, activeGame, event);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
+        if (activeGame.isFoWMode()) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(p2, activeGame) + " gained an AC due to agent usage");
+        }
+        event.getMessage().delete().queue();
+    }
+
     public static void exhaustAgent(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player, String ident) {
         String agent = buttonID.replace("exhaustAgent_", "");
         String rest = agent;
@@ -397,6 +407,34 @@ public class ButtonHelperAgents {
         if ("naazagent".equalsIgnoreCase(agent)) {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+        }
+
+        if ("augersagent".equalsIgnoreCase(agent)) {
+            Player p2 = activeGame.getPlayerFromColorOrFaction(rest.split("_")[1]);
+            int oldTg = p2.getTg();
+            p2.setTg(oldTg + 2);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame),
+                ButtonHelper.getIdentOrColor(player, activeGame) + " gained 2tg due to Augers Agent being used (" + oldTg + "->" + p2.getTg() + ")");
+            if (activeGame.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(p2, activeGame) + " gained 2tg due to agent usage");
+            }
+            ButtonHelperAbilities.pillageCheck(p2, activeGame);
+            ButtonHelperAgents.resolveArtunoCheck(p2, activeGame, 2);
+        }
+
+        if ("vaylerianagent".equalsIgnoreCase(agent)) {
+            if(rest.contains("_")){
+                Player p2 = activeGame.getPlayerFromColorOrFaction(rest.split("_")[1]);
+                String message = ButtonHelper.resolveACDraw(p2, activeGame, event);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), message);
+                if (activeGame.isFoWMode()) {
+                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(p2, activeGame) + " gained an AC due to agent usage");
+                }
+            }else{
+                String message = trueIdentity + " select faction you wish to use your agent on";
+                List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "vaylerianAgent", null);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
+            }
         }
         if ("kjalengardagent".equalsIgnoreCase(agent)) {
             Player activePlayer = activeGame.getActivePlayerObject();
@@ -442,7 +480,6 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
         }
 
-        //TODO: Allow choosing someone else for this agent
         if ("nekroagent".equalsIgnoreCase(agent)) {
             String message = trueIdentity + " select faction you wish to use your agent on";
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeGame, null, "nekroAgentRes", null);

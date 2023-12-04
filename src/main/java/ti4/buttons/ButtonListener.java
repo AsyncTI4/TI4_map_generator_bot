@@ -86,6 +86,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -451,10 +452,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.resolveStep2OfAxisAgent(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperAgents.hacanAgentRefresh(buttonID, event, activeGame, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("vaylerianAgent_")) {
+            ButtonHelperAgents.resolveVaylerianAgent(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nekroAgentRes_")) {
             ButtonHelperAgents.nekroAgentRes(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("kolleccAgentRes_")) {
             ButtonHelperAgents.kolleccAgentResStep1(buttonID, event, activeGame, player);
+        } else if (buttonID.startsWith("scourPlanet_")) {
+            ButtonHelperFactionSpecific.resolveScour(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("kolleccAgentResStep2_")) {
             ButtonHelperAgents.kolleccAgentResStep2(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("getPsychoButtons")) {
@@ -1478,6 +1483,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveMaw(activeGame, player, event);
         } else if (buttonID.startsWith("resolveCrownOfE")) {
             ButtonHelper.resolveCrownOfE(activeGame, player, event);
+        } else if (buttonID.startsWith("sarMechStep1_")) {
+            ButtonHelper.resolveSARMechStep1(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("sarMechStep2_")) {
+            ButtonHelper.resolveSARMechStep2(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("deployMykoSD_")) {
             ButtonHelperFactionSpecific.deployMykoSD(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("jrResolution_")) {
@@ -2115,6 +2124,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("terraformPlanet_")) {
             ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, activeGame, player, ident);
+        } else if (buttonID.startsWith("veldyrAttach_")) {
+            ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
             UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
@@ -2231,6 +2242,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "warfareBuild" -> {
                     List<Button> buttons;
                     Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+                    if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0){
+                        tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
+                    }
                     if (tile == null) {
                         tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
                     }
@@ -3897,6 +3911,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
+                player.setTotalExpenses(player.getTotalExpenses()+netGain*3);
             }
 
             if ("Done Redistributing CCs".equalsIgnoreCase(buttonLabel)) {
@@ -3918,6 +3933,8 @@ public class ButtonListener extends ListenerAdapter {
 
             ButtonHelper.sendMessageToRightStratThread(player, activeGame, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
+
+                player.setTotalExpenses(player.getTotalExpenses()+Helper.calculateCostOfProducedUnits(player, activeGame));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event);
