@@ -406,11 +406,7 @@
         "ItemId": "the_lady_and_the_lord",
         "OptionalSwaps": [
             "COMMANDER:ghemina"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "the_lady_and_the_lord",
+        ],
         "AdditionalComponents": [
             "FLAGSHIP:ghemina_flagship_lord",
             "HERO:gheminaherolord"
@@ -454,11 +450,7 @@
         "AdditionalComponents": [
             "ABILITY:limited_vision",
             "ABILITY:probability_algorithms"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "oracle_ai",
+        ],
         "OptionalSwaps": [
             "PN:augers",
             "HERO:augers"
@@ -577,15 +569,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "cunning",
-        "OptionalSwaps": [
-            "HERO:lizho",
-            "MECH:lizho",
-            "COMMANDER:lizho"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "combat_drones",
         "Undraftable": true
     },
@@ -604,14 +587,10 @@
         "ItemId": "prescient_memories",
         "AdditionalComponents": [
             "ABILITY:divination"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "prescient_memories",
+        ],
         "OptionalSwaps": [
-           "AGENT:mykomentori"
-        ]
+            "AGENT:mykomentori"
+         ]
     },
     {
         "ItemCategory": "ABILITY",
@@ -728,15 +707,11 @@
         "AdditionalComponents": [
             "ABILITY:collateralized_loans",
             "ABILITY:binding_debts"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "fine_print",
+        ],
         "OptionalSwaps": [
-          "MECH:vaden",
-          "HERO:vaden",
-          "COMMANDER:vaden"
+            "MECH:vaden",
+            "HERO:vaden",
+            "COMMANDER:vaden"
         ]
     },
     {
@@ -779,25 +754,12 @@
         "ItemId": "corporate_entity",
         "AdditionalComponents": [
             "ABILITY:holding_company"
-        ]
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "corporate_entity",
+        ],
         "OptionalSwaps": [
-          "HERO:veldyr",
-          "COMMANDER:veldyr",
-          "PN:dspnveld1"
-        ]
-    },
-    {
-        "ItemCategory": "PN",
-        "ItemId": "dspnveld1",
-        "AdditionalComponents": [
-            "PN:dspnveld2",
-            "PN:dspnveld3",
-            "PN:dspnveld4"
-        ]
+            "HERO:veldyr",
+            "COMMANDER:veldyr",
+            "PN:dspnveld1"
+          ]
     },
     {
         "ItemCategory": "ABILITY",
