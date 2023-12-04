@@ -89,6 +89,7 @@ public class Player {
     private int autoSaboPassMedian;
     private int actualHits;
     private int expectedHitsTimes10;
+    private int totalExpenses;
 
     private Set<Integer> followedSCs = new HashSet<>();
 
@@ -105,7 +106,9 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> spentThingsThisWindow = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
+    private HashMap<String, Integer> producedUnits = new HashMap<>();
     @Getter
     @Setter
     private List<String> factionTechs = new ArrayList<>();
@@ -206,6 +209,63 @@ public class Player {
 
     public void setMahactCC(List<String> mahactCC) {
         this.mahactCC = mahactCC;
+    }
+
+    public void resetProducedUnits(){
+        producedUnits = new HashMap<>(); 
+    }
+    public void resetSpentThings(){
+        spentThingsThisWindow = new ArrayList<>();
+    }
+
+    public HashMap<String, Integer> getCurrentProducedUnits() {
+        return producedUnits;
+    }
+    public List<String> getSpentThingsThisWindow(){
+        return spentThingsThisWindow;
+    }
+    public void addSpentThing(String thing){
+        spentThingsThisWindow.add(thing);
+    }
+    public void removeSpentThing(String thing){
+        spentThingsThisWindow.remove(thing);
+    }
+    public int getSpentTgsThisWindow(){
+        for(String thing : spentThingsThisWindow){
+            if(thing.contains("tg_")){
+                int tgs = Integer.parseInt(thing.split("_")[1]);
+                return tgs;
+            }
+        }
+        return 0;
+    }
+    public void increaseTgsSpentThisWindow(int amount){
+        int oldTgSpent = getSpentTgsThisWindow();
+        int newTgSpent = oldTgSpent+amount;
+        if(oldTgSpent != 0){
+            removeSpentThing("tg_"+oldTgSpent);
+        }
+        addSpentThing("tg_"+newTgSpent);
+    }
+    public void setSpentThings(List<String> things){
+        spentThingsThisWindow = things;
+    }
+    public void setProducedUnit(String unit, int count) {
+        producedUnits.put(unit, count);
+    }
+    public int getProducedUnit(String unit) {
+        if(producedUnits.get(unit) == null){
+            return 0;
+        }else{
+            return producedUnits.get(unit);
+        }
+    }
+    public void produceUnit(String unit){
+        int amount = getProducedUnit(unit)+1;
+        producedUnits.put(unit, amount);
+    }
+    public void setProducedUnits(HashMap<String, Integer> displacedUnits) {
+        producedUnits = displacedUnits;
     }
 
     public void addMahactCC(String cc) {
@@ -1391,6 +1451,10 @@ public class Player {
         return expectedHitsTimes10;
     }
 
+    public int getTotalExpenses() {
+        return totalExpenses;
+    }
+
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
@@ -1459,6 +1523,10 @@ public class Player {
 
     public void setExpectedHitsTimes10(int tg) {
         expectedHitsTimes10 = tg;
+    }
+
+    public void setTotalExpenses(int tg) {
+        totalExpenses = tg;
     }
 
     public void setFollowedSCs(Set<Integer> followedSCs) {

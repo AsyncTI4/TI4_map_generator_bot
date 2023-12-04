@@ -464,6 +464,7 @@ public class Constants {
     public static final String PLANET5 = "planet5";
     public static final String PLANET6 = "planet6";
     public static final String TECH = "tech";
+    public static final String SPENT_THINGS = "spent_things";
     public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
     public static final String TECH2 = "tech2";
@@ -476,6 +477,7 @@ public class Constants {
     public static final String TG = "trade_goods";
     public static final String ACTUAL_HITS = "actual_hits";
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
+    public static final String TOTAL_EXPENSES = "total_expenses";
     public static final String TURN_COUNT = "turn_count";
     public static final String COMMODITIES = "commodities";
     public static final String PERSONAL_PING_INTERVAL = "personal_ping_interval";
@@ -494,6 +496,7 @@ public class Constants {
     public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
+    public static final String PRODUCED_UNITS = "produced_units";
     public static final String MESSAGEID_FOR_SABOS = "messageid_for_sabos";
     public static final String SECRET_OBJECTIVE = "secret_objective";
     public static final String SO_DECK = "so_deck";
