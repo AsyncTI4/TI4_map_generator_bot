@@ -553,6 +553,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
@@ -1742,6 +1744,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeGame.setAbsolMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.MILTYMOD_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setMiltyModMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

@@ -19,7 +19,7 @@ public class Source {
         admins, pbd100, testsource,
 
         // personal projs
-        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous;
+        ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod;
 
         public String toString() {
             return super.toString().toLowerCase();
@@ -49,6 +49,7 @@ public class Source {
                 case ignis_aurora -> Emojis.IgnisAurora;
                 case keleresplus -> Emojis.KeleresPlus;
                 case projectpi -> Emojis.ProjectPi;
+                case miltymod -> Emojis.Charlie;
                 case lazax -> Emojis.Lazax;
                 default -> "";
             };

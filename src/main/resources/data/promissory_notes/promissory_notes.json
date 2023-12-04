@@ -479,7 +479,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitred** player's units, return this card to the **splitred** player."
     },
-{
+    {
         "alias": "splitblue_cf",
         "name": "Ceasefire",
         "color": "splitblue",
@@ -519,7 +519,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitblue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitblue** player's units, return this card to the **splitblue** player."
     },
-{
+    {
         "alias": "splitgreen_cf",
         "name": "Ceasefire",
         "color": "splitgreen",
@@ -559,7 +559,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgreen** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgreen** player's units, return this card to the **splitgreen** player."
     },
-{
+    {
         "alias": "splityellow_cf",
         "name": "Ceasefire",
         "color": "splityellow",
@@ -599,7 +599,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splityellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splityellow** player's units, return this card to the **splityellow** player."
     },
-{
+    {
         "alias": "splitorange_cf",
         "name": "Ceasefire",
         "color": "splitorange",
@@ -639,7 +639,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitorange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitorange** player's units, return this card to the **splitorange** player."
     },
-{
+    {
         "alias": "splitpurple_cf",
         "name": "Ceasefire",
         "color": "splitpurple",
@@ -679,7 +679,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpurple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpurple** player's units, return this card to the **splitpurple** player."
     },
-{
+    {
         "alias": "splitpink_cf",
         "name": "Ceasefire",
         "color": "splitpink",
@@ -719,7 +719,7 @@
         "source": "pok",
         "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpink** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpink** player's units, return this card to the **splitpink** player."
     },
-        {
+    {
         "alias": "orca_cf",
         "name": "Ceasefire",
         "color": "orca",
