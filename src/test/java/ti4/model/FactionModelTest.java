@@ -11,6 +11,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.message.BotLogger;
 
 public class FactionModelTest {
     
@@ -35,6 +36,7 @@ public class FactionModelTest {
             assertTrue(validateLeaders(faction));
             assertTrue(validatePromissoryNotes(faction));
             assertTrue(validateUnits(faction));
+            assertTrue(validateHomebrewReplacesID(faction));
         }
     }
 
@@ -113,6 +115,13 @@ public class FactionModelTest {
             if (!Mapper.getTechs().containsKey(factionTechID)) invalidFactionTechIDs.add(factionTechID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid faction tech IDs: `" + invalidFactionTechIDs + "`");
+        return false;
+    }
+
+    private boolean validateHomebrewReplacesID(FactionModel faction) {
+        if (faction.getHomebrewReplacesID().isEmpty()) return true;
+        if (Mapper.isFaction(faction.getHomebrewReplacesID().get())) return true;
+        BotLogger.log("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }
