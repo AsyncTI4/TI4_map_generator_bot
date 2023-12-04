@@ -16,7 +16,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you produce 1 or more units in this system, reduce the combined cost of the produced units by 1."
+        "ability": "When you produce 1 or more units in this system, reduce the combined cost of the produced units by 1.",
+        "homebrewReplacesID": "arborec_flagship"
     },
     {
         "id": "miltymod_arborec_infantry",
@@ -31,7 +32,8 @@
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "homebrewReplacesID": "arborec_infantry"
     },
     {
         "id": "miltymod_arborec_infantry2",
@@ -48,7 +50,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied."
+        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
+        "homebrewReplacesID": "arborec_infantry2"
     },
     {
         "id": "miltymod_ghost_flagship",
@@ -66,7 +69,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship's system contains a delta wormhole. During movement, this ship may move before or after your other ships."
+        "ability": "This ship's system contains a delta wormhole. During movement, this ship may move before or after your other ships.",
+        "homebrewReplacesID": "ghost_flagship"
     },
     {
         "id": "miltymod_hacan_flagship",
@@ -84,7 +88,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "At the start of a round of space combat, you may spend 1 trade good to apply +1 to the result of each of your combat rolls."
+        "ability": "At the start of a round of space combat, you may spend 1 trade good to apply +1 to the result of each of your combat rolls.",
+        "homebrewReplacesID": "hacan_flagship"
     },
     {
         "id": "miltymod_l1z1x_dreadnought",
@@ -104,7 +109,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "l1z1x_dreadnought"
     },
     {
         "id": "miltymod_l1z1x_dreadnought2",
@@ -125,7 +131,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "l1z1x_dreadnought2"
     },
     {
         "id": "miltymod_muaat_flagship",
@@ -143,7 +150,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After the \"Move Ships\" step in this system, you may place 1 cruiser from your reinforcements in this system."
+        "ability": "After the \"Move Ships\" step in this system, you may place 1 cruiser from your reinforcements in this system.",
+        "homebrewReplacesID": "muaat_flagship"
     },
     {
         "id": "miltymod_muaat_warsun",
@@ -165,7 +173,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "homebrewReplacesID": "muaat_warsun"
     },
     {
         "id": "miltymod_muaat_warsun2",
@@ -188,7 +197,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability."
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.",
+        "homebrewReplacesID": "muaat_warsun2"
     },
     {
         "id": "miltymod_naalu_fighter",
@@ -201,7 +211,8 @@
         "capacityUsed": 1,
         "isShip": true,
         "combatHitsOn": 8,
-        "combatDieCount": 1
+        "combatDieCount": 1,
+        "homebrewReplacesID": "naalu_fighter"
     },
     {
         "id": "miltymod_naalu_fighter2",
@@ -215,7 +226,8 @@
         "capacityUsed": 1,
         "isShip": true,
         "combatHitsOn": 7,
-        "combatDieCount": 1
+        "combatDieCount": 1,
+        "homebrewReplacesID": "naalu_fighter2"
     },
     {
         "id": "miltymod_saar_spacedock",
@@ -229,7 +241,8 @@
         "productionValue": 4,
         "capacityValue": 4,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "homebrewReplacesID": "saar_spacedock"
     },
     {
         "id": "miltymod_saar_spacedock2",
@@ -244,7 +257,8 @@
         "productionValue": 6,
         "capacityValue": 6,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
+        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "homebrewReplacesID": "saar_spacedock2"
     },
     {
         "id": "miltymod_sardakk_dreadnought",
@@ -264,7 +278,8 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "sardakk_dreadnought"
     },
     {
         "id": "miltymod_sardakk_dreadnought2",
@@ -286,7 +301,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system."
+        "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "homebrewReplacesID": "sardakk_dreadnought2"
     },
     {
         "id": "miltymod_sol_carrier",
@@ -302,7 +318,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "sol_carrier"
     },
     {
         "id": "miltymod_sol_carrier2",
@@ -321,7 +338,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "sol_carrier2"
     },
     {
         "id": "miltymod_sol_infantry",
@@ -335,7 +353,8 @@
         "cost": 0.5,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "homebrewReplacesID": "sol_infantry"
     },
     {
         "id": "miltymod_sol_infantry2",
@@ -351,7 +370,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource or influence value, gain that planet readied."
+        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource or influence value, gain that planet readied.",
+        "homebrewReplacesID": "sol_infantry2"
     },
     {
         "id": "miltymod_winnu_flagship",
@@ -369,7 +389,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat roll, it rolls an additional die for each of your opponent's non-fighter ships in this system."
+        "ability": "When this unit makes a combat roll, it rolls an additional die for each of your opponent's non-fighter ships in this system.",
+        "homebrewReplacesID": "winnu_flagship"
     },
     {
         "id": "miltymod_yssaril_flagship",
@@ -387,7 +408,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can move through systems that contain other player's ships."
+        "ability": "This ship can move through systems that contain other player's ships.",
+        "homebrewReplacesID": "yssaril_flagship"
     },
     {
         "id": "miltymod_cruiser",
@@ -401,7 +423,8 @@
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "cruiser"
     },
     {
         "id": "miltymod_cruiser2",
@@ -418,7 +441,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit."
+        "ability": "When making a combat roll for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
+        "homebrewReplacesID": "cruiser2"
     },
     {
         "id": "miltymod_dreadnought",
@@ -437,7 +461,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "dreadnought"
     },
     {
         "id": "miltymod_dreadnought2",
@@ -457,7 +482,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "dreadnought2"
     },
     {
         "id": "miltymod_fighter",
@@ -470,7 +496,8 @@
         "cost": 0.5,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "fighter"
     },
     {
         "id": "miltymod_fighter2",
@@ -486,7 +513,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "homebrewReplacesID": "fighter2"
     },
     {
         "id": "miltymod_flagship",
@@ -502,7 +530,8 @@
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "flagship"
     },
     {
         "id": "miltymod_infantry",
@@ -515,7 +544,8 @@
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "homebrewReplacesID": "infantry"
     },
     {
         "id": "miltymod_infantry2",
@@ -530,7 +560,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied."
+        "ability": "When you gain control of a planet, if you have more infantry on that planet than that planet's resource value, gain that planet readied.",
+        "homebrewReplacesID": "infantry2"
     },
     {
         "id": "miltymod_spacedock",
@@ -541,7 +572,8 @@
         "source": "miltymod",
         "productionValue": "+2",
         "capacityValue": 3,
-        "isStructure": true
+        "isStructure": true,
+        "homebrewReplacesID": "spacedock"
     },
     {
         "id": "miltymod_spacedock2",
@@ -554,7 +586,8 @@
         "productionValue": "+5",
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "When you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system."
+        "ability": "When you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.",
+        "homebrewReplacesID": "spacedock2"
     },
     {
         "id": "miltymod_warsun",
@@ -573,7 +606,8 @@
         "sustainDamage": true,
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "warsun"
     },
     {
         "id": "miltymod_carrier",
@@ -588,7 +622,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "carrier"
     },
     {
         "id": "miltymod_carrier2",
@@ -604,6 +639,7 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "homebrewReplacesID": "carrier2"
     }
 ]
