@@ -463,27 +463,30 @@ public class ButtonHelper {
         return buttons;
 
     }
-
     public static List<Button> getExhaustButtonsWithTG(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeGame);
-        if (player.getTg() > 0) {
-            Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
+        return getExhaustButtonsWithTG(activeGame, player, event, "both");
+    }
+
+    public static List<Button> getExhaustButtonsWithTG(Game activeGame, Player player, GenericInteractionCreateEvent event, String whatIsItFor) {
+        List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeGame, whatIsItFor);
+        if (player.getTg() > 0 || (activeGame.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") && !whatIsItFor.contains("inf"))) {
+            Button lost1TG = Button.danger("reduceTG_1_"+whatIsItFor, "Spend 1 TG");
             buttons.add(lost1TG);
         }
         if (player.getTg() > 1) {
-            Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
+            Button lost2TG = Button.danger("reduceTG_2_"+whatIsItFor, "Spend 2 TGs");
             buttons.add(lost2TG);
         }
         if (player.getTg() > 2) {
-            Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
+            Button lost3TG = Button.danger("reduceTG_3_"+whatIsItFor, "Spend 3 TGs");
             buttons.add(lost3TG);
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
-            Button lost1C = Button.danger("reduceComm_1", "Spend 1 comm");
+            Button lost1C = Button.danger("reduceComm_1_"+whatIsItFor, "Spend 1 comm");
             buttons.add(lost1C);
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
-            Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
+            Button lost2C = Button.danger("reduceComm_2_"+whatIsItFor, "Spend 2 comms");
             buttons.add(lost2C);
         }
         if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0 && !event.getId().contains("leadership")) {

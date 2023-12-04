@@ -71,25 +71,11 @@ public class ButtonHelperCommanders {
         int cTG = player.getTg();
         int fTG = cTG + 1;
         player.setTg(fTG);
-        String msg = " used Titans commander to gain a tg (" + cTG + "->" + fTG + "). ";
-        String exhaustedMessage = event.getMessage().getContentRaw();
-        List<ActionRow> actionRow2 = new ArrayList<>();
-        for (ActionRow row : event.getMessage().getActionRows()) {
-            List<ItemComponent> buttonRow = row.getComponents();
-            int buttonIndex = buttonRow.indexOf(event.getButton());
-            if (buttonIndex > -1) {
-                buttonRow.remove(buttonIndex);
-            }
-            if (buttonRow.size() > 0) {
-                actionRow2.add(ActionRow.of(buttonRow));
-            }
-        }
-        if (!exhaustedMessage.contains("Click the names")) {
-            exhaustedMessage = exhaustedMessage + ", " + msg;
-        } else {
-            exhaustedMessage = ident + msg;
-        }
-        event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+        String msg = "Used Titans commander to gain a tg (" + cTG + "->" + fTG + "). ";
+        player.addSpentThing(msg);
+        String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+        ButtonHelper.deleteTheOneButton(event);
+        event.getMessage().editMessage(exhaustedMessage).queue();
     }
 
     public static void resolveLetnevCommanderCheck(Player player, Game activeGame, GenericInteractionCreateEvent event) {
