@@ -96,12 +96,14 @@ public class AddTileList extends MapSubcommandData {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
-        new AddFrontierTokens().parsingForTile(event, userActiveGame);
+        if (!userActiveGame.isBaseGameMode()) {
+            new AddFrontierTokens().parsingForTile(event, userActiveGame);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
+        }
 
         GameSaveLoadManager.saveMap(userActiveGame, event);
 
         FileUpload file = GenerateMap.getInstance().saveImage(userActiveGame, event);
         MessageHelper.replyToMessage(event, file);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
     }
 }
