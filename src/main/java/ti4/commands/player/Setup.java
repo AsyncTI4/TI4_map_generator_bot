@@ -115,7 +115,7 @@ public class Setup extends PlayerSubcommandData {
         player.setPlayerStatsAnchorPosition(positionHS);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
-        if ("ghost".equals(faction)) {
+        if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             tile = new Tile("51", "tr");
             activeGame.setTile(tile);

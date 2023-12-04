@@ -375,7 +375,7 @@
         "name": "Spatial Conduit Cylinder",
         "type": "PROPULSION",
         "requirements": "BB",
-        "faction": "jol-nar",
+        "faction": "jolnar",
         "source": "absol",
         "text": "During your tactical actions, you may treat systems that contain 1 or more of your space docks as adjacent.",
         "homebrewReplacesID": "scc"
@@ -385,7 +385,7 @@
         "name": "E-Res Siphons",
         "type": "CYBERNETIC",
         "requirements": "YY",
-        "faction": "jol-nar",
+        "faction": "jolnar",
         "source": "absol",
         "text": "When another player moves ships into a system that contains 1 or more of your structures, gain trade goods equal to the number of non-fighter ships that moved into that system.",
         "homebrewReplacesID": "ers"
@@ -579,7 +579,7 @@
         "name": "Wormhole Generator",
         "type": "PROPULSION",
         "requirements": "BB",
-        "faction": "ghosts",
+        "faction": "ghost",
         "source": "absol",
         "text": "Action: Exhaust this card to place or move up to 2 Creuss wormhole tokens into systems that contain a planet you control and/or non-home systems that do not contain another player's ships.",
         "homebrewReplacesID": "wg"
@@ -589,7 +589,7 @@
         "name": "Dimensional Splicer",
         "type": "WARFARE",
         "requirements": "R",
-        "faction": "ghosts",
+        "faction": "ghost",
         "source": "absol",
         "text": "When another player's ship with SUSTAIN DAMAGE moves through a wormhole into a system that contains your ships, that ship becomes damaged.\n \n At the start of a space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships.",
         "homebrewReplacesID": "ds"

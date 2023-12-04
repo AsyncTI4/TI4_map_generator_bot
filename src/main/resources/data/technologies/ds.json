@@ -36,24 +36,6 @@
         "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to increase the PRODUCTION value of 1 of those units to match the PRODUCTION value of the unit on the game board with the highest PRODUCTION value, or apply +2 to the total PRODUCTION value of those units."
     },
     {
-        "alias": "dsblexg",
-        "name": "Biotic Weapons",
-        "type": "BIOTIC",
-        "requirements": "GG",
-        "faction": "blex",
-        "source": "ds",
-        "text": "During each round of combat in systems that contain Blight tokens, 1 of your units may roll 1 additional combat die."
-    },
-    {
-        "alias": "dsblexff",
-        "name": "Vector II",
-        "type": "UNITUPGRADE",
-        "requirements": "BG",
-        "faction": "blex",
-        "source": "ds",
-        "text": "This unit may move without being transported, and through systems that contain other players' ships. Each fighter in excess of your ship's capacity counts against your fleet pool. Cost 1(x2), Combat 8, Move 3"
-    },
-    {
         "alias": "dsceldr",
         "name": "Emergency Mobilization",
         "type": "WARFARE",
