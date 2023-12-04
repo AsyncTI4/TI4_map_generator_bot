@@ -737,7 +737,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
-             writer.write(System.lineSeparator());
+            writer.write(System.lineSeparator());
             writer.write(Constants.SPENT_THINGS + " " + String.join(",", player.getSpentThingsThisWindow()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));

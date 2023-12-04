@@ -62,7 +62,7 @@ public class FrankenDraft extends BagDraft {
         DraftItem.Category.STARTINGTECH
     };
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken","qulane", "keleresm", "keleresx" };
 
     public static List<String> getAllFactionIds(Game activeGame) {
         List<FactionModel> factionSet = Mapper.getFactions();
