@@ -215,7 +215,7 @@
         "name": "E-Res Siphons",
         "type": "CYBERNETIC",
         "requirements": "YY",
-        "faction": "jol-nar",
+        "faction": "jolnar",
         "source": "miltymod",
         "text": "After another player activates a system that contains 1 or more of your ships, gain 2 trade goods.",
         "homebrewReplacesID": "ers"

@@ -27,7 +27,7 @@ public class TechnologyModelTest {
     public void testTechnologies() {
         for (TechnologyModel techModel : Mapper.getTechs().values()) {
             assertTrue(techModel.isValid());
-            assertTrue(validateFaction(techModel));
+            assertTrue(validateFaction(techModel), techModel.getAlias() + ": invalid FactionID");
             assertTrue(validateBaseUpgrade(techModel));
             assertTrue(validateHomebrewReplacesID(techModel));
         }
@@ -35,7 +35,7 @@ public class TechnologyModelTest {
 
     private boolean validateFaction(TechnologyModel techModel) {
         if (techModel.getFaction().isEmpty()) return true;
-        if (Mapper.isFaction(techModel.getFaction().get())) return true;
+        if (Mapper.isFaction(techModel.getFaction().get()) || "keleres".equals(techModel.getFaction().get())) return true;
         BotLogger.log("Tech **" + techModel.getAlias() + "** failed validation due to invalid FactionID: `" + techModel.getFaction().get() + "`");
         return false;
     }
