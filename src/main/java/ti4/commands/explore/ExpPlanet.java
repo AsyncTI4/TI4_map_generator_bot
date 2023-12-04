@@ -1,11 +1,13 @@
 package ti4.commands.explore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -167,6 +169,17 @@ public class ExpPlanet extends ExploreSubcommandData {
         if(player.hasTech("dslaner")){
             player.setAtsCount(player.getAtsCount()+numExplores);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+        }
+        if(ButtonHelper.isPlanetLegendaryOrTechSkip(planetName, activeGame) && Helper.getPlayerFromUnlockedLeader(activeGame, "augersagent") != null){
+            for(Player p2 : activeGame.getRealPlayers()){
+                if(p2.hasUnexhaustedLeader("augersagent")){
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Button.success("exhaustAgent_augersagent_"+player.getFaction(), "Use Augers Agent on "+player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    String msg2 = p2.getRepresentation(true, true) + " you can use Augers Agent on "+ButtonHelper.getIdentOrColor(player, activeGame) + " to give them 2tg";
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
+                }
+            }
         }
     }
 }

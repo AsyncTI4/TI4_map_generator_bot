@@ -1053,12 +1053,37 @@ public class ButtonHelperFactionSpecific {
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                 || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
-            if (oneOfThree || planet.contains("custodiavigilia")) {
+            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
                 buttons.add(Button.success("terraformPlanet_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
             }
         }
         String message = "Use buttons to select which planet to terraform";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
+    public static void resolveScour(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        String msg = ButtonHelper.getIdent(player) +" used the Scour ability to discard an AC and ready "+Helper.getPlanetRepresentation(planet, activeGame);
+        player.refreshPlanet(planet);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " use buttons to discard",
+                ACInfo.getDiscardActionCardButtons(activeGame, player, false));
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+    }
+
+    public static void offerVeldyrButtons(Player player, Game activeGame, GenericInteractionCreateEvent event, String pnID) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+            if (oneOfThree || planet.contains("custodiavigilia") || planet.contains("ghoti")) {
+                buttons.add(Button.success("veldyrAttach_" + planet+"_"+pnID, Helper.getPlanetRepresentation(planet, activeGame)));
+            }
+        }
+        String message = player.getRepresentation(true, true)+" Use buttons to select which planet to put the attachment on";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
     }
 
     public static List<Button> getButtonsToTakeSomeonesAC(Game activeGame, Player thief, Player victim) {
@@ -1123,6 +1148,29 @@ public class ButtonHelperFactionSpecific {
         Planet planetReal = (Planet) unitHolder;
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Attached terraform to " + Helper.getPlanetRepresentation(planet, activeGame));
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveBranchOffice(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
+        String planet = buttonID.split("_")[1];
+        String pnID = buttonID.split("_")[2];
+        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet planetReal = (Planet) unitHolder;
+        switch(pnID) {
+            case "dspnveld1" -> {
+                planetReal.addToken("attachment_veldyrtaxhaven.png");
+            }
+            case "dspnveld2" -> {
+                planetReal.addToken("attachment_veldyrbroadcasthub.png");
+            }
+            case "dspnveld3" -> {
+                planetReal.addToken("attachment_veldyrreservebank.png");
+            }
+            case "dspnveld4" -> {
+                planetReal.addToken("attachment_veldyrorbitalshipyard.png");
+            }
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Attached branch office to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
     }
 
