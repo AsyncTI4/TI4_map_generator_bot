@@ -245,6 +245,9 @@ public class ButtonHelperHeroes {
         }
         p1.removePromissoryNote(id);
         p2.setPromissoryNote(id);
+        if(id.contains("dspnveld")){
+			ButtonHelper.resolvePNPlay(id, p2, activeGame, event);
+		}
         boolean sendSftT = false;
         boolean sendAlliance = false;
         String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);

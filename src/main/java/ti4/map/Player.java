@@ -89,6 +89,7 @@ public class Player {
     private int autoSaboPassMedian;
     private int actualHits;
     private int expectedHitsTimes10;
+    private int totalExpenses;
 
     private Set<Integer> followedSCs = new HashSet<>();
 
@@ -1417,6 +1418,10 @@ public class Player {
         return expectedHitsTimes10;
     }
 
+    public int getTotalExpenses() {
+        return totalExpenses;
+    }
+
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game activeGame = getGame();
         LinkedHashMap<String, List<String>> scoredPOs = activeGame.getScoredPublicObjectives();
@@ -1485,6 +1490,10 @@ public class Player {
 
     public void setExpectedHitsTimes10(int tg) {
         expectedHitsTimes10 = tg;
+    }
+
+    public void setTotalExpenses(int tg) {
+        totalExpenses = tg;
     }
 
     public void setFollowedSCs(Set<Integer> followedSCs) {
