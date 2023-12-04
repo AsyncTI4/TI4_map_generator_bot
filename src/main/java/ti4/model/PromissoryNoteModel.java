@@ -22,6 +22,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     private String attachment;
     private ComponentSource source;
     private String text;
+    private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
@@ -48,6 +49,10 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAttachment() {
         return Optional.ofNullable(attachment);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public String getOwner() {
@@ -118,7 +123,7 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFactionOrColor() + ") (" + getSource() + ")";
+        return getName() + " (" + getFactionOrColor() + ") [" + getSource() + "]";
     }
 
 }
