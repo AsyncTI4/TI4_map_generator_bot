@@ -15,6 +15,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.model.Source.ComponentSource;
 
 public class AbilityModelTest {
 
@@ -68,7 +69,8 @@ public class AbilityModelTest {
     @Test
     public void testSource() {
         AbilityModel abilityModel = Mapper.getAbility("mitosis");
-        String source = "testSource";
+        ComponentSource source = ComponentSource.base;
+        abilityModel.setSource(source);
         assertEquals(source, abilityModel.getSource());
     }
 
@@ -88,7 +90,7 @@ public class AbilityModelTest {
         abilityModel.setId("testId");
         abilityModel.setName("testName");
         abilityModel.setFaction("testFaction");
-        abilityModel.setSource("testSource");
+        abilityModel.setSource(ComponentSource.testsource);
         assertTrue(abilityModel.isValid());
     }
 

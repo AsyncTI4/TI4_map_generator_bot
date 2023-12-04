@@ -11,7 +11,7 @@ public class CommoditiesDraftItem extends DraftItem {
     }
 
     private FactionModel getFaction() {
-        if (ItemId.equals("keleres")) {
+        if ("keleres".equals(ItemId)) {
             return Mapper.getFaction("keleresa");
         }
         return Mapper.getFaction(ItemId);

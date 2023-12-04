@@ -55,6 +55,7 @@ public class Constants {
     public static final String NAALU_AGENT = "naalu_agent";
     public static final String L1_HERO = "l1_hero";
     public static final String NOMAD_COIN = "nomad_coin";
+    public static final String PURGED_FRAGMENTS = "purged_fragment";
     public static final String DOMINUS_ORB = "dominus_orb";
     public static final String COMPONENT_ACTION = "component_action";
     public static final String JUST_PLAYED_COMPONENT_AC = "just_played_component_ac";
@@ -475,7 +476,9 @@ public class Constants {
     public static final String TG = "trade_goods";
     public static final String ACTUAL_HITS = "actual_hits";
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
+    public static final String TURN_COUNT = "turn_count";
     public static final String COMMODITIES = "commodities";
+    public static final String PERSONAL_PING_INTERVAL = "personal_ping_interval";
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
@@ -489,6 +492,7 @@ public class Constants {
     public static final String STAGE_2_PUBLIC_DECK = "s2_public_deck";
     public static final String EXPLORATION_DECKS = "exploration_decks";
     public static final String AC_DISCARDED = "action_cards_discarded";
+    public static final String AC_PURGED = "action_cards_purged";
     public static final String SO = "secret_objectives";
     public static final String MESSAGEID_FOR_SABOS = "messageid_for_sabos";
     public static final String SECRET_OBJECTIVE = "secret_objective";
@@ -635,14 +639,17 @@ public class Constants {
     public static final String SHOW_ALL_AC = "show_all";
     public static final String SHOW_AC_TO_ALL = "show_to_all";
     public static final String DISCARD_AC = "discard";
+    public static final String PURGE_AC = "purge";
     public static final String DISCARD_AC_RANDOM = "discard_random";
     public static final String PLAY_AC = "play";
     public static final String PICK_AC_FROM_DISCARD = "pick_from_discard";
+    public static final String PICK_AC_FROM_PURGED = "pick_from_purged";
     public static final String SHUFFLE_AC_BACK_INTO_DECK = "shuffle_back_into_deck";
     public static final String REVEAL_AND_PUT_AC_INTO_DISCARD = "reveal_and_put_into_discard";
     public static final String SEND_AC = "send";
     public static final String SEND_AC_RANDOM = "send_random";
     public static final String SHOW_AC_DISCARD_LIST = "show_discard_list";
+    public static final String SHOW_AC_PURGED_LIST = "show_purged_list";
     public static final String SHOW_AC_REMAINING_CARD_COUNT = "show_remaining_card_count";
 
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
@@ -862,6 +869,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
+    public static final String LANEFIR_ATS_COUNT = "ats_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";
@@ -886,8 +894,10 @@ public class Constants {
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
+    public static final String DICE_LUCK = "dice_luck";
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";
+    public static final String MINIMUM_NUMBER_OF_EXPECTED_HITS = "minimum_number_of_expected_hits";
     public static final String UNITS_OWNED = "units_owned";
     public static final String UNIT_ID = "unit_id";
     public static final String UNIT_ID_1 = "unit_id_1";

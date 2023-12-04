@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -48,8 +47,7 @@ public class SystemInfo extends SpecialSubcommandData {
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
         if (ringsMapping != null) {
             context = ringsMapping.getAsInt();
-            int newContext = context;
-            if (context > 2) newContext = 2;
+            int newContext = Math.min(context, 2);
             if (context < 0) newContext = 0;
             if (context == 333) newContext = 3;
             if (context == 444) newContext = 4;
@@ -136,11 +134,11 @@ public class SystemInfo extends SpecialSubcommandData {
                 HashMap<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
-                    String colour = AliasHandler.resolveColor(unitKey.getColorID());
-                    Player player = activeGame.getPlayerFromColorOrFaction(colour);
+                    String color = AliasHandler.resolveColor(unitKey.getColorID());
+                    Player player = activeGame.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColour()).append(Emojis.getColourEmojis(colour));
+                    sb.append(player.getFactionEmojiOrColor()).append(Emojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
                         sb.append(Emojis.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
@@ -156,7 +154,7 @@ public class SystemInfo extends SpecialSubcommandData {
             if (!activeGame.isFoWMode()) {
                 for (Player player : activeGame.getRealPlayers()) {
 
-                    if(!FoWHelper.playerHasUnitsInSystem(player, tile)){
+                    if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                         continue;
                     }
                     List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
@@ -168,10 +166,10 @@ public class SystemInfo extends SpecialSubcommandData {
                         List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "space");
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         return;
-                    }else{
-                        for(UnitHolder unitHolder : tile.getUnitHolders().values()){
-                            if(unitHolder instanceof Planet){
-                                if(ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName()).size() > 1){
+                    } else {
+                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                            if (unitHolder instanceof Planet) {
+                                if (ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName()).size() > 1) {
                                     List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
                                     List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground");
                                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
@@ -180,7 +178,7 @@ public class SystemInfo extends SpecialSubcommandData {
                             }
                         }
                     }
-                    
+
                 }
             }
 

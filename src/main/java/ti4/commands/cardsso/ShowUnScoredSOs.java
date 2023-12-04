@@ -3,6 +3,7 @@ package ti4.commands.cardsso;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -19,6 +20,10 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
 
+        showUnscored(activeGame, event);
+    }
+
+    public void showUnscored(Game activeGame, GenericInteractionCreateEvent event){
         if(activeGame.isFoWMode()){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
@@ -60,6 +65,6 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
                 x++;
             }   
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 }

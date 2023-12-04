@@ -87,7 +87,12 @@ public class SendFragments extends ExploreSubcommandData {
 		String fragString = count + " " + trait + " " + Emojis.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message = p1 + " sent " + fragString + " to " + p2;
 		MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeGame), message);
-
+		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
+            ButtonHelper.commanderUnlockCheck(receiver, activeGame, "kollecc", event);
+        }
+		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
+            ButtonHelper.commanderUnlockCheck(receiver, activeGame, "bentor", event);
+        }
 		if (activeGame.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
@@ -96,5 +101,6 @@ public class SendFragments extends ExploreSubcommandData {
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeGame, event, sender, receiver, fragString, null);
 		}
+		ButtonHelper.checkTransactionLegality(activeGame, sender, receiver);
 	}
 }

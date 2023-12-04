@@ -26,7 +26,7 @@ public class RevealStage2 extends StatusSubcommandData {
         Map.Entry<String, Integer> objective = activeGame.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(event, activeGame) + " **Stage 2 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, activeGame.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
     }
 

@@ -1,5 +1,8 @@
 package ti4.commands.cardsac;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -18,9 +21,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class ACInfo extends ACCardsSubcommandData {
     public ACInfo() {
@@ -41,14 +41,14 @@ public class ACInfo extends ACCardsSubcommandData {
     }
 
     public static void sendActionCardInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
         sendTrapCardInfo(activeGame, player);
     }
 
     public static void sendActionCardInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used something";
+        String headerText = player.getRepresentation(true, true) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         sendActionCardInfo(activeGame, player);
         sendTrapCardInfo(activeGame, player);
@@ -63,7 +63,6 @@ public class ACInfo extends ACCardsSubcommandData {
     private static String getTrapCardInfo(Game activeGame, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
-
 
         //ACTION CARDS
         sb.append("**Trap Cards:**").append("\n");
@@ -130,7 +129,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeGame, player);
         if (!acButtons.isEmpty()) {
-            
+
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
@@ -145,7 +144,6 @@ public class ACInfo extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
 
-
         //ACTION CARDS
         sb.append("**Action Cards:**").append("\n");
         int index = 1;
@@ -158,14 +156,14 @@ public class ACInfo extends ACCardsSubcommandData {
                 for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
                     ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
-                    
+
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if(actionCard == null){
+                    if (actionCard == null) {
                         sb.append("Something broke here");
-                    }else{
+                    } else {
                         sb.append(actionCard.getRepresentation());
                     }
-                    
+
                     index++;
                 }
             }
@@ -177,42 +175,57 @@ public class ACInfo extends ACCardsSubcommandData {
     private static List<Button> getPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null && !actionCards.isEmpty()) {
-            if(!ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")){
-                for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                    Integer value = ac.getValue();
-                    String key = ac.getKey();
-                    String ac_name = Mapper.getActionCardName(key);
-                    if (ac_name != null) {
-                        acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
-                    }
+
+        if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure") && !ButtonHelper.isPlayerElected(activeGame, player, "absol_censure")) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCardName(key);
+                if (ac_name != null) {
+                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
-            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
-            if (player.hasUnexhaustedLeader("nekroagent")) {
-                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
-                acButtons.add(nekroButton);
-            }
-            if (player.hasUnexhaustedLeader("mykomentoriagent")) {
-                Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
-                acButtons.add(nekroButton);
-            }
-            if(player.hasAbility("divination")&& ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0){
-                String omenDice = "";
-                for(int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)){
-                    omenDice=omenDice+" "+omenDie;
-                }
-                omenDice=omenDice.trim();
-                Button augers = Button.secondary("getOmenDice", "Use an omen die ("+omenDice+")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
-                acButtons.add(augers);
-            }
-            if(actionCards.keySet().contains("coup") || actionCards.keySet().contains("disgrace")||actionCards.keySet().contains("investments")||actionCards.keySet().contains("summit")){
-                 acButtons.add(Button.secondary("checkForAllACAssignments","Pre assign ACs"));
-            }
-            
         }
+        acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+        if (player.hasUnexhaustedLeader("nekroagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Emojis.Nekro));
+            acButtons.add(nekroButton);
+        }
+        if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 0) {
+            Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            acButtons.add(ghostButton);
+        }
+        if (player.hasUnexhaustedLeader("kolleccagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_kolleccagent", "Use Kollecc Agent").withEmoji(Emoji.fromFormatted(Emojis.kollecc));
+            acButtons.add(nekroButton);
+        }
+        if (player.hasUnexhaustedLeader("mykomentoriagent")) {
+            Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent", "Use Myko Agent").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            acButtons.add(nekroButton);
+        }
+        if (player.hasAbility("cunning")) {
+            acButtons.add(Button.success("setTrapStep1", "Set a Trap"));
+            acButtons.add(Button.danger("revealTrapStep1", "Reveal a Trap"));
+            acButtons.add(Button.secondary("removeTrapStep1", "Remove a Trap"));
+        }
+
+        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(activeGame).size() > 0) {
+            StringBuilder omenDice = new StringBuilder();
+            for (int omenDie : ButtonHelperAbilities.getAllOmenDie(activeGame)) {
+                omenDice.append(" ").append(omenDie);
+            }
+            omenDice = new StringBuilder(omenDice.toString().trim());
+            Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")").withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
+            acButtons.add(augers);
+        }
+        if (actionCards != null && !actionCards.isEmpty() && !ButtonHelper.isPlayerElected(activeGame, player, "censure")
+            && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace") || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
+            acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
+        }
+
         return acButtons;
     }
+
     public static List<Button> getActionPlayActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
@@ -230,11 +243,12 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
+
     public static List<Button> getDiscardActionCardButtons(Game activeGame, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         String stall = "";
-        if(doingAction){
+        if (doingAction) {
             stall = "stall";
         }
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -249,7 +263,8 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-     public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
+
+    public static List<Button> getYssarilHeroActionCardButtons(Game activeGame, Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -258,12 +273,13 @@ public class ACInfo extends ACCardsSubcommandData {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.danger("yssarilHeroInitialOffering_" + value + "_"+yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Button.danger("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
         return acButtons;
     }
+
     public static List<Button> getToBeStolenActionCardButtons(Game activeGame, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
@@ -273,7 +289,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.danger("takeAC_" + value + "_"+player.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Button.danger("takeAC_" + value + "_" + player.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }

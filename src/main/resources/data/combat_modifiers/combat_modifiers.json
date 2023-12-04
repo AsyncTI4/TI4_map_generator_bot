@@ -14,6 +14,36 @@
         ]
     },
     {
+        "alias": "plus3_1combat_all_opponent",
+        "type": "DIE_MOD",
+        "value": "+3",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "applyToOpponent": true,
+        "persistenceType": "ONE_COMBAT",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "close_quarters"
+            }
+        ]
+    },
+    {
+        "alias": "minus4_bombard",
+        "type": "DIE_MOD",
+        "value": "-4",
+        "scope": "",
+        "forCombatAbility": "bombardment",
+        "applyToOpponent": true,
+        "persistenceType": "ONE_TACTICAL_ACTION",
+        "related": [
+            {
+                "type": "action_cards",
+                "alias": "bunker"
+            }
+        ]
+    },
+    {
         "alias": "plus1_1tacticalaction_all",
         "type": "DIE_MOD",
         "value": "+1",
@@ -348,6 +378,20 @@
             {
                 "type": "agenda",
                 "alias": "prophecy"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_always_fighter_lomega",
+        "type": "mods",
+        "value": "+1",
+        "scope": "ff",
+        "persistenceType": "ALWAYS",
+        "related": [
+            {
+                "type": "agenda",
+                "alias": "little_omega_prophecy"
             }
         ],
         "forCombatAbility": "combatround"

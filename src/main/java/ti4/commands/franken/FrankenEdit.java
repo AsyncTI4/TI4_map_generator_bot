@@ -1,19 +1,18 @@
 package ti4.commands.franken;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.draft.DraftBag;
+import ti4.draft.DraftItem;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.draft.DraftBag;
-import ti4.draft.DraftItem;
-
-import java.util.Objects;
 
 public class FrankenEdit extends FrankenSubcommandData {
     public FrankenEdit() {
@@ -104,7 +103,7 @@ public class FrankenEdit extends FrankenSubcommandData {
 
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName) {
         StringBuilder sb = new StringBuilder();
-        sb.append(game.getName() + " " + player.getUserName() + " Current " + bagName + ":\n");
+        sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
         for (DraftItem item : bag.Contents) {
             sb.append(item.getAlias());
             sb.append("\n");

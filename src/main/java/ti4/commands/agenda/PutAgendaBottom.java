@@ -1,7 +1,6 @@
 package ti4.commands.agenda;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,8 +23,7 @@ public class PutAgendaBottom extends AgendaSubcommandData {
         if (success && !activeGame.isFoWMode()) {
             MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on bottom");
             List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-            if (threadChannels == null) return;
-            String threadName = activeGame.getName()+"-round-"+ activeGame.getRound()+"-politics";
+          String threadName = activeGame.getName()+"-round-"+ activeGame.getRound()+"-politics";
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(threadName)) {

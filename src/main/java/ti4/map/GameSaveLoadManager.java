@@ -1,5 +1,8 @@
 package ti4.map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -21,21 +24,15 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -197,12 +194,11 @@ public class GameSaveLoadManager {
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
                     Game loadedGame = loadMap(originalMapFile);
-                    boolean sendCards = false;
-                    for(Player p1 : loadedGame.getRealPlayers()){
+                    for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
-                        if(p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()){
+                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
                             Player player = p1;
-                            String headerText = Helper.getPlayerRepresentation(player, activeGame, loadedGame.getGuild(), true) + " here is your cards info";
+                            String headerText = player.getRepresentation(true, true) + " here is your cards info";
                             MessageHelper.sendMessageToPlayerCardsInfoThread(player, loadedGame, headerText);
                             SOInfo.sendSecretObjectiveInfo(loadedGame, player);
                             ACInfo.sendActionCardInfo(loadedGame, player);
@@ -211,14 +207,14 @@ public class GameSaveLoadManager {
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
-                    try{
-                        if (loadedGame != null && loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
+                    try {
+                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
-                    }catch(Exception e){
+                    } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
-                    
+
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
@@ -305,6 +301,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(activeGame.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
+        writer.write(System.lineSeparator());
+        writeCards(activeGame.getPurgedActionCards(), writer, Constants.AC_PURGED);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", activeGame.getAllExplores()));
         writer.write(System.lineSeparator());
@@ -531,6 +529,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.NOMAD_COIN + " " + activeGame.getNomadCoin());
         writer.write(System.lineSeparator());
+        writer.write(Constants.PURGED_FRAGMENTS + " " + activeGame.getNumberOfPurgedFragments());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + activeGame.getTemporaryPingDisable());
         writer.write(System.lineSeparator());
         writer.write(Constants.DOMINUS_ORB + " " + activeGame.getDominusOrbStatus());
@@ -651,7 +651,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
-             writer.write(Constants.AFK_HOURS + " " + player.getHoursThatPlayerIsAFK());
+            writer.write(Constants.AFK_HOURS + " " + player.getHoursThatPlayerIsAFK());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
@@ -687,6 +687,10 @@ public class GameSaveLoadManager {
             writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.hasFoundIndFrag());
             writer.write(System.lineSeparator());
             writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
+            writer.write(System.lineSeparator());
+
+            //LANEFIR ATS Armaments count
+            writer.write(Constants.LANEFIR_ATS_COUNT + " " + player.getAtsCount());
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
@@ -758,6 +762,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.TURN_COUNT + " " + player.getTurnCount());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
@@ -765,6 +772,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.PERSONAL_PING_INTERVAL + " " + player.getPersonalPingInterval());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
@@ -843,14 +852,14 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             List<String> newTempCombatMods = new ArrayList<>();
-            for(TemporaryCombatModifierModel mod : player.getNewTempCombatModifiers()){
+            for (TemporaryCombatModifierModel mod : player.getNewTempCombatModifiers()) {
                 newTempCombatMods.add(mod.getSaveString());
             }
             writer.write(Constants.PLAYER_NEW_TEMP_MODS + " " + String.join("|", newTempCombatMods));
             writer.write(System.lineSeparator());
 
             List<String> tempCombatMods = new ArrayList<>();
-            for(TemporaryCombatModifierModel mod : player.getTempCombatModifiers()){
+            for (TemporaryCombatModifierModel mod : player.getTempCombatModifiers()) {
                 tempCombatMods.add(mod.getSaveString());
             }
             writer.write(Constants.PLAYER_TEMP_MODS + " " + String.join("|", tempCombatMods));
@@ -1295,6 +1304,7 @@ public class GameSaveLoadManager {
                 case Constants.REVERSE_SPEAKER_ORDER -> activeGame.setReverseSpeakerOrder("true".equals(info));
                 case Constants.AGENDAS -> activeGame.setAgendas(getCardList(info));
                 case Constants.AC_DISCARDED -> activeGame.setDiscardActionCards(getParsedCards(info));
+                case Constants.AC_PURGED -> activeGame.setPurgedActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> activeGame.setDiscardAgendas(getParsedCards(info));
                 case Constants.SENT_AGENDAS -> activeGame.setSentAgendas(getParsedCards(info));
                 case Constants.LAW -> activeGame.setLaws(getParsedCards(info));
@@ -1622,6 +1632,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.PURGED_FRAGMENTS -> {
+                    try {
+                        int value = Integer.parseInt(info);
+                        activeGame.setNumberOfPurgedFragments(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.TEMPORARY_PING_DISABLE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1886,14 +1904,15 @@ public class GameSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TURN_COUNT -> player.setTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();
                     while (debtToken.hasMoreTokens()) {
                         StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
-                        String colour = debtInfo.nextToken();
+                        String color = debtInfo.nextToken();
                         Integer count = Integer.parseInt(debtInfo.nextToken());
-                        debtTokens.put(colour, count);
+                        debtTokens.put(color, count);
                     }
                     player.setDebtTokens(debtTokens);
                 }
@@ -1901,6 +1920,7 @@ public class GameSaveLoadManager {
                 case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.PERSONAL_PING_INTERVAL -> player.setPersonalPingInterval(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN -> player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CAPTURE -> {
@@ -2071,6 +2091,7 @@ public class GameSaveLoadManager {
                 case Constants.BENTOR_HAS_FOUND_HFRAG -> player.setHasFoundHazFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.LANEFIR_ATS_COUNT -> player.setAtsCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
                 case Constants.PLAYER_NEW_TEMP_MODS -> {

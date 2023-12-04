@@ -1,17 +1,17 @@
 package ti4.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.AliasHandler;
+import ti4.model.Source.ComponentSource;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.message.BotLogger;
+import lombok.Data;
 
-import java.util.ArrayList;
-
+@Data
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
@@ -26,7 +26,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> leaders;
     private List<String> promissoryNotes;
     private List<String> units;
-    private String source;
+    private ComponentSource source;
 
     public boolean isValid() {
         return alias != null
@@ -43,32 +43,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && source != null;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getFactionName() {
-        return factionName;
-    }
-
     public String getShortTag() {
         return StringUtils.left(Optional.ofNullable(shortTag).orElse(getAlias()), 3).toUpperCase();
-    }
-
-    public String getHomeSystem() {
-        return homeSystem;
-    }
-
-    public String getStartingFleet() {
-        return startingFleet;
-    }
-
-    public int getCommodities() {
-        return commodities;
-    }
-
-    public String getSource() {
-        return source;
     }
 
     public List<String> getFactionTech() {
@@ -107,12 +83,16 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+        searchString = searchString.toLowerCase();
+        return getFactionName().contains(searchString)
+            || getAlias().contains(searchString)
+            || getShortTag().contains(searchString)
+            || getSource().toString().contains(searchString)
+            || getAlias().equals(AliasHandler.resolveFaction(searchString));
     }
 
     @Override
     public String getAutoCompleteName() {
-        return getFactionName();
+        return getFactionName() + " [" + source + "]";
     }
 }

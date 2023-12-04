@@ -1,5 +1,6 @@
 package ti4.commands.tech;
 
+import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,9 +14,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.TechnologyModel;
-
-import java.util.HashMap;
-import java.util.List;
 
 public abstract class TechAddRemove extends TechSubcommandData {
     public TechAddRemove(String id, String description) {

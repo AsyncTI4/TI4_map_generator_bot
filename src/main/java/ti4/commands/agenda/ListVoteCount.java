@@ -1,16 +1,15 @@
 package ti4.commands.agenda;
 
+import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.*;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {

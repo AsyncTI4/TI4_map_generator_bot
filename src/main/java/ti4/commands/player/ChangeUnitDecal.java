@@ -40,9 +40,8 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
             return;
         }
 
-
         player.setDecalSet(newDecalSet);
-        sendMessage(player.getFactionEmojiOrColour() + " changed their decal set to " + newDecalSet);
+        sendMessage(player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
     }
 
     @Override

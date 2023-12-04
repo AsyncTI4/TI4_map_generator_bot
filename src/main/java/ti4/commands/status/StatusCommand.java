@@ -108,6 +108,7 @@ public class StatusCommand implements Command {
         subcommands.add(new SCTradeGoods());
         subcommands.add(new ListTurnOrder());
         subcommands.add(new ListTurnStats());
+        subcommands.add(new ListDiceLuck());
         return subcommands;
     }
 

@@ -24,17 +24,17 @@ public class TemporaryCombatModifierModel {
 
     public TemporaryCombatModifierModel(String loadString) {
         String[] items = loadString.split(",");
-        this.relatedID = items[0];
-        this.relatedType = items[1];
-        this.useInTurn = Integer.parseInt(items[2]);
-        this.useInSystem = items[3];
-        this.useInUnitHolder = items[4];
+        relatedID = items[0];
+        relatedType = items[1];
+        useInTurn = Integer.parseInt(items[2]);
+        useInSystem = items[3];
+        useInUnitHolder = items[4];
         String modifierAlias = items[5];
-        this.modifier = Mapper.getCombatModifiers().get(modifierAlias);
+        modifier = Mapper.getCombatModifiers().get(modifierAlias);
     }
 
     public String getSaveString() {
-        return this.relatedID + "," + this.relatedType + "," + this.useInTurn + "," + this.useInSystem + ","
-                + this.useInUnitHolder + "," + this.getModifier().getAlias();
+        return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + ","
+                + useInUnitHolder + "," + getModifier().getAlias();
     }
 }

@@ -28,7 +28,7 @@ public class ACInfo_Legacy extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        String headerText = Helper.getPlayerRepresentation(player, activeGame, activeGame.getGuild(), true) + " used `/cards_info`";
+        String headerText = player.getRepresentation(true, true) + " used `/cards_info`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
         CardsInfo.sendCardsInfo(activeGame, player);
     }

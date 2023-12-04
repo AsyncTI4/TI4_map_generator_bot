@@ -62,6 +62,7 @@ public class StatisticsCommand implements Command {
         subcommands.add(new AverageTurnTime());
         subcommands.add(new MedianTurnTime());
         subcommands.add(new CompareAFKTimes());
+        subcommands.add(new DiceLuck());
 
         return subcommands;
     }

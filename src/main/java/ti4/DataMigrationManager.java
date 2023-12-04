@@ -78,11 +78,10 @@ public class DataMigrationManager {
     /// <Description of how data is changing, and optionally what code fix it
     /// relates to>
     public static Boolean migrateExampleMigration_241223(Game game) {
-        boolean mapNeededMigrating = false;
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
-        return mapNeededMigrating;
+        return false;
     }
 
     /// MIGRATION: Add faction techs to games that were created before faction techs added
@@ -564,7 +563,7 @@ public class DataMigrationManager {
             Date mapCreatedOn = null;
             try {
                 mapCreatedOn = mapCreatedOnFormat.parse(game.getCreationDate());
-            } catch (ParseException e) {
+            } catch (ParseException ignored) {
             }
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
@@ -644,7 +643,7 @@ public class DataMigrationManager {
         replacements.put("magen_engineers", "double_agents");
         replacements.put("production_rider", "foreign_policy");
         replacements.put("rigged_explosives", "mechanized_workforce");
-        replacements.put("shock_and_awe", "classified_weapons");
+        replacements.put("shock_and_awe", "classified_weapons_acd2");
         replacements.put("space_mines", "dangerous_conditions");
         replacements.put("transference_protocol", "masterclass_logistics");
         replacements.put("virulent_gas_canisters", "virulent_gas");

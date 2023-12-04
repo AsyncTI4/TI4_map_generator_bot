@@ -16,6 +16,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.model.Source.ComponentSource;
 
 public class AgendaModelTest {
 
@@ -56,7 +57,7 @@ public class AgendaModelTest {
         ixthian.setText1("testText1");
         assertTrue(ixthian.isValid());
 
-        ixthian.setSource("testSource");
+        ixthian.setSource(ComponentSource.testsource);
         assertTrue(ixthian.isValid());
     }
 
