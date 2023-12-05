@@ -11,6 +11,7 @@ import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
+import ti4.message.BotLogger;
 
 public class FactionModelTest {
     
@@ -26,15 +27,16 @@ public class FactionModelTest {
     @Test
     public void testFactions() {
         for (FactionModel faction : Mapper.getFactions()) {
-            assertTrue(faction.isValid());
-            assertTrue(validateAbilities(faction));
-            assertTrue(validateFactionTech(faction));
-            assertTrue(validateHomeSystem(faction));
-            assertTrue(validateHomePlanets(faction));
-            assertTrue(validateStartingTech(faction));
-            assertTrue(validateLeaders(faction));
-            assertTrue(validatePromissoryNotes(faction));
-            assertTrue(validateUnits(faction));
+            assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
+            assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
+            assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech");
+            assertTrue(validateHomeSystem(faction), faction.getAlias() + ": invalid HomeSystem");
+            assertTrue(validateHomePlanets(faction), faction.getAlias() + ": invalid HomePlanets");
+            assertTrue(validateStartingTech(faction), faction.getAlias() + ": invalid StartingTech");
+            assertTrue(validateLeaders(faction), faction.getAlias() + ": invalid Leaders");
+            assertTrue(validatePromissoryNotes(faction), faction.getAlias() + ": invalid PromissoryNotes");
+            assertTrue(validateUnits(faction), faction.getAlias() + ": invalid Units");
+            assertTrue(validateHomebrewReplacesID(faction), faction.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
 
@@ -113,6 +115,13 @@ public class FactionModelTest {
             if (!Mapper.getTechs().containsKey(factionTechID)) invalidFactionTechIDs.add(factionTechID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid faction tech IDs: `" + invalidFactionTechIDs + "`");
+        return false;
+    }
+
+    private boolean validateHomebrewReplacesID(FactionModel faction) {
+        if (faction.getHomebrewReplacesID().isEmpty()) return true;
+        if (Mapper.isFaction(faction.getHomebrewReplacesID().get())) return true;
+        BotLogger.log("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }
 }

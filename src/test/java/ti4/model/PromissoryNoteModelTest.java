@@ -27,7 +27,7 @@ public class PromissoryNoteModelTest {
     public void testPromissoryNotes() {
         for (PromissoryNoteModel pnModel : Mapper.getPromissoryNotes().values()) {
             assertTrue(pnModel.isValid());
-            assertTrue(validateHomebrewReplacesID(pnModel));
+            assertTrue(validateHomebrewReplacesID(pnModel), pnModel.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
 

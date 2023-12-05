@@ -33,6 +33,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> promissoryNotes;
     private List<String> units;
     private ComponentSource source;
+    private String homebrewReplacesID;
 
     public boolean isValid() {
         return alias != null
@@ -47,6 +48,11 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && promissoryNotes != null
             && units != null
             && source != null;
+    }
+
+    public String getFactionEmoji() {
+        if (homebrewReplacesID != null) return Emojis.getFactionIconFromDiscord(homebrewReplacesID);
+        return Emojis.getFactionIconFromDiscord(getAlias());
     }
 
     public String getShortTag() {
@@ -79,6 +85,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public List<String> getUnits() {
         return new ArrayList<>(units);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     @Override
