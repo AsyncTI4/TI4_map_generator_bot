@@ -179,7 +179,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Politics\" strategy card, they draw 2 additional action cards. When another player plays an action card, the owner of this card may discard this card to cancel that action card.",
         "text2": "",
-        "mapText": "Draw 2 additional action cards on the primary and secondary of Politics. Discard this card to cancel an action card.",
+        "mapText": "After you resolve Politics, draw 2 additional action cards. Discard this card to cancel an action card.",
         "source": "little_omega"
     },
     {
@@ -227,7 +227,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls and may produce 1 additional fighter for their cost; these additional units do not count against their production limit.",
         "text2": "",
-        "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against production limit.",
+        "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against production limits.",
         "source": "little_omega"
     },
     {
