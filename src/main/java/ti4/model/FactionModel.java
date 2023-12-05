@@ -1,10 +1,16 @@
 package ti4.model;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
 import org.apache.commons.lang3.StringUtils;
@@ -77,8 +83,39 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public MessageEmbed getRepresentationEmbed() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+        return getRepresentationEmbed(false, false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeAliases) {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        //TITLE
+        String title = Emojis.getFactionIconFromDiscord(getAlias()) +
+            " __**" + getFactionName() + "**__" +
+            getSource().emoji();
+        eb.setTitle(title);
+
+        Emoji emoji = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(getAlias()));
+        if (emoji instanceof CustomEmoji customEmoji) {
+            eb.setThumbnail(customEmoji.getImageUrl());
+        }
+
+        //DESCRIPTION
+        StringBuilder description = new StringBuilder();
+        eb.setDescription(description.toString());
+
+        //FIELDS
+        eb.addField("title", "contents", true);
+
+
+        //FOOTER
+        StringBuilder footer = new StringBuilder();
+        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeAliases) footer.append("\nAliases: "); //TODO: 
+        eb.setFooter(footer.toString());
+
+        eb.setColor(Color.black);
+        return eb.build();
     }
 
     @Override
