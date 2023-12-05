@@ -5,7 +5,7 @@
         "color": "splitgold",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitgold** player activates a system that contains 1 or more of your units: The **splitgold** player cannot move units to the active system. Then return this card to the **splitgold** player."
+        "text": "After the splitgold player activates a system that contains 1 or more of your units: The splitgold player cannot move units to the active system. Then return this card to the splitgold player."
     },
     {
         "alias": "splitgold_ps",
@@ -13,7 +13,7 @@
         "color": "splitgold",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitgold** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitgold** player."
+        "text": "When an agenda is revealed: The splitgold player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitgold player."
     },
     {
         "alias": "splitgold_sftt",
@@ -21,7 +21,7 @@
         "color": "splitgold",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitgold** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitgold** player's units, or if the **splitgold** player is eliminated, lose 1 victory point and return this card to the **splitgold** player."
+        "text": "When you receive this card, if you are not the splitgold player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitgold player's units, or if the splitgold player is eliminated, lose 1 victory point and return this card to the splitgold player."
     },
     {
         "alias": "splitgold_ta",
@@ -29,7 +29,7 @@
         "color": "splitgold",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitgold** player replenishes commodities: The **splitgold** player gives you all of their commodities. Then, return this card to the **splitgold** player."
+        "text": "When the splitgold player replenishes commodities: The splitgold player gives you all of their commodities. Then, return this card to the splitgold player."
     },
     {
         "alias": "splitgold_an",
@@ -37,7 +37,7 @@
         "color": "splitgold",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitgold** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgold** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgold** player's units, return this card to the **splitgold** player."
+        "text": "When you receive this card, if you are not the splitgold player, you must place it faceup in your play area. While this card is in your play area, you can use the splitgold player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitgold player's units, return this card to the splitgold player."
     },
     {
         "alias": "splitlime_cf",
@@ -45,7 +45,7 @@
         "color": "splitlime",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitlime** player activates a system that contains 1 or more of your units: The **splitlime** player cannot move units to the active system. Then return this card to the **splitlime** player."
+        "text": "After the splitlime player activates a system that contains 1 or more of your units: The splitlime player cannot move units to the active system. Then return this card to the splitlime player."
     },
     {
         "alias": "splitlime_ps",
@@ -53,7 +53,7 @@
         "color": "splitlime",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitlime** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitlime** player."
+        "text": "When an agenda is revealed: The splitlime player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitlime player."
     },
     {
         "alias": "splitlime_sftt",
@@ -61,7 +61,7 @@
         "color": "splitlime",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitlime** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitlime** player's units, or if the **splitlime** player is eliminated, lose 1 victory point and return this card to the **splitlime** player."
+        "text": "When you receive this card, if you are not the splitlime player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitlime player's units, or if the splitlime player is eliminated, lose 1 victory point and return this card to the splitlime player."
     },
     {
         "alias": "splitlime_ta",
@@ -69,7 +69,7 @@
         "color": "splitlime",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitlime** player replenishes commodities: The **splitlime** player gives you all of their commodities. Then, return this card to the **splitlime** player."
+        "text": "When the splitlime player replenishes commodities: The splitlime player gives you all of their commodities. Then, return this card to the splitlime player."
     },
     {
         "alias": "splitlime_an",
@@ -77,7 +77,7 @@
         "color": "splitlime",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitlime** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitlime** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitlime** player's units, return this card to the **splitlime** player."
+        "text": "When you receive this card, if you are not the splitlime player, you must place it faceup in your play area. While this card is in your play area, you can use the splitlime player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitlime player's units, return this card to the splitlime player."
     },
     {
         "alias": "splittan_cf",
@@ -85,7 +85,7 @@
         "color": "splittan",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splittan** player activates a system that contains 1 or more of your units: The **splittan** player cannot move units to the active system. Then return this card to the **splittan** player."
+        "text": "After the splittan player activates a system that contains 1 or more of your units: The splittan player cannot move units to the active system. Then return this card to the splittan player."
     },
     {
         "alias": "splittan_ps",
@@ -93,7 +93,7 @@
         "color": "splittan",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splittan** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splittan** player."
+        "text": "When an agenda is revealed: The splittan player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splittan player."
     },
     {
         "alias": "splittan_sftt",
@@ -101,7 +101,7 @@
         "color": "splittan",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splittan** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splittan** player's units, or if the **splittan** player is eliminated, lose 1 victory point and return this card to the **splittan** player."
+        "text": "When you receive this card, if you are not the splittan player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splittan player's units, or if the splittan player is eliminated, lose 1 victory point and return this card to the splittan player."
     },
     {
         "alias": "splittan_ta",
@@ -109,7 +109,7 @@
         "color": "splittan",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splittan** player replenishes commodities: The **splittan** player gives you all of their commodities. Then, return this card to the **splittan** player."
+        "text": "When the splittan player replenishes commodities: The splittan player gives you all of their commodities. Then, return this card to the splittan player."
     },
     {
         "alias": "splittan_an",
@@ -117,7 +117,7 @@
         "color": "splittan",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splittan** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splittan** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splittan** player's units, return this card to the **splittan** player."
+        "text": "When you receive this card, if you are not the splittan player, you must place it faceup in your play area. While this card is in your play area, you can use the splittan player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splittan player's units, return this card to the splittan player."
     },
     {
         "alias": "splitteal_cf",
@@ -125,7 +125,7 @@
         "color": "splitteal",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitteal** player activates a system that contains 1 or more of your units: The **splitteal** player cannot move units to the active system. Then return this card to the **splitteal** player."
+        "text": "After the splitteal player activates a system that contains 1 or more of your units: The splitteal player cannot move units to the active system. Then return this card to the splitteal player."
     },
     {
         "alias": "splitteal_ps",
@@ -133,7 +133,7 @@
         "color": "splitteal",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitteal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitteal** player."
+        "text": "When an agenda is revealed: The splitteal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitteal player."
     },
     {
         "alias": "splitteal_sftt",
@@ -141,7 +141,7 @@
         "color": "splitteal",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitteal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitteal** player's units, or if the **splitteal** player is eliminated, lose 1 victory point and return this card to the **splitteal** player."
+        "text": "When you receive this card, if you are not the splitteal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitteal player's units, or if the splitteal player is eliminated, lose 1 victory point and return this card to the splitteal player."
     },
     {
         "alias": "splitteal_ta",
@@ -149,7 +149,7 @@
         "color": "splitteal",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitteal** player replenishes commodities: The **splitteal** player gives you all of their commodities. Then, return this card to the **splitteal** player."
+        "text": "When the splitteal player replenishes commodities: The splitteal player gives you all of their commodities. Then, return this card to the splitteal player."
     },
     {
         "alias": "splitteal_an",
@@ -157,7 +157,7 @@
         "color": "splitteal",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitteal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitteal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitteal** player's units, return this card to the **splitteal** player."
+        "text": "When you receive this card, if you are not the splitteal player, you must place it faceup in your play area. While this card is in your play area, you can use the splitteal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitteal player's units, return this card to the splitteal player."
     },
     {
         "alias": "splitturquoise_cf",
@@ -165,7 +165,7 @@
         "color": "splitturquoise",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitturquoise** player activates a system that contains 1 or more of your units: The **splitturquoise** player cannot move units to the active system. Then return this card to the **splitturquoise** player."
+        "text": "After the splitturquoise player activates a system that contains 1 or more of your units: The splitturquoise player cannot move units to the active system. Then return this card to the splitturquoise player."
     },
     {
         "alias": "splitturquoise_ps",
@@ -173,7 +173,7 @@
         "color": "splitturquoise",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitturquoise** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitturquoise** player."
+        "text": "When an agenda is revealed: The splitturquoise player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitturquoise player."
     },
     {
         "alias": "splitturquoise_sftt",
@@ -181,7 +181,7 @@
         "color": "splitturquoise",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitturquoise** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitturquoise** player's units, or if the **splitturquoise** player is eliminated, lose 1 victory point and return this card to the **splitturquoise** player."
+        "text": "When you receive this card, if you are not the splitturquoise player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitturquoise player's units, or if the splitturquoise player is eliminated, lose 1 victory point and return this card to the splitturquoise player."
     },
     {
         "alias": "splitturquoise_ta",
@@ -189,7 +189,7 @@
         "color": "splitturquoise",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitturquoise** player replenishes commodities: The **splitturquoise** player gives you all of their commodities. Then, return this card to the **splitturquoise** player."
+        "text": "When the splitturquoise player replenishes commodities: The splitturquoise player gives you all of their commodities. Then, return this card to the splitturquoise player."
     },
     {
         "alias": "splitturquoise_an",
@@ -197,7 +197,7 @@
         "color": "splitturquoise",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitturquoise** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitturquoise** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitturquoise** player's units, return this card to the **splitturquoise** player."
+        "text": "When you receive this card, if you are not the splitturquoise player, you must place it faceup in your play area. While this card is in your play area, you can use the splitturquoise player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitturquoise player's units, return this card to the splitturquoise player."
     },
     {
         "alias": "splitbloodred_cf",
@@ -205,7 +205,7 @@
         "color": "splitbloodred",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitbloodred** player activates a system that contains 1 or more of your units: The **splitbloodred** player cannot move units to the active system. Then return this card to the **splitbloodred** player."
+        "text": "After the splitbloodred player activates a system that contains 1 or more of your units: The splitbloodred player cannot move units to the active system. Then return this card to the splitbloodred player."
     },
     {
         "alias": "splitbloodred_ps",
@@ -213,7 +213,7 @@
         "color": "splitbloodred",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitbloodred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitbloodred** player."
+        "text": "When an agenda is revealed: The splitbloodred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitbloodred player."
     },
     {
         "alias": "splitbloodred_sftt",
@@ -221,7 +221,7 @@
         "color": "splitbloodred",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitbloodred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitbloodred** player's units, or if the **splitbloodred** player is eliminated, lose 1 victory point and return this card to the **splitbloodred** player."
+        "text": "When you receive this card, if you are not the splitbloodred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitbloodred player's units, or if the splitbloodred player is eliminated, lose 1 victory point and return this card to the splitbloodred player."
     },
     {
         "alias": "splitbloodred_ta",
@@ -229,7 +229,7 @@
         "color": "splitbloodred",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitbloodred** player replenishes commodities: The **splitbloodred** player gives you all of their commodities. Then, return this card to the **splitbloodred** player."
+        "text": "When the splitbloodred player replenishes commodities: The splitbloodred player gives you all of their commodities. Then, return this card to the splitbloodred player."
     },
     {
         "alias": "splitbloodred_an",
@@ -237,7 +237,7 @@
         "color": "splitbloodred",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitbloodred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitbloodred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitbloodred** player's units, return this card to the **splitbloodred** player."
+        "text": "When you receive this card, if you are not the splitbloodred player, you must place it faceup in your play area. While this card is in your play area, you can use the splitbloodred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitbloodred player's units, return this card to the splitbloodred player."
     },
     {
         "alias": "splitchocolate_cf",
@@ -245,7 +245,7 @@
         "color": "splitchocolate",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitchocolate** player activates a system that contains 1 or more of your units: The **splitchocolate** player cannot move units to the active system. Then return this card to the **splitchocolate** player."
+        "text": "After the splitchocolate player activates a system that contains 1 or more of your units: The splitchocolate player cannot move units to the active system. Then return this card to the splitchocolate player."
     },
     {
         "alias": "splitchocolate_ps",
@@ -253,7 +253,7 @@
         "color": "splitchocolate",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitchocolate** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitchocolate** player."
+        "text": "When an agenda is revealed: The splitchocolate player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitchocolate player."
     },
     {
         "alias": "splitchocolate_sftt",
@@ -261,7 +261,7 @@
         "color": "splitchocolate",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitchocolate** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitchocolate** player's units, or if the **splitchocolate** player is eliminated, lose 1 victory point and return this card to the **splitchocolate** player."
+        "text": "When you receive this card, if you are not the splitchocolate player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitchocolate player's units, or if the splitchocolate player is eliminated, lose 1 victory point and return this card to the splitchocolate player."
     },
     {
         "alias": "splitchocolate_ta",
@@ -269,7 +269,7 @@
         "color": "splitchocolate",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitchocolate** player replenishes commodities: The **splitchocolate** player gives you all of their commodities. Then, return this card to the **splitchocolate** player."
+        "text": "When the splitchocolate player replenishes commodities: The splitchocolate player gives you all of their commodities. Then, return this card to the splitchocolate player."
     },
     {
         "alias": "splitchocolate_an",
@@ -277,7 +277,7 @@
         "color": "splitchocolate",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitchocolate** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitchocolate** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitchocolate** player's units, return this card to the **splitchocolate** player."
+        "text": "When you receive this card, if you are not the splitchocolate player, you must place it faceup in your play area. While this card is in your play area, you can use the splitchocolate player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitchocolate player's units, return this card to the splitchocolate player."
     },
     {
         "alias": "splitemerald_cf",
@@ -285,7 +285,7 @@
         "color": "splitemerald",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitemerald** player activates a system that contains 1 or more of your units: The **splitemerald** player cannot move units to the active system. Then return this card to the **splitemerald** player."
+        "text": "After the splitemerald player activates a system that contains 1 or more of your units: The splitemerald player cannot move units to the active system. Then return this card to the splitemerald player."
     },
     {
         "alias": "splitemerald_ps",
@@ -293,7 +293,7 @@
         "color": "splitemerald",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitemerald** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitemerald** player."
+        "text": "When an agenda is revealed: The splitemerald player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitemerald player."
     },
     {
         "alias": "splitemerald_sftt",
@@ -301,7 +301,7 @@
         "color": "splitemerald",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitemerald** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitemerald** player's units, or if the **splitemerald** player is eliminated, lose 1 victory point and return this card to the **splitemerald** player."
+        "text": "When you receive this card, if you are not the splitemerald player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitemerald player's units, or if the splitemerald player is eliminated, lose 1 victory point and return this card to the splitemerald player."
     },
     {
         "alias": "splitemerald_ta",
@@ -309,7 +309,7 @@
         "color": "splitemerald",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitemerald** player replenishes commodities: The **splitemerald** player gives you all of their commodities. Then, return this card to the **splitemerald** player."
+        "text": "When the splitemerald player replenishes commodities: The splitemerald player gives you all of their commodities. Then, return this card to the splitemerald player."
     },
     {
         "alias": "splitemerald_an",
@@ -317,7 +317,7 @@
         "color": "splitemerald",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitemerald** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitemerald** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitemerald** player's units, return this card to the **splitemerald** player."
+        "text": "When you receive this card, if you are not the splitemerald player, you must place it faceup in your play area. While this card is in your play area, you can use the splitemerald player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitemerald player's units, return this card to the splitemerald player."
     },
     {
         "alias": "splitnavy_cf",
@@ -325,7 +325,7 @@
         "color": "splitnavy",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitnavy** player activates a system that contains 1 or more of your units: The **splitnavy** player cannot move units to the active system. Then return this card to the **splitnavy** player."
+        "text": "After the splitnavy player activates a system that contains 1 or more of your units: The splitnavy player cannot move units to the active system. Then return this card to the splitnavy player."
     },
     {
         "alias": "splitnavy_ps",
@@ -333,7 +333,7 @@
         "color": "splitnavy",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitnavy** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitnavy** player."
+        "text": "When an agenda is revealed: The splitnavy player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitnavy player."
     },
     {
         "alias": "splitnavy_sftt",
@@ -341,7 +341,7 @@
         "color": "splitnavy",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitnavy** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitnavy** player's units, or if the **splitnavy** player is eliminated, lose 1 victory point and return this card to the **splitnavy** player."
+        "text": "When you receive this card, if you are not the splitnavy player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitnavy player's units, or if the splitnavy player is eliminated, lose 1 victory point and return this card to the splitnavy player."
     },
     {
         "alias": "splitnavy_ta",
@@ -349,7 +349,7 @@
         "color": "splitnavy",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitnavy** player replenishes commodities: The **splitnavy** player gives you all of their commodities. Then, return this card to the **splitnavy** player."
+        "text": "When the splitnavy player replenishes commodities: The splitnavy player gives you all of their commodities. Then, return this card to the splitnavy player."
     },
     {
         "alias": "splitnavy_an",
@@ -357,7 +357,7 @@
         "color": "splitnavy",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitnavy** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitnavy** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitnavy** player's units, return this card to the **splitnavy** player."
+        "text": "When you receive this card, if you are not the splitnavy player, you must place it faceup in your play area. While this card is in your play area, you can use the splitnavy player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitnavy player's units, return this card to the splitnavy player."
     },
     {
         "alias": "splitpetrol_cf",
@@ -365,7 +365,7 @@
         "color": "splitpetrol",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitpetrol** player activates a system that contains 1 or more of your units: The **splitpetrol** player cannot move units to the active system. Then return this card to the **splitpetrol** player."
+        "text": "After the splitpetrol player activates a system that contains 1 or more of your units: The splitpetrol player cannot move units to the active system. Then return this card to the splitpetrol player."
     },
     {
         "alias": "splitpetrol_ps",
@@ -373,7 +373,7 @@
         "color": "splitpetrol",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitpetrol** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpetrol** player."
+        "text": "When an agenda is revealed: The splitpetrol player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpetrol player."
     },
     {
         "alias": "splitpetrol_sftt",
@@ -381,7 +381,7 @@
         "color": "splitpetrol",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitpetrol** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpetrol** player's units, or if the **splitpetrol** player is eliminated, lose 1 victory point and return this card to the **splitpetrol** player."
+        "text": "When you receive this card, if you are not the splitpetrol player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpetrol player's units, or if the splitpetrol player is eliminated, lose 1 victory point and return this card to the splitpetrol player."
     },
     {
         "alias": "splitpetrol_ta",
@@ -389,7 +389,7 @@
         "color": "splitpetrol",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitpetrol** player replenishes commodities: The **splitpetrol** player gives you all of their commodities. Then, return this card to the **splitpetrol** player."
+        "text": "When the splitpetrol player replenishes commodities: The splitpetrol player gives you all of their commodities. Then, return this card to the splitpetrol player."
     },
     {
         "alias": "splitpetrol_an",
@@ -397,7 +397,7 @@
         "color": "splitpetrol",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitpetrol** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpetrol** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpetrol** player's units, return this card to the **splitpetrol** player."
+        "text": "When you receive this card, if you are not the splitpetrol player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpetrol player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpetrol player's units, return this card to the splitpetrol player."
     },
     {
         "alias": "splitrainbow_cf",
@@ -405,7 +405,7 @@
         "color": "splitrainbow",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitrainbow** player activates a system that contains 1 or more of your units: The **splitrainbow** player cannot move units to the active system. Then return this card to the **splitrainbow** player."
+        "text": "After the splitrainbow player activates a system that contains 1 or more of your units: The splitrainbow player cannot move units to the active system. Then return this card to the splitrainbow player."
     },
     {
         "alias": "splitrainbow_ps",
@@ -413,7 +413,7 @@
         "color": "splitrainbow",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitrainbow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitrainbow** player."
+        "text": "When an agenda is revealed: The splitrainbow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitrainbow player."
     },
     {
         "alias": "splitrainbow_sftt",
@@ -421,7 +421,7 @@
         "color": "splitrainbow",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitrainbow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitrainbow** player's units, or if the **splitrainbow** player is eliminated, lose 1 victory point and return this card to the **splitrainbow** player."
+        "text": "When you receive this card, if you are not the splitrainbow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitrainbow player's units, or if the splitrainbow player is eliminated, lose 1 victory point and return this card to the splitrainbow player."
     },
     {
         "alias": "splitrainbow_ta",
@@ -429,7 +429,7 @@
         "color": "splitrainbow",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitrainbow** player replenishes commodities: The **splitrainbow** player gives you all of their commodities. Then, return this card to the **splitrainbow** player."
+        "text": "When the splitrainbow player replenishes commodities: The splitrainbow player gives you all of their commodities. Then, return this card to the splitrainbow player."
     },
     {
         "alias": "splitrainbow_an",
@@ -437,7 +437,7 @@
         "color": "splitrainbow",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitrainbow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitrainbow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitrainbow** player's units, return this card to the **splitrainbow** player."
+        "text": "When you receive this card, if you are not the splitrainbow player, you must place it faceup in your play area. While this card is in your play area, you can use the splitrainbow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitrainbow player's units, return this card to the splitrainbow player."
     },
     {
         "alias": "splitred_cf",
@@ -445,7 +445,7 @@
         "color": "splitred",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitred** player activates a system that contains 1 or more of your units: The **splitred** player cannot move units to the active system. Then return this card to the **splitred** player."
+        "text": "After the splitred player activates a system that contains 1 or more of your units: The splitred player cannot move units to the active system. Then return this card to the splitred player."
     },
     {
         "alias": "splitred_ps",
@@ -453,7 +453,7 @@
         "color": "splitred",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitred** player."
+        "text": "When an agenda is revealed: The splitred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitred player."
     },
     {
         "alias": "splitred_sftt",
@@ -461,7 +461,7 @@
         "color": "splitred",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitred** player's units, or if the **splitred** player is eliminated, lose 1 victory point and return this card to the **splitred** player."
+        "text": "When you receive this card, if you are not the splitred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitred player's units, or if the splitred player is eliminated, lose 1 victory point and return this card to the splitred player."
     },
     {
         "alias": "splitred_ta",
@@ -469,7 +469,7 @@
         "color": "splitred",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitred** player replenishes commodities: The **splitred** player gives you all of their commodities. Then, return this card to the **splitred** player."
+        "text": "When the splitred player replenishes commodities: The splitred player gives you all of their commodities. Then, return this card to the splitred player."
     },
     {
         "alias": "splitred_an",
@@ -477,7 +477,7 @@
         "color": "splitred",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitred** player's units, return this card to the **splitred** player."
+        "text": "When you receive this card, if you are not the splitred player, you must place it faceup in your play area. While this card is in your play area, you can use the splitred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitred player's units, return this card to the splitred player."
     },
     {
         "alias": "splitblue_cf",
@@ -485,7 +485,7 @@
         "color": "splitblue",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitblue** player activates a system that contains 1 or more of your units: The **splitblue** player cannot move units to the active system. Then return this card to the **splitblue** player."
+        "text": "After the splitblue player activates a system that contains 1 or more of your units: The splitblue player cannot move units to the active system. Then return this card to the splitblue player."
     },
     {
         "alias": "splitblue_ps",
@@ -493,7 +493,7 @@
         "color": "splitblue",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitblue** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitblue** player."
+        "text": "When an agenda is revealed: The splitblue player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitblue player."
     },
     {
         "alias": "splitblue_sftt",
@@ -501,7 +501,7 @@
         "color": "splitblue",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitblue** player's units, or if the **splitblue** player is eliminated, lose 1 victory point and return this card to the **splitblue** player."
+        "text": "When you receive this card, if you are not the splitblue player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitblue player's units, or if the splitblue player is eliminated, lose 1 victory point and return this card to the splitblue player."
     },
     {
         "alias": "splitblue_ta",
@@ -509,7 +509,7 @@
         "color": "splitblue",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitblue** player replenishes commodities: The **splitblue** player gives you all of their commodities. Then, return this card to the **splitblue** player."
+        "text": "When the splitblue player replenishes commodities: The splitblue player gives you all of their commodities. Then, return this card to the splitblue player."
     },
     {
         "alias": "splitblue_an",
@@ -517,7 +517,7 @@
         "color": "splitblue",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitblue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitblue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitblue** player's units, return this card to the **splitblue** player."
+        "text": "When you receive this card, if you are not the splitblue player, you must place it faceup in your play area. While this card is in your play area, you can use the splitblue player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitblue player's units, return this card to the splitblue player."
     },
     {
         "alias": "splitgreen_cf",
@@ -525,7 +525,7 @@
         "color": "splitgreen",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitgreen** player activates a system that contains 1 or more of your units: The **splitgreen** player cannot move units to the active system. Then return this card to the **splitgreen** player."
+        "text": "After the splitgreen player activates a system that contains 1 or more of your units: The splitgreen player cannot move units to the active system. Then return this card to the splitgreen player."
     },
     {
         "alias": "splitgreen_ps",
@@ -533,7 +533,7 @@
         "color": "splitgreen",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitgreen** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitgreen** player."
+        "text": "When an agenda is revealed: The splitgreen player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitgreen player."
     },
     {
         "alias": "splitgreen_sftt",
@@ -541,7 +541,7 @@
         "color": "splitgreen",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitgreen** player's units, or if the **splitgreen** player is eliminated, lose 1 victory point and return this card to the **splitgreen** player."
+        "text": "When you receive this card, if you are not the splitgreen player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitgreen player's units, or if the splitgreen player is eliminated, lose 1 victory point and return this card to the splitgreen player."
     },
     {
         "alias": "splitgreen_ta",
@@ -549,7 +549,7 @@
         "color": "splitgreen",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitgreen** player replenishes commodities: The **splitgreen** player gives you all of their commodities. Then, return this card to the **splitgreen** player."
+        "text": "When the splitgreen player replenishes commodities: The splitgreen player gives you all of their commodities. Then, return this card to the splitgreen player."
     },
     {
         "alias": "splitgreen_an",
@@ -557,7 +557,7 @@
         "color": "splitgreen",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitgreen** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitgreen** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitgreen** player's units, return this card to the **splitgreen** player."
+        "text": "When you receive this card, if you are not the splitgreen player, you must place it faceup in your play area. While this card is in your play area, you can use the splitgreen player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitgreen player's units, return this card to the splitgreen player."
     },
     {
         "alias": "splityellow_cf",
@@ -565,7 +565,7 @@
         "color": "splityellow",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splityellow** player activates a system that contains 1 or more of your units: The **splityellow** player cannot move units to the active system. Then return this card to the **splityellow** player."
+        "text": "After the splityellow player activates a system that contains 1 or more of your units: The splityellow player cannot move units to the active system. Then return this card to the splityellow player."
     },
     {
         "alias": "splityellow_ps",
@@ -573,7 +573,7 @@
         "color": "splityellow",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splityellow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splityellow** player."
+        "text": "When an agenda is revealed: The splityellow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splityellow player."
     },
     {
         "alias": "splityellow_sftt",
@@ -581,7 +581,7 @@
         "color": "splityellow",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splityellow** player's units, or if the **splityellow** player is eliminated, lose 1 victory point and return this card to the **splityellow** player."
+        "text": "When you receive this card, if you are not the splityellow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splityellow player's units, or if the splityellow player is eliminated, lose 1 victory point and return this card to the splityellow player."
     },
     {
         "alias": "splityellow_ta",
@@ -589,7 +589,7 @@
         "color": "splityellow",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splityellow** player replenishes commodities: The **splityellow** player gives you all of their commodities. Then, return this card to the **splityellow** player."
+        "text": "When the splityellow player replenishes commodities: The splityellow player gives you all of their commodities. Then, return this card to the splityellow player."
     },
     {
         "alias": "splityellow_an",
@@ -597,7 +597,7 @@
         "color": "splityellow",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splityellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splityellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splityellow** player's units, return this card to the **splityellow** player."
+        "text": "When you receive this card, if you are not the splityellow player, you must place it faceup in your play area. While this card is in your play area, you can use the splityellow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splityellow player's units, return this card to the splityellow player."
     },
     {
         "alias": "splitorange_cf",
@@ -605,7 +605,7 @@
         "color": "splitorange",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitorange** player activates a system that contains 1 or more of your units: The **splitorange** player cannot move units to the active system. Then return this card to the **splitorange** player."
+        "text": "After the splitorange player activates a system that contains 1 or more of your units: The splitorange player cannot move units to the active system. Then return this card to the splitorange player."
     },
     {
         "alias": "splitorange_ps",
@@ -613,7 +613,7 @@
         "color": "splitorange",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitorange** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitorange** player."
+        "text": "When an agenda is revealed: The splitorange player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitorange player."
     },
     {
         "alias": "splitorange_sftt",
@@ -621,7 +621,7 @@
         "color": "splitorange",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitorange** player's units, or if the **splitorange** player is eliminated, lose 1 victory point and return this card to the **splitorange** player."
+        "text": "When you receive this card, if you are not the splitorange player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitorange player's units, or if the splitorange player is eliminated, lose 1 victory point and return this card to the splitorange player."
     },
     {
         "alias": "splitorange_ta",
@@ -629,7 +629,7 @@
         "color": "splitorange",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitorange** player replenishes commodities: The **splitorange** player gives you all of their commodities. Then, return this card to the **splitorange** player."
+        "text": "When the splitorange player replenishes commodities: The splitorange player gives you all of their commodities. Then, return this card to the splitorange player."
     },
     {
         "alias": "splitorange_an",
@@ -637,7 +637,7 @@
         "color": "splitorange",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitorange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitorange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitorange** player's units, return this card to the **splitorange** player."
+        "text": "When you receive this card, if you are not the splitorange player, you must place it faceup in your play area. While this card is in your play area, you can use the splitorange player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitorange player's units, return this card to the splitorange player."
     },
     {
         "alias": "splitpurple_cf",
@@ -645,7 +645,7 @@
         "color": "splitpurple",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitpurple** player activates a system that contains 1 or more of your units: The **splitpurple** player cannot move units to the active system. Then return this card to the **splitpurple** player."
+        "text": "After the splitpurple player activates a system that contains 1 or more of your units: The splitpurple player cannot move units to the active system. Then return this card to the splitpurple player."
     },
     {
         "alias": "splitpurple_ps",
@@ -653,7 +653,7 @@
         "color": "splitpurple",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitpurple** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpurple** player."
+        "text": "When an agenda is revealed: The splitpurple player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpurple player."
     },
     {
         "alias": "splitpurple_sftt",
@@ -661,7 +661,7 @@
         "color": "splitpurple",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpurple** player's units, or if the **splitpurple** player is eliminated, lose 1 victory point and return this card to the **splitpurple** player."
+        "text": "When you receive this card, if you are not the splitpurple player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpurple player's units, or if the splitpurple player is eliminated, lose 1 victory point and return this card to the splitpurple player."
     },
     {
         "alias": "splitpurple_ta",
@@ -669,7 +669,7 @@
         "color": "splitpurple",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitpurple** player replenishes commodities: The **splitpurple** player gives you all of their commodities. Then, return this card to the **splitpurple** player."
+        "text": "When the splitpurple player replenishes commodities: The splitpurple player gives you all of their commodities. Then, return this card to the splitpurple player."
     },
     {
         "alias": "splitpurple_an",
@@ -677,7 +677,7 @@
         "color": "splitpurple",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitpurple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpurple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpurple** player's units, return this card to the **splitpurple** player."
+        "text": "When you receive this card, if you are not the splitpurple player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpurple player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpurple player's units, return this card to the splitpurple player."
     },
     {
         "alias": "splitpink_cf",
@@ -685,7 +685,7 @@
         "color": "splitpink",
         "playArea": "false",
         "source": "base",
-        "text": "After the **splitpink** player activates a system that contains 1 or more of your units: The **splitpink** player cannot move units to the active system. Then return this card to the **splitpink** player."
+        "text": "After the splitpink player activates a system that contains 1 or more of your units: The splitpink player cannot move units to the active system. Then return this card to the splitpink player."
     },
     {
         "alias": "splitpink_ps",
@@ -693,7 +693,7 @@
         "color": "splitpink",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **splitpink** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **splitpink** player."
+        "text": "When an agenda is revealed: The splitpink player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpink player."
     },
     {
         "alias": "splitpink_sftt",
@@ -701,7 +701,7 @@
         "color": "splitpink",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **splitpink** player's units, or if the **splitpink** player is eliminated, lose 1 victory point and return this card to the **splitpink** player."
+        "text": "When you receive this card, if you are not the splitpink player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpink player's units, or if the splitpink player is eliminated, lose 1 victory point and return this card to the splitpink player."
     },
     {
         "alias": "splitpink_ta",
@@ -709,7 +709,7 @@
         "color": "splitpink",
         "playArea": "false",
         "source": "base",
-        "text": "When the **splitpink** player replenishes commodities: The **splitpink** player gives you all of their commodities. Then, return this card to the **splitpink** player."
+        "text": "When the splitpink player replenishes commodities: The splitpink player gives you all of their commodities. Then, return this card to the splitpink player."
     },
     {
         "alias": "splitpink_an",
@@ -717,7 +717,7 @@
         "color": "splitpink",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **splitpink** player, you must place it faceup in your play area. While this card is in your play area, you can use the **splitpink** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **splitpink** player's units, return this card to the **splitpink** player."
+        "text": "When you receive this card, if you are not the splitpink player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpink player's units, return this card to the splitpink player."
     },
     {
         "alias": "orca_cf",
@@ -725,7 +725,7 @@
         "color": "orca",
         "playArea": "false",
         "source": "base",
-        "text": "After the **orca** player activates a system that contains 1 or more of your units: The **orca** player cannot move units to the active system. Then return this card to the **orca** player."
+        "text": "After the orca player activates a system that contains 1 or more of your units: The orca player cannot move units to the active system. Then return this card to the orca player."
     },
     {
         "alias": "orca_ps",
@@ -733,7 +733,7 @@
         "color": "orca",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **orca** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **orca** player."
+        "text": "When an agenda is revealed: The orca player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the orca player."
     },
     {
         "alias": "orca_sftt",
@@ -741,7 +741,7 @@
         "color": "orca",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **orca** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **orca** player's units, or if the **orca** player is eliminated, lose 1 victory point and return this card to the **orca** player."
+        "text": "When you receive this card, if you are not the orca player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the orca player's units, or if the orca player is eliminated, lose 1 victory point and return this card to the orca player."
     },
     {
         "alias": "orca_ta",
@@ -749,7 +749,7 @@
         "color": "orca",
         "playArea": "false",
         "source": "base",
-        "text": "When the **orca** player replenishes commodities: The **orca** player gives you all of their commodities. Then, return this card to the **orca** player."
+        "text": "When the orca player replenishes commodities: The orca player gives you all of their commodities. Then, return this card to the orca player."
     },
     {
         "alias": "orca_an",
@@ -757,7 +757,7 @@
         "color": "orca",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **orca** player, you must place it faceup in your play area. While this card is in your play area, you can use the **orca** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **orca** player's units, return this card to the **orca** player."
+        "text": "When you receive this card, if you are not the orca player, you must place it faceup in your play area. While this card is in your play area, you can use the orca player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the orca player's units, return this card to the orca player."
     },
     {
         "alias": "rainbow_cf",
@@ -765,7 +765,7 @@
         "color": "rainbow",
         "playArea": "false",
         "source": "base",
-        "text": "After the **rainbow** player activates a system that contains 1 or more of your units: The **rainbow** player cannot move units to the active system. Then return this card to the **rainbow** player."
+        "text": "After the rainbow player activates a system that contains 1 or more of your units: The rainbow player cannot move units to the active system. Then return this card to the rainbow player."
     },
     {
         "alias": "rainbow_ps",
@@ -773,7 +773,7 @@
         "color": "rainbow",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **rainbow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rainbow** player."
+        "text": "When an agenda is revealed: The rainbow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the rainbow player."
     },
     {
         "alias": "rainbow_sftt",
@@ -781,7 +781,7 @@
         "color": "rainbow",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rainbow** player's units, or if the **rainbow** player is eliminated, lose 1 victory point and return this card to the **rainbow** player."
+        "text": "When you receive this card, if you are not the rainbow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the rainbow player's units, or if the rainbow player is eliminated, lose 1 victory point and return this card to the rainbow player."
     },
     {
         "alias": "rainbow_ta",
@@ -789,7 +789,7 @@
         "color": "rainbow",
         "playArea": "false",
         "source": "base",
-        "text": "When the **rainbow** player replenishes commodities: The **rainbow** player gives you all of their commodities. Then, return this card to the **rainbow** player."
+        "text": "When the rainbow player replenishes commodities: The rainbow player gives you all of their commodities. Then, return this card to the rainbow player."
     },
     {
         "alias": "rainbow_an",
@@ -797,7 +797,7 @@
         "color": "rainbow",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rainbow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rainbow** player's units, return this card to the **rainbow** player."
+        "text": "When you receive this card, if you are not the rainbow player, you must place it faceup in your play area. While this card is in your play area, you can use the rainbow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the rainbow player's units, return this card to the rainbow player."
     },
     {
         "alias": "lime_cf",
@@ -805,7 +805,7 @@
         "color": "lime",
         "playArea": "false",
         "source": "base",
-        "text": "After the **lime** player activates a system that contains 1 or more of your units: The **lime** player cannot move units to the active system. Then return this card to the **lime** player."
+        "text": "After the lime player activates a system that contains 1 or more of your units: The lime player cannot move units to the active system. Then return this card to the lime player."
     },
     {
         "alias": "lime_ps",
@@ -813,7 +813,7 @@
         "color": "lime",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **lime** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lime** player."
+        "text": "When an agenda is revealed: The lime player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lime player."
     },
     {
         "alias": "lime_sftt",
@@ -821,7 +821,7 @@
         "color": "lime",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lime** player's units, or if the **lime** player is eliminated, lose 1 victory point and return this card to the **lime** player."
+        "text": "When you receive this card, if you are not the lime player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lime player's units, or if the lime player is eliminated, lose 1 victory point and return this card to the lime player."
     },
     {
         "alias": "lime_ta",
@@ -829,7 +829,7 @@
         "color": "lime",
         "playArea": "false",
         "source": "base",
-        "text": "When the **lime** player replenishes commodities: The **lime** player gives you all of their commodities. Then, return this card to the **lime** player."
+        "text": "When the lime player replenishes commodities: The lime player gives you all of their commodities. Then, return this card to the lime player."
     },
     {
         "alias": "lime_an",
@@ -837,7 +837,7 @@
         "color": "lime",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lime** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lime** player's units, return this card to the **lime** player."
+        "text": "When you receive this card, if you are not the lime player, you must place it faceup in your play area. While this card is in your play area, you can use the lime player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lime player's units, return this card to the lime player."
     },
     {
         "alias": "lavender_cf",
@@ -845,7 +845,7 @@
         "color": "lavender",
         "playArea": "false",
         "source": "base",
-        "text": "After the **lavender** player activates a system that contains 1 or more of your units: The **lavender** player cannot move units to the active system. Then return this card to the **lavender** player."
+        "text": "After the lavender player activates a system that contains 1 or more of your units: The lavender player cannot move units to the active system. Then return this card to the lavender player."
     },
     {
         "alias": "lavender_ps",
@@ -853,7 +853,7 @@
         "color": "lavender",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **lavender** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lavender** player."
+        "text": "When an agenda is revealed: The lavender player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lavender player."
     },
     {
         "alias": "lavender_sftt",
@@ -861,7 +861,7 @@
         "color": "lavender",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lavender** player's units, or if the **lavender** player is eliminated, lose 1 victory point and return this card to the **lavender** player."
+        "text": "When you receive this card, if you are not the lavender player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lavender player's units, or if the lavender player is eliminated, lose 1 victory point and return this card to the lavender player."
     },
     {
         "alias": "lavender_ta",
@@ -869,7 +869,7 @@
         "color": "lavender",
         "playArea": "false",
         "source": "base",
-        "text": "When the **lavender** player replenishes commodities: The **lavender** player gives you all of their commodities. Then, return this card to the **lavender** player."
+        "text": "When the lavender player replenishes commodities: The lavender player gives you all of their commodities. Then, return this card to the lavender player."
     },
     {
         "alias": "lavender_an",
@@ -877,7 +877,7 @@
         "color": "lavender",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lavender** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lavender** player's units, return this card to the **lavender** player."
+        "text": "When you receive this card, if you are not the lavender player, you must place it faceup in your play area. While this card is in your play area, you can use the lavender player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lavender player's units, return this card to the lavender player."
     },
     {
         "alias": "bloodred_cf",
@@ -885,7 +885,7 @@
         "color": "bloodred",
         "playArea": "false",
         "source": "base",
-        "text": "After the **bloodred** player activates a system that contains 1 or more of your units: The **bloodred** player cannot move units to the active system. Then return this card to the **bloodred** player."
+        "text": "After the bloodred player activates a system that contains 1 or more of your units: The bloodred player cannot move units to the active system. Then return this card to the bloodred player."
     },
     {
         "alias": "bloodred_ps",
@@ -893,7 +893,7 @@
         "color": "bloodred",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **bloodred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **bloodred** player."
+        "text": "When an agenda is revealed: The bloodred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the bloodred player."
     },
     {
         "alias": "bloodred_sftt",
@@ -901,7 +901,7 @@
         "color": "bloodred",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **bloodred** player's units, or if the **bloodred** player is eliminated, lose 1 victory point and return this card to the **bloodred** player."
+        "text": "When you receive this card, if you are not the bloodred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the bloodred player's units, or if the bloodred player is eliminated, lose 1 victory point and return this card to the bloodred player."
     },
     {
         "alias": "bloodred_ta",
@@ -909,7 +909,7 @@
         "color": "bloodred",
         "playArea": "false",
         "source": "base",
-        "text": "When the **bloodred** player replenishes commodities: The **bloodred** player gives you all of their commodities. Then, return this card to the **bloodred** player."
+        "text": "When the bloodred player replenishes commodities: The bloodred player gives you all of their commodities. Then, return this card to the bloodred player."
     },
     {
         "alias": "bloodred_an",
@@ -917,7 +917,7 @@
         "color": "bloodred",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **bloodred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **bloodred** player's units, return this card to the **bloodred** player."
+        "text": "When you receive this card, if you are not the bloodred player, you must place it faceup in your play area. While this card is in your play area, you can use the bloodred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the bloodred player's units, return this card to the bloodred player."
     },
     {
         "alias": "chocolate_cf",
@@ -925,7 +925,7 @@
         "color": "chocolate",
         "playArea": "false",
         "source": "base",
-        "text": "After the **chocolate** player activates a system that contains 1 or more of your units: The **chocolate** player cannot move units to the active system. Then return this card to the **chocolate** player."
+        "text": "After the chocolate player activates a system that contains 1 or more of your units: The chocolate player cannot move units to the active system. Then return this card to the chocolate player."
     },
     {
         "alias": "chocolate_ps",
@@ -933,7 +933,7 @@
         "color": "chocolate",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **chocolate** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chocolate** player."
+        "text": "When an agenda is revealed: The chocolate player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the chocolate player."
     },
     {
         "alias": "chocolate_sftt",
@@ -941,7 +941,7 @@
         "color": "chocolate",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chocolate** player's units, or if the **chocolate** player is eliminated, lose 1 victory point and return this card to the **chocolate** player."
+        "text": "When you receive this card, if you are not the chocolate player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the chocolate player's units, or if the chocolate player is eliminated, lose 1 victory point and return this card to the chocolate player."
     },
     {
         "alias": "chocolate_ta",
@@ -949,7 +949,7 @@
         "color": "chocolate",
         "playArea": "false",
         "source": "base",
-        "text": "When the **chocolate** player replenishes commodities: The **chocolate** player gives you all of their commodities. Then, return this card to the **chocolate** player."
+        "text": "When the chocolate player replenishes commodities: The chocolate player gives you all of their commodities. Then, return this card to the chocolate player."
     },
     {
         "alias": "chocolate_an",
@@ -957,7 +957,7 @@
         "color": "chocolate",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chocolate** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chocolate** player's units, return this card to the **chocolate** player."
+        "text": "When you receive this card, if you are not the chocolate player, you must place it faceup in your play area. While this card is in your play area, you can use the chocolate player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the chocolate player's units, return this card to the chocolate player."
     },
     {
         "alias": "emerald_cf",
@@ -965,7 +965,7 @@
         "color": "emerald",
         "playArea": "false",
         "source": "base",
-        "text": "After the **emerald** player activates a system that contains 1 or more of your units: The **emerald** player cannot move units to the active system. Then return this card to the **emerald** player."
+        "text": "After the emerald player activates a system that contains 1 or more of your units: The emerald player cannot move units to the active system. Then return this card to the emerald player."
     },
     {
         "alias": "emerald_ps",
@@ -973,7 +973,7 @@
         "color": "emerald",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **emerald** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **emerald** player."
+        "text": "When an agenda is revealed: The emerald player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the emerald player."
     },
     {
         "alias": "emerald_sftt",
@@ -981,7 +981,7 @@
         "color": "emerald",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **emerald** player's units, or if the **emerald** player is eliminated, lose 1 victory point and return this card to the **emerald** player."
+        "text": "When you receive this card, if you are not the emerald player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the emerald player's units, or if the emerald player is eliminated, lose 1 victory point and return this card to the emerald player."
     },
     {
         "alias": "emerald_ta",
@@ -989,7 +989,7 @@
         "color": "emerald",
         "playArea": "false",
         "source": "base",
-        "text": "When the **emerald** player replenishes commodities: The **emerald** player gives you all of their commodities. Then, return this card to the **emerald** player."
+        "text": "When the emerald player replenishes commodities: The emerald player gives you all of their commodities. Then, return this card to the emerald player."
     },
     {
         "alias": "emerald_an",
@@ -997,7 +997,7 @@
         "color": "emerald",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area. While this card is in your play area, you can use the **emerald** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **emerald** player's units, return this card to the **emerald** player."
+        "text": "When you receive this card, if you are not the emerald player, you must place it faceup in your play area. While this card is in your play area, you can use the emerald player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the emerald player's units, return this card to the emerald player."
     },
     {
         "alias": "navy_cf",
@@ -1005,7 +1005,7 @@
         "color": "navy",
         "playArea": "false",
         "source": "base",
-        "text": "After the **navy** player activates a system that contains 1 or more of your units: The **navy** player cannot move units to the active system. Then return this card to the **navy** player."
+        "text": "After the navy player activates a system that contains 1 or more of your units: The navy player cannot move units to the active system. Then return this card to the navy player."
     },
     {
         "alias": "navy_ps",
@@ -1013,7 +1013,7 @@
         "color": "navy",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **navy** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **navy** player."
+        "text": "When an agenda is revealed: The navy player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the navy player."
     },
     {
         "alias": "navy_sftt",
@@ -1021,7 +1021,7 @@
         "color": "navy",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **navy** player's units, or if the **navy** player is eliminated, lose 1 victory point and return this card to the **navy** player."
+        "text": "When you receive this card, if you are not the navy player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the navy player's units, or if the navy player is eliminated, lose 1 victory point and return this card to the navy player."
     },
     {
         "alias": "navy_ta",
@@ -1029,7 +1029,7 @@
         "color": "navy",
         "playArea": "false",
         "source": "base",
-        "text": "When the **navy** player replenishes commodities: The **navy** player gives you all of their commodities. Then, return this card to the **navy** player."
+        "text": "When the navy player replenishes commodities: The navy player gives you all of their commodities. Then, return this card to the navy player."
     },
     {
         "alias": "navy_an",
@@ -1037,7 +1037,7 @@
         "color": "navy",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area. While this card is in your play area, you can use the **navy** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **navy** player's units, return this card to the **navy** player."
+        "text": "When you receive this card, if you are not the navy player, you must place it faceup in your play area. While this card is in your play area, you can use the navy player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the navy player's units, return this card to the navy player."
     },
     {
         "alias": "rose_cf",
@@ -1045,7 +1045,7 @@
         "color": "rose",
         "playArea": "false",
         "source": "base",
-        "text": "After the **rose** player activates a system that contains 1 or more of your units: The **rose** player cannot move units to the active system. Then return this card to the **rose** player."
+        "text": "After the rose player activates a system that contains 1 or more of your units: The rose player cannot move units to the active system. Then return this card to the rose player."
     },
     {
         "alias": "rose_ps",
@@ -1053,7 +1053,7 @@
         "color": "rose",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **rose** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rose** player."
+        "text": "When an agenda is revealed: The rose player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the rose player."
     },
     {
         "alias": "rose_sftt",
@@ -1061,7 +1061,7 @@
         "color": "rose",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rose** player's units, or if the **rose** player is eliminated, lose 1 victory point and return this card to the **rose** player."
+        "text": "When you receive this card, if you are not the rose player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the rose player's units, or if the rose player is eliminated, lose 1 victory point and return this card to the rose player."
     },
     {
         "alias": "rose_ta",
@@ -1069,7 +1069,7 @@
         "color": "rose",
         "playArea": "false",
         "source": "base",
-        "text": "When the **rose** player replenishes commodities: The **rose** player gives you all of their commodities. Then, return this card to the **rose** player."
+        "text": "When the rose player replenishes commodities: The rose player gives you all of their commodities. Then, return this card to the rose player."
     },
     {
         "alias": "rose_an",
@@ -1077,7 +1077,7 @@
         "color": "rose",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rose** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rose** player's units, return this card to the **rose** player."
+        "text": "When you receive this card, if you are not the rose player, you must place it faceup in your play area. While this card is in your play area, you can use the rose player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the rose player's units, return this card to the rose player."
     },
     {
         "alias": "spring_cf",
@@ -1085,7 +1085,7 @@
         "color": "spring",
         "playArea": "false",
         "source": "base",
-        "text": "After the **spring** player activates a system that contains 1 or more of your units: The **spring** player cannot move units to the active system. Then return this card to the **spring** player."
+        "text": "After the spring player activates a system that contains 1 or more of your units: The spring player cannot move units to the active system. Then return this card to the spring player."
     },
     {
         "alias": "spring_ps",
@@ -1093,7 +1093,7 @@
         "color": "spring",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **spring** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **spring** player."
+        "text": "When an agenda is revealed: The spring player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the spring player."
     },
     {
         "alias": "spring_sftt",
@@ -1101,7 +1101,7 @@
         "color": "spring",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **spring** player's units, or if the **spring** player is eliminated, lose 1 victory point and return this card to the **spring** player."
+        "text": "When you receive this card, if you are not the spring player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the spring player's units, or if the spring player is eliminated, lose 1 victory point and return this card to the spring player."
     },
     {
         "alias": "spring_ta",
@@ -1109,7 +1109,7 @@
         "color": "spring",
         "playArea": "false",
         "source": "base",
-        "text": "When the **spring** player replenishes commodities: The **spring** player gives you all of their commodities. Then, return this card to the **spring** player."
+        "text": "When the spring player replenishes commodities: The spring player gives you all of their commodities. Then, return this card to the spring player."
     },
     {
         "alias": "spring_an",
@@ -1117,7 +1117,7 @@
         "color": "spring",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area. While this card is in your play area, you can use the **spring** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **spring** player's units, return this card to the **spring** player."
+        "text": "When you receive this card, if you are not the spring player, you must place it faceup in your play area. While this card is in your play area, you can use the spring player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the spring player's units, return this card to the spring player."
     },
     {
         "alias": "teal_cf",
@@ -1125,7 +1125,7 @@
         "color": "teal",
         "playArea": "false",
         "source": "base",
-        "text": "After the **teal** player activates a system that contains 1 or more of your units: The **teal** player cannot move units to the active system. Then return this card to the **teal** player."
+        "text": "After the teal player activates a system that contains 1 or more of your units: The teal player cannot move units to the active system. Then return this card to the teal player."
     },
     {
         "alias": "teal_ps",
@@ -1133,7 +1133,7 @@
         "color": "teal",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **teal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **teal** player."
+        "text": "When an agenda is revealed: The teal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the teal player."
     },
     {
         "alias": "teal_sftt",
@@ -1141,7 +1141,7 @@
         "color": "teal",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **teal** player's units, or if the **teal** player is eliminated, lose 1 victory point and return this card to the **teal** player."
+        "text": "When you receive this card, if you are not the teal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the teal player's units, or if the teal player is eliminated, lose 1 victory point and return this card to the teal player."
     },
     {
         "alias": "teal_ta",
@@ -1149,7 +1149,7 @@
         "color": "teal",
         "playArea": "false",
         "source": "base",
-        "text": "When the **teal** player replenishes commodities: The **teal** player gives you all of their commodities. Then, return this card to the **teal** player."
+        "text": "When the teal player replenishes commodities: The teal player gives you all of their commodities. Then, return this card to the teal player."
     },
     {
         "alias": "teal_an",
@@ -1157,7 +1157,7 @@
         "color": "teal",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **teal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **teal** player's units, return this card to the **teal** player."
+        "text": "When you receive this card, if you are not the teal player, you must place it faceup in your play area. While this card is in your play area, you can use the teal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the teal player's units, return this card to the teal player."
     },
     {
         "alias": "brown_cf",
@@ -1165,7 +1165,7 @@
         "color": "brown",
         "playArea": "false",
         "source": "base",
-        "text": "After the **brown** player activates a system that contains 1 or more of your units: The **brown** player cannot move units to the active system. Then return this card to the **brown** player."
+        "text": "After the brown player activates a system that contains 1 or more of your units: The brown player cannot move units to the active system. Then return this card to the brown player."
     },
     {
         "alias": "brown_ps",
@@ -1173,7 +1173,7 @@
         "color": "brown",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **brown** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **brown** player."
+        "text": "When an agenda is revealed: The brown player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the brown player."
     },
     {
         "alias": "brown_sftt",
@@ -1181,7 +1181,7 @@
         "color": "brown",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **brown** player's units, or if the **brown** player is eliminated, lose 1 victory point and return this card to the **brown** player."
+        "text": "When you receive this card, if you are not the brown player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the brown player's units, or if the brown player is eliminated, lose 1 victory point and return this card to the brown player."
     },
     {
         "alias": "brown_ta",
@@ -1189,7 +1189,7 @@
         "color": "brown",
         "playArea": "false",
         "source": "base",
-        "text": "When the **brown** player replenishes commodities: The **brown** player gives you all of their commodities. Then, return this card to the **brown** player."
+        "text": "When the brown player replenishes commodities: The brown player gives you all of their commodities. Then, return this card to the brown player."
     },
     {
         "alias": "brown_an",
@@ -1197,7 +1197,7 @@
         "color": "brown",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area. While this card is in your play area, you can use the **brown** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **brown** player's units, return this card to the **brown** player."
+        "text": "When you receive this card, if you are not the brown player, you must place it faceup in your play area. While this card is in your play area, you can use the brown player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the brown player's units, return this card to the brown player."
     },
     {
         "alias": "chrome_cf",
@@ -1205,7 +1205,7 @@
         "color": "chrome",
         "playArea": "false",
         "source": "base",
-        "text": "After the **chrome** player activates a system that contains 1 or more of your units: The **chrome** player cannot move units to the active system. Then return this card to the **chrome** player."
+        "text": "After the chrome player activates a system that contains 1 or more of your units: The chrome player cannot move units to the active system. Then return this card to the chrome player."
     },
     {
         "alias": "chrome_ps",
@@ -1213,7 +1213,7 @@
         "color": "chrome",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **chrome** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chrome** player."
+        "text": "When an agenda is revealed: The chrome player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the chrome player."
     },
     {
         "alias": "chrome_sftt",
@@ -1221,7 +1221,7 @@
         "color": "chrome",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chrome** player's units, or if the **chrome** player is eliminated, lose 1 victory point and return this card to the **chrome** player."
+        "text": "When you receive this card, if you are not the chrome player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the chrome player's units, or if the chrome player is eliminated, lose 1 victory point and return this card to the chrome player."
     },
     {
         "alias": "chrome_ta",
@@ -1229,7 +1229,7 @@
         "color": "chrome",
         "playArea": "false",
         "source": "base",
-        "text": "When the **chrome** player replenishes commodities: The **chrome** player gives you all of their commodities. Then, return this card to the **chrome** player."
+        "text": "When the chrome player replenishes commodities: The chrome player gives you all of their commodities. Then, return this card to the chrome player."
     },
     {
         "alias": "chrome_an",
@@ -1237,7 +1237,7 @@
         "color": "chrome",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chrome** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chrome** player's units, return this card to the **chrome** player."
+        "text": "When you receive this card, if you are not the chrome player, you must place it faceup in your play area. While this card is in your play area, you can use the chrome player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the chrome player's units, return this card to the chrome player."
     },
     {
         "alias": "forest_cf",
@@ -1245,7 +1245,7 @@
         "color": "forest",
         "playArea": "false",
         "source": "base",
-        "text": "After the **forest** player activates a system that contains 1 or more of your units: The **forest** player cannot move units to the active system. Then return this card to the **forest** player."
+        "text": "After the forest player activates a system that contains 1 or more of your units: The forest player cannot move units to the active system. Then return this card to the forest player."
     },
     {
         "alias": "forest_ps",
@@ -1253,7 +1253,7 @@
         "color": "forest",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **forest** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **forest** player."
+        "text": "When an agenda is revealed: The forest player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the forest player."
     },
     {
         "alias": "forest_sftt",
@@ -1261,7 +1261,7 @@
         "color": "forest",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **forest** player's units, or if the **forest** player is eliminated, lose 1 victory point and return this card to the **forest** player."
+        "text": "When you receive this card, if you are not the forest player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the forest player's units, or if the forest player is eliminated, lose 1 victory point and return this card to the forest player."
     },
     {
         "alias": "forest_ta",
@@ -1269,7 +1269,7 @@
         "color": "forest",
         "playArea": "false",
         "source": "base",
-        "text": "When the **forest** player replenishes commodities: The **forest** player gives you all of their commodities. Then, return this card to the **forest** player."
+        "text": "When the forest player replenishes commodities: The forest player gives you all of their commodities. Then, return this card to the forest player."
     },
     {
         "alias": "forest_an",
@@ -1277,7 +1277,7 @@
         "color": "forest",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area. While this card is in your play area, you can use the **forest** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **forest** player's units, return this card to the **forest** player."
+        "text": "When you receive this card, if you are not the forest player, you must place it faceup in your play area. While this card is in your play area, you can use the forest player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the forest player's units, return this card to the forest player."
     },
     {
         "alias": "gold_cf",
@@ -1285,7 +1285,7 @@
         "color": "gold",
         "playArea": "false",
         "source": "base",
-        "text": "After the **gold** player activates a system that contains 1 or more of your units: The **gold** player cannot move units to the active system. Then return this card to the **gold** player."
+        "text": "After the gold player activates a system that contains 1 or more of your units: The gold player cannot move units to the active system. Then return this card to the gold player."
     },
     {
         "alias": "gold_ps",
@@ -1293,7 +1293,7 @@
         "color": "gold",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **gold** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gold** player."
+        "text": "When an agenda is revealed: The gold player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the gold player."
     },
     {
         "alias": "gold_sftt",
@@ -1301,7 +1301,7 @@
         "color": "gold",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gold** player's units, or if the **gold** player is eliminated, lose 1 victory point and return this card to the **gold** player."
+        "text": "When you receive this card, if you are not the gold player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the gold player's units, or if the gold player is eliminated, lose 1 victory point and return this card to the gold player."
     },
     {
         "alias": "gold_ta",
@@ -1309,7 +1309,7 @@
         "color": "gold",
         "playArea": "false",
         "source": "base",
-        "text": "When the **gold** player replenishes commodities: The **gold** player gives you all of their commodities. Then, return this card to the **gold** player."
+        "text": "When the gold player replenishes commodities: The gold player gives you all of their commodities. Then, return this card to the gold player."
     },
     {
         "alias": "gold_an",
@@ -1317,7 +1317,7 @@
         "color": "gold",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gold** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gold** player's units, return this card to the **gold** player."
+        "text": "When you receive this card, if you are not the gold player, you must place it faceup in your play area. While this card is in your play area, you can use the gold player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the gold player's units, return this card to the gold player."
     },
     {
         "alias": "lightgray_cf",
@@ -1325,7 +1325,7 @@
         "color": "lightgray",
         "playArea": "false",
         "source": "base",
-        "text": "After the **lightgray** player activates a system that contains 1 or more of your units: The **lightgray** player cannot move units to the active system. Then return this card to the **lightgray** player."
+        "text": "After the lightgray player activates a system that contains 1 or more of your units: The lightgray player cannot move units to the active system. Then return this card to the lightgray player."
     },
     {
         "alias": "lightgray_ps",
@@ -1333,7 +1333,7 @@
         "color": "lightgray",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **lightgray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lightgray** player."
+        "text": "When an agenda is revealed: The lightgray player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lightgray player."
     },
     {
         "alias": "lightgray_sftt",
@@ -1341,7 +1341,7 @@
         "color": "lightgray",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lightgray** player's units, or if the **lightgray** player is eliminated, lose 1 victory point and return this card to the **lightgray** player."
+        "text": "When you receive this card, if you are not the lightgray player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lightgray player's units, or if the lightgray player is eliminated, lose 1 victory point and return this card to the lightgray player."
     },
     {
         "alias": "lightgray_ta",
@@ -1349,7 +1349,7 @@
         "color": "lightgray",
         "playArea": "false",
         "source": "base",
-        "text": "When the **lightgray** player replenishes commodities: The **lightgray** player gives you all of their commodities. Then, return this card to the **lightgray** player."
+        "text": "When the lightgray player replenishes commodities: The lightgray player gives you all of their commodities. Then, return this card to the lightgray player."
     },
     {
         "alias": "lightgray_an",
@@ -1357,7 +1357,7 @@
         "color": "lightgray",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lightgray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lightgray** player's units, return this card to the **lightgray** player."
+        "text": "When you receive this card, if you are not the lightgray player, you must place it faceup in your play area. While this card is in your play area, you can use the lightgray player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lightgray player's units, return this card to the lightgray player."
     },
     {
         "alias": "petrol_cf",
@@ -1365,7 +1365,7 @@
         "color": "petrol",
         "playArea": "false",
         "source": "base",
-        "text": "After the **petrol** player activates a system that contains 1 or more of your units: The **petrol** player cannot move units to the active system. Then return this card to the **petrol** player."
+        "text": "After the petrol player activates a system that contains 1 or more of your units: The petrol player cannot move units to the active system. Then return this card to the petrol player."
     },
     {
         "alias": "petrol_ps",
@@ -1373,7 +1373,7 @@
         "color": "petrol",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **petrol** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **petrol** player."
+        "text": "When an agenda is revealed: The petrol player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the petrol player."
     },
     {
         "alias": "petrol_sftt",
@@ -1381,7 +1381,7 @@
         "color": "petrol",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **petrol** player's units, or if the **petrol** player is eliminated, lose 1 victory point and return this card to the **petrol** player."
+        "text": "When you receive this card, if you are not the petrol player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the petrol player's units, or if the petrol player is eliminated, lose 1 victory point and return this card to the petrol player."
     },
     {
         "alias": "petrol_ta",
@@ -1389,7 +1389,7 @@
         "color": "petrol",
         "playArea": "false",
         "source": "base",
-        "text": "When the **petrol** player replenishes commodities: The **petrol** player gives you all of their commodities. Then, return this card to the **petrol** player."
+        "text": "When the petrol player replenishes commodities: The petrol player gives you all of their commodities. Then, return this card to the petrol player."
     },
     {
         "alias": "petrol_an",
@@ -1397,7 +1397,7 @@
         "color": "petrol",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area. While this card is in your play area, you can use the **petrol** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **petrol** player's units, return this card to the **petrol** player."
+        "text": "When you receive this card, if you are not the petrol player, you must place it faceup in your play area. While this card is in your play area, you can use the petrol player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the petrol player's units, return this card to the petrol player."
     },
     {
         "alias": "sunset_cf",
@@ -1405,7 +1405,7 @@
         "color": "sunset",
         "playArea": "false",
         "source": "base",
-        "text": "After the **sunset** player activates a system that contains 1 or more of your units: The **sunset** player cannot move units to the active system. Then return this card to the **sunset** player."
+        "text": "After the sunset player activates a system that contains 1 or more of your units: The sunset player cannot move units to the active system. Then return this card to the sunset player."
     },
     {
         "alias": "sunset_ps",
@@ -1413,7 +1413,7 @@
         "color": "sunset",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **sunset** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **sunset** player."
+        "text": "When an agenda is revealed: The sunset player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the sunset player."
     },
     {
         "alias": "sunset_sftt",
@@ -1421,7 +1421,7 @@
         "color": "sunset",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **sunset** player's units, or if the **sunset** player is eliminated, lose 1 victory point and return this card to the **sunset** player."
+        "text": "When you receive this card, if you are not the sunset player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the sunset player's units, or if the sunset player is eliminated, lose 1 victory point and return this card to the sunset player."
     },
     {
         "alias": "sunset_ta",
@@ -1429,7 +1429,7 @@
         "color": "sunset",
         "playArea": "false",
         "source": "base",
-        "text": "When the **sunset** player replenishes commodities: The **sunset** player gives you all of their commodities. Then, return this card to the **sunset** player."
+        "text": "When the sunset player replenishes commodities: The sunset player gives you all of their commodities. Then, return this card to the sunset player."
     },
     {
         "alias": "sunset_an",
@@ -1437,7 +1437,7 @@
         "color": "sunset",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area. While this card is in your play area, you can use the **sunset** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **sunset** player's units, return this card to the **sunset** player."
+        "text": "When you receive this card, if you are not the sunset player, you must place it faceup in your play area. While this card is in your play area, you can use the sunset player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the sunset player's units, return this card to the sunset player."
     },
     {
         "alias": "tan_cf",
@@ -1445,7 +1445,7 @@
         "color": "tan",
         "playArea": "false",
         "source": "base",
-        "text": "After the **tan** player activates a system that contains 1 or more of your units: The **tan** player cannot move units to the active system. Then return this card to the **tan** player."
+        "text": "After the tan player activates a system that contains 1 or more of your units: The tan player cannot move units to the active system. Then return this card to the tan player."
     },
     {
         "alias": "tan_ps",
@@ -1453,7 +1453,7 @@
         "color": "tan",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **tan** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **tan** player."
+        "text": "When an agenda is revealed: The tan player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the tan player."
     },
     {
         "alias": "tan_sftt",
@@ -1461,7 +1461,7 @@
         "color": "tan",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **tan** player's units, or if the **tan** player is eliminated, lose 1 victory point and return this card to the **tan** player."
+        "text": "When you receive this card, if you are not the tan player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the tan player's units, or if the tan player is eliminated, lose 1 victory point and return this card to the tan player."
     },
     {
         "alias": "tan_ta",
@@ -1469,7 +1469,7 @@
         "color": "tan",
         "playArea": "false",
         "source": "base",
-        "text": "When the **tan** player replenishes commodities: The **tan** player gives you all of their commodities. Then, return this card to the **tan** player."
+        "text": "When the tan player replenishes commodities: The tan player gives you all of their commodities. Then, return this card to the tan player."
     },
     {
         "alias": "tan_an",
@@ -1477,7 +1477,7 @@
         "color": "tan",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area. While this card is in your play area, you can use the **tan** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **tan** player's units, return this card to the **tan** player."
+        "text": "When you receive this card, if you are not the tan player, you must place it faceup in your play area. While this card is in your play area, you can use the tan player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the tan player's units, return this card to the tan player."
     },
     {
         "alias": "turquoise_cf",
@@ -1485,7 +1485,7 @@
         "color": "turquoise",
         "playArea": "false",
         "source": "base",
-        "text": "After the **turquoise** player activates a system that contains 1 or more of your units: The **turquoise** player cannot move units to the active system. Then return this card to the **turquoise** player."
+        "text": "After the turquoise player activates a system that contains 1 or more of your units: The turquoise player cannot move units to the active system. Then return this card to the turquoise player."
     },
     {
         "alias": "turquoise_ps",
@@ -1493,7 +1493,7 @@
         "color": "turquoise",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **turquoise** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **turquoise** player."
+        "text": "When an agenda is revealed: The turquoise player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the turquoise player."
     },
     {
         "alias": "turquoise_sftt",
@@ -1501,7 +1501,7 @@
         "color": "turquoise",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **turquoise** player's units, or if the **turquoise** player is eliminated, lose 1 victory point and return this card to the **turquoise** player."
+        "text": "When you receive this card, if you are not the turquoise player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the turquoise player's units, or if the turquoise player is eliminated, lose 1 victory point and return this card to the turquoise player."
     },
     {
         "alias": "turquoise_ta",
@@ -1509,7 +1509,7 @@
         "color": "turquoise",
         "playArea": "false",
         "source": "base",
-        "text": "When the **turquoise** player replenishes commodities: The **turquoise** player gives you all of their commodities. Then, return this card to the **turquoise** player."
+        "text": "When the turquoise player replenishes commodities: The turquoise player gives you all of their commodities. Then, return this card to the turquoise player."
     },
     {
         "alias": "turquoise_an",
@@ -1517,7 +1517,7 @@
         "color": "turquoise",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area. While this card is in your play area, you can use the **turquoise** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **turquoise** player's units, return this card to the **turquoise** player."
+        "text": "When you receive this card, if you are not the turquoise player, you must place it faceup in your play area. While this card is in your play area, you can use the turquoise player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the turquoise player's units, return this card to the turquoise player."
     },
     {
         "alias": "purple_cf",
@@ -1525,7 +1525,7 @@
         "color": "purple",
         "playArea": "false",
         "source": "base",
-        "text": "After the **purple** player activates a system that contains 1 or more of your units: The **purple** player cannot move units to the active system. Then return this card to the **purple** player."
+        "text": "After the purple player activates a system that contains 1 or more of your units: The purple player cannot move units to the active system. Then return this card to the purple player."
     },
     {
         "alias": "purple_ps",
@@ -1533,7 +1533,7 @@
         "color": "purple",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **purple** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **purple** player."
+        "text": "When an agenda is revealed: The purple player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the purple player."
     },
     {
         "alias": "purple_sftt",
@@ -1541,7 +1541,7 @@
         "color": "purple",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **purple** player's units, or if the **purple** player is eliminated, lose 1 victory point and return this card to the **purple** player."
+        "text": "When you receive this card, if you are not the purple player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the purple player's units, or if the purple player is eliminated, lose 1 victory point and return this card to the purple player."
     },
     {
         "alias": "purple_ta",
@@ -1549,7 +1549,7 @@
         "color": "purple",
         "playArea": "false",
         "source": "base",
-        "text": "When the **purple** player replenishes commodities: The **purple** player gives you all of their commodities. Then, return this card to the **purple** player."
+        "text": "When the purple player replenishes commodities: The purple player gives you all of their commodities. Then, return this card to the purple player."
     },
     {
         "alias": "purple_an",
@@ -1557,7 +1557,7 @@
         "color": "purple",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **purple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **purple** player's units, return this card to the **purple** player."
+        "text": "When you receive this card, if you are not the purple player, you must place it faceup in your play area. While this card is in your play area, you can use the purple player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the purple player's units, return this card to the purple player."
     },
     {
         "alias": "pink_cf",
@@ -1565,7 +1565,7 @@
         "color": "pink",
         "playArea": "false",
         "source": "base",
-        "text": "After the **pink** player activates a system that contains 1 or more of your units: The **pink** player cannot move units to the active system. Then return this card to the **pink** player."
+        "text": "After the pink player activates a system that contains 1 or more of your units: The pink player cannot move units to the active system. Then return this card to the pink player."
     },
     {
         "alias": "pink_ps",
@@ -1573,7 +1573,7 @@
         "color": "pink",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **pink** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **pink** player."
+        "text": "When an agenda is revealed: The pink player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the pink player."
     },
     {
         "alias": "pink_sftt",
@@ -1581,7 +1581,7 @@
         "color": "pink",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **pink** player's units, or if the **pink** player is eliminated, lose 1 victory point and return this card to the **pink** player."
+        "text": "When you receive this card, if you are not the pink player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the pink player's units, or if the pink player is eliminated, lose 1 victory point and return this card to the pink player."
     },
     {
         "alias": "pink_ta",
@@ -1589,7 +1589,7 @@
         "color": "pink",
         "playArea": "false",
         "source": "base",
-        "text": "When the pink player replenishes commodities: The **pink** player gives you all of their commodities. Then, return this card to the **pink** player."
+        "text": "When the pink player replenishes commodities: The pink player gives you all of their commodities. Then, return this card to the pink player."
     },
     {
         "alias": "pink_an",
@@ -1597,7 +1597,7 @@
         "color": "pink",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area. While this card is in your play area, you can use the pink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **pink** player's units, return this card to the **pink** player."
+        "text": "When you receive this card, if you are not the pink player, you must place it faceup in your play area. While this card is in your play area, you can use the pink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the pink player's units, return this card to the pink player."
     },
     {
         "alias": "blue_cf",
@@ -1605,7 +1605,7 @@
         "color": "blue",
         "playArea": "false",
         "source": "base",
-        "text": "After the **blue** player activates a system that contains 1 or more of your units: The **blue** player cannot move units to the active system. Then return this card to the **blue** player."
+        "text": "After the blue player activates a system that contains 1 or more of your units: The blue player cannot move units to the active system. Then return this card to the blue player."
     },
     {
         "alias": "blue_ps",
@@ -1613,7 +1613,7 @@
         "color": "blue",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **blue** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **blue** player."
+        "text": "When an agenda is revealed: The blue player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the blue player."
     },
     {
         "alias": "blue_sftt",
@@ -1621,7 +1621,7 @@
         "color": "blue",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **blue** player's units, or if the **blue** player is eliminated, lose 1 victory point and return this card to the **blue** player."
+        "text": "When you receive this card, if you are not the blue player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the blue player's units, or if the blue player is eliminated, lose 1 victory point and return this card to the blue player."
     },
     {
         "alias": "blue_ta",
@@ -1629,7 +1629,7 @@
         "color": "blue",
         "playArea": "false",
         "source": "base",
-        "text": "When the **blue** player replenishes commodities: The **blue** player gives you all of their commodities. Then, return this card to the **blue** player."
+        "text": "When the blue player replenishes commodities: The blue player gives you all of their commodities. Then, return this card to the blue player."
     },
     {
         "alias": "blue_an",
@@ -1637,7 +1637,7 @@
         "color": "blue",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **blue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **blue** player's units, return this card to the **blue** player."
+        "text": "When you receive this card, if you are not the blue player, you must place it faceup in your play area. While this card is in your play area, you can use the blue player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the blue player's units, return this card to the blue player."
     },
     {
         "alias": "green_cf",
@@ -1645,7 +1645,7 @@
         "color": "green",
         "playArea": "false",
         "source": "base",
-        "text": "After the **green** player activates a system that contains 1 or more of your units: The **green** player cannot move units to the active system. Then return this card to the **green** player."
+        "text": "After the green player activates a system that contains 1 or more of your units: The green player cannot move units to the active system. Then return this card to the green player."
     },
     {
         "alias": "green_ps",
@@ -1653,7 +1653,7 @@
         "color": "green",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **green** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **green** player."
+        "text": "When an agenda is revealed: The green player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the green player."
     },
     {
         "alias": "green_sftt",
@@ -1661,7 +1661,7 @@
         "color": "green",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **green** player's units, or if the **green** player is eliminated, lose 1 victory point and return this card to the **green** player."
+        "text": "When you receive this card, if you are not the green player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the green player's units, or if the green player is eliminated, lose 1 victory point and return this card to the green player."
     },
     {
         "alias": "green_ta",
@@ -1669,7 +1669,7 @@
         "color": "green",
         "playArea": "false",
         "source": "base",
-        "text": "When the **green** player replenishes commodities: The **green** player gives you all of their commodities. Then, return this card to the **green** player."
+        "text": "When the green player replenishes commodities: The green player gives you all of their commodities. Then, return this card to the green player."
     },
     {
         "alias": "green_an",
@@ -1677,7 +1677,7 @@
         "color": "green",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area. While this card is in your play area, you can use the **green** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **green** player's units, return this card to the **green** player."
+        "text": "When you receive this card, if you are not the green player, you must place it faceup in your play area. While this card is in your play area, you can use the green player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the green player's units, return this card to the green player."
     },
     {
         "alias": "gray_cf",
@@ -1685,7 +1685,7 @@
         "color": "gray",
         "playArea": "false",
         "source": "base",
-        "text": "After the **gray** player activates a system that contains 1 or more of your units: The **gray** player cannot move units to the active system. Then return this card to the **gray** player."
+        "text": "After the gray player activates a system that contains 1 or more of your units: The gray player cannot move units to the active system. Then return this card to the gray player."
     },
     {
         "alias": "gray_ps",
@@ -1693,7 +1693,7 @@
         "color": "gray",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **gray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gray** player."
+        "text": "When an agenda is revealed: The gray player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the gray player."
     },
     {
         "alias": "gray_sftt",
@@ -1701,7 +1701,7 @@
         "color": "gray",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gray** player's units, or if the **gray** player is eliminated, lose 1 victory point and return this card to the **gray** player."
+        "text": "When you receive this card, if you are not the gray player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the gray player's units, or if the gray player is eliminated, lose 1 victory point and return this card to the gray player."
     },
     {
         "alias": "gray_ta",
@@ -1709,7 +1709,7 @@
         "color": "gray",
         "playArea": "false",
         "source": "base",
-        "text": "When the **gray** player replenishes commodities: The **gray** player gives you all of their commodities. Then, return this card to the **gray** player."
+        "text": "When the gray player replenishes commodities: The gray player gives you all of their commodities. Then, return this card to the gray player."
     },
     {
         "alias": "gray_an",
@@ -1717,7 +1717,7 @@
         "color": "gray",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gray** player's units, return this card to the **gray** player."
+        "text": "When you receive this card, if you are not the gray player, you must place it faceup in your play area. While this card is in your play area, you can use the gray player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the gray player's units, return this card to the gray player."
     },
     {
         "alias": "red_cf",
@@ -1725,7 +1725,7 @@
         "color": "red",
         "playArea": "false",
         "source": "base",
-        "text": "After the **red** player activates a system that contains 1 or more of your units: The **red** player cannot move units to the active system. Then return this card to the **red** player."
+        "text": "After the red player activates a system that contains 1 or more of your units: The red player cannot move units to the active system. Then return this card to the red player."
     },
     {
         "alias": "red_ps",
@@ -1733,7 +1733,7 @@
         "color": "red",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **red** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **red** player."
+        "text": "When an agenda is revealed: The red player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the red player."
     },
     {
         "alias": "red_sftt",
@@ -1741,7 +1741,7 @@
         "color": "red",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **red** player's units, or if the **red** player is eliminated, lose 1 victory point and return this card to the **red** player."
+        "text": "When you receive this card, if you are not the red player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the red player's units, or if the red player is eliminated, lose 1 victory point and return this card to the red player."
     },
     {
         "alias": "red_ta",
@@ -1749,7 +1749,7 @@
         "color": "red",
         "playArea": "false",
         "source": "base",
-        "text": "When the **red** player replenishes commodities: The **red** player gives you all of their commodities. Then, return this card to the **red** player."
+        "text": "When the red player replenishes commodities: The red player gives you all of their commodities. Then, return this card to the red player."
     },
     {
         "alias": "red_an",
@@ -1757,7 +1757,7 @@
         "color": "red",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area. While this card is in your play area, you can use the **red** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **red** player's units, return this card to the **red** player."
+        "text": "When you receive this card, if you are not the red player, you must place it faceup in your play area. While this card is in your play area, you can use the red player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the red player's units, return this card to the red player."
     },
     {
         "alias": "yellow_cf",
@@ -1765,7 +1765,7 @@
         "color": "yellow",
         "playArea": "false",
         "source": "base",
-        "text": "After the **yellow** player activates a system that contains 1 or more of your units: The **yellow** player cannot move units to the active system. Then return this card to the **yellow** player."
+        "text": "After the yellow player activates a system that contains 1 or more of your units: The yellow player cannot move units to the active system. Then return this card to the yellow player."
     },
     {
         "alias": "yellow_ps",
@@ -1773,7 +1773,7 @@
         "color": "yellow",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **yellow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **yellow** player."
+        "text": "When an agenda is revealed: The yellow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the yellow player."
     },
     {
         "alias": "yellow_sftt",
@@ -1781,7 +1781,7 @@
         "color": "yellow",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **yellow** player's units, or if the **yellow** player is eliminated, lose 1 victory point and return this card to the **yellow** player."
+        "text": "When you receive this card, if you are not the yellow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the yellow player's units, or if the yellow player is eliminated, lose 1 victory point and return this card to the yellow player."
     },
     {
         "alias": "yellow_ta",
@@ -1789,7 +1789,7 @@
         "color": "yellow",
         "playArea": "false",
         "source": "base",
-        "text": "When the **yellow** player replenishes commodities: The **yellow** player gives you all of their commodities. Then, return this card to the **yellow** player."
+        "text": "When the yellow player replenishes commodities: The yellow player gives you all of their commodities. Then, return this card to the yellow player."
     },
     {
         "alias": "yellow_an",
@@ -1797,7 +1797,7 @@
         "color": "yellow",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **yellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **yellow** player's units, return this card to the **yellow** player."
+        "text": "When you receive this card, if you are not the yellow player, you must place it faceup in your play area. While this card is in your play area, you can use the yellow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the yellow player's units, return this card to the yellow player."
     },
     {
         "alias": "black_cf",
@@ -1805,7 +1805,7 @@
         "color": "black",
         "playArea": "false",
         "source": "base",
-        "text": "After the **black** player activates a system that contains 1 or more of your units: The **black** player cannot move units to the active system. Then return this card to the **black** player."
+        "text": "After the black player activates a system that contains 1 or more of your units: The black player cannot move units to the active system. Then return this card to the black player."
     },
     {
         "alias": "black_ps",
@@ -1813,7 +1813,7 @@
         "color": "black",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **black** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **black** player."
+        "text": "When an agenda is revealed: The black player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the black player."
     },
     {
         "alias": "black_sftt",
@@ -1821,7 +1821,7 @@
         "color": "black",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **black** player's units, or if the **black** player is eliminated, lose 1 victory point and return this card to the **black** player."
+        "text": "When you receive this card, if you are not the black player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the black player's units, or if the black player is eliminated, lose 1 victory point and return this card to the black player."
     },
     {
         "alias": "black_ta",
@@ -1829,7 +1829,7 @@
         "color": "black",
         "playArea": "false",
         "source": "base",
-        "text": "When the **black** player replenishes commodities: The **black** player gives you all of their commodities. Then, return this card to the **black** player."
+        "text": "When the black player replenishes commodities: The black player gives you all of their commodities. Then, return this card to the black player."
     },
     {
         "alias": "black_an",
@@ -1837,7 +1837,7 @@
         "color": "black",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area. While this card is in your play area, you can use the **black** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **black** player's units, return this card to the **black** player."
+        "text": "When you receive this card, if you are not the black player, you must place it faceup in your play area. While this card is in your play area, you can use the black player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the black player's units, return this card to the black player."
     },
     {
         "alias": "orange_cf",
@@ -1845,7 +1845,7 @@
         "color": "orange",
         "playArea": "false",
         "source": "base",
-        "text": "After the **orange** player activates a system that contains 1 or more of your units: The **orange** player cannot move units to the active system. Then return this card to the **orange** player."
+        "text": "After the orange player activates a system that contains 1 or more of your units: The orange player cannot move units to the active system. Then return this card to the orange player."
     },
     {
         "alias": "orange_ps",
@@ -1853,7 +1853,7 @@
         "color": "orange",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **orange** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **orange** player."
+        "text": "When an agenda is revealed: The orange player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the orange player."
     },
     {
         "alias": "orange_sftt",
@@ -1861,7 +1861,7 @@
         "color": "orange",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **orange** player's units, or if the **orange** player is eliminated, lose 1 victory point and return this card to the **orange** player."
+        "text": "When you receive this card, if you are not the orange player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the orange player's units, or if the orange player is eliminated, lose 1 victory point and return this card to the orange player."
     },
     {
         "alias": "orange_ta",
@@ -1869,7 +1869,7 @@
         "color": "orange",
         "playArea": "false",
         "source": "base",
-        "text": "When the **orange** player replenishes commodities: The **orange** player gives you all of their commodities. Then, return this card to the **orange** player."
+        "text": "When the orange player replenishes commodities: The orange player gives you all of their commodities. Then, return this card to the orange player."
     },
     {
         "alias": "orange_an",
@@ -1877,7 +1877,7 @@
         "color": "orange",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **orange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **orange** player's units, return this card to the **orange** player."
+        "text": "When you receive this card, if you are not the orange player, you must place it faceup in your play area. While this card is in your play area, you can use the orange player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the orange player's units, return this card to the orange player."
     },
     {
         "alias": "ethereal_cf",
@@ -1885,7 +1885,7 @@
         "color": "ethereal",
         "playArea": "false",
         "source": "base",
-        "text": "After the **ethereal** player activates a system that contains 1 or more of your units: The **ethereal** player cannot move units to the active system. Then return this card to the **ethereal** player."
+        "text": "After the ethereal player activates a system that contains 1 or more of your units: The ethereal player cannot move units to the active system. Then return this card to the ethereal player."
     },
     {
         "alias": "ethereal_ps",
@@ -1893,7 +1893,7 @@
         "color": "ethereal",
         "playArea": "false",
         "source": "base",
-        "text": "When an agenda is revealed: The **ethereal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **ethereal** player."
+        "text": "When an agenda is revealed: The ethereal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the ethereal player."
     },
     {
         "alias": "ethereal_sftt",
@@ -1901,7 +1901,7 @@
         "color": "ethereal",
         "playArea": "true",
         "source": "base",
-        "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **ethereal** player's units, or if the **ethereal** player is eliminated, lose 1 victory point and return this card to the **ethereal** player."
+        "text": "When you receive this card, if you are not the ethereal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the ethereal player's units, or if the ethereal player is eliminated, lose 1 victory point and return this card to the ethereal player."
     },
     {
         "alias": "ethereal_ta",
@@ -1909,7 +1909,7 @@
         "color": "ethereal",
         "playArea": "false",
         "source": "base",
-        "text": "When the **ethereal** player replenishes commodities: The **ethereal** player gives you all of their commodities. Then, return this card to the **ethereal** player."
+        "text": "When the ethereal player replenishes commodities: The ethereal player gives you all of their commodities. Then, return this card to the ethereal player."
     },
     {
         "alias": "ethereal_an",
@@ -1917,6 +1917,6 @@
         "color": "ethereal",
         "playArea": "true",
         "source": "pok",
-        "text": "When you receive this card, if you are not the **ethereal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **ethereal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **ethereal** player's units, return this card to the **ethereal** player."
+        "text": "When you receive this card, if you are not the ethereal player, you must place it faceup in your play area. While this card is in your play area, you can use the ethereal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the ethereal player's units, return this card to the ethereal player."
     }
 ]
