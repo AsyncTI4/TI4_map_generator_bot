@@ -162,6 +162,7 @@ public class Setup extends PlayerSubcommandData {
         // STARTING PNs
         player.initPNs();
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+        playerPNs.addAll(setupInfo.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (activeGame.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());

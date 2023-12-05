@@ -176,12 +176,12 @@ public class Mapper {
                 + String.join("\n> ", badObjects));
     }
 
-    public static List<String> getColorFactionPromissoryNoteIDs(Game activeGame, String color, String faction) {
+    public static List<String> getColorPromissoryNoteIDs(Game activeGame, String color) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
-        if (isColorValid(color) && isFaction(faction)) {
+        if (isColorValid(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
-                if (pn.getColor().orElse("").equals(color) || pn.getFaction().orElse("").equalsIgnoreCase(faction)) {
+                if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
