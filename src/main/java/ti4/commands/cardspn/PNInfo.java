@@ -73,6 +73,12 @@ public class PNInfo extends PNCardsSubcommandData {
                 buttons.add(transact);
             }
         }
+
+        // OTHER BUTTONS
+        sendVariousAdditionalButtons(activeGame, player, buttons);
+    }
+
+    private static void sendVariousAdditionalButtons(Game activeGame, Player player, List<Button> buttons) {
         Button transaction = Button.primary("transaction", "Transaction");
         buttons.add(transaction);
         Button modify = Button.secondary("getModifyTiles", "Modify Units");
@@ -115,7 +121,7 @@ public class PNInfo extends PNCardsSubcommandData {
             buttons.add(psycho);
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nYou can use these buttons to play a PN, resolve a transaction, or to modify units", buttons);
     }
 
     public static String getPromissoryNoteCardInfo(Game activeGame, Player player, boolean longFormat) {
@@ -123,7 +129,7 @@ public class PNInfo extends PNCardsSubcommandData {
         sb.append("_ _\n");
 
         //PROMISSORY NOTES
-        sb.append("**Promissory Notes:**").append("\n");
+        sb.append("__**Promissory Notes:**__").append("\n");
         int index = 1;
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -141,7 +147,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 sb.append("\n");
 
                 //PLAY AREA PROMISSORY NOTES
-                sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
+                sb.append("\n").append("__**PLAY AREA Promissory Notes:**__").append("\n");
                 if (promissoryNotesInPlayArea.isEmpty()) {
                     sb.append("> None");
                 } else {
@@ -183,18 +189,23 @@ public class PNInfo extends PNCardsSubcommandData {
 
         sb.append(Emojis.PN);
         if (pnModel.getFaction().isPresent()) sb.append(Emojis.getFactionIconFromDiscord(pnModel.getFaction().get()));
-        sb.append("__**").append(pnName).append("**__   ");
+        sb.append("__**").append(pnName).append("**__");
+        sb.append(pnModel.getSource().emoji());
+        sb.append("   ");
 
         String pnText = pnModel.getText();
         Player pnOwner = activeGame.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
             if (!activeGame.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
-            sb.append(Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
-            // if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
-            pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeGame.getGuild(), pnOwner.getColor()));
+            sb.append(Emojis.getColorEmojiWithName(pnOwner.getColor()));
+            pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
         }
 
-        if (longFormat || Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) || pnModel.getSource() == ComponentSource.absol) sb.append("      ").append(pnText);
+        if (longFormat || 
+            Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
+            (pnModel.getSource() != ComponentSource.base && pnModel.getSource() != ComponentSource.pok)) {
+                sb.append("      ").append(pnText);
+            }
         sb.append("\n");
         return sb.toString();
     }
