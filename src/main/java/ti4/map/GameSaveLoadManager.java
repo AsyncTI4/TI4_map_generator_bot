@@ -80,7 +80,14 @@ public class GameSaveLoadManager {
     public static void saveMaps() {
         //TODO: add last command time/last save time to cut down on saves
         GameManager.getInstance().getGameNameToGame().values().parallelStream()
-            .forEach(game -> saveMap(game, true, null));
+            .forEach(game -> {
+                try {
+                    saveMap(game, true, null);
+                } catch (Exception e) {
+                    BotLogger.log("Error saving map: " + game.getName());
+                    // BotLogger.log("Error saving map: " + game.getName(), e);
+                }
+            });
     }
 
     public static void saveMap(Game activeGame) {
