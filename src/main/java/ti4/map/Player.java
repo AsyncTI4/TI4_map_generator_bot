@@ -1120,7 +1120,10 @@ public class Player {
         if (StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)) {
             return factionEmoji;
         }
-        return getFactionModel().getFactionEmoji();
+        if (getFactionModel() != null) {
+            return getFactionModel().getFactionEmoji();
+        }
+        return Emojis.getFactionIconFromDiscord(faction);
     }
 
     public String getFactionEmojiOrColor() {
@@ -1136,7 +1139,7 @@ public class Player {
 
     public boolean hasCustomFactionEmoji() {
         return StringUtils.isNotBlank(factionEmoji) && !"null".equals(factionEmoji)
-            && !factionEmoji.equalsIgnoreCase(getFactionModel().getFactionEmoji());
+            && getFactionModel() != null && !factionEmoji.equalsIgnoreCase(getFactionModel().getFactionEmoji());
     }
 
     private void initAbilities() {
