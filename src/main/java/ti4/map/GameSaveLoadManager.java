@@ -208,14 +208,18 @@ public class GameSaveLoadManager {
                     GameManager.getInstance().deleteGame(activeGame.getName());
                     GameManager.getInstance().addGame(loadedGame);
                     try {
-                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null) {
+                        if (loadedGame.getSavedButtons().size() > 0 && loadedGame.getSavedChannel() != null && !activeGame.getCurrentPhase().contains("status")) {
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(), loadedGame.getSavedMessage(), ButtonHelper.getSavedButtons(loadedGame));
                         }
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Had trouble getting the saved buttons, sorry");
                     }
+                    String msg = "Undoing the last saved command:\n> " + loadedGame.getLatestCommand();
+                    if(loadedGame.getSavedChannel() != null && loadedGame.getSavedChannel() instanceof ThreadChannel){
+                       msg = "Undoing the last saved command:\n> [CLASSIFIED]"; 
+                    }
 
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undoing the last saved command:\n> " + loadedGame.getLatestCommand());
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -549,6 +553,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeGame.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.MILTYMOD_MODE + " " + activeGame.isMiltyModMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.TEXT_SIZE + " " + activeGame.getTextSize());
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeGame.isDiscordantStarsMode());
@@ -734,6 +740,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
+            writer.write(Constants.SPENT_THINGS + " " + String.join(",", player.getSpentThingsThisWindow()));
+            writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
@@ -760,6 +768,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.EXPECTED_HITS_TIMES_10 + " " + player.getExpectedHitsTimes10());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.TOTAL_EXPENSES + " " + player.getTotalExpenses());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TURN_COUNT + " " + player.getTurnCount());
@@ -796,6 +807,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
@@ -1735,6 +1748,14 @@ public class GameSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.MILTYMOD_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeGame.setMiltyModMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.DISCORDANT_STARS_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1904,6 +1925,7 @@ public class GameSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.ACTUAL_HITS -> player.setActualHits(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.EXPECTED_HITS_TIMES_10 -> player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TOTAL_EXPENSES -> player.setTotalExpenses(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TURN_COUNT -> player.setTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
@@ -1990,6 +2012,7 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.SPENT_THINGS -> player.setSpentThings(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
@@ -2057,6 +2080,15 @@ public class GameSaveLoadManager {
                         String id = secretInfo.nextToken();
                         Integer index = Integer.parseInt(secretInfo.nextToken());
                         player.setSecret(id, index);
+                    }
+                }
+                case Constants.PRODUCED_UNITS -> {
+                    StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (secrets.hasMoreTokens()) {
+                        StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                        String id = secretInfo.nextToken();
+                        Integer amount = Integer.parseInt(secretInfo.nextToken());
+                        player.setProducedUnit(id, amount);
                     }
                 }
                 case Constants.UNIT_CAP -> {

@@ -65,30 +65,6 @@
         "source": "ds"
     },
     {
-        "id": "blight",
-        "name": "Blight",
-        "faction": "blex",
-        "permanentEffect": "Apply -1 to the results of other players' combat rolls during the first round of combat in systems that contain Blight tokens.",
-        "window": "At the start of the strategy phase",
-        "windowEffect": "You may place or move 1 \"Blight\" token into your home system, or adjacent to a system that contains a Blight token.",
-        "source": "ds"
-    },
-    {
-        "id": "contagion_blex",
-        "name": "Contagion",
-        "faction": "blex",
-        "window": "Once per tactical action, when you commit 1 or more infantry to an uncontrolled planet",
-        "windowEffect": "You may resolve ground combat on that planet.",
-        "source": "ds"
-    },
-    {
-        "id": "plague_reservoir_blex",
-        "name": "Plague Reservoir",
-        "faction": "blex",
-        "permanentEffect": "You may score public objectives as long as you control all the planets in any home system.",
-        "source": "ds"
-    },
-    {
         "id": "industrialists",
         "name": "Industrialists",
         "faction": "celdauri",

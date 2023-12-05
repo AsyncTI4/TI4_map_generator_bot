@@ -97,7 +97,7 @@
         "factionName": "Dih-Mohn Flotilla",
         "shortTag": "DMN",
         "homeSystem": "d29",
-        "startingFleet": "2 dn,2 dd,ff,mech a,2 inf a,sd a",
+        "startingFleet": "2 dn,2 dd,2 ff,mech a,2 inf a,sd a",
         "commodities": 2,
         "factionTech": ["dsdihmdn", "dsdihmy"],
         "startingTech": ["sdn", "det"],

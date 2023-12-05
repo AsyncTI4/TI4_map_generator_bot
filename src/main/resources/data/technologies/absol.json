@@ -375,7 +375,7 @@
         "name": "Spatial Conduit Cylinder",
         "type": "PROPULSION",
         "requirements": "BB",
-        "faction": "jol-nar",
+        "faction": "jolnar",
         "source": "absol",
         "text": "During your tactical actions, you may treat systems that contain 1 or more of your space docks as adjacent.",
         "homebrewReplacesID": "scc"
@@ -385,7 +385,7 @@
         "name": "E-Res Siphons",
         "type": "CYBERNETIC",
         "requirements": "YY",
-        "faction": "jol-nar",
+        "faction": "jolnar",
         "source": "absol",
         "text": "When another player moves ships into a system that contains 1 or more of your structures, gain trade goods equal to the number of non-fighter ships that moved into that system.",
         "homebrewReplacesID": "ers"
@@ -579,7 +579,7 @@
         "name": "Wormhole Generator",
         "type": "PROPULSION",
         "requirements": "BB",
-        "faction": "ghosts",
+        "faction": "ghost",
         "source": "absol",
         "text": "Action: Exhaust this card to place or move up to 2 Creuss wormhole tokens into systems that contain a planet you control and/or non-home systems that do not contain another player's ships.",
         "homebrewReplacesID": "wg"
@@ -589,7 +589,7 @@
         "name": "Dimensional Splicer",
         "type": "WARFARE",
         "requirements": "R",
-        "faction": "ghosts",
+        "faction": "ghost",
         "source": "absol",
         "text": "When another player's ship with SUSTAIN DAMAGE moves through a wormhole into a system that contains your ships, that ship becomes damaged.\n \n At the start of a space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships.",
         "homebrewReplacesID": "ds"
@@ -623,7 +623,7 @@
         "faction": "titans",
         "baseUpgrade": "absol_pds2",
         "source": "absol",
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
+        "text": "Combat 6. This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems. PLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1",
         "homebrewReplacesID": "ht2"
     },
     {
@@ -634,7 +634,7 @@
         "faction": "titans",
         "baseUpgrade": "absol_cr2",
         "source": "absol",
-        "text": "At any time, you may look at the top card of the frontier exploration deck.\n \n After a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able.",
+        "text": "Cost 2, Combat 6, Move 3, Capacity 2, SUSTAIN DAMAGE",
         "homebrewReplacesID": "se2"
     },
     {

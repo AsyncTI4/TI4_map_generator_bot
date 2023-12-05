@@ -12,7 +12,8 @@
       "leaders": ["arborecagent", "arboreccommander", "arborechero"],
       "promissoryNotes": ["miltymod_stymie"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_arborec_flagship", "miltymod_arborec_infantry", "arborec_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "arborec"
     },
     {
       "alias": "miltymod_ghost",
@@ -28,7 +29,8 @@
       "leaders": ["ghostagent", "ghostcommander", "ghosthero"],
       "promissoryNotes": ["miltymod_iff"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_ghost_flagship", "miltymod_infantry", "ghost_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "ghost"
     },
     {
       "alias": "miltymod_hacan",
@@ -43,7 +45,8 @@
       "leaders": ["hacanagent", "hacancommander", "hacanhero"],
       "promissoryNotes": ["convoys"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_hacan_flagship", "miltymod_infantry", "hacan_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "hacan"
     },
     {
       "alias": "miltymod_jolnar",
@@ -59,7 +62,8 @@
       "leaders": ["jolnaragent", "jolnarcommander", "jolnarhero"],
       "promissoryNotes": ["ra"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "jolnar_flagship", "miltymod_infantry", "jolnar_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "jolnar"
     },
     {
       "alias": "miltymod_l1z1x",
@@ -75,7 +79,8 @@
       "leaders": ["l1z1xagent", "l1z1xcommander", "l1z1xhero"],
       "promissoryNotes": ["miltymod_ce"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_l1z1x_dreadnought", "l1z1x_flagship", "miltymod_infantry", "l1z1x_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "l1z1x"
     },
     {
       "alias": "miltymod_letnev",
@@ -90,7 +95,8 @@
       "leaders": ["letnevagent", "letnevcommander", "letnevhero"],
       "promissoryNotes": ["miltymod_war_funding"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "letnev_flagship", "miltymod_infantry", "letnev_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "letnev"
     },
     {
       "alias": "miltymod_mentak",
@@ -106,7 +112,8 @@
       "leaders": ["mentakagent", "mentakcommander", "mentakhero"],
       "promissoryNotes": ["pop"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "mentak_flagship", "miltymod_infantry", "mentak_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "mentak"
     },
     {
       "alias": "miltymod_muaat",
@@ -121,7 +128,8 @@
       "leaders": ["muaatagent", "muaatcommander", "muaathero"],
       "promissoryNotes": ["fires"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_muaat_flagship", "miltymod_muaat_warsun", "miltymod_infantry", "muaat_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "muaat"
     },
     {
       "alias": "miltymod_naalu",
@@ -136,7 +144,8 @@
       "leaders": ["naaluagent", "naalucommander", "naaluhero"],
       "promissoryNotes": ["gift"],
       "units": ["miltymod_naalu_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "naalu_flagship", "miltymod_infantry", "naalu_mech_omega", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "naalu"
     },
     {
       "alias": "miltymod_nekro",
@@ -152,7 +161,8 @@
       "leaders": ["nekroagent", "nekrocommander", "nekrohero"],
       "promissoryNotes": ["miltymod_antivirus"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "nekro_flagship", "miltymod_infantry", "nekro_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "nekro"
     },
     {
       "alias": "miltymod_saar",
@@ -167,7 +177,8 @@
       "leaders": ["saaragent", "saarcommander", "saarhero"],
       "promissoryNotes": ["ragh"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "saar_flagship", "miltymod_infantry", "saar_mech", "pds", "miltymod_saar_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "saar"
     },
     {
       "alias": "miltymod_sardakk",
@@ -183,7 +194,8 @@
       "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"],
       "promissoryNotes": ["miltymod_tekklar"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_sardakk_dreadnought", "sardakk_flagship", "miltymod_infantry", "sardakk_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "sardakk"
     },
     {
       "alias": "miltymod_sol",
@@ -198,7 +210,8 @@
       "leaders": ["solagent", "solcommander", "solhero"],
       "promissoryNotes": ["miltymod_ms"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "sol_carrier", "miltymod_dreadnought", "sol_flagship", "miltymod_sol_infantry", "sol_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "sol"
     },
 
     {
@@ -214,7 +227,8 @@
       "leaders": ["winnuagent", "winnucommander", "winnuhero"],
       "promissoryNotes": ["acq"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_winnu_flagship", "miltymod_infantry", "winnu_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "winnu"
     },
     {
       "alias": "miltymod_xxcha",
@@ -229,7 +243,8 @@
       "leaders": ["xxchaagent", "xxchacommander", "xxchahero"],
       "promissoryNotes": ["miltymod_favor"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "xxcha_flagship", "miltymod_infantry", "xxcha_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "xxcha"
     },
     {
       "alias": "miltymod_yin",
@@ -244,7 +259,8 @@
       "leaders": ["yinagent", "yincommander", "yinhero"],
       "promissoryNotes": ["miltymod_greyfire"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "yin_flagship", "miltymod_infantry", "yin_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "yin"
     },
     {
       "alias": "miltymod_yssaril",
@@ -259,7 +275,8 @@
       "leaders": ["yssarilagent", "yssarilcommander", "yssarilhero"],
       "promissoryNotes": ["spynet"],
       "units": ["miltymod_fighter", "destroyer", "miltymod_cruiser", "miltymod_carrier", "miltymod_dreadnought", "miltymod_yssaril_flagship", "miltymod_infantry", "yssaril_mech", "pds", "miltymod_spacedock"],
-      "source": "miltymod"
+      "source": "miltymod",
+      "homebrewReplacesID": "yssaril"
     }
 ]
   

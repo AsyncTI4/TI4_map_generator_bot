@@ -632,7 +632,6 @@ public class DataMigrationManager {
         Map<String, String> replacements = new HashMap<>();
         replacements.put("adrenaline_shots", "armistice");
         replacements.put("assassination_attempt", "armistice");
-        replacements.put("contradictory_legal_text", "double_agents");
         replacements.put("counter-intelligence", "crisis_management");
         replacements.put("deep_cover_operatives", "espionage");
         replacements.put("disrupt_logistics", "disrupted_logistics");

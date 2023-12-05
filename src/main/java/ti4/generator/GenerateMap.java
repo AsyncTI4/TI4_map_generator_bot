@@ -406,8 +406,13 @@ public class GenerateMap {
         if ("null".equals(factionID) || StringUtils.isBlank(factionID)) {
             return null;
         }
-        String factionFileName = Mapper.getFactionFileName(factionID);
-        String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
+        String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
+        if (factionFile == null) {
+            // Handle homebrew factions based on real factions
+            if (Mapper.getFaction(factionID).getHomebrewReplacesID().isPresent()) {
+                factionFile = ResourceHelper.getInstance().getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
+            }
+        }
         if (factionFile == null) {
             BotLogger.log("Could not find image file for faction icon: " + factionID);
         }
@@ -719,9 +724,9 @@ public class GenerateMap {
                     xDelta = pnInfo(player, xDelta, yPlayArea, activeGame);
                 }
 
-                if (!player.getTechs().isEmpty()) {
+               // if (player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea, activeGame);
-                }
+              //  }
 
                 if (!player.getNotResearchedFactionTechs().isEmpty()) {
                     xDelta = factionTechInfo(player, xDelta, yPlayArea, activeGame);
@@ -1654,9 +1659,9 @@ public class GenerateMap {
     private int techInfo(Player player, int x, int y, Game activeGame) {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
-        if (techs.isEmpty()) {
-            return y;
-        }
+    //    if (techs.isEmpty()) {
+     //       return y;
+      //  }
 
         Map<String, TechnologyModel> techInfo = Mapper.getTechs();
         Map<String, List<String>> techsFiltered = new HashMap<>();
@@ -3345,7 +3350,7 @@ public class GenerateMap {
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     scale = 0.6f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 1.25f;
+                    scale = 1.32f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didnt previous get changed for custodians
                 }
@@ -3357,7 +3362,7 @@ public class GenerateMap {
                 } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
                     position = new Point(position.x + 10, position.y + 10);
                 } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
-                    position = new Point(position.x, position.y + 10);
+                    position = new Point(position.x+4, position.y + 13);
                 }
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
