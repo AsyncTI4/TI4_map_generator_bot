@@ -661,7 +661,7 @@
     "name": "Spatial Collapse",
     "phase": "Action",
     "window": "Action",
-    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex and Mallice systems; both of those systems must contain or be adjacent to your ships.",
+    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex and Mallice systems; both systems must contain or be adjacent to your ships.",
     "flavorText": "The reports were so unbelievable that Rin had chosen to witness the event firsthand. Defying all she knew, the spatial dimension had twisted into a mockery of itself, leaving the nearby galaxies nearly perfectly mirrored in position.",
     "source": "action_deck_2"
   },
