@@ -100,12 +100,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = Emojis.getFactionIconFromDiscord(getAlias()) +
+        String title = getFactionEmoji() +
             " __**" + getFactionName() + "**__" +
             getSource().emoji();
         eb.setTitle(title);
 
-        Emoji emoji = Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(getAlias()));
+        Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
         if (emoji instanceof CustomEmoji customEmoji) {
             eb.setThumbnail(customEmoji.getImageUrl());
         }
