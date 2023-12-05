@@ -75,8 +75,8 @@
     "alias": "boarding_torpedoes",
     "name": "Boarding Torpedoes",
     "phase": "Action",
-    "window": "After a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-    "text": "Place 1 ship of the same type from your reinforcements into the active system. [Note: Sustain Damage is before, and cancels, the assignment of hits.]",
+    "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
+    "text": "Replace that ship with a matching unit from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure, that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the Admiral said. \"Our ships are breaking up. If we retreat now...\" Milor glared at him. \"No! Have them launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -661,7 +661,7 @@
     "name": "Spatial Collapse",
     "phase": "Action",
     "window": "Action",
-    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex, Creuss, and Mallice systems; both of those systems must contain or be adjacent to your ships.",
+    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex and Mallice systems; both systems must contain or be adjacent to your ships.",
     "flavorText": "The reports were so unbelievable that Rin had chosen to witness the event firsthand. Defying all she knew, the spatial dimension had twisted into a mockery of itself, leaving the nearby galaxies nearly perfectly mirrored in position.",
     "source": "action_deck_2"
   },
