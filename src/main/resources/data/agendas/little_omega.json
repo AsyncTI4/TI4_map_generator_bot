@@ -6,7 +6,7 @@
         "target": "For/Against",
         "text1": "For: Technologies with prerequisites require 1 additional prerequisite, matching any they already have. When a player would research a technology, they may gain 2 command tokens instead.",
         "text2": "Against: Players return 1 of their non-unit upgrade, non-faction technologies that has the most prerequisites to their technology deck.",
-        "mapText": "Technologies require 1 additional prerequisite, matching any prerequisite they already have.",
+        "mapText": "Technologies require 1 additional prerequisite, matching any they already have.",
         "source": "little_omega"
     },
     {
@@ -44,7 +44,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. Before players vote on an agenda, the owner of this card may discard this card to choose an outcome to be resolved, as if each player had cast 1 vote for that outcome.",
         "text2": "",
-        "mapText": "Before players vote on an agenda, the owner of this card may discard this card to choose an outcome to be resolved, as if each player had cast 1 vote for that outcome.",
+        "mapText": "Before players vote, you may discard this card to choose an outcome to be resolved, as if each player had cast 1 vote for that outcome.",
         "source": "little_omega"
     },
     {
@@ -111,7 +111,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: For each planet they control in their home system, each player may place 1 PDS from their reinforcements on that planet.",
-        "text2": "Against: Each player who cast 10 or more votes places 1 command token from their reinforcements in their strategy pool.",
+        "text2": "Against: Each player may place 1 command token from their reinforcements in their strategy pool; they may place 1 additional token if they cast 5 or more votes \"Against\".",
         "source": "little_omega"
     },
     {
@@ -139,7 +139,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Trade\" strategy card, they gain 4 trade goods. When the owner of this card ends their turn, they may discard this card to replenish their commodities or to convert their commodities to trade goods.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Trade\" strategy card, they gain 4 trade goods. When the owner of this card ends their turn, they may discard this card to replenish their commodities or to convert their commodities to trade goods.",
+        "mapText": "After you resolve Trade, gain 4 TGs. When you end your turn, you may discard this card to replenish or convert your commodities.",
         "source": "little_omega"
     },
     {
@@ -149,7 +149,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "text2": "",
-        "mapText": "After the owner of this card gains command tokens while resolving the primary or secondary ability of the \"Leadership\" strategy card, they explore a planet they control. Before the owner of this card draws a card from an exploration deck, they may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
+        "mapText": "After you gain CCs from Leadership, explore a planet you control. Before you draw from an exploration deck, you may discard this card to look at each card in the deck, choose 1 to place on top, and discard the rest.",
         "source": "little_omega"
     },
     {
@@ -159,7 +159,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may use the Production ability of 1 of their space docks. When the owner of this card resolves 1 of their Production abilities, they may discard this card to resolve an additional 1 of their Production abilities.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Construction\" strategy card, they may use the Production ability of 1 of their space docks. When the owner of this card resolves 1 of their Production abilities, they may discard this card to resolve an additional 1 of their Production abilities.",
+        "mapText": "After you resolve Construction, you may use the Production ability of 1 of your space docks. When you resolve 1 of your Production abilities, you may discard this card to resolve an additional 1 of your Production abilities.",
         "source": "little_omega"
     },
     {
@@ -169,7 +169,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Diplomacy\" strategy card, they ready 1 planet they control. After a player activates a system that contains a different player's units, the owner of this card may discard this card to end the active player's turn.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Diplomacy\" strategy card, they ready 1 planet they control. After a player activates a system that contains a different player's units, the owner of this card may discard this card to end the active player's turn.",
+        "mapText": "After you resolve Diplomacy, you ready 1 planet you control. After a player activates a system that contains a different player's units, you may discard this card to end that player's turn.",
         "source": "little_omega"
     },
     {
@@ -179,7 +179,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Politics\" strategy card, they draw 2 additional action cards. When another player plays an action card, the owner of this card may discard this card to cancel that action card.",
         "text2": "",
-        "mapText": "When the owner of this card resolves the primary or secondary ability of the \"Politics\" strategy card, they draw 2 additional action cards. When another player plays an action card, the owner of this card may discard this card to cancel that action card.",
+        "mapText": "Draw 2 additional action cards on the primary and secondary of Politics. Discard this card to cancel an action card.",
         "source": "little_omega"
     },
     {
@@ -189,7 +189,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. When the owner of this card ends their turn, they may discard this card to research 1 technology.",
         "text2": "",
-        "mapText": "When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology. When the owner of this card ends their turn, they may discard this card to research 1 technology.",
+        "mapText": "After you resolve Technology, you do not need to spend resources. When you end your turn, you may discard this card to research 1 technology.",
         "source": "little_omega"
     },
     {
@@ -199,7 +199,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they may move 1 of their ships to any system that contains their ships. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and perform a tactical action.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Warfare\" strategy card, they may move 1 of their ships to any system that contains their ships. The owner of this card may discard this card after performing an action to remove 1 of their command tokens from the game board and perform a tactical action.",
+        "mapText": "After you resolve Warfare, you may move 1 ship to a system that contains your ships. You may discard this card after performing an action to remove 1 CC from the game board and perform a tactical action.",
         "source": "little_omega"
     },
     {
@@ -225,9 +225,9 @@
         "name": "Prophecy of Ixth ω",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls. The owner of this card may produce 1 additional fighter for their cost; these additional units do not count against their production limit.",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighters' combat rolls and may produce 1 additional fighter for their cost; these additional units do not count against their production limit.",
         "text2": "",
-        "mapText": "The owner of this card applies +1 to the result of their fighters' combat rolls. The owner of this card may produce 1 additional fighter for their cost; these additional units do not count against their production limit.",
+        "mapText": "+1 to fighter combat rolls. Produce 1 additional fighter for their cost that doesn't count against production limit.",
         "source": "little_omega"
     },
     {
@@ -265,7 +265,7 @@
         "target": "For/Against",
         "text1": "For: When a player's ships move, they may ignore the effect of any anomaly if it does not contain a frontier token.",
         "text2": "Against: Each player who has ships in an anomaly may research 1 technology. Then, each player destroys all of their ships in anomalies that do not contain their space docks.",
-        "mapText": "Players may ignore the effects of anomalies that do not contain a frontier token during their tactical actions.",
+        "mapText": "Players may ignore the effects of anomalies that do not contain a frontier token during movement.",
         "source": "little_omega"
     },
     {
@@ -273,7 +273,7 @@
         "name": "Unconventional Measures ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player draws 1 action card. Then, they draw 1 additional action card for every 5 votes they cast during this agenda.",
+        "text1": "For: Each player draws 2 action cards; they draw 1 additional action card if they cast 5 or more votes \"For\".",
         "text2": "Against: Each player may discard 2 action cards to gain 1 command token; they may repeat this effect any number of times.",
         "source": "little_omega"
     },
@@ -292,7 +292,7 @@
         "name": "Wormhole Research ω",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 1 technology. If the result is 1-5, each player destroys 2 of their ships in each system that contains a non-delta wormhole; they must choose non-fighter ships, if able.",
+        "text1": "For: Each player who has ships in a system that contains a wormhole may research 1 technology. Then, in each system that contains a non-delta wormhole, damage each ship with SUSTAIN DAMAGE and destroy each ship without SUSTAIN DAMAGE.",
         "text2": "Against: Each player may spend 1 strategy token to research 1 technology that has no prerequisites.",
         "source": "little_omega"
     },
@@ -332,7 +332,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. After the owner of this card resolves the primary or secondary ability of the \"Imperial\" strategy card, they look at the top 3 cards of the relic deck and place each card on top of the deck in any order. When the owner of this card ends their turn, they may discard this card to gain 1 relic.",
         "text2": "",
-        "mapText": "After the owner of this card resolves the primary or secondary ability of the \"Imperial\" strategy card, they look at the top 3 cards of the relic deck and place each card on top of the deck in any order. When they end their turn, they may discard this card to gain 1 relic.",
+        "mapText": "After you resolve Imperial, look at the top 3 of the relic deck and place each on top in any order. When you end your turn, you may discard this card to gain 1 relic.",
         "source": "little_omega"
     },
     {

@@ -245,7 +245,7 @@
   {
     "alias": "double_agents",
     "name": "Double Agents",
-    "phase": "Action",
+    "phase": "Any",
     "window": "When another player plays an action card that does not have a component action",
     "text": "Cancel and take that action card.",
     "flavorText": "\"Sorry, love, it's just business,\" Mot Nesretep said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
@@ -254,7 +254,7 @@
   {
     "alias": "early_voting",
     "name": "Early Voting",
-    "phase": "Action",
+    "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "Choose 1 player. That player votes first on this agenda. After this agenda is resolved, if that player cast votes on the resolved outcome, they may place 1 command token from their reinforcements in their strategy pool. [Note: Voting continues in the normal order. They do not vote again.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
@@ -282,7 +282,7 @@
     "alias": "espionage",
     "name": "Espionage",
     "phase": "Action",
-    "window": "After an agenda is revealed",
+    "window": "Action",
     "text": "Choose 1 player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
@@ -310,7 +310,7 @@
     "name": "Firing Solution ",
     "phase": "Action",
     "window": "At the end of a round of space combat",
-    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's ships.",
+    "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's ships. [Note: This AFB still only targets fighters.]",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked on to the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
     "source": "action_deck_2"
   },
@@ -398,7 +398,7 @@
   {
     "alias": "impeachment",
     "name": "Impeachment",
-    "phase": "Strategy",
+    "phase": "Any",
     "window": "When you would draw action cards as part of the secondary ability of the \"Politics\" strategy card",
     "text": "The speaker draws 2 action cards instead. Then, they may discard all of their action cards; otherwise, you gain the speaker token.",
     "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
@@ -470,7 +470,7 @@
   {
     "alias": "miraculous_escape",
     "name": "Miraculous Escape",
-    "phase": "Action",
+    "phase": "Any",
     "window": "When 1 of your non-fighter ships would be destroyed",
     "text": "That ship is not destroyed. Damage that ship, if able.",
     "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
@@ -661,7 +661,7 @@
     "name": "Spatial Collapse",
     "phase": "Action",
     "window": "Action",
-    "text": "Swap the positions of any 2 systems that are adjacent to each other and your ships, other than the Mecatol Rex system and systems on the edge of the game board.",
+    "text": "Swap the positions of 2 adjacent, non-home systems, other than the Mecatol Rex, Creuss, and Mallice systems; both of those systems must contain or be adjacent to your ships.",
     "flavorText": "The reports were so unbelievable that Rin had chosen to witness the event firsthand. Defying all she knew, the spatial dimension had twisted into a mockery of itself, leaving the nearby galaxies nearly perfectly mirrored in position.",
     "source": "action_deck_2"
   },
