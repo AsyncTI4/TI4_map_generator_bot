@@ -1,0 +1,1922 @@
+[
+    {
+        "alias": "splitgold_cf",
+        "name": "Ceasefire",
+        "color": "splitgold",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitgold player activates a system that contains 1 or more of your units: The splitgold player cannot move units to the active system. Then return this card to the splitgold player."
+    },
+    {
+        "alias": "splitgold_ps",
+        "name": "Political Secret",
+        "color": "splitgold",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitgold player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitgold player."
+    },
+    {
+        "alias": "splitgold_sftt",
+        "name": "Support for the Throne",
+        "color": "splitgold",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitgold player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitgold player's units, or if the splitgold player is eliminated, lose 1 victory point and return this card to the splitgold player."
+    },
+    {
+        "alias": "splitgold_ta",
+        "name": "Trade Agreement",
+        "color": "splitgold",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitgold player replenishes commodities: The splitgold player gives you all of their commodities. Then, return this card to the splitgold player."
+    },
+    {
+        "alias": "splitgold_an",
+        "name": "Alliance",
+        "color": "splitgold",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitgold player, you must place it faceup in your play area. While this card is in your play area, you can use the splitgold player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitgold player's units, return this card to the splitgold player."
+    },
+    {
+        "alias": "splitlime_cf",
+        "name": "Ceasefire",
+        "color": "splitlime",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitlime player activates a system that contains 1 or more of your units: The splitlime player cannot move units to the active system. Then return this card to the splitlime player."
+    },
+    {
+        "alias": "splitlime_ps",
+        "name": "Political Secret",
+        "color": "splitlime",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitlime player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitlime player."
+    },
+    {
+        "alias": "splitlime_sftt",
+        "name": "Support for the Throne",
+        "color": "splitlime",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitlime player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitlime player's units, or if the splitlime player is eliminated, lose 1 victory point and return this card to the splitlime player."
+    },
+    {
+        "alias": "splitlime_ta",
+        "name": "Trade Agreement",
+        "color": "splitlime",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitlime player replenishes commodities: The splitlime player gives you all of their commodities. Then, return this card to the splitlime player."
+    },
+    {
+        "alias": "splitlime_an",
+        "name": "Alliance",
+        "color": "splitlime",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitlime player, you must place it faceup in your play area. While this card is in your play area, you can use the splitlime player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitlime player's units, return this card to the splitlime player."
+    },
+    {
+        "alias": "splittan_cf",
+        "name": "Ceasefire",
+        "color": "splittan",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splittan player activates a system that contains 1 or more of your units: The splittan player cannot move units to the active system. Then return this card to the splittan player."
+    },
+    {
+        "alias": "splittan_ps",
+        "name": "Political Secret",
+        "color": "splittan",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splittan player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splittan player."
+    },
+    {
+        "alias": "splittan_sftt",
+        "name": "Support for the Throne",
+        "color": "splittan",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splittan player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splittan player's units, or if the splittan player is eliminated, lose 1 victory point and return this card to the splittan player."
+    },
+    {
+        "alias": "splittan_ta",
+        "name": "Trade Agreement",
+        "color": "splittan",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splittan player replenishes commodities: The splittan player gives you all of their commodities. Then, return this card to the splittan player."
+    },
+    {
+        "alias": "splittan_an",
+        "name": "Alliance",
+        "color": "splittan",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splittan player, you must place it faceup in your play area. While this card is in your play area, you can use the splittan player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splittan player's units, return this card to the splittan player."
+    },
+    {
+        "alias": "splitteal_cf",
+        "name": "Ceasefire",
+        "color": "splitteal",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitteal player activates a system that contains 1 or more of your units: The splitteal player cannot move units to the active system. Then return this card to the splitteal player."
+    },
+    {
+        "alias": "splitteal_ps",
+        "name": "Political Secret",
+        "color": "splitteal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitteal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitteal player."
+    },
+    {
+        "alias": "splitteal_sftt",
+        "name": "Support for the Throne",
+        "color": "splitteal",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitteal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitteal player's units, or if the splitteal player is eliminated, lose 1 victory point and return this card to the splitteal player."
+    },
+    {
+        "alias": "splitteal_ta",
+        "name": "Trade Agreement",
+        "color": "splitteal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitteal player replenishes commodities: The splitteal player gives you all of their commodities. Then, return this card to the splitteal player."
+    },
+    {
+        "alias": "splitteal_an",
+        "name": "Alliance",
+        "color": "splitteal",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitteal player, you must place it faceup in your play area. While this card is in your play area, you can use the splitteal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitteal player's units, return this card to the splitteal player."
+    },
+    {
+        "alias": "splitturquoise_cf",
+        "name": "Ceasefire",
+        "color": "splitturquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitturquoise player activates a system that contains 1 or more of your units: The splitturquoise player cannot move units to the active system. Then return this card to the splitturquoise player."
+    },
+    {
+        "alias": "splitturquoise_ps",
+        "name": "Political Secret",
+        "color": "splitturquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitturquoise player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitturquoise player."
+    },
+    {
+        "alias": "splitturquoise_sftt",
+        "name": "Support for the Throne",
+        "color": "splitturquoise",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitturquoise player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitturquoise player's units, or if the splitturquoise player is eliminated, lose 1 victory point and return this card to the splitturquoise player."
+    },
+    {
+        "alias": "splitturquoise_ta",
+        "name": "Trade Agreement",
+        "color": "splitturquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitturquoise player replenishes commodities: The splitturquoise player gives you all of their commodities. Then, return this card to the splitturquoise player."
+    },
+    {
+        "alias": "splitturquoise_an",
+        "name": "Alliance",
+        "color": "splitturquoise",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitturquoise player, you must place it faceup in your play area. While this card is in your play area, you can use the splitturquoise player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitturquoise player's units, return this card to the splitturquoise player."
+    },
+    {
+        "alias": "splitbloodred_cf",
+        "name": "Ceasefire",
+        "color": "splitbloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitbloodred player activates a system that contains 1 or more of your units: The splitbloodred player cannot move units to the active system. Then return this card to the splitbloodred player."
+    },
+    {
+        "alias": "splitbloodred_ps",
+        "name": "Political Secret",
+        "color": "splitbloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitbloodred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitbloodred player."
+    },
+    {
+        "alias": "splitbloodred_sftt",
+        "name": "Support for the Throne",
+        "color": "splitbloodred",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitbloodred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitbloodred player's units, or if the splitbloodred player is eliminated, lose 1 victory point and return this card to the splitbloodred player."
+    },
+    {
+        "alias": "splitbloodred_ta",
+        "name": "Trade Agreement",
+        "color": "splitbloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitbloodred player replenishes commodities: The splitbloodred player gives you all of their commodities. Then, return this card to the splitbloodred player."
+    },
+    {
+        "alias": "splitbloodred_an",
+        "name": "Alliance",
+        "color": "splitbloodred",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitbloodred player, you must place it faceup in your play area. While this card is in your play area, you can use the splitbloodred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitbloodred player's units, return this card to the splitbloodred player."
+    },
+    {
+        "alias": "splitchocolate_cf",
+        "name": "Ceasefire",
+        "color": "splitchocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitchocolate player activates a system that contains 1 or more of your units: The splitchocolate player cannot move units to the active system. Then return this card to the splitchocolate player."
+    },
+    {
+        "alias": "splitchocolate_ps",
+        "name": "Political Secret",
+        "color": "splitchocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitchocolate player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitchocolate player."
+    },
+    {
+        "alias": "splitchocolate_sftt",
+        "name": "Support for the Throne",
+        "color": "splitchocolate",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitchocolate player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitchocolate player's units, or if the splitchocolate player is eliminated, lose 1 victory point and return this card to the splitchocolate player."
+    },
+    {
+        "alias": "splitchocolate_ta",
+        "name": "Trade Agreement",
+        "color": "splitchocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitchocolate player replenishes commodities: The splitchocolate player gives you all of their commodities. Then, return this card to the splitchocolate player."
+    },
+    {
+        "alias": "splitchocolate_an",
+        "name": "Alliance",
+        "color": "splitchocolate",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitchocolate player, you must place it faceup in your play area. While this card is in your play area, you can use the splitchocolate player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitchocolate player's units, return this card to the splitchocolate player."
+    },
+    {
+        "alias": "splitemerald_cf",
+        "name": "Ceasefire",
+        "color": "splitemerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitemerald player activates a system that contains 1 or more of your units: The splitemerald player cannot move units to the active system. Then return this card to the splitemerald player."
+    },
+    {
+        "alias": "splitemerald_ps",
+        "name": "Political Secret",
+        "color": "splitemerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitemerald player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitemerald player."
+    },
+    {
+        "alias": "splitemerald_sftt",
+        "name": "Support for the Throne",
+        "color": "splitemerald",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitemerald player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitemerald player's units, or if the splitemerald player is eliminated, lose 1 victory point and return this card to the splitemerald player."
+    },
+    {
+        "alias": "splitemerald_ta",
+        "name": "Trade Agreement",
+        "color": "splitemerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitemerald player replenishes commodities: The splitemerald player gives you all of their commodities. Then, return this card to the splitemerald player."
+    },
+    {
+        "alias": "splitemerald_an",
+        "name": "Alliance",
+        "color": "splitemerald",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitemerald player, you must place it faceup in your play area. While this card is in your play area, you can use the splitemerald player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitemerald player's units, return this card to the splitemerald player."
+    },
+    {
+        "alias": "splitnavy_cf",
+        "name": "Ceasefire",
+        "color": "splitnavy",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitnavy player activates a system that contains 1 or more of your units: The splitnavy player cannot move units to the active system. Then return this card to the splitnavy player."
+    },
+    {
+        "alias": "splitnavy_ps",
+        "name": "Political Secret",
+        "color": "splitnavy",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitnavy player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitnavy player."
+    },
+    {
+        "alias": "splitnavy_sftt",
+        "name": "Support for the Throne",
+        "color": "splitnavy",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitnavy player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitnavy player's units, or if the splitnavy player is eliminated, lose 1 victory point and return this card to the splitnavy player."
+    },
+    {
+        "alias": "splitnavy_ta",
+        "name": "Trade Agreement",
+        "color": "splitnavy",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitnavy player replenishes commodities: The splitnavy player gives you all of their commodities. Then, return this card to the splitnavy player."
+    },
+    {
+        "alias": "splitnavy_an",
+        "name": "Alliance",
+        "color": "splitnavy",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitnavy player, you must place it faceup in your play area. While this card is in your play area, you can use the splitnavy player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitnavy player's units, return this card to the splitnavy player."
+    },
+    {
+        "alias": "splitpetrol_cf",
+        "name": "Ceasefire",
+        "color": "splitpetrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitpetrol player activates a system that contains 1 or more of your units: The splitpetrol player cannot move units to the active system. Then return this card to the splitpetrol player."
+    },
+    {
+        "alias": "splitpetrol_ps",
+        "name": "Political Secret",
+        "color": "splitpetrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitpetrol player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpetrol player."
+    },
+    {
+        "alias": "splitpetrol_sftt",
+        "name": "Support for the Throne",
+        "color": "splitpetrol",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitpetrol player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpetrol player's units, or if the splitpetrol player is eliminated, lose 1 victory point and return this card to the splitpetrol player."
+    },
+    {
+        "alias": "splitpetrol_ta",
+        "name": "Trade Agreement",
+        "color": "splitpetrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitpetrol player replenishes commodities: The splitpetrol player gives you all of their commodities. Then, return this card to the splitpetrol player."
+    },
+    {
+        "alias": "splitpetrol_an",
+        "name": "Alliance",
+        "color": "splitpetrol",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitpetrol player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpetrol player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpetrol player's units, return this card to the splitpetrol player."
+    },
+    {
+        "alias": "splitrainbow_cf",
+        "name": "Ceasefire",
+        "color": "splitrainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitrainbow player activates a system that contains 1 or more of your units: The splitrainbow player cannot move units to the active system. Then return this card to the splitrainbow player."
+    },
+    {
+        "alias": "splitrainbow_ps",
+        "name": "Political Secret",
+        "color": "splitrainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitrainbow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitrainbow player."
+    },
+    {
+        "alias": "splitrainbow_sftt",
+        "name": "Support for the Throne",
+        "color": "splitrainbow",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitrainbow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitrainbow player's units, or if the splitrainbow player is eliminated, lose 1 victory point and return this card to the splitrainbow player."
+    },
+    {
+        "alias": "splitrainbow_ta",
+        "name": "Trade Agreement",
+        "color": "splitrainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitrainbow player replenishes commodities: The splitrainbow player gives you all of their commodities. Then, return this card to the splitrainbow player."
+    },
+    {
+        "alias": "splitrainbow_an",
+        "name": "Alliance",
+        "color": "splitrainbow",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitrainbow player, you must place it faceup in your play area. While this card is in your play area, you can use the splitrainbow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitrainbow player's units, return this card to the splitrainbow player."
+    },
+    {
+        "alias": "splitred_cf",
+        "name": "Ceasefire",
+        "color": "splitred",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitred player activates a system that contains 1 or more of your units: The splitred player cannot move units to the active system. Then return this card to the splitred player."
+    },
+    {
+        "alias": "splitred_ps",
+        "name": "Political Secret",
+        "color": "splitred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitred player."
+    },
+    {
+        "alias": "splitred_sftt",
+        "name": "Support for the Throne",
+        "color": "splitred",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitred player's units, or if the splitred player is eliminated, lose 1 victory point and return this card to the splitred player."
+    },
+    {
+        "alias": "splitred_ta",
+        "name": "Trade Agreement",
+        "color": "splitred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitred player replenishes commodities: The splitred player gives you all of their commodities. Then, return this card to the splitred player."
+    },
+    {
+        "alias": "splitred_an",
+        "name": "Alliance",
+        "color": "splitred",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitred player, you must place it faceup in your play area. While this card is in your play area, you can use the splitred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitred player's units, return this card to the splitred player."
+    },
+    {
+        "alias": "splitblue_cf",
+        "name": "Ceasefire",
+        "color": "splitblue",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitblue player activates a system that contains 1 or more of your units: The splitblue player cannot move units to the active system. Then return this card to the splitblue player."
+    },
+    {
+        "alias": "splitblue_ps",
+        "name": "Political Secret",
+        "color": "splitblue",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitblue player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitblue player."
+    },
+    {
+        "alias": "splitblue_sftt",
+        "name": "Support for the Throne",
+        "color": "splitblue",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitblue player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitblue player's units, or if the splitblue player is eliminated, lose 1 victory point and return this card to the splitblue player."
+    },
+    {
+        "alias": "splitblue_ta",
+        "name": "Trade Agreement",
+        "color": "splitblue",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitblue player replenishes commodities: The splitblue player gives you all of their commodities. Then, return this card to the splitblue player."
+    },
+    {
+        "alias": "splitblue_an",
+        "name": "Alliance",
+        "color": "splitblue",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitblue player, you must place it faceup in your play area. While this card is in your play area, you can use the splitblue player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitblue player's units, return this card to the splitblue player."
+    },
+    {
+        "alias": "splitgreen_cf",
+        "name": "Ceasefire",
+        "color": "splitgreen",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitgreen player activates a system that contains 1 or more of your units: The splitgreen player cannot move units to the active system. Then return this card to the splitgreen player."
+    },
+    {
+        "alias": "splitgreen_ps",
+        "name": "Political Secret",
+        "color": "splitgreen",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitgreen player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitgreen player."
+    },
+    {
+        "alias": "splitgreen_sftt",
+        "name": "Support for the Throne",
+        "color": "splitgreen",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitgreen player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitgreen player's units, or if the splitgreen player is eliminated, lose 1 victory point and return this card to the splitgreen player."
+    },
+    {
+        "alias": "splitgreen_ta",
+        "name": "Trade Agreement",
+        "color": "splitgreen",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitgreen player replenishes commodities: The splitgreen player gives you all of their commodities. Then, return this card to the splitgreen player."
+    },
+    {
+        "alias": "splitgreen_an",
+        "name": "Alliance",
+        "color": "splitgreen",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitgreen player, you must place it faceup in your play area. While this card is in your play area, you can use the splitgreen player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitgreen player's units, return this card to the splitgreen player."
+    },
+    {
+        "alias": "splityellow_cf",
+        "name": "Ceasefire",
+        "color": "splityellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splityellow player activates a system that contains 1 or more of your units: The splityellow player cannot move units to the active system. Then return this card to the splityellow player."
+    },
+    {
+        "alias": "splityellow_ps",
+        "name": "Political Secret",
+        "color": "splityellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splityellow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splityellow player."
+    },
+    {
+        "alias": "splityellow_sftt",
+        "name": "Support for the Throne",
+        "color": "splityellow",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splityellow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splityellow player's units, or if the splityellow player is eliminated, lose 1 victory point and return this card to the splityellow player."
+    },
+    {
+        "alias": "splityellow_ta",
+        "name": "Trade Agreement",
+        "color": "splityellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splityellow player replenishes commodities: The splityellow player gives you all of their commodities. Then, return this card to the splityellow player."
+    },
+    {
+        "alias": "splityellow_an",
+        "name": "Alliance",
+        "color": "splityellow",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splityellow player, you must place it faceup in your play area. While this card is in your play area, you can use the splityellow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splityellow player's units, return this card to the splityellow player."
+    },
+    {
+        "alias": "splitorange_cf",
+        "name": "Ceasefire",
+        "color": "splitorange",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitorange player activates a system that contains 1 or more of your units: The splitorange player cannot move units to the active system. Then return this card to the splitorange player."
+    },
+    {
+        "alias": "splitorange_ps",
+        "name": "Political Secret",
+        "color": "splitorange",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitorange player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitorange player."
+    },
+    {
+        "alias": "splitorange_sftt",
+        "name": "Support for the Throne",
+        "color": "splitorange",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitorange player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitorange player's units, or if the splitorange player is eliminated, lose 1 victory point and return this card to the splitorange player."
+    },
+    {
+        "alias": "splitorange_ta",
+        "name": "Trade Agreement",
+        "color": "splitorange",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitorange player replenishes commodities: The splitorange player gives you all of their commodities. Then, return this card to the splitorange player."
+    },
+    {
+        "alias": "splitorange_an",
+        "name": "Alliance",
+        "color": "splitorange",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitorange player, you must place it faceup in your play area. While this card is in your play area, you can use the splitorange player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitorange player's units, return this card to the splitorange player."
+    },
+    {
+        "alias": "splitpurple_cf",
+        "name": "Ceasefire",
+        "color": "splitpurple",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitpurple player activates a system that contains 1 or more of your units: The splitpurple player cannot move units to the active system. Then return this card to the splitpurple player."
+    },
+    {
+        "alias": "splitpurple_ps",
+        "name": "Political Secret",
+        "color": "splitpurple",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitpurple player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpurple player."
+    },
+    {
+        "alias": "splitpurple_sftt",
+        "name": "Support for the Throne",
+        "color": "splitpurple",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitpurple player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpurple player's units, or if the splitpurple player is eliminated, lose 1 victory point and return this card to the splitpurple player."
+    },
+    {
+        "alias": "splitpurple_ta",
+        "name": "Trade Agreement",
+        "color": "splitpurple",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitpurple player replenishes commodities: The splitpurple player gives you all of their commodities. Then, return this card to the splitpurple player."
+    },
+    {
+        "alias": "splitpurple_an",
+        "name": "Alliance",
+        "color": "splitpurple",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitpurple player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpurple player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpurple player's units, return this card to the splitpurple player."
+    },
+    {
+        "alias": "splitpink_cf",
+        "name": "Ceasefire",
+        "color": "splitpink",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the splitpink player activates a system that contains 1 or more of your units: The splitpink player cannot move units to the active system. Then return this card to the splitpink player."
+    },
+    {
+        "alias": "splitpink_ps",
+        "name": "Political Secret",
+        "color": "splitpink",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The splitpink player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the splitpink player."
+    },
+    {
+        "alias": "splitpink_sftt",
+        "name": "Support for the Throne",
+        "color": "splitpink",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the splitpink player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the splitpink player's units, or if the splitpink player is eliminated, lose 1 victory point and return this card to the splitpink player."
+    },
+    {
+        "alias": "splitpink_ta",
+        "name": "Trade Agreement",
+        "color": "splitpink",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the splitpink player replenishes commodities: The splitpink player gives you all of their commodities. Then, return this card to the splitpink player."
+    },
+    {
+        "alias": "splitpink_an",
+        "name": "Alliance",
+        "color": "splitpink",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the splitpink player, you must place it faceup in your play area. While this card is in your play area, you can use the splitpink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the splitpink player's units, return this card to the splitpink player."
+    },
+    {
+        "alias": "orca_cf",
+        "name": "Ceasefire",
+        "color": "orca",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the orca player activates a system that contains 1 or more of your units: The orca player cannot move units to the active system. Then return this card to the orca player."
+    },
+    {
+        "alias": "orca_ps",
+        "name": "Political Secret",
+        "color": "orca",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The orca player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the orca player."
+    },
+    {
+        "alias": "orca_sftt",
+        "name": "Support for the Throne",
+        "color": "orca",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the orca player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the orca player's units, or if the orca player is eliminated, lose 1 victory point and return this card to the orca player."
+    },
+    {
+        "alias": "orca_ta",
+        "name": "Trade Agreement",
+        "color": "orca",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the orca player replenishes commodities: The orca player gives you all of their commodities. Then, return this card to the orca player."
+    },
+    {
+        "alias": "orca_an",
+        "name": "Alliance",
+        "color": "orca",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the orca player, you must place it faceup in your play area. While this card is in your play area, you can use the orca player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the orca player's units, return this card to the orca player."
+    },
+    {
+        "alias": "rainbow_cf",
+        "name": "Ceasefire",
+        "color": "rainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the rainbow player activates a system that contains 1 or more of your units: The rainbow player cannot move units to the active system. Then return this card to the rainbow player."
+    },
+    {
+        "alias": "rainbow_ps",
+        "name": "Political Secret",
+        "color": "rainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The rainbow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the rainbow player."
+    },
+    {
+        "alias": "rainbow_sftt",
+        "name": "Support for the Throne",
+        "color": "rainbow",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the rainbow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the rainbow player's units, or if the rainbow player is eliminated, lose 1 victory point and return this card to the rainbow player."
+    },
+    {
+        "alias": "rainbow_ta",
+        "name": "Trade Agreement",
+        "color": "rainbow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the rainbow player replenishes commodities: The rainbow player gives you all of their commodities. Then, return this card to the rainbow player."
+    },
+    {
+        "alias": "rainbow_an",
+        "name": "Alliance",
+        "color": "rainbow",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the rainbow player, you must place it faceup in your play area. While this card is in your play area, you can use the rainbow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the rainbow player's units, return this card to the rainbow player."
+    },
+    {
+        "alias": "lime_cf",
+        "name": "Ceasefire",
+        "color": "lime",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the lime player activates a system that contains 1 or more of your units: The lime player cannot move units to the active system. Then return this card to the lime player."
+    },
+    {
+        "alias": "lime_ps",
+        "name": "Political Secret",
+        "color": "lime",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The lime player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lime player."
+    },
+    {
+        "alias": "lime_sftt",
+        "name": "Support for the Throne",
+        "color": "lime",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the lime player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lime player's units, or if the lime player is eliminated, lose 1 victory point and return this card to the lime player."
+    },
+    {
+        "alias": "lime_ta",
+        "name": "Trade Agreement",
+        "color": "lime",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the lime player replenishes commodities: The lime player gives you all of their commodities. Then, return this card to the lime player."
+    },
+    {
+        "alias": "lime_an",
+        "name": "Alliance",
+        "color": "lime",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the lime player, you must place it faceup in your play area. While this card is in your play area, you can use the lime player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lime player's units, return this card to the lime player."
+    },
+    {
+        "alias": "lavender_cf",
+        "name": "Ceasefire",
+        "color": "lavender",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the lavender player activates a system that contains 1 or more of your units: The lavender player cannot move units to the active system. Then return this card to the lavender player."
+    },
+    {
+        "alias": "lavender_ps",
+        "name": "Political Secret",
+        "color": "lavender",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The lavender player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lavender player."
+    },
+    {
+        "alias": "lavender_sftt",
+        "name": "Support for the Throne",
+        "color": "lavender",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the lavender player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lavender player's units, or if the lavender player is eliminated, lose 1 victory point and return this card to the lavender player."
+    },
+    {
+        "alias": "lavender_ta",
+        "name": "Trade Agreement",
+        "color": "lavender",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the lavender player replenishes commodities: The lavender player gives you all of their commodities. Then, return this card to the lavender player."
+    },
+    {
+        "alias": "lavender_an",
+        "name": "Alliance",
+        "color": "lavender",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the lavender player, you must place it faceup in your play area. While this card is in your play area, you can use the lavender player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lavender player's units, return this card to the lavender player."
+    },
+    {
+        "alias": "bloodred_cf",
+        "name": "Ceasefire",
+        "color": "bloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the bloodred player activates a system that contains 1 or more of your units: The bloodred player cannot move units to the active system. Then return this card to the bloodred player."
+    },
+    {
+        "alias": "bloodred_ps",
+        "name": "Political Secret",
+        "color": "bloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The bloodred player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the bloodred player."
+    },
+    {
+        "alias": "bloodred_sftt",
+        "name": "Support for the Throne",
+        "color": "bloodred",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the bloodred player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the bloodred player's units, or if the bloodred player is eliminated, lose 1 victory point and return this card to the bloodred player."
+    },
+    {
+        "alias": "bloodred_ta",
+        "name": "Trade Agreement",
+        "color": "bloodred",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the bloodred player replenishes commodities: The bloodred player gives you all of their commodities. Then, return this card to the bloodred player."
+    },
+    {
+        "alias": "bloodred_an",
+        "name": "Alliance",
+        "color": "bloodred",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the bloodred player, you must place it faceup in your play area. While this card is in your play area, you can use the bloodred player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the bloodred player's units, return this card to the bloodred player."
+    },
+    {
+        "alias": "chocolate_cf",
+        "name": "Ceasefire",
+        "color": "chocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the chocolate player activates a system that contains 1 or more of your units: The chocolate player cannot move units to the active system. Then return this card to the chocolate player."
+    },
+    {
+        "alias": "chocolate_ps",
+        "name": "Political Secret",
+        "color": "chocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The chocolate player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the chocolate player."
+    },
+    {
+        "alias": "chocolate_sftt",
+        "name": "Support for the Throne",
+        "color": "chocolate",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the chocolate player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the chocolate player's units, or if the chocolate player is eliminated, lose 1 victory point and return this card to the chocolate player."
+    },
+    {
+        "alias": "chocolate_ta",
+        "name": "Trade Agreement",
+        "color": "chocolate",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the chocolate player replenishes commodities: The chocolate player gives you all of their commodities. Then, return this card to the chocolate player."
+    },
+    {
+        "alias": "chocolate_an",
+        "name": "Alliance",
+        "color": "chocolate",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the chocolate player, you must place it faceup in your play area. While this card is in your play area, you can use the chocolate player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the chocolate player's units, return this card to the chocolate player."
+    },
+    {
+        "alias": "emerald_cf",
+        "name": "Ceasefire",
+        "color": "emerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the emerald player activates a system that contains 1 or more of your units: The emerald player cannot move units to the active system. Then return this card to the emerald player."
+    },
+    {
+        "alias": "emerald_ps",
+        "name": "Political Secret",
+        "color": "emerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The emerald player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the emerald player."
+    },
+    {
+        "alias": "emerald_sftt",
+        "name": "Support for the Throne",
+        "color": "emerald",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the emerald player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the emerald player's units, or if the emerald player is eliminated, lose 1 victory point and return this card to the emerald player."
+    },
+    {
+        "alias": "emerald_ta",
+        "name": "Trade Agreement",
+        "color": "emerald",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the emerald player replenishes commodities: The emerald player gives you all of their commodities. Then, return this card to the emerald player."
+    },
+    {
+        "alias": "emerald_an",
+        "name": "Alliance",
+        "color": "emerald",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the emerald player, you must place it faceup in your play area. While this card is in your play area, you can use the emerald player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the emerald player's units, return this card to the emerald player."
+    },
+    {
+        "alias": "navy_cf",
+        "name": "Ceasefire",
+        "color": "navy",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the navy player activates a system that contains 1 or more of your units: The navy player cannot move units to the active system. Then return this card to the navy player."
+    },
+    {
+        "alias": "navy_ps",
+        "name": "Political Secret",
+        "color": "navy",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The navy player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the navy player."
+    },
+    {
+        "alias": "navy_sftt",
+        "name": "Support for the Throne",
+        "color": "navy",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the navy player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the navy player's units, or if the navy player is eliminated, lose 1 victory point and return this card to the navy player."
+    },
+    {
+        "alias": "navy_ta",
+        "name": "Trade Agreement",
+        "color": "navy",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the navy player replenishes commodities: The navy player gives you all of their commodities. Then, return this card to the navy player."
+    },
+    {
+        "alias": "navy_an",
+        "name": "Alliance",
+        "color": "navy",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the navy player, you must place it faceup in your play area. While this card is in your play area, you can use the navy player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the navy player's units, return this card to the navy player."
+    },
+    {
+        "alias": "rose_cf",
+        "name": "Ceasefire",
+        "color": "rose",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the rose player activates a system that contains 1 or more of your units: The rose player cannot move units to the active system. Then return this card to the rose player."
+    },
+    {
+        "alias": "rose_ps",
+        "name": "Political Secret",
+        "color": "rose",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The rose player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the rose player."
+    },
+    {
+        "alias": "rose_sftt",
+        "name": "Support for the Throne",
+        "color": "rose",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the rose player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the rose player's units, or if the rose player is eliminated, lose 1 victory point and return this card to the rose player."
+    },
+    {
+        "alias": "rose_ta",
+        "name": "Trade Agreement",
+        "color": "rose",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the rose player replenishes commodities: The rose player gives you all of their commodities. Then, return this card to the rose player."
+    },
+    {
+        "alias": "rose_an",
+        "name": "Alliance",
+        "color": "rose",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the rose player, you must place it faceup in your play area. While this card is in your play area, you can use the rose player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the rose player's units, return this card to the rose player."
+    },
+    {
+        "alias": "spring_cf",
+        "name": "Ceasefire",
+        "color": "spring",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the spring player activates a system that contains 1 or more of your units: The spring player cannot move units to the active system. Then return this card to the spring player."
+    },
+    {
+        "alias": "spring_ps",
+        "name": "Political Secret",
+        "color": "spring",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The spring player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the spring player."
+    },
+    {
+        "alias": "spring_sftt",
+        "name": "Support for the Throne",
+        "color": "spring",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the spring player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the spring player's units, or if the spring player is eliminated, lose 1 victory point and return this card to the spring player."
+    },
+    {
+        "alias": "spring_ta",
+        "name": "Trade Agreement",
+        "color": "spring",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the spring player replenishes commodities: The spring player gives you all of their commodities. Then, return this card to the spring player."
+    },
+    {
+        "alias": "spring_an",
+        "name": "Alliance",
+        "color": "spring",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the spring player, you must place it faceup in your play area. While this card is in your play area, you can use the spring player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the spring player's units, return this card to the spring player."
+    },
+    {
+        "alias": "teal_cf",
+        "name": "Ceasefire",
+        "color": "teal",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the teal player activates a system that contains 1 or more of your units: The teal player cannot move units to the active system. Then return this card to the teal player."
+    },
+    {
+        "alias": "teal_ps",
+        "name": "Political Secret",
+        "color": "teal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The teal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the teal player."
+    },
+    {
+        "alias": "teal_sftt",
+        "name": "Support for the Throne",
+        "color": "teal",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the teal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the teal player's units, or if the teal player is eliminated, lose 1 victory point and return this card to the teal player."
+    },
+    {
+        "alias": "teal_ta",
+        "name": "Trade Agreement",
+        "color": "teal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the teal player replenishes commodities: The teal player gives you all of their commodities. Then, return this card to the teal player."
+    },
+    {
+        "alias": "teal_an",
+        "name": "Alliance",
+        "color": "teal",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the teal player, you must place it faceup in your play area. While this card is in your play area, you can use the teal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the teal player's units, return this card to the teal player."
+    },
+    {
+        "alias": "brown_cf",
+        "name": "Ceasefire",
+        "color": "brown",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the brown player activates a system that contains 1 or more of your units: The brown player cannot move units to the active system. Then return this card to the brown player."
+    },
+    {
+        "alias": "brown_ps",
+        "name": "Political Secret",
+        "color": "brown",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The brown player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the brown player."
+    },
+    {
+        "alias": "brown_sftt",
+        "name": "Support for the Throne",
+        "color": "brown",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the brown player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the brown player's units, or if the brown player is eliminated, lose 1 victory point and return this card to the brown player."
+    },
+    {
+        "alias": "brown_ta",
+        "name": "Trade Agreement",
+        "color": "brown",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the brown player replenishes commodities: The brown player gives you all of their commodities. Then, return this card to the brown player."
+    },
+    {
+        "alias": "brown_an",
+        "name": "Alliance",
+        "color": "brown",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the brown player, you must place it faceup in your play area. While this card is in your play area, you can use the brown player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the brown player's units, return this card to the brown player."
+    },
+    {
+        "alias": "chrome_cf",
+        "name": "Ceasefire",
+        "color": "chrome",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the chrome player activates a system that contains 1 or more of your units: The chrome player cannot move units to the active system. Then return this card to the chrome player."
+    },
+    {
+        "alias": "chrome_ps",
+        "name": "Political Secret",
+        "color": "chrome",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The chrome player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the chrome player."
+    },
+    {
+        "alias": "chrome_sftt",
+        "name": "Support for the Throne",
+        "color": "chrome",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the chrome player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the chrome player's units, or if the chrome player is eliminated, lose 1 victory point and return this card to the chrome player."
+    },
+    {
+        "alias": "chrome_ta",
+        "name": "Trade Agreement",
+        "color": "chrome",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the chrome player replenishes commodities: The chrome player gives you all of their commodities. Then, return this card to the chrome player."
+    },
+    {
+        "alias": "chrome_an",
+        "name": "Alliance",
+        "color": "chrome",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the chrome player, you must place it faceup in your play area. While this card is in your play area, you can use the chrome player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the chrome player's units, return this card to the chrome player."
+    },
+    {
+        "alias": "forest_cf",
+        "name": "Ceasefire",
+        "color": "forest",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the forest player activates a system that contains 1 or more of your units: The forest player cannot move units to the active system. Then return this card to the forest player."
+    },
+    {
+        "alias": "forest_ps",
+        "name": "Political Secret",
+        "color": "forest",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The forest player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the forest player."
+    },
+    {
+        "alias": "forest_sftt",
+        "name": "Support for the Throne",
+        "color": "forest",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the forest player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the forest player's units, or if the forest player is eliminated, lose 1 victory point and return this card to the forest player."
+    },
+    {
+        "alias": "forest_ta",
+        "name": "Trade Agreement",
+        "color": "forest",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the forest player replenishes commodities: The forest player gives you all of their commodities. Then, return this card to the forest player."
+    },
+    {
+        "alias": "forest_an",
+        "name": "Alliance",
+        "color": "forest",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the forest player, you must place it faceup in your play area. While this card is in your play area, you can use the forest player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the forest player's units, return this card to the forest player."
+    },
+    {
+        "alias": "gold_cf",
+        "name": "Ceasefire",
+        "color": "gold",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the gold player activates a system that contains 1 or more of your units: The gold player cannot move units to the active system. Then return this card to the gold player."
+    },
+    {
+        "alias": "gold_ps",
+        "name": "Political Secret",
+        "color": "gold",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The gold player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the gold player."
+    },
+    {
+        "alias": "gold_sftt",
+        "name": "Support for the Throne",
+        "color": "gold",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the gold player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the gold player's units, or if the gold player is eliminated, lose 1 victory point and return this card to the gold player."
+    },
+    {
+        "alias": "gold_ta",
+        "name": "Trade Agreement",
+        "color": "gold",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the gold player replenishes commodities: The gold player gives you all of their commodities. Then, return this card to the gold player."
+    },
+    {
+        "alias": "gold_an",
+        "name": "Alliance",
+        "color": "gold",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the gold player, you must place it faceup in your play area. While this card is in your play area, you can use the gold player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the gold player's units, return this card to the gold player."
+    },
+    {
+        "alias": "lightgray_cf",
+        "name": "Ceasefire",
+        "color": "lightgray",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the lightgray player activates a system that contains 1 or more of your units: The lightgray player cannot move units to the active system. Then return this card to the lightgray player."
+    },
+    {
+        "alias": "lightgray_ps",
+        "name": "Political Secret",
+        "color": "lightgray",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The lightgray player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the lightgray player."
+    },
+    {
+        "alias": "lightgray_sftt",
+        "name": "Support for the Throne",
+        "color": "lightgray",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the lightgray player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the lightgray player's units, or if the lightgray player is eliminated, lose 1 victory point and return this card to the lightgray player."
+    },
+    {
+        "alias": "lightgray_ta",
+        "name": "Trade Agreement",
+        "color": "lightgray",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the lightgray player replenishes commodities: The lightgray player gives you all of their commodities. Then, return this card to the lightgray player."
+    },
+    {
+        "alias": "lightgray_an",
+        "name": "Alliance",
+        "color": "lightgray",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the lightgray player, you must place it faceup in your play area. While this card is in your play area, you can use the lightgray player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the lightgray player's units, return this card to the lightgray player."
+    },
+    {
+        "alias": "petrol_cf",
+        "name": "Ceasefire",
+        "color": "petrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the petrol player activates a system that contains 1 or more of your units: The petrol player cannot move units to the active system. Then return this card to the petrol player."
+    },
+    {
+        "alias": "petrol_ps",
+        "name": "Political Secret",
+        "color": "petrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The petrol player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the petrol player."
+    },
+    {
+        "alias": "petrol_sftt",
+        "name": "Support for the Throne",
+        "color": "petrol",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the petrol player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the petrol player's units, or if the petrol player is eliminated, lose 1 victory point and return this card to the petrol player."
+    },
+    {
+        "alias": "petrol_ta",
+        "name": "Trade Agreement",
+        "color": "petrol",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the petrol player replenishes commodities: The petrol player gives you all of their commodities. Then, return this card to the petrol player."
+    },
+    {
+        "alias": "petrol_an",
+        "name": "Alliance",
+        "color": "petrol",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the petrol player, you must place it faceup in your play area. While this card is in your play area, you can use the petrol player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the petrol player's units, return this card to the petrol player."
+    },
+    {
+        "alias": "sunset_cf",
+        "name": "Ceasefire",
+        "color": "sunset",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the sunset player activates a system that contains 1 or more of your units: The sunset player cannot move units to the active system. Then return this card to the sunset player."
+    },
+    {
+        "alias": "sunset_ps",
+        "name": "Political Secret",
+        "color": "sunset",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The sunset player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the sunset player."
+    },
+    {
+        "alias": "sunset_sftt",
+        "name": "Support for the Throne",
+        "color": "sunset",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the sunset player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the sunset player's units, or if the sunset player is eliminated, lose 1 victory point and return this card to the sunset player."
+    },
+    {
+        "alias": "sunset_ta",
+        "name": "Trade Agreement",
+        "color": "sunset",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the sunset player replenishes commodities: The sunset player gives you all of their commodities. Then, return this card to the sunset player."
+    },
+    {
+        "alias": "sunset_an",
+        "name": "Alliance",
+        "color": "sunset",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the sunset player, you must place it faceup in your play area. While this card is in your play area, you can use the sunset player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the sunset player's units, return this card to the sunset player."
+    },
+    {
+        "alias": "tan_cf",
+        "name": "Ceasefire",
+        "color": "tan",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the tan player activates a system that contains 1 or more of your units: The tan player cannot move units to the active system. Then return this card to the tan player."
+    },
+    {
+        "alias": "tan_ps",
+        "name": "Political Secret",
+        "color": "tan",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The tan player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the tan player."
+    },
+    {
+        "alias": "tan_sftt",
+        "name": "Support for the Throne",
+        "color": "tan",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the tan player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the tan player's units, or if the tan player is eliminated, lose 1 victory point and return this card to the tan player."
+    },
+    {
+        "alias": "tan_ta",
+        "name": "Trade Agreement",
+        "color": "tan",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the tan player replenishes commodities: The tan player gives you all of their commodities. Then, return this card to the tan player."
+    },
+    {
+        "alias": "tan_an",
+        "name": "Alliance",
+        "color": "tan",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the tan player, you must place it faceup in your play area. While this card is in your play area, you can use the tan player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the tan player's units, return this card to the tan player."
+    },
+    {
+        "alias": "turquoise_cf",
+        "name": "Ceasefire",
+        "color": "turquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the turquoise player activates a system that contains 1 or more of your units: The turquoise player cannot move units to the active system. Then return this card to the turquoise player."
+    },
+    {
+        "alias": "turquoise_ps",
+        "name": "Political Secret",
+        "color": "turquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The turquoise player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the turquoise player."
+    },
+    {
+        "alias": "turquoise_sftt",
+        "name": "Support for the Throne",
+        "color": "turquoise",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the turquoise player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the turquoise player's units, or if the turquoise player is eliminated, lose 1 victory point and return this card to the turquoise player."
+    },
+    {
+        "alias": "turquoise_ta",
+        "name": "Trade Agreement",
+        "color": "turquoise",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the turquoise player replenishes commodities: The turquoise player gives you all of their commodities. Then, return this card to the turquoise player."
+    },
+    {
+        "alias": "turquoise_an",
+        "name": "Alliance",
+        "color": "turquoise",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the turquoise player, you must place it faceup in your play area. While this card is in your play area, you can use the turquoise player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the turquoise player's units, return this card to the turquoise player."
+    },
+    {
+        "alias": "purple_cf",
+        "name": "Ceasefire",
+        "color": "purple",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the purple player activates a system that contains 1 or more of your units: The purple player cannot move units to the active system. Then return this card to the purple player."
+    },
+    {
+        "alias": "purple_ps",
+        "name": "Political Secret",
+        "color": "purple",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The purple player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the purple player."
+    },
+    {
+        "alias": "purple_sftt",
+        "name": "Support for the Throne",
+        "color": "purple",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the purple player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the purple player's units, or if the purple player is eliminated, lose 1 victory point and return this card to the purple player."
+    },
+    {
+        "alias": "purple_ta",
+        "name": "Trade Agreement",
+        "color": "purple",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the purple player replenishes commodities: The purple player gives you all of their commodities. Then, return this card to the purple player."
+    },
+    {
+        "alias": "purple_an",
+        "name": "Alliance",
+        "color": "purple",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the purple player, you must place it faceup in your play area. While this card is in your play area, you can use the purple player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the purple player's units, return this card to the purple player."
+    },
+    {
+        "alias": "pink_cf",
+        "name": "Ceasefire",
+        "color": "pink",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the pink player activates a system that contains 1 or more of your units: The pink player cannot move units to the active system. Then return this card to the pink player."
+    },
+    {
+        "alias": "pink_ps",
+        "name": "Political Secret",
+        "color": "pink",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The pink player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the pink player."
+    },
+    {
+        "alias": "pink_sftt",
+        "name": "Support for the Throne",
+        "color": "pink",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the pink player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the pink player's units, or if the pink player is eliminated, lose 1 victory point and return this card to the pink player."
+    },
+    {
+        "alias": "pink_ta",
+        "name": "Trade Agreement",
+        "color": "pink",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the pink player replenishes commodities: The pink player gives you all of their commodities. Then, return this card to the pink player."
+    },
+    {
+        "alias": "pink_an",
+        "name": "Alliance",
+        "color": "pink",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the pink player, you must place it faceup in your play area. While this card is in your play area, you can use the pink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the pink player's units, return this card to the pink player."
+    },
+    {
+        "alias": "blue_cf",
+        "name": "Ceasefire",
+        "color": "blue",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the blue player activates a system that contains 1 or more of your units: The blue player cannot move units to the active system. Then return this card to the blue player."
+    },
+    {
+        "alias": "blue_ps",
+        "name": "Political Secret",
+        "color": "blue",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The blue player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the blue player."
+    },
+    {
+        "alias": "blue_sftt",
+        "name": "Support for the Throne",
+        "color": "blue",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the blue player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the blue player's units, or if the blue player is eliminated, lose 1 victory point and return this card to the blue player."
+    },
+    {
+        "alias": "blue_ta",
+        "name": "Trade Agreement",
+        "color": "blue",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the blue player replenishes commodities: The blue player gives you all of their commodities. Then, return this card to the blue player."
+    },
+    {
+        "alias": "blue_an",
+        "name": "Alliance",
+        "color": "blue",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the blue player, you must place it faceup in your play area. While this card is in your play area, you can use the blue player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the blue player's units, return this card to the blue player."
+    },
+    {
+        "alias": "green_cf",
+        "name": "Ceasefire",
+        "color": "green",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the green player activates a system that contains 1 or more of your units: The green player cannot move units to the active system. Then return this card to the green player."
+    },
+    {
+        "alias": "green_ps",
+        "name": "Political Secret",
+        "color": "green",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The green player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the green player."
+    },
+    {
+        "alias": "green_sftt",
+        "name": "Support for the Throne",
+        "color": "green",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the green player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the green player's units, or if the green player is eliminated, lose 1 victory point and return this card to the green player."
+    },
+    {
+        "alias": "green_ta",
+        "name": "Trade Agreement",
+        "color": "green",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the green player replenishes commodities: The green player gives you all of their commodities. Then, return this card to the green player."
+    },
+    {
+        "alias": "green_an",
+        "name": "Alliance",
+        "color": "green",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the green player, you must place it faceup in your play area. While this card is in your play area, you can use the green player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the green player's units, return this card to the green player."
+    },
+    {
+        "alias": "gray_cf",
+        "name": "Ceasefire",
+        "color": "gray",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the gray player activates a system that contains 1 or more of your units: The gray player cannot move units to the active system. Then return this card to the gray player."
+    },
+    {
+        "alias": "gray_ps",
+        "name": "Political Secret",
+        "color": "gray",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The gray player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the gray player."
+    },
+    {
+        "alias": "gray_sftt",
+        "name": "Support for the Throne",
+        "color": "gray",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the gray player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the gray player's units, or if the gray player is eliminated, lose 1 victory point and return this card to the gray player."
+    },
+    {
+        "alias": "gray_ta",
+        "name": "Trade Agreement",
+        "color": "gray",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the gray player replenishes commodities: The gray player gives you all of their commodities. Then, return this card to the gray player."
+    },
+    {
+        "alias": "gray_an",
+        "name": "Alliance",
+        "color": "gray",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the gray player, you must place it faceup in your play area. While this card is in your play area, you can use the gray player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the gray player's units, return this card to the gray player."
+    },
+    {
+        "alias": "red_cf",
+        "name": "Ceasefire",
+        "color": "red",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the red player activates a system that contains 1 or more of your units: The red player cannot move units to the active system. Then return this card to the red player."
+    },
+    {
+        "alias": "red_ps",
+        "name": "Political Secret",
+        "color": "red",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The red player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the red player."
+    },
+    {
+        "alias": "red_sftt",
+        "name": "Support for the Throne",
+        "color": "red",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the red player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the red player's units, or if the red player is eliminated, lose 1 victory point and return this card to the red player."
+    },
+    {
+        "alias": "red_ta",
+        "name": "Trade Agreement",
+        "color": "red",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the red player replenishes commodities: The red player gives you all of their commodities. Then, return this card to the red player."
+    },
+    {
+        "alias": "red_an",
+        "name": "Alliance",
+        "color": "red",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the red player, you must place it faceup in your play area. While this card is in your play area, you can use the red player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the red player's units, return this card to the red player."
+    },
+    {
+        "alias": "yellow_cf",
+        "name": "Ceasefire",
+        "color": "yellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the yellow player activates a system that contains 1 or more of your units: The yellow player cannot move units to the active system. Then return this card to the yellow player."
+    },
+    {
+        "alias": "yellow_ps",
+        "name": "Political Secret",
+        "color": "yellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The yellow player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the yellow player."
+    },
+    {
+        "alias": "yellow_sftt",
+        "name": "Support for the Throne",
+        "color": "yellow",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the yellow player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the yellow player's units, or if the yellow player is eliminated, lose 1 victory point and return this card to the yellow player."
+    },
+    {
+        "alias": "yellow_ta",
+        "name": "Trade Agreement",
+        "color": "yellow",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the yellow player replenishes commodities: The yellow player gives you all of their commodities. Then, return this card to the yellow player."
+    },
+    {
+        "alias": "yellow_an",
+        "name": "Alliance",
+        "color": "yellow",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the yellow player, you must place it faceup in your play area. While this card is in your play area, you can use the yellow player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the yellow player's units, return this card to the yellow player."
+    },
+    {
+        "alias": "black_cf",
+        "name": "Ceasefire",
+        "color": "black",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the black player activates a system that contains 1 or more of your units: The black player cannot move units to the active system. Then return this card to the black player."
+    },
+    {
+        "alias": "black_ps",
+        "name": "Political Secret",
+        "color": "black",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The black player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the black player."
+    },
+    {
+        "alias": "black_sftt",
+        "name": "Support for the Throne",
+        "color": "black",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the black player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the black player's units, or if the black player is eliminated, lose 1 victory point and return this card to the black player."
+    },
+    {
+        "alias": "black_ta",
+        "name": "Trade Agreement",
+        "color": "black",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the black player replenishes commodities: The black player gives you all of their commodities. Then, return this card to the black player."
+    },
+    {
+        "alias": "black_an",
+        "name": "Alliance",
+        "color": "black",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the black player, you must place it faceup in your play area. While this card is in your play area, you can use the black player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the black player's units, return this card to the black player."
+    },
+    {
+        "alias": "orange_cf",
+        "name": "Ceasefire",
+        "color": "orange",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the orange player activates a system that contains 1 or more of your units: The orange player cannot move units to the active system. Then return this card to the orange player."
+    },
+    {
+        "alias": "orange_ps",
+        "name": "Political Secret",
+        "color": "orange",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The orange player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the orange player."
+    },
+    {
+        "alias": "orange_sftt",
+        "name": "Support for the Throne",
+        "color": "orange",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the orange player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the orange player's units, or if the orange player is eliminated, lose 1 victory point and return this card to the orange player."
+    },
+    {
+        "alias": "orange_ta",
+        "name": "Trade Agreement",
+        "color": "orange",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the orange player replenishes commodities: The orange player gives you all of their commodities. Then, return this card to the orange player."
+    },
+    {
+        "alias": "orange_an",
+        "name": "Alliance",
+        "color": "orange",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the orange player, you must place it faceup in your play area. While this card is in your play area, you can use the orange player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the orange player's units, return this card to the orange player."
+    },
+    {
+        "alias": "ethereal_cf",
+        "name": "Ceasefire",
+        "color": "ethereal",
+        "playArea": "false",
+        "source": "base",
+        "text": "After the ethereal player activates a system that contains 1 or more of your units: The ethereal player cannot move units to the active system. Then return this card to the ethereal player."
+    },
+    {
+        "alias": "ethereal_ps",
+        "name": "Political Secret",
+        "color": "ethereal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When an agenda is revealed: The ethereal player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the ethereal player."
+    },
+    {
+        "alias": "ethereal_sftt",
+        "name": "Support for the Throne",
+        "color": "ethereal",
+        "playArea": "true",
+        "source": "base",
+        "text": "When you receive this card, if you are not the ethereal player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the ethereal player's units, or if the ethereal player is eliminated, lose 1 victory point and return this card to the ethereal player."
+    },
+    {
+        "alias": "ethereal_ta",
+        "name": "Trade Agreement",
+        "color": "ethereal",
+        "playArea": "false",
+        "source": "base",
+        "text": "When the ethereal player replenishes commodities: The ethereal player gives you all of their commodities. Then, return this card to the ethereal player."
+    },
+    {
+        "alias": "ethereal_an",
+        "name": "Alliance",
+        "color": "ethereal",
+        "playArea": "true",
+        "source": "pok",
+        "text": "When you receive this card, if you are not the ethereal player, you must place it faceup in your play area. While this card is in your play area, you can use the ethereal player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the ethereal player's units, return this card to the ethereal player."
+    }
+]
