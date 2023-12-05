@@ -2720,9 +2720,8 @@ public class ButtonListener extends ListenerAdapter {
                     if (player == null || activeGame == null) {
                         break;
                     }
-                    if (!player.getSCs().contains(8)) {
-                        MessageHelper.sendMessageToChannel(privateChannel, "Only the player who has "
-                            + Helper.getSCRepresentation(activeGame, 8) + " can score the Imperial point");
+                    if (!player.getPlanetsAllianceMode().contains("mr")) {
+                        MessageHelper.sendMessageToChannel(privateChannel, "Only the player who controls Rex can score the Imperial point");
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID + "score_imperial", activeGame, player, event, " scored Imperial");

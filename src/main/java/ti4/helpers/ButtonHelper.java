@@ -735,7 +735,7 @@ public class ButtonHelper {
     public static void payForTech(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
-        List<Button> buttons = getExhaustButtonsWithTG(activeGame, player, event);
+        List<Button> buttons = getExhaustButtonsWithTG(activeGame, player, event, "res");
         String tech = buttonID.split("_")[1];
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
         if ("unitupgrade".equalsIgnoreCase(techM.getType().toString()) && player.hasTechReady("aida")) {
