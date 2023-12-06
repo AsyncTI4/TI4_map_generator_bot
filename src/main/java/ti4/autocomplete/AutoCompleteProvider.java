@@ -804,6 +804,17 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }
             }
+            case Constants.SEARCH_FACTIONS -> {
+                if (optionName.equals(Constants.SEARCH)) {
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = Mapper.getFactions().stream()
+                        .filter(entry -> entry.search(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
             case Constants.SEARCH_LEADERS -> {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
