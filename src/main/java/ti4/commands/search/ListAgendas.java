@@ -26,11 +26,12 @@ public class ListAgendas extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
         if (Mapper.isValidAgenda(searchString)) {
-            event.getChannel().sendMessage(Helper.getAgendaRepresentation(searchString)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
+
         for (AgendaModel model : Mapper.getAgendas().values()) {
             MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
