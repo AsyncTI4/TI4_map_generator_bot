@@ -32,7 +32,6 @@ import ti4.commands.agenda.PutAgendaBottom;
 import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
@@ -66,6 +65,7 @@ import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
+import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
@@ -141,7 +141,7 @@ public class ButtonListener extends ListenerAdapter {
         String messageID = event.getMessage().getId();
 
         String gameName = event.getChannel().getName();
-        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+        gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
         Game activeGame = GameManager.getInstance().getGame(gameName);

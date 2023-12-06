@@ -24,7 +24,7 @@ import ti4.model.ActionCardModel;
 
 public class ACInfo extends ACCardsSubcommandData {
     public ACInfo() {
-        super(Constants.INFO + 2, "Send Action Cards to your Cards Info thread");
+        super(Constants.INFO, "Send Action Cards to your Cards Info thread");
     }
 
     @Override

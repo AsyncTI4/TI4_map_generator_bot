@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Units.UnitKey;
@@ -57,7 +56,7 @@ public class FoWHelper {
 		}
 		if (activeGame == null) {
 			String gameName = channel.getName();
-			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			activeGame = GameManager.getInstance().getGame(gameName);
 			if (activeGame == null) {
