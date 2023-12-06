@@ -26,14 +26,14 @@ public class ListEvents extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
 
         if (Mapper.isValidEvent(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true, null)).queue();
             return;
         }
 
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         for (EventModel model : Mapper.getEvents().values()) {
-            MessageEmbed representationEmbed = model.getRepresentationEmbed(true);
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(true, null);
             if (Helper.embedContainsSearchTerm(representationEmbed, searchString)) messageEmbeds.add(representationEmbed);
         }
         if (messageEmbeds.size() > 3) {
