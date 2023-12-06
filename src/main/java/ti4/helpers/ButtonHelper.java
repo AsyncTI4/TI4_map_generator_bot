@@ -2424,9 +2424,9 @@ public class ButtonHelper {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
                 }
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
-                    if ("cabal_spacedock".equalsIgnoreCase(unit.getId())) {
+                    if (player.ownsUnit("cabal_spacedock")) {
                         fightersIgnored += 6;
-                    } else if ("cabal_spacedock2".equalsIgnoreCase(unit.getId())) {
+                    } else if (player.ownsUnit("cabal_spacedock2")) {
                         fightersIgnored += 12;
                     } else {
                         fightersIgnored += 3;
@@ -5139,6 +5139,11 @@ public class ButtonHelper {
                 message2 = ident + " washed their " + (oldP1Comms-newP1Comms) + " Commodities with " + ident2 +"  ("+ident+" tg went from ("+oldP1Tg+"->"+p1.getTg()+")\n"+ ident2 + " washed their " + (oldP2Comms-newP2Comms) + " Commodities with " + ident +" ("+ident2+" tg went from ("+oldP2tg+"->"+p2.getTg()+")";
             }
             case "shipOrders" -> {
+                message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
+                p1.removeRelic(amountToTrans);
+                p2.addRelic(amountToTrans);
+            }
+            case "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
