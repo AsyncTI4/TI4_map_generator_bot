@@ -595,7 +595,7 @@ public class MessageHelper {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					badButtonIDsAndReason
 						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
-					button = button.withEmoji(null);
+					button = Button.of(button.getStyle(), button.getId(), button.getLabel());
 				}
 			}
 			newButtons.add(button);
