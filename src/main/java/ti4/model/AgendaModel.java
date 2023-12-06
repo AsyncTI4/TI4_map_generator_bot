@@ -144,6 +144,6 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return getName() + " [" + getSource() + "]";
     }
 }

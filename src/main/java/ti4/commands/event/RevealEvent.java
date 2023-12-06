@@ -13,6 +13,7 @@ import ti4.model.EventModel;
 public class RevealEvent extends EventSubcommandData {
     public RevealEvent() {
         super(Constants.REVEAL, "Reveal top Agenda from deck");
+        addOption(OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1)");
         addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the agenda from the bottom of the deck instead of the top");
     }
 
@@ -20,7 +21,11 @@ public class RevealEvent extends EventSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Game activeGame = getActiveGame();
         boolean revealFromBottom =  event.getOption(Constants.REVEAL_FROM_BOTTOM, false, OptionMapping::getAsBoolean);
-        revealEvent(event, activeGame, event.getChannel(), activeGame.revealEvent(revealFromBottom));
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+
+        for (int i = 0; i < count; i++) {
+            revealEvent(event, activeGame, event.getChannel(), activeGame.revealEvent(revealFromBottom));
+        }
     }
 
     public void revealEvent(GenericInteractionCreateEvent event, Game activeGame, MessageChannel channel, String eventID) {

@@ -49,7 +49,7 @@ public class Source {
                 case ignis_aurora -> Emojis.IgnisAurora;
                 case keleresplus -> Emojis.KeleresPlus;
                 case projectpi -> Emojis.ProjectPi;
-                case miltymod -> Emojis.Charlie;
+                case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
                 default -> "";
             };

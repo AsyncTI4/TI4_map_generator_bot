@@ -123,7 +123,6 @@ public class ACCardsCommand implements Command {
 
     private Collection<ACCardsSubcommandData> getSubcommands() {
         Collection<ACCardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ACInfo_Legacy());
         subcommands.add(new ACInfo());
         subcommands.add(new DrawAC());
         subcommands.add(new DiscardAC());

@@ -1000,4 +1000,7 @@ public class Constants {
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
     public static final String MILTYMOD_MODE = "miltymod_mode";
+    public static final String SEARCH_FACTIONS = "factions";
+    public static final String SEARCH_EVENTS = "events";
+    public static final String EVENT_PLAY = "play";
 }

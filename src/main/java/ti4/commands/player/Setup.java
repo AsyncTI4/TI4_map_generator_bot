@@ -72,7 +72,7 @@ public class Setup extends PlayerSubcommandData {
 
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
-        String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
+        String positionHS = StringUtils.substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); //Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
