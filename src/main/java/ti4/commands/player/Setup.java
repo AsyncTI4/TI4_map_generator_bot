@@ -223,6 +223,11 @@ public class Setup extends PlayerSubcommandData {
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
         }
+        if (player.hasAbility("industrialists")) {
+            String unitID = AliasHandler.resolveUnit("spacedock");
+            player.setUnitCap(unitID, 4);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+        }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
             player.setUnitCap(unitID, 7);

@@ -1613,7 +1613,7 @@ public class ButtonListener extends ListenerAdapter {
             if (tile == null) {
                 tile = activeGame.getTileByPosition(planet);
             }
-            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "freelancers", "placeOneNDone_dontskip");
+            buttons = Helper.getPlaceUnitButtons(event, player, activeGame, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
             String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, activeGame);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
