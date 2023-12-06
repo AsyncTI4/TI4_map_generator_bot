@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.Guild;
@@ -885,6 +884,17 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
+            case Constants.SEARCH_EVENTS -> {
+                if (optionName.equals(Constants.SEARCH)) {
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = Mapper.getEvents().entrySet().stream()
                         .filter(entry -> entry.getValue().search(enteredValue))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))

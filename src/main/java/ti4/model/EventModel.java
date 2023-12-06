@@ -124,6 +124,6 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getSource() + ")";
+        return getName() + " [" + getSource() + "]";
     }
 }
