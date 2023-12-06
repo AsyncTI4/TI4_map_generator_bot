@@ -115,13 +115,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.setDescription(description.toString());
 
         //FIELDS
-        eb.addField("title", "contents", true);
-
+        eb.addField("title", "contents", true);      
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
-        if (includeAliases) footer.append("\nAliases: "); //TODO: 
+        if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(getAlias()));
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
