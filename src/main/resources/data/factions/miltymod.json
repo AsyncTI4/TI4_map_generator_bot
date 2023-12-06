@@ -1,6 +1,6 @@
 [
     {
-      "alias": "miltymod_arborec",
+      "alias": "miltymodarborec",
       "factionName": "The Arborec",
       "homeSystem": "05",
       "startingFleet": "cv, cr,dd,2 ff, 4 inf n,pds n, sd n",
@@ -16,7 +16,7 @@
       "homebrewReplacesID": "arborec"
     },
     {
-      "alias": "miltymod_ghost",
+      "alias": "miltymodghost",
       "factionName": "The Ghosts of Creuss",
       "shortTag": "CRE",
       "homeSystem": "17",
@@ -33,7 +33,7 @@
       "homebrewReplacesID": "ghost"
     },
     {
-      "alias": "miltymod_hacan",
+      "alias": "miltymodhacan",
       "factionName": "The Emirates of Hacan",
       "homeSystem": "16",
       "startingFleet": "1 cv,dn,cr,2 ff,4 inf h,sd a",
@@ -49,7 +49,7 @@
       "homebrewReplacesID": "hacan"
     },
     {
-      "alias": "miltymod_jolnar",
+      "alias": "miltymodjolnar",
       "factionName": "The Universities of Jol-Nar",
       "shortTag": "J-N",
       "homeSystem": "12",
@@ -66,7 +66,7 @@
       "homebrewReplacesID": "jolnar"
     },
     {
-      "alias": "miltymod_l1z1x",
+      "alias": "miltymodl1z1x",
       "factionName": "The L1Z1X Mindnet",
       "shortTag": "LZX",
       "homeSystem": "06",
@@ -83,7 +83,7 @@
       "homebrewReplacesID": "l1z1x"
     },
     {
-      "alias": "miltymod_letnev",
+      "alias": "miltymodletnev",
       "factionName": "The Barony of Letnev",
       "homeSystem": "10",
       "startingFleet": "dn,cv,dd,ff, 3 inf w,sd a",
@@ -99,7 +99,7 @@
       "homebrewReplacesID": "letnev"
     },
     {
-      "alias": "miltymod_mentak",
+      "alias": "miltymodmentak",
       "factionName": "The Mentak Coalition",
       "shortTag": "MTK",
       "homeSystem": "02",
@@ -116,7 +116,7 @@
       "homebrewReplacesID": "mentak"
     },
     {
-      "alias": "miltymod_muaat",
+      "alias": "miltymodmuaat",
       "factionName": "The Embers of Muaat",
       "homeSystem": "04",
       "startingFleet": "ws,dd,2 ff,4 inf m,sd m",
@@ -132,7 +132,7 @@
       "homebrewReplacesID": "muaat"
     },
     {
-      "alias": "miltymod_naalu",
+      "alias": "miltymodnaalu",
       "factionName": "The Naalu Collective",
       "homeSystem": "09",
       "startingFleet": "cv,cr,2 ff,2 inf m,2 inf d,pds m,sd d",
@@ -148,7 +148,7 @@
       "homebrewReplacesID": "naalu"
     },
     {
-      "alias": "miltymod_nekro",
+      "alias": "miltymodnekro",
       "factionName": "The Nekro Virus",
       "shortTag": "NKR",
       "homeSystem": "08",
@@ -165,7 +165,7 @@
       "homebrewReplacesID": "nekro"
     },
     {
-      "alias": "miltymod_saar",
+      "alias": "miltymodsaar",
       "factionName": "The Clan of Saar",
       "homeSystem": "11",
       "startingFleet": "cv,1 cr,2 ff,4 inf, sd",
@@ -181,7 +181,7 @@
       "homebrewReplacesID": "saar"
     },
     {
-      "alias": "miltymod_sardakk",
+      "alias": "miltymodsardakk",
       "factionName": "The Sardakk Norr",
       "shortTag": "BUG",
       "homeSystem": "13",
@@ -198,7 +198,7 @@
       "homebrewReplacesID": "sardakk"
     },
     {
-      "alias": "miltymod_sol",
+      "alias": "miltymodsol",
       "factionName": "The Federation of Sol",
       "homeSystem": "01",
       "startingFleet": "2 cv, 2 ff,4 inf j, sd j",
@@ -215,7 +215,7 @@
     },
 
     {
-      "alias": "miltymod_winnu",
+      "alias": "miltymodwinnu",
       "factionName": "The Winnu",
       "homeSystem": "07",
       "startingFleet": "cv,2 cr,2 ff,3 inf w,pds w, sd w",
@@ -231,7 +231,7 @@
       "homebrewReplacesID": "winnu"
     },
     {
-      "alias": "miltymod_xxcha",
+      "alias": "miltymodxxcha",
       "factionName": "The Xxcha Kingdoms",
       "homeSystem": "14",
       "startingFleet": "cv,2 cr,3 ff,2 inf at,2 inf ar,pds at,sd ar",
@@ -247,7 +247,7 @@
       "homebrewReplacesID": "xxcha"
     },
     {
-      "alias": "miltymod_yin",
+      "alias": "miltymodyin",
       "factionName": "The Yin Brotherhood",
       "homeSystem": "03",
       "startingFleet": "2 cv,dd,4 ff,4 inf d,sd d",
@@ -263,7 +263,7 @@
       "homebrewReplacesID": "yin"
     },
     {
-      "alias": "miltymod_yssaril",
+      "alias": "miltymodyssaril",
       "factionName": "The Yssaril Tribes",
       "homeSystem": "15",
       "startingFleet": "2 cv,cr, 2 ff, 2 inf s,3 inf r,pds s,sd r",

@@ -1224,7 +1224,7 @@ public class Game {
     }
 
     public int discardEvent(String eventID) {
-        Collection<Integer> values = discardAgendas.values();
+        Collection<Integer> values = discardedEvents.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);

@@ -1,7 +1,10 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
@@ -30,6 +33,13 @@ public class AbilityInfo extends PlayerSubcommandData {
         sendAbilityInfo(activeGame, player, event);
     }
 
+    
+    public static void sendAbilityInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+        String headerText = player.getRepresentation() + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
+        sendAbilityInfo(activeGame, player);
+    }
+
     public static void sendAbilityInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + " used a command or button";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
@@ -38,23 +48,15 @@ public class AbilityInfo extends PlayerSubcommandData {
 
     public static void sendAbilityInfo(Game activeGame, Player player) {
         //ABILITY INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getAbilityInfoText(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
     }
 
-    private static String getAbilityInfoText(Player player) {
-        List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
-        StringBuilder sb = new StringBuilder("__**Ability Info**__\n");
-        if (playerAbilities.isEmpty() || playerAbilities.get(0).isBlank()) {
-            sb.append("> No Abilities");
-            return sb.toString();
+    private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        for (AbilityModel model : player.getAbilities().stream().map(Mapper::getAbility).sorted(Comparator.comparing(AbilityModel::getAlias)).toList()) {
+            MessageEmbed representationEmbed = model.getRepresentationEmbed();
+            messageEmbeds.add(representationEmbed);
         }
-        int index = 1;
-        for (String abilityID : playerAbilities) {
-            AbilityModel abilityModel = Mapper.getAbility(abilityID);
-            sb.append("`").append(index).append(".` ");
-            sb.append(abilityModel.getRepresentation()).append("\n");
-            index++;
-        }
-        return sb.toString();
+        return messageEmbeds;
     }
 }

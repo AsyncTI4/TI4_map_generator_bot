@@ -73,6 +73,7 @@ public class EventCommand implements Command {
         subcommands.add(new ResetEvents());
         subcommands.add(new PutDiscardBackIntoDeckEvents());
         subcommands.add(new EventInfo());
+        subcommands.add(new PlayEvent());
         return subcommands;
     }
 

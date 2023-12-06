@@ -21,6 +21,6 @@ public class ShuffleEvents extends EventSubcommandData {
             return;
         }
         getActiveGame().shuffleEvents();
-        MessageHelper.replyToMessage(event, "Agenda deck shuffled");
+        MessageHelper.replyToMessage(event, "Event deck shuffled");
     }
 }

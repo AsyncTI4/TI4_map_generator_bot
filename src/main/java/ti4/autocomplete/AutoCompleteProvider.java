@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.Guild;
@@ -75,6 +74,7 @@ public class AutoCompleteProvider {
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, activeGame);
             case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName, activeGame);
             case Constants.MAP -> resolveMapAutoComplete(event, subCommandName, optionName, activeGame);
+            case Constants.EVENT -> resolveEventAutoComplete(event, subCommandName, optionName, activeGame, player);
         }
 
         // DON'T APPLY GENERIC HANDLING IF SPECIFIC HANDLING WAS APPLIED
@@ -804,6 +804,17 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }
             }
+            case Constants.SEARCH_FACTIONS -> {
+                if (optionName.equals(Constants.SEARCH)) {
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = Mapper.getFactions().stream()
+                        .filter(entry -> entry.search(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
             case Constants.SEARCH_LEADERS -> {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -874,6 +885,17 @@ public class AutoCompleteProvider {
                 if (optionName.equals(Constants.SEARCH)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                     List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                        .filter(entry -> entry.getValue().search(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
+            case Constants.SEARCH_EVENTS -> {
+                if (optionName.equals(Constants.SEARCH)) {
+                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                    List<Command.Choice> options = Mapper.getEvents().entrySet().stream()
                         .filter(entry -> entry.getValue().search(enteredValue))
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
@@ -982,6 +1004,25 @@ public class AutoCompleteProvider {
                 //         .collect(Collectors.toList());
                 //     event.replyChoices(options).queue();
                 // }
+            }
+        }
+    }
+
+    private static void resolveEventAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game activeGame, Player player) {
+        switch (subCommandName) {
+            case Constants.EVENT_PLAY -> {
+                switch (optionName) {
+                    case Constants.EVENT_ID -> {
+                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                        Map<String, Integer> techs = new HashMap<>(player.getEvents());
+                        List<Command.Choice> options = techs.entrySet().stream()
+                            .filter(entry -> entry.getKey().contains(enteredValue))
+                            .limit(25)
+                            .map(entry -> new Command.Choice(entry.getValue() + " " + entry.getKey(), entry.getValue()))
+                            .collect(Collectors.toList());
+                        event.replyChoices(options).queue();
+                    }
+                }
             }
         }
     }
