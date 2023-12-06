@@ -34,6 +34,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> units;
     private ComponentSource source;
     private String homebrewReplacesID;
+    private String factionSheetURL;
 
     public boolean isValid() {
         return alias != null
@@ -91,6 +92,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
+    public Optional<String> getFactionSheetURL() {
+        return Optional.ofNullable(factionSheetURL);
+    }
+
     @Override
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
@@ -105,17 +110,19 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             getSource().emoji();
         eb.setTitle(title);
 
-        Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
-        if (emoji instanceof CustomEmoji customEmoji) {
-            eb.setThumbnail(customEmoji.getImageUrl());
-        }
+        // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
+        // if (emoji instanceof CustomEmoji customEmoji) {
+        //     eb.setThumbnail(customEmoji.getImageUrl());
+        // }
 
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
         eb.setDescription(description.toString());
 
         //FIELDS
-        eb.addField("title", "contents", true);      
+        // eb.addField("title", "contents", true);      
+
+        if (getFactionSheetURL().isPresent()) eb.setImage(getFactionSheetURL().get());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();
