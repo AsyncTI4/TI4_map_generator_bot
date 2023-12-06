@@ -8,8 +8,11 @@ import java.util.stream.Stream;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import software.amazon.awssdk.utils.StringUtils;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.generator.Mapper;
+import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -46,6 +49,10 @@ public class EventModel implements ModelInterface, EmbeddableModel {
                 return true;
             }
         }
+    }
+
+    public boolean staysInPlay() {
+        return getCategoryDescription().equalsIgnoreCase("permanent") || getCategoryDescription().equalsIgnoreCase("temporary");
     }
 
     public String getAlias() {
@@ -105,16 +112,23 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed() {
-        return getRepresentationEmbed(false);
+        return getRepresentationEmbed(false, null);
     }
 
-    public MessageEmbed getRepresentationEmbed(boolean includeID) {
+    public MessageEmbed getRepresentationEmbed(int numericalID) {
+        return getRepresentationEmbed(false, numericalID);
+    }
+
+    public MessageEmbed getRepresentationEmbed(boolean includeID, Integer numericalID) {
         EmbedBuilder eb = new EmbedBuilder();
-        String name = getName() == null ? "" : getName();
-        eb.setTitle("__" + name + "__" + getSource().emoji(), null);
+
+        StringBuilder sb = new StringBuilder();
+        if (numericalID != null) sb.append("(").append(numericalID).append(") ");
+        sb.append(Emojis.EventCard).append("__**").append(getName()).append("**__").append(getSource().emoji());
+        eb.setTitle(sb.toString());
+
         eb.setColor(Color.black);
-        eb.setDescription(getType() + "\n" + getTarget());
-        eb.addField("", getText(), false);
+        eb.addField(StringUtils.capitalize(getCategoryDescription()) + " " + getType(), getText(), false);
         if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
     }

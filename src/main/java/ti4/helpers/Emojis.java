@@ -120,6 +120,7 @@ public class Emojis {
     public static final String HazardousCard = "<:HazardousCard:1147194829479100557>";
     public static final String IndustrialCard = "<:IndustrialCard:1147194830762545183>";
     public static final String FrontierCard = "<:FrontierCard:1147194828417929397>";
+    public static final String EventCard = "";
 
     // OBJECTIVES
     public static final String SecretObjective = "<:Secretobjective:1054660535544729670>";
