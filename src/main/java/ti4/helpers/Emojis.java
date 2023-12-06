@@ -650,7 +650,7 @@ public class Emojis {
     public static final String IgnisAurora = "<:IgnisAurora:1180155010206683218>"; // Symbol for Ignis Aurora's stuff
     public static final String KeleresPlus = "<:KeleresPlus:1180158340295299192>"; // Symbol for Keleres Plus https://discord.com/channels/743629929484386395/1027385712821149706
     public static final String ProjectPi = "";
-    public static final String MiltyMod = "";
+    public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; //Symbol for Milty's mod https://discord.com/channels/743629929484386395/1087435266249207869
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = Arrays.asList(
