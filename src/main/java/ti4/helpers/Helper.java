@@ -770,7 +770,7 @@ public class Helper {
             }
             msg = msg + localPlace;
         }
-        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" resources** (not counting discounts).";
+        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" Resources** (not counting discounts).";
         return msg;
     }
 

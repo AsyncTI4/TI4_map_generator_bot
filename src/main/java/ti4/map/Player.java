@@ -351,7 +351,7 @@ public class Player {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff");
+            || getTechs().contains("dslizhff") || ownsUnit("florzen_fighter");
     }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
