@@ -41,7 +41,7 @@
         "homePlanets": ["thedark"],
         "abilities": ["voidborn", "aetherpassage", "dark_whispers"],
         "leaders": ["empyreanagent", "empyreancommander", "empyreanhero"],
-        "promissoryNotes": ["dark_pact"],
+        "promissoryNotes": ["dark_pact", "blood_pact"],
         "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "empyrean_flagship", "infantry", "empyrean_mech", "pds", "spacedock"],
         "source": "pok"
     },
