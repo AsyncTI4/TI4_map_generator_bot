@@ -26,7 +26,7 @@ public class RemoveToken extends AddRemoveToken {
             String tokenName = option.getAsString().toLowerCase();
             tokenName = AliasHandler.resolveAttachment(tokenName);
 
-            String tokenID = Mapper.getAttachmentID(tokenName);
+            String tokenID = Mapper.getAttachmentImagePath(tokenName);
             String tokenPath = tile.getAttachmentPath(tokenID);
             if (tokenPath != null) {
                 removeToken(event, tile, tokenID, true);

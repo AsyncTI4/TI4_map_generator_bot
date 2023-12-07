@@ -303,7 +303,7 @@ public class Helper {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (factionColorOption != null) {
             String colorFromString = getColorFromString(activeGame, factionColorOption.getAsString());
-            if (Mapper.isColorValid(colorFromString)) {
+            if (Mapper.isValidColor(colorFromString)) {
                 return colorFromString;
             }
         } else {

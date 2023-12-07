@@ -3030,10 +3030,10 @@ public class ButtonHelper {
 
     public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet) {
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
-        return unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.WARFARE)) ||
-            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.CYBERNETIC)) ||
-            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.BIOTIC)) ||
-            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.PROPULSION));
+        return unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.WARFARE)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.CYBERNETIC)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.BIOTIC)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.PROPULSION));
     }
 
     public static List<Button> scanlinkResolution(Player player, Game activeGame, ButtonInteractionEvent event) {
@@ -4826,7 +4826,7 @@ public class ButtonHelper {
                     continue;
                 }
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isFaction(faction)) {
+                if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button;
                     if (!activeGame.isFoWMode()) {
                         String label = " ";
@@ -5689,7 +5689,7 @@ public class ButtonHelper {
             AddCC.addCC(event, color2, tile);
             Helper.isCCCountCorrect(event, activeGame, color2);
             for (String color : mahactP.getMahactCC()) {
-                if (Mapper.isColorValid(color) && !color.equalsIgnoreCase(player.getColor())) {
+                if (Mapper.isValidColor(color) && !color.equalsIgnoreCase(player.getColor())) {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, activeGame, color);
                 }
@@ -5710,7 +5710,7 @@ public class ButtonHelper {
             for (Player player_ : activeGame.getPlayers().values()) {
                 if (player_ != player) {
                     String color = player_.getColor();
-                    if (Mapper.isColorValid(color)) {
+                    if (Mapper.isValidColor(color)) {
                         AddCC.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, activeGame, color);
                     }
@@ -6328,7 +6328,7 @@ public class ButtonHelper {
         for (Player player : activeGame.getPlayers().values()) {
             if (player.isRealPlayer() && !player.getUserID().equals(activeGame.getSpeaker())) {
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isFaction(faction)) {
+                if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button = Button.secondary("assignSpeaker_" + faction, " ");
                     String factionEmojiString = player.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
