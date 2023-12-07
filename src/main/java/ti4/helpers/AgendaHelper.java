@@ -1264,7 +1264,7 @@ public class AgendaHelper {
         for (Player player : activeGame.getPlayers().values()) {
             if (player.isRealPlayer()) {
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isFaction(faction)) {
+                if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button;
                     if (!activeGame.isFoWMode() && !faction.contains("franken")) {
                         if (rider != null) {

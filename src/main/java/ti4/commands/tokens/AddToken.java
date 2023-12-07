@@ -37,7 +37,7 @@ public class AddToken extends AddRemoveToken {
     }
 
     public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game activeGame) {
-        String tokenFileName = Mapper.getAttachmentID(tokenName);
+        String tokenFileName = Mapper.getAttachmentImagePath(tokenName);
         String tokenPath = tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
             addToken(event, tile, tokenFileName, true, activeGame);

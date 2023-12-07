@@ -1,5 +1,16 @@
 [
     {
+        "id": "drahnagent",
+        "faction": "drahn",
+        "type": "agent",
+        "name": "Aldo Graft",
+        "title": "Contract Broker",
+        "abilityWindow": "You may exhaust this card at the start of a player's turn",
+        "abilityText": "That player may either gain 1 command token or draw 1 secret objective. If they do, then that player's turn.",
+        "unlockCondition": "Always Unlocked",
+        "source": "keleresplus"
+    },
+    {
         "id": "drahncommander",
         "faction": "drahn",
         "type": "commander",
@@ -371,8 +382,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroargent",
-        "faction": "keleres+",
+        "id": "keleresplusheroargent",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Kuuasi Aun Jalatai",
         "title": "Keleres Praefecta",
@@ -383,8 +394,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroaugurs",
-        "faction": "keleres+",
+        "id": "keleresplusheroaugurs",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Morai",
         "title": "Keleres Praefectum",
@@ -395,8 +406,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroletnev",
-        "faction": "keleres+",
+        "id": "keleresplusheroletnev",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Baronet Oran",
         "title": "Keleres Praefectus",
@@ -407,8 +418,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herobentor",
-        "faction": "keleres+",
+        "id": "keleresplusherobentor",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "C.S.O. Kara",
         "title": "Keleres Praefecta",
@@ -419,8 +430,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroberserkers",
-        "faction": "keleres+",
+        "id": "keleresplusheroberserkers",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Masdar Karavhat",
         "title": "Keleres Praefectus",
@@ -431,8 +442,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroceldauri",
-        "faction": "keleres+",
+        "id": "keleresplusheroceldauri",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Malik Georg",
         "title": "Keleres Praefectus",
@@ -443,8 +454,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herocheiran",
-        "faction": "keleres+",
+        "id": "keleresplusherocheiran",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Ish Krkrlk",
         "title": "Keleres Praefectum",
@@ -455,8 +466,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herodihmohn",
-        "faction": "keleres+",
+        "id": "keleresplusherodihmohn",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Keresh Kisdru",
         "title": "Keleres Praefectus",
@@ -467,8 +478,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroedyn",
-        "faction": "keleres+",
+        "id": "keleresplusheroedyn",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Kadryn",
         "title": "Keleres Praefecta",
@@ -479,8 +490,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herohacan",
-        "faction": "keleres+",
+        "id": "keleresplusherohacan",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Mwana Morash",
         "title": "Keleres Praefecta",
@@ -491,8 +502,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herosol",
-        "faction": "keleres+",
+        "id": "keleresplusherosol",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Askala Maryam",
         "title": "Keleres Praefecta",
@@ -503,8 +514,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herokhrask",
-        "faction": "keleres+",
+        "id": "keleresplusherokhrask",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Kisk Kital",
         "title": "Keleres Praefectum",
@@ -515,8 +526,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herol1z1x",
-        "faction": "keleres+",
+        "id": "keleresplusherol1z1x",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "1BN4",
         "title": "Keleres Praefectus",
@@ -527,8 +538,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heromentak",
-        "faction": "keleres+",
+        "id": "keleresplusheromentak",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Harka Leeds",
         "title": "Keleres Praefecta",
@@ -539,8 +550,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heromirveda",
-        "faction": "keleres+",
+        "id": "keleresplusheromirveda",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Pax Machina",
         "title": "Keleres Praefectum",
@@ -551,8 +562,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heromykomentori",
-        "faction": "keleres+",
+        "id": "keleresplusheromykomentori",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Amanita Calyptroma",
         "title": "Keleres Praefectum",
@@ -563,8 +574,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herokolume",
-        "faction": "keleres+",
+        "id": "keleresplusherokolume",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Turial The Epistoler",
         "title": "Keleres Praefectum",
@@ -575,8 +586,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heronra",
-        "faction": "keleres+",
+        "id": "keleresplusheronra",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Rosk and Kett",
         "title": "Keleres Praefecti",
@@ -587,8 +598,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heronomad",
-        "faction": "keleres+",
+        "id": "keleresplusheronomad",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "The Nomad",
         "title": "Keleres Praefectum",
@@ -599,8 +610,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herorohdhna",
-        "faction": "keleres+",
+        "id": "keleresplusherorohdhna",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Roh’Vhin Dhna Mk3",
         "title": "Keleres Praefectum",
@@ -611,8 +622,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heronorr",
-        "faction": "keleres+",
+        "id": "keleresplusheronorr",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "G'Hom K'Kadras",
         "title": "Keleres Praefectum",
@@ -623,8 +634,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroaxis",
-        "faction": "keleres+",
+        "id": "keleresplusheroaxis",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Drone Szkthnk",
         "title": "Keleres Praefectum",
@@ -635,8 +646,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroul",
-        "faction": "keleres+",
+        "id": "keleresplusheroul",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Paratecton",
         "title": "Keleres Praefectum",
@@ -647,8 +658,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herojolnar",
-        "faction": "keleres+",
+        "id": "keleresplusherojolnar",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Proctor Za Nera",
         "title": "Keleres Praefectus",
@@ -659,8 +670,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroveldyr",
-        "faction": "keleres+",
+        "id": "keleresplusheroveldyr",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Ansible Datir",
         "title": "Keleres Praefectus",
@@ -671,8 +682,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herowinnu",
-        "faction": "keleres+",
+        "id": "keleresplusherowinnu",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Mathis Mathinus",
         "title": "Keleres Praefectus",
@@ -683,8 +694,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+heroxxcha",
-        "faction": "keleres+",
+        "id": "keleresplusheroxxcha",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Odlynn Myrr",
         "title": "Keleres Praefectus",
@@ -695,8 +706,8 @@
         "source": "keleresplus"
     },
     {
-        "id": "keleres+herozealots",
-        "faction": "keleres+",
+        "id": "keleresplusherozealots",
+        "faction": "keleresplus",
         "type": "hero",
         "name": "Abbess Syna",
         "title": "Keleres Praefecta",

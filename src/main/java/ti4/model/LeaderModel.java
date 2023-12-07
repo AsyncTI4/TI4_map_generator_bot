@@ -31,6 +31,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String emoji;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private String homebrewReplacesID;
 
     @Override
     public boolean isValid() {
@@ -64,6 +65,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
     }
 
     public String getRepresentation(boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {

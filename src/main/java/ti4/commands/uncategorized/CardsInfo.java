@@ -81,7 +81,7 @@ public class CardsInfo implements Command {
         } else {
             activeGame = gameManager.getUserActiveGame(userID);
             String color = Helper.getColor(activeGame, event);
-            if (!Mapper.isColorValid(color)) {
+            if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }

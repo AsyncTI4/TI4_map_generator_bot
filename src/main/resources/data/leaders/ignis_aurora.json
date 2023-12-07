@@ -35,8 +35,8 @@
     },
     {
         "id": "baldrick_letnevhero",
-        "faction": "hero",
-        "type": "letnev",
+        "faction": "letnev",
+        "type": "hero",
         "name": "Darktalon Treilla ",
         "title": "Dark Matter Affinity ",
         "abilityName": "Void Transference",
@@ -47,8 +47,8 @@
     },
     {
         "id": "baldrick_solagent",
-        "faction": "agent",
-        "type": "sol",
+        "faction": "sol",
+        "type": "agent",
         "name": "Evelyn DeLouis ",
         "title": "Master Tactician",
         "abilityWindow": "At the start of a ground combat round:",
@@ -58,8 +58,8 @@
     },
     {
         "id": "baldrick_letnevagent",
-        "faction": "agent",
-        "type": "letnev",
+        "faction": "letnev",
+        "type": "agent",
         "name": "Viscount Unlenn ",
         "title": "The Dunlain Scourge",
         "abilityWindow": "At the start of a space combat round:",

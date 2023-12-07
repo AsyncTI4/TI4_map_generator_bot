@@ -1577,7 +1577,7 @@ public class GenerateMap {
                             originalPlanetType = "keleres";
                         }
 
-                        if (Mapper.isFaction(originalPlanetType)) {
+                        if (Mapper.isValidFaction(originalPlanetType)) {
                             drawFactionIconImage(graphics, originalPlanetType, x + deltaX - 2, y - 2, 52, 52);
                         } else {
                             String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";

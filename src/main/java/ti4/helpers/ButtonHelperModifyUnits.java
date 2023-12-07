@@ -391,7 +391,7 @@ public class ButtonHelperModifyUnits {
                     if (tile == null) {
                         tile = activeGame.getTileByPosition(tileID);
                     }
-                    if (Mapper.isColorValid(color)) {
+                    if (Mapper.isValidColor(color)) {
                         AddCC.addCC(event, color, tile);
                     }
 

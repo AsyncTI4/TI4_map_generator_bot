@@ -202,7 +202,7 @@ public class PNInfo extends PNCardsSubcommandData {
         }
 
         if (longFormat || 
-            Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
+            Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
             (pnModel.getSource() != ComponentSource.base && pnModel.getSource() != ComponentSource.pok)) {
                 sb.append("      ").append(pnText);
             }
@@ -213,7 +213,7 @@ public class PNInfo extends PNCardsSubcommandData {
     public static void checkAndAddPNs(Game activeGame, Player player) {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
-        if (!Mapper.isColorValid(playerColor) || !Mapper.isFaction(playerFaction)) {
+        if (!Mapper.isValidColor(playerColor) || !Mapper.isValidFaction(playerFaction)) {
             return;
         }
 
