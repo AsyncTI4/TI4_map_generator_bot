@@ -1,5 +1,9 @@
 package ti4.commands.cardspn;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -14,11 +18,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PNCardsCommand implements Command {
 
@@ -109,7 +108,7 @@ public class PNCardsCommand implements Command {
         String userID = event.getUser().getId();
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
-       // GenerateMap.getInstance().saveImage(activeMap, event);
+       // new GenerateMap().saveImage(activeMap, event);
     }
 
     protected String getActionDescription() {

@@ -81,16 +81,18 @@ import ti4.model.UnitModel;
 
 public class GenerateMap {
 
-    public static final int DELTA_X = 8;
     public static final int DELTA_Y = 26;
     public static final int RING_MAX_COUNT = 8;
     public static final int RING_MIN_COUNT = 3;
     public static final int PLAYER_STATS_HEIGHT = 650;
     public static final int TILE_PADDING = 100;
+    private static final int EXTRA_X = 300;
+    private static final int EXTRA_Y = 200;
     private static final Point tilePositionPoint = new Point(230, 295);
     private static final Point labelPositionPoint = new Point(90, 295);
     private static final Point numberPositionPoint = new Point(40, 27);
-    private static HashMap<Player, Integer> userVPs = new HashMap<>();
+
+    private HashMap<Player, Integer> userVPs = new HashMap<>();
 
     private Graphics graphics;
     private BufferedImage mainImage;
@@ -101,9 +103,7 @@ public class GenerateMap {
     private int mapHeight;
     private int mapWidth;
     private int heightForGameInfo;
-    private static int scoreTokenWidth;
-    private final int extraX = 300;
-    private final int extraY = 200;
+    private final int scoreTokenWidth;
 
     private int minX = -1;
     private int minY = -1;
@@ -122,9 +122,7 @@ public class GenerateMap {
     private long debugWebsiteTime;
     private long debugImageIOTime;
 
-    private static GenerateMap instance;
-
-    private GenerateMap() {
+    public GenerateMap() {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
@@ -159,11 +157,11 @@ public class GenerateMap {
 
             int ringCount = activeGame.getRingCount();
             ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-            mapHeight = (ringCount + 1) * 600 + extraY * 2;
-            mapWidth = (ringCount + 1) * 520 + extraX * 2;
+            mapHeight = (ringCount + 1) * 600 + EXTRA_Y * 2;
+            mapWidth = (ringCount + 1) * 520 + EXTRA_X * 2;
             extraRow = false;
-            if ((mapHeight - extraY) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + extraY)) {
-                mapWidth += extraX;
+            if ((mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y)) {
+                mapWidth += EXTRA_X;
                 extraRow = true;
             }
         }
@@ -175,13 +173,6 @@ public class GenerateMap {
     private void resetImage() {
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
-    }
-
-    public static GenerateMap getInstance() {
-        if (instance == null) {
-            instance = new GenerateMap();
-        }
-        return instance;
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {
@@ -353,7 +344,7 @@ public class GenerateMap {
                 ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
                 if (defaultWriteParam.canWriteCompressed()) {
                     defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                    defaultWriteParam.setCompressionQuality(0.5f);
+                    defaultWriteParam.setCompressionQuality(0.15f);
                 }
 
                 imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
@@ -2233,8 +2224,8 @@ public class GenerateMap {
             Collections.shuffle(players);
         }
 
-        int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
-        int deltaY = extraY;
+        int deltaX = mapWidth - EXTRA_X - (extraRow ? EXTRA_X : 0);
+        int deltaY = EXTRA_Y;
 
         int ringCount = activeGame.getRingCount();
         ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
@@ -2256,36 +2247,36 @@ public class GenerateMap {
                     int anchorLocationIndex = PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition()) - 1;
                     boolean isCorner = anchorProjectedOnOutsideRing.equals(PositionMapper.getTileIDAtCornerPositionOfRing(ringCount, anchorLocationIndex + 1));
                     if (anchorLocationIndex == 0 && isCorner) { // North Corner
-                        deltaX = playerStatsAnchorPoint.x + extraX + 80;
+                        deltaX = playerStatsAnchorPoint.x + EXTRA_X + 80;
                         deltaY = playerStatsAnchorPoint.y - 80;
                         deltaSplitX = 200;
                     } else if (anchorLocationIndex == 0) { // North East
-                        deltaX = playerStatsAnchorPoint.x + extraX + 300;
+                        deltaX = playerStatsAnchorPoint.x + EXTRA_X + 300;
                         deltaY = playerStatsAnchorPoint.y;
                         deltaSplitX = 200;
                     } else if (anchorLocationIndex == 1) { // East
-                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
-                        deltaY = playerStatsAnchorPoint.y + extraY;
+                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
                     } else if (anchorLocationIndex == 2 && isCorner) { // South East Corner
-                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
-                        deltaY = playerStatsAnchorPoint.y + extraY;
+                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
                     } else if (anchorLocationIndex == 2) { // South East
-                        deltaX = playerStatsAnchorPoint.x + 360 + extraX;
-                        deltaY = playerStatsAnchorPoint.y + extraY + 100;
+                        deltaX = playerStatsAnchorPoint.x + 360 + EXTRA_X;
+                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y + 100;
                     } else if (anchorLocationIndex == 3 && isCorner) { // South Corner
-                        deltaX = playerStatsAnchorPoint.x + extraX;
-                        deltaY = playerStatsAnchorPoint.y + 360 + extraY;
+                        deltaX = playerStatsAnchorPoint.x + EXTRA_X;
+                        deltaY = playerStatsAnchorPoint.y + 360 + EXTRA_Y;
                         deltaSplitX = 200;
                     } else if (anchorLocationIndex == 3) { // South West
                         deltaX = playerStatsAnchorPoint.x;
-                        deltaY = playerStatsAnchorPoint.y + 250 + extraY;
+                        deltaY = playerStatsAnchorPoint.y + 250 + EXTRA_Y;
                         deltaSplitX = 200;
                     } else if (anchorLocationIndex == 4) { // West
                         deltaX = playerStatsAnchorPoint.x + 10;
-                        deltaY = playerStatsAnchorPoint.y + extraY;
+                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
                     } else if (anchorLocationIndex == 5 && isCorner) { // North West Corner
                         deltaX = playerStatsAnchorPoint.x + 10;
-                        deltaY = playerStatsAnchorPoint.y + extraY;
+                        deltaY = playerStatsAnchorPoint.y + EXTRA_Y;
                     } else if (anchorLocationIndex == 5) { // North West
                         deltaX = playerStatsAnchorPoint.x + 10;
                         deltaY = playerStatsAnchorPoint.y - 100;
@@ -3050,8 +3041,8 @@ public class GenerateMap {
             }
 
             positionPoint = getTilePosition(activeGame, position, x, y);
-            int tileX = positionPoint.x + extraX - TILE_PADDING;
-            int tileY = positionPoint.y + extraY - TILE_PADDING;
+            int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
+            int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
             BufferedImage tileImage = partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
