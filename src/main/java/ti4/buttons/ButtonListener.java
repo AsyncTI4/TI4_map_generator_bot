@@ -1897,6 +1897,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.setTrapStep4(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("lanefirATS_")) {
             ButtonHelperFactionSpecific.resolveLanefirATS(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("rohdhnaIndustrious_")) {
+            ButtonHelperFactionSpecific.resolveRohDhnaIndustrious(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep1_")) {
             ButtonHelperFactionSpecific.resolveStymiePlayerStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep2_")) {
