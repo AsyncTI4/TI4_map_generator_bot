@@ -545,6 +545,9 @@ public class Mapper {
     }
 
     public static AttachmentModel getAttachmentInfo(String id) {
+        AttachmentModel model = attachments.get(id);
+        if (model != null) return model;
+        id = id.replace("attachment_", "").replace(".png", "");
         return attachments.get(id);
     }
 
