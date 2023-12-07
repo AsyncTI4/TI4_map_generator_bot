@@ -81,7 +81,6 @@ import ti4.model.UnitModel;
 
 public class GenerateMap {
 
-    public static final int DELTA_X = 8;
     public static final int DELTA_Y = 26;
     public static final int RING_MAX_COUNT = 8;
     public static final int RING_MIN_COUNT = 3;
@@ -90,6 +89,7 @@ public class GenerateMap {
     private static final Point tilePositionPoint = new Point(230, 295);
     private static final Point labelPositionPoint = new Point(90, 295);
     private static final Point numberPositionPoint = new Point(40, 27);
+
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
     private Graphics graphics;
@@ -121,8 +121,6 @@ public class GenerateMap {
     private long debugGameInfoTime;
     private long debugWebsiteTime;
     private long debugImageIOTime;
-
-    private static GenerateMap instance;
 
     private GenerateMap() {
         String controlID = Mapper.getControlID("red");
@@ -175,13 +173,6 @@ public class GenerateMap {
     private void resetImage() {
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
-    }
-
-    public static GenerateMap getInstance() {
-        if (instance == null) {
-            instance = new GenerateMap();
-        }
-        return instance;
     }
 
     public FileUpload saveImage(Game activeGame, @Nullable SlashCommandInteractionEvent event) {

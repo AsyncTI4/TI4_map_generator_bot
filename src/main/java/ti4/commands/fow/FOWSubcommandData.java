@@ -3,9 +3,7 @@ package ti4.commands.fow;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -43,7 +41,7 @@ public abstract class FOWSubcommandData extends SubcommandData {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-       // FileUpload file = GenerateMap.getInstance().saveImage(activeMap, event);
+       // FileUpload file = new GenerateMap().saveImage(activeMap, event);
       //  MessageHelper.replyToMessage(event, file);
     }
 }

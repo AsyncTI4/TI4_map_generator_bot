@@ -57,7 +57,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         activeGame.setTile(tileTo);
         activeGame.rebuildTilePositionAutoCompleteList();
         DisplayType displayType = DisplayType.map;
-        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, displayType, event);
+        FileUpload file = new GenerateMap().saveImage(activeGame, displayType, event);
         MessageHelper.sendFileUploadToChannel(event.getChannel(), file);
     }
 }

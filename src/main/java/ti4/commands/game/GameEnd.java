@@ -97,7 +97,7 @@ public class GameEnd extends GameSubcommandData {
         activeGame.setAutoPingSpacer(0);
 
         // SEND THE MAP IMAGE
-        FileUpload fileUpload = GenerateMap.getInstance().saveImage(activeGame, DisplayType.all, event);
+        FileUpload fileUpload = new GenerateMap().saveImage(activeGame, DisplayType.all, event);
         MessageHelper.replyToMessage(event, fileUpload);
 
         StringBuilder message = new StringBuilder();
