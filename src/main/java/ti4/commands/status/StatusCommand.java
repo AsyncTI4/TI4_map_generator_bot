@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -86,7 +85,7 @@ public class StatusCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        FileUpload fileUpload = GenerateMap.getInstance().saveImage(activeGame, event);
+        FileUpload fileUpload = new GenerateMap().saveImage(activeGame, event);
         MessageHelper.replyToMessage(event, fileUpload, false, message, message != null);
     }
 
