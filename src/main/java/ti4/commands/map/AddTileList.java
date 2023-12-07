@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -103,7 +102,7 @@ public class AddTileList extends MapSubcommandData {
 
         GameSaveLoadManager.saveMap(userActiveGame, event);
 
-        FileUpload file = GenerateMap.getInstance().saveImage(userActiveGame, event);
+        FileUpload file = new GenerateMap().saveImage(userActiveGame, event);
         MessageHelper.replyToMessage(event, file);
     }
 }
