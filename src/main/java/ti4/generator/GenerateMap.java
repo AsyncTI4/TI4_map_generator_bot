@@ -122,7 +122,7 @@ public class GenerateMap {
     private long debugWebsiteTime;
     private long debugImageIOTime;
 
-    private GenerateMap() {
+    public GenerateMap() {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
