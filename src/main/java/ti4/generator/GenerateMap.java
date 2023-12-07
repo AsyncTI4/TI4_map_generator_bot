@@ -333,7 +333,7 @@ public class GenerateMap {
             AsyncTI4DiscordBot.THREAD_POOL.execute(() -> {
                 WebHelper.putMap(activeGame.getName(), mainImage);
                 WebHelper.putData(activeGame.getName(), activeGame);
-            });
+                });
         } else if (isFoWPrivate != null && isFoWPrivate) {
             Player player = getFowPlayer(activeGame, event);
             AsyncTI4DiscordBot.THREAD_POOL.execute(() -> WebHelper.putMap(activeGame.getName(), mainImage, true, player));
