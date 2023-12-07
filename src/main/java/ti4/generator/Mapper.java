@@ -184,7 +184,7 @@ public class Mapper {
     public static List<String> getColorPromissoryNoteIDs(Game activeGame, String color) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
-        if (isColorValid(color)) {
+        if (isValidColor(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
                     if (activeGame.isAbsolMode() && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
@@ -233,12 +233,12 @@ public class Mapper {
         return decals.containsKey(decalID);
     }
 
-    public static boolean isColorValid(String color) {
+    public static boolean isValidColor(String color) {
         String property = colors.getProperty(color);
         return property != null && !"null".equals(property);
     }
 
-    public static boolean isFaction(String faction) {
+    public static boolean isValidFaction(String faction) {
         return factions.containsKey(faction);
     }
 

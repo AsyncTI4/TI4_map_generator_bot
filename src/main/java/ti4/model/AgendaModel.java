@@ -39,7 +39,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private boolean validateCategory() {
         switch (getCategory()) {
             case "faction" -> {
-                return Mapper.isFaction(getCategoryDescription());
+                return Mapper.isValidFaction(getCategoryDescription());
             }
             case "event" -> {
                 return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));

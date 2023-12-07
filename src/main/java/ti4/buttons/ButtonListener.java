@@ -1984,7 +1984,7 @@ public class ButtonListener extends ListenerAdapter {
                 return;
             }
             String color = player.getColor();
-            if (Mapper.isColorValid(color)) {
+            if (Mapper.isValidColor(color)) {
                 AddCC.addCC(event, color, tile);
             }
             //String message = playerRep + " Placed A CC From Reinforcements In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system";
@@ -2009,7 +2009,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
 
-            if (Mapper.isColorValid(color)) {
+            if (Mapper.isValidColor(color)) {
                 AddCC.addCC(event, color, tile);
             }
             //String message = playerRep + " Placed A " + StringUtils.capitalize(color) + " CC  In The " + Helper.getPlanetRepresentation(planet, activeGame) + " system due to use of Mahact agent";
