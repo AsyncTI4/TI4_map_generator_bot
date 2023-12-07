@@ -22,17 +22,6 @@
         "source": "ds"
     },
     {
-        "id": "blexagent",
-        "faction": "blex",
-        "type": "agent",
-        "name": "Tox",
-        "title": "Fleshcrafter",
-        "abilityWindow": "After a player activates a system:",
-        "abilityText": "You may exhaust this card to increase the capacity value of 1 of their ships by 2, or allow that ship to gain a capacity value of 2, until the end of this tactical action.",
-        "unlockCondition": "Always Unlocked",
-        "source": "ds"
-    },
-    {
         "id": "celdauriagent",
         "faction": "celdauri",
         "type": "agent",
@@ -404,17 +393,6 @@
         "abilityWindow": "Ongoing",
         "abilityText": "Your commodity value is increased by 1.",
         "unlockCondition": "Have 3 Fragment tokens on your faction sheet.",
-        "source": "ds"
-    },
-    {
-        "id": "blexcommander",
-        "faction": "blex",
-        "type": "commander",
-        "name": "Silas Deriga",
-        "title": "Necrosage",
-        "abilityWindow": "Once per round of ground combat on a planet you control in a system that contains a Blight token",
-        "abilityText": "When you would destroy 1 of your opponent's infantry, you may instead replace that unit with 1 from your reinforcements.",
-        "unlockCondition": "Have 6 infantry and 6 fighters on the game board.",
         "source": "ds"
     },
     {
@@ -791,18 +769,6 @@
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card to explore each planet you control in any order.",
         "unlockCondition": "Have 3 scored objectives.",
-        "source": "ds"
-    },
-    {
-        "id": "blexhero",
-        "faction": "blex",
-        "type": "hero",
-        "name": "Speygh",
-        "title": "Blightmaster",
-        "abilityName": "Brikk Strain - Galactic Blight",
-        "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to 1 of your strategy cards. Its initiative value is 9. Non-Blex Players may only resolve 1 clause of this strategy card's primary ability and must spend 1 additional command token from their strategy pool to resolve the secondary ability of this strategy card.",
-        "unlockCondition": "Have 3 scored objectives",
         "source": "ds"
     },
     {
