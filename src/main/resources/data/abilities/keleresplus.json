@@ -1,0 +1,38 @@
+[
+    {
+        "id": "thepraefecti",
+        "name": "The Praefecti",
+        "faction": "keleresplus",
+        "permanentEffect": "During setup, choose an unplayed faction from among 3 random Keleres-aligned factions; take that faction's home system, command tokens, and control markers. Additionally, take the Drahn hero that corresponds to that faction.",
+        "source": "keleresplus"
+    },
+    {
+        "id": "custodiavigilia",
+        "name": "The Praefecti",
+        "faction": "keleresplus",
+        "permanentEffect": "During setup, gain the Custodia Vigilia planet card and it's planet ability card. You cannot lose these cards and Nevermore begins the game exhausted.",
+        "source": "keleresplus"
+    },
+    {
+        "id": "mercenaryties",
+        "name": "Mercenary Ties",
+        "faction": "drahn",
+        "permanentEffect": "During setup, choose an unplayed faction from among 3 random Drahn-aligned factions; take that faction's home system, command tokens, and control markers. Additionally, take the Drahn hero that corresponds to that faction.",
+        "source": "keleresplus"
+    },
+    {
+        "id": "contractnetwork",
+        "name": "Contract Network",
+        "faction": "drahn",
+        "window": "When another player scores an objective you've scored",
+        "windowEffect": "You may gain 1 commodity or convert 1 of your commodities into a trade good.",
+        "source": "keleresplus"
+    },
+    {
+        "id": "shadowoperatives",
+        "name": "Shadow Operatives",
+        "faction": "drahn",
+        "permanentEffect": "During setup, gain the Nevermore planet card and it's planet ability card. You cannot lose these cards and Nevermore begins the game exhausted.",
+        "source": "keleresplus"
+    }
+]

@@ -1,0 +1,29 @@
+[
+    {
+        "alias": "specialclearances",
+        "name": "Special Clearances",
+        "type": "CYBERNETIC",
+        "requirements": "YYY",
+        "faction": "keleresplus",
+        "source": "keleresplus",
+        "text": "At the start of a player's turn, ou may spend 1 trade good or 1 commodity to allow that player to choose any number of laws in play. Those laws are treated as blank until the end of that player's turn."
+    },
+    {
+        "alias": "guildfund",
+        "name": "Guild Fund",
+        "type": "BIOTIC",
+        "requirements": "GGG",
+        "faction": "drahn",
+        "source": "keleresplus",
+        "text": "After you resolve the primary ability of a strategy card, you may resolve the secondary ability of that strategy card.\nWhen you would spend a command token, you may exhaust this card to spend 1 token from your reinforcements instead."
+    },
+    {
+        "alias": "specialforces",
+        "name": "Special Forces",
+        "type": "CYBERNETIC",
+        "requirements": "YY",
+        "faction": "drahn",
+        "source": "keleresplus",
+        "text": "At the start of a space combat in which you are the defender: You may exhaust this card and spend 1 command token from your strategy pool to force your opponent to declare a retreat."
+    }
+]
