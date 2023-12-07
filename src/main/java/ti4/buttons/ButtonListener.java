@@ -1799,6 +1799,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
             }
+            if(player.hasAbility("recycled_materials")) {
+                List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(activeGame, player);
+                if(!buttons.isEmpty()){
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select which unit to recycle", buttons);
+                }
+            }
+
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("genericRemove_")) {
             String pos = buttonID.replace("genericRemove_", "");
@@ -1899,6 +1906,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveLanefirATS(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("rohdhnaIndustrious_")) {
             ButtonHelperFactionSpecific.resolveRohDhnaIndustrious(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("rohdhnaRecycle_")) {
+            ButtonHelperFactionSpecific.resolveRohDhnaRecycle(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep1_")) {
             ButtonHelperFactionSpecific.resolveStymiePlayerStep1(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("stymiePlayerStep2_")) {
