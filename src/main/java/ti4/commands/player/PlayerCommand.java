@@ -1,5 +1,9 @@
 package ti4.commands.player;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,11 +16,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PlayerCommand implements Command {
 
@@ -94,7 +93,7 @@ public class PlayerCommand implements Command {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
+        new GenerateMap().saveImageToWebsiteOnly(activeGame, event);
     }
 
 

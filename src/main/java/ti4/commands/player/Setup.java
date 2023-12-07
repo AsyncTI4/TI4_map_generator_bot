@@ -72,7 +72,7 @@ public class Setup extends PlayerSubcommandData {
 
         // SPEAKER
         boolean setSpeaker = event.getOption(Constants.SPEAKER, false, OptionMapping::getAsBoolean);
-        String positionHS = event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString);
+        String positionHS = StringUtils.substringBefore(event.getOption(Constants.HS_TILE_POSITION, "", OptionMapping::getAsString), " "); //Substring to grab "305" from "305 Moll Primus (Mentak)" autocomplete
         secondHalfOfPlayerSetup(player, activeGame, color, faction, positionHS, event, setSpeaker);
     }
 
@@ -223,6 +223,11 @@ public class Setup extends PlayerSubcommandData {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+        }
+        if (player.hasAbility("industrialists")) {
+            String unitID = AliasHandler.resolveUnit("spacedock");
+            player.setUnitCap(unitID, 4);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
