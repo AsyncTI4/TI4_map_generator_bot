@@ -23,6 +23,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -1424,5 +1425,35 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
             player.getRepresentation(true, false) + " removed " + count + " commodities from ATS Armaments ("+origATS+"->"+player.getAtsCount()+")");
+    }
+
+    public static Button getRohDhnaIndustriousButton(Game activeGame, Player player, Tile tile, String unitList) {
+        int resources = 0;
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
+        for (String planet : planets) {
+            resources +=Helper.getPlanetResources(planet, activeGame);
+        }
+
+        resources += player.getTg();
+
+        if (resources > 5) {
+            return Button.success("FFCC_" + player.getFaction()+"_rohdhnaIndustrious_" + tile.getPosition() + "_" + unitList, "Replace SD with Warsun");
+        }
+
+        return null;
+    }
+
+    public static void resolveRohDhnaIndustrious(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String tilePos = buttonID.split("_")[1];
+        String toRemove = buttonID.split("_")[2];
+        String planet = toRemove.split(" ")[1];
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), "warsun", activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), toRemove, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced "+Emojis.spacedock+" on "+ Helper.getPlanetRepresentationPlusEmoji(planet) +" with a "+Emojis.warsun);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Click the names of the planets you wish to exhaust to pay the 6 resources", buttons);
+        event.getMessage().delete().queue();
     }
 }
