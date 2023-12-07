@@ -1439,8 +1439,8 @@ public class ButtonHelperFactionSpecific {
         resources += player.getTg();
 
         if (resources > 5) {
-            return Button.success("FFCC_" + player.getFaction()+"_rohdhnaIndustrious_" + tile.getPosition() + "_" + unitList, "Replace SD with Warsun");
-        }
+            return 
+        
 
         return null;
     }
@@ -1463,7 +1463,7 @@ public class ButtonHelperFactionSpecific {
         List<UnitKey> availableUnits = new ArrayList<>();
         HashMap<UnitKey, Integer> units = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
-            if(unit.getUnitType() == UnitType.Cruiser || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought) {
+            if(unit.getColor() == player.getColor() && (unit.getUnitType() == UnitType.Cruiser || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought)) {
                 //if unit is not in the list, add it
                 if(!availableUnits.contains(unit)) {
                     availableUnits.add(unit);
@@ -1476,6 +1476,10 @@ public class ButtonHelperFactionSpecific {
             buttons.add(Button.success("FFCC_" + player.getFaction()+"_rohdhnaRecycle_" + unit.unitName(), unit.unitEmoji()+" "+ unit.getUnitType().humanReadableName()));
         }
 
+        if(!buttons.isEmpty()) {
+            buttons.add(Button.danger("FFCC_" + player.getFaction()+"_deleteButtons", "Decline"));
+        }
+
         return buttons;
     }
 
@@ -1486,6 +1490,9 @@ public class ButtonHelperFactionSpecific {
         int toGain = (int) unit.getCost() - 1;
         int before = player.getTg();
         player.setTg(before + toGain);
+
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, toGain);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
             player.getRepresentation(true, false) + " recycled "+unit.getUnitEmoji()+" "+unit.getName()+" for "+toGain+" tg ("+before+"->"+player.getTg()+")");
