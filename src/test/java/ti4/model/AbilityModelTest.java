@@ -38,7 +38,7 @@ public class AbilityModelTest {
     }
 
     private boolean validateFaction(AbilityModel model) {
-        if (Mapper.isFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
+        if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
         BotLogger.log("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
         return false;
     }

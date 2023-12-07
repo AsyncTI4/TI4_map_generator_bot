@@ -39,7 +39,7 @@ abstract public class AddRemoveToken implements Command {
                     String color = Helper.getColorFromString(activeGame, colorTokenizer.nextToken());
                     if (!colors.contains(color)) {
                         colors.add(color);
-                        if (!Mapper.isColorValid(color)) {
+                        if (!Mapper.isValidColor(color)) {
                             MessageHelper.replyToMessage(event, "Color/faction not valid: " + color);
                             return;
                         }

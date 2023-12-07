@@ -210,7 +210,7 @@ public class StartMilty extends MiltySubcommandData {
     private List<net.dv8tion.jda.api.interactions.components.buttons.Button> getMiltyFactionButtons(Game activeGame) {
         List<net.dv8tion.jda.api.interactions.components.buttons.Button> factionChoose = new ArrayList<>();
         for (String faction : activeGame.getMiltyDraftManager().getFactionDraft()) {
-            if (faction != null && Mapper.isFaction(faction)) {
+            if (faction != null && Mapper.isValidFaction(faction)) {
                 net.dv8tion.jda.api.interactions.components.buttons.Button button = Button.secondary("milty_faction_" + faction, " ");
                 String factionEmojiString = Emojis.getFactionIconFromDiscord(faction);
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));

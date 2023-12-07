@@ -120,7 +120,7 @@ public class FactionModelTest {
 
     private boolean validateHomebrewReplacesID(FactionModel faction) {
         if (faction.getHomebrewReplacesID().isEmpty()) return true;
-        if (Mapper.isFaction(faction.getHomebrewReplacesID().get())) return true;
+        if (Mapper.isValidFaction(faction.getHomebrewReplacesID().get())) return true;
         BotLogger.log("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }
