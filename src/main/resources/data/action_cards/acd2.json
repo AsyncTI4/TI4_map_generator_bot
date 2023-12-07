@@ -108,15 +108,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "bureaucracy_rider",
-    "name": "Bureaucracy Rider",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, either draw 2 secret objectives or gain the speaker token.",
-    "flavorText": "Today's session would be pivotal - the Keleres proclamation was to be signed into full effect. Qanoj smiled. A new chapter in his career would begin today.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
@@ -212,7 +203,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on a planet you control.",
-    "flavorText": "Magmus spoke with a gravelly voice, \"In the final moments of their empire, the Lazax wished to see us properly armed against out oppressors. I now invoke this final decree!\"",
+    "flavorText": "\"In the final moments of their empire, the Lazax wished to see us armed against our oppressors.\" As  Magmus spoke, his voice rose from a gravelly rumble to a roar, \"I now invoke their final decree!\"",
     "source": "action_deck_2"
   },
   {
@@ -228,8 +219,8 @@
     "alias": "derelict_space_station",
     "name": "Derelict Space Station",
     "phase": "Action",
-    "window": "After you activate a system",
-    "text": "Choose 1 system that contains a frontier token. After your ships move out of, into, or through that system during this tactical action, explore that frontier token.",
+    "window": "After your ships move out of, into, or through a system that does not contain a planet",
+    "text": "Explore a frontier token in that system or gain 2 trade goods.",
     "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
     "source": "action_deck_2"
   },
@@ -347,7 +338,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose 1 system that does not contain a planet. If that system does not contain a frontier token, place 1 frontier token in it. Then, explore the frontier token in that system.",
-    "flavorText": "Ciel grimaced at the provisions to explore the Ordinian nebula.",
+    "flavorText": "Although Xuange had promised secrecy, they did not discourage the search for Mirage.",
     "source": "action_deck_2"
   },
   {
@@ -594,6 +585,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "schematics_rider",
+    "name": "Schematics Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, each player gains that technology.",
+    "flavorText": "Berekar passionately discussed the Keleres' technological inferiority with Qanoj. Though he argue their inferiority presented a peril to the galaxy, in truth, of course, he could not care less.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "seized_facility",
     "name": "Seized Facility",
     "phase": "Action",
@@ -642,7 +642,7 @@
     "alias": "singularity_charge",
     "name": "Singularity Charge",
     "phase": "Action",
-    "window": "After the \"Move Ships\" step",
+    "window": "At the start of the first round of a combat",
     "text": "Each unit with SUSTAIN DAMAGE in the active system becomes damaged.",
     "flavorText": "In a barely visible flash, their ships' shields dropped. Mendosa growled, \"Full throttle evasive maneuvers, the Tribesmen have laid a trap!\"",
     "source": "action_deck_2"
@@ -699,15 +699,6 @@
     "window": "Action",
     "text": "Place 1 cruiser from your reinforcements in a non-home anomaly that does not contain another player's ships.",
     "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\" he gestured, \"here we are.\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "strategic_withdrawal",
-    "name": "Strategic Withdrawal",
-    "phase": "Action",
-    "window": "After you move ships into a system other than the active system",
-    "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
-    "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
     "source": "action_deck_2"
   },
   {

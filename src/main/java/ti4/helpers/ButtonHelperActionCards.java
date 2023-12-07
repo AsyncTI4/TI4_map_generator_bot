@@ -327,7 +327,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveReparationsStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons;
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
         buttons = Helper.getPlanetRefreshButtons(event, player, activeGame);
         Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
@@ -776,7 +776,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true)
                 + " since spy is such a frequently sabod card, and it contains secret info, extra precaution has been taken with its resolution. A button has been sent to "
                 + ButtonHelper.getIdentOrColor(p2, activeGame) + " cards info thread, they can press this button to send a random AC to you.");
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentation(true, true) + " you have been hit with the Spy AC. Press the button to send a random AC to the person.", buttons);
@@ -1210,11 +1210,10 @@ public class ButtonHelperActionCards {
         p2.exhaustPlanet(planet);
         int resValue = Helper.getPlanetResources(planet, activeGame);
         int oldTg = player.getTg();
-        int count = resValue;
-        player.setTg(oldTg + count);
-        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ")");
+        player.setTg(oldTg + resValue);
+        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " gained " + resValue + " tgs (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, activeGame);
-        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, resValue);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you exhausted " + planetRep);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
     }

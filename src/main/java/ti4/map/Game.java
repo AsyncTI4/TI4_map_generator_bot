@@ -279,7 +279,7 @@ public class Game {
     private Map<String, Integer> tileDistances = new HashMap<>();
     @Getter
     @Setter
-    private int numberOfPurgedFragments = 0;
+    private int numberOfPurgedFragments;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -3552,9 +3552,9 @@ public class Game {
     }
 
     public void swapInVariantUnits(String source) {
-        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> source.equals(unit.getSource())).toList();
+        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> source.equals(unit.getSource().toString())).toList();
         for (Player player : getPlayers().values()) {
-            List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource())).toList();
+            List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource().toString())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
                     if ((variantUnit.getHomebrewReplacesID().isPresent() && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit

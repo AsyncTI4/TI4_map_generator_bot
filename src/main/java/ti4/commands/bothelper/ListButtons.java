@@ -1,5 +1,6 @@
 package ti4.commands.bothelper;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -34,12 +35,8 @@ public class ListButtons extends BothelperSubcommandData {
             return;
         }
 
-        Message msg = null;
-        if (channel != null) {
-            msg = channel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
-        } else {
-            msg = threadChannel.getHistoryAround(messageId, 1).complete().getMessageById(messageId);
-        }
+        Message msg;
+      msg = Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).complete().getMessageById(messageId);
 
         if (msg == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");

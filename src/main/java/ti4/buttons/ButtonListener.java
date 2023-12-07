@@ -1150,9 +1150,9 @@ public class ButtonListener extends ListenerAdapter {
             Leader playerLeader = player.getLeader("keleresagent").orElse(null);
             if (playerLeader != null && !playerLeader.isExhausted()) {
                 playerLeader.setExhausted(true);
-                StringBuilder messageText = new StringBuilder(player.getRepresentation())
-                    .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), messageText.toString());
+                String messageText = player.getRepresentation() +
+                    " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), messageText);
                 
             }
             event.getMessage().editMessage(editedMessage).queue();
@@ -1678,7 +1678,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (p2 == player) {
                         continue;
                     }
-                    if (activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction()) && p2.getActionCards().keySet().contains("disgrace")) {
+                    if (activeGame.getFactionsThatReactedToThis("Public Disgrace").contains(p2.getFaction()) && p2.getActionCards().containsKey("disgrace")) {
                         PlayAC.playAC(event, activeGame, p2, "disgrace", activeGame.getMainGameChannel(), event.getGuild());
                         activeGame.setCurrentReacts("Public Disgrace", "");
                         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -2246,9 +2246,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
                 }
-                case "getKeleresTechOptions" -> {
-                    ButtonHelperFactionSpecific.offerKeleresStartingTech(player, activeGame, event);
-                }
+                case "getKeleresTechOptions" -> ButtonHelperFactionSpecific.offerKeleresStartingTech(player, activeGame, event);
                 case "transaction" -> {
                     List<Button> buttons;
                     buttons = ButtonHelper.getPlayersToTransact(activeGame, player);
@@ -2366,9 +2364,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
-                case "getOmenDice" -> {
-                    ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
-                }
+                case "getOmenDice" -> ButtonHelperAbilities.offerOmenDiceButtons(activeGame, player);
                 case "leadershipExhaust" -> {
                     ButtonHelper.addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
@@ -2442,12 +2438,8 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
                 }
-                case "spyNetYssarilChooses" -> {
-                    ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, activeGame, event);
-                }
-                case "spyNetPlayerChooses" -> {
-                    ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, activeGame, event);
-                }
+                case "spyNetYssarilChooses" -> ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, activeGame, event);
+                case "spyNetPlayerChooses" -> ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, activeGame, event);
                 case "diploSystem" -> {
                     String message = trueIdentity + " Click the name of the planet who's system you wish to diplo";
                     List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeGame, false, null);
@@ -2484,18 +2476,10 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelper.commanderUnlockCheck(player, activeGame, "yssaril", event);
                     }
                 }
-                case "resolveMykoMech" -> {
-                    ButtonHelperFactionSpecific.resolveMykoMech(player, activeGame);
-                }
-                case "offerNecrophage" -> {
-                    ButtonHelperFactionSpecific.offerNekrophageButtons(player, activeGame, event);
-                }
-                case "resolveMykoCommander" -> {
-                    ButtonHelperCommanders.mykoCommanderUsage(player, activeGame, event);
-                }
-                case "checkForAllACAssignments" -> {
-                    ButtonHelperActionCards.checkForAllAssignmentACs(activeGame, player);
-                }
+                case "resolveMykoMech" -> ButtonHelperFactionSpecific.resolveMykoMech(player, activeGame);
+                case "offerNecrophage" -> ButtonHelperFactionSpecific.offerNekrophageButtons(player, activeGame, event);
+                case "resolveMykoCommander" -> ButtonHelperCommanders.mykoCommanderUsage(player, activeGame, event);
+                case "checkForAllACAssignments" -> ButtonHelperActionCards.checkForAllAssignmentACs(activeGame, player);
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeGame, player, event, " Drew a " + Emojis.SecretObjective);
                     if (used) {
@@ -2836,9 +2820,8 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "startYinSpinner" -> {
-                    List<Button> buttons = new ArrayList<Button>();
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " Chose to Use Yin Spinner");
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "2gf", "placeOneNDone_skipbuild"));
                     String message = "Use buttons to drop 2 infantry on a planet. Technically you can also drop 2 infantry with your ships, but this aint supported yet via button. ";
                     ButtonHelper.deleteTheOneButton(event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -2900,9 +2883,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " " + message);
                     }
                 }
-                case "startPlayerSetup" -> {
-                    ButtonHelper.resolveSetupStep0(player, activeGame, event);
-                }
+                case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, activeGame, event);
                 case "gain_1_comm_from_MahactInf" -> {
                     String message;
                     if (player.getCommodities() + 1 > player.getCommoditiesTotal()) {
@@ -3199,127 +3180,47 @@ public class ButtonListener extends ListenerAdapter {
                     new FighterConscription().doFfCon(event, player, activeGame);
                     event.getMessage().delete().queue();
                 }
-                case "miningInitiative" -> {
-                    ButtonHelperActionCards.miningInitiative(player, activeGame, event);
-                }
-                case "forwardSupplyBase" -> {
-                    ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
-                }
-                case "economicInitiative" -> {
-                    ButtonHelperActionCards.economicInitiative(player, activeGame, event);
-                }
-                case "getRepealLawButtons" -> {
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select Law to repeal", ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
-                }
-                case "resolveCounterStroke" -> {
-                    ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event);
-                }
-                case "getDivertFundingButtons" -> {
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select tech to return",
-                        ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
-                }
-                case "focusedResearch" -> {
-                    ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
-                }
-                case "resolveReparationsStep1" -> {
-                    ButtonHelperActionCards.resolveReparationsStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveSeizeArtifactStep1" -> {
-                    ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveDiplomaticPressureStep1" -> {
-                    ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveImpersonation" -> {
-                    ButtonHelperActionCards.resolveImpersonation(player, activeGame, event, buttonID);
-                }
-                case "resolveUprisingStep1" -> {
-                    ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
-                }
-                case "setTrapStep1" -> {
-                    ButtonHelperAbilities.setTrapStep1(activeGame, player);
-                }
-                case "revealTrapStep1" -> {
-                    ButtonHelperAbilities.revealTrapStep1(activeGame, player);
-                }
-                case "removeTrapStep1" -> {
-                    ButtonHelperAbilities.removeTrapStep1(activeGame, player);
-                }
-                case "offerDeckButtons" -> {
-                    ButtonHelper.offerDeckButtons(activeGame, event);
-                }
-                case "resolveAssRepsStep1" -> {
-                    ButtonHelperActionCards.resolveAssRepsStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveSignalJammingStep1" -> {
-                    ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
-                }
-                case "resolvePlagueStep1" -> {
-                    ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveCrippleDefensesStep1" -> {
-                    ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveInfiltrateStep1" -> {
-                    ButtonHelperActionCards.resolveInfiltrateStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveReactorMeltdownStep1" -> {
-                    ButtonHelperActionCards.resolveReactorMeltdownStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveSpyStep1" -> {
-                    ButtonHelperActionCards.resolveSpyStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveUnexpected" -> {
-                    ButtonHelperActionCards.resolveUnexpectedAction(player, activeGame, event, buttonID);
-                }
-                case "resolveFrontline" -> {
-                    ButtonHelperActionCards.resolveFrontlineDeployment(player, activeGame, event, buttonID);
-                }
-                case "resolveInsubStep1" -> {
-                    ButtonHelperActionCards.resolveInsubStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveUnstableStep1" -> {
-                    ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveABSStep1" -> {
-                    ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveWarEffort" -> {
-                    ButtonHelperActionCards.resolveWarEffort(activeGame, player, event);
-                }
-                case "resolveInsiderInformation" -> {
-                    ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
-                }
-                case "resolveSalvageStep1" -> {
-                    ButtonHelperActionCards.resolveSalvageStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveGhostShipStep1" -> {
-                    ButtonHelperActionCards.resolveGhostShipStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveTacticalBombardmentStep1" -> {
-                    ButtonHelperActionCards.resolveTacticalBombardmentStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveProbeStep1" -> {
-                    ButtonHelperActionCards.resolveProbeStep1(player, activeGame, event, buttonID);
-                }
-                case "resolvePSStep1" -> {
-                    ButtonHelperActionCards.resolvePSStep1(player, activeGame, event, buttonID);
-                }
-                case "resolveRally" -> {
-                    ButtonHelperActionCards.resolveRally(activeGame, player, event);
-                }
-                case "resolveHarness" -> {
-                    ButtonHelperActionCards.resolveHarnessEnergy(activeGame, player, event);
-                }
-                case "resolveSummit" -> {
-                    ButtonHelperActionCards.resolveSummit(activeGame, player, event);
-                }
-                case "resolveRefitTroops" -> {
-                    ButtonHelperActionCards.resolveRefitTroops(player, activeGame, event, buttonID, finsFactionCheckerPrefix);
-                }
-                case "industrialInitiative" -> {
-                    ButtonHelperActionCards.industrialInitiative(player, activeGame, event);
-                }
+                case "miningInitiative" -> ButtonHelperActionCards.miningInitiative(player, activeGame, event);
+                case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, activeGame, event, buttonID);
+                case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, activeGame, event);
+                case "getRepealLawButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select Law to repeal", ButtonHelperActionCards.getRepealLawButtons(activeGame, player));
+                case "resolveCounterStroke" -> ButtonHelperActionCards.resolveCounterStroke(activeGame, player, event);
+                case "getDivertFundingButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select tech to return",
+                    ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, activeGame));
+                case "focusedResearch" -> ButtonHelperActionCards.resolveFocusedResearch(activeGame, player, buttonID, event);
+                case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, activeGame, event, buttonID);
+                case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, activeGame, event, buttonID);
+                case "resolveDiplomaticPressureStep1" -> ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, activeGame, event, buttonID);
+                case "resolveImpersonation" -> ButtonHelperActionCards.resolveImpersonation(player, activeGame, event, buttonID);
+                case "resolveUprisingStep1" -> ButtonHelperActionCards.resolveUprisingStep1(player, activeGame, event, buttonID);
+                case "setTrapStep1" -> ButtonHelperAbilities.setTrapStep1(activeGame, player);
+                case "revealTrapStep1" -> ButtonHelperAbilities.revealTrapStep1(activeGame, player);
+                case "removeTrapStep1" -> ButtonHelperAbilities.removeTrapStep1(activeGame, player);
+                case "offerDeckButtons" -> ButtonHelper.offerDeckButtons(activeGame, event);
+                case "resolveAssRepsStep1" -> ButtonHelperActionCards.resolveAssRepsStep1(player, activeGame, event, buttonID);
+                case "resolveSignalJammingStep1" -> ButtonHelperActionCards.resolveSignalJammingStep1(player, activeGame, event, buttonID);
+                case "resolvePlagueStep1" -> ButtonHelperActionCards.resolvePlagueStep1(player, activeGame, event, buttonID);
+                case "resolveCrippleDefensesStep1" -> ButtonHelperActionCards.resolveCrippleDefensesStep1(player, activeGame, event, buttonID);
+                case "resolveInfiltrateStep1" -> ButtonHelperActionCards.resolveInfiltrateStep1(player, activeGame, event, buttonID);
+                case "resolveReactorMeltdownStep1" -> ButtonHelperActionCards.resolveReactorMeltdownStep1(player, activeGame, event, buttonID);
+                case "resolveSpyStep1" -> ButtonHelperActionCards.resolveSpyStep1(player, activeGame, event, buttonID);
+                case "resolveUnexpected" -> ButtonHelperActionCards.resolveUnexpectedAction(player, activeGame, event, buttonID);
+                case "resolveFrontline" -> ButtonHelperActionCards.resolveFrontlineDeployment(player, activeGame, event, buttonID);
+                case "resolveInsubStep1" -> ButtonHelperActionCards.resolveInsubStep1(player, activeGame, event, buttonID);
+                case "resolveUnstableStep1" -> ButtonHelperActionCards.resolveUnstableStep1(player, activeGame, event, buttonID);
+                case "resolveABSStep1" -> ButtonHelperActionCards.resolveABSStep1(player, activeGame, event, buttonID);
+                case "resolveWarEffort" -> ButtonHelperActionCards.resolveWarEffort(activeGame, player, event);
+                case "resolveInsiderInformation" -> ButtonHelperActionCards.resolveInsiderInformation(player, activeGame, event);
+                case "resolveSalvageStep1" -> ButtonHelperActionCards.resolveSalvageStep1(player, activeGame, event, buttonID);
+                case "resolveGhostShipStep1" -> ButtonHelperActionCards.resolveGhostShipStep1(player, activeGame, event, buttonID);
+                case "resolveTacticalBombardmentStep1" -> ButtonHelperActionCards.resolveTacticalBombardmentStep1(player, activeGame, event, buttonID);
+                case "resolveProbeStep1" -> ButtonHelperActionCards.resolveProbeStep1(player, activeGame, event, buttonID);
+                case "resolvePSStep1" -> ButtonHelperActionCards.resolvePSStep1(player, activeGame, event, buttonID);
+                case "resolveRally" -> ButtonHelperActionCards.resolveRally(activeGame, player, event);
+                case "resolveHarness" -> ButtonHelperActionCards.resolveHarnessEnergy(activeGame, player, event);
+                case "resolveSummit" -> ButtonHelperActionCards.resolveSummit(activeGame, player, event);
+                case "resolveRefitTroops" -> ButtonHelperActionCards.resolveRefitTroops(player, activeGame, event, buttonID, finsFactionCheckerPrefix);
+                case "industrialInitiative" -> ButtonHelperActionCards.industrialInitiative(player, activeGame, event);
                 case "confirm_cc" -> {
                     if (player.getMahactCC().size() > 0) {
                         ButtonHelper.addReaction(event, true, false, "Confirmed CCs: " + player.getTacticalCC() + "/" + player.getFleetCC() + "(+"
@@ -3420,21 +3321,11 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
-                case "startArbiter" -> {
-                    ButtonHelper.resolveImperialArbiter(event, activeGame, player);
-                }
-                case "pay1tgforKeleres" -> {
-                    ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
-                }
-                case "announceARetreat" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " announces a retreat");
-                }
-                case "declinePDS" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " officially declines to fire PDS");
-                }
-                case "startQDN" -> {
-                    ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
-                }
+                case "startArbiter" -> ButtonHelper.resolveImperialArbiter(event, activeGame, player);
+                case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, activeGame, event);
+                case "announceARetreat" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " announces a retreat");
+                case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " officially declines to fire PDS");
+                case "startQDN" -> ButtonHelperFactionSpecific.resolveQuantumDataHubNodeStep1(player, activeGame, event, buttonID);
                 case "finishComponentAction" -> {
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeGame, true, event);
@@ -3496,9 +3387,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
-                case "ministerOfWar" -> {
-                    AgendaHelper.resolveMinisterOfWar(activeGame, player, event);
-                }
+                case "ministerOfWar" -> AgendaHelper.resolveMinisterOfWar(activeGame, player, event);
                 case "concludeMove" -> {
                     String message = "Moved all units to the space area.";
                     Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
@@ -3571,9 +3460,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "showGameAgain" -> ShowGame.simpleShowGame(activeGame, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, activeGame, player, ident);
-                case "doneLanding" -> {
-                    ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
-                }
+                case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, activeGame, player);
                 case "vote" -> {
                     String pfaction2 = null;
                     if (player != null) {
@@ -3653,9 +3540,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     ButtonHelper.updateMap(activeGame, event, "End of Turn " + player.getTurnCount() + ", Round " + activeGame.getRound() + " for " + ButtonHelper.getIdent(player));
                 }
-                case "getDiplomatsButtons" -> {
-                    ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
-                }
+                case "getDiplomatsButtons" -> ButtonHelperAbilities.resolveGetDiplomatButtons(buttonID, event, activeGame, player);
                 case "gameEnd" -> {
                     GameEnd.secondHalfOfGameEnd(event, activeGame, true, true);
                     event.getMessage().delete().queue();
@@ -3776,9 +3661,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ACInfo.getDiscardActionCardButtons(activeGame, player, false);
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
-                case "eraseMyRiders" -> {
-                    AgendaHelper.reverseAllRiders(event, activeGame, player);
-                }
+                case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, activeGame, player);
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();
                     if (activeGame.isFoWMode()) {
