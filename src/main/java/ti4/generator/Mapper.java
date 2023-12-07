@@ -57,7 +57,6 @@ import ti4.model.Source.ComponentSource;
 public class Mapper {
     private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
-    private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties general = new Properties();
@@ -99,7 +98,6 @@ public class Mapper {
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
         readData("color.properties", colors);
         readData("decals.properties", decals);
-        readData("attachments.properties", attachment_tokens);
         readData("tokens.properties", tokens);
         readData("special_case.properties", special_case);
         readData("general.properties", general);
@@ -380,8 +378,10 @@ public class Mapper {
         return "fleet_" + property + ".png";
     }
 
-    public static String getAttachmentID(String tokenID) {
-        return attachment_tokens.getProperty(tokenID);
+    public static String getAttachmentImagePath(String tokenID) {
+        AttachmentModel model = getAttachmentInfo(tokenID);
+        if (model == null) return null;
+        return model.getImagePath();
     }
 
     public static String getTokenID(String tokenID) {
@@ -410,7 +410,7 @@ public class Mapper {
     }
 
     public static List<String> getTokens() {
-        return Stream.of(attachment_tokens.keySet(), tokens.keySet()).flatMap(Collection::stream)
+        return Stream.of(attachments.keySet(), tokens.keySet()).flatMap(Collection::stream)
             .filter(token -> token instanceof String)
             .map(token -> (String) token)
             .sorted()
@@ -419,9 +419,9 @@ public class Mapper {
 
     public static Map<String, String> getTokensToName() {
         Map<String, String> tokensToName = new HashMap<>();
-        for (Map.Entry<Object, Object> attachment : attachment_tokens.entrySet()) {
-            String key = (String) attachment.getKey();
-            String value = (String) attachment.getValue();
+        for (Map.Entry<String, AttachmentModel> attachment : attachments.entrySet()) {
+            String key = attachment.getKey();
+            String value = attachment.getValue().getImagePath();
             tokensToName.put(value, key);
         }
 
@@ -540,11 +540,15 @@ public class Mapper {
         return TileHelper.getAllPlanets().get(id);
     }
 
+    public static boolean isValidAttachment(String id) {
+        return attachments.containsKey(id);
+    }
+
     public static AttachmentModel getAttachmentInfo(String id) {
         return attachments.get(id);
     }
 
-    public static List<AttachmentModel> getAttachmentInfoAll() {
+    public static List<AttachmentModel> getAttachments() {
         return new ArrayList<>(attachments.values());
     }
 

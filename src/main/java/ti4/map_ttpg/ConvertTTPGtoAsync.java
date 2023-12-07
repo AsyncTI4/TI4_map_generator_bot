@@ -637,7 +637,7 @@ public class ConvertTTPGtoAsync {
                         String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
 
-                        String attachmentFileName = Mapper.getAttachmentID(attachmentResolved);
+                        String attachmentFileName = Mapper.getAttachmentImagePath(attachmentResolved);
                         String tokenFileName = Mapper.getTokenID(attachmentResolved);
 
                         if (tokenFileName != null && regionIsPlanet) {

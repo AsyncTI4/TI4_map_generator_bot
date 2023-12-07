@@ -19,6 +19,7 @@ public class AttachmentModel implements ModelInterface {
 
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
+    private String source;
 
     @Override
     public boolean isValid() {
@@ -28,7 +29,7 @@ public class AttachmentModel implements ModelInterface {
 
     @Override
     public String getAlias() {
-        return getImagePath(); // looks like were using the attachment_<name>.png for identification for now.
+        return getId(); // looks like were using the attachment_<name>.png for identification for now.
     }
 
     public boolean isFakeAttachment() {
