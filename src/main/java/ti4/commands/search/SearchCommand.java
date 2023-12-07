@@ -60,6 +60,7 @@ public class SearchCommand implements Command {
         subcommands.add(new ListCommands());
         subcommands.add(new ListMyGames());
         subcommands.add(new ListAgendas());
+        subcommands.add(new ListEvents());
         subcommands.add(new ListSecretObjectives());
         subcommands.add(new ListPublicObjectives());
         subcommands.add(new ListRelics());
@@ -69,6 +70,7 @@ public class SearchCommand implements Command {
         subcommands.add(new ListPromissoryNotes());
         subcommands.add(new ListExplores());
         subcommands.add(new ListDecks());
+        subcommands.add(new ListFactions());
 
         return subcommands;
     }

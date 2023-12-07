@@ -131,7 +131,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. At the end of the strategy phase, the owner of this card may discard this card to swap 1 of their strategy cards with 1 of another player's strategy cards.",
         "text2": "",
-        "mapText": "At the end of the strategy phase, you may discard this card to swap 1 of your strategy cards with 1 of another player's strategy cards.",
+        "mapText": "At the end of the strategy phase, you may discard this card to swap 1 of your  strategy cards with 1 of another player's strategy cards.",
         "source": "base"
     },
     {

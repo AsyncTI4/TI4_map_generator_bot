@@ -1,6 +1,8 @@
 package ti4.commands.event;
 
-import java.util.Map;
+import java.util.Map.Entry;
+
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -12,7 +14,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventInfo extends EventSubcommandData {
     public EventInfo() {
@@ -51,37 +54,16 @@ public class EventInfo extends EventSubcommandData {
     }
 
     public static void sendEventInfo(Game activeGame, Player player) {
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getEventInfo(activeGame, player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(activeGame, player, "_ _\n__**Events in Hand:**__", getEventMessageEmbeds(player));
     }
 
-    private static String getEventInfo(Game activeGame, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("_ _\n");
-
-        //ACTION CARDS
-        sb.append("**Event Cards in hand:**").append("\n");
-        int index = 1;
-
-        LinkedHashMap<String, Integer> eventCards = player.getEvents();
-        if (eventCards != null) {
-            if (eventCards.isEmpty()) {
-                sb.append("> None");
-            } else {
-                for (Map.Entry<String, Integer> event : eventCards.entrySet()) {
-                    Integer value = event.getValue();
-                    EventModel eventModel = Mapper.getEvent(event.getKey());
-
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    if (eventModel == null) {
-                        sb.append("Something broke here");
-                    } else {
-                        sb.append(eventModel.getRepresentation(value));
-                    }
-
-                    index++;
-                }
-            }
+    private static List<MessageEmbed> getEventMessageEmbeds(Player player) {
+        List<MessageEmbed> messageEmbeds = new ArrayList<>();
+        for (Entry<String, Integer> entry : player.getEvents().entrySet()) {
+            EventModel model = Mapper.getEvent(entry.getKey());
+            MessageEmbed representationEmbed = model.getRepresentationEmbed(entry.getValue());
+            messageEmbeds.add(representationEmbed);
         }
-        return sb.toString();
+        return messageEmbeds;
     }
 }

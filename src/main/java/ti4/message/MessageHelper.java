@@ -29,7 +29,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -255,7 +255,7 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue(complete -> {
 					if (messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn")) {
 						String gameName = channel.getName();
-						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
 						Game activeGame = GameManager.getInstance().getGame(gameName);
 						if (!activeGame.isFoWMode()) {
@@ -265,7 +265,7 @@ public class MessageHelper {
 
 					if (messageText.toLowerCase().contains("up next") && messageText.contains("#")) {
 						String gameName = channel.getName();
-						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
 						Game activeGame = GameManager.getInstance().getGame(gameName);
 						if (!activeGame.isFoWMode()) {
@@ -595,7 +595,7 @@ public class MessageHelper {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					badButtonIDsAndReason
 						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel() + "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " " + emoji.getId());
-					button = button.withEmoji(null);
+					button = Button.of(button.getStyle(), button.getId(), button.getLabel());
 				}
 			}
 			newButtons.add(button);

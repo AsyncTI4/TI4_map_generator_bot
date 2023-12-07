@@ -114,7 +114,7 @@ public class Mapper {
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class, "Could not read attachments file");
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class, "Could not read faction setup file");
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class, "Could not read franken errata file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {

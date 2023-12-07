@@ -770,7 +770,7 @@ public class Helper {
             }
             msg = msg + localPlace;
         }
-        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" resources** (not counting discounts).";
+        msg = msg +"For the total cost of: **"+calculateCostOfProducedUnits(player, activeGame) +" Resources** (not counting discounts).";
         return msg;
     }
 
@@ -1901,5 +1901,27 @@ public class Helper {
         }
 
         return false;
+    }
+
+    public static String getUnitListEmojis(String unitList) {
+        String[] units = unitList.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String desc: units) {
+            String[] split = desc.trim().split(" ");
+            String alias;
+            int count;
+            if (StringUtils.isNumeric(split[0])) {
+                count = Integer.parseInt(split[0]);
+                alias = split[1];
+            } else {
+                count = 1;
+                alias = split[0];
+            }
+
+            for (int i = 1; i <= count; i++) {
+                sb.append(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))));
+            }
+        }
+        return sb.toString();
     }
 }

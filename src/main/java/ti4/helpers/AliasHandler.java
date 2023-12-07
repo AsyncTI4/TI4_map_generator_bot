@@ -18,7 +18,6 @@ public class AliasHandler {
 
     private static final Map<String, String> tilemapAliasList = new HashMap<>();
     private static final Map<String, String> unitAliasList = new HashMap<>();
-    private static final List<String> unitValuesList = new ArrayList<>();
     private static final Map<String, String> unitListForHelp = new HashMap<>();
     private static final Map<String, String> cctokenAliasList = new HashMap<>();
     private static final Map<String, String> attachmentAliasList = new HashMap<>();
@@ -39,10 +38,12 @@ public class AliasHandler {
     private static final Map<String, String> allTileAliases = new HashMap<>();
     private static final Map<String, String> allPlanetAliases = new HashMap<>();
 
+    private static final List<String> unitValuesList = new ArrayList<>();
+    private static final List<String> factionAliasValuesList = new ArrayList<>();
+
     public static void init() {
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
-        readAliasFile("unit_alias.properties", unitValuesList, false);
         readAliasFile("unit_alias.properties", unitListForHelp);
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
@@ -60,6 +61,10 @@ public class AliasHandler {
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
+
+        readAliasFile("unit_alias.properties", unitValuesList, false);
+        readAliasFile("faction_alias.properties", factionAliasValuesList, false);
+
         initAliases();
     }
 
@@ -380,5 +385,9 @@ public class AliasHandler {
         return TileHelper.getAllTiles().values().stream()
                 .collect(Collectors.toMap(TileModel::getId,
                         tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
+    }
+
+    public static String getFactionAliasEntryList(String faction) {
+        return factionAliasValuesList.stream().filter(a -> a.startsWith(faction)).findFirst().orElse(faction);
     }
 }
