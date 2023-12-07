@@ -88,64 +88,69 @@ public class Mapper {
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
 
     public static void init() {
-        importJsonObjectsFromFolder("factions", factions, FactionModel.class, "Could not read faction setup file");
-        readData("color.properties", colors, "Could not read color name file");
-        readData("decals.properties", decals, "Could not read decals name file");
-        readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
-        readData("tokens.properties", tokens, "Could not read token name file");
-        readData("special_case.properties", special_case, "Could not read token name file");
-        readData("general.properties", general, "Could not read general token name file");
-        readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
-        readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
-        readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
-        importJsonObjectsFromFolder("explores", explore, ExploreModel.class, "Could not read explore file");
-        importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class, "Could not read secret objectives file");
-        importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class, "Could not read faction abilities file");
-        importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class, "Could not read action cards file");
-        importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class, "Could not read agendas file");
-        importJsonObjectsFromFolder("events", events, EventModel.class, "Could not read events file");
-        importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class, "Could not read public objective file");
-        importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class, "Could not read promissory notes file");
-        importJsonObjectsFromFolder("relics", relics, RelicModel.class, "Could not read relic file");
-        importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class, "Could not read technology file");
-        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class, "Could not read leader file");
-        importJsonObjectsFromFolder("decks", decks, DeckModel.class, "could not read decks file");
-        importJsonObjectsFromFolder("units", units, UnitModel.class, "could not read units file");
-        importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class, "Could not read attachments file");
-        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class, "could not read strat cards file");
-        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class, "could not read combat modifiers file");
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class, "Could not read franken errata file");
+        try {
+            loadData();
+        } catch (Exception e) {
+            BotLogger.log("Could not load data", e);
+        }
     }
 
-    private static void readData(String propertyFileName, Properties properties, String s) {
+    public static void loadData() throws Exception {
+        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
+        readData("color.properties", colors);
+        readData("decals.properties", decals);
+        readData("attachments.properties", attachment_tokens);
+        readData("tokens.properties", tokens);
+        readData("special_case.properties", special_case);
+        readData("general.properties", general);
+        readData("milty_draft.properties", miltyDraft);
+        readData("hyperlanes.properties", hyperlaneAdjacencies);
+        readData("DS_handcards.properties", ds_handcards);
+        importJsonObjectsFromFolder("explores", explore, ExploreModel.class);
+        importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
+        importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class);
+        importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
+        importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
+        importJsonObjectsFromFolder("events", events, EventModel.class);
+        importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class);
+        importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class);
+        importJsonObjectsFromFolder("relics", relics, RelicModel.class);
+        importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
+        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
+        importJsonObjectsFromFolder("decks", decks, DeckModel.class);
+        importJsonObjectsFromFolder("units", units, UnitModel.class);
+        importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardModel.class);
+        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
+    }
+
+    private static void readData(String propertyFileName, Properties properties) throws IOException {
         String propFile = ResourceHelper.getInstance().getDataFile(propertyFileName);
         if (propFile != null) {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
             } catch (IOException e) {
-                BotLogger.log(s);
+                BotLogger.log("Could not read .property file: " + propertyFileName, e);
+                throw e;
             }
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target, String error) {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws Exception {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
         objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
-        try {
-            File folder = new File(folderPath);
-            File[] listOfFiles = folder.listFiles();
-            for (File file : listOfFiles) {
-                if (file.isFile() && file.getName().endsWith(".json")) {
-                    importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target, error);
-                }
+        File folder = new File(folderPath);
+        File[] listOfFiles = folder.listFiles();
+        for (File file : listOfFiles) {
+            if (file.isFile() && file.getName().endsWith(".json")) {
+                importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
             }
-        } catch (Exception e) {
-            BotLogger.log(error, e);
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target, String error) {
+    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
@@ -156,8 +161,8 @@ public class Mapper {
                 InputStream input = new FileInputStream(filePath);
                 allObjects = objectMapper.readValue(input, type);
             } catch (Exception e) {
-                BotLogger.log(error);
-                BotLogger.log(e.getMessage());
+                BotLogger.log("Could not import JSON Objects from File: " + jsonFileName, e);
+                throw e;
             }
         }
 
