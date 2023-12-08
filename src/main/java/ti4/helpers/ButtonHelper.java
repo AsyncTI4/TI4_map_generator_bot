@@ -2412,6 +2412,7 @@ public class ButtonHelper {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
                 }
+                System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
                     if (player.ownsUnit("cabal_spacedock")) {
                         fightersIgnored += 6;
@@ -2424,7 +2425,7 @@ public class ButtonHelper {
                 }
             }
         }
-
+        System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
         for (UnitModel unit : unitsByQuantity.keySet()) {
@@ -4280,7 +4281,7 @@ public class ButtonHelper {
     }
 
     public static int getNumberOfGravRiftsPlayerIsIn(Player player, Game activeGame) {
-        return (int) activeGame.getTileMap().values().stream().filter(tile -> tile.isGravityRift() && tile.containsPlayersUnits(player)).count();
+        return (int) activeGame.getTileMap().values().stream().filter(tile -> tile.isGravityRift(activeGame) && tile.containsPlayersUnits(player)).count();
     }
 
     public static List<Button> getButtonsForRepairingUnitsInASystem(Player player, Game activeGame, Tile tile) {
