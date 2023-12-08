@@ -35,7 +35,7 @@ public class AddFrontierTokens implements Command {
         Collection<Tile> tileList = activeGame.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
-            if (frontierTileList.contains(tile.getTileID())) {
+            if (frontierTileList.contains(tile.getTileID()) && !activeGame.isBaseGameMode()) {
                 boolean hasMirage = false;
                 for (UnitHolder unitholder : tile.getUnitHolders().values()) {
                     if (unitholder.getName().equals(Constants.MIRAGE)) {
