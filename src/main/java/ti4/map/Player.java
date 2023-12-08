@@ -1231,7 +1231,7 @@ public class Player {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         } else {
             return hasExternalAccessToLeader(leaderId)
-                && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true);
+                && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
         }
     }
 

@@ -296,28 +296,34 @@ public class ButtonHelperModifyUnits {
         } else {
             Tile tile;
             String producedOrPlaced = "Produced";
-            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong)) {
-                if ("2gf".equalsIgnoreCase(unitLong)) {
+            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || (unitLong.contains("gf") && unitLong.length() > 2)) {
+                if ((unitLong.contains("gf") && unitLong.length() > 2)) {
                     if (!planetName.contains("space")) {
                         spaceOrPlanet = planetName;
                         tile = activeGame.getTile(AliasHandler.resolveTile(planetName));
-                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
-                        player.produceUnit(producedInput);
-                        player.produceUnit(producedInput);
+                        String num = unitLong.substring(0, 1);
+                        String producedInput = unit.replace(num,"")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        int nu = Integer.parseInt(num);
+                        for(int x = 0;x < nu; x++){
+                            player.produceUnit(producedInput);
+                        }
                         new AddUnits().unitParsing(event, player.getColor(),
-                            activeGame.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
+                            activeGame.getTile(AliasHandler.resolveTile(planetName)), num+" gf " + planetName,
                             activeGame);
-                        successMessage = producedOrPlaced + " 2 " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
+                        successMessage = producedOrPlaced + " "+num+" " + Emojis.infantry + " on " + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
                     } else {
                         spaceOrPlanet = "space";
                         tile = activeGame.getTileByPosition(planetName.replace("space", ""));
-                        String producedInput = unit.replace("2","")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
-                        player.produceUnit(producedInput);
-                        player.produceUnit(producedInput);
+                        String num = unitLong.substring(0, 1);
+                        String producedInput = unit.replace(num,"")+"_"+tile.getPosition()+"_"+spaceOrPlanet;
+                        int nu = Integer.parseInt(num);
+                        for(int x = 0;x < nu; x++){
+                            player.produceUnit(producedInput);
+                        }
                         new AddUnits().unitParsing(event, player.getColor(),
-                            tile, "2 gf",
+                            tile, num+" gf",
                             activeGame);
-                        successMessage = producedOrPlaced + " 2 " + Emojis.infantry + " in space.";
+                        successMessage = producedOrPlaced + " "+num+" " + Emojis.infantry + " in space.";
                     }
                 } else {
 
@@ -503,8 +509,8 @@ public class ButtonHelperModifyUnits {
                 + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
         } else {
             Tile tile;
-            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || "2gf".equalsIgnoreCase(unitLong) || "3gf".equalsIgnoreCase(unitLong)) {
-                if ("2gf".equalsIgnoreCase(unitLong) || "3gf".equalsIgnoreCase(unitLong)) {
+            if ("gf".equalsIgnoreCase(unit) || "mf".equalsIgnoreCase(unit) || ((unitLong.contains("gf") && unitLong.length() > 2))) {
+                if (unitLong.contains("gf") && unitLong.length() > 2) {
                     String amount = "" + unitLong.charAt(0);
                     if (!planetName.contains("space")) {
                         new AddUnits().unitParsing(event, player.getColor(),
@@ -557,6 +563,10 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
         if(skipbuild.contains("freelancers")){
              buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "both");
+        }
+        if (player.hasUnexhaustedLeader("ghotiagent")) {
+            Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+            buttons.add(winnuButton);
         }
         Button DoneExhausting;
         if (!buttonID.contains("deleteButtons")) {
@@ -1187,6 +1197,10 @@ public class ButtonHelperModifyUnits {
         tile.addUnitDamage(planetName, unitKey, amount);
         String message = event.getMessage().getContentRaw();
         String message2 = ident + " Sustained " + amount + " " + unitName + " from " + planetName + " in tile " + tile.getRepresentationForButtons(activeGame, player);
+
+        if(player.hasTech("nes")){
+            message2 = message2 + ". These sustains cancel 2 hits due to Non-Euclidean Shielding";
+        }
         List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeGame, tile);
         event.getMessage().editMessage(message)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();

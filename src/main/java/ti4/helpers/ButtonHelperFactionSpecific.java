@@ -1458,7 +1458,8 @@ public class ButtonHelperFactionSpecific {
 
         List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : availableUnits) {
-            buttons.add(Button.success("FFCC_" + player.getFaction()+"_rohdhnaRecycle_" + unit.unitName(), unit.unitEmoji()+" "+ unit.getUnitType().humanReadableName()));
+            buttons.add(Button.success("FFCC_" + player.getFaction()+"_rohdhnaRecycle_" + unit.unitName(), unit.getUnitType().humanReadableName()).withEmoji(Emoji.fromFormatted(unit.unitEmoji())));
+
         }
 
         if(!buttons.isEmpty()) {

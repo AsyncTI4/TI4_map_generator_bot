@@ -666,14 +666,20 @@ public class Helper {
         int inf = 0;
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
+        int bestRes = 0;
         for(String thing : spentThings){
-            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander")){
+            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
+                    if(!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet.getName()))){
+                        if(planet.getResources() > bestRes){
+                            bestRes = planet.getResources();
+                        }
+                    }
                     if(resOrInfOrBoth.equalsIgnoreCase("res")){
                         if(xxcha){
                             msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
@@ -717,8 +723,16 @@ public class Helper {
                     }
                     msg = msg+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
                 }
-                if(thing.contains("commander")){
-                     msg = msg + thing + "\n";
+                if(thing.contains("commander") || thing.contains("Gledge Agent")){
+                     msg = msg + "> "+thing + "\n";
+                }else if(thing.contains("Winnu Agent")){
+                     msg = msg +"> "+ thing + "\n";
+                    res = res +2;
+                }else if(thing.contains("Zealots Agent")){
+                    msg = msg +"> "+ thing + "(Best Resources found were "+bestRes+")\n";
+                    inf = inf +bestRes;
+                }else if(thing.contains("Agent")){
+                    msg = msg +"> "+ thing + "\n";
                 }
             }
         }

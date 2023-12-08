@@ -69,6 +69,10 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, buttons);
 	}
 
+	public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+		sendMessageToChannelWithButtons(channel, messageText, buttons);
+	}
+
 	private static void addFactionReactToMessage(Game activeGame, Player player, Message message) {
 		Emoji reactionEmoji = Helper.getPlayerEmoji(activeGame, player, message);
 		if (reactionEmoji != null) {

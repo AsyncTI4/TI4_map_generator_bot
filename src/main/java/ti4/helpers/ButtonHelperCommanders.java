@@ -71,6 +71,8 @@ public class ButtonHelperCommanders {
         int cTG = player.getTg();
         int fTG = cTG + 1;
         player.setTg(fTG);
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         String msg = "Used Titans commander to gain a tg (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
