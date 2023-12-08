@@ -1176,12 +1176,16 @@ public class GenerateMap {
                 // unitColorID = Mapper.getUnitKey("sd", playerColor);
                 continue;
             }
-            if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
-                count = count + unitCount.get(Mapper.getUnitKey("csd", playerColor));
-            }
+            
 
             if (count == null) {
                 count = 0;
+            }
+            if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
+                if(unitCount.get(Mapper.getUnitKey("csd", playerColor)) != null){
+                    count = count + unitCount.get(Mapper.getUnitKey("csd", playerColor));
+                }
+                
             }
             UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(unitID);
 
