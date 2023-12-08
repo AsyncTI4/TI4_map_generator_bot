@@ -72,6 +72,12 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
+            if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
+            && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
+                if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
+                    activeGame.setCurrentReacts("Pre Pass " + player.getFaction(), "");
+                }
+            }
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()){

@@ -1170,13 +1170,14 @@ public class GenerateMap {
 
             Integer count = unitCount.get(unitColorID);
             if ("csd".equals(unitID)) {
-                if (!(player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
-                    continue;
-                }
-                unitColorID = Mapper.getUnitKey("sd", playerColor);
+                // if (!(player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
+                //     continue;
+                // }
+                // unitColorID = Mapper.getUnitKey("sd", playerColor);
+                continue;
             }
             if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
-                continue;
+                count = count + unitCount.get(Mapper.getUnitKey("csd", playerColor));
             }
 
             if (count == null) {
@@ -3063,7 +3064,7 @@ public class GenerateMap {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly()) {
+                if (tile.isAnomaly(activeGame)) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                 }
