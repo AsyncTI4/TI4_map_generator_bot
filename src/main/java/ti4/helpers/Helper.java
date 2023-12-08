@@ -726,7 +726,13 @@ public class Helper {
         inf = inf + tg;
         if(tg > 0){
             msg = msg + "> Spent "+tg+" tgs "+Emojis.getTGorNomadCoinEmoji(activeGame) +" ("+(player.getTg()+tg)+"->"+player.getTg()+") \n";
+            if(player.hasTech("mc")){
+                res = res + tg;
+                inf = inf + tg;
+                msg = msg + "> Counted the trade goods twice due to Mirror Computing \n";
+            }
         }
+
         if(resOrInfOrBoth.equalsIgnoreCase("res")){
             msg = msg + "For a total spend of **"+res+" Resources**";
         }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
