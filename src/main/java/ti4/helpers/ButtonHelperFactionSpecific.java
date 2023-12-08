@@ -1429,21 +1429,6 @@ public class ButtonHelperFactionSpecific {
             player.getRepresentation(true, false) + " removed " + count + " commodities from ATS Armaments ("+origATS+"->"+player.getAtsCount()+")");
     }
 
-    public static Button getRohDhnaIndustriousButton(Game activeGame, Player player, Tile tile, String unitList) {
-        int resources = 0;
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-        for (String planet : planets) {
-            resources +=Helper.getPlanetResources(planet, activeGame);
-        }
-
-        resources += player.getTg();
-
-        if (resources > 5) {
-            return 
-        
-
-        return null;
-    }
 
     public static void resolveRohDhnaIndustrious(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String tilePos = buttonID.split("_")[1];

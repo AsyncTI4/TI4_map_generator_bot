@@ -147,7 +147,7 @@ public class ButtonListener extends ListenerAdapter {
         Game activeGame = GameManager.getInstance().getGame(gameName);
         Player player = activeGame.getPlayer(id);
         player = Helper.getGamePlayer(activeGame, player, event.getMember(), id);
-        if (player == null) {
+        if (player == null && !buttonID.equalsIgnoreCase("showGameAgain")) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
@@ -195,7 +195,7 @@ public class ButtonListener extends ListenerAdapter {
         String fowIdentity = player.getRepresentation(false, true);
         String ident = player.getFactionEmoji();
 
-        if (!"ultimateundo".equalsIgnoreCase(buttonID)) {
+        if (!"ultimateundo".equalsIgnoreCase(buttonID) && !buttonID.equalsIgnoreCase("showGameAgain")) {
             ButtonHelper.saveButtons(event, activeGame, player);
             GameSaveLoadManager.saveMap(activeGame, event);
         }
