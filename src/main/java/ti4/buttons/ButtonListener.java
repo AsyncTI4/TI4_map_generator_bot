@@ -284,6 +284,12 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelper.checkACLimit(activeGame, event, player);
                     event.getMessage().delete().queue();
+                    if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
+                        List<Button> buttons2 = new ArrayList<>();
+                        Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_"+player.getFaction(), "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+                        buttons2.add(hacanButton);
+                        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you can use Cymiae agent to draw an AC", buttons2);
+                    }
 
                 } catch (Exception e) {
                     BotLogger.log(event, "Something went wrong discarding", e);
@@ -448,6 +454,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolvePsychoExhaust(activeGame, event, player, buttonID);
         } else if (buttonID.startsWith("productionBiomes_")) {
             ButtonHelperFactionSpecific.resolveProductionBiomesStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("getAgentSelection_")){
+            ButtonHelper.deleteTheOneButton(event);
+            List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeGame, buttonID.split("_")[1]);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity + " choose the target of your agent", buttons);
         } else if (buttonID.startsWith("step2axisagent_")) {
             ButtonHelperAgents.resolveStep2OfAxisAgent(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
@@ -2313,6 +2323,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "titansCommanderUsage" -> ButtonHelperCommanders.titansCommanderUsage(buttonID, event, activeGame, player, ident);
+                case "ghotiATG" -> ButtonHelperAgents.ghotiAgentForTg(buttonID, event, activeGame, player);
+                case "ghotiAProd" -> ButtonHelperAgents.ghotiAgentForProduction(buttonID, event, activeGame, player);
                 case "passForRound" -> {
                     player.setPassed(true);
                     String text = player.getRepresentation() + " PASSED";
@@ -2429,6 +2441,37 @@ public class ButtonListener extends ListenerAdapter {
 
                     if (!activeGame.isFoWMode() && activeGame.isCustodiansScored() && !player.getRelics().contains("mawofworlds") && !player.getActionCards().containsKey("stability")) {
                         ButtonHelper.addReaction(event, false, false, "", "");
+                    }
+
+                    if ("statusHomework".equalsIgnoreCase(activeGame.getCurrentPhase())) {
+                        boolean cyber = false;
+                        for (String pn : player.getPromissoryNotes().keySet()) {
+                            if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
+                                cyber = true;
+                            }
+                        }
+                        if (player.hasAbility("versatile") || player.hasTech("hm") || cyber) {
+                            int properGain = 2;
+                            String reasons = "";
+                            if (player.hasAbility("versatile")) {
+                                properGain = properGain + 1;
+                                reasons = "versatile ";
+                            }
+                            if (player.hasTech("hm")) {
+                                properGain = properGain + 1;
+                                reasons = reasons + "hypermetabolism ";
+                            }
+                            if (cyber) {
+                                properGain = properGain + 1;
+                                reasons = reasons + "cybernetics ";
+                            }
+                            if(properGain > 2){
+                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                    player.getRepresentation(true, true) + " heads up, bot thinks you should gain " + properGain + " cc now due to: " + reasons);
+
+                            }
+                            
+                        }
                     }
                 }
                 case "leadershipGenerateCCButtons" -> {
@@ -2592,6 +2635,7 @@ public class ButtonListener extends ListenerAdapter {
                             player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
                     }
                     ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);
+                    ButtonHelperAgents.cabalAgentInitiation(activeGame, player);
                     ButtonHelper.addReaction(event, false, false, message, "");
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                 }
@@ -3955,6 +3999,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Emojis.Winnu));
+                    buttons.add(winnuButton);
+                }
+                if (player.hasUnexhaustedLeader("gledgeagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                    Button winnuButton = Button.danger("exhaustAgent_gledgeagent_"+player.getFaction(), "Use Gledge Agent").withEmoji(Emoji.fromFormatted(Emojis.gledge));
+                    buttons.add(winnuButton);
+                }
+                if (player.hasUnexhaustedLeader("ghotiagent")) {
+                    Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+                    buttons.add(winnuButton);
+                }
+                if (player.hasUnexhaustedLeader("rohdhnaagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
+                    Button winnuButton = Button.danger("exhaustAgent_rohdhnaagent_"+player.getFaction(), "Use Rohdhna Agent").withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
                 }
                 if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {

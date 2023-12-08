@@ -201,17 +201,21 @@ public class MessageListener extends ListenerAdapter {
                 } else {
                     continue;
                 }
-                if (activeGame.getAutoPingStatus() && activeGame.getAutoPingSpacer() != 0 && !activeGame.getTemporaryPingDisable()) {
-                    String playerID = activeGame.getActivePlayer();
-
+                long spacer = activeGame.getAutoPingSpacer();
+                String playerID = activeGame.getActivePlayer();
+                Player player = null;
+                if (playerID != null) {
+                    player = activeGame.getPlayer(playerID);
+                    if (player != null && player.getPersonalPingInterval() > 0) {
+                        spacer = player.getPersonalPingInterval();
+                    }
+                }
+                if (activeGame.getAutoPingStatus() && spacer != 0 && !activeGame.getTemporaryPingDisable()) {
                     if (playerID != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
-                        Player player = null;
-                        if (playerID != null) {
-                            player = activeGame.getPlayer(playerID);
-                        }
+                        
                         if (player != null || "agendawaiting".equalsIgnoreCase(activeGame.getCurrentPhase())) {
                             long milliSinceLastPing = new Date().getTime() - activeGame.getLastActivePlayerPing().getTime();
-                            if (milliSinceLastPing > (60 * 60 * multiplier * activeGame.getAutoPingSpacer())
+                            if (milliSinceLastPing > (60 * 60 * multiplier * spacer)
                                 || (player != null && player.shouldPlayerBeTenMinReminded() && milliSinceLastPing > (60 * 5 * multiplier))) {
                                 String realIdentity = null;
                                 String ping = null;
@@ -223,11 +227,8 @@ public class MessageListener extends ListenerAdapter {
                                     AgendaHelper.pingMissingPlayers(activeGame);
                                 } else {
                                     long milliSinceLastTurnChange = new Date().getTime() - activeGame.getLastActivePlayerChange().getTime();
-                                    int autoPingSpacer = (int) activeGame.getAutoPingSpacer();
-                                    if (player != null && player.getPersonalPingInterval() > 0) {
-                                        autoPingSpacer = player.getPersonalPingInterval();
-                                    }
-                                    int pingNumber = ((int) milliSinceLastTurnChange) / (60 * 60 * multiplier * (int) autoPingSpacer);
+                                    int autoPingSpacer = (int) spacer;
+                                    int pingNumber = (int) (milliSinceLastTurnChange)/(60 * 60 * multiplier * (int) autoPingSpacer);
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * activeGame.getAutoPingSpacer() * 2)) {
                                         ping = realIdentity + " this is a courtesy notice that the game is waiting (impatiently).";
                                     }
