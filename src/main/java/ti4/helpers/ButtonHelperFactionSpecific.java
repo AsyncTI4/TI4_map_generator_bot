@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
@@ -32,6 +33,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
 
@@ -1425,5 +1427,61 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
             player.getRepresentation(true, false) + " removed " + count + " commodities from ATS Armaments ("+origATS+"->"+player.getAtsCount()+")");
+    }
+
+
+    public static void resolveRohDhnaIndustrious(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String tilePos = buttonID.split("_")[1];
+        String toRemove = buttonID.split("_")[2];
+        String planet = toRemove.split(" ")[1];
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), "warsun", activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), toRemove, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced "+Emojis.spacedock+" on "+ Helper.getPlanetRepresentationPlusEmoji(planet) +" with a "+Emojis.warsun);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Click the names of the planets you wish to exhaust to pay the 6 resources", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getRohDhnaRecycleButtons(Game activeGame, Player player) {
+        List<UnitKey> availableUnits = new ArrayList<>();
+        HashMap<UnitKey, Integer> units = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space").getUnits();
+        for (UnitKey unit : units.keySet()) {
+            if(unit.getColor() == player.getColor() && (unit.getUnitType() == UnitType.Cruiser || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought)) {
+                //if unit is not in the list, add it
+                if(!availableUnits.contains(unit)) {
+                    availableUnits.add(unit);
+                }
+            }
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey unit : availableUnits) {
+            buttons.add(Button.success("FFCC_" + player.getFaction()+"_rohdhnaRecycle_" + unit.unitName(), unit.unitEmoji()+" "+ unit.getUnitType().humanReadableName()));
+        }
+
+        if(!buttons.isEmpty()) {
+            buttons.add(Button.danger("FFCC_" + player.getFaction()+"_deleteButtons", "Decline"));
+        }
+
+        return buttons;
+    }
+
+    public static void resolveRohDhnaRecycle(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String unitName = buttonID.split("_")[1];
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "1 "+unitName, activeGame);
+        UnitModel unit = Mapper.getUnit(unitName);
+        int toGain = (int) unit.getCost() - 1;
+        int before = player.getTg();
+        player.setTg(before + toGain);
+
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, toGain);
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            player.getRepresentation(true, false) + " recycled "+unit.getUnitEmoji()+" "+unit.getName()+" for "+toGain+" tg ("+before+"->"+player.getTg()+")");
+
+        event.getMessage().delete().queue();
     }
 }

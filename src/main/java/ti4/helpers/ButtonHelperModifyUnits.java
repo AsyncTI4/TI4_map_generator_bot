@@ -280,6 +280,13 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed a " + Emojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, activeGame) + ".";
             }
+
+            if(player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player, activeGame.getTile(AliasHandler.resolveTile(planetName)), activeGame)){
+                Button replace = Button.success("FFCC_" + player.getFaction()+"_rohdhnaIndustrious_" 
+                    + activeGame.getTile(AliasHandler.resolveTile(planetName)).getPosition() + "_" + unit + " " + planetName, "Replace SD with Warsun");
+                    
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), playerRep + "Industrious: You may spend 6 resources to replace SD with a Warsun.", replace);
+            }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
                 activeGame.getTile(AliasHandler.resolveTile(planetName)), unitLong + " " + planetName,
