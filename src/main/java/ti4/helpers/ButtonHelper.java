@@ -2442,10 +2442,10 @@ public class ButtonHelper {
         boolean fleetSupplyViolated = false;
 
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-            if(capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0){
-                new RemoveUnits().unitParsing(event, player.getColor(), tile, "csd "+capChecker.getName(), activeGame);
-                new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+capChecker.getName(), activeGame);
-            }
+            // if(capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0){
+            //     new RemoveUnits().unitParsing(event, player.getColor(), tile, "csd "+capChecker.getName(), activeGame);
+            //     new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+capChecker.getName(), activeGame);
+            // }
             HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(capChecker, player, event);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
