@@ -640,5 +640,20 @@
                 "alias": "miltymod_cruiser2"
             }
         ]
+    },
+    {
+        "alias": "roll_1_for_every_enemy_non_fighter",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "opponent_non_capital_ship",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "winnu_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
     }
 ]
