@@ -504,7 +504,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("mahactBenedictionFrom_")) {
             ButtonHelperHeroes.mahactBenediction(buttonID, event, activeGame, player);
             String pos1 = buttonID.split("_")[1];
-            String pos2 = buttonID.split("_")[1];
+            String pos2 = buttonID.split("_")[2];
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 ident + " moved all units in space from " + activeGame.getTileByPosition(pos1).getRepresentationForButtons(activeGame, player) + " to "
                     + activeGame.getTileByPosition(pos2).getRepresentationForButtons(activeGame, player)
