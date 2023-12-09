@@ -127,7 +127,6 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
                 case CYBERNETIC -> sb.append("Y");
                 case PROPULSION -> sb.append("B");
                 case WARFARE -> sb.append("R");
-                default ->
             }
         }
         return sb.toString();
