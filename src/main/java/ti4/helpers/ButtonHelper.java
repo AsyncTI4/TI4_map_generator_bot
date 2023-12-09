@@ -681,7 +681,11 @@ public class ButtonHelper {
 
     public static void getTech(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = getIdent(player);
-        String tech = buttonID.replace("getTech_","");
+        String tech = buttonID.split("_")[1];
+        String alias = AliasHandler.resolveTech(tech);
+        if(activeGame.isAbsolMode() &&  Mapper.getTechs().get("absol_"+alias) != null){
+            alias = "absol_"+alias;
+        }
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
         String message = ident + " Acquired The Tech " + techM.getRepresentation(false);
 
@@ -1082,7 +1086,7 @@ public class ButtonHelper {
                     numberOfAbilities++;
                 } else {
                     if (activeGame.isFoWMode()) {
-                        MessageHelper.sendMessageToChannel(channel, ident + " you triggered voidwatch");
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(nonActivePlayer, activeGame), ident + " you triggered voidwatch");
                         channel = player.getPrivateChannel();
                     }
                     List<Button> stuffToTransButtons = getForcedPNSendButtons(activeGame, nonActivePlayer, player);
@@ -1102,7 +1106,7 @@ public class ButtonHelper {
                     Button gainTG = Button.success(fincheckerForNonActive + "freelancersBuild_" + activeSystem.getPosition(), "Build 1 Unit");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(gainTG, Decline2);
-                    MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Arborec commander ", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Arborec commander ", buttons);
                 }
             }
             if (nonActivePlayer.hasUnit("mahact_mech") && nonActivePlayer.hasMechInSystem(activeSystem) && nonActivePlayer.getMahactCC().contains(player.getColor())
@@ -1117,7 +1121,7 @@ public class ButtonHelper {
                         "Return " + player.getColor() + " CC and end their turn");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
                     List<Button> buttons = List.of(gainTG, Decline2);
-                    MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Mahact mech ability ", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Mahact mech ability ", buttons);
                 }
             }
             if (nonActivePlayer.hasTechReady("nf") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem) && nonActivePlayer.getStrategicCC() > 0) {
@@ -1146,7 +1150,7 @@ public class ButtonHelper {
                     Button lookAtSOs = Button.success(fincheckerForNonActive + "yssarilcommander_so_" + player.getFaction(), "Look at SOs (" + (player.getSo()) + ")");
                     Button Decline2 = Button.danger(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, Decline2);
-                    MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Yssaril commander ", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(nonActivePlayer, activeGame), ident + " use buttons to resolve Yssaril commander ", buttons);
                 }
             }
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
