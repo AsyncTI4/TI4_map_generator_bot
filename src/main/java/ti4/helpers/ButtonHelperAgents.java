@@ -419,7 +419,7 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(p2, activeGame) + " gained 2tg due to agent usage");
             }
             ButtonHelperAbilities.pillageCheck(p2, activeGame);
-            ButtonHelperAgents.resolveArtunoCheck(p2, activeGame, 2);
+            resolveArtunoCheck(p2, activeGame, 2);
         }
 
         if ("vaylerianagent".equalsIgnoreCase(agent)) {

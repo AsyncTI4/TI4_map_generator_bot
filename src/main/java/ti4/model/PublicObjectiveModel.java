@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
+import java.util.Objects;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,7 +35,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public static final Comparator<PublicObjectiveModel> sortByPointsAndName = (po1, po2) -> {
-        if (po1.getPoints() == po2.getPoints()) {
+        if (Objects.equals(po1.getPoints(), po2.getPoints())) {
             return po1.getName().compareTo(po2.getName());
         } else {
             return po1.getPoints() < po2.getPoints() ? -1 : 1;

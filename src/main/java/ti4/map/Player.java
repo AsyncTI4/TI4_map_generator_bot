@@ -161,7 +161,7 @@ public class Player {
     // LANEFIR TECH "ATS Armaments"
     @Getter
     @Setter
-    private int atsCount = 0;
+    private int atsCount;
 
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     @Setter
@@ -233,8 +233,7 @@ public class Player {
     public int getSpentTgsThisWindow(){
         for(String thing : spentThingsThisWindow){
             if(thing.contains("tg_")){
-                int tgs = Integer.parseInt(thing.split("_")[1]);
-                return tgs;
+                return Integer.parseInt(thing.split("_")[1]);
             }
         }
         return 0;

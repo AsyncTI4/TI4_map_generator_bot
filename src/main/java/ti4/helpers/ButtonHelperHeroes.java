@@ -228,7 +228,7 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, activeGame), "Could not resolve second player, please resolve manually.");
             return;
         }
-        String message2 = "";
+        String message2;
         // String ident = p1.getRepresentation();
         String ident2 = p2.getRepresentation();
         String id = null;
@@ -390,20 +390,17 @@ public class ButtonHelperHeroes {
                         threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                         threadChannel.queue(m5 -> {
                             List<ThreadChannel> threadChannels = activeGame.getActionsChannel().getThreadChannels();
-                            if (threadChannels != null) {
-                                for (ThreadChannel threadChannel_ : threadChannels) {
-                                    if (threadChannel_.getName().equals(threadName)) {
-                                        MessageHelper.sendMessageToChannel(threadChannel_,
-                                            player.getRepresentation(true, true)
-                                                + player2.getRepresentation(true, true)
-                                                + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
-                                        int context = 0;
-                                        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
-                                        MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
-                                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
-                                        MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
-
-                                    }
+                            for (ThreadChannel threadChannel_ : threadChannels) {
+                                if (threadChannel_.getName().equals(threadName)) {
+                                    MessageHelper.sendMessageToChannel(threadChannel_,
+                                        player.getRepresentation(true, true)
+                                            + player2.getRepresentation(true, true)
+                                            + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
+                                    int context = 0;
+                                    FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
+                                    MessageHelper.sendMessageWithFile(threadChannel_, systemWithContext, "Picture of system", false);
+                                    List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeGame, tile.getPosition(), player, player2, "ground");
+                                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "", buttons);
                                 }
                             }
                         });
@@ -630,8 +627,7 @@ public class ButtonHelperHeroes {
     public static void checkForMykoHero(Game activeGame, String hero, Player player) {
 
         if(player.hasLeaderUnlocked("mykomentorihero")){
-            List<Leader> leaders = new ArrayList<>();
-            leaders.addAll(player.getLeaders());
+          List<Leader> leaders = new ArrayList<>(player.getLeaders());
             for(Leader leader : leaders){
                 if(leader.getId().contains("hero")){
                     player.removeLeader(leader);

@@ -366,10 +366,10 @@ public class ButtonHelperAbilities {
 
     public static void rollOmenDiceAtStartOfStrat(Game activeGame, Player myko) {
         activeGame.setCurrentReacts("OmenDice", "");
-        String msg = myko.getRepresentation(true, true) + " rolled 4 omen dice and rolled the following numbers: ";
+        StringBuilder msg = new StringBuilder(myko.getRepresentation(true, true) + " rolled 4 omen dice and rolled the following numbers: ");
         for (int x = 0; x < 4; x++) {
             Die d1 = new Die(6);
-            msg = msg + d1.getResult() + " ";
+            msg.append(d1.getResult()).append(" ");
             addOmenDie(activeGame, d1.getResult());
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, activeGame), msg.toString());
