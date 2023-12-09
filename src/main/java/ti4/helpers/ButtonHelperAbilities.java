@@ -818,7 +818,7 @@ public class ButtonHelperAbilities {
             player.setTg(player.getTg() + 1);
             player.setCommodities(player.getCommoditiesTotal());
             MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " your **Council Patronage** ability was triggered. Your " + Emojis.comm
-                + " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade good (" + player.getTg() + " -> " + (player.getTg() + 1) + ")");
+                + " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade good (" + (player.getTg()-1) + " -> " + (player.getTg()) + ")");
             pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);

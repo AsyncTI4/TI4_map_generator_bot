@@ -24,7 +24,7 @@ public class ChangeColor extends PlayerSubcommandData {
         Game activeGame = getActiveGame();
 
         String newColor = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
-        if (!Mapper.isColorValid(newColor)) {
+        if (!Mapper.isValidColor(newColor)) {
             sendMessage("Color not valid");
             return;
         }

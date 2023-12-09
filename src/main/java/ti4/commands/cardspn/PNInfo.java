@@ -108,6 +108,54 @@ public class PNInfo extends PNCardsSubcommandData {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             buttons.add(hacanButton);
         }
+        if (player.hasUnexhaustedLeader("vadenagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_vadenagent", "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("nokaragent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_nokaragent", "Use Nokar Agent").withEmoji(Emoji.fromFormatted(Emojis.nokar));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("zelianagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_zelianagent", "Use Zelian Agent").withEmoji(Emoji.fromFormatted(Emojis.zelian));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("mirvedaagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_mirvedaagent", "Use Mirveda Agent").withEmoji(Emoji.fromFormatted(Emojis.mirveda));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("cymiaeagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_cymiaeagent", "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+            buttons.add(hacanButton);
+        }
+         if (player.hasUnexhaustedLeader("zealotsagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_zealotsagent", "Use Zealots Agent").withEmoji(Emoji.fromFormatted(Emojis.zealots));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("rohdhnaagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_rohdhnaagent", "Use Rohdhna Agent").withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("veldyragent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_veldyragent", "Use Veldyr Agent").withEmoji(Emoji.fromFormatted(Emojis.veldyr));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("gledgeagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_gledgeagent", "Use Gledge Agent").withEmoji(Emoji.fromFormatted(Emojis.gledge));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("khraskagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_khraskagent", "Use Khrask Agent").withEmoji(Emoji.fromFormatted(Emojis.khrask));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("nivynagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_nivynagent", "Use Nivyn Agent").withEmoji(Emoji.fromFormatted(Emojis.nivyn));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("ghotiagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_ghotiagent", "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
+            buttons.add(hacanButton);
+        }
         if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0) {
             Button release = Button.secondary("getReleaseButtons", "Release captured units").withEmoji(Emoji.fromFormatted(Emojis.Cabal));
             buttons.add(release);
@@ -202,7 +250,7 @@ public class PNInfo extends PNCardsSubcommandData {
         }
 
         if (longFormat || 
-            Mapper.isFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
+            Mapper.isValidFaction(pnModel.getFaction().orElse("").toLowerCase()) ||
             (pnModel.getSource() != ComponentSource.base && pnModel.getSource() != ComponentSource.pok)) {
                 sb.append("      ").append(pnText);
             }
@@ -213,7 +261,7 @@ public class PNInfo extends PNCardsSubcommandData {
     public static void checkAndAddPNs(Game activeGame, Player player) {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
-        if (!Mapper.isColorValid(playerColor) || !Mapper.isFaction(playerFaction)) {
+        if (!Mapper.isValidColor(playerColor) || !Mapper.isValidFaction(playerFaction)) {
             return;
         }
 

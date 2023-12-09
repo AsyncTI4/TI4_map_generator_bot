@@ -29,7 +29,7 @@ public class FactionModelTest {
         for (FactionModel faction : Mapper.getFactions()) {
             assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
             assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
-            assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech");
+            assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech: " + faction.getFactionTech());
             assertTrue(validateHomeSystem(faction), faction.getAlias() + ": invalid HomeSystem");
             assertTrue(validateHomePlanets(faction), faction.getAlias() + ": invalid HomePlanets");
             assertTrue(validateStartingTech(faction), faction.getAlias() + ": invalid StartingTech");
@@ -120,7 +120,7 @@ public class FactionModelTest {
 
     private boolean validateHomebrewReplacesID(FactionModel faction) {
         if (faction.getHomebrewReplacesID().isEmpty()) return true;
-        if (Mapper.isFaction(faction.getHomebrewReplacesID().get())) return true;
+        if (Mapper.isValidFaction(faction.getHomebrewReplacesID().get())) return true;
         BotLogger.log("Faction **" + faction.getAlias() + "** failed validation due to invalid HomebrewReplacesID: `" + faction.getHomebrewReplacesID().get() + "`");
         return false;
     }

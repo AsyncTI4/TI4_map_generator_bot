@@ -402,6 +402,11 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isGravityRift(Game activeGame) {
+        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(activeGame);
+    }
+
+    @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken() {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             Set<String> tokenList = unitHolder.getTokenList();
@@ -416,10 +421,40 @@ public class Tile {
         }
         return false;
     }
+    @JsonIgnore
+    public boolean hasCabalSpaceDockOrGravRiftToken(Game activeGame) {
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            Set<String> tokenList = unitHolder.getTokenList();
+            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
+                return true;
+            }
+            for (UnitKey unit : unitHolder.getUnits().keySet()) {
+                if (unit.getUnitType() == UnitType.CabalSpacedock) {
+                    return true;
+                }
+                 if (unit.getUnitType() == UnitType.Spacedock && (activeGame.getPlayerFromColorOrFaction(unit.getColor()).ownsUnit("cabal_spacedock") || activeGame.getPlayerFromColorOrFaction(unit.getColor()).ownsUnit("cabal_spacedock2"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @JsonIgnore
     public boolean isAnomaly() {
         if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift()) {
+            return true;
+        }
+        for (UnitHolder unitHolder : getUnitHolders().values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                return true;
+            }
+        }
+        return false;
+    }
+    @JsonIgnore
+    public boolean isAnomaly(Game activeGame) {
+        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(activeGame)) {
             return true;
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {

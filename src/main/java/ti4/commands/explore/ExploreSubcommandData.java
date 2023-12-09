@@ -152,7 +152,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             activeGame.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
             String token = cardInfo[5];
-            String tokenFilename = Mapper.getAttachmentID(token);
+            String tokenFilename = Mapper.getAttachmentImagePath(token);
             if (tokenFilename != null && tile != null && planetName != null) {
                 PlanetModel planetInfo = Mapper.getPlanet(planetName);
                 if (Optional.ofNullable(planetInfo).isPresent()) {
@@ -162,7 +162,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                             token.equals(Constants.CYBERNETIC) ||
                             token.equals(Constants.BIOTIC) ||
                             token.equals(Constants.WEAPON))) {
-                            String attachmentID = Mapper.getAttachmentID(token + "stat");
+                            String attachmentID = Mapper.getAttachmentImagePath(token + "stat");
                             if (attachmentID != null) {
                                 tokenFilename = attachmentID;
                             }
@@ -528,7 +528,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "bentor", event);
         }
 
-        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName)) {
+        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName) && player.getPlanets().contains(planetName)) {
             Button gainCC = Button.success("putSleeperOnPlanet_" + planetName, "Put Sleeper on " + planetName);
             Button Decline3 = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(gainCC, Decline3);

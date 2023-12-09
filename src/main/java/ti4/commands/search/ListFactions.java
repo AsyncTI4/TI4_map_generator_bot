@@ -26,7 +26,7 @@ public class ListFactions extends SearchSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
-        if (Mapper.isFaction(searchString)) {
+        if (Mapper.isValidFaction(searchString)) {
             event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, true)).queue();
             return;
         }
