@@ -951,11 +951,7 @@ public class ButtonHelperActionCards {
         if ("space".equalsIgnoreCase(unitHolderName)) {
             unitHolderName = "";
         }
-        String c = "";
-        if (p2.hasUnit("cabal_spacedock") || p2.hasUnit("cabal_spacedock2")) {
-            c = "c";
-        }
-        new RemoveUnits().unitParsing(event, p2.getColor(), tile, c + "sd " + unitHolderName, activeGame);
+        new RemoveUnits().unitParsing(event, p2.getColor(), tile, "sd " + unitHolderName, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your space dock in " + tile.getRepresentation() + " was melted.");
         event.getMessage().delete().queue();
