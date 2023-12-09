@@ -4,7 +4,7 @@
     "name": "Ancient Data Archive",
     "phase": "Action",
     "window": "Before a player draws a card from an exploration deck or the relic deck",
-    "text": "That player reveals the top 3 cards of that deck, returns 2 of those cards to it, shuffles it, and places the remaining card on top of it.",
+    "text": "That player reveals the top 3 cards of that deck, shuffles 2 of those cards back into it, and places the remaining card on top of it.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had finally paid off - the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
   },
@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "If that system contains 1 of that player's command tokens, return it to their tactic pool. Then, end that player's turn.",
+    "text": "Return that player's command token in the active system to their tactic pool and end their turn.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
     "source": "action_deck_2"
   },
@@ -165,16 +165,16 @@
     "alias": "crisis_management",
     "name": "Crisis Management",
     "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "Pass. Then, perform the secondary ability of 1 readied strategy card in a player's play area.",
-    "flavorText": "\"The others have stretched themselves to the brink of destruction. Even now, with every imaginable incarnation of death on our doorsteps, they reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
+    "window": "Action",
+    "text": "Pass. Then, perform the secondary ability of 1 readied strategy card in a player's play area; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool.",
+    "flavorText": "\"They've stretched themselves to the brink of destruction. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn shook his head. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
   {
     "alias": "custodian_support",
     "name": "Custodian Support",
     "phase": "Action",
-    "window": "At the start of your turn",
+    "window": "Action",
     "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first to pass; otherwise, gain 1 command token.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of ancient traditions. Others called him paranoid, but his years had taught him to discern a shifting of the tides.",
     "source": "action_deck_2"
@@ -231,6 +231,15 @@
     "window": "When you perform a strategic action",
     "text": "Choose 1 player. When that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
     "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "diverse_strategies",
+    "name": "Diverse Strategies",
+    "phase": "Any",
+    "window": "When you would perform the primary ability of a strategy card",
+    "text": "Perform the secondary ability of any 2 strategy cards instead; while performing these abilities, spend command tokens from your reinforcements instead of your strategy pool. [Note: You cannot choose the same strategy card twice.]",
+    "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
     "source": "action_deck_2"
   },
   {
@@ -310,7 +319,7 @@
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust a strategy card",
-    "text": "Perform the secondary ability of that strategy card; during this action, spend command tokens from your reinforcements instead of your strategy pool.",
+    "text": "Perform the secondary ability of that strategy card; while performing that ability, spend command tokens from your reinforcements instead of your strategy pool.",
     "flavorText": "PROTOCOL SUCCESSFUL >> [NULL ID] FATE SEALED << DEFEAT INEVITABLE >> PEERLESS MANY << INFINITE ONE >> [ID:NIITAKA] << QUEUED1 << QUEUED2 << QUEUED3...",
     "source": "action_deck_2"
   },
@@ -373,7 +382,7 @@
     "name": "Hostile World",
     "phase": "Action",
     "window": "After another player commits units to land on a planet you control",
-    "text": "Roll 2 dice. For each result equal to or less than that planet's resource value, that player must choose and destroy 2 of those units.",
+    "text": "Roll a number of dice equal to the resource value of that planet. For each result of 6 or greater, that player must choose and destroy 1 of those units.",
     "flavorText": "The old soldier interrupted the discussion of N'orr ground tactics with a snort. \"It's not the enemy you need to be worried about, lads. It's the god forsaken planet.\"",
     "source": "action_deck_2"
   },
@@ -481,7 +490,7 @@
     "name": "Pivoted Plan",
     "phase": "Action",
     "window": "Action",
-    "text": "Draw 1 secret objective and then return 1 of your unscored secret objectives to the deck and shuffle it. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect.]",
+    "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to reaching your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
     "source": "action_deck_2"
   },
@@ -491,7 +500,7 @@
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
     "text": "During this strategy phase, strategy card choices start with the speaker and proceed counterclockwise.",
-    "flavorText": "Ciel stared at the N'orr representative's message, \"How the turn tables!\", and couldn't help but smirk, despite the circumstances.  Idioms were never their strong point.",
+    "flavorText": "In the distance, a huge explosion illuminated the sky. Brother Milor gripped the rails of his balcony as he watched the chaos unfolding in the streets below. The people demanded a revolution, and he would grant them one.",
     "source": "action_deck_2"
   },
   {
@@ -535,7 +544,7 @@
     "name": "Reconstruction",
     "phase": "Action",
     "window": "Action",
-    "text": "Ready 1 planet you control that has a trait. Then, reveal cards from the exploration deck that matches that planet until you reveal an attachment; attach that attachment to that planet and discard the rest.",
+    "text": "Ready 1 planet you control that has a trait. Then, reveal cards from the exploration deck that matches that planet until you reveal an attachment; attach that attachment to that planet and shuffle the other cards back into the deck.",
     "flavorText": "Tungstantus collapsed mid-step as their energy completely depleted. The world was far from its former glory, and they would not stop until it was a paradise once more.",
     "source": "action_deck_2"
   },
@@ -589,7 +598,7 @@
     "name": "Schematics Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, each player gains that technology.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
     "flavorText": "Berekar passionately discussed the Keleres' technological inferiority with Qanoj. Though he argue their inferiority presented a peril to the galaxy, in truth, of course, he could not care less.",
     "source": "action_deck_2"
   },
