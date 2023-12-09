@@ -47,7 +47,7 @@ public class DiploSystem extends SpecialSubcommandData {
         for (Player player_ : activeGame.getPlayers().values()) {
             if (player_ != player) {
                 String color = player_.getColor();
-                if (Mapper.isColorValid(color)) {
+                if (Mapper.isValidColor(color)) {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, activeGame, color);
                 }

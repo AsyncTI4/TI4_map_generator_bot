@@ -515,6 +515,20 @@
     {
         "id": "absol_cabal_spacedock2",
         "baseType": "spacedock",
+        "asyncId": "sd",
+        "name": "Dimensional Tear II",
+        "upgradesFromUnitId": "cabal_spacedock",
+        "requiredTechId": "absol_dt2",
+        "source": "absol",
+        "faction": "cabal",
+        "productionValue": 7,
+        "isStructure": true,
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
+        "homebrewReplacesID": "cabal_spacedock2"
+    },
+    {
+        "id": "absol_cabal_spacedock2Alt",
+        "baseType": "spacedock",
         "asyncId": "csd",
         "name": "Dimensional Tear II",
         "upgradesFromUnitId": "cabal_spacedock",

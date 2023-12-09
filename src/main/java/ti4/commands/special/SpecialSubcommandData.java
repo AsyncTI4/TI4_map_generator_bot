@@ -3,9 +3,7 @@ package ti4.commands.special;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.generator.GenerateMap;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -55,6 +53,6 @@ public abstract class SpecialSubcommandData extends SubcommandData {
         Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(activeGame, event);
 
-        GenerateMap.getInstance().saveImageToWebsiteOnly(activeGame, event);
+        new GenerateMap().saveImageToWebsiteOnly(activeGame, event);
     }
 }

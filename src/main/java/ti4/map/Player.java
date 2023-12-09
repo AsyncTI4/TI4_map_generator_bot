@@ -1230,7 +1230,7 @@ public class Player {
             return !getLeaderByID(leaderId).map(Leader::isExhausted).orElse(true);
         } else {
             return hasExternalAccessToLeader(leaderId)
-                && !getLeaderByID("yssariagent").map(Leader::isExhausted).orElse(true);
+                && !getLeaderByID("yssarilagent").map(Leader::isExhausted).orElse(true);
         }
     }
 
@@ -1382,8 +1382,8 @@ public class Player {
     }
 
     public void initPNs() {
-        if (getGame() != null && color != null && faction != null && Mapper.isColorValid(color)
-            && Mapper.isFaction(faction)) {
+        if (getGame() != null && color != null && faction != null && Mapper.isValidColor(color)
+            && Mapper.isValidFaction(faction)) {
             promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getColorPromissoryNoteIDs(getGame(), color);
             for (String promissoryNote : promissoryNotes) {

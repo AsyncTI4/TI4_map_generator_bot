@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -75,7 +74,7 @@ public class GameCommand implements Command {
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(activeGame, event);
         }
-        FileUpload file = GenerateMap.getInstance().saveImage(activeGame, event);
+        FileUpload file = new GenerateMap().saveImage(activeGame, event);
         if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING) && !subcommandName.equalsIgnoreCase(Constants.SET_DECK)) {
            // MessageHelper.replyToMessage(event, file);
             List<Button> buttons = new ArrayList<>();
