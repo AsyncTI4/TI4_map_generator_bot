@@ -34,7 +34,7 @@
       "alias": "hacan",
       "factionName": "The Emirates of Hacan",
       "homeSystem": "16",
-      "startingFleet": "2 cv,cr,2 ff,4 inf h,sd a",
+      "startingFleet": "2 cv,cr,2 ff,2 inf h,sd a, inf a, inf k",
       "commodities": 6,
       "factionTech": ["qdn", "pm"],
       "startingTech": ["st", "amd"],
