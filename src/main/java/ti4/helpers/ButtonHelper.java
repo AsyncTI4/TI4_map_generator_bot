@@ -733,8 +733,7 @@ public class ButtonHelper {
             if(player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4){
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), getIdent(player) + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
                 String message2 = player.getRepresentation(true, true)+" Use buttons to drop a mech on a legendary planet or planet with a tech skip";
-                List<Button> buttons2 = new ArrayList<>();
-                buttons2.addAll(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
+                List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
             }
             
@@ -1943,8 +1942,7 @@ public class ButtonHelper {
         }
 
         if((p1.hasTech("dslaner") && p1.getAtsCount() > 0) || (p2.hasTech("dslaner") && p2.getAtsCount() > 0)) {
-            List<Button> buttons3 = new ArrayList<>();
-            buttons3.addAll(ButtonHelperFactionSpecific.getLanefirATSButtons(p1, p2));
+            List<Button> buttons3 = new ArrayList<>(ButtonHelperFactionSpecific.getLanefirATSButtons(p1, p2));
             MessageHelper.sendMessageToChannelWithButtons(tc, "You can use these buttons to remove commodities from ATS Armaments", buttons3);
         }
     }
@@ -2355,10 +2353,9 @@ public class ButtonHelper {
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, activeGame);
         Planet planetHolder = (Planet) unitHolder;
         if (planetHolder == null) return false;
-        String planet = planetName;
         boolean hasAbility = planetHolder.isHasAbility()
             || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary") || token.contains("consulate"));
-        if ((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planet)) {
+        if ((Mapper.getPlanet(planetName).getTechSpecialties() != null && Mapper.getPlanet(planetName).getTechSpecialties().size() > 0) || checkForTechSkipAttachments(activeGame, planetName)) {
             return true;
         }
         return hasAbility;
@@ -4039,30 +4036,14 @@ public class ButtonHelper {
         for (Player player : players) {
             if (x < 9) {
                 switch (x) {
-                    case 1 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "black", "franken1", "201", event, false);
-                    }
-                    case 2 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "green", "franken2", "202", event, false);
-                    }
-                    case 3 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "purple", "franken3", "203", event, false);
-                    }
-                    case 4 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "orange", "franken4", "204", event, false);
-                    }
-                    case 5 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "pink", "franken5", "205", event, false);
-                    }
-                    case 6 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "yellow", "franken6", "206", event, false);
-                    }
-                    case 7 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "red", "franken7", "207", event, false);
-                    }
-                    case 8 -> {
-                        new Setup().secondHalfOfPlayerSetup(player, activeGame, "blue", "franken8", "208", event, false);
-                    }
+                    case 1 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "black", "franken1", "201", event, false);
+                    case 2 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "green", "franken2", "202", event, false);
+                    case 3 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "purple", "franken3", "203", event, false);
+                    case 4 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "orange", "franken4", "204", event, false);
+                    case 5 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "pink", "franken5", "205", event, false);
+                    case 6 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "yellow", "franken6", "206", event, false);
+                    case 7 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "red", "franken7", "207", event, false);
+                    case 8 -> new Setup().secondHalfOfPlayerSetup(player, activeGame, "blue", "franken8", "208", event, false);
                     default -> {
 
                     }

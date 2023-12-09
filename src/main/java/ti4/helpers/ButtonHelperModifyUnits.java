@@ -255,7 +255,7 @@ public class ButtonHelperModifyUnits {
         String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unit = AliasHandler.resolveUnit(unitLong.replace("2",""));
-        String spaceOrPlanet = "";
+        String spaceOrPlanet;
         
         String successMessage;
         String playerRep = player.getRepresentation();
@@ -1026,7 +1026,7 @@ public class ButtonHelperModifyUnits {
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
                             }
-                            if (unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")) {
+                            if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")) {
                                 for (int x = 0; x < amount; x++) {
                                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                                 }
@@ -1089,16 +1089,13 @@ public class ButtonHelperModifyUnits {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
         } else {
-            boolean cabalMech = false;
-            if (cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech")
-                && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war")) {
-                cabalMech = true;
-            }
+            boolean cabalMech = cabal != null && activeGame.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech, cabal.getColor()) > 0 && cabal.hasUnit("cabal_mech")
+                && unitName.toLowerCase().contains("infantry") && !activeGame.getLaws().containsKey("articles_war");
             if (cabal != null && (!cabal.getFaction().equalsIgnoreCase(player.getFaction()) || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech)
                 && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, activeGame, cabal, amount, unitName, event);
             }
-            if (unitKey.getUnitType().equals(UnitType.Mech) && player.hasTech("sar")) {
+            if (unitKey.getUnitType() == UnitType.Mech && player.hasTech("sar")) {
                 for (int x = 0; x < amount; x++) {
                     player.setTg(player.getTg() + 1);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1) + "->"
@@ -1107,7 +1104,7 @@ public class ButtonHelperModifyUnits {
                 }
                 ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             }
-            if (unitKey.getUnitType().equals(UnitType.Mech) && player.hasUnit("mykomentori_mech")) {
+            if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("mykomentori_mech")) {
                 for (int x = 0; x < amount; x++) {
                     ButtonHelper.rollMykoMechRevival(activeGame, player);
                 }

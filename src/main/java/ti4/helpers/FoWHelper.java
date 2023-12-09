@@ -24,7 +24,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
 import ti4.model.WormholeModel;
 
 public class FoWHelper {
