@@ -35,8 +35,7 @@ public class ListButtons extends BothelperSubcommandData {
             return;
         }
 
-        Message msg;
-      msg = Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).complete().getMessageById(messageId);
+        Message msg = Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).complete().getMessageById(messageId);
 
         if (msg == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
