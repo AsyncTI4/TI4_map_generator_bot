@@ -1293,6 +1293,9 @@ public class ButtonHelper {
         if (player.getRelics().contains("absol_codex")) {
             limit = limit + 5;
         }
+        if (player.getTechs().contains("absol_nm")) {
+            limit = limit + 3;
+        }
         if (player.getRelics().contains("e6-g0_network")) {
             limit = limit + 2;
         }
@@ -1312,6 +1315,9 @@ public class ButtonHelper {
         }
         if (player.getRelics().contains("absol_codex")) {
             limit = limit + 5;
+        }
+        if (player.getTechs().contains("absol_nm")) {
+            limit = limit + 3;
         }
         if (player.getRelics().contains("e6-g0_network")) {
             limit = limit + 2;
@@ -2151,7 +2157,7 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker + "exhaustAgent_solagent", "Sol Agent").withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
 
-        Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "solagent");
+        Player kyro = Helper.getPlayerFromUnlockedLeader(activeGame, "kyroagent");
         if (!activeGame.isFoWMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && "ground".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent", "Kyro Agent").withEmoji(Emoji.fromFormatted(Emojis.blex)));
@@ -2183,6 +2189,16 @@ public class ButtonHelper {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "nekroStealTech_" + p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
+
+        if ((p2.hasUnexhaustedLeader("kortaliagent")) && !activeGame.isFoWMode() && groundOrSpace.equalsIgnoreCase("ground") && p1.getFragments().size() > 0) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(), "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
+        if (p1.hasUnexhaustedLeader("kortaliagent") && groundOrSpace.equalsIgnoreCase("ground") && p2.getFragments().size() > 0) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(), "Use Kortali Agent To Steal Frag").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+        }
+
 
         if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) && !activeGame.isFoWMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
@@ -2714,6 +2730,13 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
         }
+        if (player.hasUnexhaustedLeader("cheiranagent") && ButtonHelperAgents.getCheiranAgentTiles(player, activeGame).size() > 0) {
+            endButtons.add(Button.success(finChecker + "exhaustAgent_cheiranagent_"+player.getFaction(), "Use Cheiran Agent").withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
+        }
+
+        if (player.hasUnexhaustedLeader("freesystemsagent") && player.getReadiedPlanets().size() > 0 && ButtonHelperAgents.getAvailableLegendaryAbilities(activeGame).size() > 0) {
+            endButtons.add(Button.success(finChecker + "exhaustAgent_freesystemsagent_"+player.getFaction(), "Use Free Systems Agent").withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
+        }
 
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_lizhoagent", "Use Lizho Agent on Yourself").withEmoji(Emoji.fromFormatted(Emojis.lizho)));
@@ -2815,6 +2838,9 @@ public class ButtonHelper {
             if (player.getTechs().contains("cm")) {
                 Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Emojis.Saar));
                 startButtons.add(chaos);
+            }
+            if (player.hasUnexhaustedLeader("florzenagent") && ButtonHelperAgents.getAttachments(activeGame, player).size() > 0) {
+                startButtons.add(Button.success(finChecker + "exhaustAgent_florzenagent_"+player.getFaction(), "Use Florzen Agent").withEmoji(Emoji.fromFormatted(Emojis.florzen)));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
                 Button chaos = Button.secondary("exhaustAgent_vadenagent_"+player.getFaction(), "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
@@ -3367,6 +3393,13 @@ public class ButtonHelper {
                 if (planet.getUnitCount(inf, colorID) > 0) {
                     limit = planet.getUnitCount(inf, colorID);
                     for (int x = 1; x < limit + 1; x++) {
+                        if(x==1 && player.hasUnexhaustedLeader("dihmohnagent")){
+                            Button dihmohn = Button
+                            .success("exhaustAgent_dihmohnagent_"+ unitHolder.getName(),
+                                "Use Dihmohn Agent to land an extra Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), activeGame))
+                            .withEmoji(Emoji.fromFormatted(Emojis.dihmohn));
+                            buttons.add(dihmohn);
+                        }
                         if (x > 2) {
                             break;
                         }
@@ -3440,6 +3473,10 @@ public class ButtonHelper {
         } //"purgeSardakkHero"
         if (player.hasUnexhaustedLeader("nokaragent") && FoWHelper.playerHasShipsInSystem(player, tile)) {
             Button chaos = Button.secondary("exhaustAgent_nokaragent_"+player.getFaction(), "Use Nokar Agent To Place A Destroyer").withEmoji(Emoji.fromFormatted(Emojis.nokar));
+            buttons.add(chaos);
+        }
+        if (player.hasUnexhaustedLeader("tnelisagent") && FoWHelper.playerHasShipsInSystem(player, tile) && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, activeGame)) {
+            Button chaos = Button.secondary("exhaustAgent_tnelisagent_"+player.getFaction(), "Use Tnelis Agent").withEmoji(Emoji.fromFormatted(Emojis.tnelis));
             buttons.add(chaos);
         }
         if (player.hasUnexhaustedLeader("zelianagent") && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) > 0) {

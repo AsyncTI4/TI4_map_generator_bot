@@ -470,6 +470,18 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAgents.kolleccAgentResStep1(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("scourPlanet_")) {
             ButtonHelperFactionSpecific.resolveScour(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("cheiranAgentStep2_")) {
+            ButtonHelperAgents.resolveCheiranAgentStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("freeSystemsAgentStep2_")) {
+            ButtonHelperAgents.resolveFreeSystemsAgentStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("florzenAgentStep2_")) {
+            ButtonHelperAgents.resolveFlorzenAgentStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("florzenAgentStep3_")) {
+            ButtonHelperAgents.resolveFlorzenAgentStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("cheiranAgentStep3_")) {
+            ButtonHelperAgents.resolveCheiranAgentStep3(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("celdauriAgentStep3_")) {
+            ButtonHelperAgents.resolveCeldauriAgentStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("kolleccAgentResStep2_")) {
             ButtonHelperAgents.kolleccAgentResStep2(buttonID, event, activeGame, player);
         } else if (buttonID.startsWith("getPsychoButtons")) {
@@ -3511,7 +3523,6 @@ public class ButtonListener extends ListenerAdapter {
                                 if (uH instanceof Planet) {
                                     String planet = uH.getName();
                                     trapButtons.add(Button.secondary("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, activeGame)));
-
                                 }
                             }
                             trapButtons.add(Button.danger("deleteButtons", "Decline"));
@@ -3519,6 +3530,13 @@ public class ButtonListener extends ListenerAdapter {
                             if (trapButtons.size() > 1) {
                                 MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, trapButtons);
                             }
+                        }
+                        if (player.hasUnexhaustedLeader("celdauriagent")) {
+                            List<Button> buttons = new ArrayList<>();
+                            Button hacanButton = Button.secondary("exhaustAgent_celdauriagent_"+player.getFaction(), "Use Celdauri Agent").withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                            buttons.add(hacanButton);
+                            buttons.add(Button.danger("deleteButtons", "Decline"));
+                            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you can use Celdauri agent to place an SD for 2tg/2comm", buttons);
                         }
                     }
 
@@ -4009,6 +4027,10 @@ public class ButtonListener extends ListenerAdapter {
                     Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
                     buttons.add(winnuButton);
                 }
+                if (player.hasUnexhaustedLeader("mortheusagent")) {
+                    Button winnuButton = Button.danger("exhaustAgent_mortheusagent_"+player.getFaction(), "Use Mortheus Agent").withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+                    buttons.add(winnuButton);
+                }
                 if (player.hasUnexhaustedLeader("rohdhnaagent") && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button.danger("exhaustAgent_rohdhnaagent_"+player.getFaction(), "Use Rohdhna Agent").withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
@@ -4047,6 +4069,13 @@ public class ButtonListener extends ListenerAdapter {
                     if (trapButtons.size() > 1) {
                         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg, trapButtons);
                     }
+                }
+                if (player.hasUnexhaustedLeader("celdauriagent")) {
+                    List<Button> buttons = new ArrayList<>();
+                    Button hacanButton = Button.secondary("exhaustAgent_celdauriagent_"+player.getFaction(), "Use Celdauri Agent").withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+                    buttons.add(hacanButton);
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you can use Celdauri agent to place an SD for 2tg/2comm", buttons);
                 }
                 List<Button> systemButtons2 = new ArrayList<>();
                 if (!activeGame.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")) {
