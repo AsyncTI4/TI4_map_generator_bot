@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "Return that player's command token in the active system to their tactic pool and end their turn.",
+    "text": "Return that player's command token in the active system to their tactic pool and end their turn. [Note: They do not have to have a token in the system to place this card.]",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
     "source": "action_deck_2"
   },
@@ -157,7 +157,7 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player who voted for or predicted the resolved outcome gains 2 trade goods.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each other player who voted for the resolved outcome gains 2 trade goods.",
     "flavorText": "As he signed the last of the trade deals, Mot sank into his chair. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
     "source": "action_deck_2"
   },

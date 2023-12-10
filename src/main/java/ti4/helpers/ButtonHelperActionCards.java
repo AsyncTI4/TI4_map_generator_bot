@@ -1051,7 +1051,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("investments")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("resolvePreassignment_Investments", "Pre-play Manipulate Investments"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
