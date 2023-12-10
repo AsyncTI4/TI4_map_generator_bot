@@ -177,42 +177,26 @@ public class AliasHandler {
      */
     public static String resolveStandardTile(String name) {
         String aliasID = tilemapAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for StandardTile: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for StandardTile: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveFaction(String name) {
         String aliasID = factionAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Faction: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Faction: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveColor(String name) {
         String aliasID = colorAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Color: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Color: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveUnit(String name) {
         String aliasID = unitAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Unit: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Unit: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static List<String> getUnitValuesList() {
@@ -248,112 +232,68 @@ public class AliasHandler {
         if("gamma".equalsIgnoreCase(name)){
             return name;
         }
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Attachment: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Attachment: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveToken(String name) {
         String aliasID = cctokenAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Token: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Token: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTech(String name) {
         String aliasID = techAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Tech: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Tech: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveActionCard(String name) {
         String aliasID = actionCardAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for ActionCard: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for ActionCard: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveAgenda(String name) {
         String aliasID = agendaAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Agenda: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Agenda: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveExploration(String name) {
         String aliasID = explorationAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Exploration: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Exploration: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolvePromissory(String name) {
         String aliasID = promissoryAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Promissory: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Promissory: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveRelic(String name) {
         String aliasID = relicAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Relic: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Relic: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveObjective(String name) {
         String aliasID = objectiveAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for Objective: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for Objective: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTTPGAttachment(String name) {
         String aliasID = ttpgAttachmentAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for ttpgAttachment: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for ttpgAttachment: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTTPGToken(String name) {
         String aliasID = ttpgTokenAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            //System.out.println("Could not find an alias for TTPGToken: " + name);
-            return name;
-        }
+        //System.out.println("Could not find an alias for TTPGToken: " + name);
+        return Objects.requireNonNullElse(aliasID, name);
     }
 
     public static String resolveTTPGUnit(String name) {

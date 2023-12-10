@@ -132,7 +132,7 @@ public class PlanetAdd extends PlanetAddRemove {
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
         }
 
-        if(((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasUnexhaustedLeader("vaylerianagent")){
+        if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasUnexhaustedLeader("vaylerianagent")){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_vaylerianagent_"+player.getFaction(), "Use Vaylerian Agent").withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -140,7 +140,7 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons);
         }
 
-        if(((activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))) || activeGame.getCurrentPhase().contains("agenda")) && player.hasAbility("scour")){
+        if(activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer()))  && player.hasAbility("scour")){
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("scourPlanet_"+planet, "Use Scour").withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
