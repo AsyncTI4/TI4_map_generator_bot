@@ -112,6 +112,22 @@ public class PNInfo extends PNCardsSubcommandData {
             Button hacanButton = Button.secondary("getAgentSelection_vadenagent", "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
             buttons.add(hacanButton);
         }
+        if (player.hasUnexhaustedLeader("celdauriagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_celdauriagent", "Use Celdauri Agent").withEmoji(Emoji.fromFormatted(Emojis.celdauri));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("cheiranagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_cheiranagent", "Use Cheiran Agent").withEmoji(Emoji.fromFormatted(Emojis.cheiran));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("freesystemsagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_freesystemsagent", "Use Free Systems Agent").withEmoji(Emoji.fromFormatted(Emojis.freesystems));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("florzenagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_florzenagent", "Use Florzen Agent").withEmoji(Emoji.fromFormatted(Emojis.florzen));
+            buttons.add(hacanButton);
+        }
         if (player.hasUnexhaustedLeader("nokaragent")) {
             Button hacanButton = Button.secondary("getAgentSelection_nokaragent", "Use Nokar Agent").withEmoji(Emoji.fromFormatted(Emojis.nokar));
             buttons.add(hacanButton);
@@ -126,6 +142,10 @@ public class PNInfo extends PNCardsSubcommandData {
         }
         if (player.hasUnexhaustedLeader("cymiaeagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_cymiaeagent", "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+            buttons.add(hacanButton);
+        }
+         if (player.hasUnexhaustedLeader("mortheusagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_mortheusagent", "Use Mortheus Agent").withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(hacanButton);
         }
          if (player.hasUnexhaustedLeader("zealotsagent")) {

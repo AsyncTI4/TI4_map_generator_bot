@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -16,6 +17,9 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.commands.tokens.AddCC;
+import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
@@ -28,6 +32,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperAgents {
@@ -689,8 +694,36 @@ public class ButtonHelperAgents {
         if("bentoragent".equalsIgnoreCase(agent)){
             resolveBentorAgentStep2(player, activeGame, event, rest);
         }
+        if("kortaliagent".equalsIgnoreCase(agent)){
+            resolveKortaliAgentStep2(player, activeGame, event, rest);
+        }
+        if("mortheusagent".equalsIgnoreCase(agent)){
+            String faction = rest.split("_")[1];
+            Player p2 = activeGame.getPlayerFromColorOrFaction(faction);
+            List<Button> buttons = new ArrayList<>();
+            buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, activeGame));
+            String message = p2.getRepresentation(true, true)+ " use buttons to select which system the ship you just produced is in";
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, activeGame), message, buttons);
+        }
+        if("cheiranagent".equalsIgnoreCase(agent)){
+            resolveCheiranAgentStep1(player, activeGame, event, rest);
+        }
+        if("freesystemsagent".equalsIgnoreCase(agent)){
+            resolveFreeSystemsAgentStep1(player, activeGame, event, rest);
+        }
+        if("florzenagent".equalsIgnoreCase(agent)){
+            resolveFlorzenAgentStep1(player, activeGame, event, rest);
+        }
+        if("dihmohnagent".equalsIgnoreCase(agent)){
+            String planet = rest.split("_")[1];
+            new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileFromPlanet(planet), "1 inf "+planet, activeGame);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player)+" landed an extra infantry on "+Helper.getPlanetRepresentation(planet, activeGame) +" using Dihmohn agent");
+        }
         if("vadenagent".equalsIgnoreCase(agent)){
             resolveVadenAgentStep2(player, activeGame, event, rest);
+        }
+        if("celdauriagent".equalsIgnoreCase(agent)){
+            resolveCeldauriAgentStep2(player, activeGame, event, rest);
         }
         if("zealotsagent".equalsIgnoreCase(agent)){
             resolveZealotsAgentStep2(player, activeGame, event, rest);
@@ -807,6 +840,210 @@ public class ButtonHelperAgents {
         }
     }
 
+    public static boolean doesTileHaveAStructureInIt(Player player, Tile tile){
+        boolean present = false;
+        for(UnitHolder uH : tile.getUnitHolders().values()){
+            if(uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || uH.getUnitCount(UnitType.Pds, player.getColor()) > 0){
+                return true;
+            }
+            if(player.hasAbility("byssus") && uH instanceof Planet && uH.getUnitCount(UnitType.Mech, player.getColor()) > 0){
+                return true;
+            }
+        }
+        return present;
+    }
+
+    public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game activeGame, Tile origTile){
+        List<Tile> tiles = new ArrayList<>();
+        List<String> adjTiles = new ArrayList<>();
+        adjTiles.addAll(FoWHelper.getAdjacentTiles(activeGame, origTile.getPosition(), player, false));
+        for(String posTile : adjTiles){
+            Tile adjTile = activeGame.getTileByPosition(posTile);
+            if(adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, origTile)){
+                tiles.add(adjTile);
+            }
+        }
+        return tiles;
+    }
+
+    public static List<String> getAttachments(Game activeGame, Player player){
+        List<String> legendaries = new ArrayList<>();
+        for(String planet : player.getPlanets()){
+            if(planet.contains("custodia") || planet.contains("ghoti")){
+                continue;
+            }
+            UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+            for(String token : uh.getTokenList()){
+                if(!token.contains("attachment")){
+                    continue;
+                }
+                token = token.replace(".png","").replace("attachment_", "");
+                
+                String s = uh.getName()+"_"+token;
+                if(!token.contains("sleeper") && !token.contains("control") && !legendaries.contains(s)){
+                    legendaries.add(s);
+                }
+            }
+        }
+        return legendaries;
+    }
+
+     public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game activeGame, Player player, Tile tile){
+        List<String> legendaries = new ArrayList<>();
+        List<String> adjTiles = new ArrayList<>();
+        adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(activeGame, tile.getPosition(), player, false));
+        adjTiles.add(tile.getPosition());
+        for(String adjTilePos : adjTiles){
+            Tile adjTile = activeGame.getTileByPosition(adjTilePos);
+            if(ButtonHelper.isTileHomeSystem(adjTile)){
+                continue;
+            }
+            for(UnitHolder unitHolder : adjTile.getPlanetUnitHolders()){
+                if(player.getPlanets().contains(unitHolder.getName())){
+                    legendaries.add(unitHolder.getName());
+                }
+            }
+        }
+        return legendaries;
+    }
+
+    public static List<String> getAvailableLegendaryAbilities(Game activeGame){
+        List<String> legendaries = new ArrayList<>();
+        for(Player player : activeGame.getRealPlayers()){
+            for(String planet : player.getPlanets()){
+                if(planet.contains("custodia")){
+                    continue;
+                }
+                PlanetModel model = Mapper.getPlanet(planet);
+                if(model.getLegendaryAbilityText() != null && model.getLegendaryAbilityText().length() > 0){
+                    legendaries.add(planet);
+                }
+            }
+        }
+        return legendaries;
+    }
+
+    public static void resolveCheiranAgentStep1(Player cheiran, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : getCheiranAgentTiles(player, activeGame)){
+            buttons.add(Button.success("cheiranAgentStep2_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the tile you wish to remove a cc from";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+
+    public static void resolveFreeSystemsAgentStep1(Player cheiran, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for(String planet : getAvailableLegendaryAbilities(activeGame)){
+            buttons.add(Button.success("freeSystemsAgentStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the legendary planet ability that you wish to use";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+
+        List<Button> buttons2 = Helper.getPlanetExhaustButtons(event, player, activeGame, "both");
+        Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+        buttons2.add(DoneExhausting);
+        String msg2 = player.getRepresentation(true, true)+ " exhaust one planet to pay for the ability";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg2, buttons2);
+    }
+
+    public static void resolveFlorzenAgentStep1(Player cheiran, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for(String attachment : getAttachments(activeGame, player)){
+            String planet = attachment.split("_")[0];
+            String attach = attachment.split("_")[1];
+            buttons.add(Button.success("florzenAgentStep2_"+attachment, attach + " on "+Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the attachment you wish to use";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+    }
+
+    public static void resolveFlorzenAgentStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String attachment = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<>();
+        for(String planet2 : getAllControlledPlanetsInThisSystemAndAdjacent(activeGame, player, activeGame.getTileFromPlanet(planet))){
+            buttons.add(Button.success("florzenAgentStep3_"+planet+"_"+planet2+"_"+attachment, Helper.getPlanetRepresentation(planet2, activeGame)));
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the adjacent planet you wish to put the attachment on";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveFlorzenAgentStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String planet2 = buttonID.split("_")[2];
+        String attachment = buttonID.split("_")[3];
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, activeGame);
+        UnitHolder uH2 = ButtonHelper.getUnitHolderFromPlanetName(planet2, activeGame);
+        uH.removeToken("attachment_"+attachment+".png");
+        uH2.addToken("attachment_"+attachment+".png");
+        String msg = player.getRepresentation(true, true)+ " removed "+attachment+" from "+Helper.getPlanetRepresentation(planet, activeGame) + " and put it on "+Helper.getPlanetRepresentation(planet2, activeGame) + " using Florzen agent";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveFreeSystemsAgentStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        new PlanetExhaustAbility().doAction(player, planet, activeGame, false);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player)+" chose to use "+Helper.getPlanetRepresentation(planet, activeGame)+" ability. This did not exhaust the ability since it was done with free systems agent.");
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveCheiranAgentStep2(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        Tile origTile = activeGame.getTileByPosition(pos);
+        RemoveCC.removeCC(event, player.getColor(), origTile, activeGame);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " removed a cc from "+origTile.getRepresentationForButtons(activeGame, player)+ " using Cheiran Agent");
+        List<Button> buttons = new ArrayList<>();
+        for(Tile tile : getAdjacentTilesWithStructuresInThem(player, activeGame, origTile)){
+            buttons.add(Button.success("cheiranAgentStep3_"+tile.getPosition(), tile.getRepresentationForButtons(activeGame, player)));
+            if(getAdjacentTilesWithStructuresInThem(player, activeGame, origTile).size() == 1){
+                resolveCheiranAgentStep3(player, activeGame, event, "cheiranAgentStep3_"+tile.getPosition());
+                return;
+            }
+        }
+        String msg = player.getRepresentation(true, true)+ " choose the tile you wish to place a cc in";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static void resolveCheiranAgentStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        Tile origTile = activeGame.getTileByPosition(pos);
+        AddCC.addCC(event, player.getColor(), origTile, true);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " placed a cc in "+origTile.getRepresentationForButtons(activeGame, player)+ " using Cheiran Agent");
+        event.getMessage().delete().queue();
+    }
+
+
+
+
+    public static List<Tile> getCheiranAgentTiles(Player player, Game activeGame){
+        List<Tile> tiles = new ArrayList<>();
+        for(Tile tile : activeGame.getTileMap().values()){
+            if(AddCC.hasCC(player, tile)){
+                if(getAdjacentTilesWithStructuresInThem(player, activeGame, tile).size() > 0){
+                    tiles.add(tile);
+                }
+            }
+        }
+        return tiles;
+    }
+
     public static void ghotiAgentForTg(String buttonID, ButtonInteractionEvent event, Game activeGame, Player player) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
@@ -855,6 +1092,24 @@ public class ButtonHelperAgents {
         if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame).size() > 1 && commGain > 0) {
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
                 player.getRepresentation(true, true) + " you have the opportunity to buy axis orders", ButtonHelperAbilities.getBuyableAxisOrders(player, activeGame));
+        }
+    }
+    public static void resolveKortaliAgentStep2(Player bentor, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(null, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        int size = player.getFragments().size();
+        int rand = ThreadLocalRandom.current().nextInt(size);
+        String frag = player.getFragments().get(rand);
+        player.removeFragment(frag);
+        bentor.addFragment(frag);
+        String[] cardInfo = Mapper.getExploreRepresentation(frag).split(";");
+        String msg = ButtonHelper.getIdentOrColor(player, activeGame) + " lost a "+cardInfo[1]+" frag to "+ButtonHelper.getIdentOrColor(bentor, activeGame)+" due to Kortali agent";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),msg);
+        if (activeGame.isFoWMode()&& bentor != player) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), msg);
         }
     }
 
@@ -962,6 +1217,68 @@ public class ButtonHelperAgents {
 
     }
 
+    public static void resolveCeldauriAgentStep2(Player bentor, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Could not resolve target player, please resolve manually.");
+            return;
+        }
+        if (player.getCommodities() <2 && player.getTg()< 2) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Player did not have the money, please resolve manually.");
+            return;
+        }
+        if(activeGame.getActivePlayerObject() != player){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Target player is not active player, please resolve manually.");
+            return;
+        }
+        Tile tileAS = activeGame.getTileByPosition(activeGame.getActiveSystem());
+        if (tileAS == null) {
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, activeGame), "Active system is null, please resolve manually.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        String option = "";
+        for(UnitHolder planet : tileAS.getPlanetUnitHolders()){
+            if(player.getPlanetsAllianceMode().contains(planet.getName())){
+                buttons.add(Button.success("celdauriAgentStep3_"+planet.getName(),"Place a SD on "+Helper.getPlanetRepresentation(planet.getName(), activeGame)));
+                option = "celdauriAgentStep3_"+planet.getName();
+            }
+        }
+        if(buttons.size() == 1){
+            resolveCeldauriAgentStep3(player, activeGame, event, option);
+            return;
+        }
+
+
+
+        String msg = player.getRepresentation(true, true)+ " choose the planet you wish to place an SD on";
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg, buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static void resolveCeldauriAgentStep3(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String msg = ButtonHelper.getIdent(player)+ " put a space dock on "+Helper.getPlanetRepresentation(planet, activeGame) +" using Celdauri Agent";
+        new AddUnits().unitParsing(event,player.getColor(),activeGame.getTileFromPlanet(planet), "1 sd "+planet, activeGame);
+        if(player.getCommodities() > 1){
+            player.setCommodities(player.getCommodities()-2);
+            msg = msg + "\n Paid 2 commodities";
+        }else{
+             player.setTg(player.getTg()-2);
+            msg = msg + "\n Paid 2 tg";
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), msg);
+        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "titans", event);
+        }
+        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "saar", event);
+        }
+        if (player.hasAbility("necrophage")) {
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+        }
+        event.getMessage().delete().queue();
+    }
 
     public static void resolveBentorAgentStep2(Player bentor, Game activeGame, ButtonInteractionEvent event, String buttonID) {
         Player player = activeGame.getPlayerFromColorOrFaction(buttonID.split("_")[1]);

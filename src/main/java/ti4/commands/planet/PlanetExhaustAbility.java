@@ -19,10 +19,15 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     public PlanetExhaustAbility() {
         super(Constants.PLANET_EXHAUST_ABILITY, "Exhaust Planet Ability");
     }
-
     @Override
     public void doAction(Player player, String planet, Game activeGame) {
-        player.exhaustPlanetAbility(planet);
+        doAction(player, planet, activeGame, true);
+    }
+    
+    public void doAction(Player player, String planet, Game activeGame, boolean exhaust) {
+        if(exhaust){
+            player.exhaustPlanetAbility(planet);
+        }
         MessageChannel channel = activeGame.getMainGameChannel();
         if (activeGame.isFoWMode()) {
             channel = player.getPrivateChannel();
