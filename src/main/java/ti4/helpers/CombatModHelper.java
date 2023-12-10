@@ -482,12 +482,10 @@ public class CombatModHelper {
                         }
                     }
                 }
-                case Constants.MOD_OPPONENT_NON_CAPITAL_SHIP -> {
-                    if (opponent != null) {
-                        scalingCount += opponentUnitsInCombat.stream()
-                                .filter(unit -> unit.getBaseType() != UnitType.Fighter.value)
-                                .count();
-                    }
+                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
+                    scalingCount += opponentUnitsInCombat.stream()
+                            .filter(unit -> unit.getBaseType() != UnitType.Fighter.value)
+                            .count();
                 }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
