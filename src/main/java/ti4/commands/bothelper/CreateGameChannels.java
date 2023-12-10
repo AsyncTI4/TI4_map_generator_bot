@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
-import ti4.commands.game.GameEnd;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;

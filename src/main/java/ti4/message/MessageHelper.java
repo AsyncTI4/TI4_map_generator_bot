@@ -56,6 +56,7 @@ public class MessageHelper {
 	public static void sendMessageToBotLogChannel(String messageText) {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
+	
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
 		splitAndSent(messageText, channel, Collections.singletonList(buttons));
@@ -67,6 +68,10 @@ public class MessageHelper {
 		}
 
 		splitAndSent(messageText, channel, buttons);
+	}
+
+	public static void sendMessageToChannel(MessageChannel channel, String messageText, List<Button> buttons) {
+		sendMessageToChannelWithButtons(channel, messageText, buttons);
 	}
 
 	private static void addFactionReactToMessage(Game activeGame, Player player, Message message) {
@@ -124,7 +129,6 @@ public class MessageHelper {
 				Player player_ = activeGame.getPlayerFromColorOrFaction(player);
 				addFactionReactToMessage(activeGame, player_, msg);
 			}
-
 		};
 
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
