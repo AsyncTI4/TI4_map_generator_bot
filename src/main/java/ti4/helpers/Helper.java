@@ -668,7 +668,7 @@ public class Helper {
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
         int bestRes = 0;
         for(String thing : spentThings){
-            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
+            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
@@ -733,6 +733,14 @@ public class Helper {
                     inf = inf +bestRes;
                 }else if(thing.contains("Agent")){
                     msg = msg +"> "+ thing + "\n";
+                }else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Custiodia Vigilia (2/3)" + "\n";
+                    res = res + 2;
+                    inf = inf + 3;
+                } else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Ghoti (3/3)" + "\n";
+                    res = res + 3;
+                    inf = inf + 3;
                 }
             }
         }

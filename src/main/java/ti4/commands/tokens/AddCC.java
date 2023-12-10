@@ -16,6 +16,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -84,6 +85,24 @@ public class AddCC extends AddRemoveToken {
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        return tile.hasCC(ccID);
+    }
+    public static boolean hasCC(String color, Tile tile) {
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            return false;
+        }
+        return tile.hasCC(ccID);
+    }
+
+    public static boolean hasCC(Player player, Tile tile) {
+        String color = player.getColor();
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            return false;
         }
         return tile.hasCC(ccID);
     }
