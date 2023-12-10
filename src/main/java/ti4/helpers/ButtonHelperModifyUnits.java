@@ -568,6 +568,10 @@ public class ButtonHelperModifyUnits {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_"+player.getFaction(), "Use Ghoti Agent").withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
         }
+        if (player.hasUnexhaustedLeader("mortheusagent")) {
+            Button winnuButton = Button.danger("exhaustAgent_mortheusagent_"+player.getFaction(), "Use Mortheus Agent").withEmoji(Emoji.fromFormatted(Emojis.mortheus));
+            buttons.add(winnuButton);
+        }
         Button DoneExhausting;
         if (!buttonID.contains("deleteButtons")) {
             DoneExhausting = Button.danger("deleteButtons_" + buttonID, "Done Exhausting Planets");
@@ -709,7 +713,7 @@ public class ButtonHelperModifyUnits {
         new AddUnits().unitParsing(event, player.getColor(), tile2, unit, activeGame);
         new RemoveUnits().unitParsing(event, player.getColor(), tile1, unit, activeGame);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdent(player) + " moved 1 " + unit + " from " + tile1.getRepresentationForButtons(activeGame, player) + " to "
-            + tile2.getRepresentationForButtons(activeGame, player) + " using Domna legendary ability.");
+            + tile2.getRepresentationForButtons(activeGame, player) + "an ability.");
         event.getMessage().delete().queue();
     }
 

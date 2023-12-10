@@ -56,6 +56,7 @@ public class MessageHelper {
 	public static void sendMessageToBotLogChannel(String messageText) {
 		splitAndSent(messageText, BotLogger.getPrimaryBotLogChannel());
 	}
+	
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button buttons) {
 		splitAndSent(messageText, channel, Collections.singletonList(buttons));
