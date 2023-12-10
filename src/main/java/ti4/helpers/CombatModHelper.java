@@ -335,7 +335,7 @@ public class CombatModHelper {
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, playerUnits, opponentUnits);
+                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -424,7 +424,7 @@ public class CombatModHelper {
     /// or how many POs the opponent has scored that you havent etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-            Game activeGame, List<UnitModel> playerUnitsInCombat, List<UnitModel> opponentUnitsInCombat) {
+            Game activeGame, List<UnitModel> opponentUnitsInCombat) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;

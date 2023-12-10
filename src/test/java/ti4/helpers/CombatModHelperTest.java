@@ -22,7 +22,6 @@ public class CombatModHelperTest {
         Player player = new Player();
         Player opponent = new Player();
         Game game = new Game();
-        List<UnitModel> playerUnits = new ArrayList<>();
 
         UnitModel nonFighter = new UnitModel();
         nonFighter.setBaseType(UnitType.Carrier.value);
@@ -31,7 +30,7 @@ public class CombatModHelperTest {
         opponentUnits.add(nonFighter);
         opponentUnits.add(nonFighter);
 
-        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, playerUnits, opponentUnits));
+        assertEquals(2, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
     }
 
     @Test
@@ -43,7 +42,6 @@ public class CombatModHelperTest {
         Player player = new Player();
         Player opponent = new Player();
         Game game = new Game();
-        List<UnitModel> playerUnits = new ArrayList<>();
 
         UnitModel nonFighter = new UnitModel();
         nonFighter.setBaseType(UnitType.Carrier.value);
@@ -55,6 +53,6 @@ public class CombatModHelperTest {
         opponentUnits.add(nonFighter);
         opponentUnits.add(fighter);
 
-        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, playerUnits, opponentUnits));
+        assertEquals(1, CombatModHelper.GetVariableModValue(model, player, opponent, game, opponentUnits));
     }
 }
