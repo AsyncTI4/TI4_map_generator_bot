@@ -24,6 +24,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -78,8 +79,11 @@ public class TurnEnd extends PlayerSubcommandData {
             return unpassedPlayers.get(0);
         }
     }
-
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer) {
+        pingNextPlayer(event, activeGame, mainPlayer, false);
+    }
+
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game activeGame, Player mainPlayer, boolean justPassed) {
         activeGame.setComponentAction(false);
         activeGame.setTemporaryPingDisable(false);
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
@@ -121,7 +125,16 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
         ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
-        TurnStart.turnStart(event, activeGame, nextPlayer);
+        if(justPassed){
+            if(!ButtonHelperAgents.checkForEdynAgentPreset(activeGame, mainPlayer, nextPlayer, event)){
+                TurnStart.turnStart(event, activeGame, nextPlayer);
+            }
+        }else{
+            if(!ButtonHelperAgents.checkForEdynAgentActive(activeGame, event)){
+                TurnStart.turnStart(event, activeGame, nextPlayer);
+            }
+        }
+        
     }
 
     public static List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Game activeGame) {
