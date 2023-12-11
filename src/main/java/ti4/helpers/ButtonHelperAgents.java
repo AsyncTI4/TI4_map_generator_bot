@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -15,9 +16,13 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExpPlanet;
 import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
@@ -725,6 +730,9 @@ public class ButtonHelperAgents {
         if("celdauriagent".equalsIgnoreCase(agent)){
             resolveCeldauriAgentStep2(player, activeGame, event, rest);
         }
+        if("celdauriagent".equalsIgnoreCase(agent)){
+            resolveCeldauriAgentStep2(player, activeGame, event, rest);
+        }
         if("zealotsagent".equalsIgnoreCase(agent)){
             resolveZealotsAgentStep2(player, activeGame, event, rest);
         }
@@ -840,6 +848,50 @@ public class ButtonHelperAgents {
         }
     }
 
+    
+
+
+    public static List<String> getExhaustedPlanetsOfASeperateTrait(Game activeGame, Player player, String planetOrig) {
+        List<String> types = new ArrayList<>();
+        List<String> planets = new ArrayList<>();
+        if (planetOrig.contains("custodia") || planetOrig.contains("ghoti")) {
+            return planets;
+        }
+        UnitHolder unitHolder2 = activeGame.getPlanetsInfo().get(planetOrig);
+        Planet planetReal2 = (Planet) unitHolder2;
+        boolean oneOfThree2 = planetReal2 != null && planetReal2.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal2.getOriginalPlanetType())
+            || "cultural".equalsIgnoreCase(planetReal2.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal2.getOriginalPlanetType()));
+        if (planetReal2 != null && oneOfThree2 && !types.contains(planetReal2.getOriginalPlanetType())) {
+            types.add(planetReal2.getOriginalPlanetType());
+        }
+        if (unitHolder2.getTokenList().contains("attachment_titanspn.png")) {
+            return planets;
+        }
+        if(types.size() == 0){
+            return planets;
+        }
+        for (String planet : player.getExhaustedPlanets()) {
+            if (planet.contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+            if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
+                continue;
+            }
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
+                || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType()) || "hazardous".equalsIgnoreCase(planetReal.getOriginalPlanetType()));
+            if (planetReal != null && oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
+                planets.add(planet);
+            }
+            
+        }
+        return planets;
+    }
+
+
+    
+
     public static boolean doesTileHaveAStructureInIt(Player player, Tile tile){
         boolean present = false;
         for(UnitHolder uH : tile.getUnitHolders().values()){
@@ -851,6 +903,76 @@ public class ButtonHelperAgents {
             }
         }
         return present;
+    }
+
+    public static void resolveLanefirAgent(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID){
+        if(buttonID.contains("Decline")){
+            if(buttonID.contains("frontier")){
+                String cardChosen = buttonID.split("_")[3];
+                String pos = buttonID.split("_")[4];
+                new ExpFrontier().expFrontAlreadyDone(event, activeGame.getTileByPosition(pos), activeGame, player, cardChosen);
+            }else{
+                String drawColor = buttonID.split("_")[2];
+                String cardID = buttonID.split("_")[3];
+                String planetName = buttonID.split("_")[4];
+                Tile tile = activeGame.getTileFromPlanet(planetName);
+                String messageText = player.getRepresentation() + " explored " +
+                    Emojis.getEmojiFromDiscord(drawColor) +
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
+                    "> " + new ExpPlanet().displayExplore(cardID);
+                new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+                if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
+                    new PlanetRefresh().doAction(player, planetName, activeGame);
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+                    ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
+                }
+                if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                    UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                    activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+                }
+                if(player.hasTech("dslaner")){
+                    player.setAtsCount(player.getAtsCount()+1);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+                }
+            }
+        }else{
+            exhaustAgent("exhaustAgent_lanefiragent", event, activeGame, player, ButtonHelper.getIdent(player));
+            if(buttonID.contains("frontier")){
+                String cardChosen = activeGame.drawExplore(Constants.FRONTIER);
+                String pos = buttonID.split("_")[3];
+                String card = Mapper.getExploreRepresentation(cardChosen);
+                String[] cardInfo1 = card.split(";");
+                String name1 = cardInfo1[0];
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " in " + activeGame.getTileByPosition(pos).getRepresentation());
+                new ExpFrontier().expFrontAlreadyDone(event, activeGame.getTileByPosition(pos), activeGame, player, cardChosen);
+            }else{
+                String drawColor = buttonID.split("_")[2];
+                String planetName = buttonID.split("_")[3];
+                Tile tile = activeGame.getTileFromPlanet(planetName);
+                String cardID = activeGame.drawExplore(drawColor);
+                String messageText = player.getRepresentation() + " explored " +
+                    Emojis.getEmojiFromDiscord(drawColor) +
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition() + ")*:\n" +
+                    "> " + new ExpPlanet().displayExplore(cardID);
+                new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText, false, player, activeGame);
+                if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && activeGame.getCurrentPhase().contains("agenda")) {
+                    new PlanetRefresh().doAction(player, planetName, activeGame);
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+                    ListVoteCount.turnOrder(event, activeGame, activeGame.getMainGameChannel());
+                }
+                if(activeGame.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                    UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                    activeGame.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+                }
+                if(player.hasTech("dslaner")){
+                    player.setAtsCount(player.getAtsCount()+1);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " Put 1 commodity on ATS Armaments");
+                }
+            }
+        }
+        event.getMessage().delete().queue();
     }
 
     public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game activeGame, Tile origTile){

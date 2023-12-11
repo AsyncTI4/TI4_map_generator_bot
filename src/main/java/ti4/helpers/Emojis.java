@@ -575,11 +575,11 @@ public class Emojis {
     public static final String BioticDisabled = "<:bioticDisabled:1120031652299681963>";
     public static final String Biotic2 = "<:biotic2:1120031649732771841>";
     public static final String Biotic3 = "<:biotic3:1120031651167227944>";
-    public static final String CyberneticTech = "<:Cybernetictech:947250608149245972>";
+    public static final String CyberneticTech = "<:Cybernetictech:1092053090720563211>";
     public static final String CyberneticDisabled = "<:cyberneticDisabled:1120031658582737047>";
     public static final String Cybernetic2 = "<:cybernetic2:1120031655374102718>";
     public static final String Cybernetic3 = "<:cybernetic3:1120031656766619658>";
-    public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
+    public static final String WarfareTech = "<:Warfaretech:1092053103777427468>";
     public static final String WarfareDisabled = "<:warfareDisabled:1120031828384956446>";
     public static final String Warfare2 = "<:warfare2:1120031824891093113>";
     public static final String Warfare3 = "<:warfare3:1120031825851584523>";
