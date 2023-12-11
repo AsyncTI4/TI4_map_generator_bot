@@ -681,13 +681,17 @@ public class ButtonHelper {
 
     public static void getTech(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = getIdent(player);
-        String tech = buttonID.split("_")[1];
-        String alias = AliasHandler.resolveTech(tech);
-        if(activeGame.isAbsolMode() &&  Mapper.getTechs().get("absol_"+alias) != null){
-            alias = "absol_"+alias;
+        boolean paymentRequired = !buttonID.contains("__noPay");
+        buttonID = buttonID.replace("__noPay", "");
+
+        String techID = StringUtils.substringAfter(buttonID, "getTech_");
+        techID = AliasHandler.resolveTech(techID);
+        if (!Mapper.isValidTech(techID)) {
+            BotLogger.log(event, "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+            return;
         }
-        TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
-        String message = ident + " Acquired The Tech " + techM.getRepresentation(false);
+        TechnologyModel techM = Mapper.getTech(techID);
+        StringBuilder message = new StringBuilder(ident).append(" Acquired The Tech ").append(techM.getRepresentation(false));
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
             if (player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")) {
@@ -708,11 +712,11 @@ public class ButtonHelper {
             buttons.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)+ " you can use Zealots agent to produce 1 ship at home or in a system where you have a tech skip planet", buttons);
         }
-        player.addTech(AliasHandler.resolveTech(tech));
-        ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, tech, activeGame);
-        ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, activeGame);
-        if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(tech))) {
-            message = message + "\n Automatically added the Custodia Vigilia planet";
+        player.addTech(techID);
+        ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, activeGame);
+        ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, activeGame);
+        if ("iihq".equalsIgnoreCase(techID)) {
+            message.append("\n Automatically added the Custodia Vigilia planet");
         }
         if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
             commanderUnlockCheck(player, activeGame, "jolnar", event);
@@ -723,22 +727,21 @@ public class ButtonHelper {
         if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
             commanderUnlockCheck(player, activeGame, "mirveda", event);
         }
-        if (StringUtils.countMatches(buttonID, "_") < 2) {
+        if (StringUtils.countMatches(buttonID, "_") < 2) { //TODO: Better explain what this is doing and why this way
             if (activeGame.getComponentAction()) {
-                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message);
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
             } else {
-                sendMessageToRightStratThread(player, activeGame, message, "technology");
+                sendMessageToRightStratThread(player, activeGame, message.toString(), "technology");
             }
-            payForTech(activeGame, player, event, buttonID);
-            if(player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4){
-                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), getIdent(player) + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
+            if (paymentRequired) payForTech(activeGame, player, event, buttonID);
+            if (player.hasUnit("augers_mech") && getNumberOfUnitsOnTheBoard(activeGame, player, "mech") < 4) {
+                MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
                 String message2 = player.getRepresentation(true, true)+" Use buttons to drop a mech on a legendary planet or planet with a tech skip";
                 List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, activeGame, "mech", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
             }
-            
         } else {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message);
+            MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
         }
         event.getMessage().delete().queue();
     }
