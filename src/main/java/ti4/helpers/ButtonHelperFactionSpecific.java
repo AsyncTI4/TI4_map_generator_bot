@@ -874,7 +874,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(transact2);
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String message = "Use buttons to select how to use the Kollecc AI Survey PN";
-        System.out.println(player.getFaction() + " is playing PN KOLLEC");
+       // System.out.println(player.getFaction() + " is playing PN KOLLEC");
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message, buttons);
     }
 

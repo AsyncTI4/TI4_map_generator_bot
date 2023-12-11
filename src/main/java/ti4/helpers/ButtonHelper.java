@@ -479,6 +479,10 @@ public class ButtonHelper {
             Button lost1C = Button.danger("reduceComm_1_"+whatIsItFor, "Spend 1 comm");
             buttons.add(lost1C);
         }
+        if (player.hasUnexhaustedLeader("olradinagent")) {
+            Button hacanButton = Button.secondary("exhaustAgent_olradinagent_"+player.getFaction(), "Use Olradin Agent").withEmoji(Emoji.fromFormatted(Emojis.olradin));
+            buttons.add(hacanButton);
+        }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
             Button lost2C = Button.danger("reduceComm_2_"+whatIsItFor, "Spend 2 comms");
             buttons.add(lost2C);
@@ -2473,7 +2477,7 @@ public class ButtonHelper {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
                 }
-                System.out.println(unit.getBaseType());
+               // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
                     if (player.ownsUnit("cabal_spacedock")) {
                         fightersIgnored += 6;
@@ -2486,7 +2490,7 @@ public class ButtonHelper {
                 }
             }
         }
-        System.out.println(fightersIgnored);
+        //System.out.println(fightersIgnored);
         UnitHolder combatOnHolder = tile.getUnitHolders().get("space");
         HashMap<UnitModel, Integer> unitsByQuantity = CombatHelper.GetAllUnits(combatOnHolder, player, event);
         for (UnitModel unit : unitsByQuantity.keySet()) {
@@ -3900,7 +3904,7 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     String unitName = getUnitName(unitKey.asyncID());
-                    System.out.println(unitKey.asyncID());
+                   // System.out.println(unitKey.asyncID());
                     int totalUnits = unitEntry.getValue();
                     int damagedUnits = 0;
 

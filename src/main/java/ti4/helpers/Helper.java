@@ -710,7 +710,7 @@ public class Helper {
                 }
             }else{
                 if(thing.contains("sarween")){
-                    msg = msg + "> Used Sarween Tools "+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                    msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +"\n";
                     res = res+1;
                 }
                 if(thing.contains("aida")){
@@ -721,7 +721,7 @@ public class Helper {
                     }else{
                        msg =  msg + " for a tech skip on a unit upgrade ";
                     }
-                    msg = msg+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                    msg = msg+Emojis.WarfareTech +"\n";
                 }
                 if(thing.contains("commander") || thing.contains("Gledge Agent")){
                      msg = msg + "> "+thing + "\n";
