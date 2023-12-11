@@ -23,15 +23,9 @@ public class FrankenDraft extends BagDraft {
     public int getItemLimitForCategory(DraftItem.Category category) {
         int limit = 0;
         switch (category) {
-            case ABILITY, BLUETILE -> {
-                limit = 3;
-            }
-            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
-                limit = 2;
-            }
-            case DRAFTORDER -> {
-                limit = 1;
-            }
+            case ABILITY, BLUETILE -> limit = 3;
+            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> limit = 2;
+            case DRAFTORDER -> limit = 1;
         }
         return limit;
     }
