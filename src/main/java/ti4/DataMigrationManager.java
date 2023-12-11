@@ -68,7 +68,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
             runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
             runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
-            runMigration("migrateRemoveOldArcaneShieldID_1111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_1111223);
+            runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -87,16 +87,18 @@ public class DataMigrationManager {
     }
 
     /// MIGRATION: Remove old/bad arcane shield attachmentID
-    public static Boolean migrateRemoveOldArcaneShieldID_1111223(Game game) {
+    public static Boolean migrateRemoveOldArcaneShieldID_111223(Game game) {
+        boolean mapNeededMigrating = false;
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder.getTokenList().contains("attachment_arcane_shield.png")) {
                     unitHolder.removeToken("attachment_arcane_shield.png");
-                    return true;
+                    unitHolder.addToken("attachment_arc_shield.png");
+                    mapNeededMigrating = true;
                 }
             }
         }
-        return false;
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Add faction techs to games that were created before faction techs added
