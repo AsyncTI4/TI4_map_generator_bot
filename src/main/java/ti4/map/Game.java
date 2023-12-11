@@ -3569,7 +3569,7 @@ public class Game {
             }
         }
     }
-
+    @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;
@@ -3596,7 +3596,7 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
-
+    @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;

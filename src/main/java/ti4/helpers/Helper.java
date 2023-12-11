@@ -869,7 +869,7 @@ public class Helper {
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
         unitButtons.add(ff1Button);
         if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
-            && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+            && !"chaosM".equalsIgnoreCase(warfareNOtherstuff) ) {
             Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp, "Produce 2 Fighters");
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
             unitButtons.add(ff2Button);
@@ -909,7 +909,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp, "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
-                if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp, "Produce 2 Infantry on " + getPlanetRepresentation(pp, activeGame));
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
@@ -922,7 +922,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(), "Produce 1 Infantry in space");
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
-                if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(), "Produce 2 Infantry in space");
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);

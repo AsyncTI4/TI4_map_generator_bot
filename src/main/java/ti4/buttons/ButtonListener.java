@@ -2001,8 +2001,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
-        } else if (buttonID.startsWith("unstableStep2_")) {
+        } else if (buttonID.startsWith("unstableStep2_")) {//"titansConstructionMechDeployStep2_"
             ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("titansConstructionMechDeployStep2_")) {
+            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep2(activeGame,player, event, buttonID);
+        } else if (buttonID.startsWith("titansConstructionMechDeployStep1")) {
+            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep1(activeGame,player);
         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
@@ -2172,6 +2176,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "mirveda", event);
+                }
+                if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
+                    ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
                 }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
             }
@@ -3379,6 +3386,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     activeGame.setNaaluAgent(false);
                     activeGame.setL1Hero(false);
+                    activeGame.setCurrentReacts("planetsTakenThisRound","");
                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                     String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
