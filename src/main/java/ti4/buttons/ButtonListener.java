@@ -1178,8 +1178,8 @@ public class ButtonListener extends ListenerAdapter {
                 
             }
             event.getMessage().editMessage(editedMessage).queue();
-
-            // MessageHelper.sendMessageToChannel(event.getChannel(), message);resFrontier_
+         } else if (buttonID.startsWith("lanefirAgentRes_")) {
+            ButtonHelperAgents.resolveLanefirAgent(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resFrontier_")) {
             buttonID = buttonID.replace("resFrontier_", "");
             String[] stuff = buttonID.split("_");
@@ -3928,7 +3928,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 }
-                ButtonHelper.updateMap(activeGame, event, "Conclusion of build on turn " + player.getTurnCount() + " for " + ButtonHelper.getIdent(player));
+                ButtonHelper.updateMap(activeGame, event, "Result of build on turn " + player.getTurnCount() + " for " + ButtonHelper.getIdent(player));
                 buttons.add(DoneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }

@@ -2461,6 +2461,7 @@ public class ButtonHelper {
                 UnitKey sdKey = Mapper.getUnitKey("sd", colorID);
                 capChecker.removeUnit(csdKey, 1);
                 capChecker.addUnit(sdKey, 1);
+                BotLogger.log("Removing csd in game "+activeGame.getName());
                 // new RemoveUnits().unitParsing(event, player.getColor(), tile, "csd "+capChecker.getName(), activeGame);
                 // new AddUnits().unitParsing(event, player.getColor(), tile, "sd "+capChecker.getName(), activeGame);
             }
@@ -3045,7 +3046,6 @@ public class ButtonHelper {
                 String card2 = Mapper.getExploreRepresentation(cardID2);
                 String[] cardInfo2 = card2.split(";");
                 String name2 = cardInfo2[0];
-
                 Button resolveExplore1 = Button.success("resFrontier_" + cardID + "_" + tile.getPosition() + "_" + cardID2, "Choose " + name1);
                 Button resolveExplore2 = Button.success("resFrontier_" + cardID2 + "_" + tile.getPosition() + "_" + cardID, "Choose " + name2);
                 List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
@@ -3066,6 +3066,25 @@ public class ButtonHelper {
                 String msg2 = "As a reminder of their text, the card abilities read as: \n";
                 msg2 = msg2 + name1 + ": " + cardInfo1[4] + "\n";
                 msg2 = msg2 + name2 + ": " + cardInfo2[4] + "\n";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
+            } else if (player.hasUnexhaustedLeader("lanefiragent")) {
+                String cardID = activeGame.drawExplore(Constants.FRONTIER);
+                String card = Mapper.getExploreRepresentation(cardID);
+                String[] cardInfo1 = card.split(";");
+                String name1 = cardInfo1[0];
+                Button resolveExplore1 = Button.success("lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
+                Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_frontier_" + tile.getPosition(), "Use Lanefir Agent");
+                List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+                String message = player.getRepresentation(true, true) + " You have Lanefir Agent, and thus can decline this explore to draw another one instead.";
+                if (!activeGame.isFoWMode() && event.getChannel() != activeGame.getActionsChannel()) {
+                    String pF = player.getFactionEmoji();
+                    MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), pF + " found a " + name1 + " in " + tile.getRepresentation());
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a " + name1 + " and in " + tile.getRepresentation());
+                }
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                String msg2 = "As a reminder of the text, the card reads as: \n";
+                msg2 = msg2 + name1 + ": " + cardInfo1[4] + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
                 new ExpFrontier().expFront(event, tile, activeGame, player);
