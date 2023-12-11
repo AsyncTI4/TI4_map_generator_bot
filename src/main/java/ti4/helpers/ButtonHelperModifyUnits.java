@@ -455,6 +455,18 @@ public class ButtonHelperModifyUnits {
         if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "l1z1x", event);
         }
+        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "tnelis", event);
+        }
+        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "cymiae", event);
+        }
+        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kyro", event);
+        }
+        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "ghemina", event);
+        }
         if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander") && "warsun".equalsIgnoreCase(unitLong)) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "muaat", event);
         }
@@ -557,6 +569,18 @@ public class ButtonHelperModifyUnits {
             if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
                 ButtonHelper.commanderUnlockCheck(player, activeGame, "l1z1x", event);
             }
+            if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "cymiae", event);
+            }
+            if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "kyro", event);
+            }
+            if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "ghemina", event);
+            }
+            if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
+                ButtonHelper.commanderUnlockCheck(player, activeGame, "tnelis", event);
+            }
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
@@ -597,6 +621,18 @@ public class ButtonHelperModifyUnits {
         }
         if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "l1z1x", event);
+        }
+        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "tnelis", event);
+        }
+        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "cymiae", event);
+        }
+        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "kyro", event);
+        }
+        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "ghemina", event);
         }
         if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander") && "warsun".equalsIgnoreCase(unitLong)) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "muaat", event);

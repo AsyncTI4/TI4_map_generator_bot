@@ -138,8 +138,7 @@ public class MessageListener extends ListenerAdapter {
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
             if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
-                MessageHelper.sendMessageToChannel(channel,
-                    "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
+                //MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 gameManager.resetMapForUser(userID);
             }
         }

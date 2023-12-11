@@ -122,6 +122,9 @@ public class PlanetAdd extends PlanetAddRemove {
         if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "naazcommander")) {
             alreadyOwned = false;
         }
+        if(!activeGame.getCurrentPhase().contains("agenda")){
+            activeGame.setCurrentReacts("planetsTakenThisRound",activeGame.getFactionsThatReactedToThis("planetsTakenThisRound")+"_"+planet);
+        }
         if (activeGame.getActivePlayer() != null && !("".equalsIgnoreCase(activeGame.getActivePlayer())) && player.hasAbility("scavenge") && !doubleCheck && event != null) {
             String fac = player.getFactionEmoji();
 
@@ -185,21 +188,21 @@ public class PlanetAdd extends PlanetAddRemove {
         if (unitHolder.getUnits() != null) {
             numMechs = unitHolder.getUnitCount(UnitType.Mech, colorID);
         }
-        if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech") && !doubleCheck) {
+        // if (numMechs > 0 && player.getUnitsOwned().contains("winnu_mech") && !doubleCheck) {
 
-            Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
-            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-            Button pdsButton = Button.success("winnuStructure_pds_" + planet, "Place a PDS on " + Helper.getPlanetRepresentation(planet, activeGame));
-            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-            Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(sdButton);
-            buttons.add(pdsButton);
-            buttons.add(tgButton);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
-                player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
+        //     Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
+        //     sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+        //     Button pdsButton = Button.success("winnuStructure_pds_" + planet, "Place a PDS on " + Helper.getPlanetRepresentation(planet, activeGame));
+        //     pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
+        //     Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
+        //     List<Button> buttons = new ArrayList<>();
+        //     buttons.add(sdButton);
+        //     buttons.add(pdsButton);
+        //     buttons.add(tgButton);
+        //     MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+        //         player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
 
-        }
+        // }
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !activeGame.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeGame, planetReal, player);
