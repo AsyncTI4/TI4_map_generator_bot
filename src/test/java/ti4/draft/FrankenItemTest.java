@@ -54,19 +54,12 @@ public class FrankenItemTest {
         };
     }
 
-
     @Test
     public void testAllPoKCardsHaveValidLongNames() {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            try {
-                assert !card.getLongDescription().isEmpty() : card.getAlias();
-            }
-            catch (Exception e)
-            {
-                assert false : card.getAlias();
-            }
+            assert !card.getLongDescription().isEmpty() : card.getAlias();
         };
     }
 
