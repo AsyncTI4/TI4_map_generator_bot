@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.model.FactionModel;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class FrankenItemTest {
 
     @Test
     public void testAllPoKCardsHaveValidLongNames() {
+        TileHelper.initTilesFromJson();
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
@@ -72,6 +74,7 @@ public class FrankenItemTest {
 
     @Test
     public void testAllDSCardsHaveValidLongNames() {
+        TileHelper.initTilesFromJson();
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
