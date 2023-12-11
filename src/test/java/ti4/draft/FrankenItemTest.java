@@ -1,10 +1,14 @@
 package ti4.draft;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Storage;
 import ti4.model.FactionModel;
 
 import java.util.ArrayList;
@@ -13,6 +17,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class FrankenItemTest {
+
+    @BeforeAll
+    public static void init() {
+        TileHelper.init();
+        PositionMapper.init();
+        Mapper.init();
+        AliasHandler.init();
+        Storage.init();
+    }
+
     private List<FactionModel> getPoKFactions() {
         var factions = Mapper.getFactions();
         factions.removeIf(faction -> !faction.getSource().isPok());
@@ -58,7 +72,6 @@ public class FrankenItemTest {
 
     @Test
     public void testAllPoKCardsHaveValidLongNames() {
-        TileHelper.init();
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
@@ -74,7 +87,6 @@ public class FrankenItemTest {
 
     @Test
     public void testAllDSCardsHaveValidLongNames() {
-        TileHelper.init();
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
