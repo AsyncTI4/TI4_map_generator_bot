@@ -148,6 +148,10 @@ public class SCPlay extends PlayerSubcommandData {
         if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 7 && Helper.getPlayerFromAbility(activeGame, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
+
+        if (!activeGame.isHomeBrewSCMode() && !activeGame.isFoWMode() && scToPlay == 4 && Helper.getPlayerFromUnit(activeGame, "titans_mech") != null) {
+            scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
+        }
         if (!scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
         if (actionRow != null) baseMessageObject.addComponents(actionRow);
         player.setWhetherPlayerShouldBeTenMinReminded(true);

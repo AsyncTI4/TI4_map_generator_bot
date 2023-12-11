@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
-import ti4.commands.game.GameEnd;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
@@ -247,9 +246,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            thread.getManager().setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue();
-            thread.getManager().setArchived(true).queue();
-            thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
+            thread.getManager()
+                .setName(newGame.getName() +"-launched - " + thread.getName())
+                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                .setArchived(true)
+                .queue();
         }
 
         GameCreate.reportNewGameCreated(newGame);

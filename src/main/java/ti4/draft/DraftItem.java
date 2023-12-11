@@ -62,51 +62,21 @@ public abstract class DraftItem implements ModelInterface {
         DraftItem item = null;
         switch (category) {
 
-            case ABILITY -> {
-                item =  new AbilityDraftItem(itemId);
-            }
-            case TECH -> {
-                item =  new TechDraftItem(itemId);
-            }
-            case AGENT -> {
-                item =  new AgentDraftItem(itemId);
-            }
-            case COMMANDER -> {
-                item =  new CommanderDraftItem(itemId);
-            }
-            case HERO -> {
-                item =  new HeroDraftItem(itemId);
-            }
-            case MECH -> {
-                item =  new MechDraftItem(itemId);
-            }
-            case FLAGSHIP -> {
-                item =  new FlagshipDraftItem(itemId);
-            }
-            case COMMODITIES -> {
-                item =  new CommoditiesDraftItem(itemId);
-            }
-            case PN -> {
-                item =  new PNDraftItem(itemId);
-            }
-            case HOMESYSTEM -> {
-                item =  new HomeSystemDraftItem(itemId);
-            }
-            case STARTINGTECH -> {
-                item =  new StartingTechDraftItem(itemId);
-            }
-            case STARTINGFLEET -> {
-                item =  new StartingFleetDraftItem(itemId);
-            }
-            case BLUETILE -> {
-                item =  new BlueTileDraftItem(itemId);
-            }
-            case REDTILE -> {
-                item =  new RedTileDraftItem(itemId);
-            }
-            case DRAFTORDER -> {
-                item =  new SpeakerOrderDraftItem(itemId);
-            }
+            case ABILITY -> item =  new AbilityDraftItem(itemId);
+            case TECH -> item =  new TechDraftItem(itemId);
+            case AGENT -> item =  new AgentDraftItem(itemId);
+            case COMMANDER -> item =  new CommanderDraftItem(itemId);
+            case HERO -> item =  new HeroDraftItem(itemId);
+            case MECH -> item =  new MechDraftItem(itemId);
+            case FLAGSHIP -> item =  new FlagshipDraftItem(itemId);
+            case COMMODITIES -> item =  new CommoditiesDraftItem(itemId);
+            case PN -> item =  new PNDraftItem(itemId);
+            case HOMESYSTEM -> item =  new HomeSystemDraftItem(itemId);
+            case STARTINGTECH -> item =  new StartingTechDraftItem(itemId);
+            case STARTINGFLEET -> item =  new StartingFleetDraftItem(itemId);
+            case BLUETILE -> item =  new BlueTileDraftItem(itemId);
+            case REDTILE -> item =  new RedTileDraftItem(itemId);
+            case DRAFTORDER -> item =  new SpeakerOrderDraftItem(itemId);
         }
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;

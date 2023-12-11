@@ -23,15 +23,9 @@ public class FrankenDraft extends BagDraft {
     public int getItemLimitForCategory(DraftItem.Category category) {
         int limit = 0;
         switch (category) {
-            case ABILITY, BLUETILE -> {
-                limit = 3;
-            }
-            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
-                limit = 2;
-            }
-            case DRAFTORDER -> {
-                limit = 1;
-            }
+            case ABILITY, BLUETILE -> limit = 3;
+            case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> limit = 2;
+            case DRAFTORDER -> limit = 1;
         }
         return limit;
     }
@@ -55,16 +49,14 @@ public class FrankenDraft extends BagDraft {
         List<FactionModel> factionSet = Mapper.getFactions();
         List<String> factionIds = new ArrayList<>();
         factionSet.forEach((FactionModel model) -> {
-            if ("ds".equals(model.getSource().toString()) && !activeGame.isDiscordantStarsMode()) {
-                return;
-            } else {
+            if (model.getSource().isPok() || (model.getSource().isDs() && activeGame.isDiscordantStarsMode())) {
                 for (String excludedFaction : excludedFactions) {
                     if (model.getAlias().contains(excludedFaction)) {
                         return;
                     }
                 }
+                factionIds.add(model.getAlias());
             }
-            factionIds.add(model.getAlias());
         });
         return factionIds;
     }

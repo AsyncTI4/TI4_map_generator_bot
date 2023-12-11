@@ -103,7 +103,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 } else {
                     options = factions.stream()
-                        .filter(faction -> !"ds".equals(faction.getSource()))
+                        .filter(faction -> !faction.getSource().isDs())
                         .filter(faction -> faction.search(enteredValue))
                         .limit(25)
                         .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))

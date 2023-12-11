@@ -327,7 +327,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveReparationsStep1(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons;
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
         buttons = Helper.getPlanetRefreshButtons(event, player, activeGame);
         Button DoneRefreshing = Button.danger("deleteButtons", "Done Readying Planets");
@@ -776,7 +776,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true)
                 + " since spy is such a frequently sabod card, and it contains secret info, extra precaution has been taken with its resolution. A button has been sent to "
                 + ButtonHelper.getIdentOrColor(p2, activeGame) + " cards info thread, they can press this button to send a random AC to you.");
-        List<Button> buttons = new ArrayList<Button>();
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentation(true, true) + " you have been hit with the Spy AC. Press the button to send a random AC to the person.", buttons);
@@ -951,11 +951,7 @@ public class ButtonHelperActionCards {
         if ("space".equalsIgnoreCase(unitHolderName)) {
             unitHolderName = "";
         }
-        String c = "";
-        if (p2.hasUnit("cabal_spacedock") || p2.hasUnit("cabal_spacedock2")) {
-            c = "c";
-        }
-        new RemoveUnits().unitParsing(event, p2.getColor(), tile, c + "sd " + unitHolderName, activeGame);
+        new RemoveUnits().unitParsing(event, p2.getColor(), tile, "sd " + unitHolderName, activeGame);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your space dock in " + tile.getRepresentation() + " was melted.");
         event.getMessage().delete().queue();
@@ -1055,7 +1051,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("investments")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("resolvePreassignment_Investments", "Pre-play Manipulate Investments"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1210,11 +1206,10 @@ public class ButtonHelperActionCards {
         p2.exhaustPlanet(planet);
         int resValue = Helper.getPlanetResources(planet, activeGame);
         int oldTg = player.getTg();
-        int count = resValue;
-        player.setTg(oldTg + count);
-        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ")");
+        player.setTg(oldTg + resValue);
+        MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdent(player) + " gained " + resValue + " tgs (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, activeGame);
-        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, resValue);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true) + " you exhausted " + planetRep);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeGame), p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
     }
@@ -1339,7 +1334,7 @@ public class ButtonHelperActionCards {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         return techs;

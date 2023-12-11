@@ -1,10 +1,8 @@
 package ti4.commands.agenda;
 
-import java.util.Map;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,7 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -30,8 +27,11 @@ public class DrawAgenda extends AgendaSubcommandData {
     public void drawAgenda(GenericInteractionCreateEvent event, int count, Game activeGame, Player player) {
         drawAgenda(event, count, false, activeGame, player);
     }
-
     public void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game activeGame, Player player) {
+        drawAgenda(event, count, fromBottom, activeGame, player, false);
+    }
+
+    public void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game activeGame, Player player, boolean discard) {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeGame.getName()).append("\n");
@@ -45,10 +45,13 @@ public class DrawAgenda extends AgendaSubcommandData {
                 sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                 index++;
                 sb.append("\n");
-                Button top = Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck.");
-                Button bottom = Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck.");
-                buttons.add(top);
-                buttons.add(bottom);
+                buttons.add(Button.primary("topAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the top of the agenda deck."));
+                if(!discard){
+                buttons.add(Button.danger("bottomAgenda_" + entry.getValue(), "Put agenda " + entry.getValue() + " on the bottom of the agenda deck."));
+                }else{
+                    buttons.add(Button.danger("discardAgenda_" + entry.getValue(), "Discard agenda " + entry.getValue() ));
+
+                }
             }
         }
         sb.append("-----------\n");

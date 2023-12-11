@@ -1,5 +1,10 @@
 package ti4.commands.franken;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -16,12 +21,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 public class FrankenCommand implements Command {
 
     private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
@@ -36,17 +35,15 @@ public class FrankenCommand implements Command {
         if (event.getName().equals(getActionID())) {
             User user = event.getUser();
             String userID = user.getId();
-            // if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
-            //     Member member = event.getMember();
-            //     List<Role> roles = member.getRoles();
-            //     for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-            //         if (roles.contains(role)) {
-            //             return true;
-            //         }
-            //     }
-            //     MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
-            //     return false;
-            // }
+            if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
+                Member member = event.getMember();
+                List<Role> roles = member.getRoles();
+                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
+                }
+            }
 
             GameManager gameManager = GameManager.getInstance();
             if (!gameManager.isUserWithActiveGame(userID)) {
