@@ -72,7 +72,7 @@ public class Info extends GameSubcommandData {
             .append("/").append(activeGame.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(activeGame.getAgendaDeckID()).append("` ").append(activeGame.getAgendaDeckSize()).append("/")
             .append(activeGame.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (activeGame.getEventDeckID() != null) sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/")
+        if (activeGame.getEventDeckID() != null && !"null".equals(activeGame.getEventDeckID())) sb.append("- ").append("Event Deck: `").append(activeGame.getEventDeckID()).append("` ").append(activeGame.getEventDeckSize()).append("/")
             .append(activeGame.getEventFullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(activeGame.getTechnologyDeckID()).append("`").append(NEW_LINE);
         sb.append("- ").append(Emojis.RelicCard).append("Relic Deck: `").append(activeGame.getRelicDeckID()).append("` ").append(activeGame.getRelicDeckSize()).append("/")

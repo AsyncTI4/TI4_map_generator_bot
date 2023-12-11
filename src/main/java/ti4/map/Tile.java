@@ -408,19 +408,9 @@ public class Tile {
 
     @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken() {
-        for (UnitHolder unitHolder : getUnitHolders().values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
-                return true;
-            }
-            for (UnitKey unit : unitHolder.getUnits().keySet()) {
-                if (unit.getUnitType() == UnitType.CabalSpacedock) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return hasCabalSpaceDockOrGravRiftToken(null);
     }
+
     @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken(Game activeGame) {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
@@ -432,8 +422,11 @@ public class Tile {
                 if (unit.getUnitType() == UnitType.CabalSpacedock) {
                     return true;
                 }
-                 if (unit.getUnitType() == UnitType.Spacedock && (activeGame.getPlayerFromColorOrFaction(unit.getColor()).ownsUnit("cabal_spacedock") || activeGame.getPlayerFromColorOrFaction(unit.getColor()).ownsUnit("cabal_spacedock2"))) {
-                    return true;
+                if (unit.getUnitType() == UnitType.Spacedock && activeGame != null) {
+                    Player player = activeGame.getPlayerFromColorOrFaction(unit.getColor());
+                    if (player != null && (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
+                        return true;
+                    }
                 }
             }
         }
