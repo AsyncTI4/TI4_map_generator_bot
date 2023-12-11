@@ -100,7 +100,7 @@ public class TurnStart extends PlayerSubcommandData {
             player.setPassed(true);
             String text2 = player.getRepresentation() + " PASSED";
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), text2);
-            TurnEnd.pingNextPlayer(event, activeGame, player);
+            TurnEnd.pingNextPlayer(event, activeGame, player, true);
         }
     }
 

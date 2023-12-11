@@ -111,6 +111,14 @@ public class PNInfo extends PNCardsSubcommandData {
         if (player.hasUnexhaustedLeader("vadenagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_vadenagent", "Use Vaden Agent").withEmoji(Emoji.fromFormatted(Emojis.vaden));
             buttons.add(hacanButton);
+        }//olradinagent
+        if (player.hasUnexhaustedLeader("olradinagent")) {
+            Button hacanButton = Button.secondary("getAgentSelection_olradinagent", "Use Olradin Agent").withEmoji(Emoji.fromFormatted(Emojis.olradin));
+            buttons.add(hacanButton);
+        }
+        if (player.hasUnexhaustedLeader("edynagent")) {
+            Button hacanButton2 = Button.secondary("presetEdynAgentStep1", "Preset Edyn Agent").withEmoji(Emoji.fromFormatted(Emojis.edyn));
+            buttons.add(hacanButton2);
         }
         if (player.hasUnexhaustedLeader("celdauriagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_celdauriagent", "Use Celdauri Agent").withEmoji(Emoji.fromFormatted(Emojis.celdauri));
