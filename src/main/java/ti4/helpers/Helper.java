@@ -1535,13 +1535,16 @@ public class Helper {
 
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
-            String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
+            String techID = tech.getAlias();
+            String buttonID;
             if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
                 if (jolNarHeroTech.equalsIgnoreCase("nekro")) {
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName + "_nopay";
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__nopay";
                 } else {
                     buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
                 }
+            } else {
+                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
             }
             Button techB;
             //String requirementsEmoji = tech.getRequirementsEmoji();
