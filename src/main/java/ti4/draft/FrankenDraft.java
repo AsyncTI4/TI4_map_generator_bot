@@ -8,9 +8,9 @@ import java.util.Map;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.commands.milty.StartMilty;
+import ti4.draft.items.*;
 import ti4.generator.Mapper;
 import ti4.map.Game;
-import ti4.message.BotLogger;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 
@@ -48,20 +48,6 @@ public class FrankenDraft extends BagDraft {
         Collections.shuffle(items);
     }
 
-    // All the generic types of draftable items (i.e. things like "Argent Starting Tech"
-    private static final DraftItem.Category[] genericDraftableTypes = {
-        DraftItem.Category.AGENT,
-        DraftItem.Category.COMMANDER,
-        DraftItem.Category.HERO,
-        DraftItem.Category.COMMODITIES,
-        DraftItem.Category.PN,
-        DraftItem.Category.MECH,
-        DraftItem.Category.FLAGSHIP,
-        DraftItem.Category.HOMESYSTEM,
-        DraftItem.Category.STARTINGFLEET,
-        DraftItem.Category.STARTINGTECH
-    };
-
 
     private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane" };
 
@@ -83,14 +69,22 @@ public class FrankenDraft extends BagDraft {
         return factionIds;
     }
 
-    public static List<DraftItem> buildDraftOrderSet(Game activeGame) {
-        List<DraftItem> allItems = new ArrayList<>();
-        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
-            allItems.add(DraftItem.Generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
-        }
-        filterUndraftablesAndShuffle(allItems, DraftItem.Category.DRAFTORDER);
-        return allItems;
+    public static List<FactionModel> getAllDraftableFactions(Game activeGame) {
+        List<FactionModel> factionSet = Mapper.getFactions();
+        factionSet.removeIf((FactionModel model) -> {
+            if (model.getSource().isPok() || (model.getSource().isDs() && activeGame.isDiscordantStarsMode())){
+                for (String excludedFaction : excludedFactions) {
+                    if (model.getAlias().contains(excludedFaction)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            return true;
+        });
+        return factionSet;
     }
+
 
     public static List<DraftItem> buildTileSet(MiltyDraftManager draftManager, boolean blue) {
         List<DraftItem> allItems = new ArrayList<>();
@@ -111,37 +105,6 @@ public class FrankenDraft extends BagDraft {
         return allItems;
     }
 
-    public static List<DraftItem> buildAbilitySet(Game activeGame) {
-        List<String> allFactions = getAllFactionIds(activeGame);
-        List<DraftItem> allAbilityItems = new ArrayList<>();
-        for (var factionId : allFactions) {
-            FactionModel faction = Mapper.getFaction(factionId);
-            if (faction != null) {
-                for (var ability : faction.getAbilities()) {
-                    allAbilityItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
-                }
-            } else {
-                BotLogger.log("Franken faction returned null on this id" + factionId);
-            }
-
-        }
-
-        filterUndraftablesAndShuffle(allAbilityItems, DraftItem.Category.ABILITY);
-        return allAbilityItems;
-    }
-
-    public static List<DraftItem> buildFactionTechSet(Game activeGame) {
-        List<String> allFactions = getAllFactionIds(activeGame);
-        List<DraftItem> allDraftableTechs = new ArrayList<>();
-        for (var factionId : allFactions) {
-            FactionModel faction = Mapper.getFaction(factionId);
-            for (var tech : faction.getFactionTech()) {
-                allDraftableTechs.add(DraftItem.Generate(DraftItem.Category.TECH, tech));
-            }
-        }
-        filterUndraftablesAndShuffle(allDraftableTechs, DraftItem.Category.TECH);
-        return allDraftableTechs;
-    }
 
     public static List<DraftItem> buildGenericFactionItemSet(DraftItem.Category category, Game activeGame) {
         List<String> factionIds = getAllFactionIds(activeGame);
@@ -156,19 +119,28 @@ public class FrankenDraft extends BagDraft {
     @Override
     public List<DraftBag> generateBags(Game activeGame) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
-        for (DraftItem.Category category : genericDraftableTypes) {
-            allDraftableItems.put(category, buildGenericFactionItemSet(category, activeGame));
-        }
+        List<FactionModel> allDraftableFactions = getAllDraftableFactions(activeGame);
 
-        allDraftableItems.put(DraftItem.Category.DRAFTORDER, buildDraftOrderSet(activeGame));
+        allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.HERO, HeroDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.COMMODITIES, CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.FLAGSHIP, FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.MECH, MechDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.PN, PNDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.STARTINGFLEET, StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftItem.Category.STARTINGTECH, StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions));
+
+        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(activeGame));
 
         MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
         new StartMilty().initDraftTiles(draftManager);
-        allDraftableItems.put(DraftItem.Category.REDTILE, buildTileSet(draftManager, false));
-        allDraftableItems.put(DraftItem.Category.BLUETILE, buildTileSet(draftManager, true));
+        allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
+        allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
 
-        allDraftableItems.put(DraftItem.Category.ABILITY, buildAbilitySet(activeGame));
-        allDraftableItems.put(DraftItem.Category.TECH, buildFactionTechSet(activeGame));
 
         List<DraftBag> bags = new ArrayList<>();
 

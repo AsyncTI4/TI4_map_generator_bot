@@ -1,6 +1,11 @@
 package ti4.model;
 
 import ti4.draft.DraftItem;
+import ti4.generator.Mapper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class DraftErrataModel implements ModelInterface{
     @Override
@@ -32,5 +37,12 @@ public class DraftErrataModel implements ModelInterface{
 
     public DraftErrataModel() {
 
+    }
+
+    public static void filterUndraftablesAndShuffle(List<DraftItem> items, DraftItem.Category listCategory) {
+        Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
+        items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
+        items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
+        Collections.shuffle(items);
     }
 }

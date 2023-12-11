@@ -1,13 +1,14 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Emojis;
-import ti4.model.FactionModel;
-import ti4.model.PlanetModel;
-import ti4.model.TileModel;
+import ti4.model.*;
 
 public class HomeSystemDraftItem extends DraftItem {
     public HomeSystemDraftItem(String itemId) {
@@ -48,5 +49,14 @@ public class HomeSystemDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.getFactionIconFromDiscord(ItemId);
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (FactionModel faction : factions) {
+            allItems.add(DraftItem.Generate(Category.HOMESYSTEM, faction.getAlias()));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
+        return allItems;
     }
 }

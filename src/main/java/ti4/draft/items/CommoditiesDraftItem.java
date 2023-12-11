@@ -3,7 +3,11 @@ package ti4.draft.items;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommoditiesDraftItem extends DraftItem {
     public CommoditiesDraftItem(String itemId) {
@@ -30,5 +34,14 @@ public class CommoditiesDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.comm;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (FactionModel faction : factions) {
+            allItems.add(DraftItem.Generate(Category.COMMODITIES, faction.getAlias()));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
+        return allItems;
     }
 }

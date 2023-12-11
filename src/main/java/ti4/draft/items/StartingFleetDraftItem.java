@@ -6,7 +6,11 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StartingFleetDraftItem extends DraftItem {
     public StartingFleetDraftItem(String itemId) {
@@ -34,5 +38,14 @@ public class StartingFleetDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.NonUnitTechSkip;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (FactionModel faction : factions) {
+            allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGFLEET);
+        return allItems;
     }
 }
