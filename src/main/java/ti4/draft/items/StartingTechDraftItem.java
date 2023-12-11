@@ -82,11 +82,7 @@ public class StartingTechDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            if ("keleresa".equals(faction.getAlias())){
-                allItems.add(DraftItem.Generate(Category.STARTINGTECH, "keleres"));
-            } else {
-                allItems.add(DraftItem.Generate(Category.STARTINGTECH, faction.getAlias()));
-            }
+            allItems.add(DraftItem.Generate(Category.STARTINGTECH, faction.getAlias()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
         return allItems;

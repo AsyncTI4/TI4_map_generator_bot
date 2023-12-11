@@ -40,11 +40,7 @@ public class StartingFleetDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            if ("keleresa".equals(faction.getAlias())){
-                allItems.add(DraftItem.Generate(Category.STARTINGFLEET, "keleres"));
-            } else {
-                allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
-            }
+            allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGFLEET);
         return allItems;
