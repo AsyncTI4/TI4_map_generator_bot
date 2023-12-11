@@ -80,6 +80,7 @@ public class TechCommand implements Command {
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
         subcommands.add(new TechInfo());
+        subcommands.add(new TechButton());
 
         return subcommands;
     }
