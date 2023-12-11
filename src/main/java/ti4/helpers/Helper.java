@@ -1539,7 +1539,7 @@ public class Helper {
             String buttonID;
             if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
                 if (jolNarHeroTech.equalsIgnoreCase("nekro")) {
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__nopay";
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
                 } else {
                     buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
                 }
