@@ -69,16 +69,14 @@ public class FrankenDraft extends BagDraft {
         List<FactionModel> factionSet = Mapper.getFactions();
         List<String> factionIds = new ArrayList<>();
         factionSet.forEach((FactionModel model) -> {
-            if ("ds".equals(model.getSource().toString()) && !activeGame.isDiscordantStarsMode()) {
-                return;
-            } else {
+            if (model.getSource().isPok() || (model.getSource().isDs() && activeGame.isDiscordantStarsMode())) {
                 for (String excludedFaction : excludedFactions) {
                     if (model.getAlias().contains(excludedFaction)) {
                         return;
                     }
                 }
+                factionIds.add(model.getAlias());
             }
-            factionIds.add(model.getAlias());
         });
         return factionIds;
     }
