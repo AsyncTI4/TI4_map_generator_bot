@@ -98,6 +98,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -837,6 +838,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveArboHeroBuild(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("saarHeroResolution_")) {
             ButtonHelperHeroes.resolveSaarHero(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("refreshWithOlradinAgent_")) {
+            ButtonHelperAgents.resolveRefreshWithOlradinAgent(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("resolveGrace_")) {
             ButtonHelperAbilities.resolveGrace(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("increaseTGonSC_")) {
@@ -2192,6 +2195,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.putSleeperOn(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("frankenDraftAction;")) {
             FrankenDraftHelper.resolveFrankenDraftAction(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("presetEdynAgentStep1")) {
+            ButtonHelperAgents.presetEdynAgentStep1(activeGame, player);
+        } else if (buttonID.startsWith("presetEdynAgentStep2_")) {
+            ButtonHelperAgents.presetEdynAgentStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("presetEdynAgentStep3_")) {
+            ButtonHelperAgents.presetEdynAgentStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
             ButtonHelperAbilities.removeSleeper(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("replaceSleeperWith_")) {
@@ -2200,6 +2209,7 @@ public class ButtonListener extends ListenerAdapter {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), activeGame);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put " + agendaNumID + " on the top of the agenda deck.");
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("primaryOfWarfare")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "warfare");
             MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
@@ -2224,6 +2234,14 @@ public class ButtonListener extends ListenerAdapter {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), activeGame);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put " + agendaNumID + " on the bottom of the agenda deck.");
+            ButtonHelper.deleteTheOneButton(event);
+        } else if (buttonID.startsWith("discardAgenda_")) {
+            String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+            String AGid = activeGame.revealAgenda(false);
+            AgendaModel agendaDetails = Mapper.getAgenda(AGid);
+            String agendaName = agendaDetails.getName();
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame)+ "discarded " + agendaName +" using Edyn Agent");
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
@@ -2339,7 +2357,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setPassed(true);
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
-                    TurnEnd.pingNextPlayer(event, activeGame, player);
+                    TurnEnd.pingNextPlayer(event, activeGame, player, true);
                     ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round " + activeGame.getRound() + " for " + ButtonHelper.getIdent(player));
                 }
                 case "proceedToVoting" -> {
