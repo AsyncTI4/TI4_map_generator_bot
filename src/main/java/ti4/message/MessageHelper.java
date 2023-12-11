@@ -129,7 +129,6 @@ public class MessageHelper {
 				Player player_ = activeGame.getPlayerFromColorOrFaction(player);
 				addFactionReactToMessage(activeGame, player_, msg);
 			}
-
 		};
 
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);

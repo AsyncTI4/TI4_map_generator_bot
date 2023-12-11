@@ -2,7 +2,6 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -113,9 +112,7 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> {
-                DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
-            }
+            case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, activeGame, activeGame.getRealPlayers().size());
             case "titanshero" -> {
                 String titanshero = Mapper.getTokenID("titanshero");
                 System.out.println(titanshero);
@@ -234,9 +231,7 @@ public class HeroPlay extends LeaderAction {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText) + " sent everyone a ping in their private threads with buttons to send you an AC");
             }
-            case "keleresheroharka" -> {
-                KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
-            }
+            case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(activeGame, player, event);
         }
         var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.LEADER, leaderModel.getID(), player.getNumberTurns());
         if (posssibleCombatMod != null) {

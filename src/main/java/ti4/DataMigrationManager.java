@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
@@ -491,7 +492,7 @@ public class DataMigrationManager {
         boolean mapNeededMigrating = false;
         for (Entry<String, UnitHolder> entry : game.getPlanetsInfo().entrySet()) {
             if (entry.getValue() instanceof Planet p) {
-                HashSet<String> tokens = new HashSet<>(p.getTokenList());
+                Set<String> tokens = new HashSet<>(p.getTokenList());
                 for (String token : tokens) {
                     if ("attachment_veldyr1.png".equals(token)) {
                         p.removeToken(token);
