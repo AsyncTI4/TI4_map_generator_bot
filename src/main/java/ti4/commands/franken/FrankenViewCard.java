@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 public class FrankenViewCard extends FrankenSubcommandData {
     public FrankenViewCard() {
 
-        super("view_card", "Frankendraft Edit Commands");
+        super("view_card", "View a Frankendraft card from its alias");
         addOptions(new OptionData(OptionType.STRING, "alias", "card alias").setRequired(true));
     }
     @Override
