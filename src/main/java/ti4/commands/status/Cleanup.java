@@ -72,7 +72,8 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
-            if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
+            
+            if (player.isRealPlayer() && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()) != null
             && activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
                 if (activeGame.getFactionsThatReactedToThis("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
                     activeGame.setCurrentReacts("Pre Pass " + player.getFaction(), "");

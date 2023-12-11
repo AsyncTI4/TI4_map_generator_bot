@@ -2315,7 +2315,8 @@ public class Game {
 
     public void addExplore(String id) {
         if (Mapper.getExploreRepresentation(id) != null) {
-            explore.add(id);
+            int place = ThreadLocalRandom.current().nextInt(explore.size());
+            explore.add(place,id);
         }
         discardExplore.remove(id);
     }
