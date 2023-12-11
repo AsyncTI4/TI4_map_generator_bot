@@ -58,7 +58,7 @@ public class FrankenItemTest {
 
     @Test
     public void testAllPoKCardsHaveValidLongNames() {
-        TileHelper.initTilesFromJson();
+        TileHelper.init();
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
@@ -74,7 +74,7 @@ public class FrankenItemTest {
 
     @Test
     public void testAllDSCardsHaveValidLongNames() {
-        TileHelper.initTilesFromJson();
+        TileHelper.init();
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
