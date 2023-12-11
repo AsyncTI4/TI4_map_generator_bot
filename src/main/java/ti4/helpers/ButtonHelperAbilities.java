@@ -366,10 +366,10 @@ public class ButtonHelperAbilities {
 
     public static void rollOmenDiceAtStartOfStrat(Game activeGame, Player myko) {
         activeGame.setCurrentReacts("OmenDice", "");
-        String msg = myko.getRepresentation(true, true) + " rolled 4 omen dice and rolled the following numbers: ";
+        StringBuilder msg = new StringBuilder(myko.getRepresentation(true, true) + " rolled 4 omen dice and rolled the following numbers: ");
         for (int x = 0; x < 4; x++) {
             Die d1 = new Die(6);
-            msg = msg + d1.getResult() + " ";
+            msg.append(d1.getResult()).append(" ");
             addOmenDie(activeGame, d1.getResult());
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(myko, activeGame), msg.toString());
@@ -760,7 +760,7 @@ public class ButtonHelperAbilities {
     public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game activeGame) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
-            techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+            techToGain.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
         }
         return techToGain;
     }
@@ -818,7 +818,7 @@ public class ButtonHelperAbilities {
             player.setTg(player.getTg() + 1);
             player.setCommodities(player.getCommoditiesTotal());
             MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " your **Council Patronage** ability was triggered. Your " + Emojis.comm
-                + " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade good (" + player.getTg() + " -> " + (player.getTg() + 1) + ")");
+                + " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(activeGame) + " trade good (" + (player.getTg()-1) + " -> " + (player.getTg()) + ")");
             pillageCheck(player, activeGame);
             ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
             ButtonHelper.resolveMinisterOfCommerceCheck(activeGame, player, event);

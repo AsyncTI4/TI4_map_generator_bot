@@ -55,7 +55,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         Integer uniqueID = discardAgendas.get(id);
         //Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
         boolean action = false;
-        if(!activeGame.getCurrentPhase().equalsIgnoreCase("action")){
+        if(!"action".equalsIgnoreCase(activeGame.getCurrentPhase())){
             activeGame.setCurrentPhase("agendawaiting");
         }else{
             action = true;
@@ -159,7 +159,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeGame.setCurrentReacts("lastAgendaReactTime", "" + new Date().getTime());
         
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = ""; 
+        String msg;
 
         if(action){
            msg = "It seems likely you are resolving Edyn hero, you can use this button to skip straight to the resolution";

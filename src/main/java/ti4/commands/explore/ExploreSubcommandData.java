@@ -528,7 +528,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "bentor", event);
         }
 
-        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName)) {
+        if (player.hasAbility("awaken") && !activeGame.getAllPlanetsWithSleeperTokens().contains(planetName) && player.getPlanets().contains(planetName)) {
             Button gainCC = Button.success("putSleeperOnPlanet_" + planetName, "Put Sleeper on " + planetName);
             Button Decline3 = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(gainCC, Decline3);

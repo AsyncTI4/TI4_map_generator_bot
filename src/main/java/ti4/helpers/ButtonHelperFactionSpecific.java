@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
@@ -32,12 +33,13 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
 
     public static void checkForStymie(Game activeGame, Player activePlayer, Tile tile) {
         for (Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, activeGame, tile)) {
-            if (p2.getPromissoryNotes().keySet().contains("stymie") && activeGame.getPNOwner("stymie") != p2) {
+            if (p2.getPromissoryNotes().containsKey("stymie") && activeGame.getPNOwner("stymie") != p2) {
                 String msg = p2.getRepresentation(true, true) + " you have the opportunity to stymie " + ButtonHelper.getIdentOrColor(activePlayer, activeGame);
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("stymiePlayerStep1_" + activePlayer.getFaction(), "Play Stymie"));
@@ -148,7 +150,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         event.getMessage().delete().queue();
@@ -168,7 +170,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         List<Button> techs2 = new ArrayList<>(techs);
@@ -191,7 +193,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -255,8 +257,8 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getRaghsCallButtons(Player player, Game activeGame, Tile tile) {
-        List<Button> buttons = new ArrayList<Button>();
-        if (!player.getPromissoryNotes().keySet().contains("ragh")) {
+        List<Button> buttons = new ArrayList<>();
+        if (!player.getPromissoryNotes().containsKey("ragh")) {
             return buttons;
         }
         Player saar = activeGame.getPNOwner("ragh");
@@ -566,8 +568,7 @@ public class ButtonHelperFactionSpecific {
             return false;
         }
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
-            List<UnitKey> unitKeys = new ArrayList<>();
-            unitKeys.addAll(unitHolder.getUnits().keySet());
+            List<UnitKey> unitKeys = new ArrayList<>(unitHolder.getUnits().keySet());
             for (UnitKey unitKey : unitKeys) {
                 if (blockader.unitBelongsToPlayer(unitKey)) {
                     return true;
@@ -579,19 +580,17 @@ public class ButtonHelperFactionSpecific {
 
     public static void releaseAllUnits(Player cabal, Game activeGame, Player blockader, GenericInteractionCreateEvent event) {
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
-            Player player = blockader;
-            List<UnitKey> unitKeys = new ArrayList<>();
-            unitKeys.addAll(unitHolder.getUnits().keySet());
+            List<UnitKey> unitKeys = new ArrayList<>(unitHolder.getUnits().keySet());
             for (UnitKey unitKey : unitKeys) {
                 if (blockader.unitBelongsToPlayer(unitKey)) {
                     int amount = unitHolder.getUnits().get(unitKey);
                     String unit = ButtonHelper.getUnitName(unitKey.asyncID());
-                    new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), amount + " " + unit, activeGame);
+                    new RemoveUnits().unitParsing(event, blockader.getColor(), cabal.getNomboxTile(), amount + " " + unit, activeGame);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeGame),
-                        cabal.getRepresentation(true, true) + " released " + amount + " " + ButtonHelper.getIdentOrColor(player, activeGame) + " " + unit + " from prison due to blockade");
-                    if (cabal != player) {
-                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
-                            player.getRepresentation(true, true) + " " + amount + " " + unit + " of yours was released from prison.");
+                        cabal.getRepresentation(true, true) + " released " + amount + " " + ButtonHelper.getIdentOrColor(blockader, activeGame) + " " + unit + " from prison due to blockade");
+                    if (cabal != blockader) {
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(blockader, activeGame),
+                            blockader.getRepresentation(true, true) + " " + amount + " " + unit + " of yours was released from prison.");
                     }
 
                 }
@@ -674,7 +673,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void increaseMykoMech(Game activeGame) {
-        int amount = 0;
+        int amount;
         if (!activeGame.getFactionsThatReactedToThis("mykoMech").isEmpty()) {
             amount = Integer.parseInt(activeGame.getFactionsThatReactedToThis("mykoMech"));
             amount = amount + 1;
@@ -1158,18 +1157,10 @@ public class ButtonHelperFactionSpecific {
         UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
         Planet planetReal = (Planet) unitHolder;
         switch(pnID) {
-            case "dspnveld1" -> {
-                planetReal.addToken("attachment_veldyrtaxhaven.png");
-            }
-            case "dspnveld2" -> {
-                planetReal.addToken("attachment_veldyrbroadcasthub.png");
-            }
-            case "dspnveld3" -> {
-                planetReal.addToken("attachment_veldyrreservebank.png");
-            }
-            case "dspnveld4" -> {
-                planetReal.addToken("attachment_veldyrorbitalshipyard.png");
-            }
+            case "dspnveld1" -> planetReal.addToken("attachment_veldyrtaxhaven.png");
+            case "dspnveld2" -> planetReal.addToken("attachment_veldyrbroadcasthub.png");
+            case "dspnveld3" -> planetReal.addToken("attachment_veldyrreservebank.png");
+            case "dspnveld4" -> planetReal.addToken("attachment_veldyrorbitalshipyard.png");
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), "Attached branch office to " + Helper.getPlanetRepresentation(planet, activeGame));
         event.getMessage().delete().queue();
@@ -1425,5 +1416,62 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
             player.getRepresentation(true, false) + " removed " + count + " commodities from ATS Armaments ("+origATS+"->"+player.getAtsCount()+")");
+    }
+
+
+    public static void resolveRohDhnaIndustrious(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String tilePos = buttonID.split("_")[1];
+        String toRemove = buttonID.split("_")[2];
+        String planet = toRemove.split(" ")[1];
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeGame, player, event, "res");
+        Button DoneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        new AddUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), "warsun", activeGame);
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(tilePos), toRemove, activeGame);
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdent(player) + " replaced "+Emojis.spacedock+" on "+ Helper.getPlanetRepresentationPlusEmoji(planet) +" with a "+Emojis.warsun);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Click the names of the planets you wish to exhaust to pay the 6 resources", buttons);
+        event.getMessage().delete().queue();
+    }
+
+    public static List<Button> getRohDhnaRecycleButtons(Game activeGame, Player player) {
+        List<UnitKey> availableUnits = new ArrayList<>();
+        HashMap<UnitKey, Integer> units = activeGame.getTileByPosition(activeGame.getActiveSystem()).getUnitHolders().get("space").getUnits();
+        for (UnitKey unit : units.keySet()) {
+            if(unit.getColor() == player.getColor() && (unit.getUnitType() == UnitType.Cruiser || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought)) {
+                //if unit is not in the list, add it
+                if(!availableUnits.contains(unit)) {
+                    availableUnits.add(unit);
+                }
+            }
+        }
+
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey unit : availableUnits) {
+            buttons.add(Button.success("FFCC_" + player.getFaction()+"_rohdhnaRecycle_" + unit.unitName(), unit.getUnitType().humanReadableName()).withEmoji(Emoji.fromFormatted(unit.unitEmoji())));
+
+        }
+
+        if(!buttons.isEmpty()) {
+            buttons.add(Button.danger("FFCC_" + player.getFaction()+"_deleteButtons", "Decline"));
+        }
+
+        return buttons;
+    }
+
+    public static void resolveRohDhnaRecycle(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID) {
+        String unitName = buttonID.split("_")[1];
+        new RemoveUnits().unitParsing(event, player.getColor(), activeGame.getTileByPosition(activeGame.getActiveSystem()), "1 "+unitName, activeGame);
+        UnitModel unit = Mapper.getUnit(unitName);
+        int toGain = (int) unit.getCost() - 1;
+        int before = player.getTg();
+        player.setTg(before + toGain);
+
+        ButtonHelperAbilities.pillageCheck(player, activeGame);
+        ButtonHelperAgents.resolveArtunoCheck(player, activeGame, toGain);
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            player.getRepresentation(true, false) + " recycled "+unit.getUnitEmoji()+" "+unit.getName()+" for "+toGain+" tg ("+before+"->"+player.getTg()+")");
+
+        event.getMessage().delete().queue();
     }
 }

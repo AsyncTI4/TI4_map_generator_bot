@@ -666,14 +666,20 @@ public class Helper {
         int inf = 0;
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
+        int bestRes = 0;
         for(String thing : spentThings){
-            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander")){
+            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
+                    if(!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet.getName()))){
+                        if(planet.getResources() > bestRes){
+                            bestRes = planet.getResources();
+                        }
+                    }
                     if(resOrInfOrBoth.equalsIgnoreCase("res")){
                         if(xxcha){
                             msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
@@ -717,8 +723,24 @@ public class Helper {
                     }
                     msg = msg+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
                 }
-                if(thing.contains("commander")){
-                     msg = msg + thing + "\n";
+                if(thing.contains("commander") || thing.contains("Gledge Agent")){
+                     msg = msg + "> "+thing + "\n";
+                }else if(thing.contains("Winnu Agent")){
+                     msg = msg +"> "+ thing + "\n";
+                    res = res +2;
+                }else if(thing.contains("Zealots Agent")){
+                    msg = msg +"> "+ thing + "(Best Resources found were "+bestRes+")\n";
+                    inf = inf +bestRes;
+                }else if(thing.contains("Agent")){
+                    msg = msg +"> "+ thing + "\n";
+                }else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Custiodia Vigilia (2/3)" + "\n";
+                    res = res + 2;
+                    inf = inf + 3;
+                } else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Ghoti (3/3)" + "\n";
+                    res = res + 3;
+                    inf = inf + 3;
                 }
             }
         }
@@ -726,7 +748,13 @@ public class Helper {
         inf = inf + tg;
         if(tg > 0){
             msg = msg + "> Spent "+tg+" tgs "+Emojis.getTGorNomadCoinEmoji(activeGame) +" ("+(player.getTg()+tg)+"->"+player.getTg()+") \n";
+            if(player.hasTech("mc")){
+                res = res + tg;
+                inf = inf + tg;
+                msg = msg + "> Counted the trade goods twice due to Mirror Computing \n";
+            }
         }
+
         if(resOrInfOrBoth.equalsIgnoreCase("res")){
             msg = msg + "For a total spend of **"+res+" Resources**";
         }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
@@ -1507,13 +1535,16 @@ public class Helper {
 
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
-            String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
+            String techID = tech.getAlias();
+            String buttonID;
             if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
                 if (jolNarHeroTech.equalsIgnoreCase("nekro")) {
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName + "_nopay";
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__nopay";
                 } else {
                     buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
                 }
+            } else {
+                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
             }
             Button techB;
             //String requirementsEmoji = tech.getRequirementsEmoji();

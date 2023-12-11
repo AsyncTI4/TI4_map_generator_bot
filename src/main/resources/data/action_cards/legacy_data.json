@@ -385,5 +385,23 @@
     "text": "Choose 1 non-home anomaly. For each ship that moves out of, into, or through that system during this tactical action, roll 1 die; on a result of 1-3, remove that ship from the game board, along with any units it is transporting.",
     "flavorText": "\"Even those who tread lightly through the void are often lost,\" Acamar said coldly. \"Seal their fates, so others may be warned.\"",
     "source": "action_deck_2"
+  },
+  {
+    "alias": "bureaucracy_rider",
+    "name": "Bureaucracy Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, either draw 2 secret objectives or gain the speaker token.",
+    "flavorText": "Today's session would be pivotal - the Keleres proclamation was to be signed into full effect. Qanoj smiled. A new chapter in his career would begin today.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "strategic_withdrawal",
+    "name": "Strategic Withdrawal",
+    "phase": "Action",
+    "window": "After you move ships into a system other than the active system",
+    "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
+    "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
+    "source": "action_deck_2"
   }
 ]
