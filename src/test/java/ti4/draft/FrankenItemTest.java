@@ -60,7 +60,13 @@ public class FrankenItemTest {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            assert !card.getLongDescription().isEmpty() : card.getAlias();
+            try {
+                assert !card.getLongDescription().isEmpty() : card.getAlias();
+            }
+            catch (Exception e)
+            {
+                assert false : card.getAlias();
+            }
         };
     }
 
