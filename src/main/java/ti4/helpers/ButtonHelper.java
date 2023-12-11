@@ -731,6 +731,9 @@ public class ButtonHelper {
         if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
             commanderUnlockCheck(player, activeGame, "mirveda", event);
         }
+        if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
+        }
         if (StringUtils.countMatches(buttonID, "_") < 2) { //TODO: Better explain what this is doing and why this way
             if (activeGame.getComponentAction()) {
                 MessageHelper.sendMessageToChannel(getCorrectChannel(player, activeGame), message.toString());
@@ -1421,6 +1424,11 @@ public class ButtonHelper {
                     shouldBeUnlocked = true;
                 }
             }
+            case "dihmohn" -> {
+                if (getNumberOfUnitUpgrades(player) > 0) {
+                    shouldBeUnlocked = true;
+                }
+            }
             case "kollecc" -> {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() > 3) {
                     shouldBeUnlocked = true;
@@ -1486,6 +1494,26 @@ public class ButtonHelper {
             }
             case "mentak" -> {
                 if (getNumberOfUnitsOnTheBoard(activeGame, player, "cruiser") > 3) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "ghemina" -> {
+                if ((getNumberOfUnitsOnTheBoard(activeGame, player, "flagship") + getNumberOfUnitsOnTheBoard(activeGame, player, "lady")) > 1) {
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "tnelis"->{
+                if(getNumberOfUnitsOnTheBoard(activeGame, player, "destroyer") > 5){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "cymiae"->{
+                if(getNumberOfUnitsOnTheBoard(activeGame, player, "infantry") > 9){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "kyro"->{
+                if(getNumberOfUnitsOnTheBoard(activeGame, player, "infantry") > 5 && getNumberOfUnitsOnTheBoard(activeGame, player, "fighter") > 5){
                     shouldBeUnlocked = true;
                 }
             }
@@ -3040,6 +3068,25 @@ public class ButtonHelper {
 
     public static void exploreDET(Player player, Game activeGame, ButtonInteractionEvent event) {
         Tile tile = activeGame.getTileByPosition(activeGame.getActiveSystem());
+
+        if(player.hasUnit("winnu_mech")){
+            for(UnitHolder uH : tile.getPlanetUnitHolders()){
+                if(uH.getUnitCount(UnitType.Mech, player.getColor()) > 0 && activeGame.getFactionsThatReactedToThis("planetsTakenThisRound").contains(uH.getName())){
+                    String planet = uH.getName();
+                    Button sdButton = Button.success("winnuStructure_sd_" + planet, "Place A SD on " + Helper.getPlanetRepresentation(planet, activeGame));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+                    Button pdsButton = Button.success("winnuStructure_pds_" + planet, "Place a PDS on " + Helper.getPlanetRepresentation(planet, activeGame));
+                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
+                    Button tgButton = Button.danger("deleteButtons", "Delete Buttons");
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(sdButton);
+                    buttons.add(pdsButton);
+                    buttons.add(tgButton);
+                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
+                        player.getRepresentation(true, true) + " Use buttons to place structures equal to the amount of mechs you have", buttons);
+                }
+            }
+        }
         if (!FoWHelper.playerHasShipsInSystem(player, tile)) {
             return;
         }
