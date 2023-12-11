@@ -41,7 +41,7 @@ public class FrankenItemTest {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            assert(!card.getShortDescription().isEmpty());
+            assert !card.getShortDescription().isEmpty() : card.getAlias();
         };
     }
 
@@ -50,7 +50,7 @@ public class FrankenItemTest {
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
-            assert(!card.getShortDescription().isEmpty());
+            assert !card.getShortDescription().isEmpty() : card.getAlias();
         };
     }
 
@@ -60,7 +60,7 @@ public class FrankenItemTest {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            assert(!card.getLongDescription().isEmpty());
+            assert !card.getLongDescription().isEmpty() : card.getAlias();
         };
     }
 
@@ -69,7 +69,7 @@ public class FrankenItemTest {
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
-            assert(!card.getLongDescription().isEmpty());
+            assert !card.getLongDescription().isEmpty() : card.getAlias();
         };
     }
 
@@ -79,7 +79,7 @@ public class FrankenItemTest {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            assert(!card.getItemEmoji().isEmpty());
+            assert !card.getItemEmoji().isEmpty() : card.getAlias();
         };
     }
 
@@ -88,7 +88,7 @@ public class FrankenItemTest {
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
-            assert(!card.getItemEmoji().isEmpty());
+            assert !card.getItemEmoji().isEmpty() : card.getAlias();
         };
     }
 
