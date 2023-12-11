@@ -1,5 +1,6 @@
 package ti4.draft;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
@@ -59,7 +60,13 @@ public class FrankenItemTest {
         var pok = getPoKFactions();
         var cards = generateAllCards(pok);
         for (var card: cards) {
-            assert !card.getLongDescription().isEmpty() : card.getAlias();
+            try {
+                assert !card.getLongDescription().isEmpty() : card.getAlias();
+            }
+            catch (Exception e)
+            {
+                Assertions.fail(card.getAlias() + " threw an exception: " + e);
+            }
         };
     }
 
@@ -68,7 +75,13 @@ public class FrankenItemTest {
         var ds = getDsFactions();
         var cards = generateAllCards(ds);
         for (var card: cards) {
-            assert !card.getLongDescription().isEmpty() : card.getAlias();
+            try {
+                assert !card.getLongDescription().isEmpty() : card.getAlias();
+            }
+            catch (Exception e)
+            {
+                Assertions.fail(card.getAlias() + " threw an exception: " + e);
+            }
         };
     }
 
