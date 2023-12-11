@@ -39,7 +39,11 @@ public class CommoditiesDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.COMMODITIES, faction.getAlias()));
+            if ("keleresa".equals(faction.getAlias())){
+                allItems.add(DraftItem.Generate(Category.COMMODITIES, "keleres"));
+            } else {
+                allItems.add(DraftItem.Generate(Category.COMMODITIES, faction.getAlias()));
+            }
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMODITIES);
         return allItems;

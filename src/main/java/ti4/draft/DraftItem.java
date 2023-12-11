@@ -59,9 +59,6 @@ public abstract class DraftItem implements ModelInterface {
     public DraftErrataModel Errata;
 
     public static DraftItem Generate(Category category, String itemId) {
-        if (itemId.contains("keleres") && category != Category.HERO) {
-            itemId = "keleres";
-        }
         DraftItem item = null;
         switch (category) {
 

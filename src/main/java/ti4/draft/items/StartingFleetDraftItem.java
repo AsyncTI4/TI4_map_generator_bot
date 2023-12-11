@@ -19,9 +19,6 @@ public class StartingFleetDraftItem extends DraftItem {
 
 
     private FactionModel getFaction() {
-        if ("keleres".equals(ItemId)) {
-            return Mapper.getFaction("keleresa");
-        }
         return Mapper.getFaction(ItemId);
     }
 
@@ -43,7 +40,11 @@ public class StartingFleetDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
+            if ("keleresa".equals(faction.getAlias())){
+                allItems.add(DraftItem.Generate(Category.STARTINGFLEET, "keleres"));
+            } else {
+                allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
+            }
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGFLEET);
         return allItems;
