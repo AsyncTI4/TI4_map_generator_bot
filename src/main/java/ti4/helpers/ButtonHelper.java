@@ -1895,27 +1895,32 @@ public class ButtonHelper {
         TextChannel textChannel = (TextChannel) channel;
         Helper.checkThreadLimitAndArchive(event.getGuild());
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent("Resolve combat");
+        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
+            if (threadChannel_.getName().equals(threadName)) {
+                initializeCombatThread(threadChannel_, activeGame, p1, p2, tile, event, spaceOrGround);
+                return;
+            }
+        }
         channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            boolean foundThread = false;
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+            if (activeGame.isFoWMode()) {
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            } else {
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+            }
+            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, "Resolve here"));
+            
+        });
+        MessageCreateBuilder baseMessageObject2 = new MessageCreateBuilder().addContent("Good luck!");
+        channel.sendMessage(baseMessageObject2.build()).queueAfter(300, TimeUnit.MILLISECONDS, message_ -> {
             for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
                 if (threadChannel_.getName().equals(threadName)) {
-                    foundThread = true;
                     initializeCombatThread(threadChannel_, activeGame, p1, p2, tile, event, spaceOrGround);
-                    break;
+                    return;
                 }
-            }
-
-            if (!foundThread) {
-                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-                if (activeGame.isFoWMode()) {
-                    threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-                } else {
-                    threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-                }
-
-                threadChannel.queue(tc -> initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround));
             }
         });
+
     }
 
     private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
