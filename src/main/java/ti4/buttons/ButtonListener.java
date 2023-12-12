@@ -98,6 +98,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -837,6 +838,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveArboHeroBuild(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("saarHeroResolution_")) {
             ButtonHelperHeroes.resolveSaarHero(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("refreshWithOlradinAgent_")) {
+            ButtonHelperAgents.resolveRefreshWithOlradinAgent(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("resolveGrace_")) {
             ButtonHelperAbilities.resolveGrace(activeGame, player, buttonID, event);
         } else if (buttonID.startsWith("increaseTGonSC_")) {
@@ -1178,8 +1181,8 @@ public class ButtonListener extends ListenerAdapter {
                 
             }
             event.getMessage().editMessage(editedMessage).queue();
-
-            // MessageHelper.sendMessageToChannel(event.getChannel(), message);resFrontier_
+         } else if (buttonID.startsWith("lanefirAgentRes_")) {
+            ButtonHelperAgents.resolveLanefirAgent(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("resFrontier_")) {
             buttonID = buttonID.replace("resFrontier_", "");
             String[] stuff = buttonID.split("_");
@@ -1998,8 +2001,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUprisingStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("asnStep2_")) {
             ButtonHelperFactionSpecific.resolveASNStep2(activeGame, player, buttonID, event);
-        } else if (buttonID.startsWith("unstableStep2_")) {
+        } else if (buttonID.startsWith("unstableStep2_")) {//"titansConstructionMechDeployStep2_"
             ButtonHelperActionCards.resolveUnstableStep2(player, activeGame, event, buttonID);
+        } else if (buttonID.startsWith("titansConstructionMechDeployStep2_")) {
+            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep2(activeGame,player, event, buttonID);
+        } else if (buttonID.startsWith("titansConstructionMechDeployStep1")) {
+            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep1(activeGame,player);
         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
@@ -2170,6 +2177,9 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
                     ButtonHelper.commanderUnlockCheck(player, activeGame, "mirveda", event);
                 }
+                if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
+                    ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
+                }
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message);
             }
             ButtonHelper.resolvePNPlay(pnID, player, activeGame, event);
@@ -2192,6 +2202,12 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.putSleeperOn(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("frankenDraftAction;")) {
             FrankenDraftHelper.resolveFrankenDraftAction(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("presetEdynAgentStep1")) {
+            ButtonHelperAgents.presetEdynAgentStep1(activeGame, player);
+        } else if (buttonID.startsWith("presetEdynAgentStep2_")) {
+            ButtonHelperAgents.presetEdynAgentStep2(activeGame, player, event, buttonID);
+        } else if (buttonID.startsWith("presetEdynAgentStep3_")) {
+            ButtonHelperAgents.presetEdynAgentStep3(activeGame, player, event, buttonID);
         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
             ButtonHelperAbilities.removeSleeper(buttonID, event, activeGame, player, ident);
         } else if (buttonID.startsWith("replaceSleeperWith_")) {
@@ -2200,6 +2216,7 @@ public class ButtonListener extends ListenerAdapter {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), activeGame);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put " + agendaNumID + " on the top of the agenda deck.");
+            ButtonHelper.deleteTheOneButton(event);
         } else if (buttonID.startsWith("primaryOfWarfare")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeGame, event, "warfare");
             MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeGame);
@@ -2224,6 +2241,14 @@ public class ButtonListener extends ListenerAdapter {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
             new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), activeGame);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put " + agendaNumID + " on the bottom of the agenda deck.");
+            ButtonHelper.deleteTheOneButton(event);
+        } else if (buttonID.startsWith("discardAgenda_")) {
+            String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+            String AGid = activeGame.revealAgenda(false);
+            AgendaModel agendaDetails = Mapper.getAgenda(AGid);
+            String agendaName = agendaDetails.getName();
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), ButtonHelper.getIdentOrColor(player, activeGame)+ "discarded " + agendaName +" using Edyn Agent");
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(activeGame, buttonID, event, actionsChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
@@ -2339,7 +2364,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setPassed(true);
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
-                    TurnEnd.pingNextPlayer(event, activeGame, player);
+                    TurnEnd.pingNextPlayer(event, activeGame, player, true);
                     ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round " + activeGame.getRound() + " for " + ButtonHelper.getIdent(player));
                 }
                 case "proceedToVoting" -> {
@@ -3361,6 +3386,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     activeGame.setNaaluAgent(false);
                     activeGame.setL1Hero(false);
+                    activeGame.setCurrentReacts("planetsTakenThisRound","");
                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                     String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
@@ -3928,7 +3954,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 }
-                ButtonHelper.updateMap(activeGame, event, "Conclusion of build on turn " + player.getTurnCount() + " for " + ButtonHelper.getIdent(player));
+                ButtonHelper.updateMap(activeGame, event, "Result of build on turn " + player.getTurnCount() + " for " + ButtonHelper.getIdent(player));
                 buttons.add(DoneExhausting);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }

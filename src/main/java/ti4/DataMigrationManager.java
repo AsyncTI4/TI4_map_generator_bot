@@ -68,6 +68,7 @@ public class DataMigrationManager {
             runMigration("migrateInitializeLO_061123", DataMigrationManager::migrateInitializeLO_061123);
             runMigration("migrateInitializeLO_081123", DataMigrationManager::migrateInitializeLO_081123);
             runMigration("migrateInitializeLO_171123", DataMigrationManager::migrateInitializeLO_171123);
+            runMigration("migrateRemoveOldArcaneShieldID_111223", DataMigrationManager::migrateRemoveOldArcaneShieldID_111223);
             // runMigration("migrateExampleMigration_241223", (map) ->
             // migrateExampleMigration_241223(map));
         } catch (Exception e) {
@@ -83,6 +84,21 @@ public class DataMigrationManager {
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
         return false;
+    }
+
+    /// MIGRATION: Remove old/bad arcane shield attachmentID
+    public static Boolean migrateRemoveOldArcaneShieldID_111223(Game game) {
+        boolean mapNeededMigrating = false;
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder.getTokenList().contains("attachment_arcane_shield.png")) {
+                    unitHolder.removeToken("attachment_arcane_shield.png");
+                    unitHolder.addToken("attachment_arc_shield.png");
+                    mapNeededMigrating = true;
+                }
+            }
+        }
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Add faction techs to games that were created before faction techs added

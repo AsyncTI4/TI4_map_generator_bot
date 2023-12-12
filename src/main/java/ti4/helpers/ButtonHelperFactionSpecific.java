@@ -37,6 +37,37 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
 
+
+    public static void handleTitansConstructionMechDeployStep1(Game activeGame, Player player){
+        List<Button> buttons = new ArrayList<>();
+        if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeGame, player, "mech") > 3){
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " you have all your mechs out and cant deploy more");
+            return;
+        }
+        for(String planet : player.getPlanets())
+        {
+            buttons.add(Button.success("titansConstructionMechDeployStep2_"+planet, Helper.getPlanetRepresentation(planet, activeGame)));
+        }
+        String msg = player.getRepresentation(true, true) + " select the planet that you wish to drop a mech and infantry on";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+    }
+     public static void handleTitansConstructionMechDeployStep2(Game activeGame, Player player, ButtonInteractionEvent event, String buttonID){
+        String planet = buttonID.split("_")[1];
+        Tile tile = activeGame.getTileFromPlanet(planet);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 mech "+planet, activeGame);
+        new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf "+planet, activeGame);
+        String msg = player.getRepresentation(true, true) + " deployed a mech and infantry on "+Helper.getPlanetRepresentation(planet, activeGame);
+        ButtonHelper.sendMessageToRightStratThread(player, activeGame, msg, "construction");
+        if (!player.getSCs().contains(Integer.parseInt("4"))) {
+            String color = player.getColor();
+            if (Mapper.isValidColor(color)) {
+                AddCC.addCC(event, color, tile);
+            }
+            ButtonHelper.sendMessageToRightStratThread(player, activeGame, ButtonHelper.getIdent(player) + " Placed A CC From Reinforcements In The "
+                + Helper.getPlanetRepresentation(planet, activeGame) + " system", "construction");
+        }
+        event.getMessage().delete().queue();
+    }
     public static void checkForStymie(Game activeGame, Player activePlayer, Tile tile) {
         for (Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, activeGame, tile)) {
             if (p2.getPromissoryNotes().containsKey("stymie") && activeGame.getPNOwner("stymie") != p2) {
@@ -150,7 +181,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         event.getMessage().delete().queue();
@@ -170,7 +201,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         List<Button> techs2 = new ArrayList<>(techs);
@@ -193,7 +224,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getName() + "_noPay", Mapper.getTech(tech).getName()));
+                techs.add(Button.success("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame),
@@ -874,7 +905,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(transact2);
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String message = "Use buttons to select how to use the Kollecc AI Survey PN";
-        System.out.println(player.getFaction() + " is playing PN KOLLEC");
+       // System.out.println(player.getFaction() + " is playing PN KOLLEC");
         MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), message, buttons);
     }
 

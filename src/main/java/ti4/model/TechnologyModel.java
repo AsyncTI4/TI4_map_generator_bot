@@ -90,6 +90,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techEmoji = Emojis.getEmojiFromDiscord(techType.toString().toLowerCase() + "tech");
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji).append("**").append(techName).append("**").append(factionEmoji);
+        sb.append(getSource().emoji());
         if (includeCardText) sb.append("\n").append("> ").append(getText()).append("\n");
         return sb.toString();
     }

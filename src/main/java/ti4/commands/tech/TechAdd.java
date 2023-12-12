@@ -32,6 +32,9 @@ public class TechAdd extends TechAddRemove {
         if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
             ButtonHelper.commanderUnlockCheck(player, activeGame, "nekro", event);
         }
+        if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
+            ButtonHelper.commanderUnlockCheck(player, activeGame, "dihmohn", event);
+        }
         sendMessage(message);
     }
 }

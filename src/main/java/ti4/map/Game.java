@@ -2315,7 +2315,8 @@ public class Game {
 
     public void addExplore(String id) {
         if (Mapper.getExploreRepresentation(id) != null) {
-            explore.add(id);
+            int place = ThreadLocalRandom.current().nextInt(explore.size());
+            explore.add(place,id);
         }
         discardExplore.remove(id);
     }
@@ -3568,7 +3569,7 @@ public class Game {
             }
         }
     }
-
+    @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;
@@ -3595,7 +3596,7 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
-
+    @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;

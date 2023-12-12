@@ -183,10 +183,28 @@ public class FoWHelper {
 
 		for (Tile tile : activeGame.getTileMap().values()) {
 			if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
-				return true;
+				if(ButtonHelper.isTileHomeSystem(tile)){
+					return true;
+				}
 			}
 			if(player.getPlanets().contains("creuss") && tile.getUnitHolders().get("creuss") != null && (faction.contains("ghost") || faction.contains("franken")) &&!tile.hasFog(viewingPlayer)){
 				return true;
+			}
+		}
+		if(!player.getFaction().contains("franken")){
+			Tile tile = activeGame.getTile(AliasHandler.resolveTile(player.getFaction()));
+			if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).size() > 0){
+				tile = ButtonHelper.getTilesOfPlayersSpecificUnits(activeGame, player, UnitType.Flagship).get(0);
+			}
+			if (tile == null) {
+				tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeGame);
+			}
+			if(tile != null){
+				if (tile.getPosition().equalsIgnoreCase(player.getPlayerStatsAnchorPosition()) && !tile.hasFog(viewingPlayer)) {
+					if(ButtonHelper.isTileHomeSystem(tile)){
+						return true;
+					}
+				}
 			}
 		}
 

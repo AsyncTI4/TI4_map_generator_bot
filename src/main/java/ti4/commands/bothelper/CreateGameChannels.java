@@ -246,9 +246,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //AUTOCLOSE THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
-            thread.getManager().setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue();
-            thread.getManager().setArchived(true).queue();
-            thread.getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
+            thread.getManager()
+                .setName(newGame.getName() +"-launched - " + thread.getName())
+                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                .setArchived(true)
+                .queue();
         }
 
         GameCreate.reportNewGameCreated(newGame);
