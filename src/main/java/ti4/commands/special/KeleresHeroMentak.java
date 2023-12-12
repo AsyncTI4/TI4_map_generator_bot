@@ -33,10 +33,10 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        if (!("keleresm".equalsIgnoreCase(player.getFaction()) || "keleres".equalsIgnoreCase(player.getFaction()))) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
-            return;
-        }
+        // if (!("keleresm".equalsIgnoreCase(player.getFaction()) || "keleres".equalsIgnoreCase(player.getFaction()))) {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
+        //     return;
+        // }
         resolveKeleresHeroMentak(activeGame, player, event);
     }
 
