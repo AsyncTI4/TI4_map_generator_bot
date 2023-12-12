@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -16,6 +17,7 @@ public class StartingTechDraftItem extends DraftItem {
         super(Category.STARTINGTECH, itemId);
     }
 
+    @JsonIgnore
     private FactionModel getFaction() {
         if ("keleres".equals(ItemId)) {
             return Mapper.getFaction("keleresa");
@@ -23,6 +25,7 @@ public class StartingTechDraftItem extends DraftItem {
         return Mapper.getFaction(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return getFaction().getFactionName() + " Starting Tech";
@@ -46,6 +49,9 @@ public class StartingTechDraftItem extends DraftItem {
             Map.entry("tnelis", "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Warfaretech: Plasma Scoring."),
             Map.entry("vaden", "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Cybernetictech: Sarween Tools.")
     );
+
+
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         if (selectableStartingTechs.containsKey(ItemId)) {
@@ -73,6 +79,7 @@ public class StartingTechDraftItem extends DraftItem {
         return getFaction().getStartingTech();
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.UnitTechSkip;

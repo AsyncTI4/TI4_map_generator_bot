@@ -3,6 +3,7 @@ package ti4.draft.items;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
@@ -18,11 +19,13 @@ public class BlueTileDraftItem extends DraftItem {
         super(Category.BLUETILE, itemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return TileHelper.getTile(ItemId).getName() + " (" + ItemId + ")";
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         TileModel tile = TileHelper.getTile(ItemId);
@@ -73,6 +76,7 @@ public class BlueTileDraftItem extends DraftItem {
         };
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.SemLor;

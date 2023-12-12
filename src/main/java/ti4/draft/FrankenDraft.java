@@ -38,7 +38,7 @@ public class FrankenDraft extends BagDraft {
     public static List<FactionModel> getDraftableFactionsForGame(Game activeGame) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
         if (!activeGame.isDiscordantStarsMode()) {
-            factionSet.removeIf(factionModel -> factionModel.getSource().isDs());
+            factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
     }

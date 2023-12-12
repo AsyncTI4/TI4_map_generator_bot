@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -20,17 +21,21 @@ public class CommoditiesDraftItem extends DraftItem {
         }
         return Mapper.getFaction(ItemId);
     }
+
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return getFaction().getFactionName() + " Commodities";
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         int comms = getFaction().getCommodities();
         return comms + " Commodities";
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.comm;

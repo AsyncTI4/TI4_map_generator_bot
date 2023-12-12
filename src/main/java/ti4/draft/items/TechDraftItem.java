@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -15,6 +16,7 @@ public class TechDraftItem extends DraftItem {
         super(Category.TECH, itemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return getTech().getName();
@@ -24,11 +26,13 @@ public class TechDraftItem extends DraftItem {
         return Mapper.getTech(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         return getTech().getText() + " " + getTech().getRequirementsEmoji();
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         TechnologyModel model = getTech();

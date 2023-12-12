@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -15,22 +16,26 @@ public class PNDraftItem extends DraftItem {
         super(Category.PN, itemId);
     }
 
+    @JsonIgnore
     private PromissoryNoteModel getPn() {
         return Mapper.getPromissoryNoteByID(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         PromissoryNoteModel pn = getPn();
         return "Promissory Note - " + pn.getName();
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         PromissoryNoteModel pn = getPn();
         return pn.getText();
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.PN;
