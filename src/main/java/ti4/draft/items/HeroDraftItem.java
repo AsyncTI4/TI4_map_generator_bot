@@ -3,6 +3,8 @@ package ti4.draft.items;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -15,10 +17,12 @@ public class HeroDraftItem extends DraftItem {
         super(Category.HERO, itemId);
     }
 
+    @JsonIgnore
     private LeaderModel getLeader() {
         return Mapper.getLeader(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
@@ -29,6 +33,7 @@ public class HeroDraftItem extends DraftItem {
         return "Hero - " + leader.getName().replace("\n", "");
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
@@ -38,6 +43,7 @@ public class HeroDraftItem extends DraftItem {
         return "";
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
 

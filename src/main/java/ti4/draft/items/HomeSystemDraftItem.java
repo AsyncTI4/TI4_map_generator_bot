@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -15,11 +16,13 @@ public class HomeSystemDraftItem extends DraftItem {
         super(Category.HOMESYSTEM, itemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return Mapper.getFaction(ItemId).getFactionName() + " Home System";
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         if ("ghost".equals(ItemId)) {
@@ -46,6 +49,7 @@ public class HomeSystemDraftItem extends DraftItem {
         sb.append(") ");
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.getFactionIconFromDiscord(ItemId);

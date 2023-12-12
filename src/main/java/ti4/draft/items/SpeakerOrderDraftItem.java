@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.helpers.Emojis;
 import ti4.map.Game;
@@ -13,11 +14,13 @@ public class SpeakerOrderDraftItem extends DraftItem {
         super(Category.DRAFTORDER, itemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return "Table Position " + ItemId;
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         if ("1".equals(ItemId)) {
@@ -26,6 +29,7 @@ public class SpeakerOrderDraftItem extends DraftItem {
         return "Table Position " + ItemId;
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         if ("1".equals(ItemId)) {

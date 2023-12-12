@@ -2,6 +2,8 @@ package ti4.draft;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -105,8 +107,10 @@ public abstract class DraftItem implements ModelInterface {
         ItemId = itemId;
     }
 
+    @JsonIgnore
     public abstract String getShortDescription();
 
+    @JsonIgnore
     public String getLongDescription() {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (Errata != null) {
@@ -132,8 +136,10 @@ public abstract class DraftItem implements ModelInterface {
         return sb.toString();
     }
 
+    @JsonIgnore
     protected abstract String getLongDescriptionImpl();
 
+    @JsonIgnore
     public abstract String getItemEmoji();
 
     public boolean isDraftable(Player player) {
