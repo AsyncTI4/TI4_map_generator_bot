@@ -474,7 +474,7 @@ public class CombatHelper {
         return opponent;
     }
 
-    public static String RollForUnits(Map<UnitModel, Integer> units,
+    public static String RollForUnits(Map<UnitModel, Integer> playerUnits, Map<UnitModel, Integer> opponentUnits,
             List<NamedCombatModifierModel> extraRolls, List<NamedCombatModifierModel> customMods,
             List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
             Player opponent,
@@ -484,28 +484,29 @@ public class CombatHelper {
         List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
         mods.addAll(autoMods);
         mods.addAll(tempMods);
-        result += CombatModHelper.GetModifiersText("With automatic modifiers: \n", units, autoMods);
-        result += CombatModHelper.GetModifiersText("With custom modifiers: \n", units, customMods);
-        result += CombatModHelper.GetModifiersText("With temp modifiers: \n", units, tempMods);
+        result += CombatModHelper.GetModifiersText("With automatic modifiers: \n", playerUnits, autoMods);
+        result += CombatModHelper.GetModifiersText("With custom modifiers: \n", playerUnits, customMods);
+        result += CombatModHelper.GetModifiersText("With temp modifiers: \n", playerUnits, tempMods);
 
         // Display extra rolls info
-        result += CombatModHelper.GetModifiersText("With automatic extra rolls: \n", units, extraRolls);
+        result += CombatModHelper.GetModifiersText("With automatic extra rolls: \n", playerUnits, extraRolls);
 
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
-        List<UnitModel> unitsList = new ArrayList<>(units.keySet());
-        for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
+        List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
+        List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
+        for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
             int toHit = unit.getCombatDieHitsOnForAbility(rollType);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, mods, player, opponent,
                     activeGame,
-                    unitsList, rollType);
+                    playerUnitsList, opponentUnitsList, rollType);
             int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, extraRolls, player,
                     opponent,
-                    activeGame, unitsList, rollType);
+                    activeGame, playerUnitsList, opponentUnitsList, rollType);
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
