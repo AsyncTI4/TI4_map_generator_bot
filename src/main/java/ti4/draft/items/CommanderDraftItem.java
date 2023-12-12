@@ -1,9 +1,14 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 
@@ -12,22 +17,8 @@ public class CommanderDraftItem extends DraftItem {
         super(Category.COMMANDER, itemId);
     }
 
-    private FactionModel getFaction() {
-        if ("keleres".equals(ItemId)) {
-            return Mapper.getFaction("keleresa");
-        }
-        return Mapper.getFaction(ItemId);
-    }
-
     private LeaderModel getLeader() {
-        List<String> leaders = getFaction().getLeaders();
-        for (String leader : leaders) {
-            if (leader.contains("commander")) {
-                return Mapper.getLeader(leader);
-            }
-        }
-
-        return null;
+        return Mapper.getLeader(ItemId);
     }
 
     @Override
@@ -55,5 +46,20 @@ public class CommanderDraftItem extends DraftItem {
             return Emojis.getEmojiFromDiscord(leader.getID());
         }
         return "";
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        HashMap<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        for (FactionModel faction : factions) {
+            List<String> leaders = faction.getLeaders();
+            leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
+            if (leaders.isEmpty()) {
+                continue;
+            }
+            allItems.add(DraftItem.Generate(Category.COMMANDER, leaders.get(0)));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        return allItems;
     }
 }
