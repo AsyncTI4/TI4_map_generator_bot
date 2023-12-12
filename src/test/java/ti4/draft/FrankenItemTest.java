@@ -27,53 +27,26 @@ public class FrankenItemTest {
         Storage.init();
     }
 
-    private List<FactionModel> getPoKFactions() {
-        var factions = Mapper.getFactions();
-        factions.removeIf(faction -> !faction.getSource().isPok());
-        return factions;
-    }
 
-    private List<FactionModel> getDsFactions() {
-        var factions = Mapper.getFactions();
-        factions.removeIf(faction -> !faction.getSource().isDs());
-        return factions;
-
+    @Test
+    public void testAllCardsGenerateSuccessfully() {
+        var factions = FrankenDraft.getAllFrankenLegalFactions();
+        assertDoesNotThrow(() -> generateAllCards(factions));
     }
 
     @Test
-    public void testAllPoKCardsGenerateSuccessfully() {
-        var pok = getPoKFactions();
-        assertDoesNotThrow(() -> generateAllCards(pok));
-    }
-
-    @Test
-    public void testAllDSCardsGenerateSuccessfully() {
-        var ds = getDsFactions();
-        assertDoesNotThrow(() -> generateAllCards(ds));
-    }
-
-    @Test
-    public void testAllPoKCardsHaveValidShortNames() {
-        var pok = getPoKFactions();
-        var cards = generateAllCards(pok);
+    public void testAllCardsHaveValidShortNames() {
+        var factions = FrankenDraft.getAllFrankenLegalFactions();
+        var cards = generateAllCards(factions);
         for (var card: cards) {
             assert !card.getShortDescription().isEmpty() : card.getAlias();
         };
     }
 
     @Test
-    public void testAllDSCardsHaveValidShortNames() {
-        var ds = getDsFactions();
-        var cards = generateAllCards(ds);
-        for (var card: cards) {
-            assert !card.getShortDescription().isEmpty() : card.getAlias();
-        };
-    }
-
-    @Test
-    public void testAllPoKCardsHaveValidLongNames() {
-        var pok = getPoKFactions();
-        var cards = generateAllCards(pok);
+    public void testAllCardsHaveValidLongNames() {
+        var factions = FrankenDraft.getAllFrankenLegalFactions();
+        var cards = generateAllCards(factions);
         for (var card: cards) {
             try {
                 assert !card.getLongDescription().isEmpty() : card.getAlias();
@@ -86,34 +59,9 @@ public class FrankenItemTest {
     }
 
     @Test
-    public void testAllDSCardsHaveValidLongNames() {
-        var ds = getDsFactions();
-        var cards = generateAllCards(ds);
-        for (var card: cards) {
-            try {
-                assert !card.getLongDescription().isEmpty() : card.getAlias();
-            }
-            catch (Exception e)
-            {
-                Assertions.fail(card.getAlias() + " threw an exception: " + e);
-            }
-        };
-    }
-
-
-    @Test
-    public void testAllPoKCardsHaveValidEmoji() {
-        var pok = getPoKFactions();
-        var cards = generateAllCards(pok);
-        for (var card: cards) {
-            assert !card.getItemEmoji().isEmpty() : card.getAlias();
-        };
-    }
-
-    @Test
-    public void testAllDSCardsHaveValidEmoji() {
-        var ds = getDsFactions();
-        var cards = generateAllCards(ds);
+    public void testAllCardsHaveValidEmoji() {
+        var factions = FrankenDraft.getAllFrankenLegalFactions();
+        var cards = generateAllCards(factions);
         for (var card: cards) {
             assert !card.getItemEmoji().isEmpty() : card.getAlias();
         };
@@ -121,20 +69,18 @@ public class FrankenItemTest {
 
     @Test
     public void errataFileSanityTest() {
-        var pok = getPoKFactions();
-        var cards = generateAllCards(pok);
+        var factions = FrankenDraft.getAllFrankenLegalFactions();
+        var cards = generateAllCards(factions);
         for (var card: cards) {
+            // PoK
             assert(!card.getAlias().equals("ABILITY:mitosis"));
             assert(!card.getAlias().equals("ABILITY:hubris"));
             assert(!card.getAlias().equals("ABILITY:fragile"));
             assert(!card.getAlias().equals("STARTINGTECH:sardakk"));
             assert(!card.getAlias().equals("AGENT:mentakagent"));
             assert(!card.getAlias().equals("ABILITY:creuss_gate"));
-        }
 
-        var ds = getDsFactions();
-        cards = generateAllCards(ds);
-        for (var card: cards) {
+            // DS
             assert(!card.getAlias().equals("ABILITY:probability_algorithms"));
             assert(!card.getAlias().equals("MECH:kjalengard_mech"));
             assert(!card.getAlias().equals("ABILITY:singularity_point"));
