@@ -31,7 +31,7 @@ public class StartingTechDraftItem extends DraftItem {
     public static Map<String, String> selectableStartingTechs = Map.ofEntries(
             Map.entry("winnu", "Choose any 1 technology that has no prerequisites."),
             Map.entry("argent", "Choose 2 of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
-            Map.entry("keleres", "Choose 2 non-faction technologies owned by other players."),
+            Map.entry("keleresa", "Choose 2 non-faction technologies owned by other players."),
             Map.entry("bentor", "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Propulsiontech: Dark Energy Tap, and :Cybernetictech: Scanlink Drone Network."),
             Map.entry("celdauri", "Choose 2 of the following: :Propulsiontech: Antimass Deflectors, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
             Map.entry("cheiran", "Choose 1 of the following: :Warfaretech: Magen Defense Grid, :Warfaretech: Self-Assembly Routines"),
