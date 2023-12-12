@@ -3,7 +3,13 @@ package ti4.draft.items;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
 import ti4.model.UnitModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class FlagshipDraftItem extends DraftItem {
     public FlagshipDraftItem(String itemId) {
@@ -11,10 +17,7 @@ public class FlagshipDraftItem extends DraftItem {
     }
 
     private UnitModel getUnit() {
-        if (ItemId.contains("flagship")) {
-            return Mapper.getUnit(ItemId);
-        }
-        return Mapper.getUnit(ItemId + "_flagship");
+        return Mapper.getUnit(ItemId);
     }
 
     @Override
@@ -61,5 +64,18 @@ public class FlagshipDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.flagship;
+    }
+
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, UnitModel> allUnits = Mapper.getUnits();
+        for (FactionModel faction : factions) {
+            var units = faction.getUnits();
+            units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
+            allItems.add(DraftItem.Generate(Category.FLAGSHIP, units.get(0)));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.FLAGSHIP);
+        return allItems;
     }
 }

@@ -130,6 +130,7 @@ public class FrankenCommand implements Command {
         subcommands.add(new SetFactionIcon());
         subcommands.add(new FrankenEdit());
         subcommands.add(new ShowFrankenBag());
+        subcommands.add(new FrankenViewCard());
         return subcommands;
     }
 

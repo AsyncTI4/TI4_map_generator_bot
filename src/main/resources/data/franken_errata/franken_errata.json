@@ -54,7 +54,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "indoctrination",
         "OptionalSwaps": [
-            "MECH:yin"
+            "MECH:yin_mech"
         ]
     },
     {
@@ -66,14 +66,14 @@
         "ItemCategory": "ABILITY",
         "ItemId": "orbital_drop",
         "OptionalSwaps": [
-            "MECH:sol"
+            "MECH:sol_mech"
         ]
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "pillage",
         "OptionalSwaps": [
-            "AGENT:mentak"
+            "AGENT:mentakagent"
         ]
     },
     {
@@ -92,21 +92,21 @@
         "ItemCategory": "ABILITY",
         "ItemId": "stall_tactics",
         "OptionalSwaps": [
-            "MECH:yssaril"
+            "MECH:yssaril_mech"
         ]
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "star_forge",
         "OptionalSwaps": [
-            "MECH:muaat"
+            "MECH:muaat_mech"
         ]
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "technological_singularity",
         "OptionalSwaps": [
-            "PN:nekro",
+            "PN:antivirus",
             "TECH:vax"
         ]
     },
@@ -114,7 +114,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "telepathic",
         "OptionalSwaps": [
-            "PN:naalu"
+            "PN:gift"
         ]
     },
     {
@@ -140,49 +140,39 @@
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "keleresa",
-        "Undraftable": true
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "keleresa",
+        "ItemId": "keleresagent",
         "Undraftable": true
     },
     {
         "ItemCategory": "HOMESYSTEM",
-        "ItemId": "keleres",
+        "ItemId": "keleresa",
         "Undraftable": true
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "mentak",
+        "ItemId": "mentakagent",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "cabal",
+        "ItemId": "cabalcommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "nomad",
+        "ItemId": "nomad_flagship",
         "OptionalSwaps": [
             "TECH:m2"
         ]
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "cabal",
+        "ItemId": "cabalhero",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
         "ItemId": "keleresheroodlynn",
-        "AlwaysAddToPool": true
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "keleresherokuuasi",
         "AlwaysAddToPool": true
     },
     {
@@ -199,22 +189,22 @@
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "muaat",
+        "ItemId": "muaat_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "sol",
+        "ItemId": "sol_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "yin",
+        "ItemId": "yin_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "yssaril",
+        "ItemId": "yssaril_mech",
         "Undraftable": true
     },
     {
@@ -224,17 +214,17 @@
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "mentak",
+        "ItemId": "pop",
         "Undraftable": true
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "naalu",
+        "ItemId": "gift",
         "Undraftable": true
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "nekro",
+        "ItemId": "antivirus",
         "Undraftable": true
     },
     {
@@ -246,8 +236,8 @@
         "ItemCategory": "TECH",
         "ItemId": "dt2",
         "OptionalSwaps": [
-            "HERO:cabal",
-            "COMMANDER:cabal"
+            "HERO:cabalhero",
+            "COMMANDER:cabalcommander"
         ]
     },
     {
@@ -267,29 +257,29 @@
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "jolnar",
+        "ItemId": "jolnar_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "mahact",
+        "ItemId": "mahactcommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "imperia",
         "OptionalSwaps": [
-            "COMMANDER:mahact"
+            "COMMANDER:mahactcommander"
         ]
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "axis",
+        "ItemId": "axiscommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "axis",
+        "ItemId": "axishero",
         "Undraftable": true
     },
     {
@@ -301,37 +291,37 @@
         "ItemCategory": "ABILITY",
         "ItemId": "military_industrial_complex",
         "OptionalSwaps": [
-            "HERO:axis",
-            "COMMANDER:axis"
+            "HERO:axishero",
+            "COMMANDER:axiscommander"
         ]
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "bentor",
+        "ItemId": "bentor_flagship",
         "Undraftable": true
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "bentor",
+        "ItemId": "bentoragent",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "bentor",
+        "ItemId": "bentoragent",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "bentor",
+        "ItemId": "bentor_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "ancient_blueprints",
         "OptionalSwaps": [
-            "AGENT:bentor",
-            "COMMANDER:bentor",
-            "MECH:bentor"
+            "AGENT:bentoragent",
+            "COMMANDER:bentorcommander",
+            "MECH:bentor_mech"
         ]
     },
     {
@@ -346,7 +336,7 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "edyn",
+        "ItemId": "edynhero",
         "Undraftable": true
     },
     {
@@ -356,9 +346,9 @@
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "edyn",
+        "ItemId": "edyn_mech",
         "OptionalSwaps": [
-            "HERO:edyn",
+            "HERO:edynhero",
             "ABILITY:radiance"
         ]
     },
@@ -369,14 +359,14 @@
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "freesystems",
+        "ItemId": "freesystems_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "rally_to_the_cause",
         "OptionalSwaps": [
-            "MECH:freesystems"
+            "MECH:freesystems_mech"
         ]
     },
     {
@@ -388,7 +378,7 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "ghemina",
+        "ItemId": "gheminacommander",
         "Undraftable": true
     },
     {
@@ -405,7 +395,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "the_lady_and_the_lord",
         "OptionalSwaps": [
-            "COMMANDER:ghemina"
+            "COMMANDER:gheminacommander"
         ],
         "AdditionalComponents": [
             "FLAGSHIP:ghemina_flagship_lord",
@@ -441,7 +431,7 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "augers",
+        "ItemId": "augershero",
         "Undraftable": true
     },
     {
@@ -452,8 +442,8 @@
             "ABILITY:probability_algorithms"
         ],
         "OptionalSwaps": [
-            "PN:augers",
-            "HERO:augers"
+            "PN:dspnauge",
+            "HERO:augershero"
         ]
     },
     {
@@ -487,22 +477,22 @@
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "kjalengard",
+        "ItemId": "kjalengardagent",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "kjalengard",
+        "ItemId": "kjalengardcommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "kjalengard",
+        "ItemId": "kjalengardhero",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "kjalengard",
+        "ItemId": "kjalengard_mech",
         "Undraftable": true
     },
     {
@@ -510,20 +500,20 @@
         "ItemId": "for_glory",
         "OptionalSwaps": [
             "TECH:dskjalg",
-            "AGENT:kjalengard",
-            "COMMANDER:kjalengard",
-            "HERO:kjalengard",
-            "MECH:kjalengard"
+            "AGENT:kjalengardagent",
+            "COMMANDER:kjalengardcommander",
+            "HERO:kjalengardhero",
+            "MECH:kjalengard_mech"
         ]
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "kollecc",
+        "ItemId": "kollecc_flagship",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "kollecc",
+        "ItemId": "kollecc_mech",
         "Undraftable": true
     },
     {
@@ -536,8 +526,8 @@
         "ItemId": "shroud_of_lith",
         "OptionalSwaps": [
             "ABILITY:cloaked_fleets",
-            "FLAGSHIP:kollecc",
-            "MECH:kollecc"
+            "FLAGSHIP:kollecc_flagship",
+            "MECH:kollecc_mech"
         ]
     },
     {
@@ -547,17 +537,17 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "lizho",
+        "ItemId": "lizhohero",
         "Undraftable": true
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "lizho",
+        "ItemId": "lizhocommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "lizho",
+        "ItemId": "lizho_mech",
         "Undraftable": true
     },
     {
@@ -579,7 +569,7 @@
     },
     {
         "ItemCategory": "AGENT",
-        "ItemId": "mykomentori",
+        "ItemId": "mykomentoriagent",
         "Undraftable": true
     },
     {
@@ -589,7 +579,7 @@
             "ABILITY:divination"
         ],
         "OptionalSwaps": [
-            "AGENT:mykomentori"
+            "AGENT:mykomentoriagent"
          ]
     },
     {
@@ -599,12 +589,12 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "nivyn",
+        "ItemId": "nivynhero",
         "Undraftable": true
     },
     {
         "ItemCategory": "TECH",
-        "ItemId": "nivyn_mech2",
+        "ItemId": "dsnivymf",
         "Undraftable": true
     },
     {
@@ -612,56 +602,52 @@
         "ItemId": "nivyn_mech",
         "AdditionalComponents": [
             "ABILITY:singularity_point"
-        ]
-    },
-    {
-        "ItemCategory": "MECH",
-        "ItemId": "nivyn_mech2",
+        ],
         "OptionalSwaps": [
-           "HERO:nivyn",
-           "TECH:nivyn_mech2"
+           "HERO:nivynhero",
+           "TECH:dsnivymf"
         ]
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "nokar",
+        "ItemId": "nokarcommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "hired_guns",
         "OptionalSwaps": [
-           "COMMANDER:nokar"
+           "COMMANDER:nokarcommander"
         ]
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "olradin",
+        "ItemId": "olradinhero",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "olradin",
+        "ItemId": "olradin_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "policies",
         "OptionalSwaps": [
-           "HERO:olradin",
-           "MECH:olradin"
+           "HERO:olradinhero",
+           "MECH:olradin_mech"
         ]
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "rohdhna",
+        "ItemId": "rohdhna_mech",
         "Undraftable": true
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "recycled_materials",
         "OptionalSwaps": [
-          "MECH:rohdhna"
+          "MECH:rohdhna_mech"
         ]
     },
     {
@@ -671,7 +657,7 @@
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "tnelis",
+        "ItemId": "tnelis_mech",
         "AdditionalComponents": [
           "ABILITY:stealth_insertion"
         ]
@@ -688,17 +674,17 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "vaden",
+        "ItemId": "vadencommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "vaden",
+        "ItemId": "vadenhero",
         "Undraftable": true
     },
     {
         "ItemCategory": "MECH",
-        "ItemId": "vaden",
+        "ItemId": "vaden_mech",
         "Undraftable": true
     },
     {
@@ -709,9 +695,9 @@
             "ABILITY:binding_debts"
         ],
         "OptionalSwaps": [
-            "MECH:vaden",
-            "HERO:vaden",
-            "COMMANDER:vaden"
+            "MECH:vaden_mech",
+            "HERO:vadenhero",
+            "COMMANDER:vadencommander"
         ]
     },
     {
@@ -741,12 +727,12 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "veldyr",
+        "ItemId": "veldyrcommander",
         "Undraftable": true
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "veldyr",
+        "ItemId": "veldyrhero",
         "Undraftable": true
     },
     {
@@ -756,8 +742,8 @@
             "ABILITY:holding_company"
         ],
         "OptionalSwaps": [
-            "HERO:veldyr",
-            "COMMANDER:veldyr",
+            "HERO:veldyrhero",
+            "COMMANDER:veldyrcommander",
             "PN:dspnveld1"
           ]
     },

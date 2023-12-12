@@ -1,9 +1,12 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 
@@ -12,25 +15,8 @@ public class HeroDraftItem extends DraftItem {
         super(Category.HERO, itemId);
     }
 
-    private FactionModel getFaction() {
-        if ("keleres".equals(ItemId)) {
-            return Mapper.getFaction("keleresa");
-        }
-        return Mapper.getFaction(ItemId);
-    }
-
     private LeaderModel getLeader() {
-        FactionModel faction = getFaction();
-        if (faction == null) {
-            return Mapper.getLeader(ItemId);
-        }
-        List<String> leaders = faction.getLeaders();
-        for (String leader : leaders) {
-            if (leader.contains("hero")) {
-                return Mapper.getLeader(leader);
-            }
-        }
-        return null;
+        return Mapper.getLeader(ItemId);
     }
 
     @Override
@@ -60,5 +46,21 @@ public class HeroDraftItem extends DraftItem {
             return Emojis.getEmojiFromDiscord(leader.getID());
         }
         return "";
+    }
+
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        HashMap<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        for (FactionModel faction : factions) {
+            List<String> leaders = faction.getLeaders();
+            leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+            if (leaders.isEmpty()) {
+                continue;
+            }
+            allItems.add(DraftItem.Generate(Category.HERO, leaders.get(0)));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.HERO);
+        return allItems;
     }
 }

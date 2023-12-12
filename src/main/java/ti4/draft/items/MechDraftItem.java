@@ -3,7 +3,13 @@ package ti4.draft.items;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
+import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
 import ti4.model.UnitModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MechDraftItem extends DraftItem {
     public MechDraftItem(String itemId) {
@@ -11,10 +17,7 @@ public class MechDraftItem extends DraftItem {
     }
 
     private UnitModel getUnit() {
-        if (ItemId.contains("mech")) {
-            return Mapper.getUnit(ItemId);
-        }
-        return Mapper.getUnit(ItemId + "_mech");
+        return Mapper.getUnit(ItemId);
     }
 
     @Override
@@ -55,5 +58,17 @@ public class MechDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.mech;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, UnitModel> allUnits = Mapper.getUnits();
+        for (FactionModel faction : factions) {
+            var units = faction.getUnits();
+            units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
+            allItems.add(DraftItem.Generate(Category.MECH, units.get(0)));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        return allItems;
     }
 }

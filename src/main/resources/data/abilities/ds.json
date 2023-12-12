@@ -403,7 +403,8 @@
         "id": "contagion",
         "name": "Contagion",
         "faction": "kyro",
-        "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card, commit 1 infantry from your reinforcements to each of 2 planets that are adjacent to a planet you control; resolve invasion on those planets, if able.",
+        "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
+        "windowEffect": "Commit 1 infantry from your reinforcements to each of 2 planets that are adjacent to a planet you control; resolve invasion on those planets, if able.",
         "source": "ds"
     },
     {

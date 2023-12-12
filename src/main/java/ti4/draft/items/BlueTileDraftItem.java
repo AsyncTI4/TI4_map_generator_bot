@@ -1,15 +1,17 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
-import ti4.model.PlanetModel;
-import ti4.model.PlanetTypeModel;
-import ti4.model.TechSpecialtyModel;
-import ti4.model.TileModel;
+import ti4.map.Tile;
+import ti4.model.*;
 
 public class BlueTileDraftItem extends DraftItem {
     public BlueTileDraftItem(String itemId) {
@@ -18,7 +20,7 @@ public class BlueTileDraftItem extends DraftItem {
 
     @Override
     public String getShortDescription() {
-        return TileHelper.getTile(ItemId).getName();
+        return TileHelper.getTile(ItemId).getName() + " (" + ItemId + ")";
     }
 
     @Override
@@ -74,5 +76,24 @@ public class BlueTileDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         return Emojis.SemLor;
+    }
+
+
+    public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (MiltyDraftTile tile : draftManager.getHigh()) {
+            allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
+                    tile.getTile().getTileID()));
+        }
+        for (MiltyDraftTile tile : draftManager.getMid()) {
+            allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
+                    tile.getTile().getTileID()));
+        }
+        for (MiltyDraftTile tile : draftManager.getLow()) {
+            allItems.add(DraftItem.Generate(DraftItem.Category.BLUETILE,
+                    tile.getTile().getTileID()));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
+        return allItems;
     }
 }

@@ -59,9 +59,6 @@ public abstract class DraftItem implements ModelInterface {
     public DraftErrataModel Errata;
 
     public static DraftItem Generate(Category category, String itemId) {
-        if (itemId.contains("keleres") && category != Category.HERO) {
-            itemId = "keleres";
-        }
         DraftItem item = null;
         switch (category) {
 
@@ -117,7 +114,7 @@ public abstract class DraftItem implements ModelInterface {
                 sb.append(" *Also adds: ");
                 for (DraftErrataModel i: Errata.AdditionalComponents) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(item.getShortDescription());
+                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
                 sb.append("*");
@@ -126,7 +123,7 @@ public abstract class DraftItem implements ModelInterface {
                 sb.append(" *Includes optional swaps: ");
                 for (DraftErrataModel i: Errata.OptionalSwaps) {
                     DraftItem item = Generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(item.getShortDescription());
+                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
                 sb.append("*");
