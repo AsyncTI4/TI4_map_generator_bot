@@ -174,6 +174,9 @@ public class CombatRoll extends SpecialSubcommandData {
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
         }
         Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, activeGame);
+        if(opponent == null){
+            opponent = player;
+        }
         Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event,
                 rollType, activeGame);
 
