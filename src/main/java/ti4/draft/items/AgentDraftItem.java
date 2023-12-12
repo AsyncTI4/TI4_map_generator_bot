@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -17,10 +18,12 @@ public class AgentDraftItem extends DraftItem {
         super(Category.AGENT, itemId);
     }
 
+    @JsonIgnore
     private LeaderModel getLeader() {
         return Mapper.getLeader(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
@@ -31,6 +34,7 @@ public class AgentDraftItem extends DraftItem {
         return "Agent - " + leader.getName();
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
@@ -40,6 +44,7 @@ public class AgentDraftItem extends DraftItem {
         return "";
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         LeaderModel leader = getLeader();

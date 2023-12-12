@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -18,20 +19,24 @@ public class StartingFleetDraftItem extends DraftItem {
     }
 
 
+    @JsonIgnore
     private FactionModel getFaction() {
         return Mapper.getFaction(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return getFaction().getFactionName() + " Starting Fleet";
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         return Helper.getUnitListEmojis(getFaction().getStartingFleet());
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.NonUnitTechSkip;

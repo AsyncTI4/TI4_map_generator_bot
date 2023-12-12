@@ -1,5 +1,6 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -20,11 +21,13 @@ public class MechDraftItem extends DraftItem {
         return Mapper.getUnit(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return "Mech - " + getUnit().getName();
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         UnitModel unit = getUnit();
@@ -55,6 +58,7 @@ public class MechDraftItem extends DraftItem {
         return sb.toString();
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return Emojis.mech;

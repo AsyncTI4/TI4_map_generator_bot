@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -17,10 +18,12 @@ public class CommanderDraftItem extends DraftItem {
         super(Category.COMMANDER, itemId);
     }
 
+    @JsonIgnore
     private LeaderModel getLeader() {
         return Mapper.getLeader(ItemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
@@ -30,6 +33,7 @@ public class CommanderDraftItem extends DraftItem {
         }return "Commander - " + getLeader().getName();
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
@@ -39,6 +43,7 @@ public class CommanderDraftItem extends DraftItem {
         return "";
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         LeaderModel leader = getLeader();
