@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -329,12 +330,12 @@ public class CombatModHelper {
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
             List<NamedCombatModifierModel> modifiers, Player player,
-            Player opponent, Game activeGame, List<UnitModel> allUnits, CombatRollType rollType) {
+            Player opponent, Game activeGame, List<UnitModel> playerUnits, List<UnitModel> opponentUnits, CombatRollType rollType) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
-            if (modifier.isInScopeForUnit(unit, allUnits, rollType)) {
-                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame);
+            if (modifier.isInScopeForUnit(unit, playerUnits, rollType)) {
+                Integer modValue = GetVariableModValue(modifier, player, opponent, activeGame, opponentUnits);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -423,7 +424,7 @@ public class CombatModHelper {
     /// or how many POs the opponent has scored that you havent etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
-            Game activeGame) {
+            Game activeGame, List<UnitModel> opponentUnitsInCombat) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         Long scalingCount = (long) 0;
@@ -480,6 +481,11 @@ public class CombatModHelper {
                             }
                         }
                     }
+                }
+                case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
+                    scalingCount += opponentUnitsInCombat.stream()
+                            .filter(unit -> unit.getBaseType() != UnitType.Fighter.value)
+                            .count();
                 }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
