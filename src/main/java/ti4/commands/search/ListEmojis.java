@@ -13,7 +13,6 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
 public class ListEmojis extends SearchSubcommandData {
-    
     public ListEmojis() {
         super(Constants.SEARCH_EMOJIS, "List all emojis the bot can use");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
