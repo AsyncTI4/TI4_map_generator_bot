@@ -103,7 +103,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new Cleanup());
         subcommands.add(new ResetDrawStateAgendas());
         subcommands.add(new PutDiscardBackIntoDeckAgendas());
-        subcommands.add(new ShowLaws());
+        subcommands.add(new LawInfo());
         return subcommands;
     }
 
