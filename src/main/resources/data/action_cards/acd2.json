@@ -13,7 +13,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "During this turn, you can negotiate transactions with players who are not your neighbor. Choose any number of other players. Those players gain 2 commodities.",
+    "text": "During this turn, you can negotiate transactions with players who are not your neighbor. Choose any number of your neighbors. Those players gain 2 commodities.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -364,7 +364,7 @@
     "name": "Grand Heist",
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
-    "text": "That player must give you each relic fragment in their play area.",
+    "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
     "flavorText": "As her hostages hurled insults, Suffi began to laugh. \"This artifact was the property of countless different civilizations. You thought its journey would end with yours?\"",
     "source": "action_deck_2"
   },
@@ -472,7 +472,7 @@
     "name": "Miraculous Escape",
     "phase": "Any",
     "window": "When 1 of your non-fighter ships would be destroyed",
-    "text": "That ship is not destroyed. Damage that ship, if able.",
+    "text": "That ship is not destroyed. That ship becomes damaged, if able.",
     "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
     "source": "action_deck_2"
   },
@@ -652,7 +652,7 @@
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of the first round of a combat",
-    "text": "Each unit with SUSTAIN DAMAGE in the active system becomes damaged.",
+    "text": "Each participating unit that has SUSTAIN DAMAGE in the active system becomes damaged.",
     "flavorText": "In a barely visible flash, their ships' shields dropped. Mendosa growled, \"Full throttle evasive maneuvers, the Tribesmen have laid a trap!\"",
     "source": "action_deck_2"
   },
