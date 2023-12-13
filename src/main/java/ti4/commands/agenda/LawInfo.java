@@ -5,9 +5,9 @@ import ti4.message.MessageHelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public class ShowLaws extends AgendaSubcommandData {
-    public ShowLaws() {
-        super("show_laws", "Show laws in play");
+public class LawInfo extends AgendaSubcommandData {
+    public LawInfo() {
+        super("law_info", "Show laws in play");
     }
 
     @Override
