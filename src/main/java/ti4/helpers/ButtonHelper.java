@@ -2923,9 +2923,9 @@ public class ButtonHelper {
             activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
             activeGame.setLatestTransactionMsg("");
         }
-        if (activeGame.getActionCards().size() > 130 && getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
-            startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
-        }
+        // if (activeGame.getActionCards().size() > 130 && getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
+        //     startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
+        // }
 
         return startButtons;
     }
@@ -4501,12 +4501,12 @@ public class ButtonHelper {
 
                     UnitKey unitKey = unitEntry.getKey();
                     Player owningPlayer = activeGame.getPlayerByColorID(unitKey.getColorID()).orElse(null);
-                    if (owningPlayer == null || owningPlayer.getFaction().equals(player.getFaction()) || playersWithPds2.contains(owningPlayer)) {
+                    if (owningPlayer == null || playersWithPds2.contains(owningPlayer)) {
                         continue;
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (model != null && model.getDeepSpaceCannon()) {
+                    if (model != null && (model.getDeepSpaceCannon() || (tilePos.equalsIgnoreCase(adjTilePos) && model.getSpaceCannonDieCount() > 0))) {
                         playersWithPds2.add(owningPlayer);
                     }
                 }
