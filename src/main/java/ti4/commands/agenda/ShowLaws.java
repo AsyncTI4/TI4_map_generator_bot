@@ -3,10 +3,6 @@ package ti4.commands.agenda;
 import ti4.generator.Mapper;
 import ti4.message.MessageHelper;
 
-import java.util.Map;
-
-import org.apache.commons.lang3.ObjectUtils.Null;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class ShowLaws extends AgendaSubcommandData {
