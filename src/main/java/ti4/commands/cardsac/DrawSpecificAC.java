@@ -26,10 +26,14 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
             return;
         }
         OptionMapping option = event.getOption(Constants.AC_ID);
-
+        int ac = player.getAc();
         if (option != null) {
             String providedID = option.getAsString();
             activeGame.drawSpecificActionCard(providedID, player.getUserID());
+        }
+        if(ac == player.getAc()){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for scramble frequency) and not the number ID. You can find the word ID by proper usage of the /search command");
+            return;
         }
         ACInfo.sendActionCardInfo(activeGame, player);
     }
