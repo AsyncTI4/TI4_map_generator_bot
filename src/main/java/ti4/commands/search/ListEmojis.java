@@ -1,4 +1,4 @@
-﻿package ti4.commands.search;
+package ti4.commands.search;
 
 import java.util.List;
 import java.util.stream.Collectors;
