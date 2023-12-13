@@ -1,19 +1,27 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.model.AbilityModel;
+import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbilityDraftItem extends DraftItem {
     public AbilityDraftItem(String itemId) {
         super(Category.ABILITY, itemId);
     }
 
+    @JsonIgnore
     @Override
     public String getShortDescription() {
         return getAbilityModel().getName();
     }
 
+    @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
         AbilityModel abilityModel = getAbilityModel();
@@ -25,12 +33,25 @@ public class AbilityDraftItem extends DraftItem {
         return "";
     }
 
+    @JsonIgnore
     @Override
     public String getItemEmoji() {
         return getAbilityModel().getFactionEmoji();
     }
 
+    @JsonIgnore
     private AbilityModel getAbilityModel() {
         return Mapper.getAbility(ItemId);
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (FactionModel faction : factions) {
+            for (var ability : faction.getAbilities()) {
+                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+            }
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.ABILITY);
+        return allItems;
     }
 }

@@ -55,6 +55,14 @@ public class CheckDistance extends SpecialSubcommandData {
                 .reduce("Distances: \n", (a, b) -> a + "\n" + b));
     }
 
+    public static int getDistanceBetweenTwoTiles(Game activeGame, Player player, String tilePosition1, String tilePosition2){
+         Map<String, Integer> distances = getTileDistances(activeGame, player, tilePosition1, 8);
+         if(distances.get(tilePosition2) != null){
+            return distances.get(tilePosition2);
+         }
+         return 100;
+    }
+
     public static Map<String, Integer> getTileDistances(Game activeGame, Player player, String tilePosition, int maxDistance) {
         Map<String, Integer> distances = new HashMap<>();
         distances.put(tilePosition, 0);
