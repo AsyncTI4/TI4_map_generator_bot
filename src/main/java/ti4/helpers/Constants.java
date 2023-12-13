@@ -1004,4 +1004,6 @@ public class Constants {
     public static final String SEARCH_FACTIONS = "factions";
     public static final String SEARCH_EVENTS = "events";
     public static final String EVENT_PLAY = "play";
+    public static final String SEARCH_EMOJIS = "emojis";
+    public static final String INCLUDE_RAW_STRING = "include_raw_string";
 }
