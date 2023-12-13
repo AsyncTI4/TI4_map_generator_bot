@@ -567,6 +567,10 @@ public class ButtonHelper {
                 continue;
             }
             UnitHolder unitHolder = getUnitHolderFromPlanetName(planet, activeGame);
+            if(unitHolder == null){
+                BotLogger.log("Null unitholder for planet "+planet);
+                continue;
+            }
             Set<String> tokenList = unitHolder.getTokenList();
             if (tokenList.stream().anyMatch(token -> token.contains("dmz_large") || token.contains("dmz"))) {
                 dmzPlanet = planet;
@@ -1901,6 +1905,17 @@ public class ButtonHelper {
                 return;
             }
         }
+        List<Player> playersWithPds2;
+        if (activeGame.isFoWMode() || "ground".equalsIgnoreCase(spaceOrGround)) {
+            playersWithPds2 = new ArrayList<>();
+        } else {
+            playersWithPds2 = tileHasPDS2Cover(p1, activeGame, tile.getPosition());
+        }
+        int context = 0;
+        if (playersWithPds2.size() > 0) {
+            context = 1;
+        }
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
         channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
             if (activeGame.isFoWMode()) {
@@ -1908,22 +1923,15 @@ public class ButtonHelper {
             } else {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
             }
-            threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, "Resolve here"));
-            
-        });
-        MessageCreateBuilder baseMessageObject2 = new MessageCreateBuilder().addContent("Good luck!");
-        channel.sendMessage(baseMessageObject2.build()).queueAfter(300, TimeUnit.MILLISECONDS, message_ -> {
-            for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
-                if (threadChannel_.getName().equals(threadName)) {
-                    initializeCombatThread(threadChannel_, activeGame, p1, p2, tile, event, spaceOrGround);
-                    return;
-                }
-            }
+            threadChannel.queue(tc -> initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, systemWithContext));
         });
 
     }
-
     private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
+        initializeCombatThread(tc, activeGame, p1, p2, tile, event, spaceOrGround, null);
+    }
+
+    private static void initializeCombatThread(ThreadChannel tc, Game activeGame, Player p1, Player p2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file) {
         StringBuilder message = new StringBuilder();
         if (activeGame.isFoWMode()) {
             message.append(p1.getRepresentation(true, true));
@@ -1962,7 +1970,12 @@ public class ButtonHelper {
         if (playersWithPds2.size() > 0) {
             context = 1;
         }
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
+        FileUpload systemWithContext;
+        if(file == null){
+           systemWithContext  = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event, p1);
+        }else{
+            systemWithContext  =  file;
+        }
         MessageHelper.sendMessageWithFile(tc, systemWithContext, "Picture of system", false);
         List<Button> buttons = getButtonsForPictureCombats(activeGame, tile.getPosition(), p1, p2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(tc, "Combat", buttons);
@@ -4507,7 +4520,13 @@ public class ButtonHelper {
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
                     if (model != null && (model.getDeepSpaceCannon() || (tilePos.equalsIgnoreCase(adjTilePos) && model.getSpaceCannonDieCount() > 0))) {
-                        playersWithPds2.add(owningPlayer);
+                        if(owningPlayer == player ){
+                            if(FoWHelper.otherPlayersHaveShipsInSystem(player, adjTile, activeGame)){
+                                playersWithPds2.add(owningPlayer);
+                            }
+                        }else{
+                            playersWithPds2.add(owningPlayer);
+                        }
                     }
                 }
             }
