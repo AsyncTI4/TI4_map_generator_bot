@@ -430,7 +430,7 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Veto";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.primary("flip_agenda", "Reveal next Agenda"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), codedMessage + codedName, codedButtons);
             }
 
             codedName = "Fighter Conscription";
