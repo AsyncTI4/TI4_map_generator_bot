@@ -121,8 +121,8 @@ public class GameEnd extends GameSubcommandData {
             if (!activeGame.isFoWMode()) {
                 // INFORM PLAYERS
                 pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-                    m.editMessageAttachments(fileUpload).queueAfter(50, TimeUnit.MILLISECONDS); //ADD MAP FILE TO MESSAGE
-                    m.createThreadChannel(gameName).queueAfter(500, TimeUnit.MILLISECONDS, t -> t.sendMessage(message.toString()).queue(null,
+                    m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                    m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS, t -> t.sendMessage(message.toString()).queue(null,
                         (error) -> BotLogger.log("Failure to create Game End thread for **" + activeGame.getName() + "** in PBD Chronicles:\n> " + error.getMessage()))); //CREATE THREAD AND POST FOLLOW UP
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
                 });
