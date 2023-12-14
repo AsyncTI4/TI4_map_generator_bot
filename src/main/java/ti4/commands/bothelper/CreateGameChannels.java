@@ -377,9 +377,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return false;
         }
 
-        // CLEAN UP IN-LIMBO FIRST
-        // GameEnd.cleanUpInLimboCategory(guild, 50); //Disabling this - it was causing freshly ended games to be deleted. An extra 25 games crammed onto a server isn't a great thing anyways.
-
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
         int channelMax = 500;
