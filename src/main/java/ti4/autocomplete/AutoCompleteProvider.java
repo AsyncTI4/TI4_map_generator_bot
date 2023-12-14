@@ -95,20 +95,11 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FactionModel> factions = Mapper.getFactions();
                 List<Command.Choice> options;
-                if (activeGame != null && activeGame.isDiscordantStarsMode()) {
-                    options = factions.stream()
-                        .filter(faction -> faction.search(enteredValue))
-                        .limit(25)
-                        .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))
-                        .collect(Collectors.toList());
-                } else {
-                    options = factions.stream()
-                        .filter(faction -> !"ds".equals(faction.getSource()))
-                        .filter(faction -> faction.search(enteredValue))
-                        .limit(25)
-                        .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))
-                        .collect(Collectors.toList());
-                }
+                options = factions.stream()
+                    .filter(faction -> faction.search(enteredValue))
+                    .limit(25)
+                    .map(faction -> new Command.Choice(faction.getAutoCompleteName(), faction.getAlias()))
+                    .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {

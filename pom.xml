@@ -12,7 +12,7 @@
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.21.32</version>
+                <version>2.21.42</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-batch</artifactId>
-            <version>1.12.598</version>
+            <version>1.12.609</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -94,7 +94,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.13</version>
+            <version>1.4.14</version>
         </dependency>
     </dependencies>
 

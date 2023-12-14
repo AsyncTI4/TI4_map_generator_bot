@@ -71,9 +71,9 @@ public class SOInfo extends SOCardsSubcommandData {
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
             buttons.add(scoreB);
             buttons.add(discardB);
-            if (activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
-                buttons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
-            }
+            // if (activeGame.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false).size() > 0) {
+            //     buttons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeGame, false));
+            // }
             MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
 
         }

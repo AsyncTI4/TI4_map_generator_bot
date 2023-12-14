@@ -430,7 +430,7 @@ public class PlayAC extends ACCardsSubcommandData {
             codedName = "Veto";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.primary("flip_agenda", "Reveal next Agenda"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), codedMessage + codedName, codedButtons);
             }
 
             codedName = "Fighter Conscription";
@@ -509,6 +509,12 @@ public class PlayAC extends ACCardsSubcommandData {
             String fowMessage = player.getRepresentation() + " played an Action Card: " + actionCardTitle;
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, activeGame, "Played action card: " + actionCardTitle);
+        }
+        if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
+            List<Button> buttons2 = new ArrayList<>();
+            Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_"+player.getFaction(), "Use Cymiae Agent").withEmoji(Emoji.fromFormatted(Emojis.cymiae));
+            buttons2.add(hacanButton);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation(true, true)+ " you can use Cymiae agent to draw an AC", buttons2);
         }
 
         ACInfo.sendActionCardInfo(activeGame, player);

@@ -203,12 +203,11 @@ public class GameSaveLoadManager {
                     for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = activeGame.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            Player player = p1;
-                            String headerText = player.getRepresentation(true, true) + " here is your cards info";
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, loadedGame, headerText);
-                            SOInfo.sendSecretObjectiveInfo(loadedGame, player);
-                            ACInfo.sendActionCardInfo(loadedGame, player);
-                            PNInfo.sendPromissoryNoteInfo(loadedGame, player, false);
+                            String headerText = p1.getRepresentation(true, true) + " here is your cards info";
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(p1, loadedGame, headerText);
+                            SOInfo.sendSecretObjectiveInfo(loadedGame, p1);
+                            ACInfo.sendActionCardInfo(loadedGame, p1);
+                            PNInfo.sendPromissoryNoteInfo(loadedGame, p1, false);
                         }
                     }
                     GameManager.getInstance().deleteGame(activeGame.getName());
@@ -2093,7 +2092,7 @@ public class GameSaveLoadManager {
                     while (secrets.hasMoreTokens()) {
                         StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
                         String id = secretInfo.nextToken();
-                        Integer amount = Integer.parseInt(secretInfo.nextToken());
+                        int amount = Integer.parseInt(secretInfo.nextToken());
                         player.setProducedUnit(id, amount);
                     }
                 }

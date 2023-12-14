@@ -5,7 +5,7 @@
         "type": "action_card",
         "description": "A combination of PoK and homebrew action cards, with a lot of the chaff removed.",
         "cardIDs": [
-            "lead_rider", "diplo_rider", "politic_rider", "const_rider", "trade_rider", "war_rider", "tech_rider", "imp_rider", "relic_rider", "bureaucracy_rider", "defense_rider", "exploration_rider", "frontier_rider", "foreign_policy",
+            "lead_rider", "diplo_rider", "politic_rider", "const_rider", "trade_rider", "war_rider", "tech_rider", "imp_rider", "relic_rider", "schematics_rider", "defense_rider", "exploration_rider", "frontier_rider", "foreign_policy",
             "assassin", "assassin2", "assassin3", "assassin4", "bribery", "bribery2", "bribery3", "bribery4", "veto", "veto2", "veto3", "veto4", "corporate_lobbying", "corporate_lobbying2", "distinguished", "distinguished2", "insider", "insider2", "public_outcry", "public_outcry2", "confusing", "confounding", "double_agents", "repeal", "sanction",
             "fs1", "fs2", "fs3", "fs4", "mb1", "mb2", "mb3", "mb4", "sabo1", "sabo2", "sabo3", "sabo4", "sh1", "sh2", "sh3", "sh4", "s_retreat1", "s_retreat2", "s_retreat3", "s_retreat4", "dh1", "dh2", "f_conscription", "messiah",
             "arch_expedition", "arch_expedition2", "arch_expedition3", "arch_expedition4", "artifact_hunters", "artifact_hunters2", "artifact_hunters3", "artifact_hunters4", "derelict_space_station", "derelict_space_station2", "derelict_space_station3", "derelict_space_station4", "probe", "probe2", "probe3", "probe4", "professional_archeologists", "professional_archeologists2", "professional_archeologists3", "professional_archeologists4", "planetary_rigs", "planetary_rigs2", "reconstruction", "reconstruction2", "secured_trove", "secured_trove2",

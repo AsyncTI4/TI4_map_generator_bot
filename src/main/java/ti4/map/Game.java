@@ -279,7 +279,7 @@ public class Game {
     private Map<String, Integer> tileDistances = new HashMap<>();
     @Getter
     @Setter
-    private int numberOfPurgedFragments = 0;
+    private int numberOfPurgedFragments;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -2315,7 +2315,8 @@ public class Game {
 
     public void addExplore(String id) {
         if (Mapper.getExploreRepresentation(id) != null) {
-            explore.add(id);
+            int place = ThreadLocalRandom.current().nextInt(explore.size());
+            explore.add(place,id);
         }
         discardExplore.remove(id);
     }
@@ -3122,6 +3123,8 @@ public class Game {
                 }
             }
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+            planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
+            planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
         }
         return planets.keySet();
@@ -3552,9 +3555,9 @@ public class Game {
     }
 
     public void swapInVariantUnits(String source) {
-        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> source.equals(unit.getSource())).toList();
+        List<UnitModel> variantUnits = Mapper.getUnits().values().stream().filter(unit -> source.equals(unit.getSource().toString())).toList();
         for (Player player : getPlayers().values()) {
-            List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource())).toList();
+            List<UnitModel> playersUnits = player.getUnitModels().stream().filter(unit -> !source.equals(unit.getSource().toString())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
                     if ((variantUnit.getHomebrewReplacesID().isPresent() && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
@@ -3568,7 +3571,7 @@ public class Game {
             }
         }
     }
-
+    @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;
@@ -3595,7 +3598,7 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
-
+    @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;

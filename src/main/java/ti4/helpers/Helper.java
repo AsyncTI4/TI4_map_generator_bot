@@ -666,14 +666,20 @@ public class Helper {
         int inf = 0;
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
+        int bestRes = 0;
         for(String thing : spentThings){
-            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("aida") && !thing.contains("commander")){
+            if(!thing.contains("tg_") && !thing.contains("sarween") && !thing.contains("ghoti") && !thing.contains("custodia") && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")){
                 UnitHolder unitHolder = activeGame.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg = msg + "> ";
                 if (unitHolder == null) {
                     msg = msg + thing + "\n";
                 } else {
                     Planet planet = (Planet) unitHolder;
+                    if(!ButtonHelper.isTileHomeSystem(activeGame.getTileFromPlanet(planet.getName()))){
+                        if(planet.getResources() > bestRes){
+                            bestRes = planet.getResources();
+                        }
+                    }
                     if(resOrInfOrBoth.equalsIgnoreCase("res")){
                         if(xxcha){
                             msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, activeGame) +"\n";
@@ -704,7 +710,7 @@ public class Helper {
                 }
             }else{
                 if(thing.contains("sarween")){
-                    msg = msg + "> Used Sarween Tools "+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                    msg = msg + "> Used Sarween Tools "+Emojis.CyberneticTech +"\n";
                     res = res+1;
                 }
                 if(thing.contains("aida")){
@@ -715,10 +721,26 @@ public class Helper {
                     }else{
                        msg =  msg + " for a tech skip on a unit upgrade ";
                     }
-                    msg = msg+Emojis.getEmojiFromDiscord(Emojis.CyberneticTech) +"\n";
+                    msg = msg+Emojis.WarfareTech +"\n";
                 }
-                if(thing.contains("commander")){
-                     msg = msg + thing + "\n";
+                if(thing.contains("commander") || thing.contains("Gledge Agent")){
+                     msg = msg + "> "+thing + "\n";
+                }else if(thing.contains("Winnu Agent")){
+                     msg = msg +"> "+ thing + "\n";
+                    res = res +2;
+                }else if(thing.contains("Zealots Agent")){
+                    msg = msg +"> "+ thing + "(Best Resources found were "+bestRes+")\n";
+                    inf = inf +bestRes;
+                }else if(thing.contains("Agent")){
+                    msg = msg +"> "+ thing + "\n";
+                }else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Custiodia Vigilia (2/3)" + "\n";
+                    res = res + 2;
+                    inf = inf + 3;
+                } else if(thing.contains("custodia")){
+                    msg = msg +"> "+ "Ghoti (3/3)" + "\n";
+                    res = res + 3;
+                    inf = inf + 3;
                 }
             }
         }
@@ -726,7 +748,13 @@ public class Helper {
         inf = inf + tg;
         if(tg > 0){
             msg = msg + "> Spent "+tg+" tgs "+Emojis.getTGorNomadCoinEmoji(activeGame) +" ("+(player.getTg()+tg)+"->"+player.getTg()+") \n";
+            if(player.hasTech("mc")){
+                res = res + tg;
+                inf = inf + tg;
+                msg = msg + "> Counted the trade goods twice due to Mirror Computing \n";
+            }
         }
+
         if(resOrInfOrBoth.equalsIgnoreCase("res")){
             msg = msg + "For a total spend of **"+res+" Resources**";
         }else if(resOrInfOrBoth.equalsIgnoreCase("inf")){
@@ -841,7 +869,7 @@ public class Helper {
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
         unitButtons.add(ff1Button);
         if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !regulated && !"sling".equalsIgnoreCase(warfareNOtherstuff)
-            && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+            && !"chaosM".equalsIgnoreCase(warfareNOtherstuff) ) {
             Button ff2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2ff_" + tp, "Produce 2 Fighters");
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Emojis.fighter));
             unitButtons.add(ff2Button);
@@ -881,7 +909,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp, "Produce 1 Infantry on " + getPlanetRepresentation(pp, activeGame));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
-                if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff) && !regulated && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_" + pp, "Produce 2 Infantry on " + getPlanetRepresentation(pp, activeGame));
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
@@ -894,7 +922,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space" + tile.getPosition(), "Produce 1 Infantry in space");
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                 unitButtons.add(inf1Button);
-                if (!"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
+                if (!"genericBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4 && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                     Button inf2Button = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(), "Produce 2 Infantry in space");
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
@@ -1507,13 +1535,16 @@ public class Helper {
 
         for (TechnologyModel tech : techs) {
             String techName = tech.getName();
-            String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
+            String techID = tech.getAlias();
+            String buttonID;
             if (!jolNarHeroTech.equalsIgnoreCase("nope")) {
                 if (jolNarHeroTech.equalsIgnoreCase("nekro")) {
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName + "_nopay";
+                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
                 } else {
                     buttonID = "FFCC_" + player.getFaction() + "_swapTechs_" + jolNarHeroTech + "_" + tech.getAlias();
                 }
+            } else {
+                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
             }
             Button techB;
             //String requirementsEmoji = tech.getRequirementsEmoji();
