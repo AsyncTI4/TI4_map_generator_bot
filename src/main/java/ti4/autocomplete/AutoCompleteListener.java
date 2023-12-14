@@ -9,8 +9,8 @@ public class AutoCompleteListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.readyToReceiveCommands) {
-            event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+            event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0).queue();
             return;
         }
 
