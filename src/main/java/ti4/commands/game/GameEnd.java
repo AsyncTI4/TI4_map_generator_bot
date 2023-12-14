@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -106,7 +108,6 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
-        String bothelperMention = Helper.getRoleMentionByName(AsyncTI4DiscordBot.guildPrimary, "bothelper");
 
         Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
         // CREATE POST IN #THE-PBD-CHRONICLES
@@ -140,16 +141,13 @@ public class GameEnd extends GameSubcommandData {
             return;
         }
 
-        // MAKE SPACE IN IN-LIMBO
-        cleanUpInLimboCategory(event.getGuild(), 2);
-
         // MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = activeGame.getTableTalkChannel();
         TextChannel actionsChannel = activeGame.getMainGameChannel();
         if (inLimboCategory != null && archiveChannels) {
-            if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
-                cleanUpInLimboCategory(event.getGuild(), 10);
+            if (inLimboCategory.getChannels().size() >= 47) { //HANDLE FULL IN-LIMBO
+                cleanUpInLimboCategory(event.getGuild(), 3);
             }
 
             String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
@@ -256,6 +254,9 @@ public class GameEnd extends GameSubcommandData {
             BotLogger.log("`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: " + guild.getName());
             return;
         }
-        inLimboCategory.getChannels().stream().limit(channelCountToDelete).forEach(channel -> channel.delete().queue());
+        inLimboCategory.getTextChannels().stream()
+            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+            .limit(channelCountToDelete)
+            .forEach(channel -> channel.delete().queue());
     }
 }
