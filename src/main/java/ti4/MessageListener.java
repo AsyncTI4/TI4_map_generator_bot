@@ -50,7 +50,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
+        if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
