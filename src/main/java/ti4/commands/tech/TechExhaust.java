@@ -5,7 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -27,7 +27,7 @@ public class TechExhaust extends TechAddRemove {
                     "Select who you would like to mageon.", buttons);
         }
 
-        var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.TECH, techID,
+        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.TECH, techID,
                 player.getNumberTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);

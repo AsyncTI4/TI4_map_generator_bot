@@ -71,7 +71,9 @@ public class CombatCommand implements Command {
     }
 
     private Collection<CombatSubcommandData> getSubcommands() {
-      return new HashSet<>();
+        HashSet<CombatSubcommandData> hashSet = new HashSet<>();
+        hashSet.add(new CombatRoll());
+        return hashSet;
     }
 
     @Override
