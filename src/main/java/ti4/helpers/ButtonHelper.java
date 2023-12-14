@@ -2774,9 +2774,11 @@ public class ButtonHelper {
                 }
             }
         }
-
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Button.success(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
+        }
+        if (player.getTechs().contains("miltymod_hm") && !player.getExhaustedTechs().contains("miltymod_hm")) {
+            endButtons.add(Button.success(finChecker + "exhaustTech_miltymod_hm", "Exhaust Hyper Metabolism"));
         }
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Button.success(finChecker + "exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Emojis.Naaz)));
