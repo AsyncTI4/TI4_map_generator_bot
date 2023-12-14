@@ -111,22 +111,25 @@ public class CombatModHelper {
     public static void EnsureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
 
-        tempMods = tempMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns())
-                .collect(Collectors.toList());
         for (TemporaryCombatModifierModel mod : tempMods) {
-          switch (mod.getModifier().getPersistenceType()) {
-            case Constants.MOD_TEMP_ONE_COMBAT -> {
-              if (!mod.getUseInUnitHolder().equals(holder.getName())
-                  || !mod.getUseInSystem().equals(tile.getId())) {
+            if(mod.getUseInTurn() != player.getNumberTurns()){
                 player.removeTempMod(mod);
-              }
+                continue;
             }
-            case Constants.MOD_TEMP_ONE_TACTICAL_ACTION -> {
-              if (!mod.getUseInSystem().equals(tile.getId())) {
-                player.removeTempMod(mod);
-              }
+
+            switch (mod.getModifier().getPersistenceType()) {
+                case Constants.MOD_TEMP_ONE_COMBAT -> {
+                    if (!mod.getUseInUnitHolder().equals(holder.getName())
+                        || !mod.getUseInSystem().equals(tile.getId())) {
+                    player.removeTempMod(mod);
+                    }
+                }
+                case Constants.MOD_TEMP_ONE_TACTICAL_ACTION -> {
+                    if (!mod.getUseInSystem().equals(tile.getId())) {
+                    player.removeTempMod(mod);
+                    }
+                }
             }
-          }
         }
     }
 
