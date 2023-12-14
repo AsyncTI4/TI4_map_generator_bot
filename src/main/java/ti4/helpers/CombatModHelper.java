@@ -16,55 +16,15 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.model.AbilityModel;
-import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
-import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatModHelper {
-    public static String GetModifiersText(String prefixText, Map<UnitModel, Integer> units,
-            List<NamedCombatModifierModel> modifiers) {
-        String result = "";
-        if (!modifiers.isEmpty()) {
-
-            result += prefixText;
-            List<String> modifierMessages = new ArrayList<>();
-            for (NamedCombatModifierModel namedModifier : modifiers) {
-                CombatModifierModel mod = namedModifier.getModifier();
-                String unitScope = mod.getScope();
-                if (StringUtils.isNotBlank(unitScope)) {
-                    Optional<UnitModel> unitScopeModel = units.keySet().stream()
-                            .filter(unit -> unit.getAsyncId().equals(mod.getScope())).findFirst();
-                    if (unitScopeModel.isPresent()) {
-                        unitScope = Emojis.getEmojiFromDiscord(unitScopeModel.get().getBaseType());
-                    }
-                } else {
-                    unitScope = "all";
-                }
-
-                String plusPrefix = "+";
-                Integer modifierValue = mod.getValue();
-                if (modifierValue < 0) {
-                    plusPrefix = "";
-                }
-                String modifierName = namedModifier.getName();
-                if (StringUtils.isNotBlank(modifierName)) {
-                    modifierMessages.add(modifierName);
-                } else {
-                    modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
-                }
-
-            }
-            result += String.join("\n", modifierMessages) + "\n";
-        }
-        return result;
-    }
 
     public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier,
             CombatRollType rollType) {
@@ -76,143 +36,19 @@ public class CombatModHelper {
         return false;
     }
 
-    public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
-        List<TemporaryCombatModifierModel> modsToUseNow = new ArrayList<>();
-        // player.unusedCombatModifiers.add(any, player.numTurns)
-        // ....
-        // /combat_roll (000 space)
-        // - if unsused - use (unless its a different turn, then empty it)
-        // - if one_round - use - dont add to recoop
-        // - if one_combat - reuse in this combat (000 space) (add to recoop with combat
-        // details)
-        // - if one tactical action - reuse in this system & turn (000,
-        // player.num_turns) (add to recoop with system details)
-
-        // - if recooped
-        // - check against conditions - then use
-        // - otherwise remove from recoop (for one_combat, this changes as soon as
-        // unit_holder changes, for one_tactical_action this changes when system is
-        // different)
-
-        List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();
-        unusedMods = unusedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns())
-                .collect(Collectors.toList());
-        for (TemporaryCombatModifierModel mod : unusedMods) {
-            mod.setUseInSystem(tile.getId());
-            mod.setUseInUnitHolder(holder.getName());
-
-            // modsToUseNow.add(mod);
-            player.addTempCombatMod(mod);
-        }
-        // player.setTempCombatModifiers(modsToUseNow);
-        player.clearNewTempCombatModifiers();
-    }
-
-    public static void EnsureValidTempMods(Player player, TileModel tile, UnitHolder holder) {
-        List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
-
-        for (TemporaryCombatModifierModel mod : tempMods) {
-            if(mod.getUseInTurn() != player.getNumberTurns()){
-                player.removeTempMod(mod);
-                continue;
-            }
-
-            switch (mod.getModifier().getPersistenceType()) {
-                case Constants.MOD_TEMP_ONE_COMBAT -> {
-                    if (!mod.getUseInUnitHolder().equals(holder.getName())
-                        || !mod.getUseInSystem().equals(tile.getId())) {
-                    player.removeTempMod(mod);
-                    }
-                }
-                case Constants.MOD_TEMP_ONE_TACTICAL_ACTION -> {
-                    if (!mod.getUseInSystem().equals(tile.getId())) {
-                    player.removeTempMod(mod);
-                    }
-                }
-            }
-        }
-    }
-
-    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(Player player, TileModel tile,
-            UnitHolder holder, Boolean isApplyToOpponent, CombatRollType rollType) {
-        EnsureValidTempMods(player, tile, holder);
-        List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
-        List<NamedCombatModifierModel> currentRoundResults = new ArrayList<>();
-        for (TemporaryCombatModifierModel mod : tempMods) {
-            currentRoundResults.add(new NamedCombatModifierModel(mod.getModifier(),
-                    GetModfierRelatedDisplayName(player, mod.getRelatedID(), mod.getRelatedType())));
-            if (mod.getModifier().getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)) {
-                player.removeTempMod(mod);
-            }
-        }
-        currentRoundResults = currentRoundResults.stream()
-        .filter(mod -> mod.getModifier().getApplyToOpponent().equals(isApplyToOpponent))
-        .filter(mod -> mod.getModifier().getForCombatAbility().equals(rollType.toString())).toList();
-        
-        return currentRoundResults;
-    }
-
-    public static TemporaryCombatModifierModel GetPossibleTempModifier(String relatedType, String relatedID,
-            int currentTurnCount) {
-        TemporaryCombatModifierModel result = null;
-        var combatModifiers = Mapper.getCombatModifiers();
-        Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                .filter(modifier -> modifier.isRelevantTo(relatedType, relatedID)
-                        && (modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_COMBAT)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_TACTICAL_ACTION)))
-                .findFirst();
-        if (relevantMod.isPresent()) {
-            result = new TemporaryCombatModifierModel(relatedType, relatedID, relevantMod.get(), currentTurnCount);
-        }
-        return result;
-    }
-
-    public static String GetModfierRelatedDisplayName(Player player, String relatedID, String relatedType) {
-        String displayName = "";
-      switch (relatedType) {
-        case Constants.AGENDA -> {
-          AgendaModel agenda = Mapper.getAgenda(relatedID);
-          displayName = Emojis.Agenda + " " + agenda.getName();
-        }
-        case Constants.AC -> {
-          ActionCardModel actionCard = Mapper.getActionCard(relatedID);
-          displayName = actionCard.getRepresentation();
-        }
-        case Constants.PROMISSORY_NOTES -> {
-          PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
-          displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
-        }
-        case Constants.TECH -> displayName = Mapper.getTech(relatedID).getRepresentation(true);
-        case Constants.RELIC -> displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
-        case Constants.ABILITY -> displayName = Mapper.getAbility(relatedID).getRepresentation();
-        case Constants.UNIT -> {
-          UnitModel unit = Mapper.getUnit(relatedID);
-          displayName = unit.getUnitEmoji() + " "
-              + unit.getName() + " " + unit.getAbility();
-        }
-        case Constants.LEADER -> displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
-        default -> {
-        }
-      }
-        return displayName;
-    }
-
-    /// Retrieves Always on modifiers,
-    /// based on the player's info (techs, owned relics, active leaders, units),
-    /// current laws in play, units in combat, and opponent race abilities)
-    public static List<NamedCombatModifierModel> CalculateAutomaticMods(Player player, Player opponent,
+    public static List<NamedCombatModifierModel> GetModifiers(Player player, Player opponent,
             Map<UnitModel, Integer> unitsByQuantity,
             TileModel tile,
             Game activeGame,
             CombatRollType rollType,
             String modifierType) {
-        List<NamedCombatModifierModel> alwaysOnMods = new ArrayList<>();
+        List<NamedCombatModifierModel> modifiers = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
                 .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString()))
                 .filter(entry -> entry.getValue().getType().equals(modifierType))
                 .filter(entry -> !entry.getValue().getApplyToOpponent())
+                .filter(entry -> IsModInScopeForUnits(new ArrayList<>(unitsByQuantity.keySet()), entry.getValue(), rollType))
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         for (String ability : player.getAbilities()) {
@@ -224,7 +60,7 @@ public class CombatModHelper {
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
                 AbilityModel abilityModel = Mapper.getAbility(ability);
-                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
             }
         }
 
@@ -236,8 +72,9 @@ public class CombatModHelper {
             if (relevantMod.isPresent()
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
-                alwaysOnMods
-                        .add(new NamedCombatModifierModel(relevantMod.get(), Helper.getTechRepresentationLong(tech)));
+                TechnologyModel technologyModel = Mapper.getTech(tech);
+                modifiers
+                        .add(new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
             }
         }
 
@@ -250,8 +87,9 @@ public class CombatModHelper {
                 if (relevantMod.isPresent()
                         && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                                 activeGame)) {
-                    alwaysOnMods.add(
-                            new NamedCombatModifierModel(relevantMod.get(), Helper.getTechRepresentationLong(tech)));
+                    TechnologyModel technologyModel = Mapper.getTech(tech);
+                    modifiers.add(
+                            new NamedCombatModifierModel(relevantMod.get(), technologyModel.getRepresentation(true)));
                 }
             }
         }
@@ -264,7 +102,7 @@ public class CombatModHelper {
             if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent,
                     unitsByQuantity, activeGame)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
-                alwaysOnMods.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
+                modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
             }
         }
 
@@ -280,7 +118,7 @@ public class CombatModHelper {
             if (relevantMod.isPresent()
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
-                alwaysOnMods
+                modifiers
                         .add(new NamedCombatModifierModel(relevantMod.get(), Emojis.Agenda + " " + agenda.getName()));
             }
         }
@@ -294,7 +132,7 @@ public class CombatModHelper {
             if (relevantMod.isPresent()
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
-                alwaysOnMods.add(
+                modifiers.add(
                         new NamedCombatModifierModel(relevantMod.get(),
                                 Emojis.getEmojiFromDiscord(unit.getBaseType()) + " "
                                         + unit.getName() + " " + unit.getAbility()));
@@ -312,7 +150,7 @@ public class CombatModHelper {
             if (relevantMod.isPresent()
                     && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
                             activeGame)) {
-                alwaysOnMods.add(
+                modifiers.add(
                         new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
             }
         }
@@ -323,12 +161,12 @@ public class CombatModHelper {
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
             if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
                     activeGame)) {
-                alwaysOnMods.add(
+                modifiers.add(
                         new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
             }
         }
 
-        return alwaysOnMods;
+        return modifiers;
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
@@ -492,7 +330,6 @@ public class CombatModHelper {
                 }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
-                        // TODO:If player.getunittech existed, you could reuse it here.
                         scalingCount = opponent.getTechs().stream()
                                 .map(Mapper::getTech)
                                 .filter(tech -> tech.getType() == TechnologyModel.TechnologyType.UNITUPGRADE)
@@ -501,7 +338,6 @@ public class CombatModHelper {
                 }
                 case Constants.MOD_OPPONENT_FACTION_TECH -> {
                     if (opponent != null) {
-                        // player.getFactionTEchs?
                         scalingCount = opponent.getTechs().stream()
                                 .map(Mapper::getTech)
                                 .filter(tech -> StringUtils.isNotBlank(tech.getFaction().orElse("")))
@@ -517,10 +353,10 @@ public class CombatModHelper {
         return (int) value;
     }
 
-    public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods,
-            List<UnitModel> units, CombatRollType rollType) {
-        return mods.stream()
-                .filter(model -> IsModInScopeForUnits(units, model.getModifier(), rollType))
-                .toList();
-    }
+    // public static List<NamedCombatModifierModel> FilterRelevantMods(List<NamedCombatModifierModel> mods,
+    //         List<UnitModel> units, CombatRollType rollType) {
+    //     return mods.stream()
+    //             .filter(model -> IsModInScopeForUnits(units, model.getModifier(), rollType))
+    //             .toList();
+    // }
 }
