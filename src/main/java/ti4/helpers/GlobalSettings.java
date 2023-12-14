@@ -40,6 +40,10 @@ public class GlobalSettings {
         return clazz.cast(settings.get(attr));
     }
 
+    public static <T> void setSetting(ImplementedSettings setting, T val) {
+        setSetting(setting.toString(), val);
+    }
+
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, val);
         saveSettings();
