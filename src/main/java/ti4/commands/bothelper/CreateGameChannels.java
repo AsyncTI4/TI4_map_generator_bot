@@ -30,6 +30,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
+import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -330,21 +331,21 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF SECONDARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildSecondary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET SECONDARY SERVER AS DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET SECONDARY SERVER AS DEFAULT
             return guild;
         }
 
         // CHECK IF TERTIARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildTertiary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET TERTIARY SERVER AS DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET TERTIARY SERVER AS DEFAULT
             return guild;
         }
 
         // CHECK IF QUATERNARY SERVER HAS ROOM
         guild = AsyncTI4DiscordBot.guildQuaternary;
         if (serverHasRoomForNewFullCategory(guild)) {
-            GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), guild.getId()); // SET QUATERNARY SERVER AS DEFAULT
+            GlobalSettings.setSetting(ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId()); // SET QUATERNARY SERVER AS DEFAULT
             return guild;
         }
 
