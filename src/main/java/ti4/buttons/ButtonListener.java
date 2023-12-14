@@ -56,7 +56,6 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
-import ti4.commands.special.CheckDistance;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.special.NovaSeed;
@@ -66,7 +65,6 @@ import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnits;
 import ti4.generator.GenerateTile;
@@ -82,10 +80,9 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperTacticalAction;
-import ti4.helpers.CombatModHelper;
+import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -2101,7 +2098,7 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
             }
 
-            var posssibleCombatMod = CombatModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
+            var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
             if (posssibleCombatMod != null) {
                 player.addNewTempCombatMod(posssibleCombatMod);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
@@ -2177,7 +2174,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
             String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-            TemporaryCombatModifierModel combatModAC = CombatModHelper.GetPossibleTempModifier(Constants.AC, acAlias,
+            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC, acAlias,
                 player.getNumberTurns());
             if (combatModAC != null) {
                 player.addNewTempCombatMod(combatModAC);

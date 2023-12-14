@@ -113,7 +113,6 @@ public class SpecialCommand implements Command {
         subcommands.add(new SleeperToken());
         subcommands.add(new IonFlip());
         subcommands.add(new SystemInfo());
-        subcommands.add(new CombatRoll());
         subcommands.add(new StellarConverter());
         subcommands.add(new RiseOfMessiah());
         subcommands.add(new SwordsToPlowsharesTGGain());
