@@ -402,7 +402,7 @@ public class CombatHelper {
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-            List<Die> resultRolls = DiceHelper.rollDice(numRolls, toHit - modifierToHit);
+            List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
 
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
