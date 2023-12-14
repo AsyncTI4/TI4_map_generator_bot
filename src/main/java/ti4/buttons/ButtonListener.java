@@ -1241,42 +1241,45 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
             String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
-            if (!"st".equals(tech)) {
-                if ("bs".equals(tech)) {
+            player.exhaustTech(tech);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
+            switch (tech) {
+                case "st" -> { // Sarween Tools
+                    player.addSpentThing("sarween");
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                    ButtonHelper.deleteTheOneButton(event);
+                    event.getMessage().editMessage(exhaustedMessage).queue();
+                }
+                case "bs" -> { //Bio-stims
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player);
                 }
-                if ("td".equals(tech)) {
+                case "td" -> { //Transit Diodes
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player, event);
                 }
-                if ("aida".equals(tech) || "sar".equals(tech) || "htp".equals(tech)) {
+                case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
+                    Button gainCC = Button.success(player.getFinButtonChecker() + "gain_CC", "Gain CC");
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
+                }
+                case "aida", "sar", "htp" -> {
                     String exhaustedMessage = event.getMessage().getContentRaw();
                     ButtonHelper.deleteTheOneButton(event);
-                    if(buttonLabel.contains("(")){
-                        player.addSpentThing(tech+"_");
-                    }else{
+                    if (buttonLabel.contains("(")) {
+                        player.addSpentThing(tech + "_");
+                    } else {
                         player.addSpentThing(tech);
                     }
                     exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
                     event.getMessage().editMessage(exhaustedMessage).queue();
-                    
                 }
-                player.exhaustTech(tech);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
-                if ("pi".equals(tech)) {
+                case "pi" -> {
                     List<Button> redistributeButton = new ArrayList<>();
                     Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
                     redistributeButton.add(redistribute);
                     redistributeButton.add(deleButton);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                        fowIdentity + " use buttons to redistribute", redistributeButton);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", redistributeButton);
                 }
-            } else {
-                player.addSpentThing("sarween");
-                String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
-                ButtonHelper.deleteTheOneButton(event);
-                event.getMessage().editMessage(exhaustedMessage).queue();
-            }
+            }     
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
             Player planetOwner = activeGame.getPlayerFromColorOrFaction(factionOrColor);
