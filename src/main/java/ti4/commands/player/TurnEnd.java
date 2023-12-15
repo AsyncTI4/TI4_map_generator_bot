@@ -124,7 +124,9 @@ public class TurnEnd extends PlayerSubcommandData {
             FoWHelper.pingAllPlayersWithFullStats(activeGame, event, mainPlayer, "ended turn");
         }
         ButtonHelper.checkFleetInEveryTile(mainPlayer, activeGame, event);
-        ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
+        if(mainPlayer != nextPlayer){
+            ButtonHelper.checkForPrePassing(activeGame, mainPlayer);
+        }
         if(justPassed){
             if(!ButtonHelperAgents.checkForEdynAgentPreset(activeGame, mainPlayer, nextPlayer, event)){
                 TurnStart.turnStart(event, activeGame, nextPlayer);
