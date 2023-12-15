@@ -1241,8 +1241,6 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_", "");
             String techRepresentation = Mapper.getTech(tech).getRepresentation(false);
-            player.exhaustTech(tech);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
             switch (tech) {
                 case "st" -> { // Sarween Tools
                     player.addSpentThing("sarween");
@@ -1251,33 +1249,39 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "bs" -> { //Bio-stims
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeGame, event, player);
                 }
                 case "td" -> { //Transit Diodes
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.resolveTransitDiodesStep1(activeGame, player, event);
                 }
                 case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     Button gainCC = Button.success(player.getFinButtonChecker() + "gain_CC", "Gain CC");
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
                 }
                 case "aida", "sar", "htp" -> {
-                    String exhaustedMessage = event.getMessage().getContentRaw();
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     ButtonHelper.deleteTheOneButton(event);
                     if (buttonLabel.contains("(")) {
                         player.addSpentThing(tech + "_");
                     } else {
                         player.addSpentThing(tech);
                     }
-                    exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, activeGame, "res");
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "pi" -> {
-                    List<Button> redistributeButton = new ArrayList<>();
+                    player.exhaustTech(tech);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), (player.getRepresentation() + " exhausted tech: " + techRepresentation));
                     Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
                     Button deleButton = Button.danger("FFCC_" + player.getFaction() + "_" + "deleteButtons", "Delete These Buttons");
-                    redistributeButton.add(redistribute);
-                    redistributeButton.add(deleButton);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", redistributeButton);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), fowIdentity + " use buttons to redistribute", List.of(redistribute, deleButton));
                 }
             }     
         } else if (buttonID.startsWith("planetOutcomes_")) {
