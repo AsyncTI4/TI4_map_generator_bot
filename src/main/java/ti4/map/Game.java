@@ -3625,4 +3625,7 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
+
+    
+
 }

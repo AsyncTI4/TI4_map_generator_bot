@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.GenerateMap.TileStep;
+import ti4.generator.MapGenerator.TileStep;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -37,11 +37,18 @@ public class GenerateTile {
     private int width;
     private int height;
 
+    private final int extraX = 100;
+    private final int extraY = 100;
+    private final int tileHeight = 300;
+    private final int tileWidth = 345;
+    private final int tileExtraWidth = 260;
+
     private int offsetX;
     private int offsetY;
 
     private Boolean isFoWPrivate;
     private Player fowPlayer;
+    private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
 
     private static GenerateTile instance;
 
@@ -51,12 +58,7 @@ public class GenerateTile {
     }
 
     private void init(int context, String focusTile) {
-        int tileExtraWidth = 260;
-        int tileWidth = 345;
-        int extraX = 100;
         width = tileWidth + (tileExtraWidth * 2 * context) + extraX;
-        int tileHeight = 300;
-        int extraY = 100;
         height = tileHeight * (2 * context + 1) + extraY;
 
         if (focusTile == null) {
@@ -101,7 +103,7 @@ public class GenerateTile {
         init(context, focusTile);
         reset();
 
-        HashMap<String, Tile> tilesToDisplay = new HashMap<>(activeGame.getTileMap());
+        tilesToDisplay = new HashMap<>(activeGame.getTileMap());
         Set<String> systemsInRange = getTilesToShow(activeGame, context, focusTile);
         Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
         keysToRemove.removeAll(systemsInRange);
@@ -218,10 +220,10 @@ public class GenerateTile {
                 throw new Exception("Could not map tile to a position on the map: " + activeGame.getName());
             }
 
-            int tileX = positionPoint.x + offsetX - GenerateMap.TILE_PADDING;
-            int tileY = positionPoint.y + offsetY - GenerateMap.TILE_PADDING;
+            int tileX = positionPoint.x + offsetX - MapGenerator.TILE_PADDING;
+            int tileY = positionPoint.y + offsetY - MapGenerator.TILE_PADDING;
 
-            BufferedImage tileImage = GenerateMap.partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
+            BufferedImage tileImage = MapGenerator.partialTileImage(tile, activeGame, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
 
         } catch (Exception exception) {
