@@ -297,7 +297,9 @@ public class ButtonHelperTacticalAction {
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeGame, event);
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeGame, event);
         } else {
-            ButtonHelper.resolveEmpyCommanderCheck(player, activeGame, tile, event);
+            if(!activeGame.getMovedUnitsFromCurrentActivation().isEmpty()){
+                ButtonHelper.resolveEmpyCommanderCheck(player, activeGame, tile, event);
+            }
             List<Button> empyButtons = new ArrayList<>();
             if (!activeGame.getMovedUnitsFromCurrentActivation().isEmpty() && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
                 Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent").withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
@@ -376,11 +378,53 @@ public class ButtonHelperTacticalAction {
         activeGame.setL1Hero(false);
         activeGame.setCurrentReacts("planetsTakenThisRound","");
         player.setWhetherPlayerShouldBeTenMinReminded(false);
-        String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
-        List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
         activeGame.resetCurrentMovedUnitsFrom1TacticalAction();
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
 
+        if(player.doesPlayerPreferDistanceBasedTacticalActions() && !activeGame.isFoWMode() && activeGame.getRingCount() < 5){
+            alternateWayOfOfferingTiles(player, activeGame);
+        }else{
+            String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
+            List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeGame);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
+        }
+    }
+
+    public static void alternateWayOfOfferingTiles(Player player, Game activeGame){
+        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame, player);
+        List<String> initialOffering = new ArrayList<>();
+        initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, 0));
+        int maxDistance = 0;
+        List<Button> buttons = new ArrayList<>();
+        String message = "Doing a tactical action. Please select the tile you want to activate. Right now showing tiles ";
+        if(initialOffering.size()+ CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, 1).size() < 6){
+            initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, 1));
+            maxDistance = 1;
+            message = message +"0-1 tiles away";
+        }else{
+            message = message +"0 tiles away";
+        }
+        for(String pos : initialOffering){
+            buttons.add(Button.success("ringTile_"+pos, activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player)));
+        }
+        buttons.add(Button.secondary("getTilesThisFarAway_"+(maxDistance+1), "Get Tiles "+(maxDistance+1) +" Spaces Away"));
+        
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+    }
+    public static void getTilesThisFarAway(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
+        int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
+        Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(activeGame, player);
+        int maxDistance = desiredDistance;
+        List<Button> buttons = new ArrayList<>();
+        if(desiredDistance > 0){
+            buttons.add(Button.secondary("getTilesThisFarAway_"+(maxDistance-1), "Get Tiles "+(maxDistance-1) +" Spaces Away"));
+        }
+        for(String pos : CheckDistance.getAllTilesACertainDistanceAway(activeGame, player, distances, desiredDistance)){
+            buttons.add(Button.success("ringTile_"+pos, activeGame.getTileByPosition(pos).getRepresentationForButtons(activeGame, player)));
+        }
+        buttons.add(Button.secondary("getTilesThisFarAway_"+(maxDistance+1), "Get Tiles "+(maxDistance+1) +" Spaces Away"));
+        String message = "Doing a tactical action. Please select the tile you want to activate";
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), message, buttons);
+        event.getMessage().delete().queue();
     }
 
     public static void selectActiveSystem(Player player, Game activeGame, ButtonInteractionEvent event, String buttonID) {
