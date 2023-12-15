@@ -90,11 +90,11 @@ public class BothelperCommand implements Command {
 
     private Collection<BothelperSubcommandData> getSubcommands() {
         Collection<BothelperSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ImportTTPG());
+        // subcommands.add(new ImportTTPG());
         subcommands.add(new CreateGameChannels());
         subcommands.add(new CreateFOWGameChannels());
         subcommands.add(new ServerLimitStats());
-        //subcommands.add(new ListOldChannels());
+        subcommands.add(new ListOldChannels());
         subcommands.add(new ListOldThreads());
         subcommands.add(new ArchiveOldThreads());
         subcommands.add(new FixGameChannelPermissions());

@@ -236,5 +236,25 @@
       "8": "Imperial"
     },
     "description": "MiltyMod strategy cards, featuring updated Construction"
+  },
+  {
+    "name": "Infinite Tech Strategy Cards",
+    "alias": "many_techs",
+    "cardValues": {
+      "1": "Leadership",
+      "2": "Diplomacy",
+      "3": "Politics",
+      "4": "Construction",
+      "5": "Trade",
+      "6": "Warfare",
+      "7": "Technology",
+      "8": "Technology",
+      "9": "Technology",
+      "10": "Technology",
+      "11": "Technology",
+      "12": "Technology",
+      "13": "Imperial"
+    },
+    "description": "Normal Strategy Cards except with five extra Techs"
   }
 ]

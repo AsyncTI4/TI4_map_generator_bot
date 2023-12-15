@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
@@ -48,15 +47,6 @@ public class CombatHelper {
                 .filter(unit -> !duplicates.add(unit.getAsyncId()))
                 .map(UnitModel::getBaseType)
                 .toList();
-        // List<String> missing =
-        // unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
-        // .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-        // .collect(Collectors.toList());
-
-        // List<String> dupes = output.keySet().stream()
-        // .filter(unit -> !duplicates.add(unit.getAsyncId()))
-        // .map(UnitModel::getBaseType)
-        // .toList();
         for (String dupe : dupes) {
             for (UnitModel mod : output.keySet()) {
                 if (mod.getBaseType().equalsIgnoreCase(dupe) && !mod.getId().contains("2")) {
@@ -133,30 +123,7 @@ public class CombatHelper {
                             && (entry.getKey().getIsGroundForce() || entry.getKey().getIsShip()))
                     .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         }
-        Set<String> duplicates = new HashSet<>();
-        List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
-        List<String> missing = unitHolder.getUnitAsyncIdsOnHolder(colorID).keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
-
-        // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
-        }
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
-        }
-        if (missing.size() > 0 || dupes.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
@@ -186,30 +153,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-        Set<String> duplicates = new HashSet<>();
-        List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
-        List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
-
-        // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
-        }
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
-        }
-        if (missing.size() > 0 || dupes.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
@@ -237,30 +181,7 @@ public class CombatHelper {
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
                 .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
-        Set<String> duplicates = new HashSet<>();
-        List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
-        List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
-
-        // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
-        }
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
-        }
-        if (missing.size() > 0 || dupes.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
@@ -308,30 +229,7 @@ public class CombatHelper {
                 .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
-        Set<String> duplicates = new HashSet<>();
-        List<String> dupes = output.keySet().stream()
-                .filter(unit -> !duplicates.add(unit.getAsyncId()))
-                .map(UnitModel::getBaseType)
-                .collect(Collectors.toList());
-        List<String> missing = unitsByAsyncId.keySet().stream()
-                .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
-                .collect(Collectors.toList());
-
-        // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
-        }
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
-        }
-        if (event != null && (missing.size() > 0 || dupes.size() > 0)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
+        checkBadUnits(player, event, unitsByAsyncId, output);
 
         return output;
     }
@@ -422,6 +320,13 @@ public class CombatHelper {
             }
         }
 
+        checkBadUnits(player, event, unitsByAsyncId, output);
+
+        return output;
+    }
+
+    private static void checkBadUnits(Player player, GenericInteractionCreateEvent event,
+            HashMap<String, Integer> unitsByAsyncId, HashMap<UnitModel, Integer> output) {
         Set<String> duplicates = new HashSet<>();
         List<String> dupes = output.keySet().stream()
                 .filter(unit -> !duplicates.add(unit.getAsyncId()))
@@ -431,23 +336,12 @@ public class CombatHelper {
                 .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
                 .collect(Collectors.toList());
 
-        // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        if (missing.size() > 0) {
-            error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-            error.append(" Ping bothelper if this seems to be in error.\n");
-            error.append("> Unowned units: ").append(missing).append("\n");
+        if(dupes.size() > 0){
+            CombatMessageHelper.displayDuplicateUnits(event, missing);
         }
-        if (dupes.size() > 0) {
-            error.append(
-                    "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-            error.append("> Duplicate units: ").append(dupes);
+        if(missing.size() > 0){
+            CombatMessageHelper.displayMissingUnits(event, missing);
         }
-        if (missing.size() > 0 || dupes.size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
-        }
-
-        return output;
     }
 
     public static Player GetOpponent(Player player, List<UnitHolder> unitHolders, Game activeGame) {
@@ -475,21 +369,19 @@ public class CombatHelper {
     }
 
     public static String RollForUnits(Map<UnitModel, Integer> playerUnits, Map<UnitModel, Integer> opponentUnits,
-            List<NamedCombatModifierModel> extraRolls, List<NamedCombatModifierModel> customMods,
+            List<NamedCombatModifierModel> extraRolls, 
             List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
             Player opponent,
             Game activeGame, CombatRollType rollType) {
         String result = "";
 
-        List<NamedCombatModifierModel> mods = new ArrayList<>(customMods);
-        mods.addAll(autoMods);
+        List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
         mods.addAll(tempMods);
-        result += CombatModHelper.GetModifiersText("With automatic modifiers: \n", playerUnits, autoMods);
-        result += CombatModHelper.GetModifiersText("With custom modifiers: \n", playerUnits, customMods);
-        result += CombatModHelper.GetModifiersText("With temp modifiers: \n", playerUnits, tempMods);
 
-        // Display extra rolls info
-        result += CombatModHelper.GetModifiersText("With automatic extra rolls: \n", playerUnits, extraRolls);
+        List<NamedCombatModifierModel> modAndExtraRolls = new ArrayList<>(mods);
+        modAndExtraRolls.addAll(extraRolls);
+
+        result += CombatMessageHelper.displayModifiers("With modifiers: \n", playerUnits, modAndExtraRolls);
 
         // Actually roll for each unit
         int totalHits = 0;
@@ -510,71 +402,18 @@ public class CombatHelper {
             int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType);
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-            int[] resultRolls = new int[numRolls];
-            for (int index = 0; index < numRolls; index++) {
-                int min = 1;
-                int max = 10;
-                resultRolls[index] = ThreadLocalRandom.current().nextInt(max - min + 1) + min;
-            }
+            List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
 
-            int[] hitRolls = Arrays.stream(resultRolls)
-                    .filter(roll -> roll >= toHit - modifierToHit)
-                    .toArray();
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            totalHits += hitRolls;
 
-            String hitsSuffix = "";
-            totalHits += hitRolls.length;
-            if (hitRolls.length > 1) {
-                hitsSuffix = "s";
-            }
-
-            // Rolls str fragment
-            String unitRollsTextInfo = "";
-            int totalRolls = unit.getCombatDieCountForAbility(rollType) + extraRollsForUnit;
-            if (totalRolls > 1) {
-                unitRollsTextInfo = String.format("%s rolls,", unit.getCombatDieCountForAbility(rollType));
-                if (extraRollsForUnit > 0 && unit.getCombatDieCountForAbility(rollType) > 1) {
-                    unitRollsTextInfo = String.format("%s rolls (+%s rolls),",
-                            unit.getCombatDieCountForAbility(rollType),
-                            extraRollsForUnit);
-                } else if (extraRollsForUnit > 0) {
-                    unitRollsTextInfo = String.format("(+%s rolls),",
-                            extraRollsForUnit);
-                }
-            }
-
-            String unitTypeHitsInfo = String.format("hits on %s", toHit);
-            if (modifierToHit != 0) {
-                String modifierToHitString = Integer.toString(modifierToHit);
-                if (modifierToHit > 0) {
-                    modifierToHitString = "+" + modifierToHitString;
-                }
-
-                if ((toHit - modifierToHit) <= 1) {
-                    unitTypeHitsInfo = String.format("always hits (%s mods)",
-                            modifierToHitString);
-                } else {
-                    unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifierToHit),
-                            modifierToHitString);
-                }
-            }
-            String upgradedUnitName = "";
-            if (unit.getUpgradesFromUnitId().isPresent() || unit.getFaction().isPresent()) {
-                upgradedUnitName = String.format(" %s", unit.getName());
-            }
-
-            List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo,
-                    unitTypeHitsInfo);
-            String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
-                    .collect(Collectors.joining(" "));
-
-            String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());
-            resultBuilder.append(String.format("%s %s%s %s - %s hit%s\n", numOfUnit, unitEmoji, optionalText,
-                    Arrays.toString(resultRolls), hitRolls.length, hitsSuffix));
+            String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+            resultBuilder.append(unitRoll);
         }
         result = resultBuilder.toString();
 
-        result += String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
+        result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         return result;
     }
