@@ -36,6 +36,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
+
     public GameEnd() {
         super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
