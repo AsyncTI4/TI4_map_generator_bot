@@ -452,8 +452,10 @@ public class Helper {
             scSet = scSet.replace("pbd1000", "pok");
         }
 
-        return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet +
-            "_" + scAsString + ".png", "Could not find SC image!"));
+        String scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + scAsString + ".png", "Could not find SC image!");
+        if (scImagePath == null) scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png", "Could not find SC image!");
+
+        return new File(scImagePath);
     }
 
     public static Emoji getPlayerEmoji(Game activeGame, Player player, Message message) {

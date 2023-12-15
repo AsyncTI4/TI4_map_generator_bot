@@ -25,9 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Emojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.ActionCardModel;
@@ -53,6 +55,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.model.Source.ComponentSource;
+import ti4.helpers.Constants;
 
 public class Mapper {
     private static final Properties colors = new Properties();
@@ -835,5 +838,35 @@ public class Mapper {
             .map(UnitModel::getBaseType)
             .findFirst()
             .orElse(null);
+    }
+
+    public static String getRelatedName(String relatedID, String relatedType) {
+        String displayName = "";
+        switch (relatedType) {
+            case Constants.AGENDA -> {
+                AgendaModel agenda = Mapper.getAgenda(relatedID);
+                displayName = Emojis.Agenda + " " + agenda.getName();
+            }
+            case Constants.AC -> {
+                ActionCardModel actionCard = Mapper.getActionCard(relatedID);
+                displayName = actionCard.getRepresentation();
+            }
+            case Constants.PROMISSORY_NOTES -> {
+                PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(relatedID);
+                displayName = Emojis.PN + " " + pn.getName() + ": " + pn.getText();
+            }
+            case Constants.TECH -> displayName = Mapper.getTech(relatedID).getRepresentation(true);
+            case Constants.RELIC -> displayName = Mapper.getRelic(relatedID).getSimpleRepresentation();
+            case Constants.ABILITY -> displayName = Mapper.getAbility(relatedID).getRepresentation();
+            case Constants.UNIT -> {
+                UnitModel unit = Mapper.getUnit(relatedID);
+                displayName = unit.getUnitEmoji() + " "
+                    + unit.getName() + " " + unit.getAbility();
+            }
+            case Constants.LEADER -> displayName = Mapper.getLeader(relatedID).getRepresentation(true, true, false);
+            default -> {
+            }
+        }
+        return displayName;
     }
 }
