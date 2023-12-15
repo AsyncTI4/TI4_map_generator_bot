@@ -51,12 +51,12 @@ public class GenerateTile {
     }
 
     private void init(int context, String focusTile) {
-        int extraX = 100;
-        int tileWidth = 345;
         int tileExtraWidth = 260;
+        int tileWidth = 345;
+        int extraX = 100;
         width = tileWidth + (tileExtraWidth * 2 * context) + extraX;
-        int extraY = 100;
         int tileHeight = 300;
+        int extraY = 100;
         height = tileHeight * (2 * context + 1) + extraY;
 
         if (focusTile == null) {
