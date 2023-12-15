@@ -62,6 +62,7 @@ public class Player {
     private boolean readyToPassBag;
     private boolean searchWarrant;
     private boolean isDummy;
+    private boolean prefersDistanceBasedTacticalActions = false;
 
     private String faction;
     private String factionEmoji;
@@ -486,6 +487,14 @@ public class Player {
 
     public boolean isReadyToPassBag() {
         return readyToPassBag;
+    }
+
+    public boolean doesPlayerPreferDistanceBasedTacticalActions() {
+        return prefersDistanceBasedTacticalActions;
+    }
+
+    public void setPreferenceForDistanceBasedTacticalActions(boolean preference ) {
+        prefersDistanceBasedTacticalActions = preference;
     }
 
     public boolean shouldPlayerBeTenMinReminded() {
