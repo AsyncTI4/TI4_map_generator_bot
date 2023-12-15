@@ -107,6 +107,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new Observer());
         subcommands.add(new ListButtons());
         subcommands.add(new ListSlashCommandsUsed());
+        subcommands.add(new SendJsonToS3());
         return subcommands;
     }
 

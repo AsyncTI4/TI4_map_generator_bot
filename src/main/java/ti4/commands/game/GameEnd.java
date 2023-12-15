@@ -189,7 +189,10 @@ public class GameEnd extends GameSubcommandData {
         // send game json file to s3
         String JSON = ".json";
         File jsonGameFile =Storage.getMapsJSONStorage(activeGame.getName() + JSON);
-        WebHelper.putFile(activeGame.getName(), jsonGameFile);
+        Boolean isWon = activeGame.getGameWinner().isPresent() && activeGame.isHasEnded();
+        if (isWon) {
+            WebHelper.putFile(activeGame.getName(), jsonGameFile);
+        }
     }
 
     public static String getGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
