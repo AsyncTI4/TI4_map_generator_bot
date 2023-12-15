@@ -19,6 +19,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,6 +117,30 @@ public class WebHelper {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server", e);
+        }
+    }
+    public static void putFile(String gameId, File file) {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
+
+        try {
+            Region region = Region.US_EAST_1;
+            S3Client s3 = S3Client.builder()
+                    .region(region)
+                    .build();
+            String jsonPathFormat = "json_saves/%s/%s";
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(jsonPathFormat, gameId, file.getName()))
+                    .contentType("application/json")
+                    .build();
+
+            s3.putObject(request, RequestBody.fromFile(file));
+        } catch (SdkClientException e) {
+            BotLogger.log("Could not add json file for game `" + gameId + "` to web server. Likely invalid credentials.", e);
+        } catch (Exception e) {
+            BotLogger.log("Could not add json file for game `" + gameId + "` to web server", e);
         }
     }
 }
