@@ -37,18 +37,11 @@ public class GenerateTile {
     private int width;
     private int height;
 
-    private final int extraX = 100;
-    private final int extraY = 100;
-    private final int tileHeight = 300;
-    private final int tileWidth = 345;
-    private final int tileExtraWidth = 260;
-
     private int offsetX;
     private int offsetY;
 
     private Boolean isFoWPrivate;
     private Player fowPlayer;
-    private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
 
     private static GenerateTile instance;
 
@@ -58,7 +51,12 @@ public class GenerateTile {
     }
 
     private void init(int context, String focusTile) {
+        int extraX = 100;
+        int tileWidth = 345;
+        int tileExtraWidth = 260;
         width = tileWidth + (tileExtraWidth * 2 * context) + extraX;
+        int extraY = 100;
+        int tileHeight = 300;
         height = tileHeight * (2 * context + 1) + extraY;
 
         if (focusTile == null) {
@@ -103,7 +101,7 @@ public class GenerateTile {
         init(context, focusTile);
         reset();
 
-        tilesToDisplay = new HashMap<>(activeGame.getTileMap());
+        HashMap<String, Tile> tilesToDisplay = new HashMap<>(activeGame.getTileMap());
         Set<String> systemsInRange = getTilesToShow(activeGame, context, focusTile);
         Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
         keysToRemove.removeAll(systemsInRange);
