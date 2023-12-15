@@ -1751,6 +1751,8 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.replace("doActivation_", "");
             ButtonHelper.resolveOnActivationEnemyAbilities(activeGame, activeGame.getTileByPosition(pos), player, false);
             event.getMessage().delete().queue();
+        } else if(buttonID.startsWith("getTilesThisFarAway_")){
+            ButtonHelperTacticalAction.getTilesThisFarAway(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("ringTile_")) {
             ButtonHelperTacticalAction.selectActiveSystem(player, activeGame, event, buttonID);
         } else if (buttonID.startsWith("genericRemove_")) {
@@ -2279,6 +2281,7 @@ public class ButtonListener extends ListenerAdapter {
                     String text = player.getRepresentation() + " PASSED";
                     MessageHelper.sendMessageToChannel(event.getChannel(), text);
                     TurnEnd.pingNextPlayer(event, activeGame, player, true);
+                    event.getMessage().delete().queue();
                     ButtonHelper.updateMap(activeGame, event, "End of Turn (PASS) " + player.getTurnCount() + ", Round " + activeGame.getRound() + " for " + ButtonHelper.getIdent(player));
                 }
                 case "proceedToVoting" -> {
