@@ -3626,7 +3626,7 @@ public class Game {
         }
     }
 
-    public static String getSCNumberIfNaaluInPlay(Player player, Game activeGame, String scText) {
+    public static String getSCNumberIfNaaluInPlay(Player player, String scText) {
         if (player.hasAbility("telepathic")) { // naalu 0 token ability
             boolean giftPlayed = false;
             Collection<Player> activePlayers = activeGame.getPlayers().values().stream().filter(Player::isRealPlayer).toList();
