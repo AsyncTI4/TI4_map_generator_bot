@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.Storage;
+import ti4.helpers.WebHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -182,6 +185,11 @@ public class GameEnd extends GameSubcommandData {
                     "Game: **" + gameName + "** on server **" + activeGame.getGuild().getName() + "** has concluded.");
             }
         }
+
+        // send game json file to s3
+        String JSON = ".json";
+        File jsonGameFile =Storage.getMapsJSONStorage(activeGame.getName() + JSON);
+        WebHelper.putFile(activeGame.getName(), jsonGameFile);
     }
 
     public static String getGameEndText(Game activeGame, GenericInteractionCreateEvent event) {
