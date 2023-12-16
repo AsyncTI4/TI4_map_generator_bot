@@ -3625,4 +3625,24 @@ public class Game {
             player.setExhaustedTechs(newExhaustedTechs);
         }
     }
+
+    public String getSCNumberIfNaaluInPlay(Player player, String scText) {
+        if (player.hasAbility("telepathic")) { // naalu 0 token ability
+            boolean giftPlayed = false;
+            Collection<Player> activePlayers = getPlayers().values().stream().filter(Player::isRealPlayer).toList();
+            for (Player player_ : activePlayers) {
+                if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+                    giftPlayed = true;
+                    break;
+                }
+            }
+            if (!giftPlayed) {
+                scText = "0/" + scText;
+            }
+        } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+            scText = "0/" + scText;
+        }
+        return scText;
+    }
+
 }
